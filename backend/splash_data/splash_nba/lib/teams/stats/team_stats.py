@@ -1,0 +1,64 @@
+from nba_api.stats.endpoints import leaguedashteamstats, leaguehustlestatsteam
+import logging
+
+
+def fetch_team_stats(team_id, season):
+    # Init return variables
+    team_basic_stats = {}
+    team_adv_stats = {}
+    team_hustle_stats = {}
+
+    for attempt in range(1, 4):
+        try:
+            # Get basic stats
+            basic_stats = leaguedashteamstats.LeagueDashTeamStats(
+                season=season, timeout=30
+            ).get_normalized_dict()['LeagueDashTeamStats']
+
+            for team in basic_stats:
+                if team['TEAM_ID'] == team_id:
+                    team_basic_stats = team
+                    team_basic_stats['LEAGUE_TEAMS'] = len(basic_stats)
+            break
+        except Exception as e:
+            logging.error(f'Error retrieving basic stats: {e}')
+
+    # Advanced Stats only available for 2015-16 and beyond.
+    if season >= '1996-97':
+        for attempt in range(1, 4):
+            try:
+                adv_stats = leaguedashteamstats.LeagueDashTeamStats(
+                    season=season, measure_type_detailed_defense='Advanced', timeout=30
+                ).get_normalized_dict()['LeagueDashTeamStats']
+
+                for team in adv_stats:
+                    if team['TEAM_ID'] == team_id:
+                        team_adv_stats = team
+                        team_adv_stats['LEAGUE_TEAMS'] = len(adv_stats)
+                break
+            except Exception as e:
+                logging.error(f'Error retrieving advanced stats: {e}')
+
+    # Hustle Stats only available for 2015-16 and beyond.
+    if season >= '2015-16':
+        for attempt in range(1, 4):
+            try:
+                hustle_stats = leaguehustlestatsteam.LeagueHustleStatsTeam(
+                    season=season, timeout=30
+                ).get_normalized_dict()['HustleStatsTeam']
+
+                for team in hustle_stats:
+                    if team['TEAM_ID'] == team_id:
+                        team_hustle_stats = team
+                        team_hustle_stats['LEAGUE_TEAMS'] = len(hustle_stats)
+                break
+            except Exception as e:
+                logging.error(f'Error retrieving hustle stats: {e}')
+
+    team_stats = {
+        'BASIC': team_basic_stats,
+        'ADV': team_adv_stats,
+        'HUSTLE': team_hustle_stats
+    }
+
+    return team_stats
