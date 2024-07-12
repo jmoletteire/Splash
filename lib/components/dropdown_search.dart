@@ -139,10 +139,10 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
       items: categorizedFields.values.expand((list) => list).toList(),
       popupProps: PopupProps.dialog(
         fit: FlexFit.loose,
-        dialogProps: DialogProps(backgroundColor: Colors.grey.shade900),
+        dialogProps: DialogProps(backgroundColor: Color(0xFF121212)),
         containerBuilder: (context, dialogState) {
           return Dialog(
-            backgroundColor: Colors.grey.shade900,
+            backgroundColor: Color(0xFF121212),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(10.0),
               child: Column(
@@ -161,6 +161,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                           fontStyle: FontStyle.italic,
                         ),
                       ),
+                      const SizedBox(height: 8.0),
                       GridView.count(
                         padding: const EdgeInsets.only(bottom: 10.0),
                         shrinkWrap: true,
@@ -184,6 +185,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 5.0, vertical: 0.0),
                                 decoration: BoxDecoration(
+                                    color: Colors.grey.shade900,
                                     border:
                                         Border.all(color: Colors.deepOrange),
                                     borderRadius: BorderRadius.circular(10.0)),
