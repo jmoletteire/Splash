@@ -278,7 +278,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
   },
-  'SHOOTING': {
+  'SCORING': {
     'PTS': {
       'location': 'BASIC',
       'secondaryLocation': '',
@@ -1280,7 +1280,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
   },
-  'SHOOTING': {
+  'SCORING': {
     'PTS': {
       'location': ['BASIC'],
       'TOTAL': {
@@ -1472,69 +1472,6 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of 3-point field goal attempts a player shoots compared to the number of total field goal attempts they shoot.',
       'formula': '3PA / FGA'
     },
-    'fill3': {'first_available': '2013'},
-    'WIDE_OPEN_3_PCT': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '6+ Feet - Wide Open'
-      ],
-      'TOTAL': {
-        'nba_name': 'FG3_PCT',
-        'rank_nba_name': 'FG3_PCT_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'FG3_PCT',
-        'rank_nba_name': 'FG3_PCT_RANK',
-      },
-      'splash_name': 'WIDE OPEN 3%',
-      'full_name': 'Wide Open Three-Point FG%',
-      'first_available': '2013',
-      'convert': 'true',
-      'round': '1',
-      'definition':
-          'The number of 3-point field goal attempts a player shoots with no defenders within 6 feet of the shot.',
-      'formula': ''
-    },
-    'CATCH_N_SHOOT_3_PCT': {
-      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
-      'TOTAL': {
-        'nba_name': 'FG3_PCT',
-        'rank_nba_name': 'FG3_PCT_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'FG3_PCT',
-        'rank_nba_name': 'FG3_PCT_RANK',
-      },
-      'splash_name': 'C&S 3%',
-      'full_name': 'Catch & Shoot Three-Point FG%',
-      'first_available': '2013',
-      'convert': 'true',
-      'round': '1',
-      'definition':
-          'The number of 3-point field goal attempts a player shoots compared to the number of total field goal attempts they shoot.',
-      'formula': ''
-    },
-    'PULL_UP_3_PCT': {
-      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
-      'TOTAL': {
-        'nba_name': 'FG3_PCT',
-        'rank_nba_name': 'FG3_PCT_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'FG3_PCT',
-        'rank_nba_name': 'FG3_PCT_RANK',
-      },
-      'splash_name': 'PULL UP 3%',
-      'full_name': 'Pull Up Three-Point FG%',
-      'first_available': '2013',
-      'convert': 'true',
-      'round': '1',
-      'definition':
-          'The number of 3-point field goal attempts a player shoots compared to the number of total field goal attempts they shoot.',
-      'formula': ''
-    },
     'fill4': {'first_available': '1996'},
     'FTM': {
       'location': ['BASIC'],
@@ -1611,103 +1548,548 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': 'FTA / FGA'
     },
   },
-  'DEFENSE': {
-    'DRTG_ON': {
-      'location': ['ADV'],
+  'SHOT TYPE': {
+    'CNS_FREQ': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
       'TOTAL': {
-        'nba_name': 'DEF_RATING',
-        'rank_nba_name': 'DEF_RATING_RANK',
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
       },
       'PER_75': {
-        'nba_name': 'DEF_RATING',
-        'rank_nba_name': 'DEF_RATING_RANK',
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
       },
-      'splash_name': 'DRTG - ON',
-      'full_name': 'Defensive Rating - On',
-      'first_available': '2007',
-      'convert': 'false',
+      'splash_name': 'C&S FREQ',
+      'full_name': 'Frequency',
+      'first_available': '2013',
+      'convert': 'true',
       'round': '1',
       'definition':
-          'Team\'s points allowed per 100 possessions when player is on court.',
+          'The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
       'formula': ''
     },
-    'fill': {'first_available': '2016'},
-    'STL': {
-      'location': ['BASIC'],
+    'PU_FREQ': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
       'TOTAL': {
-        'nba_name': 'STL',
-        'rank_nba_name': 'STL_RANK',
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
       },
       'PER_75': {
-        'nba_name': 'STL_PER_75',
-        'rank_nba_name': 'STL_PER_75_RANK',
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
       },
-      'splash_name': 'STL',
-      'full_name': 'Steals',
+      'splash_name': 'PULL UP FREQ',
+      'full_name': 'Frequency',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
+      'formula': ''
+    },
+    'LT10_FREQ': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Less than 10 ft'],
+      'TOTAL': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'splash_name': '< 10FT FREQ',
+      'full_name': 'Frequency',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
+      'formula': ''
+    },
+    'fill': {'first_available': '2013'},
+    'CNS_FG%': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
+      'TOTAL': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'splash_name': 'C&S FG%',
+      'full_name': 'Field Goal Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'The percentage of field goal attempts that a player makes.',
+      'formula': 'FGM / FGA'
+    },
+    'PU_FG%': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
+      'TOTAL': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'splash_name': 'PULL UP FG%',
+      'full_name': 'Field Goal Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'The percentage of field goal attempts that a player makes.',
+      'formula': 'FGM / FGA'
+    },
+    'LT10_FG%': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Less than 10 ft'],
+      'TOTAL': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'splash_name': '< 10FT FG%',
+      'full_name': 'Field Goal Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'The percentage of field goal attempts that a player makes.',
+      'formula': 'FGM / FGA'
+    },
+    'fill2': {'first_available': '2013'},
+    'CNS_3P%': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
+      'TOTAL': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'splash_name': 'C&S 3P%',
+      'full_name': 'Three-Point Field Goal Percentage',
       'first_available': '1996',
-      'convert': 'false',
-      'round': '0',
+      'convert': 'true',
+      'round': '1',
       'definition':
-          'Number of times a defensive player or team takes the ball from a player on offense, causing a turnover.',
-      'formula': ''
+          'The percentage of 3-point field goal attempts that a player makes.',
+      'formula': '3PM / 3PA'
     },
-    'DEFLECTIONS': {
-      'location': ['HUSTLE'],
+    'PU_3P%': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
       'TOTAL': {
-        'nba_name': 'DEFLECTIONS',
-        'rank_nba_name': 'DEFLECTIONS_RANK',
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
       },
       'PER_75': {
-        'nba_name': 'DEFLECTIONS_PER_75',
-        'rank_nba_name': 'DEFLECTIONS_PER_75_RANK',
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
       },
-      'splash_name': 'DEFLECTIONS',
-      'full_name': 'Deflections',
-      'first_available': '2016',
-      'convert': 'false',
-      'round': '0',
-      'definition':
-          'The number of times a defensive player or team gets their hand on the ball on a non-shot attempt.',
-      'formula': ''
-    },
-    'fill2': {'first_available': '2016'},
-    'BLK': {
-      'location': ['BASIC'],
-      'TOTAL': {
-        'nba_name': 'BLK',
-        'rank_nba_name': 'BLK_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'BLK_PER_75',
-        'rank_nba_name': 'BLK_PER_75_RANK',
-      },
-      'splash_name': 'BLK',
-      'full_name': 'Blocks',
+      'splash_name': 'PULL UP 3P%',
+      'full_name': 'Three-Point Field Goal Percentage',
       'first_available': '1996',
-      'convert': 'false',
-      'round': '0',
+      'convert': 'true',
+      'round': '1',
       'definition':
-          'A block occurs when an offensive player attempts a shot, and the defense player tips the ball, blocking their chance to score.',
-      'formula': ''
+          'The percentage of 3-point field goal attempts that a player makes.',
+      'formula': '3PM / 3PA'
     },
-    'CONTESTED_SHOTS': {
-      'location': ['HUSTLE'],
+    'fill3': {'first_available': '2013'},
+    'CNS_eFG%': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
       'TOTAL': {
-        'nba_name': 'CONTESTED_SHOTS',
-        'rank_nba_name': 'CONTESTED_SHOTS_RANK',
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
       },
       'PER_75': {
-        'nba_name': 'CONTESTED_SHOTS_PER_75',
-        'rank_nba_name': 'CONTESTED_SHOTS_PER_75_RANK',
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
       },
-      'splash_name': 'CONTESTED SHOTS',
-      'full_name': 'Contested Shots',
-      'first_available': '2016',
-      'convert': 'false',
-      'round': '0',
+      'splash_name': 'C&S eFG%',
+      'full_name': 'Effective Field Goal Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
       'definition':
-          'The number of times a defensive player or team closes out and raises a hand to contest a shot prior to its release.',
+          'Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
+      'formula': '((FGM + (0.5 * 3PM)) / FGA'
+    },
+    'PU_eFG%': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
+      'TOTAL': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'splash_name': 'PULL UP eFG%',
+      'full_name': 'Effective Field Goal Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
+      'formula': '((FGM + (0.5 * 3PM)) / FGA'
+    },
+  },
+  'CLOSEST DEFENDER': {
+    'VT_FREQ': {
+      'location': [
+        'ADV',
+        'SHOOTING',
+        'CLOSEST_DEFENDER',
+        '0-2 Feet - Very Tight'
+      ],
+      'TOTAL': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'splash_name': 'VERY TIGHT - FREQ',
+      'full_name': 'Frequency (Very Tight)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Very Tight - Closest defender is within 2 feet of the player.\n\nFrequency - The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
       'formula': ''
+    },
+    'T_FREQ': {
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '2-4 Feet - Tight'],
+      'TOTAL': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'splash_name': 'TIGHT - FREQ',
+      'full_name': 'Frequency (Tight)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Tight - Closest defender is 2-4 feet from the player.\n\nFrequency - The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
+      'formula': ''
+    },
+    'O_FREQ': {
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
+      'TOTAL': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'splash_name': 'OPEN - FREQ',
+      'full_name': 'Frequency (Open)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Open - Closest defender is 4-6 feet from the player.\n\nFrequency - The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
+      'formula': ''
+    },
+    'WO_FREQ': {
+      'location': [
+        'ADV',
+        'SHOOTING',
+        'CLOSEST_DEFENDER',
+        '6+ Feet - Wide Open'
+      ],
+      'TOTAL': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FGA_FREQUENCY',
+        'rank_nba_name': 'FGA_FREQUENCY_RANK',
+      },
+      'splash_name': 'WIDE OPEN - FREQ',
+      'full_name': 'Frequency (Wide Open)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Wide Open - No defender within 6+ feet of the player.\n\nFrequency - The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
+      'formula': ''
+    },
+    'fill': {'first_available': '2013'},
+    'VT_FG%': {
+      'location': [
+        'ADV',
+        'SHOOTING',
+        'CLOSEST_DEFENDER',
+        '0-2 Feet - Very Tight'
+      ],
+      'TOTAL': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'splash_name': 'VERY TIGHT - FG%',
+      'full_name': 'Field Goal Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Very Tight - Closest defender is within 2 feet of the player.\n\nFG% - The percentage of field goal attempts that a player makes.',
+      'formula': 'FGM / FGA'
+    },
+    'T_FG%': {
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '2-4 Feet - Tight'],
+      'TOTAL': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'splash_name': 'TIGHT - FG%',
+      'full_name': 'Field Goal Percentage (Tight)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Tight - Closest defender is 2-4 feet from the player.\n\nFG% - The percentage of field goal attempts that a player makes.',
+      'formula': 'FGM / FGA'
+    },
+    'O_FG%': {
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
+      'TOTAL': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'splash_name': 'OPEN - FG%',
+      'full_name': 'Field Goal Percentage (Open)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Open - Closest defender is 4-6 feet from the player.\n\nFG% - The percentage of field goal attempts that a player makes.',
+      'formula': 'FGM / FGA'
+    },
+    'WO_FG%': {
+      'location': [
+        'ADV',
+        'SHOOTING',
+        'CLOSEST_DEFENDER',
+        '6+ Feet - Wide Open'
+      ],
+      'TOTAL': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG_PCT',
+        'rank_nba_name': 'FG_PCT_RANK',
+      },
+      'splash_name': 'WIDE OPEN - FG%',
+      'full_name': 'Field Goal Percentage (Wide Open)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Wide Open - No defender within 6+ feet of the player.\n\nFG% - The percentage of field goal attempts that a player makes.',
+      'formula': 'FGM / FGA'
+    },
+    'fill2': {'first_available': '2013'},
+    'VT_3P%': {
+      'location': [
+        'ADV',
+        'SHOOTING',
+        'CLOSEST_DEFENDER',
+        '0-2 Feet - Very Tight'
+      ],
+      'TOTAL': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'splash_name': 'VERY TIGHT - 3P%',
+      'full_name': 'Three-Point Field Goal Percentage (Very Tight)',
+      'first_available': '1996',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Very Tight - Closest defender is within 2 feet of the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
+      'formula': '3PM / 3PA'
+    },
+    'T_3P%': {
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '2-4 Feet - Tight'],
+      'TOTAL': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'splash_name': 'TIGHT - 3P%',
+      'full_name': 'Three-Point Field Goal Percentage (Tight)',
+      'first_available': '1996',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Open - Closest defender is 2-4 feet from the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
+      'formula': '3PM / 3PA'
+    },
+    'O_3P%': {
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
+      'TOTAL': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'splash_name': 'OPEN - 3P%',
+      'full_name': 'Three-Point Field Goal Percentage (Open)',
+      'first_available': '1996',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Open - Closest defender is 4-6 feet from the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
+      'formula': '3PM / 3PA'
+    },
+    'WO_3P%': {
+      'location': [
+        'ADV',
+        'SHOOTING',
+        'CLOSEST_DEFENDER',
+        '6+ Feet - Wide Open'
+      ],
+      'TOTAL': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'FG3_PCT',
+        'rank_nba_name': 'FG3_PCT_RANK',
+      },
+      'splash_name': 'WIDE OPEN - 3P%',
+      'full_name': 'Three-Point Field Goal Percentage (Wide Open)',
+      'first_available': '1996',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Wide Open - No defender within 6+ feet of the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
+      'formula': '3PM / 3PA'
+    },
+    'fill3': {'first_available': '2013'},
+    'VT_eFG%': {
+      'location': [
+        'ADV',
+        'SHOOTING',
+        'CLOSEST_DEFENDER',
+        '0-2 Feet - Very Tight'
+      ],
+      'TOTAL': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'splash_name': 'VERY TIGHT - eFG%',
+      'full_name': 'Effective Field Goal Percentage (Very Tight)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Very Tight - Closest defender is within 2 feet of the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
+      'formula': '((FGM + (0.5 * 3PM)) / FGA'
+    },
+    'T_eFG%': {
+      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
+      'TOTAL': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'splash_name': 'TIGHT - eFG%',
+      'full_name': 'Effective Field Goal Percentage (Tight)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Tight - Closest defender is 2-4 feet from the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
+      'formula': '((FGM + (0.5 * 3PM)) / FGA'
+    },
+    'O_eFG%': {
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
+      'TOTAL': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'splash_name': 'OPEN - eFG%',
+      'full_name': 'Effective Field Goal Percentage (Open)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Open - Closest defender is 4-6 feet from the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
+      'formula': '((FGM + (0.5 * 3PM)) / FGA'
+    },
+    'WO_eFG%': {
+      'location': [
+        'ADV',
+        'SHOOTING',
+        'CLOSEST_DEFENDER',
+        '6+ Feet - Wide Open'
+      ],
+      'TOTAL': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'EFG_PCT',
+        'rank_nba_name': 'EFG_PCT_RANK',
+      },
+      'splash_name': 'WIDE OPEN - eFG%',
+      'full_name': 'Effective Field Goal Percentage (Wide Open)',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Wide Open - No defender within 6+ feet of the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
+      'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
   },
   'REBOUNDING': {
@@ -2037,6 +2419,105 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition':
           'The percentage of passes by a player that are assists, free throw assists, or secondary assists.',
       'formula': 'ADJ AST / Passes'
+    },
+  },
+  'DEFENSE': {
+    'DRTG_ON': {
+      'location': ['ADV'],
+      'TOTAL': {
+        'nba_name': 'DEF_RATING',
+        'rank_nba_name': 'DEF_RATING_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DEF_RATING',
+        'rank_nba_name': 'DEF_RATING_RANK',
+      },
+      'splash_name': 'DRTG - ON',
+      'full_name': 'Defensive Rating - On',
+      'first_available': '2007',
+      'convert': 'false',
+      'round': '1',
+      'definition':
+          'Team\'s points allowed per 100 possessions when player is on court.',
+      'formula': ''
+    },
+    'fill': {'first_available': '2016'},
+    'STL': {
+      'location': ['BASIC'],
+      'TOTAL': {
+        'nba_name': 'STL',
+        'rank_nba_name': 'STL_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'STL_PER_75',
+        'rank_nba_name': 'STL_PER_75_RANK',
+      },
+      'splash_name': 'STL',
+      'full_name': 'Steals',
+      'first_available': '1996',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'Number of times a defensive player or team takes the ball from a player on offense, causing a turnover.',
+      'formula': ''
+    },
+    'DEFLECTIONS': {
+      'location': ['HUSTLE'],
+      'TOTAL': {
+        'nba_name': 'DEFLECTIONS',
+        'rank_nba_name': 'DEFLECTIONS_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DEFLECTIONS_PER_75',
+        'rank_nba_name': 'DEFLECTIONS_PER_75_RANK',
+      },
+      'splash_name': 'DEFLECTIONS',
+      'full_name': 'Deflections',
+      'first_available': '2016',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'The number of times a defensive player or team gets their hand on the ball on a non-shot attempt.',
+      'formula': ''
+    },
+    'fill2': {'first_available': '2016'},
+    'BLK': {
+      'location': ['BASIC'],
+      'TOTAL': {
+        'nba_name': 'BLK',
+        'rank_nba_name': 'BLK_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'BLK_PER_75',
+        'rank_nba_name': 'BLK_PER_75_RANK',
+      },
+      'splash_name': 'BLK',
+      'full_name': 'Blocks',
+      'first_available': '1996',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'A block occurs when an offensive player attempts a shot, and the defense player tips the ball, blocking their chance to score.',
+      'formula': ''
+    },
+    'CONTESTED_SHOTS': {
+      'location': ['HUSTLE'],
+      'TOTAL': {
+        'nba_name': 'CONTESTED_SHOTS',
+        'rank_nba_name': 'CONTESTED_SHOTS_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'CONTESTED_SHOTS_PER_75',
+        'rank_nba_name': 'CONTESTED_SHOTS_PER_75_RANK',
+      },
+      'splash_name': 'CONTESTED SHOTS',
+      'full_name': 'Contested Shots',
+      'first_available': '2016',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'The number of times a defensive player or team closes out and raises a hand to contest a shot prior to its release.',
+      'formula': ''
     },
   },
   'HUSTLE': {

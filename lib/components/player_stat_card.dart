@@ -30,11 +30,11 @@ class PlayerStatCard extends StatelessWidget {
       if (value is Map<String, dynamic> && value.containsKey(key)) {
         value = value[key];
       } else {
-        return null; // Return null if any key is not found
+        return 0; // Return null if any key is not found
       }
     }
 
-    return value[stat];
+    return value[stat] ?? 0;
   }
 
   @override
@@ -183,7 +183,7 @@ class StatisticRow extends StatelessWidget {
                   textAlign: TextAlign.start,
                   style: const TextStyle(
                     fontFamily: 'Anton',
-                    fontSize: 13.0,
+                    fontSize: 12.5,
                     letterSpacing: 0.0,
                     color: Color(0xFFCFCFCF),
                   ),

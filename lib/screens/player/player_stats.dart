@@ -326,7 +326,23 @@ class _PlayerStatsState extends State<PlayerStats> {
                           PlayerStatCard(
                             playerStats: widget.player['STATS'][selectedSeason],
                             selectedSeason: selectedSeason,
-                            statGroup: 'SHOOTING',
+                            statGroup: 'SCORING',
+                            perMode: perMode,
+                            isPlayoffs: _isPlayoffs,
+                          ),
+                        if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
+                          PlayerStatCard(
+                            playerStats: widget.player['STATS'][selectedSeason],
+                            selectedSeason: selectedSeason,
+                            statGroup: 'SHOT TYPE',
+                            perMode: perMode,
+                            isPlayoffs: _isPlayoffs,
+                          ),
+                        if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
+                          PlayerStatCard(
+                            playerStats: widget.player['STATS'][selectedSeason],
+                            selectedSeason: selectedSeason,
+                            statGroup: 'CLOSEST DEFENDER',
                             perMode: perMode,
                             isPlayoffs: _isPlayoffs,
                           ),
@@ -436,17 +452,20 @@ class _PlayerStatsState extends State<PlayerStats> {
                           flex: 1,
                           child: Stack(
                             children: [
-                              Transform.rotate(
-                                angle:
-                                    -1.5708, // Rotate 90 degrees counterclockwise
-                                child: CupertinoSwitch(
-                                  activeColor: teamColor,
-                                  value: _isPlayoffs,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _isPlayoffs = value;
-                                    });
-                                  },
+                              Transform.scale(
+                                scale: 0.9,
+                                child: Transform.rotate(
+                                  angle:
+                                      -1.5708, // Rotate 90 degrees counterclockwise
+                                  child: CupertinoSwitch(
+                                    activeColor: teamColor,
+                                    value: _isPlayoffs,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _isPlayoffs = value;
+                                      });
+                                    },
+                                  ),
                                 ),
                               ),
                               Positioned(

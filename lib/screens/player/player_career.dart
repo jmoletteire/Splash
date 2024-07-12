@@ -200,7 +200,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
                         : Alignment.centerRight,
                 child: Text(
                   columnNames[column],
-                  style: kBebasBold.copyWith(
+                  style: kBebasWhite.copyWith(
                     fontSize: 16.0,
                   ),
                 ),

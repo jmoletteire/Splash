@@ -1418,86 +1418,15 @@ class _PlayerComparisonState extends State<PlayerComparison> {
             right: 0,
             child: Opacity(
               opacity: _opacity,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                color: Colors.grey.shade900,
-                height: 65.0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PlayerHome(
-                                teamId: playerOne['TEAM_ID'].toString(),
-                                playerId: playerOne['PERSON_ID'].toString(),
-                              ),
-                            ),
-                          );
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius:
-                                    MediaQuery.of(context).size.width * 0.055,
-                                backgroundColor: Colors.white70,
-                                foregroundImage: NetworkImage(
-                                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerOne['PERSON_ID']}.png'),
-                              ),
-                              const SizedBox(width: 10.0),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AutoSizeText(
-                                    playerOne['FIRST_NAME'],
-                                    textAlign: TextAlign.start,
-                                    style:
-                                        kBebasOffWhite.copyWith(fontSize: 15.0),
-                                    maxLines: 1,
-                                  ),
-                                  AutoSizeText(
-                                    playerOne['LAST_NAME'],
-                                    textAlign: TextAlign.start,
-                                    style:
-                                        kBebasOffWhite.copyWith(fontSize: 18.0),
-                                    maxLines: 1,
-                                  ),
-                                  Row(
-                                    children: [
-                                      AutoSizeText(
-                                        playerOne['POSITION'],
-                                        style: kBebasNormal.copyWith(
-                                            color: Colors.grey.shade400,
-                                            fontSize: 12.0),
-                                        maxLines: 1,
-                                      ),
-                                      const SizedBox(width: 5.0),
-                                      ConstrainedBox(
-                                        constraints: const BoxConstraints(
-                                            maxWidth: 20.0),
-                                        child: Image.asset(
-                                          'images/NBA_Logos/${playerOne['TEAM_ID']}.png',
-                                          fit: BoxFit.contain,
-                                          alignment: Alignment.center,
-                                          width: 20.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (playerTwo.isNotEmpty)
+              child: IgnorePointer(
+                ignoring: _opacity != 1,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  color: Colors.grey.shade900,
+                  height: 65.0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -1505,8 +1434,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PlayerHome(
-                                  teamId: playerTwo['TEAM_ID'].toString(),
-                                  playerId: playerTwo['PERSON_ID'].toString(),
+                                  teamId: playerOne['TEAM_ID'].toString(),
+                                  playerId: playerOne['PERSON_ID'].toString(),
                                 ),
                               ),
                             );
@@ -1516,25 +1445,35 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                           children: [
                             Row(
                               children: [
+                                CircleAvatar(
+                                  radius:
+                                      MediaQuery.of(context).size.width * 0.055,
+                                  backgroundColor: Colors.white70,
+                                  foregroundImage: NetworkImage(
+                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerOne['PERSON_ID']}.png'),
+                                ),
+                                const SizedBox(width: 10.0),
                                 Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     AutoSizeText(
-                                      playerTwo['FIRST_NAME'],
+                                      playerOne['FIRST_NAME'],
+                                      textAlign: TextAlign.start,
                                       style: kBebasOffWhite.copyWith(
                                           fontSize: 15.0),
                                       maxLines: 1,
                                     ),
                                     AutoSizeText(
-                                      playerTwo['LAST_NAME'],
-                                      style:
-                                          kBebasWhite.copyWith(fontSize: 18.0),
+                                      playerOne['LAST_NAME'],
+                                      textAlign: TextAlign.start,
+                                      style: kBebasOffWhite.copyWith(
+                                          fontSize: 18.0),
                                       maxLines: 1,
                                     ),
                                     Row(
                                       children: [
                                         AutoSizeText(
-                                          playerTwo['POSITION'],
+                                          playerOne['POSITION'],
                                           style: kBebasNormal.copyWith(
                                               color: Colors.grey.shade400,
                                               fontSize: 12.0),
@@ -1545,30 +1484,100 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                           constraints: const BoxConstraints(
                                               maxWidth: 20.0),
                                           child: Image.asset(
-                                            'images/NBA_Logos/${playerTwo['TEAM_ID']}.png',
+                                            'images/NBA_Logos/${playerOne['TEAM_ID']}.png',
                                             fit: BoxFit.contain,
                                             alignment: Alignment.center,
-                                            width: 20.0,
+                                            width: 18.0,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
-                                const SizedBox(width: 10.0),
-                                CircleAvatar(
-                                  radius:
-                                      MediaQuery.of(context).size.width * 0.055,
-                                  backgroundColor: Colors.white70,
-                                  foregroundImage: NetworkImage(
-                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png'),
-                                ),
                               ],
                             ),
                           ],
                         ),
                       ),
-                  ],
+                      if (playerTwo.isNotEmpty)
+                        IgnorePointer(
+                          ignoring: _opacity == 1 ? false : true,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PlayerHome(
+                                      teamId: playerTwo['TEAM_ID'].toString(),
+                                      playerId:
+                                          playerTwo['PERSON_ID'].toString(),
+                                    ),
+                                  ),
+                                );
+                              });
+                            },
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        AutoSizeText(
+                                          playerTwo['FIRST_NAME'],
+                                          style: kBebasOffWhite.copyWith(
+                                              fontSize: 15.0),
+                                          maxLines: 1,
+                                        ),
+                                        AutoSizeText(
+                                          playerTwo['LAST_NAME'],
+                                          style: kBebasWhite.copyWith(
+                                              fontSize: 18.0),
+                                          maxLines: 1,
+                                        ),
+                                        Row(
+                                          children: [
+                                            AutoSizeText(
+                                              playerTwo['POSITION'],
+                                              style: kBebasNormal.copyWith(
+                                                  color: Colors.grey.shade400,
+                                                  fontSize: 12.0),
+                                              maxLines: 1,
+                                            ),
+                                            const SizedBox(width: 5.0),
+                                            ConstrainedBox(
+                                              constraints: const BoxConstraints(
+                                                  maxWidth: 20.0),
+                                              child: Image.asset(
+                                                'images/NBA_Logos/${playerTwo['TEAM_ID']}.png',
+                                                fit: BoxFit.contain,
+                                                alignment: Alignment.center,
+                                                width: 18.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 10.0),
+                                    CircleAvatar(
+                                      radius:
+                                          MediaQuery.of(context).size.width *
+                                              0.055,
+                                      backgroundColor: Colors.white70,
+                                      foregroundImage: NetworkImage(
+                                          'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),

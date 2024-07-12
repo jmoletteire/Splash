@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:splash/components/custom_circle_avatar.dart';
 import 'package:splash/screens/player/player_home.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -212,6 +213,7 @@ class _TeamRosterState extends State<TeamRoster> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
+                    bool networkImageFailed = false;
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -240,11 +242,9 @@ class _TeamRosterState extends State<TeamRoster> {
                               flex: 11,
                               child: Row(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 20.0,
-                                    backgroundColor: Colors.white12,
-                                    foregroundImage: NetworkImage(
-                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png'),
+                                  PlayerAvatar(
+                                    playerImageUrl:
+                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png',
                                   ),
                                   const SizedBox(
                                     width: 15.0,
