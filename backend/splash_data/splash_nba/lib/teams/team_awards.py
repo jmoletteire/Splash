@@ -4,7 +4,7 @@ from splash_nba.util.env import uri
 import logging
 
 
-def fetch_team_details(team_id):
+def fetch_team_awards(team_id):
     team_details = teamdetails.TeamDetails(team_id).get_normalized_dict()
     league_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsChampionships']]
     conf_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsConf']]
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         logging.info("Connected to MongoDB")
 
         for team in teams_collection.find():
-            fetch_team_details(team['id'])
+            fetch_team_awards(team['id'])
 
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

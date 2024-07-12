@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:splash/components/custom_circle_avatar.dart';
+import 'package:splash/components/player_avatar.dart';
 import 'package:splash/screens/player/player_home.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -243,6 +243,8 @@ class _TeamRosterState extends State<TeamRoster> {
                               child: Row(
                                 children: [
                                   PlayerAvatar(
+                                    radius: 20.0,
+                                    backgroundColor: Colors.white12,
                                     playerImageUrl:
                                         'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png',
                                   ),

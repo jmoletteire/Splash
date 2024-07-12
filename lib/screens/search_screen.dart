@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/player/player_home.dart';
 import 'package:splash/screens/team/team_home.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../components/player_avatar.dart';
 import '../utilities/nba_api/library/network.dart';
 
 class SearchProvider with ChangeNotifier {
@@ -92,12 +92,11 @@ class SearchScreen extends StatelessWidget {
                         ),
                         title: Row(
                           children: [
-                            CircleAvatar(
+                            PlayerAvatar(
                               radius: 20.0,
                               backgroundColor: Colors.white12,
-                              foregroundColor: Colors.white12,
-                              foregroundImage: NetworkImage(
-                                  'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png'),
+                              playerImageUrl:
+                                  'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
                             ),
                             const SizedBox(
                               width: 15.0,
@@ -127,8 +126,8 @@ class SearchScreen extends StatelessWidget {
                           children: [
                             Container(
                               margin: const EdgeInsets.only(left: 4.0),
-                              child: SvgPicture.asset(
-                                '/Users/jackmole/StudioProjects/Splash/images/NBA_Logos/${team['TEAM_ID']}.svg',
+                              child: Image.asset(
+                                'images/NBA_Logos/${team['TEAM_ID']}.png',
                                 fit: BoxFit.contain,
                                 width: 40,
                                 height: 40,

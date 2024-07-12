@@ -9,6 +9,7 @@ import 'package:splash/screens/player/player_home.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../components/custom_icon_button.dart';
+import '../../components/player_avatar.dart';
 import '../../components/search_widget.dart';
 import '../../utilities/player.dart';
 import '../search_screen.dart';
@@ -218,13 +219,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                   padding: const EdgeInsets.all(15.0),
                                   child: Column(
                                     children: [
-                                      CircleAvatar(
+                                      PlayerAvatar(
                                         radius:
                                             MediaQuery.of(context).size.width *
                                                 0.06,
                                         backgroundColor: Colors.white70,
-                                        foregroundImage: NetworkImage(
-                                            'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerOne['PERSON_ID']}.png'),
+                                        playerImageUrl:
+                                            'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerOne['PERSON_ID']}.png',
                                       ),
                                       const SizedBox(height: 5.0),
                                       AutoSizeText(
@@ -312,13 +313,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               child: Column(
                                 children: [
                                   if (playerTwo.isNotEmpty)
-                                    CircleAvatar(
+                                    PlayerAvatar(
                                       radius:
                                           MediaQuery.of(context).size.width *
                                               0.06,
                                       backgroundColor: Colors.white70,
-                                      foregroundImage: NetworkImage(
-                                          'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png'),
+                                      playerImageUrl:
+                                          'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png',
                                     ),
                                   if (playerTwo.isEmpty)
                                     SvgPicture.asset(
@@ -1445,12 +1446,12 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                           children: [
                             Row(
                               children: [
-                                CircleAvatar(
+                                PlayerAvatar(
                                   radius:
                                       MediaQuery.of(context).size.width * 0.055,
                                   backgroundColor: Colors.white70,
-                                  foregroundImage: NetworkImage(
-                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerOne['PERSON_ID']}.png'),
+                                  playerImageUrl:
+                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerOne['PERSON_ID']}.png',
                                 ),
                                 const SizedBox(width: 10.0),
                                 Column(
@@ -1562,13 +1563,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                       ],
                                     ),
                                     const SizedBox(width: 10.0),
-                                    CircleAvatar(
+                                    PlayerAvatar(
                                       radius:
                                           MediaQuery.of(context).size.width *
                                               0.055,
                                       backgroundColor: Colors.white70,
-                                      foregroundImage: NetworkImage(
-                                          'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png'),
+                                      playerImageUrl:
+                                          'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png',
                                     ),
                                   ],
                                 ),

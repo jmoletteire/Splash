@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
+import '../../components/animated_polar_chart.dart';
 import '../../components/player_stat_card.dart';
-import '../../utilities/animated_polar_chart.dart';
 import '../../utilities/constants.dart';
 
 class PlayerStats extends StatefulWidget {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:splash/components/player_avatar.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../screens/search_screen.dart';
@@ -54,12 +55,11 @@ class SearchWidget extends StatelessWidget {
                         ),
                         title: Row(
                           children: [
-                            CircleAvatar(
+                            PlayerAvatar(
                               radius: 20.0,
                               backgroundColor: Colors.white12,
-                              foregroundColor: Colors.white12,
-                              foregroundImage: NetworkImage(
-                                  'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png'),
+                              playerImageUrl:
+                                  'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
                             ),
                             const SizedBox(
                               width: 15.0,

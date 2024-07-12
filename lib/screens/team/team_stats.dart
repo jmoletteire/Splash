@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
+import '../../components/animated_polar_chart.dart';
 import '../../components/team_stat_card.dart';
-import '../../utilities/animated_polar_chart.dart';
 
 class TeamStats extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -269,7 +269,7 @@ class _TeamStatsState extends State<TeamStats> {
               TeamStatCard(
                 teamStats: widget.team['seasons'][selectedSeason]['STATS'],
                 selectedSeason: selectedSeason,
-                statGroup: 'SHOOTING',
+                statGroup: 'SCORING',
                 perMode: perMode,
               ),
             if (seasons.indexOf(selectedSeason) < 28)

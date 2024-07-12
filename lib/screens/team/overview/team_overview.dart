@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:splash/components/player_avatar.dart';
 import 'package:splash/screens/team/overview/team_last_lineup.dart';
 import 'package:splash/screens/team/overview/team_latest_news.dart';
 import 'package:splash/screens/team/overview/team_recent_transactions.dart';
@@ -113,11 +114,11 @@ class _TeamOverviewState extends State<TeamOverview> {
                       ),
                       Row(
                         children: [
-                          CircleAvatar(
+                          PlayerAvatar(
                             radius: 10.0,
                             backgroundColor: Colors.white24,
-                            foregroundImage: NetworkImage(
-                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.team['coaches'][0]['COACH_ID']}.png'),
+                            playerImageUrl:
+                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.team['coaches'][0]['COACH_ID']}.png',
                           ),
                           const SizedBox(
                             width: 10.0,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:splash/screens/scoreboard.dart';
-import 'package:splash/screens/standings.dart';
+import 'package:splash/screens/standings/standings.dart';
 import 'package:splash/utilities/constants.dart';
+
+import '../screens/more/more.dart';
 
 class TabHomeScreen extends StatefulWidget {
   const TabHomeScreen({super.key});
@@ -111,6 +113,8 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
         return Scoreboard();
       case "Standings":
         return Standings();
+      case "More":
+        return More();
       default:
         return Container(
           child: Center(

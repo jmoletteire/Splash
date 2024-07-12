@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
+import 'package:splash/components/player_avatar.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/player_career.dart';
 import 'package:splash/screens/player/player_comparison.dart';
@@ -190,11 +191,11 @@ class _PlayerHomeState extends State<PlayerHome>
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         if (_showImage)
-                          CircleAvatar(
+                          PlayerAvatar(
                             radius: MediaQuery.of(context).size.width * 0.04,
                             backgroundColor: Colors.white70,
-                            foregroundImage: NetworkImage(
-                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png'),
+                            playerImageUrl:
+                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
                           ),
                         const SizedBox(width: 15.0),
                         Flexible(
@@ -315,11 +316,11 @@ class PlayerInfo extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          CircleAvatar(
+          PlayerAvatar(
             radius: MediaQuery.of(context).size.width * 0.125,
             backgroundColor: Colors.white70,
-            foregroundImage: NetworkImage(
-                'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png'),
+            playerImageUrl:
+                'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
           ),
           const SizedBox(
             width: 20.0,

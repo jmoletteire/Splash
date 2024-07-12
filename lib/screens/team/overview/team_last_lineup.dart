@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:splash/components/player_avatar.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../player/player_home.dart';
@@ -199,11 +200,11 @@ class PlayerCard extends StatelessWidget {
       },
       child: Column(
         children: [
-          CircleAvatar(
+          PlayerAvatar(
             radius: 30,
             backgroundColor: Colors.grey.shade800,
-            foregroundImage: NetworkImage(
-                'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png'),
+            playerImageUrl:
+                'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
           ),
           const SizedBox(height: 5.0),
           Text(

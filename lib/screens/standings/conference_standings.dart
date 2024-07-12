@@ -5,7 +5,7 @@ import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
 import 'package:splash/utilities/constants.dart';
 
-import '../screens/team/team_home.dart';
+import '../team/team_home.dart';
 
 class ConferenceStandings extends StatefulWidget {
   final List columnNames;

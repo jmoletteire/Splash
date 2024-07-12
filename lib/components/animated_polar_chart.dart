@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:splash/utilities/polar_area_painter.dart';
+import 'package:splash/components/polar_area_painter.dart';
 
 class AnimatedPolarAreaChart extends StatefulWidget {
   final Key key;
