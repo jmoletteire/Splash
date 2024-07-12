@@ -10,7 +10,7 @@ const kSplashText = Text(
       TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 35.0),
 );
 
-const String kFlaskUrl = "564fd55dc952.ngrok.app";
+const String kFlaskUrl = "ee4de391eec5.ngrok.app";
 
 /// ******************************************************
 ///                    TEXT STYLES

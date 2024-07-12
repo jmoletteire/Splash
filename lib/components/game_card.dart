@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:splash/utilities/constants.dart';
 
 class GameCard extends StatefulWidget {
@@ -43,22 +44,32 @@ class _GameCardState extends State<GameCard> {
                   Expanded(
                     flex: 4,
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] !=
-                            null) ...[
-                          const Icon(
-                            Icons.tv_sharp, // TV icon
-                            color: Colors.white70,
-                            size: 14.0,
-                          ),
-                          const SizedBox(width: 4),
-                        ],
                         Text(
                           summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
                           style: kGameCardTextStyle.copyWith(
                               color: Colors.white70),
                           textAlign: TextAlign.start,
                         ),
+                        if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] !=
+                            null) ...[
+                          const SizedBox(width: 5),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] !=
+                              'NBA TV')
+                            const Icon(
+                              Icons.tv_sharp, // TV icon
+                              color: Colors.white70,
+                              size: 14.0,
+                            ),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] ==
+                              'NBA TV')
+                            SvgPicture.asset(
+                              'images/NBA_TV.svg',
+                              width: 12.0,
+                              height: 12.0,
+                            ),
+                        ],
                       ],
                     ),
                   ),

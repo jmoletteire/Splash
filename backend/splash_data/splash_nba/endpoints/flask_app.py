@@ -1,10 +1,12 @@
+import os
+
 from flask import Flask, jsonify, request
 from pymongo import MongoClient
-from splash_nba.util.env import uri
 import logging
 
-app = Flask(__name__)
+from splash_nba.util.env import uri
 
+app = Flask(__name__)
 
 @app.route('/search', methods=['GET'])
 def search():
