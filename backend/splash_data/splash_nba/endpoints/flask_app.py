@@ -8,6 +8,31 @@ from splash_nba.util.env import uri
 
 app = Flask(__name__)
 
+
+@app.route('/stats_query', methods=['POST'])
+def apply_filters():
+    filters = request.json
+    query = build_query(filters)
+    results = players_collection.find(query).sort("STATS.BASIC.PTS", -1)
+    results_list = list(results)
+    return jsonify(results_list)
+
+def build_query(filters):
+    query = {"$and": []}
+    for field, condition in filters.items():
+        operator = condition['operator']
+        value = condition['value']
+        if operator == 'gt':
+            query["$and"].append({f"STATS.{field}": {"$gt": value}})
+        elif operator == 'lt':
+            query["$and"].append({f"STATS.{field}": {"$lt": value}})
+        elif operator == 'eq':
+            query["$and"].append({f"STATS.{field}": value})
+        elif operator == 'contains':
+            query["$and"].append({f"STATS.{field}": {"$regex": value, "$options": "i"}})
+    return query
+
+
 @app.route('/search', methods=['GET'])
 def search():
     try:

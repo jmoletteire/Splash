@@ -14,107 +14,38 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
       ValueNotifier<String?>(null);
 
   Map<String, List<String>> categorizedFields = {
-    "Efficiency": [
-      "GP",
-      "MIN",
-      "MPG",
-      "POSS",
-      "POSS PER GM",
-      "PACE",
-      "ORTG",
-      "DRTG",
-      "NRTG",
-      "USAGE",
-      "TOUCHES",
-      "PTS PER TOUCH",
-      "SEC PER TOUCH",
-      "DRIB PER TOUCH",
-      "% SHOOT",
-      "% PASS",
-      "% TOV",
-      "% FOULED",
-    ],
-    "Scoring": [
-      "PTS",
-      "eFG%",
-      "TS%",
-      "FGM",
-      "FGA",
-      "FG%",
-      "3PM",
-      "3PA",
-      "3PA Rate",
-      "3P%",
-      "FTM",
-      "FTA",
-      "FT%",
-      "FTA Rate",
-    ],
-    "Shot Type": [
-      "C&S Freq",
-      "Pull Up Freq",
-      "< 10ft Freq",
-      "C&S FG%",
-      "Pull Up FG%",
-      "< 10ft FG%",
-      "C&S 3P%",
-      "Pull Up 3P%",
-      "C&S eFG%",
-      "Pull Up eFG%",
-    ],
-    'Closest Defender': [
-      'Very Tight FREQ',
-      'Very Tight FG%',
-      'Very Tight 3P%',
-      'Very Tight eFG%',
-      'Tight FREQ',
-      'Tight FG%',
-      'Tight 3P%',
-      'Tight eFG%',
-      'Open FREQ',
-      'Open FG%',
-      'Open 3P%',
-      'Open eFG%',
-      'Wide Open FREQ',
-      'Wide Open FG%',
-      'Wide Open 3P%',
-      'Wide Open eFG%'
-    ],
-    "Rebounding": [
-      "REB",
-      "OREB",
-      "DREB",
-      "OREB%",
-      "DREB%",
-      "BOX OUTS",
-      "OFF BOX OUTS",
-      "DEF BOX OUTS",
-    ],
-    "Passing": [
-      "AST",
-      "2nd AST",
-      "FT AST",
-      "ADJ AST",
-      "POTENTIAL AST",
-      "AST PTS",
-      "AST%",
-      "AST-PASS %",
-      "ADJ AST-PASS %"
-    ],
-    "Defense": [
-      "DRTG - ON",
-      "STL",
-      "DFLCT",
-      "BLK",
-      "CNTST",
-    ],
-    "Hustle": [
-      "SCREEN AST",
-      "SCREEN AST PTS",
-      "CHARGES DRAWN",
-      "FOULS",
-      "FOULS DRAWN"
-    ]
+    "Efficiency": kPlayerStatLabelMap['EFFICIENCY']
+        .keys
+        .where((key) => !key.contains("fill"))
+        .toList(),
+    "Scoring": kPlayerStatLabelMap['SCORING']
+        .keys
+        .where((key) => !key.contains("fill"))
+        .toList(),
+    "Shot Type": kPlayerStatLabelMap['SHOT TYPE']
+        .keys
+        .where((key) => !key.contains("fill"))
+        .toList(),
+    'Closest Defender': kPlayerStatLabelMap['CLOSEST DEFENDER']
+        .keys
+        .where((key) => !key.contains("fill"))
+        .toList(),
+    "Rebounding": kPlayerStatLabelMap['REBOUNDING']
+        .keys
+        .where((key) => !key.contains("fill"))
+        .toList(),
+    "Passing": kPlayerStatLabelMap['PASSING']
+        .keys
+        .where((key) => !key.contains("fill"))
+        .toList(),
+    "Defense": kPlayerStatLabelMap['DEFENSE']
+        .keys
+        .where((key) => !key.contains("fill"))
+        .toList(),
+    "Hustle": kPlayerStatLabelMap['HUSTLE']
+        .keys
+        .where((key) => !key.contains("fill"))
+        .toList(),
   };
 
   @override
@@ -139,10 +70,10 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
       items: categorizedFields.values.expand((list) => list).toList(),
       popupProps: PopupProps.dialog(
         fit: FlexFit.loose,
-        dialogProps: DialogProps(backgroundColor: Color(0xFF121212)),
+        dialogProps: const DialogProps(backgroundColor: Color(0xFF121212)),
         containerBuilder: (context, dialogState) {
           return Dialog(
-            backgroundColor: Color(0xFF121212),
+            backgroundColor: const Color(0xFF121212),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(10.0),
               child: Column(

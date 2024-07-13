@@ -17,6 +17,7 @@ class _LeadersState extends State<Leaders> {
   late String seasonType;
 
   List<String> seasonTypes = ['Regular Season', 'Playoffs'];
+  List<String> positions = ['G', 'F', 'C', 'G-F', 'F-C'];
 
   @override
   void initState() {
@@ -165,7 +166,7 @@ class _LeadersState extends State<Leaders> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 15.0),
+                          const SizedBox(height: 30.0),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -214,6 +215,24 @@ class _LeadersState extends State<Leaders> {
                                       hintStyle: kBebasNormal.copyWith(
                                           fontSize: 16.5)),
                                   onSaved: (value) => _value = value!,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 30.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 40.0,
+                                width: 40.0,
+                                child: FloatingActionButton(
+                                  onPressed: () {},
+                                  child: Text(
+                                    '+',
+                                    style: kBebasBold.copyWith(
+                                        color: Colors.black, fontSize: 28.0),
+                                  ),
                                 ),
                               ),
                             ],

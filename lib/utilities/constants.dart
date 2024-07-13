@@ -979,7 +979,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The number of game minutes a player was on the court.',
       'formula': ''
     },
-    'MIN_PER_GM': {
+    'MPG': {
       'location': ['ADV'],
       'TOTAL': {
         'nba_name': 'MIN',
@@ -1016,7 +1016,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The number of team possessions a player was on the court.',
       'formula': ''
     },
-    'POSS_PER_GM': {
+    'POSS PER GM': {
       'location': ['ADV'],
       'TOTAL': {
         'nba_name': 'POSS_PER_GM',
@@ -1055,7 +1055,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'A team\'s number of possessions per 48 minutes when this player is on the court.',
       'formula': ''
     },
-    'ORTG_ON_OFF': {
+    'ORTG': {
       'location': ['ADV'],
       'TOTAL': {
         'nba_name': 'OFF_RATING_ON_OFF',
@@ -1074,7 +1074,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Difference in team\'s points scored per 100 possessions when player is on court vs. when player is off court.',
       'formula': 'ORTG (On) - ORTG (Off)'
     },
-    'DRTG_ON_OFF': {
+    'DRTG': {
       'location': ['ADV'],
       'TOTAL': {
         'nba_name': 'DEF_RATING_ON_OFF',
@@ -1093,7 +1093,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Difference in team\'s points allowed per 100 possessions when player is on court vs. when player is off court.',
       'formula': 'DRTG (On) - DRTG (Off)'
     },
-    'NRTG_ON_OFF': {
+    'NRTG': {
       'location': ['ADV'],
       'TOTAL': {
         'nba_name': 'NET_RATING_ON_OFF',
@@ -1151,7 +1151,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill3': {'first_available': '2013'},
-    'PTS_PER_TOUCH': {
+    'PTS PER TOUCH': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
         'nba_name': 'PTS_PER_TOUCH',
@@ -1169,7 +1169,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The number of points scored by a player per touch.',
       'formula': ''
     },
-    'SECONDS_PER_TOUCH': {
+    'SECONDS PER TOUCH': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
         'nba_name': 'AVG_SEC_PER_TOUCH',
@@ -1187,7 +1187,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The number of times a player dribbles the ball per touch.',
       'formula': ''
     },
-    'DRIBBLES_PER_TOUCH': {
+    'DRIBBLES PER TOUCH': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
         'nba_name': 'AVG_DRIB_PER_TOUCH',
@@ -1206,7 +1206,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill4': {'first_available': '2013'},
-    'FGA_PER_TOUCH': {
+    '% SHOOT': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
         'nba_name': 'FGA_PER_TOUCH',
@@ -1224,7 +1224,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The percentage of touches a player shot the ball.',
       'formula': ''
     },
-    'PASSES_PER_TOUCH': {
+    '% PASS': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
         'nba_name': 'PASSES_PER_TOUCH',
@@ -1243,7 +1243,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of touches a player passed the ball to a teammate.',
       'formula': ''
     },
-    'TOV_PER_TOUCH': {
+    '% TOV': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
         'nba_name': 'TOV_PER_TOUCH',
@@ -1261,7 +1261,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The percentage of touches a player turned the ball over.',
       'formula': ''
     },
-    'PFD_PER_TOUCH': {
+    '% FOULED': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
         'nba_name': 'PFD_PER_TOUCH',
@@ -1453,7 +1453,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
-    '3PAr': {
+    '3PA RATE': {
       'location': ['BASIC'],
       'TOTAL': {
         'nba_name': '3PAr',
@@ -1528,7 +1528,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of free throw attempts that a player makes.',
       'formula': 'FTM / FTA'
     },
-    'FTr': {
+    'FTA RATE': {
       'location': ['BASIC'],
       'TOTAL': {
         'nba_name': 'FTAr',
@@ -1549,7 +1549,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
   },
   'SHOT TYPE': {
-    'CNS_FREQ': {
+    'C&S FREQ': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
       'TOTAL': {
         'nba_name': 'FGA_FREQUENCY',
@@ -1568,7 +1568,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
       'formula': ''
     },
-    'PU_FREQ': {
+    'PULL UP FREQ': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
       'TOTAL': {
         'nba_name': 'FGA_FREQUENCY',
@@ -1587,7 +1587,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
       'formula': ''
     },
-    'LT10_FREQ': {
+    '< 10FT FREQ': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Less than 10 ft'],
       'TOTAL': {
         'nba_name': 'FGA_FREQUENCY',
@@ -1607,7 +1607,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill': {'first_available': '2013'},
-    'CNS_FG%': {
+    'C&S FG%': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
       'TOTAL': {
         'nba_name': 'FG_PCT',
@@ -1626,7 +1626,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
-    'PU_FG%': {
+    'PULL UP FG%': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
       'TOTAL': {
         'nba_name': 'FG_PCT',
@@ -1645,7 +1645,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
-    'LT10_FG%': {
+    '< 10FT FG%': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Less than 10 ft'],
       'TOTAL': {
         'nba_name': 'FG_PCT',
@@ -1665,7 +1665,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': 'FGM / FGA'
     },
     'fill2': {'first_available': '2013'},
-    'CNS_3P%': {
+    'C&S 3P%': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
       'TOTAL': {
         'nba_name': 'FG3_PCT',
@@ -1684,7 +1684,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
-    'PU_3P%': {
+    'PULL UP 3P%': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
       'TOTAL': {
         'nba_name': 'FG3_PCT',
@@ -1704,7 +1704,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': '3PM / 3PA'
     },
     'fill3': {'first_available': '2013'},
-    'CNS_eFG%': {
+    'C&S eFG%': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Catch and Shoot'],
       'TOTAL': {
         'nba_name': 'EFG_PCT',
@@ -1723,7 +1723,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
-    'PU_eFG%': {
+    'PULL UP eFG%': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
       'TOTAL': {
         'nba_name': 'EFG_PCT',
@@ -1744,7 +1744,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
   },
   'CLOSEST DEFENDER': {
-    'VT_FREQ': {
+    'VERY TIGHT FREQ': {
       'location': [
         'ADV',
         'SHOOTING',
@@ -1768,7 +1768,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Very Tight - Closest defender is within 2 feet of the player.\n\nFrequency - The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
       'formula': ''
     },
-    'T_FREQ': {
+    'TIGHT FREQ': {
       'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '2-4 Feet - Tight'],
       'TOTAL': {
         'nba_name': 'FGA_FREQUENCY',
@@ -1787,7 +1787,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Tight - Closest defender is 2-4 feet from the player.\n\nFrequency - The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
       'formula': ''
     },
-    'O_FREQ': {
+    'OPEN FREQ': {
       'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
       'TOTAL': {
         'nba_name': 'FGA_FREQUENCY',
@@ -1806,7 +1806,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Open - Closest defender is 4-6 feet from the player.\n\nFrequency - The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
       'formula': ''
     },
-    'WO_FREQ': {
+    'WIDE OPEN FREQ': {
       'location': [
         'ADV',
         'SHOOTING',
@@ -1831,7 +1831,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill': {'first_available': '2013'},
-    'VT_FG%': {
+    'VERY TIGHT FG%': {
       'location': [
         'ADV',
         'SHOOTING',
@@ -1855,7 +1855,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Very Tight - Closest defender is within 2 feet of the player.\n\nFG% - The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
-    'T_FG%': {
+    'TIGHT FG%': {
       'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '2-4 Feet - Tight'],
       'TOTAL': {
         'nba_name': 'FG_PCT',
@@ -1874,7 +1874,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Tight - Closest defender is 2-4 feet from the player.\n\nFG% - The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
-    'O_FG%': {
+    'OPEN FG%': {
       'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
       'TOTAL': {
         'nba_name': 'FG_PCT',
@@ -1893,7 +1893,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Open - Closest defender is 4-6 feet from the player.\n\nFG% - The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
-    'WO_FG%': {
+    'WIDE OPEN FG%': {
       'location': [
         'ADV',
         'SHOOTING',
@@ -1918,7 +1918,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': 'FGM / FGA'
     },
     'fill2': {'first_available': '2013'},
-    'VT_3P%': {
+    'VERY TIGHT 3P%': {
       'location': [
         'ADV',
         'SHOOTING',
@@ -1942,7 +1942,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Very Tight - Closest defender is within 2 feet of the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
-    'T_3P%': {
+    'TIGHT 3P%': {
       'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '2-4 Feet - Tight'],
       'TOTAL': {
         'nba_name': 'FG3_PCT',
@@ -1961,7 +1961,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Open - Closest defender is 2-4 feet from the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
-    'O_3P%': {
+    'OPEN 3P%': {
       'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
       'TOTAL': {
         'nba_name': 'FG3_PCT',
@@ -1980,7 +1980,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Open - Closest defender is 4-6 feet from the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
-    'WO_3P%': {
+    'WIDE OPEN 3P%': {
       'location': [
         'ADV',
         'SHOOTING',
@@ -2005,7 +2005,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': '3PM / 3PA'
     },
     'fill3': {'first_available': '2013'},
-    'VT_eFG%': {
+    'VERY TIGHT eFG%': {
       'location': [
         'ADV',
         'SHOOTING',
@@ -2029,7 +2029,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Very Tight - Closest defender is within 2 feet of the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
-    'T_eFG%': {
+    'TIGHT eFG%': {
       'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
       'TOTAL': {
         'nba_name': 'EFG_PCT',
@@ -2048,7 +2048,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Tight - Closest defender is 2-4 feet from the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
-    'O_eFG%': {
+    'OPEN eFG%': {
       'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
       'TOTAL': {
         'nba_name': 'EFG_PCT',
@@ -2067,7 +2067,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Open - Closest defender is 4-6 feet from the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
-    'WO_eFG%': {
+    'WIDE OPEN eFG%': {
       'location': [
         'ADV',
         'SHOOTING',
@@ -2190,7 +2190,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill2': {'first_available': '2016'},
-    'BOX_OUTS': {
+    'BOX OUTS': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'BOX_OUTS',
@@ -2209,7 +2209,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of times a player made physical contact with an opponent who was actively pursuing a rebound, showed visible progress or strong effort in disadvantaging the opponent, and successfully prevented that opponent from securing the rebound.',
       'formula': ''
     },
-    'OFF_BOX_OUTS': {
+    'OFF BOX OUTS': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'OFF_BOXOUTS',
@@ -2228,7 +2228,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of times an offensive player made physical contact with an opponent who was actively pursuing a rebound, showed visible progress or strong effort in disadvantaging the opponent, and successfully prevented that opponent from securing the rebound.',
       'formula': ''
     },
-    'DEF_BOX_OUTS': {
+    'DEF BOX OUTS': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'DEF_BOXOUTS',
@@ -2268,7 +2268,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of passes made by a player that lead directly to a made basket',
       'formula': ''
     },
-    'SECONDARY_AST': {
+    '2ND AST': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
         'nba_name': 'SECONDARY_AST',
@@ -2287,7 +2287,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'A player is awarded a secondary assist if they passed the ball to a player who recorded an assist within 1 second and without dribbling.',
       'formula': ''
     },
-    'FT_AST': {
+    'FT AST': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
         'nba_name': 'FT_AST',
@@ -2306,7 +2306,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'A player is awarded a free throw assist if they passed the ball to a player who drew a shooting foul within one dribble of receiving the pass.',
       'formula': ''
     },
-    'AST_ADJ': {
+    'ADJ AST': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
         'nba_name': 'AST_ADJ',
@@ -2326,7 +2326,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': 'AST + FT AST + Secondary AST'
     },
     'fill': {'first_available': '2013'},
-    'POTENTIAL_AST': {
+    'POT. AST': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
         'nba_name': 'POTENTIAL_AST',
@@ -2345,7 +2345,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Any pass to a teammate who shoots within 1 dribble of receiving the ball.',
       'formula': ''
     },
-    'AST_PTS_CREATED': {
+    'AST PTS CREATED': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
         'nba_name': 'AST_PTS_CREATED',
@@ -2364,7 +2364,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill2': {'first_available': '2013'},
-    'AST_PCT': {
+    'AST%': {
       'location': ['ADV'],
       'TOTAL': {
         'nba_name': 'AST_PCT',
@@ -2383,7 +2383,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of teammate field goals a player assisted on while they were on the floor.',
       'formula': 'AST / (TmFGM - FGM)'
     },
-    'AST_TO_PASS_PCT': {
+    'AST-PASS %': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
         'nba_name': 'AST_TO_PASS_PCT',
@@ -2401,7 +2401,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The percentage of passes by a player that are assists.',
       'formula': 'AST / Passes'
     },
-    'AST_TO_PASS_PCT_ADJ': {
+    'ADJ AST-PASS %': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
         'nba_name': 'AST_TO_PASS_PCT_ADJ',
@@ -2422,7 +2422,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
   },
   'DEFENSE': {
-    'DRTG_ON': {
+    'DRTG - ON': {
       'location': ['ADV'],
       'TOTAL': {
         'nba_name': 'DEF_RATING',
@@ -2461,7 +2461,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Number of times a defensive player or team takes the ball from a player on offense, causing a turnover.',
       'formula': ''
     },
-    'DEFLECTIONS': {
+    'DEFLECTS': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'DEFLECTIONS',
@@ -2500,7 +2500,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'A block occurs when an offensive player attempts a shot, and the defense player tips the ball, blocking their chance to score.',
       'formula': ''
     },
-    'CONTESTED_SHOTS': {
+    'CONTESTS': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'CONTESTED_SHOTS',
@@ -2521,7 +2521,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
   },
   'HUSTLE': {
-    'SCREEN_ASSISTS': {
+    'SCREEN AST': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'SCREEN_ASSISTS',
@@ -2540,7 +2540,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of times an offensive player sets a screen for a teammate that directly leads to a made field goal by that teammate.',
       'formula': ''
     },
-    'SCREEN_AST_PTS': {
+    'SCREEN AST PTS': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'SCREEN_AST_PTS',
@@ -2559,7 +2559,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill': {'first_available': '2016'},
-    'LOOSE_BALLS_RECOVERED': {
+    'LOOSE BALLS': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'LOOSE_BALLS_RECOVERED',
@@ -2579,7 +2579,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill2': {'first_available': '2016'},
-    'PF': {
+    'FOULS': {
       'location': ['BASIC'],
       'TOTAL': {
         'nba_name': 'PF',
@@ -2597,7 +2597,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The number of personal fouls a player committed.',
       'formula': ''
     },
-    'PFD': {
+    'FOULS DRAWN': {
       'location': ['BASIC'],
       'TOTAL': {
         'nba_name': 'PFD',
@@ -2615,7 +2615,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The number of personal fouls drawn by a player.',
       'formula': ''
     },
-    'CHARGES_DRAWN': {
+    'CHARGES DRAWN': {
       'location': ['HUSTLE'],
       'TOTAL': {
         'nba_name': 'CHARGES_DRAWN',
