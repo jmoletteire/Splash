@@ -5,23 +5,20 @@ import 'package:splash/utilities/constants.dart';
 
 class MyDropdownSearch extends StatefulWidget {
   final ValueChanged<String> onChanged;
+  final ValueChanged<String> onLocationChanged;
   final ValueNotifier<String?> selectedItemNotifier;
 
-  MyDropdownSearch(
-      {required this.onChanged, required this.selectedItemNotifier});
+  MyDropdownSearch({
+    required this.onChanged,
+    required this.onLocationChanged,
+    required this.selectedItemNotifier,
+  });
 
   @override
   _MyDropdownSearchState createState() => _MyDropdownSearchState();
 }
 
 class _MyDropdownSearchState extends State<MyDropdownSearch> {
-  /*
-  String _field = '';
-  final ValueNotifier<String?> _selectedItemNotifier =
-      ValueNotifier<String?>(null);
-
-   */
-
   Map<String, List<String>> categorizedFields = {
     "Efficiency": kPlayerStatLabelMap['EFFICIENCY']
         .keys
@@ -56,24 +53,6 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
         .where((key) => !key.contains("fill"))
         .toList(),
   };
-/*
-  @override
-  void initState() {
-    super.initState();
-    _selectedItemNotifier.addListener(() {
-      if (_selectedItemNotifier.value != null) {
-        (context as Element).markNeedsBuild();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _selectedItemNotifier.dispose();
-    super.dispose();
-  }
-
- */
 
   @override
   void initState() {
@@ -89,6 +68,16 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
   void dispose() {
     widget.selectedItemNotifier.dispose();
     super.dispose();
+  }
+
+  String _getLocation(String field) {
+    for (var category in kPlayerStatLabelMap.entries) {
+      if (category.value.containsKey(field)) {
+        List<dynamic> locations = category.value[field]['location'];
+        return locations.join('.');
+      }
+    }
+    return '';
   }
 
   @override
@@ -130,19 +119,11 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                         crossAxisSpacing: 10,
                         children: entry.value.map((item) {
                           return InkWell(
-                            /*
-                            onTap: () {
-                              setState(() {
-                                _field = item;
-                              });
-                              _selectedItemNotifier.value = item;
-                              widget.onChanged(item);
-                              Navigator.pop(context, item);
-                            },
-                             */
                             onTap: () {
                               widget.selectedItemNotifier.value = item;
                               widget.onChanged(item);
+                              widget
+                                  .onLocationChanged(_getLocation(item) ?? '');
                               Navigator.pop(context, item);
                             },
                             child: GridTile(
@@ -178,17 +159,10 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
           );
         },
       ),
-      /*
-      onChanged: (String? selectedItem) {
-        setState(() {
-          _field = selectedItem ?? '';
-          widget.onChanged(selectedItem!);
-        });
-      },
-       */
       onChanged: (String? selectedItem) {
         widget.selectedItemNotifier.value = selectedItem;
         widget.onChanged(selectedItem!);
+        widget.onLocationChanged(_getLocation(selectedItem) ?? '');
       },
       dropdownBuilder: (context, selectedItem) {
         return AutoSizeText(
@@ -201,7 +175,6 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
           ),
         );
       },
-      //selectedItem: _field.isEmpty ? null : _field,
       selectedItem: widget.selectedItemNotifier.value,
     );
   }

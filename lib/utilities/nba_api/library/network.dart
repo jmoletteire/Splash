@@ -13,4 +13,21 @@ class Network {
       print(response.statusCode);
     }
   }
+
+  Future<dynamic> postData(Uri url, String body) async {
+    http.Response response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      String data = response.body;
+      return jsonDecode(data);
+    } else {
+      print(response.statusCode);
+    }
+  }
 }

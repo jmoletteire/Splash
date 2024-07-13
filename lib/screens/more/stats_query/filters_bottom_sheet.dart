@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:splash/screens/more/stats_query/stats_query.dart';
 
 import '../../../components/custom_icon_button.dart';
 import '../../../utilities/constants.dart';
@@ -26,6 +27,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   String _operation = 'equals';
   TextEditingController _valueController = TextEditingController();
   ValueNotifier<String?> _selectedFieldNotifier = ValueNotifier<String?>(null);
+  String _location = '';
 
   @override
   void initState() {
@@ -54,6 +56,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
       _valueController.clear();
       _autoValidate = false;
       _editIndex = null;
+      _location = '';
     });
   }
 
@@ -62,6 +65,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
       _selectedFieldNotifier.value = filters[index]['field'];
       _operation = filters[index]['operation'];
       _valueController.text = filters[index]['value'];
+      _location = filters[index]['location'];
       _editIndex = index;
     });
   }
@@ -188,8 +192,10 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       _resetForm();
+                                      await StatsQuery().postStatsQuery(
+                                          selectedSeason, filters);
                                       Navigator.pop(context);
                                     },
                                     child: const Text(
@@ -320,6 +326,11 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                       _selectedFieldNotifier.value = value;
                                     });
                                   },
+                                  onLocationChanged: (location) {
+                                    setModalState(() {
+                                      _location = location;
+                                    });
+                                  },
                                   selectedItemNotifier: _selectedFieldNotifier,
                                 ),
                               ),
@@ -408,6 +419,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                                   _selectedFieldNotifier.value!,
                                               'operation': _operation,
                                               'value': _valueController.text,
+                                              'location': _location,
                                             };
                                           } else {
                                             filters.add({
@@ -415,6 +427,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                                   _selectedFieldNotifier.value!,
                                               'operation': _operation,
                                               'value': _valueController.text,
+                                              'location': _location,
                                             });
                                           }
                                         });

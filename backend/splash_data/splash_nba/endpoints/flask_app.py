@@ -12,10 +12,11 @@ app = Flask(__name__)
 @app.route('/stats_query', methods=['POST'])
 def apply_filters():
     filters = request.json
+    logging.info(f'Filters: {filters}')
     selected_season = filters.pop('selected_season')
     stats_filters = filters.get('stats', {})
     query = build_query(stats_filters)
-    results = players_collection.find(query).sort(f"STATS.{selected_season}.PTS", -1)
+    results = players_collection.find(query).sort(f"STATS.{selected_season}.BASIC.PTS", -1)
     results_list = list(results)
     return jsonify(results_list)
 
@@ -26,11 +27,11 @@ def build_query(filters):
         for field, condition in stats.items():
             operator = condition['operator']
             value = condition['value']
-            if operator == 'gt':
+            if operator == 'greater than':
                 query["$and"].append({f"STATS.{season}.{field}": {"$gt": value}})
-            elif operator == 'lt':
+            elif operator == 'less than':
                 query["$and"].append({f"STATS.{season}.{field}": {"$lt": value}})
-            elif operator == 'eq':
+            elif operator == 'equals':
                 query["$and"].append({f"STATS.{season}.{field}": value})
             elif operator == 'contains':
                 query["$and"].append({f"STATS.{season}.{field}": {"$regex": value, "$options": "i"}})
