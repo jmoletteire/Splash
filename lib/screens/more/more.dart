@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:splash/screens/more/draft.dart';
 import 'package:splash/screens/more/league_history.dart';
-import 'package:splash/screens/more/stats_leaders.dart';
+import 'package:splash/screens/more/stats_query/stats_leaders.dart';
 import 'package:splash/screens/search_screen.dart';
 
 import '../../components/custom_icon_button.dart';

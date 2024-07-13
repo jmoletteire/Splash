@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:splash/utilities/constants.dart';
 
 class MyDropdownSearch extends StatefulWidget {
+  final ValueChanged<String> onChanged;
+
+  MyDropdownSearch({required this.onChanged});
+
   @override
   _MyDropdownSearchState createState() => _MyDropdownSearchState();
 }
@@ -108,6 +112,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                                 _field = item;
                               });
                               _selectedItemNotifier.value = item;
+                              widget.onChanged(item);
                               Navigator.pop(context, item);
                             },
                             child: GridTile(
@@ -146,6 +151,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
       onChanged: (String? selectedItem) {
         setState(() {
           _field = selectedItem ?? '';
+          widget.onChanged(selectedItem!);
         });
       },
       dropdownBuilder: (context, selectedItem) {
