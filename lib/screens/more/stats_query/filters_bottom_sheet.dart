@@ -14,342 +14,493 @@ class FiltersBottomSheet extends StatefulWidget {
 class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   late String selectedSeason;
   late String seasonType;
+  late String selectedPosition;
   final List<Map<String, dynamic>> filters = [];
   final _formKey = GlobalKey<FormState>();
+  bool _autoValidate = false;
+  int? _editIndex;
 
   List<String> seasonTypes = ['Regular Season', 'Playoffs'];
-  List<String> positions = ['G', 'F', 'C', 'G-F', 'F-C'];
+  List<String> positions = ['ALL', 'G', 'F', 'C', 'G/F', 'F/C'];
 
-  String _field = '';
   String _operation = 'equals';
-  String _value = '';
+  TextEditingController _valueController = TextEditingController();
+  ValueNotifier<String?> _selectedFieldNotifier = ValueNotifier<String?>(null);
 
   @override
   void initState() {
     super.initState();
     selectedSeason = kSeasons.first;
     seasonType = seasonTypes.first;
+    selectedPosition = positions.first;
+  }
+
+  @override
+  void dispose() {
+    _valueController.dispose();
+    _selectedFieldNotifier.dispose();
+    super.dispose();
   }
 
   bool _isFormValid() {
-    return _field.isNotEmpty && _value.isNotEmpty;
+    return _selectedFieldNotifier.value != null &&
+        _valueController.text.isNotEmpty;
   }
 
   void _resetForm() {
     setState(() {
-      _field = '';
+      _selectedFieldNotifier.value = null;
       _operation = 'equals';
-      _value = '';
+      _valueController.clear();
+      _autoValidate = false;
+      _editIndex = null;
+    });
+  }
+
+  void _editFilter(int index, StateSetter setModalState) {
+    setModalState(() {
+      _selectedFieldNotifier.value = filters[index]['field'];
+      _operation = filters[index]['operation'];
+      _valueController.text = filters[index]['value'];
+      _editIndex = index;
     });
   }
 
   void _removeFilter(int index, StateSetter setModalState) {
     setModalState(() {
       filters.removeAt(index);
+      _resetForm();
     });
+    setModalState(() {});
+  }
+
+  bool _requiresConversion(String field) {
+    for (var category in kPlayerStatLabelMap.values) {
+      if (category.containsKey(field)) {
+        return category[field]['convert'] == 'true';
+      }
+    }
+    return false;
+  }
+
+  String? _validateValue(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Value cannot be empty';
+    }
+    final numValue = num.tryParse(value);
+    if (numValue == null) {
+      return 'Value must be a number';
+    }
+    if (_requiresConversion(_selectedFieldNotifier.value!)) {
+      if (numValue < 0 || numValue > 1) {
+        return 'Value must be between 0 and 1';
+      }
+    }
+    return null;
+  }
+
+  void _showErrorSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: kBebasNormal.copyWith(
+          color: Colors.white,
+          fontSize: 18.0,
+        ),
+      ),
+      backgroundColor: Colors.red,
+      duration: const Duration(seconds: 3),
+      showCloseIcon: true,
+      closeIconColor: Colors.white,
+      dismissDirection: DismissDirection.vertical,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomIconButton(
-        icon: Icons.filter_alt,
-        onPressed: () {
-          showModalBottomSheet(
-              backgroundColor: const Color(0xFF111111),
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setModalState) {
-                    return PopScope(
-                      onPopInvoked: (popped) {
-                        _resetForm();
-                      },
-                      child: Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: const ColorScheme.dark(
-                            primary: Colors.deepOrange,
-                            onPrimary: Colors.white,
-                            secondary: Colors.white,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 25.0, vertical: 10.0),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Filter',
-                                      style:
-                                          kBebasBold.copyWith(fontSize: 22.0),
-                                    ),
-                                    Row(
-                                      children: [
-                                        TextButton(
-                                          onPressed: filters.isEmpty
-                                              ? null
-                                              : () {
-                                                  setModalState(() {
-                                                    filters.clear();
-                                                  });
-                                                },
-                                          child: Text(
-                                            'CLEAR ALL',
-                                            style: kBebasNormal.copyWith(
-                                              color: filters.isEmpty
-                                                  ? Colors.white24
-                                                  : Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            _resetForm();
-                                            Navigator.pop(context);
+      icon: Icons.filter_alt,
+      onPressed: () {
+        setState(() {
+          _selectedFieldNotifier = ValueNotifier<String?>(null);
+        });
+        _openBottomSheet();
+      },
+    );
+  }
+
+  void _openBottomSheet() {
+    showModalBottomSheet(
+        backgroundColor: const Color(0xFF111111),
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setModalState) {
+              return PopScope(
+                onPopInvoked: (popped) {
+                  _resetForm();
+                },
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: const ColorScheme.dark(
+                      primary: Colors.deepOrange,
+                      onPrimary: Colors.white,
+                      secondary: Colors.white,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 25.0, vertical: 10.0),
+                    child: Form(
+                      key: _formKey,
+                      autovalidateMode: _autoValidate
+                          ? AutovalidateMode.always
+                          : AutovalidateMode.disabled,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Filter',
+                                style: kBebasBold.copyWith(fontSize: 22.0),
+                              ),
+                              Row(
+                                children: [
+                                  TextButton(
+                                    onPressed: filters.isEmpty
+                                        ? null
+                                        : () {
+                                            setModalState(() {
+                                              filters.clear();
+                                              _resetForm();
+                                            });
                                           },
-                                          child: const Text(
-                                            'Done',
-                                            style: kBebasNormal,
-                                          ),
-                                        ),
-                                      ],
+                                    child: Text(
+                                      'CLEAR',
+                                      style: kBebasNormal.copyWith(
+                                        color: filters.isEmpty
+                                            ? Colors.white24
+                                            : Colors.white,
+                                      ),
                                     ),
-                                  ],
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      _resetForm();
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text(
+                                      'Done',
+                                      style: kBebasNormal,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.shade900,
+                                    border:
+                                        Border.all(color: Colors.deepOrange),
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: DropdownButton<String>(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15.0),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  menuMaxHeight: 300.0,
+                                  dropdownColor: Colors.grey.shade900,
+                                  isExpanded: false,
+                                  underline: Container(),
+                                  value: selectedSeason,
+                                  items: kSeasons.map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: kBebasNormal.copyWith(
+                                            fontSize: 18.0),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? value) {
+                                    setModalState(() {
+                                      selectedSeason = value!;
+                                    });
+                                  },
                                 ),
-                                const SizedBox(height: 10.0),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey.shade900,
-                                          border: Border.all(
-                                              color: Colors.deepOrange),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0)),
-                                      child: DropdownButton<String>(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15.0),
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        menuMaxHeight: 300.0,
-                                        dropdownColor: Colors.grey.shade900,
-                                        isExpanded: false,
-                                        underline: Container(),
-                                        value: selectedSeason,
-                                        items: kSeasons
-                                            .map<DropdownMenuItem<String>>(
-                                                (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(
-                                              value,
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 18.0),
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (String? value) {
-                                          setModalState(() {
-                                            selectedSeason = value!;
-                                          });
-                                        },
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.shade900,
+                                    border:
+                                        Border.all(color: Colors.deepOrange),
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: DropdownButton<String>(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15.0),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  menuMaxHeight: 300.0,
+                                  dropdownColor: Colors.grey.shade900,
+                                  isExpanded: false,
+                                  underline: Container(),
+                                  value: seasonType,
+                                  items: seasonTypes
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: kBebasNormal.copyWith(
+                                            fontSize: 18.0),
                                       ),
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey.shade900,
-                                          border: Border.all(
-                                              color: Colors.deepOrange),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0)),
-                                      child: DropdownButton<String>(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15.0),
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        menuMaxHeight: 300.0,
-                                        dropdownColor: Colors.grey.shade900,
-                                        isExpanded: false,
-                                        underline: Container(),
-                                        value: seasonType,
-                                        items: seasonTypes
-                                            .map<DropdownMenuItem<String>>(
-                                                (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(
-                                              value,
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 18.0),
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (String? value) {
-                                          setModalState(() {
-                                            seasonType = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ],
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? value) {
+                                    setModalState(() {
+                                      seasonType = value!;
+                                    });
+                                  },
                                 ),
-                                const SizedBox(height: 30.0),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Expanded(
-                                      flex: 4,
-                                      child: MyDropdownSearch(
-                                        onChanged: (value) {
-                                          setModalState(() {
-                                            _field = value;
-                                          });
-                                        },
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.grey.shade900,
+                                    border:
+                                        Border.all(color: Colors.deepOrange),
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: DropdownButton<String>(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15.0),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  menuMaxHeight: 300.0,
+                                  dropdownColor: Colors.grey.shade900,
+                                  isExpanded: false,
+                                  underline: Container(),
+                                  value: selectedPosition,
+                                  items: positions
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: kBebasNormal.copyWith(
+                                            fontSize: 18.0),
                                       ),
-                                    ),
-                                    const Spacer(),
-                                    Expanded(
-                                      flex: 3,
-                                      child: DropdownButtonFormField<String>(
-                                        value: _operation,
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        menuMaxHeight: 300.0,
-                                        dropdownColor: Colors.grey.shade900,
-                                        items: [
-                                          'equals',
-                                          'contains',
-                                          'greater than',
-                                          'less than'
-                                        ].map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(
-                                              value,
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 16.5),
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (newValue) {
-                                          setModalState(() {
-                                            _operation = newValue!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Expanded(
-                                      flex: 2,
-                                      child: TextFormField(
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? value) {
+                                    setModalState(() {
+                                      selectedPosition = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 30.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                flex: 4,
+                                child: MyDropdownSearch(
+                                  onChanged: (value) {
+                                    setModalState(() {
+                                      _selectedFieldNotifier.value = value;
+                                    });
+                                  },
+                                  selectedItemNotifier: _selectedFieldNotifier,
+                                ),
+                              ),
+                              const Spacer(),
+                              Expanded(
+                                flex: 3,
+                                child: DropdownButtonFormField<String>(
+                                  value: _operation,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  menuMaxHeight: 300.0,
+                                  dropdownColor: Colors.grey.shade900,
+                                  items: [
+                                    'equals',
+                                    'contains',
+                                    'greater than',
+                                    'less than'
+                                  ].map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
                                         style: kBebasNormal.copyWith(
                                             fontSize: 16.5),
-                                        cursorColor: Colors.white70,
-                                        decoration: InputDecoration(
-                                            hintText: 'Value',
-                                            hintStyle: kBebasNormal.copyWith(
-                                                fontSize: 16.5)),
-                                        onChanged: (value) {
-                                          setModalState(() {
-                                            _value = value;
-                                          });
-                                        },
-                                        onSaved: (value) => _value = value!,
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                  }).toList(),
+                                  onChanged: (newValue) {
+                                    setModalState(() {
+                                      _operation = newValue!;
+                                    });
+                                  },
                                 ),
-                                const SizedBox(height: 30.0),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      height: 40.0,
-                                      width: 40.0,
-                                      child: FloatingActionButton(
-                                        onPressed: _isFormValid()
-                                            ? () {
-                                                if (_formKey.currentState!
-                                                    .validate()) {
-                                                  _formKey.currentState!.save();
-                                                  setModalState(() {
-                                                    filters.add({
-                                                      'field': _field,
-                                                      'operation': _operation,
-                                                      'value': _value,
-                                                    });
-                                                  });
-                                                  print(filters);
-                                                  _resetForm();
-                                                }
-                                              }
-                                            : null,
-                                        child: Text(
-                                          '+',
-                                          style: kBebasBold.copyWith(
-                                              color: Colors.black,
-                                              fontSize: 28.0),
-                                        ),
-                                        backgroundColor: _isFormValid()
-                                            ? Colors.deepOrange
-                                            : Colors.grey,
-                                      ),
-                                    ),
-                                  ],
+                              ),
+                              const Spacer(),
+                              Expanded(
+                                flex: 2,
+                                child: TextFormField(
+                                  controller: _valueController,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                  style: kBebasNormal.copyWith(fontSize: 16.5),
+                                  cursorColor: Colors.white70,
+                                  decoration: InputDecoration(
+                                      hintText: 'Value',
+                                      hintStyle: kBebasNormal.copyWith(
+                                          fontSize: 16.5)),
+                                  onChanged: (value) {
+                                    setModalState(() {
+                                      _valueController.text = value;
+                                    });
+                                  },
+                                  onTapOutside: (event) {
+                                    FocusScope.of(context).unfocus();
+                                  },
                                 ),
-                                const SizedBox(height: 25.0),
-                                Expanded(
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: filters.length,
-                                    itemBuilder: (context, index) {
-                                      final filter = filters[index];
-                                      return ListTile(
-                                        shape: const Border(
-                                          bottom: BorderSide(
-                                            color: Colors
-                                                .white, // Set the color of the border
-                                            width:
-                                                0.25, // Set the width of the border
-                                          ),
-                                        ),
-                                        title: Text(
-                                          '${filter['field']} ${filter['operation']} ${filter['value']}',
-                                          style: kBebasNormal,
-                                        ),
-                                        trailing: IconButton(
-                                          icon: const Icon(Icons.delete,
-                                              color: Colors.red),
-                                          onPressed: () {
-                                            _removeFilter(index, setModalState);
-                                            setModalState(() {
-                                              // Ensure revalidation
-                                              _formKey.currentState?.validate();
-                                            })
-                                          },
-                                        ),
-                                      );
-                                    },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 30.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 40.0,
+                                width: 40.0,
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    setModalState(() {
+                                      _autoValidate = true;
+                                    });
+                                    final validationError =
+                                        _validateValue(_valueController.text);
+                                    if (validationError != null) {
+                                      _showErrorSnackBar(
+                                          context, validationError);
+                                      return;
+                                    }
+                                    if (_isFormValid()) {
+                                      if (_formKey.currentState!.validate()) {
+                                        _formKey.currentState!.save();
+                                        setModalState(() {
+                                          if (_editIndex != null) {
+                                            filters[_editIndex!] = {
+                                              'field':
+                                                  _selectedFieldNotifier.value!,
+                                              'operation': _operation,
+                                              'value': _valueController.text,
+                                            };
+                                          } else {
+                                            filters.add({
+                                              'field':
+                                                  _selectedFieldNotifier.value!,
+                                              'operation': _operation,
+                                              'value': _valueController.text,
+                                            });
+                                          }
+                                        });
+                                        print(filters);
+                                        _resetForm();
+                                      }
+                                    }
+                                  },
+                                  backgroundColor: _isFormValid()
+                                      ? Colors.deepOrange
+                                      : Colors.grey,
+                                  child: Text(
+                                    _editIndex != null ? '✓' : '+',
+                                    style: _editIndex != null
+                                        ? kBebasBold.copyWith(
+                                            color: Colors.black, fontSize: 14.0)
+                                        : kBebasBold.copyWith(
+                                            color: Colors.black,
+                                            fontSize: 28.0),
                                   ),
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 25.0),
+                          Expanded(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: filters.length,
+                              itemBuilder: (context, index) {
+                                final filter = filters[index];
+                                return ListTile(
+                                  shape: const Border(
+                                    bottom: BorderSide(
+                                      color: Colors
+                                          .white, // Set the color of the border
+                                      width:
+                                          0.25, // Set the width of the border
+                                    ),
+                                  ),
+                                  title: Text(
+                                    '${filter['field']} ${filter['operation']} ${filter['value']}',
+                                    style:
+                                        kBebasNormal.copyWith(fontSize: 18.0),
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.edit,
+                                          color: Colors.white70,
+                                          size: 20.0,
+                                        ),
+                                        onPressed: () {
+                                          _editFilter(index, setModalState);
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.remove_circle_outline_outlined,
+                                          color: Colors.red,
+                                          size: 20.0,
+                                        ),
+                                        onPressed: () {
+                                          _removeFilter(index, setModalState);
+                                          setModalState(() {
+                                            // Ensure revalidation
+                                            _formKey.currentState?.validate();
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    );
-                  },
-                );
-              });
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
         });
   }
 }

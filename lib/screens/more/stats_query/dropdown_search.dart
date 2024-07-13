@@ -5,17 +5,22 @@ import 'package:splash/utilities/constants.dart';
 
 class MyDropdownSearch extends StatefulWidget {
   final ValueChanged<String> onChanged;
+  final ValueNotifier<String?> selectedItemNotifier;
 
-  MyDropdownSearch({required this.onChanged});
+  MyDropdownSearch(
+      {required this.onChanged, required this.selectedItemNotifier});
 
   @override
   _MyDropdownSearchState createState() => _MyDropdownSearchState();
 }
 
 class _MyDropdownSearchState extends State<MyDropdownSearch> {
+  /*
   String _field = '';
   final ValueNotifier<String?> _selectedItemNotifier =
       ValueNotifier<String?>(null);
+
+   */
 
   Map<String, List<String>> categorizedFields = {
     "Efficiency": kPlayerStatLabelMap['EFFICIENCY']
@@ -51,7 +56,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
         .where((key) => !key.contains("fill"))
         .toList(),
   };
-
+/*
   @override
   void initState() {
     super.initState();
@@ -65,6 +70,24 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
   @override
   void dispose() {
     _selectedItemNotifier.dispose();
+    super.dispose();
+  }
+
+ */
+
+  @override
+  void initState() {
+    super.initState();
+    widget.selectedItemNotifier.addListener(() {
+      if (widget.selectedItemNotifier.value != null) {
+        (context as Element).markNeedsBuild();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.selectedItemNotifier.dispose();
     super.dispose();
   }
 
@@ -107,11 +130,18 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                         crossAxisSpacing: 10,
                         children: entry.value.map((item) {
                           return InkWell(
+                            /*
                             onTap: () {
                               setState(() {
                                 _field = item;
                               });
                               _selectedItemNotifier.value = item;
+                              widget.onChanged(item);
+                              Navigator.pop(context, item);
+                            },
+                             */
+                            onTap: () {
+                              widget.selectedItemNotifier.value = item;
                               widget.onChanged(item);
                               Navigator.pop(context, item);
                             },
@@ -148,11 +178,17 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
           );
         },
       ),
+      /*
       onChanged: (String? selectedItem) {
         setState(() {
           _field = selectedItem ?? '';
           widget.onChanged(selectedItem!);
         });
+      },
+       */
+      onChanged: (String? selectedItem) {
+        widget.selectedItemNotifier.value = selectedItem;
+        widget.onChanged(selectedItem!);
       },
       dropdownBuilder: (context, selectedItem) {
         return AutoSizeText(
@@ -165,7 +201,8 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
           ),
         );
       },
-      selectedItem: _field.isEmpty ? null : _field,
+      //selectedItem: _field.isEmpty ? null : _field,
+      selectedItem: widget.selectedItemNotifier.value,
     );
   }
 }
