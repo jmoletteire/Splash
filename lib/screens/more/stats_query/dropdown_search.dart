@@ -74,7 +74,9 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
     for (var category in kPlayerStatLabelMap.entries) {
       if (category.value.containsKey(field)) {
         List<dynamic> locations = category.value[field]['location'];
-        return locations.join('.');
+        String loc = locations.join('.');
+        loc += '.' + category.value[field]['TOTAL']['nba_name'];
+        return loc;
       }
     }
     return '';

@@ -12,6 +12,16 @@ class Leaders extends StatefulWidget {
 }
 
 class _LeadersState extends State<Leaders> {
+  Map<String, dynamic>? queryData;
+
+  void _handleFiltersDone(Map<String, dynamic> data) {
+    setState(() {
+      queryData = data;
+      // Use the data as needed, e.g., make another API call, update the UI, etc.
+      print('Received data: $data');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,8 +46,19 @@ class _LeadersState extends State<Leaders> {
               );
             },
           ),
-          FiltersBottomSheet()
+          FiltersBottomSheet(onDone: _handleFiltersDone)
         ],
+      ),
+      body: Center(
+        child: queryData == null
+            ? Text(
+                'No data',
+                style: TextStyle(color: Colors.white),
+              )
+            : Text(
+                'Data received: ${queryData!['data'][0]['DISPLAY_FI_LAST']}',
+                style: TextStyle(color: Colors.white),
+              ),
       ),
     );
   }

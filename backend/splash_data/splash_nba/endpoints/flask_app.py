@@ -10,31 +10,46 @@ app = Flask(__name__)
 
 
 @app.route('/stats_query', methods=['POST'])
-def apply_filters():
-    filters = request.json
-    logging.info(f'Filters: {filters}')
-    selected_season = filters.pop('selected_season')
-    stats_filters = filters.get('stats', {})
-    query = build_query(stats_filters)
-    results = players_collection.find(query).sort(f"STATS.{selected_season}.BASIC.PTS", -1)
-    results_list = list(results)
-    return jsonify(results_list)
+def query_database():
+    data = request.json
+    selected_season = data.get('selectedSeason')
+    selected_season_type = data.get('seasonType')
+    filters = data.get('filters')
+
+    query = build_query(selected_season, selected_season_type, filters)
+    results = players_collection.find(query, {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, f'STATS.{selected_season}': 1, '_id': 0})
+
+    return jsonify([result for result in results])
 
 
-def build_query(filters):
+def build_query(season, season_type, filters):
     query = {"$and": []}
-    for season, stats in filters.items():
-        for field, condition in stats.items():
-            operator = condition['operator']
-            value = condition['value']
-            if operator == 'greater than':
-                query["$and"].append({f"STATS.{season}.{field}": {"$gt": value}})
-            elif operator == 'less than':
-                query["$and"].append({f"STATS.{season}.{field}": {"$lt": value}})
-            elif operator == 'equals':
-                query["$and"].append({f"STATS.{season}.{field}": value})
-            elif operator == 'contains':
-                query["$and"].append({f"STATS.{season}.{field}": {"$regex": value, "$options": "i"}})
+    for stat_filter in filters:
+        logging.info(stat_filter)
+
+        operator = stat_filter['operation']
+        value = stat_filter['value']
+        location = stat_filter['location']
+
+        stats = 'STATS'
+        if season_type == 'Playoffs':
+            stats = 'STATS.PLAYOFFS'
+
+        path = f"{stats}.{season}.{location}"
+
+        try:
+            value = float(value)  # Try to convert value to a float for numerical comparisons
+        except ValueError:
+            pass  # Keep value as a string for non-numerical comparisons
+
+        if operator == 'greater than':
+            query["$and"].append({path: {"$gt": value}})
+        elif operator == 'less than':
+            query["$and"].append({path: {"$lt": value}})
+        elif operator == 'equals':
+            query["$and"].append({path: value})
+        elif operator == 'contains':
+            query["$and"].append({path: {"$regex": value, "$options": "i"}})
     return query
 
 
