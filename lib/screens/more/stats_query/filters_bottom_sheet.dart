@@ -30,7 +30,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   List<String> positions = ['ALL', 'G', 'F', 'C', 'G/F', 'F/C'];
 
   String _operation = 'equals';
-  TextEditingController _valueController = TextEditingController();
+  final TextEditingController _valueController = TextEditingController();
   ValueNotifier<String?> _selectedFieldNotifier = ValueNotifier<String?>(null);
   String _location = '';
 
@@ -149,13 +149,10 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
     });
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print(data);
+      final List<dynamic> data = jsonDecode(response.body);
       widget.onDone({
         'data': data,
         'selectedSeason': selectedSeason,
-        'seasonType': seasonType,
-        'filters': filters,
       });
     } else {
       _showErrorSnackBar(context, 'Error fetching data from server');

@@ -17,7 +17,7 @@ def query_database():
     filters = data.get('filters')
 
     query = build_query(selected_season, selected_season_type, filters)
-    results = players_collection.find(query, {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, f'STATS.{selected_season}': 1, '_id': 0})
+    results = players_collection.find(query, {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, f'STATS.{selected_season}': 1, '_id': 0})
 
     return jsonify([result for result in results])
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:splash/screens/more/stats_query/filters_bottom_sheet.dart';
+import 'package:splash/screens/more/stats_query/players_table.dart';
 
 import '../../../components/custom_icon_button.dart';
+import '../../player/player_career.dart';
 import '../../search_screen.dart';
 
 class Leaders extends StatefulWidget {
@@ -12,13 +14,15 @@ class Leaders extends StatefulWidget {
 }
 
 class _LeadersState extends State<Leaders> {
-  Map<String, dynamic>? queryData;
+  List<dynamic>? queryData;
+  String? selectedSeason;
+  final ScrollController _scrollController = ScrollController();
 
   void _handleFiltersDone(Map<String, dynamic> data) {
+    print('Data: ${data['data']}');
     setState(() {
-      queryData = data;
-      // Use the data as needed, e.g., make another API call, update the UI, etc.
-      print('Received data: $data');
+      queryData = data['data'];
+      selectedSeason = data['selectedSeason'];
     });
   }
 
@@ -51,13 +55,45 @@ class _LeadersState extends State<Leaders> {
       ),
       body: Center(
         child: queryData == null
-            ? Text(
+            ? const Text(
                 'No data',
                 style: TextStyle(color: Colors.white),
               )
-            : Text(
-                'Data received: ${queryData!['data'][0]['DISPLAY_FI_LAST']}',
-                style: TextStyle(color: Colors.white),
+            : ScrollConfiguration(
+                behavior: MyCustomScrollBehavior(),
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    PlayersTable(
+                      columnNames: const [
+                        'PLAYER',
+                        'TEAM',
+                        'AGE',
+                        'PPG',
+                        'RPG',
+                        'APG',
+                        'SPG',
+                        'BPG',
+                        'TOPG',
+                        'FG%',
+                        '3P%',
+                        'FT%',
+                        'EFG%',
+                        'TS%',
+                        'USG%',
+                        'NRTG',
+                        'ORTG',
+                        'DRTG',
+                        'WO 3P%',
+                        'NW',
+                        'PAC',
+                        'SW',
+                      ],
+                      selectedSeason: selectedSeason!,
+                      players: queryData!,
+                    ),
+                  ],
+                ),
               ),
       ),
     );
