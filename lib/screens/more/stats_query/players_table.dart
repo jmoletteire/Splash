@@ -28,6 +28,17 @@ class _PlayersTableState extends State<PlayersTable> {
   int? _sortColumnIndex;
   bool _sortAscending = true;
 
+  Map<String, String> positionsMap = {
+    '': '',
+    'Guard': 'G',
+    'Forward': 'F',
+    'Center': 'C',
+    'Guard-Forward': 'G-F',
+    'Forward-Guard': 'F-G',
+    'Forward-Center': 'F-C',
+    'Center-Forward': 'C-F',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -55,15 +66,71 @@ class _PlayersTableState extends State<PlayersTable> {
     });
   }
 
+  Comparable<dynamic> _getSortingKey(Map<String, dynamic> player, int column) {
+    switch (column) {
+      case 0:
+        return player['DISPLAY_FI_LAST'];
+      case 1:
+        return player['TEAM_ID'];
+      case 2:
+        return player['STATS'][widget.selectedSeason]['BASIC']['AGE'];
+      case 3:
+        return player['POSITION'];
+      case 4:
+        return player['STATS'][widget.selectedSeason]['BASIC']['PTS'] /
+            player['STATS'][widget.selectedSeason]['BASIC']['GP'];
+      case 5:
+        return player['STATS'][widget.selectedSeason]['BASIC']['REB'] /
+            player['STATS'][widget.selectedSeason]['BASIC']['GP'];
+      case 6:
+        return player['STATS'][widget.selectedSeason]['BASIC']['AST'] /
+            player['STATS'][widget.selectedSeason]['BASIC']['GP'];
+      case 7:
+        return player['STATS'][widget.selectedSeason]['BASIC']['STL'] /
+            player['STATS'][widget.selectedSeason]['BASIC']['GP'];
+      case 8:
+        return player['STATS'][widget.selectedSeason]['BASIC']['BLK'] /
+            player['STATS'][widget.selectedSeason]['BASIC']['GP'];
+      case 9:
+        return player['STATS'][widget.selectedSeason]['BASIC']['TOV'] /
+            player['STATS'][widget.selectedSeason]['BASIC']['GP'];
+      case 10:
+        return player['STATS'][widget.selectedSeason]['BASIC']['FG_PCT'];
+      case 11:
+        return player['STATS'][widget.selectedSeason]['BASIC']['FG3_PCT'];
+      case 12:
+        return player['STATS'][widget.selectedSeason]['BASIC']['FT_PCT'];
+      case 13:
+        return player['STATS'][widget.selectedSeason]['ADV']['EFG_PCT'];
+      case 14:
+        return player['STATS'][widget.selectedSeason]['ADV']['TS_PCT'];
+      case 15:
+        return player['STATS'][widget.selectedSeason]['ADV']['USG_PCT'];
+      case 16:
+        return player['STATS'][widget.selectedSeason]['ADV']
+            ['NET_RATING_ON_OFF'];
+      case 17:
+        return player['STATS'][widget.selectedSeason]['ADV']
+            ['OFF_RATING_ON_OFF'];
+      case 18:
+        return player['STATS'][widget.selectedSeason]['ADV']
+            ['DEF_RATING_ON_OFF'];
+      case 19:
+        return player['STATS'][widget.selectedSeason]['ADV']['SHOOTING']
+            ['CLOSEST_DEFENDER']['6+ Feet - Wide Open']['FG3_PCT'];
+      case 20:
+        return player['STATS'][widget.selectedSeason]['BASIC']['PTS'];
+      case 21:
+        return player['STATS'][widget.selectedSeason]['BASIC']['PTS'];
+      case 22:
+        return player['STATS'][widget.selectedSeason]['BASIC']['PTS'];
+      default:
+        return player['DISPLAY_FI_LAST'];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    /*
-    widget.players.sort((a, b) {
-      return a['seasons'][widget.selectedSeason]['CONF_RANK']
-          .compareTo(b['seasons'][widget.selectedSeason]['CONF_RANK']);
-    });
-     */
-
     return SliverTableView.builder(
       horizontalScrollController: scrollController,
       style: const TableViewStyle(
@@ -90,16 +157,16 @@ class _PlayersTableState extends State<PlayersTable> {
         ),
 
         /// TEAM
-        TableColumn(width: MediaQuery.of(context).size.width * 0.18),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.135),
 
         /// AGE
-        TableColumn(
-          width: MediaQuery.of(context).size.width * 0.1,
-          maxResizeWidth: MediaQuery.of(context).size.width * 0.15,
-        ),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+
+        /// POS
+        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
 
         /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.135),
 
         /// REB
         TableColumn(width: MediaQuery.of(context).size.width * 0.125),
@@ -172,8 +239,7 @@ class _PlayersTableState extends State<PlayersTable> {
                 final isAscending =
                     _sortColumnIndex == column && _sortAscending;
                 _sort<dynamic>(
-                  (player) => player['STATS'][widget.selectedSeason]['ADV']
-                      ['USG_PCT'], // Replace with appropriate sorting field
+                  (player) => _getSortingKey(player, column),
                   column,
                   !isAscending,
                 );
@@ -198,6 +264,7 @@ class _PlayersTableState extends State<PlayersTable> {
                         _sortAscending
                             ? Icons.arrow_drop_up
                             : Icons.arrow_drop_down,
+                        size: 15.0,
                       ),
                   ],
                 ),
@@ -271,20 +338,6 @@ class _PlayersTableState extends State<PlayersTable> {
           padding: const EdgeInsets.fromLTRB(8.0, 8.0, 3.0, 8.0),
           child: Row(
             children: [
-              /*
-              Expanded(
-                flex: 1,
-                child: Text(
-                  widget.players[row]['seasons'][widget.selectedSeason]['CONF_RANK']
-                      .toString(),
-                  textAlign: TextAlign.center,
-                  style: kBebasNormal.copyWith(
-                    color: Colors.white70,
-                    fontSize: 19.0,
-                  ),
-                ),
-              ),
-               */
               Expanded(
                 flex: 1,
                 child: ConstrainedBox(
@@ -296,14 +349,6 @@ class _PlayersTableState extends State<PlayersTable> {
                         'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PERSON_ID']}.png',
                   ),
                 ),
-                /*
-                SvgPicture.string(
-                  widget.standings[row]['LOGO'][0],
-                  alignment: Alignment.center,
-                  width: 24,
-                  height: 24,
-                ),
-                 */
               ),
               const SizedBox(width: 8.0),
               Expanded(
@@ -340,100 +385,103 @@ class _PlayersTableState extends State<PlayersTable> {
                 .toStringAsFixed(0));
       case 3:
         return StandingsDataText(
-            text: (widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
-                        ['PTS']! /
-                    widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
-                        ['GP']!)
-                .toStringAsFixed(1));
+            text: positionsMap[widget.players[row]['POSITION']!]!);
       case 4:
         return StandingsDataText(
             text: (widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
-                        ['REB']! /
+                        ['PTS']! /
                     widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
                         ['GP']!)
                 .toStringAsFixed(1));
       case 5:
         return StandingsDataText(
             text: (widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
-                        ['AST']! /
+                        ['REB']! /
                     widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
                         ['GP']!)
                 .toStringAsFixed(1));
       case 6:
         return StandingsDataText(
             text: (widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
-                        ['STL']! /
+                        ['AST']! /
                     widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
                         ['GP']!)
                 .toStringAsFixed(1));
       case 7:
         return StandingsDataText(
             text: (widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
-                        ['BLK']! /
+                        ['STL']! /
                     widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
                         ['GP']!)
                 .toStringAsFixed(1));
       case 8:
         return StandingsDataText(
             text: (widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
-                        ['TOV']! /
+                        ['BLK']! /
                     widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
                         ['GP']!)
                 .toStringAsFixed(1));
       case 9:
         return StandingsDataText(
-            text:
-                '${(widget.players[row]['STATS'][widget.selectedSeason]['BASIC']['FG_PCT']! * 100).toStringAsFixed(1)}%');
+            text: (widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
+                        ['TOV']! /
+                    widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
+                        ['GP']!)
+                .toStringAsFixed(1));
       case 10:
         return StandingsDataText(
             text:
-                '${((widget.players[row]['STATS'][widget.selectedSeason]['BASIC']['FG3_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
+                '${(widget.players[row]['STATS'][widget.selectedSeason]['BASIC']['FG_PCT']! * 100).toStringAsFixed(1)}%');
       case 11:
         return StandingsDataText(
             text:
-                '${(widget.players[row]['STATS'][widget.selectedSeason]['BASIC']['FT_PCT']! * 100).toStringAsFixed(1)}%');
+                '${((widget.players[row]['STATS'][widget.selectedSeason]['BASIC']['FG3_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
       case 12:
         return StandingsDataText(
             text:
-                '${(widget.players[row]['STATS'][widget.selectedSeason]['ADV']['EFG_PCT']! * 100).toStringAsFixed(1)}%');
+                '${(widget.players[row]['STATS'][widget.selectedSeason]['BASIC']['FT_PCT']! * 100).toStringAsFixed(1)}%');
       case 13:
         return StandingsDataText(
             text:
-                '${(widget.players[row]['STATS'][widget.selectedSeason]['ADV']['TS_PCT']! * 100).toStringAsFixed(1)}%');
+                '${(widget.players[row]['STATS'][widget.selectedSeason]['ADV']['EFG_PCT']! * 100).toStringAsFixed(1)}%');
       case 14:
         return StandingsDataText(
             text:
-                '${(widget.players[row]['STATS'][widget.selectedSeason]['ADV']['USG_PCT']! * 100).toStringAsFixed(1)}%');
+                '${(widget.players[row]['STATS'][widget.selectedSeason]['ADV']['TS_PCT']! * 100).toStringAsFixed(1)}%');
       case 15:
+        return StandingsDataText(
+            text:
+                '${(widget.players[row]['STATS'][widget.selectedSeason]['ADV']['USG_PCT']! * 100).toStringAsFixed(1)}%');
+      case 16:
         return StandingsDataText(
             text: widget.players[row]['STATS'][widget.selectedSeason]['ADV']
                     ['NET_RATING_ON_OFF']!
                 .toStringAsFixed(1));
-      case 16:
+      case 17:
         return StandingsDataText(
             text: widget.players[row]['STATS'][widget.selectedSeason]['ADV']
                     ['OFF_RATING_ON_OFF']!
                 .toStringAsFixed(1));
-      case 17:
+      case 18:
         return StandingsDataText(
             text: widget.players[row]['STATS'][widget.selectedSeason]['ADV']
                     ['DEF_RATING_ON_OFF']!
                 .toStringAsFixed(1));
-      case 18:
+      case 19:
         return StandingsDataText(
             text:
                 '${((widget.players[row]['STATS'][widget.selectedSeason]['ADV']['SHOOTING']['CLOSEST_DEFENDER']['6+ Feet - Wide Open']['FG3_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
-      case 19:
-        return StandingsDataText(
-            text: widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
-                    ['PTS']!
-                .toStringAsFixed(0));
       case 20:
         return StandingsDataText(
             text: widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
                     ['PTS']!
                 .toStringAsFixed(0));
       case 21:
+        return StandingsDataText(
+            text: widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
+                    ['PTS']!
+                .toStringAsFixed(0));
+      case 22:
         return StandingsDataText(
             text: widget.players[row]['STATS'][widget.selectedSeason]['BASIC']
                     ['PTS']!

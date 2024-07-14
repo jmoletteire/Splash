@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:splash/screens/more/stats_query/filters_bottom_sheet.dart';
 import 'package:splash/screens/more/stats_query/players_table.dart';
+import 'package:splash/utilities/constants.dart';
 
 import '../../../components/custom_icon_button.dart';
 import '../../player/player_career.dart';
@@ -34,7 +35,7 @@ class _LeadersState extends State<Leaders> {
         backgroundColor: Colors.grey.shade900,
         surfaceTintColor: Colors.grey.shade900,
         title: const Text(
-          'Leaders',
+          'STATS',
           style: TextStyle(
               color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 28.0),
         ),
@@ -55,9 +56,19 @@ class _LeadersState extends State<Leaders> {
       ),
       body: Center(
         child: queryData == null
-            ? const Text(
-                'No data',
-                style: TextStyle(color: Colors.white),
+            ? const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Select Filters',
+                    style: kBebasNormal,
+                  ),
+                  SizedBox(width: 5.0),
+                  Icon(
+                    Icons.filter_alt,
+                    size: 20.0,
+                  )
+                ],
               )
             : ScrollConfiguration(
                 behavior: MyCustomScrollBehavior(),
@@ -69,6 +80,7 @@ class _LeadersState extends State<Leaders> {
                         'PLAYER',
                         'TEAM',
                         'AGE',
+                        'POS',
                         'PPG',
                         'RPG',
                         'APG',

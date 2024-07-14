@@ -16,7 +16,7 @@ class More extends StatefulWidget {
 
 class _MoreState extends State<More> {
   Map<String, dynamic> pages = {
-    'Leaders': [Icons.leaderboard, Leaders()],
+    'Stats': [Icons.leaderboard, Leaders()],
     'Draft': [Icons.format_list_numbered, Draft()],
     'League History': [Icons.history, LeagueHistory()],
   };

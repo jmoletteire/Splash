@@ -172,8 +172,42 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
     );
   }
 
+  Widget _buildDropdownButton({
+    required String selectedValue,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade900,
+        border: Border.all(color: Colors.deepOrange),
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: DropdownButton<String>(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        borderRadius: BorderRadius.circular(10.0),
+        menuMaxHeight: 300.0,
+        dropdownColor: Colors.grey.shade900,
+        isExpanded: false,
+        underline: Container(),
+        value: selectedValue,
+        items: items.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(
+              value,
+              style: kBebasNormal.copyWith(fontSize: 18.0),
+            ),
+          );
+        }).toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
+
   void _openBottomSheet() {
     showModalBottomSheet(
+        scrollControlDisabledMaxHeightRatio: 0.65,
         backgroundColor: const Color(0xFF111111),
         context: context,
         builder: (BuildContext context) {
@@ -258,110 +292,32 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey.shade900,
-                                        border: Border.all(
-                                            color: Colors.deepOrange),
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    child: DropdownButton<String>(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15.0),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      menuMaxHeight: 300.0,
-                                      dropdownColor: Colors.grey.shade900,
-                                      isExpanded: false,
-                                      underline: Container(),
-                                      value: selectedSeason,
-                                      items: kSeasons
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(
-                                            value,
-                                            style: kBebasNormal.copyWith(
-                                                fontSize: 18.0),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? value) {
-                                        setModalState(() {
-                                          selectedSeason = value!;
-                                        });
-                                      },
-                                    ),
+                                  _buildDropdownButton(
+                                    selectedValue: selectedSeason,
+                                    items: kSeasons,
+                                    onChanged: (value) {
+                                      setModalState(() {
+                                        selectedSeason = value!;
+                                      });
+                                    },
                                   ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey.shade900,
-                                        border: Border.all(
-                                            color: Colors.deepOrange),
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    child: DropdownButton<String>(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15.0),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      menuMaxHeight: 300.0,
-                                      dropdownColor: Colors.grey.shade900,
-                                      isExpanded: false,
-                                      underline: Container(),
-                                      value: seasonType,
-                                      items: seasonTypes
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(
-                                            value,
-                                            style: kBebasNormal.copyWith(
-                                                fontSize: 18.0),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? value) {
-                                        setModalState(() {
-                                          seasonType = value!;
-                                        });
-                                      },
-                                    ),
+                                  _buildDropdownButton(
+                                    selectedValue: seasonType,
+                                    items: seasonTypes,
+                                    onChanged: (value) {
+                                      setModalState(() {
+                                        seasonType = value!;
+                                      });
+                                    },
                                   ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey.shade900,
-                                        border: Border.all(
-                                            color: Colors.deepOrange),
-                                        borderRadius:
-                                            BorderRadius.circular(10.0)),
-                                    child: DropdownButton<String>(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15.0),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      menuMaxHeight: 300.0,
-                                      dropdownColor: Colors.grey.shade900,
-                                      isExpanded: false,
-                                      underline: Container(),
-                                      value: selectedPosition,
-                                      items: positions
-                                          .map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(
-                                            value,
-                                            style: kBebasNormal.copyWith(
-                                                fontSize: 18.0),
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? value) {
-                                        setModalState(() {
-                                          selectedPosition = value!;
-                                        });
-                                      },
-                                    ),
+                                  _buildDropdownButton(
+                                    selectedValue: selectedPosition,
+                                    items: positions,
+                                    onChanged: (value) {
+                                      setModalState(() {
+                                        selectedPosition = value!;
+                                      });
+                                    },
                                   ),
                                 ],
                               ),
@@ -514,59 +470,60 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                               ),
                               const SizedBox(height: 25.0),
                               Expanded(
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: filters.length,
-                                  itemBuilder: (context, index) {
-                                    final filter = filters[index];
-                                    return ListTile(
-                                      shape: const Border(
-                                        bottom: BorderSide(
-                                          color: Colors
-                                              .white, // Set the color of the border
-                                          width:
-                                              0.25, // Set the width of the border
+                                child: ClipRect(
+                                  child: ListView.builder(
+                                    itemCount: filters.length,
+                                    itemBuilder: (context, index) {
+                                      final filter = filters[index];
+                                      return ListTile(
+                                        shape: const Border(
+                                          bottom: BorderSide(
+                                            color: Colors.white,
+                                            width: 0.25,
+                                          ),
                                         ),
-                                      ),
-                                      title: Text(
-                                        '${filter['field']} ${filter['operation']} ${filter['value']}',
-                                        style: kBebasNormal.copyWith(
-                                            fontSize: 18.0),
-                                      ),
-                                      trailing: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons.edit,
-                                              color: Colors.white70,
-                                              size: 20.0,
+                                        title: Text(
+                                          '${filter['field']} ${filter['operation']} ${filter['value']}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: kBebasNormal.copyWith(
+                                              fontSize: 18.0),
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.edit,
+                                                color: Colors.white70,
+                                                size: 20.0,
+                                              ),
+                                              onPressed: () {
+                                                _editFilter(
+                                                    index, setModalState);
+                                              },
                                             ),
-                                            onPressed: () {
-                                              _editFilter(index, setModalState);
-                                            },
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons
-                                                  .remove_circle_outline_outlined,
-                                              color: Colors.red,
-                                              size: 20.0,
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons
+                                                    .remove_circle_outline_outlined,
+                                                color: Colors.red,
+                                                size: 20.0,
+                                              ),
+                                              onPressed: () {
+                                                _removeFilter(
+                                                    index, setModalState);
+                                                setModalState(() {
+                                                  _formKey.currentState
+                                                      ?.validate();
+                                                });
+                                              },
                                             ),
-                                            onPressed: () {
-                                              _removeFilter(
-                                                  index, setModalState);
-                                              setModalState(() {
-                                                // Ensure revalidation
-                                                _formKey.currentState
-                                                    ?.validate();
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ],
