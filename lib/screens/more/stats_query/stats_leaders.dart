@@ -21,7 +21,6 @@ class _LeadersState extends State<Leaders> {
   final ScrollController _scrollController = ScrollController();
 
   void _handleFiltersDone(Map<String, dynamic> data) {
-    print('Data: ${data['data']}');
     setState(() {
       queryData = data['data'];
       selectedSeason = data['selectedSeason'];
@@ -98,10 +97,10 @@ class _LeadersState extends State<Leaders> {
                         'NRTG',
                         'ORTG',
                         'DRTG',
+                        'POSS',
+                        'Tch',
+                        'PASS',
                         'WO 3P%',
-                        'NW',
-                        'PAC',
-                        'SW',
                       ],
                       selectedSeason: selectedSeason!,
                       selectedSeasonType: selectedSeasonType!,

@@ -71,86 +71,119 @@ class _PlayersTableState extends State<PlayersTable> {
   Comparable<dynamic> _getSortingKey(Map<String, dynamic> player, int column) {
     switch (column) {
       case 0:
-        return player['DISPLAY_FI_LAST'];
+        return player['DISPLAY_FI_LAST'] ?? '';
       case 1:
-        return player['TEAM_ID'];
+        return player['TEAM_ID'] ?? 0;
       case 2:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['BASIC']['AGE'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['AGE'] ??
+            0;
       case 3:
-        return player['POSITION'];
+        return player['POSITION'] ?? '';
       case 4:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['PTS'] /
-            player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['GP'];
+        int pts = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['PTS'] ??
+            0;
+        int gp = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['GP'] ??
+            0;
+        return gp != 0 ? pts / gp : 0.0;
       case 5:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['REB'] /
-            player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['GP'];
+        int reb = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['REB'] ??
+            0;
+        int gp = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['GP'] ??
+            0;
+        return gp != 0 ? reb / gp : 0.0;
       case 6:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['AST'] /
-            player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['GP'];
+        int ast = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['AST'] ??
+            0;
+        int gp = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['GP'] ??
+            0;
+        return gp != 0 ? ast / gp : 0.0;
       case 7:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['STL'] /
-            player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['GP'];
+        int stl = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['STL'] ??
+            0;
+        int gp = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['GP'] ??
+            0;
+        return gp != 0 ? stl / gp : 0.0;
       case 8:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['BLK'] /
-            player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['GP'];
+        int blk = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['BLK'] ??
+            0;
+        int gp = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['GP'] ??
+            0;
+        return gp != 0 ? blk / gp : 0.0;
       case 9:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['TOV'] /
-            player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['BASIC']['GP'];
+        int tov = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['TOV'] ??
+            0;
+        int gp = player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['GP'] ??
+            0;
+        return gp != 0 ? tov / gp : 0.0;
       case 10:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['BASIC']['FG_PCT'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['FG_PCT'] ??
+            0;
       case 11:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['BASIC']['FG3_PCT'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['FG3_PCT'] ??
+            0;
       case 12:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['BASIC']['FT_PCT'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['BASIC']?['FT_PCT'] ??
+            0;
       case 13:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['ADV']['EFG_PCT'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['EFG_PCT'] ??
+            0;
       case 14:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['ADV']['TS_PCT'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['TS_PCT'] ??
+            0;
       case 15:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['ADV']['USG_PCT'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['USG_PCT'] ??
+            0;
       case 16:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['ADV']['NET_RATING_ON_OFF'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['NET_RATING_ON_OFF'] ??
+            0;
       case 17:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['ADV']['OFF_RATING_ON_OFF'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['OFF_RATING_ON_OFF'] ??
+            0;
       case 18:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['ADV']['DEF_RATING_ON_OFF'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['DEF_RATING_ON_OFF'] ??
+            0;
       case 19:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-                ['ADV']['SHOOTING']['CLOSEST_DEFENDER']['6+ Feet - Wide Open']
-            ['FG3_PCT'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['POSS'] ??
+            0;
       case 20:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['BASIC']['PTS'];
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']?['TOUCHES'] ??
+            0;
       case 21:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['BASIC']['PTS'];
+        return player['STATS']?[widget.selectedSeason]
+                    ?[widget.selectedSeasonType]?['ADV']?['PASSING']
+                ?['PASSES_MADE'] ??
+            0;
       case 22:
-        return player['STATS'][widget.selectedSeason][widget.selectedSeasonType]
-            ['BASIC']['PTS'];
+        return player['STATS']?[widget.selectedSeason]
+                    ?[widget.selectedSeasonType]?['ADV']?['SHOOTING']
+                ?['CLOSEST_DEFENDER']?['6+ Feet - Wide Open']?['FG3_PCT'] ??
+            0;
       default:
-        return player['DISPLAY_FI_LAST'];
+        return player['DISPLAY_FI_LAST'] ?? '';
     }
   }
 
@@ -235,17 +268,17 @@ class _PlayersTableState extends State<PlayersTable> {
         /// DRTG
         TableColumn(width: MediaQuery.of(context).size.width * 0.125),
 
-        /// WIDE OPEN 3P%
+        /// POSS
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
 
-        /// VS NORTHWEST
+        /// TOUCHES
         TableColumn(width: MediaQuery.of(context).size.width * 0.125),
 
-        /// VS PACIFIC
+        /// PASSES MADE
         TableColumn(width: MediaQuery.of(context).size.width * 0.125),
 
-        /// VS SOUTHWEST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        /// WIDE OPEN 3P%
+        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -554,26 +587,38 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['SHOOTING']['CLOSEST_DEFENDER']['6+ Feet - Wide Open']['FG3_PCT'] * 100).toStringAsFixed(1)}%';
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['POSS'].toStringAsFixed(0)}';
         } catch (e) {
           value = '-';
         }
         return StandingsDataText(text: value);
       case 20:
-        return StandingsDataText(
-            text: widget.players[row]['STATS'][widget.selectedSeason]
-                    [widget.selectedSeasonType]['BASIC']['PTS']!
-                .toStringAsFixed(0));
+        String value = '';
+        try {
+          value =
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['TOUCHES'].toStringAsFixed(0)}';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
       case 21:
-        return StandingsDataText(
-            text: widget.players[row]['STATS'][widget.selectedSeason]
-                    [widget.selectedSeasonType]['BASIC']['PTS']!
-                .toStringAsFixed(0));
+        String value = '';
+        try {
+          value =
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['PASSING']['PASSES_MADE'].toStringAsFixed(0)}';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
       case 22:
-        return StandingsDataText(
-            text: widget.players[row]['STATS'][widget.selectedSeason]
-                    [widget.selectedSeasonType]['BASIC']['PTS']!
-                .toStringAsFixed(0));
+        String value = '';
+        try {
+          value =
+              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['SHOOTING']['CLOSEST_DEFENDER']['6+ Feet - Wide Open']['FG3_PCT'] * 100).toStringAsFixed(1)}%';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
       default:
         return Text('');
     }

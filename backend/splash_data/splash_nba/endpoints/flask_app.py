@@ -16,8 +16,12 @@ def query_database():
     selected_season_type = data.get('selectedSeasonType')
     filters = data.get('filters')
 
-    query = build_query(selected_season, selected_season_type, filters)
-    results = players_collection.find(query, {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{selected_season}': 1, '_id': 0})
+    if filters:
+        query = build_query(selected_season, selected_season_type, filters)
+    else:
+        query = {f"STATS.{selected_season}.{selected_season_type}": {"$exists": True}}
+
+    results = players_collection.find(query, {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{selected_season}.{selected_season_type}': 1, '_id': 0})
 
     return jsonify([result for result in results])
 
