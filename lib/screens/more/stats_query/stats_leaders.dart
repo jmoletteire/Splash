@@ -17,6 +17,7 @@ class Leaders extends StatefulWidget {
 class _LeadersState extends State<Leaders> {
   List<dynamic>? queryData;
   String? selectedSeason;
+  String? selectedSeasonType;
   final ScrollController _scrollController = ScrollController();
 
   void _handleFiltersDone(Map<String, dynamic> data) {
@@ -24,6 +25,7 @@ class _LeadersState extends State<Leaders> {
     setState(() {
       queryData = data['data'];
       selectedSeason = data['selectedSeason'];
+      selectedSeasonType = data['selectedSeasonType'];
     });
   }
 
@@ -102,6 +104,7 @@ class _LeadersState extends State<Leaders> {
                         'SW',
                       ],
                       selectedSeason: selectedSeason!,
+                      selectedSeasonType: selectedSeasonType!,
                       players: queryData!,
                     ),
                   ],

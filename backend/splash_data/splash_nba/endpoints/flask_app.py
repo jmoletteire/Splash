@@ -13,7 +13,7 @@ app = Flask(__name__)
 def query_database():
     data = request.json
     selected_season = data.get('selectedSeason')
-    selected_season_type = data.get('seasonType')
+    selected_season_type = data.get('selectedSeasonType')
     filters = data.get('filters')
 
     query = build_query(selected_season, selected_season_type, filters)
@@ -26,16 +26,13 @@ def build_query(season, season_type, filters):
     query = {"$and": []}
     for stat_filter in filters:
         logging.info(stat_filter)
+        logging.info(season_type)
 
         operator = stat_filter['operation']
         value = stat_filter['value']
         location = stat_filter['location']
 
-        stats = 'STATS'
-        if season_type == 'Playoffs':
-            stats = 'STATS.PLAYOFFS'
-
-        path = f"{stats}.{season}.{location}"
+        path = f"STATS.{season}.{season_type}.{location}"
 
         try:
             value = float(value)  # Try to convert value to a float for numerical comparisons

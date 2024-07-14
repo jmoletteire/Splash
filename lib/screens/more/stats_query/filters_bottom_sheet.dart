@@ -26,7 +26,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   bool _loading = false;
   int? _editIndex;
 
-  List<String> seasonTypes = ['Regular Season', 'Playoffs'];
+  List<String> seasonTypes = ['REGULAR SEASON', 'PLAYOFFS'];
   List<String> positions = ['ALL', 'G', 'F', 'C', 'G/F', 'F/C'];
 
   String _operation = 'equals';
@@ -139,7 +139,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
       },
       body: jsonEncode({
         'selectedSeason': selectedSeason,
-        'seasonType': seasonType,
+        'selectedSeasonType': seasonType,
         'filters': filters,
       }),
     );
@@ -153,6 +153,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
       widget.onDone({
         'data': data,
         'selectedSeason': selectedSeason,
+        'selectedSeasonType': seasonType,
       });
     } else {
       _showErrorSnackBar(context, 'Error fetching data from server');
