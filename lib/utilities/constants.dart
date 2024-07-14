@@ -1112,6 +1112,24 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Difference in team\'s point differential per 100 possessions when player is on court vs. when player is off court.',
       'formula': 'NRTG (On) - NRTG (Off)'
     },
+    '+/-': {
+      'location': ['BASIC'],
+      'TOTAL': {
+        'nba_name': 'PLUS_MINUS',
+        'rank_nba_name': 'PLUS_MINUS_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'PLUS_MINUS',
+        'rank_nba_name': 'PLUS_MINUS_RANK',
+      },
+      'splash_name': 'P/M',
+      'full_name': 'Plus/Minus',
+      'first_available': '1996',
+      'convert': 'false',
+      'round': '0',
+      'definition': 'Team\'s point differential when player is on court.',
+      'formula': ''
+    },
     'fill2': {'first_available': '1996'},
     'USAGE': {
       'location': ['ADV'],
@@ -2249,6 +2267,25 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
   },
   'PASSING': {
+    'PASSES': {
+      'location': ['ADV', 'PASSING'],
+      'TOTAL': {
+        'nba_name': 'PASSES_MADE',
+        'rank_nba_name': 'PASSES_MADE_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'PASSES_MADE_PER_75',
+        'rank_nba_name': 'PASSES_MADE_PER_75_RANK',
+      },
+      'splash_name': 'PASSES',
+      'full_name': 'Passes Made',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition': 'The number of passes made by a player.',
+      'formula': ''
+    },
+    'fill': {'first_available': '2013'},
     'AST': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
@@ -2325,7 +2362,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The total sum of a player\'s assists, free throw assists, and secondary assists.',
       'formula': 'AST + FT AST + Secondary AST'
     },
-    'fill': {'first_available': '2013'},
+    'fill2': {'first_available': '2013'},
     'POT. AST': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
@@ -2363,7 +2400,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'Points created by a player through their assists.',
       'formula': ''
     },
-    'fill2': {'first_available': '2013'},
+    'fill3': {'first_available': '2013'},
     'AST%': {
       'location': ['ADV'],
       'TOTAL': {

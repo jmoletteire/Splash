@@ -4,27 +4,26 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import '../utilities/constants.dart';
 
 class PlayerStatCard extends StatelessWidget {
-  const PlayerStatCard(
-      {super.key,
-      required this.playerStats,
-      required this.selectedSeason,
-      required this.statGroup,
-      required this.perMode,
-      required this.isPlayoffs});
+  const PlayerStatCard({
+    super.key,
+    required this.playerStats,
+    required this.selectedSeason,
+    required this.selectedSeasonType,
+    required this.statGroup,
+    required this.perMode,
+  });
 
   final Map<String, dynamic> playerStats;
   final String selectedSeason;
+  final String selectedSeasonType;
   final String statGroup;
   final String perMode;
-  final bool isPlayoffs;
 
   dynamic getValueFromMap(
       Map<String, dynamic> map, List<String> keys, String stat) {
     dynamic value = map;
 
-    if (isPlayoffs) {
-      keys = ['PLAYOFFS'] + keys;
-    }
+    keys = [selectedSeasonType] + keys;
 
     for (var key in keys) {
       if (value is Map<String, dynamic> && value.containsKey(key)) {
@@ -115,9 +114,8 @@ class PlayerStatCard extends StatelessWidget {
                     stats[stat]?['location'],
                     stats[stat]?[perMode]['rank_nba_name'],
                   ),
-                  numPlayers: isPlayoffs
-                      ? playerStats['PLAYOFFS']['BASIC']['NUM_PLAYERS']
-                      : playerStats['BASIC']['NUM_PLAYERS'],
+                  numPlayers: playerStats[selectedSeasonType]['BASIC']
+                      ['NUM_PLAYERS'],
                 ),
             ],
           ],

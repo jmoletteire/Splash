@@ -20,21 +20,22 @@ class _PlayerStatsState extends State<PlayerStats> {
   late List<String> seasons;
   late String selectedSeason;
   late String perMode;
-  bool _isPlayoffs = false;
+  late String selectedSeasonType;
   List<String> modes = ['TOTAL', 'PER_75'];
-  int playoffsInitialLabelIndex = 0;
+  bool _playoffSwitch = false;
   int perModeInitialLabelIndex = 0;
 
   double getPercentile(List<String> location, String stat) {
     num rank = (location.length == 1
-            ? widget.player['STATS'][selectedSeason][location[0]]
-                ['${stat}_RANK']
-            : widget.player['STATS'][selectedSeason][location[0]][location[1]]
-                ['${stat}_RANK']) ??
+            ? widget.player['STATS'][selectedSeason][selectedSeasonType]
+                [location[0]]['${stat}_RANK']
+            : widget.player['STATS'][selectedSeason][selectedSeasonType]
+                [location[0]][location[1]]['${stat}_RANK']) ??
         0;
     return 1 -
         ((rank - 1) /
-            (widget.player['STATS'][selectedSeason]['BASIC']['NUM_PLAYERS'] -
+            (widget.player['STATS'][selectedSeason][selectedSeasonType]['BASIC']
+                    ['NUM_PLAYERS'] -
                 1));
   }
 
@@ -93,6 +94,7 @@ class _PlayerStatsState extends State<PlayerStats> {
         ? seasons = widget.player['STATS'].keys.toList().reversed.toList()
         : seasons = [kCurrentSeason];
     selectedSeason = seasons.first;
+    selectedSeasonType = 'REGULAR SEASON';
     perMode = modes[0];
   }
 
@@ -149,13 +151,16 @@ class _PlayerStatsState extends State<PlayerStats> {
                                           begin: 0,
                                           end: perMode == 'PER_75'
                                               ? widget.player['STATS']
-                                                      [selectedSeason]['BASIC']
-                                                  ['PTS_PER_75']
-                                              : (widget.player['STATS']
                                                           [selectedSeason]
+                                                      [selectedSeasonType]
+                                                  ['BASIC']['PTS_PER_75']
+                                              : (widget.player['STATS']
+                                                              [selectedSeason]
+                                                          [selectedSeasonType]
                                                       ['BASIC']['PTS'] /
                                                   widget.player['STATS']
-                                                          [selectedSeason]
+                                                              [selectedSeason]
+                                                          [selectedSeasonType]
                                                       ['BASIC']['GP']),
                                         ),
                                         duration:
@@ -178,13 +183,16 @@ class _PlayerStatsState extends State<PlayerStats> {
                                             begin: 0,
                                             end: perMode == 'PER_75'
                                                 ? widget.player['STATS']
-                                                        [selectedSeason]
+                                                            [selectedSeason]
+                                                        [selectedSeasonType]
                                                     ['BASIC']['REB_PER_75']
                                                 : (widget.player['STATS']
-                                                            [selectedSeason]
+                                                                [selectedSeason]
+                                                            [selectedSeasonType]
                                                         ['BASIC']['REB'] /
                                                     widget.player['STATS']
-                                                            [selectedSeason]
+                                                                [selectedSeason]
+                                                            [selectedSeasonType]
                                                         ['BASIC']['GP']),
                                           ),
                                           duration:
@@ -205,19 +213,18 @@ class _PlayerStatsState extends State<PlayerStats> {
                                           tween: Tween(
                                             begin: 0,
                                             end: perMode == 'PER_75'
-                                                ? (widget.player['STATS']
-                                                                [selectedSeason]
+                                                ? (widget.player['STATS'][selectedSeason]
+                                                                [selectedSeasonType]
                                                             ['BASIC']['AST'] /
-                                                        widget.player['STATS']
-                                                                [selectedSeason]
+                                                        widget.player['STATS'][selectedSeason]
+                                                                [selectedSeasonType]
                                                             ['ADV']['POSS']) *
                                                     75
-                                                : (widget.player['STATS']
-                                                            [selectedSeason]
+                                                : (widget.player['STATS'][selectedSeason]
+                                                            [selectedSeasonType]
                                                         ['BASIC']['AST'] /
-                                                    widget.player['STATS']
-                                                            [selectedSeason]
-                                                        ['BASIC']['GP']),
+                                                    widget.player['STATS'][selectedSeason]
+                                                        [selectedSeasonType]['BASIC']['GP']),
                                           ),
                                           duration:
                                               const Duration(milliseconds: 250),
@@ -320,7 +327,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeason: selectedSeason,
                             statGroup: 'EFFICIENCY',
                             perMode: perMode,
-                            isPlayoffs: _isPlayoffs,
+                            selectedSeasonType: selectedSeasonType,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 1996)
                           PlayerStatCard(
@@ -328,7 +335,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeason: selectedSeason,
                             statGroup: 'SCORING',
                             perMode: perMode,
-                            isPlayoffs: _isPlayoffs,
+                            selectedSeasonType: selectedSeasonType,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
                           PlayerStatCard(
@@ -336,7 +343,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeason: selectedSeason,
                             statGroup: 'SHOT TYPE',
                             perMode: perMode,
-                            isPlayoffs: _isPlayoffs,
+                            selectedSeasonType: selectedSeasonType,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
                           PlayerStatCard(
@@ -344,7 +351,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeason: selectedSeason,
                             statGroup: 'CLOSEST DEFENDER',
                             perMode: perMode,
-                            isPlayoffs: _isPlayoffs,
+                            selectedSeasonType: selectedSeasonType,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 1996)
                           PlayerStatCard(
@@ -352,7 +359,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeason: selectedSeason,
                             statGroup: 'REBOUNDING',
                             perMode: perMode,
-                            isPlayoffs: _isPlayoffs,
+                            selectedSeasonType: selectedSeasonType,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
                           PlayerStatCard(
@@ -360,7 +367,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeason: selectedSeason,
                             statGroup: 'PASSING',
                             perMode: perMode,
-                            isPlayoffs: _isPlayoffs,
+                            selectedSeasonType: selectedSeasonType,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 1996)
                           PlayerStatCard(
@@ -368,7 +375,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeason: selectedSeason,
                             statGroup: 'DEFENSE',
                             perMode: perMode,
-                            isPlayoffs: _isPlayoffs,
+                            selectedSeasonType: selectedSeasonType,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) > 2015)
                           PlayerStatCard(
@@ -376,7 +383,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeason: selectedSeason,
                             statGroup: 'HUSTLE',
                             perMode: perMode,
-                            isPlayoffs: _isPlayoffs,
+                            selectedSeasonType: selectedSeasonType,
                           ),
                         const Padding(
                           padding: EdgeInsets.only(bottom: 100),
@@ -402,50 +409,59 @@ class _PlayerStatsState extends State<PlayerStats> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade900,
-                            border: Border.all(color: teamColor),
-                            borderRadius: BorderRadius.circular(10.0)),
-                        margin: const EdgeInsets.all(11.0),
-                        child: DropdownButton<String>(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          borderRadius: BorderRadius.circular(10.0),
-                          menuMaxHeight: 300.0,
-                          dropdownColor: Colors.grey.shade900,
-                          isExpanded: false,
-                          underline: Container(),
-                          value: selectedSeason,
-                          items: seasons
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Text(
-                                    value,
-                                    style:
-                                        kBebasNormal.copyWith(fontSize: 19.0),
-                                  ),
-                                  const SizedBox(width: 10.0),
-                                  Image.asset(
-                                    'images/NBA_Logos/${widget.player['STATS'][value]['BASIC']['TEAM_ID']}.png',
-                                    fit: BoxFit.scaleDown,
-                                    width: 25.0,
-                                    height: 25.0,
-                                    alignment: Alignment.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? value) {
-                            setState(() {
-                              selectedSeason = value!;
-                              _isPlayoffs = false;
-                            });
-                          },
-                        ),
-                      ),
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade900,
+                              border: Border.all(color: teamColor),
+                              borderRadius: BorderRadius.circular(10.0)),
+                          margin: const EdgeInsets.all(11.0),
+                          child: DropdownButton<String>(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 15.0),
+                            borderRadius: BorderRadius.circular(10.0),
+                            menuMaxHeight: 300.0,
+                            dropdownColor: Colors.grey.shade900,
+                            isExpanded: false,
+                            underline: Container(),
+                            value: selectedSeason,
+                            items: seasons
+                                .map<DropdownMenuItem<String>>((String value) {
+                              print(selectedSeasonType);
+                              var teamId = widget.player['STATS'][value]
+                                  ?['REGULAR SEASON']?['BASIC']?['TEAM_ID'];
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      value,
+                                      style:
+                                          kBebasNormal.copyWith(fontSize: 19.0),
+                                    ),
+                                    const SizedBox(width: 10.0),
+                                    if (teamId != null)
+                                      Image.asset(
+                                        'images/NBA_Logos/$teamId.png',
+                                        fit: BoxFit.scaleDown,
+                                        width: 25.0,
+                                        height: 25.0,
+                                        alignment: Alignment.center,
+                                      )
+                                    else
+                                      const SizedBox(
+                                        width: 25.0,
+                                        height: 25.0,
+                                      ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedSeason = value!;
+                                selectedSeasonType = 'REGULAR SEASON';
+                              });
+                            },
+                          )),
                       if (widget.player['STATS'][selectedSeason]
                           .containsKey('PLAYOFFS'))
                         Expanded(
@@ -459,22 +475,26 @@ class _PlayerStatsState extends State<PlayerStats> {
                                       -1.5708, // Rotate 90 degrees counterclockwise
                                   child: CupertinoSwitch(
                                     activeColor: teamColor,
-                                    value: _isPlayoffs,
+                                    value: _playoffSwitch,
                                     onChanged: (value) {
                                       setState(() {
-                                        _isPlayoffs = value;
+                                        _playoffSwitch = value;
+                                        _playoffSwitch
+                                            ? selectedSeasonType = 'PLAYOFFS'
+                                            : selectedSeasonType =
+                                                'REGULAR SEASON';
                                       });
                                     },
                                   ),
                                 ),
                               ),
                               Positioned(
-                                top: 1,
+                                top: 2,
                                 left: 8, // Adjust based on your switch size
                                 child: IgnorePointer(
                                   ignoring: true,
                                   child: Visibility(
-                                    visible: _isPlayoffs,
+                                    visible: _playoffSwitch,
                                     child: SvgPicture.asset(
                                       'images/playoffs.svg',
                                       width: 16.0,
