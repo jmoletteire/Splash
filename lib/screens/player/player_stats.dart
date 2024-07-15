@@ -425,7 +425,6 @@ class _PlayerStatsState extends State<PlayerStats> {
                             value: selectedSeason,
                             items: seasons
                                 .map<DropdownMenuItem<String>>((String value) {
-                              print(selectedSeasonType);
                               var teamId = widget.player['STATS'][value]
                                   ?['REGULAR SEASON']?['BASIC']?['TEAM_ID'];
                               return DropdownMenuItem<String>(

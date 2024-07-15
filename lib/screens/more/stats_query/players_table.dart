@@ -150,37 +150,72 @@ class _PlayersTableState extends State<PlayersTable> {
             0;
       case 15:
         return player['STATS']?[widget.selectedSeason]
-                ?[widget.selectedSeasonType]?['ADV']?['USG_PCT'] ??
+                    ?[widget.selectedSeasonType]?['ADV']?['SHOOTING']
+                ?['CLOSEST_DEFENDER']?['6+ Feet - Wide Open']?['FG3_PCT'] ??
             0;
       case 16:
         return player['STATS']?[widget.selectedSeason]
-                ?[widget.selectedSeasonType]?['ADV']?['NET_RATING_ON_OFF'] ??
+                ?[widget.selectedSeasonType]?['ADV']?['USG_PCT'] ??
             0;
       case 17:
         return player['STATS']?[widget.selectedSeason]
-                ?[widget.selectedSeasonType]?['ADV']?['OFF_RATING_ON_OFF'] ??
+                ?[widget.selectedSeasonType]?['ADV']?['NET_RATING_ON_OFF'] ??
             0;
       case 18:
         return player['STATS']?[widget.selectedSeason]
-                ?[widget.selectedSeasonType]?['ADV']?['DEF_RATING_ON_OFF'] ??
+                ?[widget.selectedSeasonType]?['ADV']?['OFF_RATING_ON_OFF'] ??
             0;
       case 19:
         return player['STATS']?[widget.selectedSeason]
-                ?[widget.selectedSeasonType]?['ADV']?['POSS'] ??
+                ?[widget.selectedSeasonType]?['ADV']?['DEF_RATING_ON_OFF'] ??
             0;
       case 20:
         return player['STATS']?[widget.selectedSeason]
-                ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']?['TOUCHES'] ??
+                ?[widget.selectedSeasonType]?['ADV']?['POSS'] ??
             0;
       case 21:
+        return player['STATS']?[widget.selectedSeason]
+                ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']?['TOUCHES'] ??
+            0;
+      case 22:
+        return player['STATS']?[widget.selectedSeason]
+                    ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']
+                ?['AVG_DRIB_PER_TOUCH'] ??
+            0;
+      case 23:
+        return player['STATS']?[widget.selectedSeason]
+                    ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']
+                ?['AVG_SEC_PER_TOUCH'] ??
+            0;
+      case 24:
+        return player['STATS']?[widget.selectedSeason]
+                    ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']
+                ?['FGA_PER_TOUCH'] ??
+            0;
+      case 25:
+        return player['STATS']?[widget.selectedSeason]
+                    ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']
+                ?['PASSES_PER_TOUCH'] ??
+            0;
+      case 26:
+        return player['STATS']?[widget.selectedSeason]
+                    ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']
+                ?['TOV_PER_TOUCH'] ??
+            0;
+      case 27:
+        return player['STATS']?[widget.selectedSeason]
+                    ?[widget.selectedSeasonType]?['ADV']?['TOUCHES']
+                ?['PFD_PER_TOUCH'] ??
+            0;
+      case 28:
         return player['STATS']?[widget.selectedSeason]
                     ?[widget.selectedSeasonType]?['ADV']?['PASSING']
                 ?['PASSES_MADE'] ??
             0;
-      case 22:
+      case 29:
         return player['STATS']?[widget.selectedSeason]
-                    ?[widget.selectedSeasonType]?['ADV']?['SHOOTING']
-                ?['CLOSEST_DEFENDER']?['6+ Feet - Wide Open']?['FG3_PCT'] ??
+                    ?[widget.selectedSeasonType]?['ADV']?['PASSING']
+                ?['AST_TO_PASS_PCT_ADJ'] ??
             0;
       default:
         return player['DISPLAY_FI_LAST'] ?? '';
@@ -256,29 +291,50 @@ class _PlayersTableState extends State<PlayersTable> {
         /// TS%
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
 
+        /// WIDE OPEN 3P%
+        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
+
         /// USG%
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
 
         /// NRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
 
         /// ORTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
 
         /// DRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
 
         /// POSS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
 
         /// TOUCHES
+        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
+
+        /// DRIB PER TOUCH
         TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+
+        /// SEC PER TOUCH
+        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+
+        /// SHOOT %
+        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
+
+        /// PASS %
+        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
+
+        /// TOV %
+        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
+
+        /// FOULED %
+        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
 
         /// PASSES MADE
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// WIDE OPEN 3P%
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
+
+        /// ADJ AST - PASS %
+        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -551,7 +607,7 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['USG_PCT'] * 100).toStringAsFixed(1)}%';
+              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['SHOOTING']['CLOSEST_DEFENDER']['6+ Feet - Wide Open']['FG3_PCT'] * 100).toStringAsFixed(1)}%';
         } catch (e) {
           value = '-';
         }
@@ -560,7 +616,7 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['NET_RATING_ON_OFF'].toStringAsFixed(1)}';
+              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['USG_PCT'] * 100).toStringAsFixed(1)}%';
         } catch (e) {
           value = '-';
         }
@@ -569,7 +625,7 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['OFF_RATING_ON_OFF'].toStringAsFixed(1)}';
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['NET_RATING_ON_OFF'].toStringAsFixed(1)}';
         } catch (e) {
           value = '-';
         }
@@ -578,7 +634,7 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['DEF_RATING_ON_OFF'].toStringAsFixed(1)}';
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['OFF_RATING_ON_OFF'].toStringAsFixed(1)}';
         } catch (e) {
           value = '-';
         }
@@ -587,7 +643,7 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['POSS'].toStringAsFixed(0)}';
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['DEF_RATING_ON_OFF'].toStringAsFixed(1)}';
         } catch (e) {
           value = '-';
         }
@@ -596,7 +652,7 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['TOUCHES'].toStringAsFixed(0)}';
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['POSS'].toStringAsFixed(0)}';
         } catch (e) {
           value = '-';
         }
@@ -605,7 +661,7 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['PASSING']['PASSES_MADE'].toStringAsFixed(0)}';
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['TOUCHES'].toStringAsFixed(0)}';
         } catch (e) {
           value = '-';
         }
@@ -614,7 +670,70 @@ class _PlayersTableState extends State<PlayersTable> {
         String value = '';
         try {
           value =
-              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['SHOOTING']['CLOSEST_DEFENDER']['6+ Feet - Wide Open']['FG3_PCT'] * 100).toStringAsFixed(1)}%';
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['AVG_DRIB_PER_TOUCH'].toStringAsFixed(1)}';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
+      case 23:
+        String value = '';
+        try {
+          value =
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['AVG_SEC_PER_TOUCH'].toStringAsFixed(1)}';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
+      case 24:
+        String value = '';
+        try {
+          value =
+              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['FGA_PER_TOUCH'] * 100).toStringAsFixed(1)}%';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
+      case 25:
+        String value = '';
+        try {
+          value =
+              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['PASSES_PER_TOUCH'] * 100).toStringAsFixed(1)}%';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
+      case 26:
+        String value = '';
+        try {
+          value =
+              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['TOV_PER_TOUCH'] * 100).toStringAsFixed(1)}%';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
+      case 27:
+        String value = '';
+        try {
+          value =
+              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['TOUCHES']['PFD_PER_TOUCH'] * 100).toStringAsFixed(1)}%';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
+      case 28:
+        String value = '';
+        try {
+          value =
+              '${widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['PASSING']['PASSES_MADE'].toStringAsFixed(0)}';
+        } catch (e) {
+          value = '-';
+        }
+        return StandingsDataText(text: value);
+      case 29:
+        String value = '';
+        try {
+          value =
+              '${(widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType]['ADV']['PASSING']['AST_TO_PASS_PCT_ADJ'] * 100).toStringAsFixed(1)}%';
         } catch (e) {
           value = '-';
         }
