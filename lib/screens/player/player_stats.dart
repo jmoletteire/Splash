@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 import '../../components/animated_polar_chart.dart';
+import '../../components/custom_key.dart';
 import '../../components/player_stat_card.dart';
 import '../../utilities/constants.dart';
 
@@ -286,7 +287,8 @@ class _PlayerStatsState extends State<PlayerStats> {
                             child: Padding(
                               padding: const EdgeInsets.all(75.0),
                               child: AnimatedPolarAreaChart(
-                                key: ValueKey(selectedSeason),
+                                key: ObjectKey(CustomKey(
+                                    selectedSeason, selectedSeasonType)),
                                 values: [
                                   getFinalPercentile('Defense'),
                                   getFinalPercentile('Rebounding'),

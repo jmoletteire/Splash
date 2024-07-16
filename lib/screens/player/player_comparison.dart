@@ -540,7 +540,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                             'PLAYOFFS'
                                           ]
                                         : seasonTypesTwo = ['REGULAR SEASON'];
-                                    selectedSeasonTypeTwo = seasonTypesTwo.first;
+                                    selectedSeasonTypeTwo =
+                                        seasonTypesTwo.first;
                                   });
                                 }
                               : null,
