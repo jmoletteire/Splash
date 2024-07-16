@@ -3,22 +3,25 @@ import 'package:material_table_view/default_animated_switcher_transition_builder
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
+import 'package:splash/screens/more/stats_query/util/column_options.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/player_avatar.dart';
 import '../../player/player_home.dart';
 
 class PlayersTable extends StatefulWidget {
-  final List columnNames;
+  final List<ColumnOption> selectedColumns;
   final String selectedSeason;
   final String selectedSeasonType;
   final List<dynamic> players;
+  final Function(List<ColumnOption>) updateSelectedColumns;
 
   PlayersTable({
-    required this.columnNames,
+    required this.selectedColumns,
     required this.selectedSeason,
     required this.selectedSeasonType,
     required this.players,
+    required this.updateSelectedColumns,
   });
 
   @override
@@ -243,99 +246,12 @@ class _PlayersTableState extends State<PlayersTable> {
       rowCount: widget.players.length,
       rowHeight: MediaQuery.of(context).size.height * 0.055,
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
-      columns: [
-        TableColumn(
-          width: MediaQuery.of(context).size.width * 0.35,
-          freezePriority: 1,
-        ),
-
-        /// TEAM
-        TableColumn(width: MediaQuery.of(context).size.width * 0.135),
-
-        /// AGE
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// POS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.135),
-
-        /// REB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// AST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// STL
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// BLK
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// TOV
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// FG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// 3P%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// FT%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// eFG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// TS%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// WIDE OPEN 3P%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
-
-        /// USG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// NRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// ORTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// DRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// POSS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// TOUCHES
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// DRIB PER TOUCH
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// SEC PER TOUCH
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
-
-        /// SHOOT %
-        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
-
-        /// PASS %
-        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
-
-        /// TOV %
-        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
-
-        /// FOULED %
-        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
-
-        /// PASSES MADE
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// ADJ AST - PASS %
-        TableColumn(width: MediaQuery.of(context).size.width * 0.175),
-      ],
+      columns: widget.selectedColumns.map((col) {
+        return TableColumn(
+          width: MediaQuery.of(context).size.width * col.width,
+          freezePriority: col.index == 0 ? 1 : 0,
+        );
+      }).toList(),
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
     );
@@ -346,6 +262,7 @@ class _PlayersTableState extends State<PlayersTable> {
       contentBuilder(
         context,
         (context, column) {
+          final col = widget.selectedColumns[column];
           return Material(
             color: Colors.grey.shade800,
             child: InkWell(
@@ -353,7 +270,7 @@ class _PlayersTableState extends State<PlayersTable> {
                 final isAscending =
                     _sortColumnIndex == column && _sortAscending;
                 _sort<dynamic>(
-                  (player) => _getSortingKey(player, column),
+                  (player) => _getSortingKey(player, col.index),
                   column,
                   !isAscending,
                 );
@@ -368,7 +285,7 @@ class _PlayersTableState extends State<PlayersTable> {
                       : MainAxisAlignment.end,
                   children: [
                     Text(
-                      '${widget.columnNames[column]}',
+                      col.header,
                       style: kBebasNormal.copyWith(
                         fontSize: 18.0,
                       ),
@@ -412,10 +329,7 @@ class _PlayersTableState extends State<PlayersTable> {
       );
 
   Widget? _rowBuilder(
-    BuildContext context,
-    int row,
-    TableRowContentBuilder contentBuilder,
-  ) {
+      BuildContext context, int row, TableRowContentBuilder contentBuilder) {
     return _wrapRow(
       row,
       Material(
@@ -434,9 +348,10 @@ class _PlayersTableState extends State<PlayersTable> {
           }),
           splashColor: Colors.white,
           child: contentBuilder(context, (context, column) {
+            final col = widget.selectedColumns[column];
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: getContent(widget.players, row, column, context),
+              child: getContent(widget.players, row, col.index, context),
             );
           }),
         ),

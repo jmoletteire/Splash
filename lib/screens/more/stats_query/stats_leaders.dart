@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:splash/screens/more/stats_query/filters_bottom_sheet.dart';
 import 'package:splash/screens/more/stats_query/players_table.dart';
+import 'package:splash/screens/more/stats_query/util/column_options.dart';
+import 'package:splash/screens/more/stats_query/util/custom_bottom_sheet.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/custom_icon_button.dart';
@@ -18,6 +20,7 @@ class _LeadersState extends State<Leaders> {
   List<dynamic>? queryData;
   String? selectedSeason;
   String? selectedSeasonType;
+  List<ColumnOption> selectedColumns = [];
   final ScrollController _scrollController = ScrollController();
 
   void _handleFiltersDone(Map<String, dynamic> data) {
@@ -26,6 +29,31 @@ class _LeadersState extends State<Leaders> {
       selectedSeason = data['selectedSeason'];
       selectedSeasonType = data['selectedSeasonType'];
     });
+  }
+
+  void _showColumnSelector() {
+    showModalBottomSheet(
+      backgroundColor: const Color(0xFF111111),
+      context: context,
+      builder: (context) {
+        return CustomBottomSheet(
+          selectedColumns: selectedColumns,
+          updateSelectedColumns: updateSelectedColumns,
+        );
+      },
+    );
+  }
+
+  void updateSelectedColumns(List<ColumnOption> newColumns) {
+    setState(() {
+      selectedColumns = newColumns;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    selectedColumns = List.from(kAllColumns); // Initially select all columns
   }
 
   @override
@@ -52,6 +80,10 @@ class _LeadersState extends State<Leaders> {
               );
             },
           ),
+          CustomIconButton(
+            icon: Icons.table_rows,
+            onPressed: _showColumnSelector,
+          ),
           FiltersBottomSheet(onDone: _handleFiltersDone)
         ],
       ),
@@ -77,41 +109,11 @@ class _LeadersState extends State<Leaders> {
                   controller: _scrollController,
                   slivers: [
                     PlayersTable(
-                      columnNames: const [
-                        'PLAYER',
-                        'TEAM',
-                        'AGE',
-                        'POS',
-                        'PPG',
-                        'RPG',
-                        'APG',
-                        'SPG',
-                        'BPG',
-                        'TOPG',
-                        'FG%',
-                        '3P%',
-                        'FT%',
-                        'EFG%',
-                        'TS%',
-                        'WO 3P%',
-                        'USG%',
-                        'NRTG',
-                        'ORTG',
-                        'DRTG',
-                        'POSS',
-                        'Tch',
-                        'DRIB',
-                        'SEC',
-                        '% SHOT',
-                        '% PASS',
-                        '% TOV',
-                        '% FOUL',
-                        'PASS',
-                        'AA-P%',
-                      ],
+                      selectedColumns: selectedColumns,
                       selectedSeason: selectedSeason!,
                       selectedSeasonType: selectedSeasonType!,
                       players: queryData!,
+                      updateSelectedColumns: updateSelectedColumns,
                     ),
                   ],
                 ),
