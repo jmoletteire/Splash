@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/team/team_cache.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -156,7 +157,7 @@ class _StandingsState extends State<Standings> {
   Widget build(BuildContext context) {
     return isLoading
         ? const Center(
-            child: CircularProgressIndicator(
+            child: SpinningIcon(
               color: Colors.deepOrange,
             ),
           )

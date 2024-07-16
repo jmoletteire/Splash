@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/game_card.dart';
+import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/search_screen.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/nba_api/library/network.dart';
@@ -213,7 +214,7 @@ class _ScoreboardState extends State<Scoreboard>
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(
+              child: SpinningIcon(
                 color: Colors.deepOrange,
               ),
             )

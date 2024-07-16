@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:splash/components/player_avatar.dart';
+import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/player/player_home.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -84,7 +85,7 @@ class _TeamRosterState extends State<TeamRoster> {
   Widget build(BuildContext context) {
     return _isLoading
         ? Center(
-            child: CircularProgressIndicator(
+            child: SpinningIcon(
               color: kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
                   ? (kTeamColors[widget.team['ABBREVIATION']]
                       ?['secondaryColor'])
@@ -213,7 +214,6 @@ class _TeamRosterState extends State<TeamRoster> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    bool networkImageFailed = false;
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(

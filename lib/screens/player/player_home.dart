@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/player_avatar.dart';
+import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/player_career.dart';
 import 'package:splash/screens/player/player_comparison.dart';
@@ -171,7 +173,7 @@ class _PlayerHomeState extends State<PlayerHome>
     return Scaffold(
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(
+              child: SpinningIcon(
                 color: kDarkPrimaryColors.contains(team['ABBREVIATION'])
                     ? (kTeamColors[team['ABBREVIATION']]?['secondaryColor'])
                     : (kTeamColors[team['ABBREVIATION']]?['primaryColor']),
@@ -386,15 +388,6 @@ class PlayerInfo extends StatelessWidget {
                           height: 20.0,
                         ),
                       ),
-                      /*
-                      SvgPicture.string(
-                        team['LOGO'][0],
-                        fit: BoxFit.contain,
-                        width: 18.0,
-                        height: 18.0,
-                      ),
-
-                       */
                     ],
                   ),
                 ),

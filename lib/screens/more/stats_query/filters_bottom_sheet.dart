@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:splash/components/spinning_ball_loading.dart';
 
 import '../../../components/custom_icon_button.dart';
 import '../../../utilities/constants.dart';
@@ -535,8 +536,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                         Container(
                           color: Colors.black.withOpacity(0.5),
                           child: const Center(
-                            child: CircularProgressIndicator(
-                                color: Colors.deepOrange),
+                            child: SpinningIcon(color: Colors.deepOrange),
                           ),
                         ),
                     ],

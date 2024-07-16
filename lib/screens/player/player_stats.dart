@@ -52,34 +52,34 @@ class _PlayerStatsState extends State<PlayerStats> {
         return getPercentile(['ADV'], 'TS_PCT');
       case 'Defense':
         double result = (getPercentile(['ADV'], 'DEF_RATING_ON_OFF') +
-                getPercentile(['BASIC'], 'STL') +
-                getPercentile(['BASIC'], 'BLK') +
-                getPercentile(['HUSTLE'], 'DEFLECTIONS') +
-                getPercentile(['HUSTLE'], 'CONTESTED_SHOTS')) /
+                getPercentile(['BASIC'], 'STL_PER_75') +
+                getPercentile(['BASIC'], 'BLK_PER_75') +
+                getPercentile(['HUSTLE'], 'DEFLECTIONS_PER_75') +
+                getPercentile(['HUSTLE'], 'CONTESTED_SHOTS_PER_75')) /
             5;
         return result;
       case 'Rebounding':
         double result = (getPercentile(['ADV'], 'OREB_PCT') +
                 getPercentile(['ADV'], 'DREB_PCT') +
-                getPercentile(['HUSTLE'], 'BOX_OUTS') +
-                getPercentile(['HUSTLE'], 'OFF_BOXOUTS') +
-                getPercentile(['HUSTLE'], 'DEF_BOXOUTS')) /
+                getPercentile(['HUSTLE'], 'BOX_OUTS_PER_75') +
+                getPercentile(['HUSTLE'], 'OFF_BOXOUTS_PER_75') +
+                getPercentile(['HUSTLE'], 'DEF_BOXOUTS_PER_75')) /
             5;
         return result;
       case 'Passing':
-        double result = (getPercentile(['BASIC'], 'AST') +
-                getPercentile(['ADV', 'PASSING'], 'AST_ADJ') +
+        double result = (getPercentile(['BASIC'], 'AST_PER_75') +
+                getPercentile(['ADV', 'PASSING'], 'AST_ADJ_PER_75') +
                 getPercentile(['ADV', 'PASSING'], 'AST_TO_PASS_PCT') +
                 getPercentile(['ADV', 'PASSING'], 'AST_TO_PASS_PCT_ADJ') +
-                getPercentile(['ADV', 'PASSING'], 'POTENTIAL_AST')) /
+                getPercentile(['ADV', 'PASSING'], 'POTENTIAL_AST_PER_75')) /
             5;
         return result;
       case 'Hustle':
         double result = (getPercentile(['ADV'], 'PACE') +
                 getPercentile(['HUSTLE'], 'CHARGES_DRAWN') +
-                getPercentile(['HUSTLE'], 'SCREEN_ASSISTS') +
-                getPercentile(['HUSTLE'], 'SCREEN_AST_PTS') +
-                getPercentile(['HUSTLE'], 'LOOSE_BALLS_RECOVERED')) /
+                getPercentile(['HUSTLE'], 'SCREEN_ASSISTS_PER_75') +
+                getPercentile(['HUSTLE'], 'SCREEN_AST_PTS_PER_75') +
+                getPercentile(['HUSTLE'], 'LOOSE_BALLS_RECOVERED_PER_75')) /
             5;
         return result;
       default:

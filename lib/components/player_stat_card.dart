@@ -3,7 +3,7 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import '../utilities/constants.dart';
 
-class PlayerStatCard extends StatelessWidget {
+class PlayerStatCard extends StatefulWidget {
   const PlayerStatCard({
     super.key,
     required this.playerStats,
@@ -19,11 +19,18 @@ class PlayerStatCard extends StatelessWidget {
   final String statGroup;
   final String perMode;
 
+  @override
+  _PlayerStatCardState createState() => _PlayerStatCardState();
+}
+
+class _PlayerStatCardState extends State<PlayerStatCard> {
+  bool _isExpanded = true;
+
   dynamic getValueFromMap(
       Map<String, dynamic> map, List<String> keys, String stat) {
     dynamic value = map;
 
-    keys = [selectedSeasonType] + keys;
+    keys = [widget.selectedSeasonType] + keys;
 
     for (var key in keys) {
       if (value is Map<String, dynamic> && value.containsKey(key)) {
@@ -38,88 +45,150 @@ class PlayerStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stats = kPlayerStatLabelMap[statGroup] ?? {};
+    final stats = kPlayerStatLabelMap[widget.statGroup] ?? {};
 
     return Card(
+      clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.fromLTRB(11.0, 0.0, 11.0, 11.0),
       color: Colors.grey.shade900,
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 10,
-                  child: Text(
-                    statGroup,
-                    style: const TextStyle(
-                      fontFamily: 'Anton',
-                      fontSize: 18.0,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ),
-                const Expanded(
-                  flex: 1,
-                  child: Text(
-                    'Rank',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Anton',
-                      fontSize: 13.0,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            for (dynamic stat in stats.keys) ...[
-              if (stat.toString().contains('fill') &&
-                  int.parse(selectedSeason.substring(0, 4)) >=
-                      int.parse(stats[stat]!['first_available']))
-                const SizedBox(height: 12.0),
-              if (!stat.toString().contains('fill') &&
-                  int.parse(selectedSeason.substring(0, 4)) >=
-                      int.parse(stats[stat]!['first_available']))
-                const SizedBox(height: 8.0),
-              if (!stat.toString().contains('fill') &&
-                  int.parse(selectedSeason.substring(0, 4)) >=
-                      int.parse(stats[stat]!['first_available']))
-                StatisticRow(
-                  statValue: stats[stat]?['convert'] == 'true'
-                      ? getValueFromMap(
-                            playerStats,
-                            stats[stat]?['location'],
-                            stats[stat]?[perMode]['nba_name'],
-                          ) *
-                          100
-                      : getValueFromMap(
-                          playerStats,
-                          stats[stat]?['location'],
-                          stats[stat]?[perMode]['nba_name'],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          ExpansionPanelList(
+            expandedHeaderPadding: EdgeInsets.zero,
+            elevation: 0,
+            materialGapSize: 0.0,
+            expansionCallback: (int index, bool isExpanded) {
+              setState(() {
+                _isExpanded = isExpanded;
+              });
+            },
+            children: [
+              ExpansionPanel(
+                canTapOnHeader: true,
+                backgroundColor: Colors.transparent,
+                headerBuilder: (BuildContext context, bool isExpanded) {
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 10,
+                          child: Text(
+                            widget.statGroup,
+                            style: const TextStyle(
+                              fontFamily: 'Anton',
+                              fontSize: 18.0,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
                         ),
-                  perMode: perMode,
-                  round: stats[stat]!['round']!,
-                  convert: stats[stat]!['convert']!,
-                  statName: stats[stat]!['splash_name']!,
-                  statFullName: stats[stat]!['full_name']!,
-                  definition: stats[stat]!['definition']!,
-                  formula: stats[stat]!['formula']!,
-                  statGroup: statGroup,
-                  rank: getValueFromMap(
-                    playerStats,
-                    stats[stat]?['location'],
-                    stats[stat]?[perMode]['rank_nba_name'],
+                      ],
+                    ),
+                  );
+                },
+                body: Padding(
+                  padding: const EdgeInsets.fromLTRB(15.0, 0.0, 5.0, 15.0),
+                  child: Column(
+                    children: [
+                      /*
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                'Name',
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                  fontFamily: 'Anton',
+                                  fontSize: 12.0,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                'Value',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Anton',
+                                  fontSize: 12.0,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                'Rank',
+                                textAlign: TextAlign.end,
+                                style: TextStyle(
+                                  fontFamily: 'Anton',
+                                  fontSize: 12.0,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 5.0),
+                          ],
+                        ),
+                      ),
+                      // */
+                      for (dynamic stat in stats.keys) ...[
+                        if (stat.toString().contains('fill') &&
+                            int.parse(widget.selectedSeason.substring(0, 4)) >=
+                                int.parse(stats[stat]!['first_available']))
+                          const SizedBox(height: 12.0),
+                        if (!stat.toString().contains('fill') &&
+                            int.parse(widget.selectedSeason.substring(0, 4)) >=
+                                int.parse(stats[stat]!['first_available']))
+                          const SizedBox(height: 8.0),
+                        if (!stat.toString().contains('fill') &&
+                            int.parse(widget.selectedSeason.substring(0, 4)) >=
+                                int.parse(stats[stat]!['first_available']))
+                          StatisticRow(
+                            statValue: stats[stat]?['convert'] == 'true'
+                                ? getValueFromMap(
+                                      widget.playerStats,
+                                      stats[stat]?['location'],
+                                      stats[stat]?[widget.perMode]['nba_name'],
+                                    ) *
+                                    100
+                                : getValueFromMap(
+                                    widget.playerStats,
+                                    stats[stat]?['location'],
+                                    stats[stat]?[widget.perMode]['nba_name'],
+                                  ),
+                            perMode: widget.perMode,
+                            round: stats[stat]!['round']!,
+                            convert: stats[stat]!['convert']!,
+                            statName: stats[stat]!['splash_name']!,
+                            statFullName: stats[stat]!['full_name']!,
+                            definition: stats[stat]!['definition']!,
+                            formula: stats[stat]!['formula']!,
+                            statGroup: widget.statGroup,
+                            rank: getValueFromMap(
+                              widget.playerStats,
+                              stats[stat]?['location'],
+                              stats[stat]?[widget.perMode]['rank_nba_name'],
+                            ),
+                            numPlayers:
+                                widget.playerStats[widget.selectedSeasonType]
+                                    ['BASIC']['NUM_PLAYERS'],
+                          ),
+                      ],
+                    ],
                   ),
-                  numPlayers: playerStats[selectedSeasonType]['BASIC']
-                      ['NUM_PLAYERS'],
                 ),
+                isExpanded: _isExpanded,
+              ),
             ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -190,57 +259,10 @@ class StatisticRow extends StatelessWidget {
               const SizedBox(
                 width: 5.0,
               ),
-              Tooltip(
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(10.0)),
-                triggerMode: TooltipTriggerMode.tap,
-                showDuration: const Duration(minutes: 2),
-                richMessage: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '$statFullName\n\n',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        height: 0.9,
-                        fontSize: 14.0,
-                        fontFamily: 'Anton',
-                      ),
-                    ),
-                    TextSpan(
-                      text: definition,
-                      style: const TextStyle(
-                        color: Color(0xFFBCBCBC),
-                        fontSize: 13.0,
-                        fontFamily: 'Anton',
-                      ),
-                    ),
-                    if (formula != '')
-                      const TextSpan(
-                        text: '\n\nFormula: ',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13.0,
-                          fontFamily: 'Anton',
-                        ),
-                      ),
-                    if (formula != '')
-                      TextSpan(
-                        text: formula,
-                        style: const TextStyle(
-                          color: Color(0xFFBCBCBC),
-                          fontSize: 13.0,
-                          fontFamily: 'Anton',
-                        ),
-                      ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.info_outline,
-                  color: Colors.white70,
-                  size: 15.0,
-                ),
+              DismissibleTooltip(
+                statFullName: statFullName,
+                definition: definition,
+                formula: formula,
               ),
             ],
           ),
@@ -312,6 +334,101 @@ class StatisticRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class DismissibleTooltip extends StatefulWidget {
+  final String statFullName;
+  final String definition;
+  final String formula;
+
+  const DismissibleTooltip({
+    Key? key,
+    required this.statFullName,
+    required this.definition,
+    this.formula = '',
+  }) : super(key: key);
+
+  @override
+  _DismissibleTooltipState createState() => _DismissibleTooltipState();
+}
+
+class _DismissibleTooltipState extends State<DismissibleTooltip> {
+  final GlobalKey _tooltipKey = GlobalKey();
+  bool _isTooltipVisible = false;
+
+  void _toggleTooltip() {
+    setState(() {
+      _isTooltipVisible = !_isTooltipVisible;
+    });
+    if (_isTooltipVisible) {
+      final dynamic tooltip = _tooltipKey.currentState;
+      tooltip.ensureTooltipVisible();
+    } else {
+      final dynamic tooltip = _tooltipKey.currentState;
+      tooltip.deactivate();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _toggleTooltip,
+      child: Tooltip(
+        key: _tooltipKey,
+        padding: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        triggerMode: TooltipTriggerMode.manual,
+        showDuration: const Duration(minutes: 2),
+        richMessage: TextSpan(
+          children: [
+            TextSpan(
+              text: '${widget.statFullName}\n\n',
+              style: const TextStyle(
+                color: Colors.white,
+                height: 0.9,
+                fontSize: 14.0,
+                fontFamily: 'Anton',
+              ),
+            ),
+            TextSpan(
+              text: widget.definition,
+              style: const TextStyle(
+                color: Color(0xFFBCBCBC),
+                fontSize: 13.0,
+                fontFamily: 'Anton',
+              ),
+            ),
+            if (widget.formula.isNotEmpty)
+              const TextSpan(
+                text: '\n\nFormula: ',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13.0,
+                  fontFamily: 'Anton',
+                ),
+              ),
+            if (widget.formula.isNotEmpty)
+              TextSpan(
+                text: widget.formula,
+                style: const TextStyle(
+                  color: Color(0xFFBCBCBC),
+                  fontSize: 13.0,
+                  fontFamily: 'Anton',
+                ),
+              ),
+          ],
+        ),
+        child: const Icon(
+          Icons.info_outline,
+          color: Colors.white70,
+          size: 15.0,
+        ),
+      ),
     );
   }
 }

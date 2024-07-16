@@ -23,27 +23,19 @@ class PlayerComparison extends StatefulWidget {
 }
 
 class _PlayerComparisonState extends State<PlayerComparison> {
-  late List<String> seasonsOne;
-  late List<String> seasonsTwo;
-  late String selectedSeasonOne;
-  late String selectedSeasonTwo;
   late Map<String, dynamic> playerOne;
   late Map<String, dynamic> playerTwo;
+  late List<String> seasonsOne;
+  late List<String> seasonsTwo;
+  late List<String> seasonTypesOne;
+  late List<String> seasonTypesTwo;
+  late String selectedSeasonOne;
+  late String selectedSeasonTwo;
+  late String selectedSeasonTypeOne;
+  late String selectedSeasonTypeTwo;
 
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   double _opacity = 0.0;
-
-  String calculateAge(String birthDate) {
-    int age = DateTime.now().year -
-        DateTime.parse(birthDate).year -
-        (DateTime.now().month < DateTime.parse(birthDate).month ||
-                (DateTime.now().month == DateTime.parse(birthDate).month &&
-                    DateTime.now().day < DateTime.parse(birthDate).day)
-            ? 1
-            : 0);
-
-    return age.toString();
-  }
 
   double roundToDecimalPlaces(double value, int decimalPlaces) {
     num factor = pow(10, decimalPlaces);
@@ -77,6 +69,11 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                   : seasonsTwo = [kCurrentSeason];
 
               selectedSeasonTwo = seasonsTwo.first;
+
+              playerTwo['STATS'][selectedSeasonTwo].keys.contains('PLAYOFFS')
+                  ? seasonTypesTwo = ['REGULAR SEASON', 'PLAYOFFS']
+                  : seasonTypesTwo = ['REGULAR SEASON'];
+              selectedSeasonTypeTwo = seasonTypesTwo.first;
             });
           },
         ),
@@ -90,12 +87,23 @@ class _PlayerComparisonState extends State<PlayerComparison> {
     playerOne = widget.player;
     playerTwo = {};
 
-    playerOne.keys.contains('STATS')
-        ? seasonsOne = playerOne['STATS'].keys.toList().reversed.toList()
-        : seasonsOne = [kCurrentSeason];
+    if (playerOne.keys.contains('STATS')) {
+      seasonsOne = playerOne['STATS'].keys.toList().reversed.toList();
+      selectedSeasonOne = seasonsOne.first;
+
+      playerOne['STATS'][selectedSeasonOne].keys.contains('PLAYOFFS')
+          ? seasonTypesOne = ['REGULAR SEASON', 'PLAYOFFS']
+          : seasonTypesOne = ['REGULAR SEASON'];
+    } else {
+      seasonsOne = [kCurrentSeason];
+      seasonTypesOne = ['REGULAR SEASON'];
+    }
 
     selectedSeasonOne = seasonsOne.first;
+    selectedSeasonTypeOne = seasonTypesOne.first;
+
     seasonsTwo = [kCurrentSeason];
+    seasonTypesTwo = ['REGULAR SEASON'];
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showBottomSheet();
@@ -121,26 +129,27 @@ class _PlayerComparisonState extends State<PlayerComparison> {
 
   @override
   Widget build(BuildContext context) {
-    Color teamOneColor = kDarkPrimaryColors.contains(
-            playerOne['STATS'][selectedSeasonOne]['BASIC']['TEAM_ABBREVIATION'])
-        ? (kTeamColors[playerOne['STATS'][selectedSeasonOne]['BASIC']
+    Color teamOneColor = kDarkPrimaryColors.contains(playerOne['STATS']
+                [selectedSeasonOne][selectedSeasonTypeOne]['BASIC']
+            ['TEAM_ABBREVIATION'])
+        ? (kTeamColors[playerOne['STATS'][selectedSeasonOne]
+                [selectedSeasonTypeOne]['BASIC']
             ['TEAM_ABBREVIATION']]!['secondaryColor']!)
-        : (kTeamColors[playerOne['STATS'][selectedSeasonOne]['BASIC']
+        : (kTeamColors[playerOne['STATS'][selectedSeasonOne]
+                [selectedSeasonTypeOne]['BASIC']
             ['TEAM_ABBREVIATION']]!['primaryColor']!);
 
     Color teamTwoColor = Colors.transparent;
     if (playerTwo.isNotEmpty) {
       teamTwoColor = kDarkPrimaryColors.contains(playerTwo['STATS']
-              [selectedSeasonTwo]['BASIC']['TEAM_ABBREVIATION'])
-          ? (kTeamColors[playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+                  [selectedSeasonTwo][selectedSeasonTypeTwo]['BASIC']
+              ['TEAM_ABBREVIATION'])
+          ? (kTeamColors[playerTwo['STATS'][selectedSeasonTwo]
+                  [selectedSeasonTypeTwo]['BASIC']
               ['TEAM_ABBREVIATION']]!['secondaryColor']!)
-          : (kTeamColors[playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+          : (kTeamColors[playerTwo['STATS'][selectedSeasonTwo]
+                  [selectedSeasonTypeTwo]['BASIC']
               ['TEAM_ABBREVIATION']]!['primaryColor']!);
-    }
-
-    playerOne['AGE'] = calculateAge(playerOne['BIRTHDATE']);
-    if (playerTwo.isNotEmpty) {
-      playerTwo['AGE'] = calculateAge(playerTwo['BIRTHDATE']);
     }
 
     var heightOne = playerOne['HEIGHT'].split('-');
@@ -194,15 +203,32 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                     playerOne = await getPlayer(
                                         player["PERSON_ID"].toString());
                                     setState(() {
-                                      playerOne.keys.contains('STATS')
-                                          ? seasonsOne = playerOne['STATS']
-                                              .keys
-                                              .toList()
-                                              .reversed
-                                              .toList()
-                                          : seasonsOne = [kCurrentSeason];
+                                      if (playerOne.keys.contains('STATS')) {
+                                        seasonsOne = playerOne['STATS']
+                                            .keys
+                                            .toList()
+                                            .reversed
+                                            .toList();
+                                        selectedSeasonOne = seasonsOne.first;
+
+                                        playerOne['STATS'][selectedSeasonOne]
+                                                .keys
+                                                .contains('PLAYOFFS')
+                                            ? seasonTypesOne = [
+                                                'REGULAR SEASON',
+                                                'PLAYOFFS'
+                                              ]
+                                            : seasonTypesOne = [
+                                                'REGULAR SEASON'
+                                              ];
+                                      } else {
+                                        seasonsOne = [kCurrentSeason];
+                                        seasonTypesOne = ['REGULAR SEASON'];
+                                      }
 
                                       selectedSeasonOne = seasonsOne.first;
+                                      selectedSeasonTypeOne =
+                                          seasonTypesOne.first;
                                     });
                                   },
                                 ),
@@ -288,15 +314,30 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                   playerTwo = await getPlayer(
                                       player["PERSON_ID"].toString());
                                   setState(() {
-                                    playerTwo.keys.contains('STATS')
-                                        ? seasonsTwo = playerTwo['STATS']
-                                            .keys
-                                            .toList()
-                                            .reversed
-                                            .toList()
-                                        : seasonsTwo = [kCurrentSeason];
+                                    if (playerTwo.keys.contains('STATS')) {
+                                      seasonsTwo = playerTwo['STATS']
+                                          .keys
+                                          .toList()
+                                          .reversed
+                                          .toList();
+                                      selectedSeasonTwo = seasonsTwo.first;
+
+                                      playerTwo['STATS'][selectedSeasonTwo]
+                                              .keys
+                                              .contains('PLAYOFFS')
+                                          ? seasonTypesTwo = [
+                                              'REGULAR SEASON',
+                                              'PLAYOFFS'
+                                            ]
+                                          : seasonTypesTwo = ['REGULAR SEASON'];
+                                    } else {
+                                      seasonsTwo = [kCurrentSeason];
+                                      seasonTypesTwo = ['REGULAR SEASON'];
+                                    }
 
                                     selectedSeasonTwo = seasonsTwo.first;
+                                    selectedSeasonTypeTwo =
+                                        seasonTypesTwo.first;
                                   });
                                 },
                               ),
@@ -416,7 +457,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                     constraints:
                                         const BoxConstraints(maxWidth: 20.0),
                                     child: Image.asset(
-                                      'images/NBA_Logos/${playerOne['STATS'][value]['BASIC']['TEAM_ID']}.png',
+                                      'images/NBA_Logos/${playerOne['STATS'][value]['REGULAR SEASON']['BASIC']['TEAM_ID']}.png',
                                       fit: BoxFit.contain,
                                       alignment: Alignment.center,
                                       width: 20.0,
@@ -429,6 +470,15 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                           onChanged: (String? value) {
                             setState(() {
                               selectedSeasonOne = value!;
+                              playerOne['STATS'][selectedSeasonOne]
+                                      .keys
+                                      .contains('PLAYOFFS')
+                                  ? seasonTypesOne = [
+                                      'REGULAR SEASON',
+                                      'PLAYOFFS'
+                                    ]
+                                  : seasonTypesOne = ['REGULAR SEASON'];
+                              selectedSeasonTypeOne = seasonTypesOne.first;
                             });
                           },
                         ),
@@ -468,7 +518,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                       constraints:
                                           const BoxConstraints(maxWidth: 20.0),
                                       child: Image.asset(
-                                        'images/NBA_Logos/${playerTwo['STATS'][value]['BASIC']['TEAM_ID']}.png',
+                                        'images/NBA_Logos/${playerTwo['STATS'][value]['REGULAR SEASON']['BASIC']['TEAM_ID']}.png',
                                         fit: BoxFit.contain,
                                         alignment: Alignment.center,
                                         width: 20.0,
@@ -482,6 +532,136 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               ? (String? value) {
                                   setState(() {
                                     selectedSeasonTwo = value!;
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                            .keys
+                                            .contains('PLAYOFFS')
+                                        ? seasonTypesTwo = [
+                                            'REGULAR SEASON',
+                                            'PLAYOFFS'
+                                          ]
+                                        : seasonTypesTwo = ['REGULAR SEASON'];
+                                    selectedSeasonTypeTwo = seasonTypesTwo.first;
+                                  });
+                                }
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            borderRadius: BorderRadius.circular(10.0)),
+                        margin: const EdgeInsets.fromLTRB(11.0, 5.0, 5.0, 5.0),
+                        child: DropdownButton<String>(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          borderRadius: BorderRadius.circular(10.0),
+                          menuMaxHeight: 300.0,
+                          dropdownColor: Colors.grey.shade900,
+                          isExpanded: true,
+                          underline: Container(),
+                          value: selectedSeasonTypeOne,
+                          items: seasonTypesOne
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    value,
+                                    style:
+                                        kBebasNormal.copyWith(fontSize: 18.0),
+                                  ),
+                                  const SizedBox(width: 10.0),
+                                  ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 10.0),
+                                    child: value == 'REGULAR SEASON'
+                                        ? Image.asset(
+                                            'images/NBA_Logos/0.png',
+                                            fit: BoxFit.contain,
+                                            alignment: Alignment.center,
+                                            width: 10.0,
+                                          )
+                                        : SvgPicture.asset(
+                                            'images/playoffs.svg',
+                                            fit: BoxFit.contain,
+                                            alignment: Alignment.center,
+                                            width: 10.0,
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedSeasonTypeOne = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            borderRadius: BorderRadius.circular(10.0)),
+                        margin: const EdgeInsets.fromLTRB(5.0, 5.0, 11.0, 5.0),
+                        child: DropdownButton<String>(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          borderRadius: BorderRadius.circular(10.0),
+                          menuMaxHeight: 300.0,
+                          dropdownColor: Colors.grey.shade900,
+                          isExpanded: true,
+                          underline: Container(),
+                          value: playerTwo.isNotEmpty
+                              ? selectedSeasonTypeTwo
+                              : 'REGULAR SEASON',
+                          items: seasonTypesTwo
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    value,
+                                    style:
+                                        kBebasNormal.copyWith(fontSize: 18.0),
+                                  ),
+                                  if (playerTwo.isNotEmpty)
+                                    const SizedBox(width: 10.0),
+                                  if (playerTwo.isNotEmpty)
+                                    ConstrainedBox(
+                                      constraints:
+                                          const BoxConstraints(maxWidth: 20.0),
+                                      child: value == 'REGULAR SEASON'
+                                          ? Image.asset(
+                                              'images/NBA_Logos/0.png',
+                                              fit: BoxFit.contain,
+                                              alignment: Alignment.center,
+                                              width: 10.0,
+                                            )
+                                          : SvgPicture.asset(
+                                              'images/playoffs.svg',
+                                              fit: BoxFit.contain,
+                                              alignment: Alignment.center,
+                                              width: 10.0,
+                                            ),
+                                    ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: playerTwo.isNotEmpty
+                              ? (String? value) {
+                                  setState(() {
+                                    selectedSeasonTypeTwo = value!;
                                   });
                                 }
                               : null,
@@ -507,8 +687,12 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
                             statName: 'AGE',
-                            playerOne: playerOne['AGE'],
-                            playerTwo: playerTwo['AGE'],
+                            playerOne: playerOne['STATS'][selectedSeasonOne]
+                                    [selectedSeasonTypeOne]['BASIC']['AGE']
+                                .toStringAsFixed(0),
+                            playerTwo: playerTwo['STATS'][selectedSeasonTwo]
+                                    [selectedSeasonTypeTwo]['BASIC']['AGE']
+                                .toStringAsFixed(0),
                           ),
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
@@ -566,9 +750,9 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'Games Played',
                               playerOne: playerOne['STATS'][selectedSeasonOne]
-                                  ['BASIC']['GP'],
+                                  [selectedSeasonTypeOne]['BASIC']['GP'],
                               playerTwo: playerTwo['STATS'][selectedSeasonTwo]
-                                  ['BASIC']['GP'],
+                                  [selectedSeasonTypeTwo]['BASIC']['GP'],
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
@@ -576,12 +760,12 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'Min Per Game',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
-                                      ['MIN'],
+                                  playerOne['STATS'][selectedSeasonOne]
+                                      [selectedSeasonTypeOne]['ADV']['MIN'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
-                                      ['MIN'],
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                      [selectedSeasonTypeTwo]['ADV']['MIN'],
                                   1),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
@@ -590,11 +774,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'Poss Per Game',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['ADV']
                                       ['POSS_PER_GM'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['ADV']
                                       ['POSS_PER_GM'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -605,15 +791,19 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               statName: 'PPG',
                               playerOne: roundToDecimalPlaces(
                                   (playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['PTS'] /
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['PTS'] /
                                       playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['GP']),
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['GP']),
                                   1),
                               playerTwo: roundToDecimalPlaces(
                                   (playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['PTS'] /
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['PTS'] /
                                       playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['GP']),
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['GP']),
                                   1),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
@@ -623,15 +813,19 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               statName: 'RPG',
                               playerOne: roundToDecimalPlaces(
                                   (playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['REB'] /
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['REB'] /
                                       playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['GP']),
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['GP']),
                                   1),
                               playerTwo: roundToDecimalPlaces(
                                   (playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['REB'] /
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['REB'] /
                                       playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['GP']),
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['GP']),
                                   1),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
@@ -641,15 +835,19 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               statName: 'APG',
                               playerOne: roundToDecimalPlaces(
                                   (playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['AST'] /
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['AST'] /
                                       playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['GP']),
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['GP']),
                                   1),
                               playerTwo: roundToDecimalPlaces(
                                   (playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['AST'] /
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['AST'] /
                                       playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['GP']),
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['GP']),
                                   1),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
@@ -658,12 +856,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'Usage %',
                               playerOne: roundToDecimalPlaces(
-                                  (playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  (playerOne['STATS'][selectedSeasonOne]
+                                              [selectedSeasonTypeOne]['ADV']
                                           ['USG_PCT'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  (playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  (playerTwo['STATS'][selectedSeasonTwo]
+                                              [selectedSeasonTypeTwo]['ADV']
                                           ['USG_PCT'] *
                                       100),
                                   1),
@@ -682,11 +882,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               ComparisonRow(
                                 statName: 'Touches per 75',
                                 playerOne: roundToDecimalPlaces(
-                                    playerOne['STATS'][selectedSeasonOne]['ADV']
+                                    playerOne['STATS'][selectedSeasonOne]
+                                            [selectedSeasonTypeOne]['ADV']
                                         ['TOUCHES']['TOUCHES_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
-                                    playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                            [selectedSeasonTypeTwo]['ADV']
                                         ['TOUCHES']['TOUCHES_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
@@ -696,11 +898,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'PTS per 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['BASIC']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['BASIC']
                                       ['PTS_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['BASIC']
                                       ['PTS_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -718,11 +922,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               ComparisonRow(
                                 statName: 'OFF - On/Off',
                                 playerOne: roundToDecimalPlaces(
-                                    playerOne['STATS'][selectedSeasonOne]['ADV']
+                                    playerOne['STATS'][selectedSeasonOne]
+                                            [selectedSeasonTypeOne]['ADV']
                                         ['OFF_RATING_ON_OFF'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
-                                    playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                            [selectedSeasonTypeTwo]['ADV']
                                         ['OFF_RATING_ON_OFF'],
                                     1),
                                 teamOneColor: teamOneColor,
@@ -740,11 +946,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               ComparisonRow(
                                 statName: 'DEF - On/Off',
                                 playerOne: roundToDecimalPlaces(
-                                    playerOne['STATS'][selectedSeasonOne]['ADV']
+                                    playerOne['STATS'][selectedSeasonOne]
+                                            [selectedSeasonTypeOne]['ADV']
                                         ['DEF_RATING_ON_OFF'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
-                                    playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                            [selectedSeasonTypeTwo]['ADV']
                                         ['DEF_RATING_ON_OFF'],
                                     1),
                                 teamOneColor: teamOneColor,
@@ -762,11 +970,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               ComparisonRow(
                                 statName: 'Net - On/Off',
                                 playerOne: roundToDecimalPlaces(
-                                    playerOne['STATS'][selectedSeasonOne]['ADV']
+                                    playerOne['STATS'][selectedSeasonOne]
+                                            [selectedSeasonTypeOne]['ADV']
                                         ['NET_RATING_ON_OFF'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
-                                    playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                            [selectedSeasonTypeTwo]['ADV']
                                         ['NET_RATING_ON_OFF'],
                                     1),
                                 teamOneColor: teamOneColor,
@@ -799,12 +1009,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               statName: 'FG%',
                               playerOne: roundToDecimalPlaces(
                                   (playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['FG_PCT'] *
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['FG_PCT'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
                                   (playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['FG_PCT'] *
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['FG_PCT'] *
                                       100),
                                   1),
                               teamOneColor: teamOneColor,
@@ -815,12 +1027,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               statName: '3P%',
                               playerOne: roundToDecimalPlaces(
                                   (playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['FG3_PCT'] *
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['FG3_PCT'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
                                   (playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['FG3_PCT'] *
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['FG3_PCT'] *
                                       100),
                                   1),
                               teamOneColor: teamOneColor,
@@ -831,12 +1045,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               statName: 'FT%',
                               playerOne: roundToDecimalPlaces(
                                   (playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['FT_PCT'] *
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['FT_PCT'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
                                   (playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['FT_PCT'] *
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['FT_PCT'] *
                                       100),
                                   1),
                               teamOneColor: teamOneColor,
@@ -847,12 +1063,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               statName: '3PA Rate%',
                               playerOne: roundToDecimalPlaces(
                                   (playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['3PAr'] *
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['3PAr'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
                                   (playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['3PAr'] *
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['3PAr'] *
                                       100),
                                   1),
                               teamOneColor: teamOneColor,
@@ -863,12 +1081,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               statName: 'FTA Rate%',
                               playerOne: roundToDecimalPlaces(
                                   (playerOne['STATS'][selectedSeasonOne]
-                                          ['BASIC']['FTAr'] *
+                                              [selectedSeasonTypeOne]['BASIC']
+                                          ['FTAr'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
                                   (playerTwo['STATS'][selectedSeasonTwo]
-                                          ['BASIC']['FTAr'] *
+                                              [selectedSeasonTypeTwo]['BASIC']
+                                          ['FTAr'] *
                                       100),
                                   1),
                               teamOneColor: teamOneColor,
@@ -878,12 +1098,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'EFG%',
                               playerOne: roundToDecimalPlaces(
-                                  (playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  (playerOne['STATS'][selectedSeasonOne]
+                                              [selectedSeasonTypeOne]['ADV']
                                           ['EFG_PCT'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  (playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  (playerTwo['STATS'][selectedSeasonTwo]
+                                              [selectedSeasonTypeTwo]['ADV']
                                           ['EFG_PCT'] *
                                       100),
                                   1),
@@ -894,12 +1116,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'TS%',
                               playerOne: roundToDecimalPlaces(
-                                  (playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  (playerOne['STATS'][selectedSeasonOne]
+                                              [selectedSeasonTypeOne]['ADV']
                                           ['TS_PCT'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  (playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  (playerTwo['STATS'][selectedSeasonTwo]
+                                              [selectedSeasonTypeTwo]['ADV']
                                           ['TS_PCT'] *
                                       100),
                                   1),
@@ -932,11 +1156,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'REB PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['BASIC']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['BASIC']
                                       ['REB_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['BASIC']
                                       ['REB_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -946,11 +1172,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'OREB PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['BASIC']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['BASIC']
                                       ['OREB_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['BASIC']
                                       ['OREB_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -960,11 +1188,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'DREB PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['BASIC']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['BASIC']
                                       ['DREB_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['BASIC']
                                       ['DREB_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -974,12 +1204,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'OREB%',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                              [selectedSeasonTypeOne]['ADV']
                                           ['OREB_PCT'] *
                                       100,
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                              [selectedSeasonTypeTwo]['ADV']
                                           ['OREB_PCT'] *
                                       100,
                                   1),
@@ -990,12 +1222,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'DREB%',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                              [selectedSeasonTypeOne]['ADV']
                                           ['DREB_PCT'] *
                                       100,
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                              [selectedSeasonTypeTwo]['ADV']
                                           ['DREB_PCT'] *
                                       100,
                                   1),
@@ -1015,11 +1249,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'BOX OUTS PER 75',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        ['HUSTLE']['BOX_OUTS_PER_75'],
+                                            [selectedSeasonTypeOne]['HUSTLE']
+                                        ['BOX_OUTS_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        ['HUSTLE']['BOX_OUTS_PER_75'],
+                                            [selectedSeasonTypeTwo]['HUSTLE']
+                                        ['BOX_OUTS_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
@@ -1037,11 +1273,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'OFF BOXOUTS PER 75',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        ['HUSTLE']['OFF_BOXOUTS_PER_75'],
+                                            [selectedSeasonTypeOne]['HUSTLE']
+                                        ['OFF_BOXOUTS_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        ['HUSTLE']['OFF_BOXOUTS_PER_75'],
+                                            [selectedSeasonTypeTwo]['HUSTLE']
+                                        ['OFF_BOXOUTS_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
@@ -1059,11 +1297,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'DEF BOXOUTS PER 75',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        ['HUSTLE']['DEF_BOXOUTS_PER_75'],
+                                            [selectedSeasonTypeOne]['HUSTLE']
+                                        ['DEF_BOXOUTS_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        ['HUSTLE']['DEF_BOXOUTS_PER_75'],
+                                            [selectedSeasonTypeTwo]['HUSTLE']
+                                        ['DEF_BOXOUTS_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
@@ -1094,11 +1334,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'AST PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['ADV']
                                       ['PASSING']['AST_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['ADV']
                                       ['PASSING']['AST_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -1108,11 +1350,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'ADJ AST PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['ADV']
                                       ['PASSING']['AST_ADJ_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['ADV']
                                       ['PASSING']['AST_ADJ_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -1122,11 +1366,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'POT. AST PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['ADV']
                                       ['PASSING']['POTENTIAL_AST_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['ADV']
                                       ['PASSING']['POTENTIAL_AST_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -1136,11 +1382,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'AST PTS CREATED PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['ADV']
                                       ['PASSING']['AST_PTS_CREATED_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['ADV']
                                       ['PASSING']['AST_PTS_CREATED_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -1150,12 +1398,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'AST - PASS %',
                               playerOne: roundToDecimalPlaces(
-                                  (playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  (playerOne['STATS'][selectedSeasonOne]
+                                              [selectedSeasonTypeOne]['ADV']
                                           ['PASSING']['AST_TO_PASS_PCT'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  (playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  (playerTwo['STATS'][selectedSeasonTwo]
+                                              [selectedSeasonTypeOne]['ADV']
                                           ['PASSING']['AST_TO_PASS_PCT'] *
                                       100),
                                   1),
@@ -1166,12 +1416,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'ADJ AST - PASS %',
                               playerOne: roundToDecimalPlaces(
-                                  (playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  (playerOne['STATS'][selectedSeasonOne]
+                                              [selectedSeasonTypeOne]['ADV']
                                           ['PASSING']['AST_TO_PASS_PCT_ADJ'] *
                                       100),
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  (playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  (playerTwo['STATS'][selectedSeasonTwo]
+                                              [selectedSeasonTypeTwo]['ADV']
                                           ['PASSING']['AST_TO_PASS_PCT_ADJ'] *
                                       100),
                                   1),
@@ -1204,49 +1456,35 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'DRTG - ON',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['ADV']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['ADV']
                                       ['DEF_RATING'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['ADV']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['ADV']
                                       ['DEF_RATING'],
                                   1),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'STL PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['BASIC']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['BASIC']
                                       ['STL_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['BASIC']
                                       ['STL_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
                             const SizedBox(height: 5.0),
-                            ComparisonRow(
-                              statName: 'BLK PER 75',
-                              playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['BASIC']
-                                      ['BLK_PER_75'],
-                                  1),
-                              playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['BASIC']
-                                      ['BLK_PER_75'],
-                                  1),
-                              teamOneColor: teamOneColor,
-                              teamTwoColor: teamTwoColor,
-                            ),
-                            if (int.parse(selectedSeasonOne.substring(0, 4)) >=
-                                    2016 &&
-                                int.parse(selectedSeasonTwo.substring(0, 4)) >=
-                                    2016)
-                              const SizedBox(height: 15.0),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >=
                                     2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >=
@@ -1255,15 +1493,37 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'DEFLECTIONS PER 75',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        ['HUSTLE']['DEFLECTIONS_PER_75'],
+                                            [selectedSeasonTypeOne]['HUSTLE']
+                                        ['DEFLECTIONS_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        ['HUSTLE']['DEFLECTIONS_PER_75'],
+                                            [selectedSeasonTypeTwo]['HUSTLE']
+                                        ['DEFLECTIONS_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >=
+                                    2016 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >=
+                                    2016)
+                              const SizedBox(height: 15.0),
+                            ComparisonRow(
+                              statName: 'BLK PER 75',
+                              playerOne: roundToDecimalPlaces(
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['BASIC']
+                                      ['BLK_PER_75'],
+                                  1),
+                              playerTwo: roundToDecimalPlaces(
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['BASIC']
+                                      ['BLK_PER_75'],
+                                  1),
+                              teamOneColor: teamOneColor,
+                              teamTwoColor: teamTwoColor,
+                            ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >=
                                     2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >=
@@ -1277,11 +1537,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'CONTESTS PER 75',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        ['HUSTLE']['CONTESTED_SHOTS_PER_75'],
+                                            [selectedSeasonTypeOne]['HUSTLE']
+                                        ['CONTESTED_SHOTS_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        ['HUSTLE']['CONTESTED_SHOTS_PER_75'],
+                                            [selectedSeasonTypeTwo]['HUSTLE']
+                                        ['CONTESTED_SHOTS_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
@@ -1317,11 +1579,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'SCREEN AST PER 75',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        ['HUSTLE']['SCREEN_ASSISTS_PER_75'],
+                                            [selectedSeasonTypeOne]['HUSTLE']
+                                        ['SCREEN_ASSISTS_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        ['HUSTLE']['SCREEN_ASSISTS_PER_75'],
+                                            [selectedSeasonTypeTwo]['HUSTLE']
+                                        ['SCREEN_ASSISTS_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
@@ -1339,11 +1603,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'SCREEN AST PTS PER 75',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        ['HUSTLE']['SCREEN_AST_PTS_PER_75'],
+                                            [selectedSeasonTypeOne]['HUSTLE']
+                                        ['SCREEN_AST_PTS_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        ['HUSTLE']['SCREEN_AST_PTS_PER_75'],
+                                            [selectedSeasonTypeTwo]['HUSTLE']
+                                        ['SCREEN_AST_PTS_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
@@ -1361,12 +1627,12 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'LOOSE BALLS PER 75',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                            ['HUSTLE']
+                                            [selectedSeasonTypeOne]['HUSTLE']
                                         ['LOOSE_BALLS_RECOVERED_PER_75'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                            ['HUSTLE']
+                                            [selectedSeasonTypeTwo]['HUSTLE']
                                         ['LOOSE_BALLS_RECOVERED_PER_75'],
                                     1),
                                 teamOneColor: teamOneColor,
@@ -1380,11 +1646,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'FOULS PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['BASIC']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['BASIC']
                                       ['PF_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['BASIC']
                                       ['PF_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -1394,11 +1662,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             ComparisonRow(
                               statName: 'FOULS DRAWN PER 75',
                               playerOne: roundToDecimalPlaces(
-                                  playerOne['STATS'][selectedSeasonOne]['BASIC']
+                                  playerOne['STATS'][selectedSeasonOne]
+                                          [selectedSeasonTypeOne]['BASIC']
                                       ['PFD_PER_75'],
                                   1),
                               playerTwo: roundToDecimalPlaces(
-                                  playerTwo['STATS'][selectedSeasonTwo]['BASIC']
+                                  playerTwo['STATS'][selectedSeasonTwo]
+                                          [selectedSeasonTypeTwo]['BASIC']
                                       ['PFD_PER_75'],
                                   1),
                               teamOneColor: teamOneColor,
@@ -1483,7 +1753,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                         const SizedBox(width: 5.0),
                                         ConstrainedBox(
                                           constraints: const BoxConstraints(
-                                              maxWidth: 20.0),
+                                              maxWidth: 18.0, maxHeight: 18.0),
                                           child: Image.asset(
                                             'images/NBA_Logos/${playerOne['TEAM_ID']}.png',
                                             fit: BoxFit.contain,
@@ -1550,7 +1820,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                             const SizedBox(width: 5.0),
                                             ConstrainedBox(
                                               constraints: const BoxConstraints(
-                                                  maxWidth: 20.0),
+                                                  maxWidth: 18.0,
+                                                  maxHeight: 18.0),
                                               child: Image.asset(
                                                 'images/NBA_Logos/${playerTwo['TEAM_ID']}.png',
                                                 fit: BoxFit.contain,

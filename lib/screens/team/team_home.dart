@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
+import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/team/overview/team_overview.dart';
 import 'package:splash/screens/team/schedule/team_schedule.dart';
 import 'package:splash/screens/team/team_cache.dart';
@@ -122,7 +123,7 @@ class _TeamHomeState extends State<TeamHome>
   @override
   Widget build(BuildContext context) {
     return _isLoading
-        ? const CircularProgressIndicator(
+        ? const SpinningIcon(
             color: Colors.deepOrange,
           )
         : Scaffold(
