@@ -151,18 +151,11 @@ class _PlayerStatCardState extends State<PlayerStatCard> {
                             int.parse(widget.selectedSeason.substring(0, 4)) >=
                                 int.parse(stats[stat]!['first_available']))
                           StatisticRow(
-                            statValue: stats[stat]?['convert'] == 'true'
-                                ? getValueFromMap(
-                                      widget.playerStats,
-                                      stats[stat]?['location'],
-                                      stats[stat]?[widget.perMode]['nba_name'],
-                                    ) *
-                                    100
-                                : getValueFromMap(
-                                    widget.playerStats,
-                                    stats[stat]?['location'],
-                                    stats[stat]?[widget.perMode]['nba_name'],
-                                  ),
+                            statValue: getValueFromMap(
+                              widget.playerStats,
+                              stats[stat]?['location'],
+                              stats[stat]?[widget.perMode]['nba_name'],
+                            ),
                             perMode: widget.perMode,
                             round: stats[stat]!['round']!,
                             convert: stats[stat]!['convert']!,
@@ -278,6 +271,7 @@ class StatisticRow extends StatelessWidget {
             ),
             duration: const Duration(milliseconds: 250),
             builder: (BuildContext context, num value, Widget? child) {
+              value = convert == 'true' ? value * 100 : value;
               return Text(
                 round == '0'
                     ? (perMode == 'PER_75' &&
@@ -307,7 +301,9 @@ class StatisticRow extends StatelessWidget {
                 getProgressColor(1 - ((rank - 1) / (numPlayers - 1))),
             percent: 1 - ((rank - 1) / (numPlayers - 1)) < 0
                 ? 0
-                : 1 - ((rank - 1) / (numPlayers - 1)),
+                : 1 - ((rank - 1) / (numPlayers - 1)) > 1
+                    ? 0
+                    : 1 - ((rank - 1) / (numPlayers - 1)),
             barRadius: const Radius.circular(10.0),
             animation: true,
             animateFromLastPercent: true,

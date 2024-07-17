@@ -14,6 +14,7 @@ def query_database():
     data = request.json
     selected_season = data.get('selectedSeason')
     selected_season_type = data.get('selectedSeasonType')
+    position = data.get('selectedPosition')
     filters = data.get('filters')
 
     if filters:

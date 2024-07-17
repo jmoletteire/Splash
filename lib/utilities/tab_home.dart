@@ -64,14 +64,16 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey.shade900,
-        selectedFontSize: 0.0,
+        //selectedFontSize: 0.0,
         selectedItemColor: Colors.white,
+        selectedLabelStyle: kBebasNormal.copyWith(fontSize: 12.0),
         unselectedItemColor: Colors.grey,
+        unselectedLabelStyle: kBebasNormal.copyWith(fontSize: 12.0),
         iconSize: 32.0,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.scoreboard_outlined),
-            label: 'Scoreboard',
+            label: 'Scores',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.stacked_bar_chart),

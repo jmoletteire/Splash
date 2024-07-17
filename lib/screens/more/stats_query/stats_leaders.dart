@@ -6,7 +6,7 @@ import 'package:splash/screens/more/stats_query/util/custom_bottom_sheet.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/custom_icon_button.dart';
-import '../../player/player_career.dart';
+import '../../player/career/player_career.dart';
 import '../../search_screen.dart';
 
 class Leaders extends StatefulWidget {
@@ -33,6 +33,7 @@ class _LeadersState extends State<Leaders> {
 
   void _showColumnSelector() {
     showModalBottomSheet(
+      scrollControlDisabledMaxHeightRatio: 0.75,
       backgroundColor: const Color(0xFF111111),
       context: context,
       builder: (context) {

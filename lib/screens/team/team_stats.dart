@@ -233,6 +233,7 @@ class _TeamStatsState extends State<TeamStats> {
                   padding: const EdgeInsets.all(75.0),
                   child: AnimatedPolarAreaChart(
                     key: ValueKey(selectedSeason),
+                    selectedSeasonType: selectedSeason,
                     values: [
                       getFinalPercentile('Defense'),
                       getFinalPercentile('Rebounding'),
