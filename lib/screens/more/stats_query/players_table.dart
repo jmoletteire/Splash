@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:material_table_view/default_animated_switcher_transition_builder.dart';
 import 'package:material_table_view/material_table_view.dart';
@@ -257,13 +258,15 @@ class _PlayersTableState extends State<PlayersTable> {
     switch (column) {
       case 0:
         return Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+          padding: const EdgeInsets.fromLTRB(6.0, 8.0, 0.0, 8.0),
           child: Row(
             children: [
               Expanded(
                 flex: 1,
-                child: Text(
+                child: AutoSizeText(
                   (row + 1).toString(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 16.0),
                 ),
               ),

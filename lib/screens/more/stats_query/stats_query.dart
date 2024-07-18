@@ -91,19 +91,26 @@ class _StatsQueryState extends State<StatsQuery> {
         ],
       ),
       body: Center(
-        child: queryData == null
-            ? const Row(
+        child: queryData == null || queryData!.isEmpty
+            ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Select Filters',
-                    style: kBebasNormal,
-                  ),
-                  SizedBox(width: 5.0),
-                  Icon(
-                    Icons.filter_alt,
-                    size: 20.0,
-                  )
+                  if (queryData == null)
+                    const Text(
+                      'Select Filters',
+                      style: kBebasNormal,
+                    )
+                  else
+                    const Text(
+                      'No Results',
+                      style: kBebasNormal,
+                    ),
+                  const SizedBox(width: 5.0),
+                  if (queryData == null)
+                    const Icon(
+                      Icons.filter_alt,
+                      size: 20.0,
+                    )
                 ],
               )
             : ScrollConfiguration(

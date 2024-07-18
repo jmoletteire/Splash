@@ -14,6 +14,7 @@ def query_database():
     data = request.json
     selected_season = data.get('selectedSeason')
     selected_season_type = data.get('selectedSeasonType')
+
     position_map = {
         'ALL': '',
         'G': 'Guard',
@@ -24,6 +25,8 @@ def query_database():
         'C-F': 'Center-Forward',
         'F-C': 'Forward-Center',
     }
+
+    position = position_map[data.get('selectedPosition')]
 
     filters = data.get('filters')
 
