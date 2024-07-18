@@ -56,6 +56,8 @@ class SearchProvider with ChangeNotifier {
 }
 
 class SearchScreen extends StatelessWidget {
+  final TextEditingController _textEditingController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,12 +66,20 @@ class SearchScreen extends StatelessWidget {
         surfaceTintColor: Colors.grey.shade900,
         title: TextField(
           autofocus: true,
+          controller: _textEditingController,
           onChanged: (query) =>
-              Provider.of<SearchProvider>(context, listen: false)
-                  .onSearchChanged(query),
-          decoration: const InputDecoration(
+              Provider.of<SearchProvider>(context, listen: false).onSearchChanged(query),
+          decoration: InputDecoration(
             hintText: 'Search',
             border: InputBorder.none,
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                // Clear the text field
+                _textEditingController.clear();
+                Provider.of<SearchProvider>(context, listen: false).onSearchChanged('');
+              },
+            ),
           ),
           style: kBebasNormal.copyWith(fontSize: 18.0),
           cursorColor: Colors.white,

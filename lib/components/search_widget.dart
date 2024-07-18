@@ -10,6 +10,8 @@ class SearchWidget extends StatelessWidget {
 
   SearchWidget({required this.onPlayerSelected});
 
+  final TextEditingController _textEditingController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -18,9 +20,9 @@ class SearchWidget extends StatelessWidget {
         children: [
           TextField(
             autofocus: true,
+            controller: _textEditingController,
             onChanged: (query) =>
-                Provider.of<SearchProvider>(context, listen: false)
-                    .onSearchChanged(query),
+                Provider.of<SearchProvider>(context, listen: false).onSearchChanged(query),
             decoration: InputDecoration(
               hintText: 'Search',
               focusedBorder: OutlineInputBorder(
@@ -34,6 +36,14 @@ class SearchWidget extends StatelessWidget {
                 borderSide: const BorderSide(
                   color: Colors.white70,
                 ),
+              ),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  // Clear the text field
+                  _textEditingController.clear();
+                  Provider.of<SearchProvider>(context, listen: false).onSearchChanged('');
+                },
               ),
             ),
             style: kBebasNormal.copyWith(fontSize: 18.0),
