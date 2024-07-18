@@ -31,17 +31,24 @@ def query_database():
     filters = data.get('filters')
 
     if filters:
-        results = build_pipeline(selected_season, selected_season_type, filters)
+        results = apply_filters(selected_season, selected_season_type, filters, position)
     else:
+        query = {f"STATS.{selected_season}.{selected_season_type}": {"$exists": True}}
+        if position:
+            query['POSITION'] = position
         results = list(players_collection.find(
-            {f"STATS.{selected_season}.{selected_season_type}": {"$exists": True}},
+            query,
             {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{selected_season}.{selected_season_type}': 1, '_id': 0}
         ))
 
     return jsonify(results)
 
 
-def build_pipeline(season, season_type, filters):
+def apply_filters(season, season_type, filters, position):
+    initial_match_stage = {"$match": {}}
+    if position:
+        initial_match_stage["$match"]['POSITION'] = position
+
     results = None
     for stat_filter in filters:
         operator = stat_filter['operation']
@@ -55,7 +62,7 @@ def build_pipeline(season, season_type, filters):
         except ValueError:
             pass  # Keep value as a string for non-numerical comparisons
 
-        pipeline = []
+        pipeline = [initial_match_stage]
 
         if operator == 'greater than':
             pipeline.append({"$match": {path: {"$gt": value}}})

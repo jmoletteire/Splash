@@ -227,21 +227,15 @@ class StatisticRow extends StatelessWidget {
             duration: const Duration(milliseconds: 250),
             builder: (BuildContext context, num value, Widget? child) {
               return Text(
-                round == '0'
-                    ? (perMode == 'PER_100' &&
-                            statName != 'MIN' &&
-                            statName != 'GP'
-                        ? value.toStringAsFixed(1)
-                        : value.toStringAsFixed(0))
-                    : convert == 'true'
-                        ? '${value.toStringAsFixed(int.parse(round))}%'
-                        : value.toStringAsFixed(int.parse(round)),
-                textAlign: TextAlign.right,
-                style: const TextStyle(
-                    fontFamily: 'Bebas_Neue',
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold),
-              );
+                  round == '0'
+                      ? (perMode == 'PER_100' && statName != 'MIN' && statName != 'GP'
+                          ? value.toStringAsFixed(1)
+                          : value.toStringAsFixed(0))
+                      : convert == 'true'
+                          ? '${value.toStringAsFixed(int.parse(round))}%'
+                          : value.toStringAsFixed(int.parse(round)),
+                  textAlign: TextAlign.right,
+                  style: kBebasNormal.copyWith(fontSize: 16.0));
             },
           ),
         ),
