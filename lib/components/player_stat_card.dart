@@ -26,8 +26,7 @@ class PlayerStatCard extends StatefulWidget {
 class _PlayerStatCardState extends State<PlayerStatCard> {
   bool _isExpanded = true;
 
-  dynamic getValueFromMap(
-      Map<String, dynamic> map, List<String> keys, String stat) {
+  dynamic getValueFromMap(Map<String, dynamic> map, List<String> keys, String stat) {
     dynamic value = map;
 
     keys = [widget.selectedSeasonType] + keys;
@@ -169,9 +168,8 @@ class _PlayerStatCardState extends State<PlayerStatCard> {
                               stats[stat]?['location'],
                               stats[stat]?[widget.perMode]['rank_nba_name'],
                             ),
-                            numPlayers:
-                                widget.playerStats[widget.selectedSeasonType]
-                                    ['BASIC']['NUM_PLAYERS'],
+                            numPlayers: widget.playerStats[widget.selectedSeasonType]['BASIC']
+                                ['NUM_PLAYERS'],
                           ),
                       ],
                     ],
@@ -284,7 +282,7 @@ class StatisticRow extends StatelessWidget {
                         ? '${value.toStringAsFixed(int.parse(round))}%'
                         : value.toStringAsFixed(int.parse(round)),
                 textAlign: TextAlign.right,
-                style: kBebasWhite.copyWith(fontSize: 16.0),
+                style: kBebasNormal.copyWith(fontSize: 16.0),
               );
             },
           ),
@@ -297,8 +295,7 @@ class StatisticRow extends StatelessWidget {
           child: LinearPercentIndicator(
             lineHeight: 10.0,
             backgroundColor: const Color(0xFF444444),
-            progressColor:
-                getProgressColor(1 - ((rank - 1) / (numPlayers - 1))),
+            progressColor: getProgressColor(1 - ((rank - 1) / (numPlayers - 1))),
             percent: 1 - ((rank - 1) / (numPlayers - 1)) < 0
                 ? 0
                 : 1 - ((rank - 1) / (numPlayers - 1)) > 1

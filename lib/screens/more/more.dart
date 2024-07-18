@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:splash/screens/more/draft.dart';
 import 'package:splash/screens/more/league_history.dart';
-import 'package:splash/screens/more/stats_query/stats_leaders.dart';
+import 'package:splash/screens/more/stats_query/stats_query.dart';
 import 'package:splash/screens/search_screen.dart';
 
 import '../../components/custom_icon_button.dart';
@@ -16,7 +16,7 @@ class More extends StatefulWidget {
 
 class _MoreState extends State<More> {
   Map<String, dynamic> pages = {
-    'Stats': [Icons.leaderboard, Leaders()],
+    'Stats': [Icons.leaderboard, StatsQuery()],
     'Draft': [Icons.format_list_numbered, Draft()],
     'League History': [Icons.history, LeagueHistory()],
   };
@@ -30,8 +30,7 @@ class _MoreState extends State<More> {
         surfaceTintColor: Colors.grey.shade900,
         title: const Text(
           'More',
-          style: TextStyle(
-              color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 35.0),
+          style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 35.0),
         ),
         actions: [
           CustomIconButton(

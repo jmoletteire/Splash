@@ -6,11 +6,10 @@ import 'package:flutter/material.dart';
 
 const kSplashText = Text(
   'Splash',
-  style:
-      TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 35.0),
+  style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 35.0),
 );
 
-const String kFlaskUrl = "09caeac018f7.ngrok.app";
+const String kFlaskUrl = "2ed73ca50d85.ngrok.app";
 
 /// ******************************************************
 ///                    TEXT STYLES
@@ -38,6 +37,7 @@ const kBebasOffWhite = TextStyle(
 );
 
 const kBebasBold = TextStyle(
+  color: Colors.white,
   fontFamily: 'Bebas_Neue',
   fontSize: 18.0,
   fontWeight: FontWeight.bold,
@@ -45,8 +45,10 @@ const kBebasBold = TextStyle(
 );
 
 const kBebasNormal = TextStyle(
+  color: Colors.white,
   fontFamily: 'Bebas_Neue',
   fontSize: 20.0,
+  textBaseline: TextBaseline.alphabetic,
 );
 
 /// ******************************************************
@@ -355,8 +357,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of field goal attempts (shots) that a team makes.',
+      'definition': 'The number of field goal attempts (shots) that a team makes.',
       'formula': ''
     },
     'FGA': {
@@ -414,8 +415,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of 3-point field goal attempts that a team makes.',
+      'definition': 'The number of 3-point field goal attempts that a team makes.',
       'formula': ''
     },
     '3PA': {
@@ -453,8 +453,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of 3-point field goal attempts that a team makes.',
+      'definition': 'The percentage of 3-point field goal attempts that a team makes.',
       'formula': '3PM / 3PA'
     },
     '3PAr': {
@@ -733,8 +732,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of available offensive rebounds a team obtained.',
+      'definition': 'The percentage of available offensive rebounds a team obtained.',
       'formula': ''
     },
     'DREB%': {
@@ -753,8 +751,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of available defensive rebounds a team obtained.',
+      'definition': 'The percentage of available defensive rebounds a team obtained.',
       'formula': ''
     },
     'fill2': {'first_available': '2016'},
@@ -994,8 +991,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '1',
-      'definition':
-          'The number of game minutes a player was on the court per game.',
+      'definition': 'The number of game minutes a player was on the court per game.',
       'formula': ''
     },
     'POSS': {
@@ -1031,8 +1027,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '1',
-      'definition':
-          'The number of team possessions a player was on the court per game.',
+      'definition': 'The number of team possessions a player was on the court per game.',
       'formula': ''
     },
     'fill': {'first_available': '1996'},
@@ -1257,8 +1252,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of touches a player passed the ball to a teammate.',
+      'definition': 'The percentage of touches a player passed the ball to a teammate.',
       'formula': ''
     },
     '% TOV': {
@@ -1371,8 +1365,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of field goal attempts (shots) that a player makes.',
+      'definition': 'The number of field goal attempts (shots) that a player makes.',
       'formula': ''
     },
     'FGA': {
@@ -1390,8 +1383,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of field goals (shots) that a player attempted.',
+      'definition': 'The number of field goals (shots) that a player attempted.',
       'formula': ''
     },
     'FG%': {
@@ -1409,8 +1401,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of field goal attempts that a player makes.',
+      'definition': 'The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
     'fill2': {'first_available': '1996'},
@@ -1429,8 +1420,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of 3-point field goal attempts that a player makes.',
+      'definition': 'The number of 3-point field goal attempts that a player makes.',
       'formula': ''
     },
     '3PA': {
@@ -1448,8 +1438,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of 3-point field goals that a player attempted.',
+      'definition': 'The number of 3-point field goals that a player attempted.',
       'formula': ''
     },
     '3P%': {
@@ -1467,8 +1456,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of 3-point field goal attempts that a player makes.',
+      'definition': 'The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
     '3PA RATE': {
@@ -1542,8 +1530,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of free throw attempts that a player makes.',
+      'definition': 'The percentage of free throw attempts that a player makes.',
       'formula': 'FTM / FTA'
     },
     'FTA RATE': {
@@ -1640,8 +1627,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of field goal attempts that a player makes.',
+      'definition': 'The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
     'PULL UP FG%': {
@@ -1659,8 +1645,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of field goal attempts that a player makes.',
+      'definition': 'The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
     '< 10FT FG%': {
@@ -1678,8 +1663,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of field goal attempts that a player makes.',
+      'definition': 'The percentage of field goal attempts that a player makes.',
       'formula': 'FGM / FGA'
     },
     'fill2': {'first_available': '2013'},
@@ -1698,8 +1682,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of 3-point field goal attempts that a player makes.',
+      'definition': 'The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
     'PULL UP 3P%': {
@@ -1717,8 +1700,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'The percentage of 3-point field goal attempts that a player makes.',
+      'definition': 'The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
     'fill3': {'first_available': '2013'},
@@ -1763,12 +1745,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
   },
   'CLOSEST DEFENDER': {
     'VERY TIGHT FREQ': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '0-2 Feet - Very Tight'
-      ],
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '0-2 Feet - Very Tight'],
       'TOTAL': {
         'nba_name': 'FGA_FREQUENCY',
         'rank_nba_name': 'FGA_FREQUENCY_RANK',
@@ -1825,12 +1802,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'WIDE OPEN FREQ': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '6+ Feet - Wide Open'
-      ],
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '6+ Feet - Wide Open'],
       'TOTAL': {
         'nba_name': 'FGA_FREQUENCY',
         'rank_nba_name': 'FGA_FREQUENCY_RANK',
@@ -1850,12 +1822,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
     'fill': {'first_available': '2013'},
     'VERY TIGHT FG%': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '0-2 Feet - Very Tight'
-      ],
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '0-2 Feet - Very Tight'],
       'TOTAL': {
         'nba_name': 'FG_PCT',
         'rank_nba_name': 'FG_PCT_RANK',
@@ -1912,12 +1879,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': 'FGM / FGA'
     },
     'WIDE OPEN FG%': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '6+ Feet - Wide Open'
-      ],
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '6+ Feet - Wide Open'],
       'TOTAL': {
         'nba_name': 'FG_PCT',
         'rank_nba_name': 'FG_PCT_RANK',
@@ -1937,12 +1899,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
     'fill2': {'first_available': '2013'},
     'VERY TIGHT 3P%': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '0-2 Feet - Very Tight'
-      ],
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '0-2 Feet - Very Tight'],
       'TOTAL': {
         'nba_name': 'FG3_PCT',
         'rank_nba_name': 'FG3_PCT_RANK',
@@ -1999,12 +1956,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': '3PM / 3PA'
     },
     'WIDE OPEN 3P%': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '6+ Feet - Wide Open'
-      ],
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '6+ Feet - Wide Open'],
       'TOTAL': {
         'nba_name': 'FG3_PCT',
         'rank_nba_name': 'FG3_PCT_RANK',
@@ -2024,12 +1976,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
     'fill3': {'first_available': '2013'},
     'VERY TIGHT eFG%': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '0-2 Feet - Very Tight'
-      ],
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '0-2 Feet - Very Tight'],
       'TOTAL': {
         'nba_name': 'EFG_PCT',
         'rank_nba_name': 'EFG_PCT_RANK',
@@ -2086,12 +2033,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
     'WIDE OPEN eFG%': {
-      'location': [
-        'ADV',
-        'SHOOTING',
-        'CLOSEST_DEFENDER',
-        '6+ Feet - Wide Open'
-      ],
+      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '6+ Feet - Wide Open'],
       'TOTAL': {
         'nba_name': 'EFG_PCT',
         'rank_nba_name': 'EFG_PCT_RANK',
@@ -2126,8 +2068,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of total rebounds a player obtains while on the floor.',
+      'definition': 'The number of total rebounds a player obtains while on the floor.',
       'formula': 'OREB + DREB'
     },
     'OREB': {
@@ -2145,8 +2086,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of offensive rebounds a player obtains while on the floor.',
+      'definition': 'The number of offensive rebounds a player obtains while on the floor.',
       'formula': ''
     },
     'DREB': {
@@ -2164,8 +2104,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '1996',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'The number of defensive rebounds a player obtains while on the floor.',
+      'definition': 'The number of defensive rebounds a player obtains while on the floor.',
       'formula': ''
     },
     'fill': {'first_available': '1996'},
@@ -2474,8 +2413,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2007',
       'convert': 'false',
       'round': '1',
-      'definition':
-          'Team\'s points allowed per 100 possessions when player is on court.',
+      'definition': 'Team\'s points allowed per 100 possessions when player is on court.',
       'formula': ''
     },
     'fill': {'first_available': '2016'},
@@ -2674,10 +2612,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
 };
 
 const kTeamColors = {
-  "FA": {
-    "primaryColor": Color(0xFF00438C),
-    "secondaryColor": Color(0xFFDA1A32)
-  },
+  "FA": {"primaryColor": Color(0xFF00438C), "secondaryColor": Color(0xFFDA1A32)},
   "ATL": {
     "primaryColor": Color(0xFFE03A3E),
     "secondaryColor": Color(0xFFC1D32F)
@@ -2790,10 +2725,7 @@ const kTeamColors = {
     "primaryColor": Color(0xFFCE1141),
     "secondaryColor": Color(0xFF000000)
   }, // Toronto Raptors
-  "UTA": {
-    "primaryColor": Color(0xFF002B5C),
-    "secondaryColor": Color(0xFFFCA200)
-  }, // Utah Jazz
+  "UTA": {"primaryColor": Color(0xFF002B5C), "secondaryColor": Color(0xFFFCA200)}, // Utah Jazz
   "WAS": {
     "primaryColor": Color(0xFF002B5C),
     "secondaryColor": Color(0xFFE31837)
@@ -2847,11 +2779,4 @@ const List<String> kDarkPrimaryColors = [
   'WAS'
 ];
 
-const List<String> kDarkSecondaryColors = [
-  'CHA',
-  'CHI',
-  'DET',
-  'HOU',
-  'POR',
-  'TOR'
-];
+const List<String> kDarkSecondaryColors = ['CHA', 'CHI', 'DET', 'HOU', 'POR', 'TOR'];

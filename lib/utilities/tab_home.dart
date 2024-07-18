@@ -122,7 +122,7 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
           child: Center(
             child: Text(
               'S',
-              style: kBebasWhite.copyWith(fontSize: 100.0),
+              style: kBebasNormal.copyWith(fontSize: 100.0),
             ),
           ),
         );

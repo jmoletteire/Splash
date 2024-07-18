@@ -51,8 +51,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   }
 
   bool _isFormValid() {
-    return _selectedFieldNotifier.value != null &&
-        _valueController.text.isNotEmpty;
+    return _selectedFieldNotifier.value != null && _valueController.text.isNotEmpty;
   }
 
   void _resetForm() {
@@ -141,6 +140,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
       body: jsonEncode({
         'selectedSeason': selectedSeason,
         'selectedSeasonType': seasonType,
+        'selectedPosition': selectedPosition,
         'filters': filters,
       }),
     );
@@ -155,6 +155,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
         'data': data,
         'selectedSeason': selectedSeason,
         'selectedSeasonType': seasonType,
+        'selectedPosition': selectedPosition,
       });
     } else {
       _showErrorSnackBar(context, 'Error fetching data from server');
@@ -230,8 +231,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                   child: Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 25.0, vertical: 10.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
                         child: Form(
                           key: _formKey,
                           autovalidateMode: _autoValidate
@@ -241,8 +241,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Filter',
@@ -280,9 +279,10 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                           });
                                           Navigator.pop(context);
                                         },
-                                        child: const Text(
+                                        child: Text(
                                           'Done',
-                                          style: kBebasNormal,
+                                          style:
+                                              kBebasNormal.copyWith(color: Colors.deepOrange),
                                         ),
                                       ),
                                     ],
@@ -291,8 +291,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                               ),
                               const SizedBox(height: 10.0),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   _buildDropdownButton(
                                     selectedValue: selectedSeason,
@@ -325,8 +324,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                               ),
                               const SizedBox(height: 30.0),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Expanded(
                                     flex: 4,
@@ -341,8 +339,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                           _location = location;
                                         });
                                       },
-                                      selectedItemNotifier:
-                                          _selectedFieldNotifier,
+                                      selectedItemNotifier: _selectedFieldNotifier,
                                     ),
                                   ),
                                   const Spacer(),
@@ -355,16 +352,16 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                       dropdownColor: Colors.grey.shade900,
                                       items: [
                                         'equals',
-                                        'contains',
                                         'greater than',
-                                        'less than'
+                                        'less than',
+                                        'top',
+                                        'bottom'
                                       ].map((String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
                                           child: Text(
                                             value,
-                                            style: kBebasNormal.copyWith(
-                                                fontSize: 16.5),
+                                            style: kBebasNormal.copyWith(fontSize: 16.5),
                                           ),
                                         );
                                       }).toList(),
@@ -381,15 +378,12 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                     child: TextFormField(
                                       controller: _valueController,
                                       keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      style:
-                                          kBebasNormal.copyWith(fontSize: 16.5),
+                                          const TextInputType.numberWithOptions(decimal: true),
+                                      style: kBebasNormal.copyWith(fontSize: 16.5),
                                       cursorColor: Colors.white70,
                                       decoration: InputDecoration(
                                           hintText: 'Value',
-                                          hintStyle: kBebasNormal.copyWith(
-                                              fontSize: 16.5)),
+                                          hintStyle: kBebasNormal.copyWith(fontSize: 16.5)),
                                       onChanged: (value) {
                                         setModalState(() {
                                           _valueController.text = value;
@@ -414,57 +408,45 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                         setModalState(() {
                                           _autoValidate = true;
                                         });
-                                        final validationError = _validateValue(
-                                            _valueController.text);
+                                        final validationError =
+                                            _validateValue(_valueController.text);
                                         if (validationError != null) {
-                                          _showErrorSnackBar(
-                                              context, validationError);
+                                          _showErrorSnackBar(context, validationError);
                                           return;
                                         }
                                         if (_isFormValid()) {
-                                          if (_formKey.currentState!
-                                              .validate()) {
+                                          if (_formKey.currentState!.validate()) {
                                             _formKey.currentState!.save();
                                             setModalState(() {
                                               if (_editIndex != null) {
                                                 filters[_editIndex!] = {
-                                                  'field':
-                                                      _selectedFieldNotifier
-                                                          .value!,
+                                                  'field': _selectedFieldNotifier.value!,
                                                   'operation': _operation,
-                                                  'value':
-                                                      _valueController.text,
+                                                  'value': _valueController.text,
                                                   'location': _location,
                                                 };
                                               } else {
                                                 filters.add({
-                                                  'field':
-                                                      _selectedFieldNotifier
-                                                          .value!,
+                                                  'field': _selectedFieldNotifier.value!,
                                                   'operation': _operation,
-                                                  'value':
-                                                      _valueController.text,
+                                                  'value': _valueController.text,
                                                   'location': _location,
                                                 });
                                               }
                                             });
-                                            print(filters);
                                             _resetForm();
                                           }
                                         }
                                       },
-                                      backgroundColor: _isFormValid()
-                                          ? Colors.deepOrange
-                                          : Colors.grey,
+                                      backgroundColor:
+                                          _isFormValid() ? Colors.deepOrange : Colors.grey,
                                       child: Text(
                                         _editIndex != null ? '✓' : '+',
                                         style: _editIndex != null
                                             ? kBebasBold.copyWith(
-                                                color: Colors.black,
-                                                fontSize: 14.0)
+                                                color: Colors.black, fontSize: 14.0)
                                             : kBebasBold.copyWith(
-                                                color: Colors.black,
-                                                fontSize: 28.0),
+                                                color: Colors.black, fontSize: 28.0),
                                       ),
                                     ),
                                   ),
@@ -488,8 +470,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                           '${filter['field']} ${filter['operation']} ${filter['value']}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: kBebasNormal.copyWith(
-                                              fontSize: 18.0),
+                                          style: kBebasNormal.copyWith(fontSize: 18.0),
                                         ),
                                         trailing: Row(
                                           mainAxisSize: MainAxisSize.min,
@@ -501,23 +482,19 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                                 size: 20.0,
                                               ),
                                               onPressed: () {
-                                                _editFilter(
-                                                    index, setModalState);
+                                                _editFilter(index, setModalState);
                                               },
                                             ),
                                             IconButton(
                                               icon: const Icon(
-                                                Icons
-                                                    .remove_circle_outline_outlined,
+                                                Icons.remove_circle_outline_outlined,
                                                 color: Colors.red,
                                                 size: 20.0,
                                               ),
                                               onPressed: () {
-                                                _removeFilter(
-                                                    index, setModalState);
+                                                _removeFilter(index, setModalState);
                                                 setModalState(() {
-                                                  _formKey.currentState
-                                                      ?.validate();
+                                                  _formKey.currentState?.validate();
                                                 });
                                               },
                                             ),

@@ -9,17 +9,18 @@ import '../../../components/custom_icon_button.dart';
 import '../../player/career/player_career.dart';
 import '../../search_screen.dart';
 
-class Leaders extends StatefulWidget {
-  const Leaders({super.key});
+class StatsQuery extends StatefulWidget {
+  const StatsQuery({super.key});
 
   @override
-  State<Leaders> createState() => _LeadersState();
+  State<StatsQuery> createState() => _StatsQueryState();
 }
 
-class _LeadersState extends State<Leaders> {
+class _StatsQueryState extends State<StatsQuery> {
   List<dynamic>? queryData;
   String? selectedSeason;
   String? selectedSeasonType;
+  String? selectedPosition;
   List<ColumnOption> selectedColumns = [];
   final ScrollController _scrollController = ScrollController();
 
@@ -28,7 +29,9 @@ class _LeadersState extends State<Leaders> {
       queryData = data['data'];
       selectedSeason = data['selectedSeason'];
       selectedSeasonType = data['selectedSeasonType'];
+      selectedPosition = data['selectedPosition'];
     });
+    print(queryData?.length);
   }
 
   void _showColumnSelector() {
@@ -66,8 +69,7 @@ class _LeadersState extends State<Leaders> {
         surfaceTintColor: Colors.grey.shade900,
         title: const Text(
           'STATS',
-          style: TextStyle(
-              color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 28.0),
+          style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 28.0),
         ),
         actions: [
           CustomIconButton(

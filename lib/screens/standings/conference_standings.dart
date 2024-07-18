@@ -148,8 +148,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
     );
   }
 
-  Widget _headerBuilder(
-          BuildContext context, TableRowContentBuilder contentBuilder) =>
+  Widget _headerBuilder(BuildContext context, TableRowContentBuilder contentBuilder) =>
       contentBuilder(
         context,
         (context, column) {
@@ -160,8 +159,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                   ? const EdgeInsets.only(left: 20.0)
                   : const EdgeInsets.only(right: 8.0),
               child: Align(
-                alignment:
-                    column == 0 ? Alignment.centerLeft : Alignment.centerRight,
+                alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
                 child: Text('${widget.columnNames[column]}',
                     style: kBebasNormal.copyWith(
                       fontSize: 18.0,
@@ -230,8 +228,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
     );
   }
 
-  Widget getContent(List<Map<String, dynamic>> eastTeams, int row, int column,
-      BuildContext context) {
+  Widget getContent(
+      List<Map<String, dynamic>> eastTeams, int row, int column, BuildContext context) {
     switch (column) {
       case 0:
         return Padding(
@@ -241,8 +239,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
               Expanded(
                 flex: 1,
                 child: Text(
-                  widget.standings[row]['seasons'][kCurrentSeason]['CONF_RANK']
-                      .toString(),
+                  widget.standings[row]['seasons'][kCurrentSeason]['CONF_RANK'].toString(),
                   textAlign: TextAlign.center,
                   style: kBebasNormal.copyWith(
                     color: Colors.white70,
@@ -281,12 +278,10 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                         style: kBebasBold.copyWith(fontSize: 20.0),
                       ),
                       TextSpan(
-                        text: getClinched(widget.standings[row]['seasons']
-                            [kCurrentSeason]['STANDINGS']),
-                        style: kBebasWhite.copyWith(
-                            fontFamily: 'Anton',
-                            fontSize: 12.0,
-                            letterSpacing: 0.8),
+                        text: getClinched(
+                            widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']),
+                        style: kBebasNormal.copyWith(
+                            fontFamily: 'Anton', fontSize: 12.0, letterSpacing: 0.8),
                       ),
                     ],
                   ),
@@ -297,8 +292,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
         );
       case 1:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['WINS']!
-                .toStringAsFixed(0));
+            text:
+                widget.standings[row]['seasons'][kCurrentSeason]['WINS']!.toStringAsFixed(0));
       case 2:
         return StandingsDataText(
             text: widget.standings[row]['seasons'][kCurrentSeason]['LOSSES']!
@@ -314,34 +309,32 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                 .toString());
       case 5:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']
-                    ['ADV']['NET_RATING']!
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['ADV']
+                    ['NET_RATING']!
                 .toStringAsFixed(1));
       case 6:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']
-                    ['ADV']['OFF_RATING']!
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['ADV']
+                    ['OFF_RATING']!
                 .toStringAsFixed(1));
       case 7:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']
-                    ['ADV']['DEF_RATING']!
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['ADV']
+                    ['DEF_RATING']!
                 .toStringAsFixed(1));
       case 8:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']
-                    ['ADV']['PACE']!
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['ADV']['PACE']!
                 .toStringAsFixed(1));
       case 9:
         return Container(
           alignment: Alignment.centerRight,
           child: Text(
-            widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['strCurrentStreak']!,
-            style: kBebasWhite.copyWith(
+            widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['strCurrentStreak']!,
+            style: kBebasNormal.copyWith(
                 fontSize: 18.0,
-                color: widget.standings[row]['seasons'][kCurrentSeason]
-                            ['STANDINGS']['strCurrentStreak']!
+                color: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
+                            ['strCurrentStreak']!
                         .contains('W')
                     ? Colors.green
                     : Colors.red),
@@ -349,36 +342,30 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
         );
       case 10:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['L10']!);
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['L10']!);
       case 11:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['HOME']!);
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['HOME']!);
       case 12:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['ROAD']!);
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['ROAD']!);
       case 13:
         return StandingsDataText(
             text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
                 ['OppOver500']!);
       case 14:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['vsEast']!);
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['vsEast']!);
       case 15:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['vsWest']!);
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['vsWest']!);
       case 16:
         return StandingsDataText(
             text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
                 ['vsAtlantic']!);
       case 17:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['vsCentral']!);
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['vsCentral']!);
       case 18:
         return StandingsDataText(
             text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
@@ -389,8 +376,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                 ['vsNorthwest']!);
       case 20:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['vsPacific']!);
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['vsPacific']!);
       case 21:
         return StandingsDataText(
             text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
@@ -413,7 +399,7 @@ class StandingsDataText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasWhite.copyWith(fontSize: 19.0),
+        style: kBebasNormal.copyWith(fontSize: 19.0),
       ),
     );
   }

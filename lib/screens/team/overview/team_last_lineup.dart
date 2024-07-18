@@ -15,15 +15,13 @@ class TeamLastLineup extends StatefulWidget {
 
 class _TeamLastLineupState extends State<TeamLastLineup> {
   Map<String, dynamic> getLastGame() {
-    Map<String, dynamic> schedule =
-        widget.team['seasons'][kCurrentSeason]['GAMES'];
+    Map<String, dynamic> schedule = widget.team['seasons'][kCurrentSeason]['GAMES'];
 
     // Convert the map to a list of entries
     var entries = schedule.entries.toList();
 
     // Sort the entries by the GAME_DATE value
-    entries
-        .sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
+    entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
 
     // Extract the sorted keys
     var gameIndex = entries.map((e) => e.key).toList();
@@ -54,14 +52,12 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                     Container(
                       decoration: BoxDecoration(
                         border: Border(
-                          bottom:
-                              BorderSide(color: Colors.grey.shade700, width: 2),
+                          bottom: BorderSide(color: Colors.grey.shade700, width: 2),
                         ),
                       ),
                       child: Text(
                         'Last Starting Lineup',
-                        style: kBebasBold.copyWith(
-                            fontSize: 20.0, color: Colors.white),
+                        style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
                       ),
                     ),
                     const SizedBox(height: 5.0),
@@ -71,22 +67,18 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                           TextSpan(
                             text:
                                 '${formatDate(lastGame['GAME_DATE'])} - ${lastGame['HOME_AWAY']} ${kTeamNames[lastGame['OPP'].toString()][1]} (${lastGame['TEAM_PTS']}-${lastGame['OPP_PTS']} ',
-                            style: kBebasBold.copyWith(
-                                fontSize: 15.0, color: Colors.grey),
+                            style: kBebasBold.copyWith(fontSize: 15.0, color: Colors.grey),
                           ),
                           TextSpan(
                             text: '${lastGame['RESULT']}',
                             style: kBebasBold.copyWith(
                               fontSize: 15.0,
-                              color: lastGame['RESULT'] == 'W'
-                                  ? Colors.green
-                                  : Colors.red,
+                              color: lastGame['RESULT'] == 'W' ? Colors.green : Colors.red,
                             ),
                           ),
                           TextSpan(
                             text: ')',
-                            style: kBebasBold.copyWith(
-                                fontSize: 15.0, color: Colors.grey),
+                            style: kBebasBold.copyWith(fontSize: 15.0, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -203,13 +195,12 @@ class PlayerCard extends StatelessWidget {
           PlayerAvatar(
             radius: 30,
             backgroundColor: Colors.grey.shade800,
-            playerImageUrl:
-                'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
+            playerImageUrl: 'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
           ),
           const SizedBox(height: 5.0),
           Text(
             name,
-            style: kBebasWhite,
+            style: kBebasNormal.copyWith(fontSize: 16.0),
           ),
           Text(
             position,
@@ -236,8 +227,7 @@ class HalfCourtPainter extends CustomPainter {
 
     // Draw center arc
     canvas.drawArc(
-      Rect.fromCircle(
-          center: Offset(size.width * 1.95 / 2, 0), radius: keyWidth / 2),
+      Rect.fromCircle(center: Offset(size.width * 1.95 / 2, 0), radius: keyWidth / 2),
       0,
       3.14,
       false,
@@ -254,8 +244,7 @@ class HalfCourtPainter extends CustomPainter {
     // Draw key (free throw lane)
     canvas.drawRect(
       Rect.fromCenter(
-        center: Offset(
-            size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 2)),
+        center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 2)),
         width: keyWidth,
         height: keyHeight,
       ),
@@ -265,8 +254,7 @@ class HalfCourtPainter extends CustomPainter {
     // Draw free throw line arc
     canvas.drawArc(
       Rect.fromCircle(
-          center:
-              Offset(size.width * 1.95 / 2, (size.height * 0.98) - keyHeight),
+          center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - keyHeight),
           radius: keyWidth / 2),
       3.14,
       3.14,
@@ -283,8 +271,7 @@ class HalfCourtPainter extends CustomPainter {
     );
 
     final path = Path();
-    const totalAngle =
-        3.14; // The arc's angle in radians (half-circle in this case)
+    const totalAngle = 3.14; // The arc's angle in radians (half-circle in this case)
     const segments = 10; // Increase for smoother dash transitions
     const segmentAngle = totalAngle / segments;
     bool draw = true;
@@ -294,8 +281,7 @@ class HalfCourtPainter extends CustomPainter {
       final endAngle = startAngle + segmentAngle;
 
       if (draw) {
-        path.addArc(arcRect, startAngle,
-            segmentAngle * (dashWidth / (dashWidth + dashSpace)));
+        path.addArc(arcRect, startAngle, segmentAngle * (dashWidth / (dashWidth + dashSpace)));
       }
 
       draw = !draw;
@@ -306,8 +292,7 @@ class HalfCourtPainter extends CustomPainter {
     // Draw restricted area
     canvas.drawArc(
       Rect.fromCircle(
-          center: Offset(
-              size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 4)),
+          center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 4)),
           radius: centerCircleRadius),
       3.14,
       3.14,
@@ -317,23 +302,20 @@ class HalfCourtPainter extends CustomPainter {
 
     // Draw three-point line with flattened ends
     canvas.drawLine(
-      Offset(
-          (size.width * 1.95 / 2) + threePointLineRadius, size.height * 0.98),
+      Offset((size.width * 1.95 / 2) + threePointLineRadius, size.height * 0.98),
       Offset((size.width * 1.95 / 2) + threePointLineRadius,
           (size.height * 0.98) - (keyHeight / 2)),
       paint,
     );
     canvas.drawLine(
-      Offset(
-          (size.width * 1.95 / 2) - threePointLineRadius, size.height * 0.98),
+      Offset((size.width * 1.95 / 2) - threePointLineRadius, size.height * 0.98),
       Offset((size.width * 1.95 / 2) - threePointLineRadius,
           (size.height * 0.98) - (keyHeight / 2)),
       paint,
     );
     canvas.drawArc(
       Rect.fromCircle(
-          center: Offset(
-              size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 2)),
+          center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 2)),
           radius: threePointLineRadius),
       3.14,
       3.14,

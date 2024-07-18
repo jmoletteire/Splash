@@ -131,8 +131,7 @@ class _CareerStatsState extends State<CareerStats> {
     );
   }
 
-  Widget _headerBuilder(
-          BuildContext context, TableRowContentBuilder contentBuilder) =>
+  Widget _headerBuilder(BuildContext context, TableRowContentBuilder contentBuilder) =>
       contentBuilder(
         context,
         (context, column) {
@@ -150,7 +149,7 @@ class _CareerStatsState extends State<CareerStats> {
                         : Alignment.centerRight,
                 child: Text(
                   columnNames[column],
-                  style: kBebasWhite.copyWith(
+                  style: kBebasNormal.copyWith(
                     fontSize: 16.0,
                   ),
                 ),
@@ -183,8 +182,7 @@ class _CareerStatsState extends State<CareerStats> {
         ),
       );
 
-  Widget? _rowBuilder(
-      BuildContext context, int row, TableRowContentBuilder contentBuilder) {
+  Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
     String season = widget.seasons.keys.toList().reversed.toList()[row];
     return _wrapRow(
       row,
@@ -197,8 +195,7 @@ class _CareerStatsState extends State<CareerStats> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => TeamHome(
-                    teamId: widget.seasons[season][widget.seasonType]['BASIC']
-                            ['TEAM_ID']
+                    teamId: widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ID']
                         .toString(),
                   ),
                 ),
@@ -218,8 +215,8 @@ class _CareerStatsState extends State<CareerStats> {
     );
   }
 
-  Widget getContent(Map<String, dynamic> playerSeasons, int row, int column,
-      BuildContext context) {
+  Widget getContent(
+      Map<String, dynamic> playerSeasons, int row, int column, BuildContext context) {
     String season = widget.seasons.keys.toList().reversed.toList()[row];
     switch (column) {
       case 0:
@@ -227,7 +224,7 @@ class _CareerStatsState extends State<CareerStats> {
           child: Text(
             '\'${season.substring(2)}',
             textAlign: TextAlign.center,
-            style: kBebasWhite.copyWith(
+            style: kBebasNormal.copyWith(
               color: Colors.white70,
               fontSize: 19.0,
             ),
@@ -252,8 +249,7 @@ class _CareerStatsState extends State<CareerStats> {
             Expanded(
               flex: 4,
               child: Text(
-                widget.seasons[season][widget.seasonType]['BASIC']
-                    ['TEAM_ABBREVIATION'],
+                widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'],
                 style: kBebasBold,
               ),
             ),
@@ -261,8 +257,7 @@ class _CareerStatsState extends State<CareerStats> {
         );
       case 2:
         return StandingsDataText(
-            text: widget.seasons[season][widget.seasonType]['BASIC']['GP']
-                .toStringAsFixed(0));
+            text: widget.seasons[season][widget.seasonType]['BASIC']['GP'].toStringAsFixed(0));
       case 3:
         return StandingsDataText(
             text: (widget.seasons[season][widget.seasonType]['BASIC']['PTS'] /
@@ -320,22 +315,19 @@ class _CareerStatsState extends State<CareerStats> {
       case 15:
         return StandingsDataText(
             text: int.parse(season.substring(0, 4)) > 2007
-                ? widget.seasons[season][widget.seasonType]['ADV']
-                        ['OFF_RATING_ON_OFF']
+                ? widget.seasons[season][widget.seasonType]['ADV']['OFF_RATING_ON_OFF']
                     .toStringAsFixed(1)
                 : '-');
       case 16:
         return StandingsDataText(
             text: int.parse(season.substring(0, 4)) > 2007
-                ? widget.seasons[season][widget.seasonType]['ADV']
-                        ['DEF_RATING_ON_OFF']
+                ? widget.seasons[season][widget.seasonType]['ADV']['DEF_RATING_ON_OFF']
                     .toStringAsFixed(1)
                 : '-');
       case 17:
         return StandingsDataText(
             text: int.parse(season.substring(0, 4)) > 2007
-                ? widget.seasons[season][widget.seasonType]['ADV']
-                        ['NET_RATING_ON_OFF']
+                ? widget.seasons[season][widget.seasonType]['ADV']['NET_RATING_ON_OFF']
                     .toStringAsFixed(1)
                 : '-');
       default:
@@ -356,7 +348,7 @@ class StandingsDataText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasWhite.copyWith(fontSize: 18.0),
+        style: kBebasNormal.copyWith(fontSize: 18.0),
       ),
     );
   }

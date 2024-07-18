@@ -14,7 +14,17 @@ def query_database():
     data = request.json
     selected_season = data.get('selectedSeason')
     selected_season_type = data.get('selectedSeasonType')
-    position = data.get('selectedPosition')
+    position_map = {
+        'ALL': '',
+        'G': 'Guard',
+        'F': 'Forward',
+        'C': 'Center',
+        'G-F': 'Guard-Forward',
+        'F-G': 'Forward-Guard',
+        'C-F': 'Center-Forward',
+        'F-C': 'Forward-Center',
+    }
+
     filters = data.get('filters')
 
     if filters:
@@ -30,9 +40,6 @@ def query_database():
 def build_query(season, season_type, filters):
     query = {"$and": []}
     for stat_filter in filters:
-        logging.info(stat_filter)
-        logging.info(season_type)
-
         operator = stat_filter['operation']
         value = stat_filter['value']
         location = stat_filter['location']
@@ -52,6 +59,16 @@ def build_query(season, season_type, filters):
             query["$and"].append({path: value})
         elif operator == 'contains':
             query["$and"].append({path: {"$regex": value, "$options": "i"}})
+        elif operator == 'top':
+            # Sorting in descending order and limiting to top N results
+            query["$and"].append({"$sort": {path: -1}})
+            if value:
+                query["$and"].append({"$limit": value})
+        elif operator == 'bottom':
+            # Sorting in ascending order and limiting to bottom N results
+            query["$and"].append({"$sort": {path: 1}})
+            if value:
+                query["$and"].append({"$limit": value})
     return query
 
 

@@ -56,8 +56,8 @@ class _PlayersTableState extends State<PlayersTable> {
     super.dispose();
   }
 
-  void _sort<T>(Comparable<T> Function(Map<String, dynamic> p) getValue,
-      int columnIndex, bool ascending) {
+  void _sort<T>(Comparable<T> Function(Map<String, dynamic> p) getValue, int columnIndex,
+      bool ascending) {
     widget.players.sort((a, b) {
       final aValue = getValue(a);
       final bValue = getValue(b);
@@ -71,12 +71,11 @@ class _PlayersTableState extends State<PlayersTable> {
     });
   }
 
-  Comparable<dynamic> _getSortingValues(
-      Map<String, dynamic> player, ColumnOption column) {
+  Comparable<dynamic> _getSortingValues(Map<String, dynamic> player, ColumnOption column) {
     Map<String, dynamic> playerStats =
         player['STATS']?[widget.selectedSeason]?[widget.selectedSeasonType];
 
-    switch (column.index) {
+    switch (column.getIndex(kAllColumns)) {
       case 0:
         return player['DISPLAY_FI_LAST'] ?? '';
       case 1:
@@ -85,27 +84,27 @@ class _PlayersTableState extends State<PlayersTable> {
         return playerStats['BASIC']?['AGE'] ?? 0;
       case 3:
         return player['POSITION'] ?? '';
-      case 4:
+      case 8:
         int pts = playerStats['BASIC']?['PTS'] ?? 0;
         int gp = playerStats['BASIC']?['GP'] ?? 0;
         return gp != 0 ? pts / gp : 0.0;
-      case 5:
+      case 9:
         int reb = playerStats['BASIC']?['REB'] ?? 0;
         int gp = playerStats['BASIC']?['GP'] ?? 0;
         return gp != 0 ? reb / gp : 0.0;
-      case 6:
+      case 10:
         int ast = playerStats['BASIC']?['AST'] ?? 0;
         int gp = playerStats['BASIC']?['GP'] ?? 0;
         return gp != 0 ? ast / gp : 0.0;
-      case 7:
+      case 11:
         int stl = playerStats['BASIC']?['STL'] ?? 0;
         int gp = playerStats['BASIC']?['GP'] ?? 0;
         return gp != 0 ? stl / gp : 0.0;
-      case 8:
+      case 12:
         int blk = playerStats['BASIC']?['BLK'] ?? 0;
         int gp = playerStats['BASIC']?['GP'] ?? 0;
         return gp != 0 ? blk / gp : 0.0;
-      case 9:
+      case 13:
         int tov = playerStats['BASIC']?['TOV'] ?? 0;
         int gp = playerStats['BASIC']?['GP'] ?? 0;
         return gp != 0 ? tov / gp : 0.0;
@@ -113,8 +112,7 @@ class _PlayersTableState extends State<PlayersTable> {
         return getValueFromMap(
           playerStats,
           kPlayerStatLabelMap[column.mapKey][column.mapName]['location'],
-          kPlayerStatLabelMap[column.mapKey][column.mapName]['TOTAL']
-              ['nba_name'],
+          kPlayerStatLabelMap[column.mapKey][column.mapName]['TOTAL']['nba_name'],
         );
     }
   }
@@ -143,7 +141,7 @@ class _PlayersTableState extends State<PlayersTable> {
       columns: widget.selectedColumns.map((col) {
         return TableColumn(
           width: MediaQuery.of(context).size.width * col.width,
-          freezePriority: col.index == 0 ? 1 : 0,
+          freezePriority: col.getIndex(kAllColumns) == 0 ? 1 : 0,
         );
       }).toList(),
       rowBuilder: _rowBuilder,
@@ -151,8 +149,7 @@ class _PlayersTableState extends State<PlayersTable> {
     );
   }
 
-  Widget _headerBuilder(
-          BuildContext context, TableRowContentBuilder contentBuilder) =>
+  Widget _headerBuilder(BuildContext context, TableRowContentBuilder contentBuilder) =>
       contentBuilder(
         context,
         (context, column) {
@@ -161,22 +158,23 @@ class _PlayersTableState extends State<PlayersTable> {
             color: Colors.grey.shade800,
             child: InkWell(
               onTap: () {
-                final isAscending =
-                    _sortColumnIndex == column && _sortAscending;
+                bool isCurrentlySortedColumn = _sortColumnIndex == column;
+                bool ascending = isCurrentlySortedColumn ? !_sortAscending : false;
                 _sort<dynamic>(
                   (player) => _getSortingValues(player, col),
                   column,
-                  !isAscending,
+                  ascending,
                 );
               },
               child: Padding(
                 padding: column == 0
                     ? const EdgeInsets.only(left: 20.0)
-                    : const EdgeInsets.only(right: 8.0),
+                    : _sortColumnIndex != column
+                        ? const EdgeInsets.only(right: 8.0)
+                        : EdgeInsets.zero,
                 child: Row(
-                  mainAxisAlignment: column == 0
-                      ? MainAxisAlignment.start
-                      : MainAxisAlignment.end,
+                  mainAxisAlignment:
+                      column == 0 ? MainAxisAlignment.start : MainAxisAlignment.end,
                   children: [
                     Text(
                       col.headerName,
@@ -186,9 +184,7 @@ class _PlayersTableState extends State<PlayersTable> {
                     ),
                     if (_sortColumnIndex == column)
                       Icon(
-                        _sortAscending
-                            ? Icons.arrow_drop_up
-                            : Icons.arrow_drop_down,
+                        _sortAscending ? Icons.arrow_drop_up : Icons.arrow_drop_down,
                         size: 15.0,
                       ),
                   ],
@@ -222,8 +218,7 @@ class _PlayersTableState extends State<PlayersTable> {
         ),
       );
 
-  Widget? _rowBuilder(
-      BuildContext context, int row, TableRowContentBuilder contentBuilder) {
+  Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
     return _wrapRow(
       row,
       Material(
@@ -245,7 +240,7 @@ class _PlayersTableState extends State<PlayersTable> {
             final col = widget.selectedColumns[column];
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: getContent(row, col.index, col.mapName, context),
+              child: getContent(row, col.getIndex(kAllColumns), col.mapName, context),
             );
           }),
         ),
@@ -253,34 +248,35 @@ class _PlayersTableState extends State<PlayersTable> {
     );
   }
 
-  Widget getContent(
-      int row, int column, String statName, BuildContext context) {
-    Map<String, dynamic> playerStats = widget.players[row]['STATS']
-        [widget.selectedSeason][widget.selectedSeasonType];
+  Widget getContent(int row, int column, String statName, BuildContext context) {
+    Map<String, dynamic> playerStats =
+        widget.players[row]['STATS'][widget.selectedSeason][widget.selectedSeasonType];
 
     Map<String, Widget> statValues = buildPlayerStatValues(playerStats);
 
     switch (column) {
       case 0:
         return Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 3.0, 8.0),
+          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
           child: Row(
             children: [
               Expanded(
                 flex: 1,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 24.0),
-                  child: PlayerAvatar(
-                    radius: 20.0,
-                    backgroundColor: Colors.white70,
-                    playerImageUrl:
-                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PERSON_ID']}.png',
-                  ),
+                child: Text(
+                  (row + 1).toString(),
+                  style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 16.0),
                 ),
               ),
               const SizedBox(width: 8.0),
+              PlayerAvatar(
+                radius: 12.0,
+                backgroundColor: Colors.white70,
+                playerImageUrl:
+                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PERSON_ID']}.png',
+              ),
+              const SizedBox(width: 8.0),
               Expanded(
-                flex: 3,
+                flex: 5,
                 child: Text(
                   widget.players[row]['DISPLAY_FI_LAST'],
                   maxLines: 1,
@@ -315,9 +311,8 @@ class _PlayersTableState extends State<PlayersTable> {
         }
         return PlayerStatsTableText(text: value);
       case 3:
-        return PlayerStatsTableText(
-            text: positionsMap[widget.players[row]['POSITION']!]!);
-      case 4:
+        return PlayerStatsTableText(text: positionsMap[widget.players[row]['POSITION']!]!);
+      case 8:
         String value = '';
         try {
           value =
@@ -326,7 +321,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 5:
+      case 9:
         String value = '';
         try {
           value =
@@ -335,7 +330,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 6:
+      case 10:
         String value = '';
         try {
           value =
@@ -344,7 +339,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 7:
+      case 11:
         String value = '';
         try {
           value =
@@ -353,7 +348,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 8:
+      case 12:
         String value = '';
         try {
           value =
@@ -362,7 +357,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 9:
+      case 13:
         String value = '';
         try {
           value =
@@ -376,8 +371,7 @@ class _PlayersTableState extends State<PlayersTable> {
     }
   }
 
-  dynamic getValueFromMap(
-      Map<String, dynamic> map, List<String> keys, String stat) {
+  dynamic getValueFromMap(Map<String, dynamic> map, List<String> keys, String stat) {
     dynamic value = map;
 
     for (var key in keys) {
@@ -403,10 +397,7 @@ class _PlayersTableState extends State<PlayersTable> {
     try {
       statValue = convert == 'true' ? statValue * 100 : statValue;
       value = round == '0'
-          ? (perMode == 'PER_75' &&
-                  statName != 'MIN' &&
-                  statName != 'GP' &&
-                  statName != 'POSS'
+          ? (perMode == 'PER_75' && statName != 'MIN' && statName != 'GP' && statName != 'POSS'
               ? statValue.toStringAsFixed(1)
               : statValue.toStringAsFixed(0))
           : convert == 'true'
@@ -458,7 +449,7 @@ class PlayerStatsTableText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasWhite.copyWith(fontSize: 19.0),
+        style: kBebasNormal.copyWith(fontSize: 18.0),
       ),
     );
   }

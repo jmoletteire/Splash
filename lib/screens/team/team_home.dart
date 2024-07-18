@@ -24,8 +24,7 @@ class TeamHome extends StatefulWidget {
   State<TeamHome> createState() => _TeamHomeState();
 }
 
-class _TeamHomeState extends State<TeamHome>
-    with SingleTickerProviderStateMixin {
+class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
   late Map<String, dynamic> team;
@@ -87,8 +86,7 @@ class _TeamHomeState extends State<TeamHome>
   }
 
   bool get _isSliverAppBarExpanded {
-    return _scrollController.hasClients &&
-        _scrollController.offset > (200 - kToolbarHeight);
+    return _scrollController.hasClients && _scrollController.offset > (200 - kToolbarHeight);
   }
 
   /// ******************************************************
@@ -107,8 +105,7 @@ class _TeamHomeState extends State<TeamHome>
   ///      Initialize each tab via anonymous function.
   /// ******************************************************
 
-  final List<Widget Function({required Map<String, dynamic> team})> _teamPages =
-      [
+  final List<Widget Function({required Map<String, dynamic> team})> _teamPages = [
     ({required Map<String, dynamic> team}) => TeamOverview(team: team),
     ({required Map<String, dynamic> team}) => TeamSchedule(team: team),
     ({required Map<String, dynamic> team}) => TeamStats(team: team),
@@ -129,20 +126,18 @@ class _TeamHomeState extends State<TeamHome>
         : Scaffold(
             body: NestedScrollView(
               controller: _scrollController,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return [
                   SliverAppBar(
-                    backgroundColor:
-                        kTeamColors[team['ABBREVIATION']]!['primaryColor']!,
+                    backgroundColor: kTeamColors[team['ABBREVIATION']]!['primaryColor']!,
                     title: _title
                         ? SvgPicture.asset(
                             'images/NBA_Logos/${team['TEAM_ID']}.svg',
                             fit: BoxFit.contain,
-                            width: team['ABBREVIATION'] == 'LAC' ||
-                                    team['ABBREVIATION'] == 'CHI'
-                                ? MediaQuery.of(context).size.width * 0.165
-                                : MediaQuery.of(context).size.width * 0.1,
+                            width:
+                                team['ABBREVIATION'] == 'LAC' || team['ABBREVIATION'] == 'CHI'
+                                    ? MediaQuery.of(context).size.width * 0.165
+                                    : MediaQuery.of(context).size.width * 0.1,
                           )
                         : null,
                     centerTitle: true,
@@ -162,13 +157,10 @@ class _TeamHomeState extends State<TeamHome>
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                kTeamColors[team['ABBREVIATION']]![
-                                        'primaryColor']!
-                                    .withOpacity(kTeamColorOpacity[
-                                            team['ABBREVIATION']]![
+                                kTeamColors[team['ABBREVIATION']]!['primaryColor']!
+                                    .withOpacity(kTeamColorOpacity[team['ABBREVIATION']]![
                                         'opacity']!), // Transparent at the top
-                                kTeamColors[team['ABBREVIATION']]![
-                                        'primaryColor']!
+                                kTeamColors[team['ABBREVIATION']]!['primaryColor']!
                                     .withOpacity(1.0), // Opaque at the bottom
                               ],
                             ),
@@ -189,8 +181,7 @@ class _TeamHomeState extends State<TeamHome>
                       isScrollable: true,
                       tabAlignment: TabAlignment.start,
                       indicatorSize: TabBarIndicatorSize.tab,
-                      indicatorColor:
-                          kTeamColors[team['ABBREVIATION']]!['secondaryColor']!,
+                      indicatorColor: kTeamColors[team['ABBREVIATION']]!['secondaryColor']!,
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
@@ -272,8 +263,7 @@ class TeamInfo extends StatelessWidget {
     var entries = schedule.entries.toList();
 
     // Sort the entries by the GAME_DATE value
-    entries
-        .sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
+    entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
 
     // Extract the sorted keys
     var gameIndex = entries.map((e) => e.key).toList();
@@ -307,12 +297,12 @@ class TeamInfo extends StatelessWidget {
                 text: TextSpan(
                   text:
                       "${team['seasons'][kCurrentSeason]['WINS']!.toInt()}-${team['seasons'][kCurrentSeason]['LOSSES']!.toInt()}",
-                  style: kBebasWhite.copyWith(fontSize: 34.0),
+                  style: kBebasNormal.copyWith(fontSize: 34.0),
                   children: [
                     TextSpan(
                       text:
                           '  (${getStanding(team['seasons'][kCurrentSeason]['CONF_RANK'])} ${team['CONF'].substring(0, 4)})',
-                      style: kBebasWhite.copyWith(fontSize: 24.0),
+                      style: kBebasNormal.copyWith(fontSize: 24.0),
                     ),
                   ],
                 ),
@@ -325,8 +315,7 @@ class TeamInfo extends StatelessWidget {
                   ),
                   Text(
                     "${lastGame['HOME_AWAY']} ",
-                    style: kBebasNormal.copyWith(
-                        color: Colors.white70, fontSize: 14.0),
+                    style: kBebasNormal.copyWith(color: Colors.white70, fontSize: 14.0),
                   ),
                   Text(
                     "${kTeamNames[lastGame['OPP'].toString()][1]} ",
