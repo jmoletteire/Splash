@@ -28,17 +28,18 @@ def query_database():
     filters = data.get('filters')
 
     if filters:
-        query = build_query(selected_season, selected_season_type, filters)
+        results = build_pipeline(selected_season, selected_season_type, filters)
     else:
-        query = {f"STATS.{selected_season}.{selected_season_type}": {"$exists": True}}
+        results = list(players_collection.find(
+            {f"STATS.{selected_season}.{selected_season_type}": {"$exists": True}},
+            {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{selected_season}.{selected_season_type}': 1, '_id': 0}
+        ))
 
-    results = players_collection.find(query, {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{selected_season}.{selected_season_type}': 1, '_id': 0})
-
-    return jsonify([result for result in results])
+    return jsonify(results)
 
 
-def build_query(season, season_type, filters):
-    query = {"$and": []}
+def build_pipeline(season, season_type, filters):
+    results = None
     for stat_filter in filters:
         operator = stat_filter['operation']
         value = stat_filter['value']
@@ -51,25 +52,44 @@ def build_query(season, season_type, filters):
         except ValueError:
             pass  # Keep value as a string for non-numerical comparisons
 
+        pipeline = []
+
         if operator == 'greater than':
-            query["$and"].append({path: {"$gt": value}})
+            pipeline.append({"$match": {path: {"$gt": value}}})
         elif operator == 'less than':
-            query["$and"].append({path: {"$lt": value}})
+            pipeline.append({"$match": {path: {"$lt": value}}})
         elif operator == 'equals':
-            query["$and"].append({path: value})
+            pipeline.append({"$match": {path: value}})
         elif operator == 'contains':
-            query["$and"].append({path: {"$regex": value, "$options": "i"}})
+            pipeline.append({"$match": {path: {"$regex": value, "$options": "i"}}})
         elif operator == 'top':
-            # Sorting in descending order and limiting to top N results
-            query["$and"].append({"$sort": {path: -1}})
-            if value:
-                query["$and"].append({"$limit": value})
+            pipeline.append({"$sort": {path: -1}})
+            pipeline.append({"$limit": int(value)})
         elif operator == 'bottom':
-            # Sorting in ascending order and limiting to bottom N results
-            query["$and"].append({"$sort": {path: 1}})
-            if value:
-                query["$and"].append({"$limit": value})
-    return query
+            pipeline.append({"$sort": {path: 1}})
+            pipeline.append({"$limit": int(value)})
+
+        pipeline.append({"$project": {'PERSON_ID': 1}})
+
+        current_results = list(players_collection.aggregate(pipeline))
+
+        if results is None:
+            results = current_results
+        else:
+            # Intersect current results with previous results
+            current_ids = {player['PERSON_ID'] for player in current_results}
+            results = [player for player in results if player['PERSON_ID'] in current_ids]
+
+    if results:
+        person_ids = [player['PERSON_ID'] for player in results]
+        final_results = list(players_collection.find(
+            {'PERSON_ID': {'$in': person_ids}},
+            {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{season}.{season_type}': 1, '_id': 0}
+        ))
+    else:
+        final_results = []
+
+    return final_results
 
 
 @app.route('/search', methods=['GET'])

@@ -118,13 +118,13 @@ class _CareerStatsState extends State<CareerStats> {
         TableColumn(width: MediaQuery.of(context).size.width * 0.13),
 
         /// ORTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
 
         /// DRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
 
         /// NRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,

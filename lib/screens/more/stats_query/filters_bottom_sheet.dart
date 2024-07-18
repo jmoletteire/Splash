@@ -92,7 +92,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
     return false;
   }
 
-  String? _validateValue(String? value) {
+  String? _validateValue(String? value, String? operation) {
     if (value == null || value.isEmpty) {
       return 'Value cannot be empty';
     }
@@ -100,7 +100,8 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
     if (numValue == null) {
       return 'Value must be a number';
     }
-    if (_requiresConversion(_selectedFieldNotifier.value!)) {
+    if (!['top', 'bottom'].contains(operation) &
+        _requiresConversion(_selectedFieldNotifier.value!)) {
       if (numValue < 0 || numValue > 1) {
         return 'Value must be between 0 and 1';
       }
@@ -409,7 +410,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                           _autoValidate = true;
                                         });
                                         final validationError =
-                                            _validateValue(_valueController.text);
+                                            _validateValue(_valueController.text, _operation);
                                         if (validationError != null) {
                                           _showErrorSnackBar(context, validationError);
                                           return;
