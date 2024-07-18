@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
@@ -16,9 +18,11 @@ class TeamStats extends StatefulWidget {
 class _TeamStatsState extends State<TeamStats> {
   late List<String> seasons;
   late String selectedSeason;
+  late String selectedSeasonType;
   late String perMode;
   List<String> modes = ['TOTAL', 'PER_100'];
   int initialLabelIndex = 0;
+  bool _playoffSwitch = false;
 
   String getStanding(int confRank) {
     switch (confRank) {
@@ -76,10 +80,10 @@ class _TeamStatsState extends State<TeamStats> {
 
   double getPercentile(String location, String stat) {
     return 1 -
-        ((widget.team['seasons'][selectedSeason]['STATS'][location]
+        ((widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType][location]
                     ['${stat}_RANK'] -
                 1) /
-            (widget.team['seasons'][selectedSeason]['STATS']['BASIC']
+            (widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]['BASIC']
                     ['LEAGUE_TEAMS'] -
                 1)) as double;
   }
@@ -87,11 +91,7 @@ class _TeamStatsState extends State<TeamStats> {
   double getFinalPercentile(String group) {
     switch (group) {
       case 'Efficiency':
-        double result = (getPercentile('ADV', 'OFF_RATING') +
-                getPercentile('ADV', 'DEF_RATING') +
-                getPercentile('ADV', 'NET_RATING') +
-                getPercentile('ADV', 'TM_TOV_PCT')) /
-            4;
+        double result = getPercentile('ADV', 'OFF_RATING');
         return result;
       case 'Shooting':
         double result = (getPercentile('BASIC', 'FG_PCT') +
@@ -103,26 +103,23 @@ class _TeamStatsState extends State<TeamStats> {
         return result;
       case 'Defense':
         double result = (getPercentile('ADV', 'DEF_RATING') +
-                getPercentile('BASIC', 'STL') +
-                getPercentile('BASIC', 'BLK') +
-                getPercentile('HUSTLE', 'DEFLECTIONS') +
-                getPercentile('HUSTLE', 'CONTESTED_SHOTS')) /
+                getPercentile('BASIC', 'STL_PER_100') +
+                getPercentile('BASIC', 'BLK_PER_100') +
+                getPercentile('HUSTLE', 'DEFLECTIONS_PER_100') +
+                getPercentile('HUSTLE', 'CONTESTED_SHOTS_PER_100')) /
             5;
         return result;
       case 'Rebounding':
         double result = (getPercentile('ADV', 'OREB_PCT') +
                 getPercentile('ADV', 'DREB_PCT') +
-                getPercentile('HUSTLE', 'BOX_OUTS') +
-                getPercentile('HUSTLE', 'OFF_BOX_OUTS') +
-                getPercentile('HUSTLE', 'DEF_BOX_OUTS')) /
-            5;
+                getPercentile('HUSTLE', 'BOX_OUTS_PER_100')) /
+            3;
         return result;
       case 'Hustle':
         double result = (getPercentile('ADV', 'PACE') +
-                getPercentile('HUSTLE', 'CHARGES_DRAWN') +
-                getPercentile('HUSTLE', 'SCREEN_ASSISTS') +
-                getPercentile('HUSTLE', 'SCREEN_AST_PTS') +
-                getPercentile('HUSTLE', 'LOOSE_BALLS_RECOVERED')) /
+                getPercentile('HUSTLE', 'SCREEN_ASSISTS_PER_100') +
+                getPercentile('HUSTLE', 'SCREEN_AST_PTS_PER_100') +
+                getPercentile('HUSTLE', 'LOOSE_BALLS_RECOVERED_PER_100')) /
             5;
         return result;
       default:
@@ -135,6 +132,7 @@ class _TeamStatsState extends State<TeamStats> {
     super.initState();
     seasons = widget.team['seasons'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
+    selectedSeasonType = 'REGULAR SEASON';
     perMode = 'TOTAL';
   }
 
@@ -143,10 +141,9 @@ class _TeamStatsState extends State<TeamStats> {
     Color teamColor = kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
         ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
-    Color teamSecondaryColor =
-        kDarkSecondaryColors.contains(widget.team['ABBREVIATION'])
-            ? (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!)
-            : (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!);
+    Color teamSecondaryColor = kDarkSecondaryColors.contains(widget.team['ABBREVIATION'])
+        ? (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!)
+        : (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!);
 
     return Stack(children: [
       SingleChildScrollView(
@@ -182,8 +179,7 @@ class _TeamStatsState extends State<TeamStats> {
                         Expanded(
                           flex: 1,
                           child: Text(
-                            getPlayoffs(
-                                widget.team['seasons'][selectedSeason]!),
+                            getPlayoffs(widget.team['seasons'][selectedSeason]!),
                             textAlign: TextAlign.center,
                             style: kBebasOffWhite.copyWith(fontSize: 18.0),
                           ),
@@ -197,8 +193,8 @@ class _TeamStatsState extends State<TeamStats> {
                           child: Text(
                             'RECORD',
                             textAlign: TextAlign.center,
-                            style: kBebasNormal.copyWith(
-                                fontSize: 16.0, color: Colors.white70),
+                            style:
+                                kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
                           ),
                         ),
                         Expanded(
@@ -206,8 +202,8 @@ class _TeamStatsState extends State<TeamStats> {
                           child: Text(
                             'CONF',
                             textAlign: TextAlign.center,
-                            style: kBebasNormal.copyWith(
-                                fontSize: 16.0, color: Colors.white70),
+                            style:
+                                kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
                           ),
                         ),
                         Expanded(
@@ -215,8 +211,8 @@ class _TeamStatsState extends State<TeamStats> {
                           child: Text(
                             'PLAYOFFS',
                             textAlign: TextAlign.center,
-                            style: kBebasNormal.copyWith(
-                                fontSize: 16.0, color: Colors.white70),
+                            style:
+                                kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
                           ),
                         ),
                       ],
@@ -233,7 +229,7 @@ class _TeamStatsState extends State<TeamStats> {
                   padding: const EdgeInsets.all(75.0),
                   child: AnimatedPolarAreaChart(
                     key: ValueKey(selectedSeason),
-                    selectedSeasonType: selectedSeason,
+                    selectedSeasonType: selectedSeasonType,
                     values: [
                       getFinalPercentile('Defense'),
                       getFinalPercentile('Rebounding'),
@@ -263,6 +259,7 @@ class _TeamStatsState extends State<TeamStats> {
               TeamStatCard(
                 teamStats: widget.team['seasons'][selectedSeason]['STATS'],
                 selectedSeason: selectedSeason,
+                selectedSeasonType: selectedSeasonType,
                 statGroup: 'EFFICIENCY',
                 perMode: perMode,
               ),
@@ -270,6 +267,7 @@ class _TeamStatsState extends State<TeamStats> {
               TeamStatCard(
                 teamStats: widget.team['seasons'][selectedSeason]['STATS'],
                 selectedSeason: selectedSeason,
+                selectedSeasonType: selectedSeasonType,
                 statGroup: 'SCORING',
                 perMode: perMode,
               ),
@@ -277,6 +275,7 @@ class _TeamStatsState extends State<TeamStats> {
               TeamStatCard(
                 teamStats: widget.team['seasons'][selectedSeason]['STATS'],
                 selectedSeason: selectedSeason,
+                selectedSeasonType: selectedSeasonType,
                 statGroup: 'REBOUNDING',
                 perMode: perMode,
               ),
@@ -284,6 +283,7 @@ class _TeamStatsState extends State<TeamStats> {
               TeamStatCard(
                 teamStats: widget.team['seasons'][selectedSeason]['STATS'],
                 selectedSeason: selectedSeason,
+                selectedSeasonType: selectedSeasonType,
                 statGroup: 'DEFENSE',
                 perMode: perMode,
               ),
@@ -291,6 +291,7 @@ class _TeamStatsState extends State<TeamStats> {
               TeamStatCard(
                 teamStats: widget.team['seasons'][selectedSeason]['STATS'],
                 selectedSeason: selectedSeason,
+                selectedSeasonType: selectedSeasonType,
                 statGroup: 'HUSTLE',
                 perMode: perMode,
               ),
@@ -340,10 +341,53 @@ class _TeamStatsState extends State<TeamStats> {
                   onChanged: (String? value) {
                     setState(() {
                       selectedSeason = value!;
+                      selectedSeasonType = 'REGULAR SEASON';
                     });
                   },
                 ),
               ),
+              if (widget.team['seasons'][selectedSeason]['STATS'].containsKey('PLAYOFFS'))
+                Expanded(
+                  flex: 1,
+                  child: Stack(
+                    children: [
+                      Transform.scale(
+                        scale: 0.9,
+                        child: Transform.rotate(
+                          angle: -1.5708, // Rotate 90 degrees counterclockwise
+                          child: CupertinoSwitch(
+                            activeColor: teamColor,
+                            value: _playoffSwitch,
+                            onChanged: (value) {
+                              setState(() {
+                                _playoffSwitch = value;
+                                _playoffSwitch
+                                    ? selectedSeasonType = 'PLAYOFFS'
+                                    : selectedSeasonType = 'REGULAR SEASON';
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 2,
+                        left: 11, // Adjust based on your switch size
+                        child: IgnorePointer(
+                          ignoring: true,
+                          child: Visibility(
+                            visible: _playoffSwitch,
+                            child: SvgPicture.asset(
+                              'images/playoffs.svg',
+                              width: 16.0,
+                              height: 16.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const Spacer(),
               Container(
                 decoration: BoxDecoration(
                     color: Colors.grey.shade900,

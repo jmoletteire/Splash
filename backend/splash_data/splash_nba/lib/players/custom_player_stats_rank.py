@@ -29,7 +29,7 @@ custom_stats = [
     # ("REB_PER_75", "PLAYOFFS.BASIC", -1),
     # ("OREB_PER_75", "PLAYOFFS.BASIC", -1),
     # ("DREB_PER_75", "PLAYOFFS.BASIC", -1),
-    # ("PF_PER_75", "BASIC", 1),
+    ("PF_PER_75", "BASIC", 1),
     # ("PFD_PER_75", "PLAYOFFS.BASIC", -1),
     # ("PTS_PER_75", "PLAYOFFS.BASIC", -1),
 
@@ -40,7 +40,7 @@ custom_stats = [
     # ("POSS_PER_GM", "PLAYOFFS.ADV", -1),
 
     # ADV -> SHOOTING
-    ()
+    # ()
 
     # ADV -> PASSING
     # ("PASSES_MADE", "PLAYOFFS.ADV.PASSING", -1),
@@ -103,7 +103,6 @@ seasons = [
     '2015-16',
     '2014-15',
     '2013-14',
-    '''
     '2012-13',
     '2011-12',
     '2010-11',
@@ -121,7 +120,6 @@ seasons = [
     '1998-99',
     '1997-98',
     '1996-97'
-    '''
 ]
 
 for season in seasons:
@@ -142,6 +140,11 @@ for season in seasons:
             {
                 "$match": {
                     f"STATS.{season}.{stat[1]}.{stat[0]}": {"$exists": True}
+                }
+            },
+            {
+                "$project": {
+                    f"STATS.{season}.{stat[1]}.{stat[0]}": 1
                 }
             },
             {

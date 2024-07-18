@@ -17,6 +17,23 @@ class _PlayerAwardsState extends State<PlayerAwards> {
     'All-Rookie Team',
   ];
 
+  List<String> awards = [
+    'NBA Champion',
+    'NBA Finals Most Valuable Player',
+    'NBA Most Valuable Player',
+    'NBA Defensive Player of the Year',
+    'NBA Most Improved Player',
+    'NBA Rookie of the Year',
+    'All-NBA',
+    'All-Defensive Team',
+    'All-Rookie Team',
+    'NBA All-Star',
+    'NBA All-Star Most Valuable Player',
+    'Olympic Gold Medal',
+    'Olympic Silver Medal',
+    'Olympic Bronze Medal',
+  ];
+
   Widget awardCount(String awardName) {
     return Row(
       children: [
@@ -36,9 +53,8 @@ class _PlayerAwardsState extends State<PlayerAwards> {
 
   Widget awardYears(String awardName) {
     if (!allNbaTeams.contains(awardName)) {
-      List<dynamic> seasons = widget.playerAwards[awardName]
-          .map((award) => award['SEASON'])
-          .toList();
+      List<dynamic> seasons =
+          widget.playerAwards[awardName].map((award) => award['SEASON']).toList();
       seasons.sort();
 
       return Wrap(
@@ -114,6 +130,13 @@ class _PlayerAwardsState extends State<PlayerAwards> {
 
   @override
   Widget build(BuildContext context) {
+    bool hasAwards = false;
+    for (String key in widget.playerAwards.keys) {
+      if (awards.contains(key)) {
+        hasAwards = true;
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade900,
@@ -135,9 +158,8 @@ class _PlayerAwardsState extends State<PlayerAwards> {
               style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
             ),
           ),
-
-          if (widget.playerAwards.isEmpty) const SizedBox(height: 10.0),
-          if (widget.playerAwards.isEmpty)
+          if (widget.playerAwards.isEmpty || !hasAwards) const SizedBox(height: 10.0),
+          if (widget.playerAwards.isEmpty || !hasAwards)
             const Row(
               children: [
                 Text(
@@ -146,125 +168,12 @@ class _PlayerAwardsState extends State<PlayerAwards> {
                 ),
               ],
             ),
-
-          // NBA CHAMPION
-          if (widget.playerAwards.containsKey('NBA Champion'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('NBA Champion'))
-            awardCount('NBA Champion'),
-          if (widget.playerAwards.containsKey('NBA Champion'))
-            awardYears('NBA Champion'),
-
-          // FINALS MVP
-          if (widget.playerAwards
-              .containsKey('NBA Finals Most Valuable Player'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards
-              .containsKey('NBA Finals Most Valuable Player'))
-            awardCount('NBA Finals Most Valuable Player'),
-          if (widget.playerAwards
-              .containsKey('NBA Finals Most Valuable Player'))
-            awardYears('NBA Finals Most Valuable Player'),
-
-          // MVP
-          if (widget.playerAwards.containsKey('NBA Most Valuable Player'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('NBA Most Valuable Player'))
-            awardCount('NBA Most Valuable Player'),
-          if (widget.playerAwards.containsKey('NBA Most Valuable Player'))
-            awardYears('NBA Most Valuable Player'),
-
-          // DPOY
-          if (widget.playerAwards
-              .containsKey('NBA Defensive Player of the Year'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards
-              .containsKey('NBA Defensive Player of the Year'))
-            awardCount('NBA Defensive Player of the Year'),
-          if (widget.playerAwards
-              .containsKey('NBA Defensive Player of the Year'))
-            awardYears('NBA Defensive Player of the Year'),
-
-          // MIP
-          if (widget.playerAwards.containsKey('NBA Most Improved Player'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('NBA Most Improved Player'))
-            awardCount('NBA Most Improved Player'),
-          if (widget.playerAwards.containsKey('NBA Most Improved Player'))
-            awardYears('NBA Most Improved Player'),
-
-          // ROTY
-          if (widget.playerAwards.containsKey('NBA Rookie of the Year'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('NBA Rookie of the Year'))
-            awardCount('NBA Rookie of the Year'),
-          if (widget.playerAwards.containsKey('NBA Rookie of the Year'))
-            awardYears('NBA Rookie of the Year'),
-
-          // ALL-NBA
-          if (widget.playerAwards.containsKey('All-NBA'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('All-NBA')) awardCount('All-NBA'),
-          if (widget.playerAwards.containsKey('All-NBA')) awardYears('All-NBA'),
-
-          // ALL-DEFENSE
-          if (widget.playerAwards.containsKey('All-Defensive Team'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('All-Defensive Team'))
-            awardCount('All-Defensive Team'),
-          if (widget.playerAwards.containsKey('All-Defensive Team'))
-            awardYears('All-Defensive Team'),
-
-          // ALL-ROOKIE
-          if (widget.playerAwards.containsKey('All-Rookie Team'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('All-Rookie Team'))
-            awardCount('All-Rookie Team'),
-          if (widget.playerAwards.containsKey('All-Rookie Team'))
-            awardYears('All-Rookie Team'),
-
-          // ALL-STAR
-          if (widget.playerAwards.containsKey('NBA All-Star'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('NBA All-Star'))
-            awardCount('NBA All-Star'),
-          if (widget.playerAwards.containsKey('NBA All-Star'))
-            awardYears('NBA All-Star'),
-
-          // ASG MVP
-          if (widget.playerAwards
-              .containsKey('NBA All-Star Most Valuable Player'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards
-              .containsKey('NBA All-Star Most Valuable Player'))
-            awardCount('NBA All-Star Most Valuable Player'),
-          if (widget.playerAwards
-              .containsKey('NBA All-Star Most Valuable Player'))
-            awardYears('NBA All-Star Most Valuable Player'),
-
-          // Olympic Gold
-          if (widget.playerAwards.containsKey('Olympic Gold Medal'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('Olympic Gold Medal'))
-            awardCount('Olympic Gold Medal'),
-          if (widget.playerAwards.containsKey('Olympic Gold Medal'))
-            awardYears('Olympic Gold Medal'),
-
-          // Olympic Silver
-          if (widget.playerAwards.containsKey('Olympic Silver Medal'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('Olympic Silver Medal'))
-            awardCount('Olympic Silver Medal'),
-          if (widget.playerAwards.containsKey('Olympic Silver Medal'))
-            awardYears('Olympic Silver Medal'),
-
-          // Olympic Bronze
-          if (widget.playerAwards.containsKey('Olympic Bronze Medal'))
-            const SizedBox(height: 10.0),
-          if (widget.playerAwards.containsKey('Olympic Bronze Medal'))
-            awardCount('Olympic Bronze Medal'),
-          if (widget.playerAwards.containsKey('Olympic Bronze Medal'))
-            awardYears('Olympic Bronze Medal'),
+          for (String award in widget.playerAwards.keys)
+            if (awards.contains(award)) ...[
+              const SizedBox(height: 10.0),
+              awardCount(award),
+              awardYears(award),
+            ],
         ],
       ),
     );

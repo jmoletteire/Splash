@@ -23,7 +23,7 @@ def fetch_team_stats(team_id, season):
         except Exception as e:
             logging.error(f'Error retrieving basic stats: {e}')
 
-    # Advanced Stats only available for 2015-16 and beyond.
+    # Advanced Stats only available since 1996-97.
     if season >= '1996-97':
         for attempt in range(1, 4):
             try:
@@ -39,7 +39,7 @@ def fetch_team_stats(team_id, season):
             except Exception as e:
                 logging.error(f'Error retrieving advanced stats: {e}')
 
-    # Hustle Stats only available for 2015-16 and beyond.
+    # Hustle Stats only available since 2015-16.
     if season >= '2015-16':
         for attempt in range(1, 4):
             try:

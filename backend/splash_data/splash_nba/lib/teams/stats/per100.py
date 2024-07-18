@@ -12,7 +12,7 @@ teams_collection = db.nba_teams
 logging.info("Connected to MongoDB")
 
 
-# Function to calculate per-75 possession values and update the document
+# Function to calculate per-100 possession values and update the document
 def calculate_and_update_per_100_possessions(team_doc, playoffs):
     seasons = team_doc.get("seasons", None)
 
@@ -92,7 +92,7 @@ stats_to_calculate = [
     ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
 ]
 
-playoffs = False
+playoffs = True
 
 # Set the batch size
 batch_size = 10  # Adjust this value based on your needs and system performance
@@ -110,4 +110,4 @@ for batch_start in range(0, total_documents, batch_size):
         logging.info(f'Processing {i + 1} of {batch_size}')
         calculate_and_update_per_100_possessions(team_doc, playoffs)
 
-print("Per-75 possession values have been calculated and updated.")
+print("Per-100 possession values have been calculated and updated.")

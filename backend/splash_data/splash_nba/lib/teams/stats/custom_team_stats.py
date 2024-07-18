@@ -3,12 +3,15 @@ from splash_nba.util.env import uri
 import logging
 
 
-def get_rank(season, stats):
+def get_avg_ranks(season, category, stats):
     pipeline = [
         {
-            "$project": {
-                "average": {
-                    "$avg": [f"seasons.{season}.STATS.{location}.{stat}_RANK" for stat, location in stats]
+            "$addFields": {
+                f"seasons.{season}.STATS.ADV": {
+                    "$mergeObjects": [
+                        f"$seasons.{season}.STATS.ADV",
+                        {f"{category}_AVG_RANK": {"$avg": [f"$seasons.{season}.STATS.{location}.{stat}" for stat, location in stats]}}
+                    ]
                 }
             }
         }
@@ -44,47 +47,43 @@ def avg_category_rankings():
         ],
         'DEFENSE': [
             ('DEF_RATING', 'ADV'),
-            ('STL', 'BASIC'),
-            ('BLK', 'BASIC'),
-            ('DEFLECTIONS', 'HUSTLE'),
-            ('CONTESTED_SHOTS', 'HUSTLE'),
+            ('STL_PER_100', 'BASIC'),
+            ('BLK_PER_100', 'BASIC'),
+            ('DEFLECTIONS_PER_100', 'HUSTLE'),
+            ('CONTESTED_SHOTS_PER_100', 'HUSTLE'),
         ],
         'REBOUNDING': [
             ('OREB_PCT', 'ADV'),
             ('DREB_PCT', 'ADV'),
-            ('BOX_OUTS', 'HUSTLE'),
-            ('OFF_BOXOUTS', 'HUSTLE'),
-            ('DEF_BOXOUTS', 'HUSTLE')
+            ('BOX_OUTS_PER_100', 'HUSTLE')
         ],
         'HUSTLE': [
-            ('SCREEN_ASSISTS', 'HUSTLE'),
-            ('SCREEN_AST_PTS', 'HUSTLE'),
-            ('LOOSE_BALLS_RECOVERED', 'HUSTLE'),
+            ('PACE', 'ADV'),
+            ('SCREEN_ASSISTS_PER_100', 'HUSTLE'),
+            ('SCREEN_AST_PTS_PER_100', 'HUSTLE'),
+            ('LOOSE_BALLS_RECOVERED_PER_100', 'HUSTLE'),
         ]
     }
 
     # Update each document in the collection
-    for team in teams_collection.find({}, {"TEAM_ID": 1, "seasons": 1, "_id": 0}):
-        team_id = team['TEAM_ID']
-        logging.info(f'Processing team {team_id}...')
-        for season in seasons:
-            for stat_group in stats.keys():
-                try:
-                    logging.info(f"Season: {season}")
-                    results = get_rank(season, stats[stat_group])
+    for season in seasons:
+        for stat_group in stats.keys():
+            try:
+                logging.info(f"Season: {season}")
+                results = get_avg_ranks(season, stat_group, stats[stat_group])
 
-                    logging.info(f"Adding {stat_group}_AVG_RANK to database.")
+                logging.info(f"Adding {stat_group}_AVG_RANK to database.")
 
-                    # Update each document with the new rank field
-                    for result in results:
-                        teams_collection.update_one(
-                            {"_id": result["_id"]},
-                            {"$set": {f"seasons.{season}.STATS.{stat_group}.{stat_group}_AVG_RANK":
-                                          result['seasons'][season]['STATS'][stat_group][f'{stat_group}_AVG_RANK']}}
-                        )
+                # Update each document with the new rank field
+                for result in results:
+                    teams_collection.update_one(
+                        {"_id": result["_id"]},
+                        {"$set": {f"seasons.{season}.STATS.ADV.{stat_group}_AVG_RANK":
+                                      result['seasons'][season]['STATS']['ADV'][f'{stat_group}_AVG_RANK']}}
+                    )
 
-                except KeyError as e:
-                    logging.error(f"Key error for document with _id {team['_id']}: {e}")
+            except Exception as e:
+                logging.error(f"Error processing documents for season {season}: {e}")
 
 
 def three_and_ft_rate():
@@ -163,6 +162,7 @@ if __name__ == "__main__":
     teams_collection = db.nba_teams
     logging.info("Connected to MongoDB")
 
-    three_and_ft_rate()
+    #three_and_ft_rate()
+    avg_category_rankings()
 
     logging.info("Update complete.")

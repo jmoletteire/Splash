@@ -309,22 +309,23 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                 .toString());
       case 5:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['ADV']
-                    ['NET_RATING']!
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']
+                    ['ADV']['NET_RATING']!
                 .toStringAsFixed(1));
       case 6:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['ADV']
-                    ['OFF_RATING']!
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']
+                    ['ADV']['OFF_RATING']!
                 .toStringAsFixed(1));
       case 7:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['ADV']
-                    ['DEF_RATING']!
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']
+                    ['ADV']['DEF_RATING']!
                 .toStringAsFixed(1));
       case 8:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['ADV']['PACE']!
+            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']
+                    ['ADV']['PACE']!
                 .toStringAsFixed(1));
       case 9:
         return Container(

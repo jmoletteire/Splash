@@ -9,7 +9,7 @@ const kSplashText = Text(
   style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 35.0),
 );
 
-const String kFlaskUrl = "6a7501a8d47a.ngrok.app";
+const String kFlaskUrl = "api.splashapp.org";
 
 /// ******************************************************
 ///                    TEXT STYLES
@@ -185,7 +185,7 @@ Map<String, dynamic> kTeamNames = {
 const Map<String, dynamic> kTeamStatLabelMap = {
   'EFFICIENCY': {
     'ORTG': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'OFF_RATING',
@@ -204,7 +204,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': '100 * (Points Scored / Possessions)'
     },
     'DRTG': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'DEF_RATING',
@@ -223,7 +223,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': '100 * (Points Allowed / Possessions)'
     },
     'NRTG': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'NET_RATING',
@@ -242,7 +242,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': 'ORTG - DRTG'
     },
     'PACE': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'PACE',
@@ -261,7 +261,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'TOV%': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'TM_TOV_PCT',
@@ -282,7 +282,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
   },
   'SCORING': {
     'PTS': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'PTS',
@@ -301,7 +301,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'eFG%': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'EFG_PCT',
@@ -321,7 +321,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
     'TS%': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'TS_PCT',
@@ -342,7 +342,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
     },
     'fill': {'first_available': '1996'},
     'FGM': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FGM',
@@ -361,7 +361,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'FGA': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FGA',
@@ -380,7 +380,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'FG%': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FG_PCT',
@@ -400,7 +400,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
     },
     'fill2': {'first_available': '1996'},
     '3PM': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FG3M',
@@ -419,7 +419,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     '3PA': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FG3A',
@@ -438,7 +438,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     '3P%': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FG3_PCT',
@@ -457,7 +457,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': '3PM / 3PA'
     },
     '3PAr': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': '3PAr',
@@ -478,7 +478,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
     },
     'fill3': {'first_available': '1996'},
     'FTM': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FTM',
@@ -497,7 +497,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'FTA': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FTA',
@@ -516,7 +516,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'FT%': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FT_PCT',
@@ -535,7 +535,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': 'FTM / FTA'
     },
     'FTAr': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'FTAr',
@@ -557,7 +557,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
   },
   'DEFENSE': {
     'DRTG': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'DEF_RATING',
@@ -575,8 +575,9 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'definition': 'Team\'s points allowed per 100 possessions.',
       'formula': '100 * (Points Allowed / Possessions)'
     },
+    'fill': {'first_available': '2016'},
     'STL': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'STL',
@@ -595,8 +596,8 @@ const Map<String, dynamic> kTeamStatLabelMap = {
           'Number of times a defensive player or team takes the ball from a player on offense, causing a turnover.',
       'formula': ''
     },
-    'DEFLECTIONS': {
-      'location': 'HUSTLE',
+    'DEFLECTS': {
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'DEFLECTIONS',
@@ -615,9 +616,9 @@ const Map<String, dynamic> kTeamStatLabelMap = {
           'The number of times a defensive player or team gets their hand on the ball on a non-shot attempt.',
       'formula': ''
     },
-    'fill': {'first_available': '2016'},
+    'fill2': {'first_available': '2016'},
     'BLK': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'BLK',
@@ -636,8 +637,8 @@ const Map<String, dynamic> kTeamStatLabelMap = {
           'A block occurs when an offensive player attempts a shot, and the defensive player tips the ball, blocking their chance to score.',
       'formula': ''
     },
-    'CONTESTED_SHOTS': {
-      'location': 'HUSTLE',
+    'CONTESTS': {
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'CONTESTED_SHOTS',
@@ -659,7 +660,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
   },
   'REBOUNDING': {
     'REB': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'REB',
@@ -678,7 +679,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': 'OREB + DREB'
     },
     'OREB': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'OREB',
@@ -697,7 +698,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'DREB': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'DREB',
@@ -717,7 +718,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
     },
     'fill': {'first_available': '1996'},
     'OREB%': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'OREB_PCT',
@@ -736,7 +737,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'DREB%': {
-      'location': 'ADV',
+      'location': ['ADV'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'DREB_PCT',
@@ -756,7 +757,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
     },
     'fill2': {'first_available': '2016'},
     'BOX_OUTS': {
-      'location': 'HUSTLE',
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'BOX_OUTS',
@@ -776,7 +777,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'OFF_BOX_OUTS': {
-      'location': 'HUSTLE',
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'OFF_BOXOUTS',
@@ -796,7 +797,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'DEF_BOX_OUTS': {
-      'location': 'HUSTLE',
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'DEF_BOXOUTS',
@@ -818,7 +819,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
   },
   'HUSTLE': {
     'SCREEN_ASSISTS': {
-      'location': 'HUSTLE',
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'SCREEN_ASSISTS',
@@ -838,7 +839,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'SCREEN_AST_PTS': {
-      'location': 'HUSTLE',
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'SCREEN_AST_PTS',
@@ -858,7 +859,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
     },
     'fill': {'first_available': '2016'},
     'LOOSE_BALLS_RECOVERED': {
-      'location': 'HUSTLE',
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'LOOSE_BALLS_RECOVERED',
@@ -879,7 +880,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
     },
     'fill2': {'first_available': '2016'},
     'PF': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'PF',
@@ -898,7 +899,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'PFD': {
-      'location': 'BASIC',
+      'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'PFD',
@@ -917,7 +918,7 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'formula': ''
     },
     'CHARGES_DRAWN': {
-      'location': 'HUSTLE',
+      'location': ['HUSTLE'],
       'secondaryLocation': '',
       'TOTAL': {
         'nba_name': 'CHARGES_DRAWN',
