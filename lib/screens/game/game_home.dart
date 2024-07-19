@@ -402,7 +402,7 @@ class GameInfo extends StatelessWidget {
                     Text(
                       awayLinescore['TEAM_WINS_LOSSES'],
                       style:
-                          kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300),
+                          kBebasNormal.copyWith(fontSize: 18.0, color: Colors.grey.shade300),
                     )
                   ],
                 ),
@@ -454,7 +454,7 @@ class GameInfo extends StatelessWidget {
                     Text(
                       homeLinescore['TEAM_WINS_LOSSES'],
                       style:
-                          kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300),
+                          kBebasNormal.copyWith(fontSize: 18.0, color: Colors.grey.shade300),
                     )
                   ],
                 ),

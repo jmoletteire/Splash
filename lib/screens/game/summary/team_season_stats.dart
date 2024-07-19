@@ -79,6 +79,11 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
         padding: const EdgeInsets.all(15.0),
         child: Column(
           children: [
+            Text(
+              'Season Stats',
+              style: kBebasNormal,
+            ),
+            const SizedBox(height: 10.0),
             ComparisonRow(
               statName: 'ORTG',
               awayTeam: roundToDecimalPlaces(
