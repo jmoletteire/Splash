@@ -9,6 +9,8 @@ import 'package:splash/screens/team/team_cache.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/custom_icon_button.dart';
+import '../../../utilities/scroll/scroll_controller_notifier.dart';
+import '../../../utilities/scroll/scroll_controller_provider.dart';
 import '../../../utilities/team.dart';
 import '../../search_screen.dart';
 import '../team_home.dart';
@@ -33,7 +35,8 @@ class _TeamComparisonState extends State<TeamComparison> {
   late String selectedSeasonTypeOne;
   late String selectedSeasonTypeTwo;
 
-  final ScrollController _scrollController = ScrollController();
+  late ScrollController _scrollController;
+  late ScrollControllerNotifier _notifier;
   double _opacity = 0.0;
 
   double roundToDecimalPlaces(double value, int decimalPlaces) {
@@ -161,7 +164,7 @@ class _TeamComparisonState extends State<TeamComparison> {
       _showBottomSheet();
     });
 
-    _scrollController.addListener(_scrollListener);
+    _scrollController = ScrollController()..addListener(_scrollListener);
   }
 
   void _scrollListener() {
@@ -174,7 +177,16 @@ class _TeamComparisonState extends State<TeamComparison> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _scrollController = ScrollController()..addListener(_scrollListener);
+    _notifier.addController(_scrollController);
+  }
+
+  @override
   void dispose() {
+    _notifier.removeController(_scrollController);
     _scrollController.dispose();
     super.dispose();
   }

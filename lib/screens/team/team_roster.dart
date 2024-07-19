@@ -6,7 +6,8 @@ import 'package:splash/utilities/constants.dart';
 
 class TeamRoster extends StatefulWidget {
   final Map<String, dynamic> team;
-  const TeamRoster({super.key, required this.team});
+  final ScrollController controller;
+  const TeamRoster({super.key, required this.controller, required this.team});
 
   @override
   State<TeamRoster> createState() => _TeamRosterState();
@@ -34,27 +35,27 @@ class _TeamRosterState extends State<TeamRoster> {
         case 'Name':
           order == 'ASC'
               // Sort the entries by last name
-              ? entries.sort((a, b) => getLastName(a.value['PLAYER'])
-                  .compareTo(getLastName(b.value['PLAYER'])))
+              ? entries.sort((a, b) =>
+                  getLastName(a.value['PLAYER']).compareTo(getLastName(b.value['PLAYER'])))
               // Sort the entries by last name in reverse order
-              : entries.sort((a, b) => getLastName(b.value['PLAYER'])
-                  .compareTo(getLastName(a.value['PLAYER'])));
+              : entries.sort((a, b) =>
+                  getLastName(b.value['PLAYER']).compareTo(getLastName(a.value['PLAYER'])));
           break;
         case 'Number':
           order == 'ASC'
-              ? entries.sort((a, b) => int.parse(a.value['NUM'])
-                  .compareTo(int.parse(b.value['NUM'])))
-              : entries.sort((a, b) => int.parse(b.value['NUM'])
-                  .compareTo(int.parse(a.value['NUM'])));
+              ? entries.sort(
+                  (a, b) => int.parse(a.value['NUM']).compareTo(int.parse(b.value['NUM'])))
+              : entries.sort(
+                  (a, b) => int.parse(b.value['NUM']).compareTo(int.parse(a.value['NUM'])));
           break;
         case 'Position':
           order == 'ASC'
               // Sort the entries by position
-              ? entries.sort((a, b) => (a.value['POSITION'].toString())
-                  .compareTo(b.value['POSITION'].toString()))
+              ? entries.sort((a, b) =>
+                  (a.value['POSITION'].toString()).compareTo(b.value['POSITION'].toString()))
               // Sort the entries by position in reverse order
-              : entries.sort((a, b) => (b.value['POSITION'].toString())
-                  .compareTo(a.value['POSITION'].toString()));
+              : entries.sort((a, b) =>
+                  (b.value['POSITION'].toString()).compareTo(a.value['POSITION'].toString()));
           break;
       }
 
@@ -87,8 +88,7 @@ class _TeamRosterState extends State<TeamRoster> {
         ? Center(
             child: SpinningIcon(
               color: kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
-                  ? (kTeamColors[widget.team['ABBREVIATION']]
-                      ?['secondaryColor'])
+                  ? (kTeamColors[widget.team['ABBREVIATION']]?['secondaryColor'])
                   : (kTeamColors[widget.team['ABBREVIATION']]?['primaryColor']),
             ),
           )
@@ -227,14 +227,12 @@ class _TeamRosterState extends State<TeamRoster> {
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14.0, vertical: 6.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
                         height: 50,
                         decoration: BoxDecoration(
                             color: Colors.grey.shade900,
                             border: const Border(
-                                bottom: BorderSide(
-                                    color: Colors.white54, width: 0.125))),
+                                bottom: BorderSide(color: Colors.white54, width: 0.125))),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -252,10 +250,8 @@ class _TeamRosterState extends State<TeamRoster> {
                                     width: 15.0,
                                   ),
                                   Text(
-                                    widget.team['roster'][players[index]]
-                                        ['PLAYER'],
-                                    style:
-                                        kBebasOffWhite.copyWith(fontSize: 19.0),
+                                    widget.team['roster'][players[index]]['PLAYER'],
+                                    style: kBebasOffWhite.copyWith(fontSize: 19.0),
                                   ),
                                 ],
                               ),
@@ -263,8 +259,7 @@ class _TeamRosterState extends State<TeamRoster> {
                             Expanded(
                               flex: 2,
                               child: Text(
-                                widget.team['roster'][players[index]]['NUM'] !=
-                                        null
+                                widget.team['roster'][players[index]]['NUM'] != null
                                     ? '#${widget.team['roster'][players[index]]['NUM']}'
                                     : '',
                                 textAlign: TextAlign.center,
@@ -274,8 +269,7 @@ class _TeamRosterState extends State<TeamRoster> {
                             Expanded(
                               flex: 1,
                               child: Text(
-                                widget.team['roster'][players[index]]
-                                    ['POSITION'],
+                                widget.team['roster'][players[index]]['POSITION'],
                                 textAlign: TextAlign.center,
                                 style: kBebasOffWhite.copyWith(fontSize: 19.0),
                               ),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/search_screen.dart';
 import 'package:splash/screens/team/team_cache.dart';
+import 'package:splash/utilities/scroll/tap_status_bar_to_scroll.dart';
 import 'package:splash/utilities/tab_home.dart';
 
 void main() {
@@ -32,7 +33,7 @@ class Splash extends StatelessWidget {
           bodyMedium: const TextStyle(fontSize: 18.0),
         ),
       ),
-      home: TabHomeScreen(),
+      home: TapStatusBarToScroll(child: TabHomeScreen()),
     );
   }
 }

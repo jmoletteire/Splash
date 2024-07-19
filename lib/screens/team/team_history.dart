@@ -4,7 +4,8 @@ import 'package:splash/utilities/constants.dart';
 
 class TeamHistory extends StatefulWidget {
   final Map<String, dynamic> team;
-  const TeamHistory({super.key, required this.team});
+  final ScrollController controller;
+  const TeamHistory({super.key, required this.controller, required this.team});
 
   @override
   State<TeamHistory> createState() => _TeamHistoryState();
@@ -190,8 +191,7 @@ class _TeamHistoryState extends State<TeamHistory> {
           child: Column(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade800.withOpacity(0.5),
                   border: const Border(
@@ -209,8 +209,7 @@ class _TeamHistoryState extends State<TeamHistory> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade800.withOpacity(0.75),
                   border: const Border(
@@ -224,23 +223,20 @@ class _TeamHistoryState extends State<TeamHistory> {
                   children: [
                     Expanded(
                         flex: 1,
-                        child: Text('YEAR',
-                            textAlign: TextAlign.start, style: kBebasOffWhite)),
+                        child:
+                            Text('YEAR', textAlign: TextAlign.start, style: kBebasOffWhite)),
                     Expanded(
                         flex: 3,
                         child: Text('RECORD',
-                            textAlign: TextAlign.center,
-                            style: kBebasOffWhite)),
+                            textAlign: TextAlign.center, style: kBebasOffWhite)),
                     Expanded(
                         flex: 1,
-                        child: Text('CONF',
-                            textAlign: TextAlign.center,
-                            style: kBebasOffWhite)),
+                        child:
+                            Text('CONF', textAlign: TextAlign.center, style: kBebasOffWhite)),
                     Expanded(
                         flex: 3,
                         child: Text('PLAYOFFS',
-                            textAlign: TextAlign.center,
-                            style: kBebasOffWhite)),
+                            textAlign: TextAlign.center, style: kBebasOffWhite)),
                   ],
                 ),
               ),
@@ -251,13 +247,12 @@ class _TeamHistoryState extends State<TeamHistory> {
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
               return Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14.0, vertical: 10.0),
+                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
                 height: MediaQuery.sizeOf(context).height * 0.06,
                 decoration: BoxDecoration(
                     color: getColor(seasons[seasonIndex[index]]),
-                    border: const Border(
-                        bottom: BorderSide(color: Colors.white70, width: 0.5))),
+                    border:
+                        const Border(bottom: BorderSide(color: Colors.white70, width: 0.5))),
                 child: Row(
                   children: [
                     Expanded(

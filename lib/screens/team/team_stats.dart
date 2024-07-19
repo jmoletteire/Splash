@@ -9,7 +9,8 @@ import '../../components/team_stat_card.dart';
 
 class TeamStats extends StatefulWidget {
   final Map<String, dynamic> team;
-  const TeamStats({super.key, required this.team});
+  final ScrollController controller;
+  const TeamStats({super.key, required this.controller, required this.team});
 
   @override
   State<TeamStats> createState() => _TeamStatsState();

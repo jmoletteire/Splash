@@ -13,8 +13,10 @@ import 'package:splash/screens/player/player_contract.dart';
 import 'package:splash/screens/player/player_stats.dart';
 import 'package:splash/screens/player/profile/player_profile.dart';
 import 'package:splash/utilities/constants.dart';
+import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
 import '../../utilities/player.dart';
+import '../../utilities/scroll/scroll_controller_provider.dart';
 import '../../utilities/team.dart';
 import '../search_screen.dart';
 import '../team/team_cache.dart';
@@ -34,6 +36,7 @@ class PlayerHome extends StatefulWidget {
 class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
+  late ScrollControllerNotifier _notifier;
   Map<String, dynamic> player = {};
   Map<String, dynamic> team = {};
   String _title = '';
@@ -124,6 +127,20 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
     return _scrollController.hasClients && _scrollController.offset > (200 - kToolbarHeight);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _scrollController = ScrollController()
+      ..addListener(() {
+        setState(() {
+          _title = _isSliverAppBarExpanded ? player['DISPLAY_FIRST_LAST'] : '';
+          _showImage = _isSliverAppBarExpanded ? true : false;
+        });
+      });
+    _notifier.addController(_scrollController);
+  }
+
   /// ******************************************************
   ///    Dispose of Controllers with page to conserve
   ///    memory & improve performance.
@@ -132,6 +149,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
   @override
   void dispose() {
     _tabController.dispose();
+    _notifier.removeController(_scrollController);
     _scrollController.dispose();
     super.dispose();
   }

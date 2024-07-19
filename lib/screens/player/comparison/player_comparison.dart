@@ -7,10 +7,12 @@ import 'package:provider/provider.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/player_home.dart';
 import 'package:splash/utilities/constants.dart';
+import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
 import '../../../components/custom_icon_button.dart';
 import '../../../components/player_avatar.dart';
 import '../../../utilities/player.dart';
+import '../../../utilities/scroll/scroll_controller_provider.dart';
 import '../../search_screen.dart';
 import 'player_search_widget.dart';
 
@@ -34,7 +36,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
   late String selectedSeasonTypeOne;
   late String selectedSeasonTypeTwo;
 
-  final ScrollController _scrollController = ScrollController();
+  late ScrollController _scrollController;
+  late ScrollControllerNotifier _notifier;
   double _opacity = 0.0;
 
   double roundToDecimalPlaces(double value, int decimalPlaces) {
@@ -108,7 +111,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
       _showBottomSheet();
     });
 
-    _scrollController.addListener(_scrollListener);
+    _scrollController = ScrollController()..addListener(_scrollListener);
   }
 
   void _scrollListener() {
@@ -121,7 +124,16 @@ class _PlayerComparisonState extends State<PlayerComparison> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _scrollController = ScrollController()..addListener(_scrollListener);
+    _notifier.addController(_scrollController);
+  }
+
+  @override
   void dispose() {
+    _notifier.removeController(_scrollController);
     _scrollController.dispose();
     super.dispose();
   }

@@ -7,7 +7,8 @@ import 'package:splash/utilities/constants.dart';
 
 class TeamOverview extends StatefulWidget {
   final Map<String, dynamic> team;
-  const TeamOverview({super.key, required this.team});
+  final ScrollController controller;
+  const TeamOverview({super.key, required this.controller, required this.team});
 
   @override
   State<TeamOverview> createState() => _TeamOverviewState();
@@ -37,15 +38,13 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Container(
                         decoration: BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(
-                                color: Colors.grey.shade700, width: 2),
+                            bottom: BorderSide(color: Colors.grey.shade700, width: 2),
                           ),
                         ),
                         child: Text(
                           //'Franchise',
                           '${widget.team['CITY']} ${widget.team['NICKNAME']}',
-                          style: kBebasBold.copyWith(
-                              fontSize: 20.0, color: Colors.white),
+                          style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
                         ),
                       ),
                     ],
@@ -181,14 +180,12 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Container(
                         decoration: BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(
-                                color: Colors.grey.shade700, width: 2),
+                            bottom: BorderSide(color: Colors.grey.shade700, width: 2),
                           ),
                         ),
                         child: Text(
                           'Venue',
-                          style: kBebasBold.copyWith(
-                              fontSize: 20.0, color: Colors.white),
+                          style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
                         ),
                       ),
                     ],
@@ -196,8 +193,7 @@ class _TeamOverviewState extends State<TeamOverview> {
                   const SizedBox(height: 12.5),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
-                    child: Image.asset(
-                        'images/arenas/${widget.team['TEAM_ID']}.jpg'),
+                    child: Image.asset('images/arenas/${widget.team['TEAM_ID']}.jpg'),
                   ),
                   const SizedBox(height: 20.0),
                   Row(

@@ -7,6 +7,9 @@ import 'package:splash/screens/search_screen.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/nba_api/library/network.dart';
 
+import '../utilities/scroll/scroll_controller_notifier.dart';
+import '../utilities/scroll/scroll_controller_provider.dart';
+
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
   static const int pageIndex = 0;
@@ -16,13 +19,13 @@ class Scoreboard extends StatefulWidget {
   _ScoreboardState createState() => _ScoreboardState();
 }
 
-class _ScoreboardState extends State<Scoreboard>
-    with SingleTickerProviderStateMixin {
+class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late ScrollController _scrollController;
+  late ScrollControllerNotifier _notifier;
+
   List<DateTime> _dates = List.generate(15, (index) {
-    return DateTime.now()
-        .subtract(const Duration(days: 7))
-        .add(Duration(days: index));
+    return DateTime.now().subtract(const Duration(days: 7)).add(Duration(days: index));
   });
   Map<String, dynamic> cachedGames = {};
   bool _isLoading = false;
@@ -45,7 +48,17 @@ class _ScoreboardState extends State<Scoreboard>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _scrollController = ScrollController();
+    _notifier.addController(_scrollController);
+  }
+
+  @override
   void dispose() {
+    _notifier.removeController(_scrollController);
+    _scrollController.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -53,9 +66,7 @@ class _ScoreboardState extends State<Scoreboard>
   void setDates(DateTime date) {
     setState(() {
       _dates = List.generate(15, (index) {
-        return date
-            .subtract(const Duration(days: 7))
-            .add(Duration(days: index));
+        return date.subtract(const Duration(days: 7)).add(Duration(days: index));
       });
     });
   }
@@ -81,24 +92,6 @@ class _ScoreboardState extends State<Scoreboard>
       dynamic jsonData = await network.getData(url);
       Map<String, dynamic> gamesData = jsonData ?? {};
 
-      /*
-      // Fetch team data in parallel for all games
-      await Future.wait(gamesData.keys.map((gameKey) async {
-        if (gamesData[gameKey] is Map) {
-          Map<String, dynamic> game = gamesData[gameKey];
-
-          var teams = await Future.wait([
-            getTeam(
-                game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'].toString()),
-            getTeam(
-                game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'].toString())
-          ]);
-          game['homeTeam'] = teams[0];
-          game['awayTeam'] = teams[1];
-        }
-      }));
-      */
-
       setState(() {
         cachedGames[formattedDate] = gamesData;
         _isLoading = false; // Set loading state to false
@@ -112,31 +105,12 @@ class _ScoreboardState extends State<Scoreboard>
     }
   }
 
-  /*
-  Future<Map<String, dynamic>> getTeam(String teamId) async {
-    Network network = Network();
-    var url = Uri.http(
-      kFlaskUrl,
-      '/get_team',
-      {'team_id': teamId},
-    );
-    try {
-      var response = await network.getData(url);
-      return response ?? {};
-    } catch (e) {
-      print('Error fetching team $teamId: $e');
-      return {};
-    }
-  }
-   */
-
   @override
   Widget build(BuildContext context) {
     DateTime today = DateTime.now();
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize:
-            Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
+        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
         child: AppBar(
           backgroundColor: Colors.grey.shade900,
           title: kSplashText,
@@ -170,8 +144,7 @@ class _ScoreboardState extends State<Scoreboard>
                       child: CalendarDatePicker(
                         initialDate: _dates[_tabController.index],
                         firstDate: DateTime(2013, 11, 3),
-                        lastDate:
-                            DateTime(today.year + 1, today.month, today.day),
+                        lastDate: DateTime(today.year + 1, today.month, today.day),
                         onDateChanged: (date) async {
                           setDates(date);
                           _tabController.index = 7;
@@ -203,8 +176,7 @@ class _ScoreboardState extends State<Scoreboard>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(DateFormat('E').format(date)),
-                    Text(
-                        '${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}'),
+                    Text('${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}'),
                   ],
                 ),
               );
@@ -241,8 +213,8 @@ class _ScoreboardState extends State<Scoreboard>
                             const SizedBox(height: 15.0),
                             Text(
                               'No games available',
-                              style: kBebasNormal.copyWith(
-                                  fontSize: 20.0, color: Colors.white54),
+                              style:
+                                  kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
                             ),
                           ],
                         ),
@@ -251,15 +223,14 @@ class _ScoreboardState extends State<Scoreboard>
                       Map<String, dynamic> game = gamesData[gameKey];
                       gameCards.add(GameCard(
                         game: game,
-                        homeTeam: game['SUMMARY']['GameSummary'][0]
-                            ['HOME_TEAM_ID'],
-                        awayTeam: game['SUMMARY']['GameSummary'][0]
-                            ['VISITOR_TEAM_ID'],
+                        homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
+                        awayTeam: game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'],
                       ));
                     }
                   }
 
                   return SingleChildScrollView(
+                    controller: _scrollController,
                     child: Column(
                       children: gameCards,
                     ),
@@ -277,8 +248,7 @@ class _ScoreboardState extends State<Scoreboard>
                         const SizedBox(height: 15.0),
                         Text(
                           'No games available',
-                          style: kBebasNormal.copyWith(
-                              fontSize: 20.0, color: Colors.white54),
+                          style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
                         ),
                       ],
                     ),

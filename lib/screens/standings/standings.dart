@@ -7,6 +7,8 @@ import 'package:splash/screens/team/team_cache.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../components/custom_icon_button.dart';
+import '../../utilities/scroll/scroll_controller_notifier.dart';
+import '../../utilities/scroll/scroll_controller_provider.dart';
 import '../../utilities/team.dart';
 import '../search_screen.dart';
 import 'conference_standings.dart';
@@ -23,12 +25,8 @@ class _StandingsState extends State<Standings> {
   List<Map<String, dynamic>> eastTeams = [];
   List<Map<String, dynamic>> westTeams = [];
   bool isLoading = true;
-  ScrollController _scrollController = ScrollController();
-  final ScrollController _eastScrollController = ScrollController();
-  final ScrollController _westScrollController = ScrollController();
-
-  double _eastSavedScrollPosition = 0.0;
-  double _westSavedScrollPosition = 0.0;
+  late ScrollController _scrollController;
+  late ScrollControllerNotifier _notifier;
 
   int selectedYear = DateTime.now().year;
 
@@ -78,8 +76,7 @@ class _StandingsState extends State<Standings> {
 
   Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
     final teamCache = Provider.of<TeamCache>(context, listen: false);
-    List<Future<Map<String, dynamic>>> teamFutures =
-        teamIds.map((teamId) async {
+    List<Future<Map<String, dynamic>>> teamFutures = teamIds.map((teamId) async {
       try {
         if (teamCache.containsTeam(teamId)) {
           return teamCache.getTeam(teamId)!;
@@ -90,9 +87,7 @@ class _StandingsState extends State<Standings> {
         }
       } catch (e) {
         print('Error fetching team $teamId: $e');
-        return {
-          'error': 'not found'
-        }; // Return an empty map in case of an error
+        return {'error': 'not found'}; // Return an empty map in case of an error
       }
     }).toList();
 
@@ -105,10 +100,8 @@ class _StandingsState extends State<Standings> {
     });
 
     try {
-      List<Map<String, dynamic>> fetchedEastTeams =
-          await getTeams(kEastConfTeamIds);
-      List<Map<String, dynamic>> fetchedWestTeams =
-          await getTeams(kWestConfTeamIds);
+      List<Map<String, dynamic>> fetchedEastTeams = await getTeams(kEastConfTeamIds);
+      List<Map<String, dynamic>> fetchedWestTeams = await getTeams(kWestConfTeamIds);
 
       setState(() {
         eastTeams = fetchedEastTeams;
@@ -127,29 +120,20 @@ class _StandingsState extends State<Standings> {
   void initState() {
     super.initState();
     setTeams();
-    _scrollController.addListener(() {
-      if (_scrollController.offset <=
-              _scrollController.position.minScrollExtent &&
-          !_scrollController.position.outOfRange) {}
-    });
+  }
 
-    _eastScrollController.addListener(() {
-      _eastSavedScrollPosition = _eastScrollController.position.pixels;
-      print("East Scroll position saved: $_eastSavedScrollPosition");
-      _eastScrollController.jumpTo(_eastSavedScrollPosition);
-    });
-
-    _westScrollController.addListener(() {
-      _westSavedScrollPosition = _westScrollController.position.pixels;
-      print("West Scroll position saved: $_westSavedScrollPosition");
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _scrollController = ScrollController();
+    _notifier.addController(_scrollController);
   }
 
   @override
   void dispose() {
+    _notifier.removeController(_scrollController);
     _scrollController.dispose();
-    _eastScrollController.dispose();
-    _westScrollController.dispose();
     super.dispose();
   }
 

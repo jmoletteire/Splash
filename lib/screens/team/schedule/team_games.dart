@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../utilities/constants.dart';
 
 class TeamGames extends StatefulWidget {
+  final ScrollController scrollController;
   final Map<String, dynamic> team;
   final Map<String, dynamic> schedule;
   final String selectedSeason;
@@ -12,6 +13,7 @@ class TeamGames extends StatefulWidget {
 
   const TeamGames({
     super.key,
+    required this.scrollController,
     required this.team,
     required this.schedule,
     required this.selectedSeason,
@@ -26,6 +28,7 @@ class TeamGames extends StatefulWidget {
 class _TeamGamesState extends State<TeamGames> {
   late List<String> gamesList;
   late Map<String, dynamic> teamGames;
+  double topPadding = 0.0;
 
   Map<String, String> seasonTypes = {
     '1': 'Pre-Season',
@@ -64,8 +67,7 @@ class _TeamGamesState extends State<TeamGames> {
     };
 
     // Function to filter games by month
-    Map<String, dynamic> filterByMonth(
-        Map<String, dynamic> schedule, int month) {
+    Map<String, dynamic> filterByMonth(Map<String, dynamic> schedule, int month) {
       // Create a new map to store filtered games
       Map<String, dynamic> filteredSchedule = {};
 
@@ -85,8 +87,7 @@ class _TeamGamesState extends State<TeamGames> {
     }
 
     // Function to filter games by month
-    Map<String, dynamic> filterByOpp(
-        Map<String, dynamic> schedule, int opponentId) {
+    Map<String, dynamic> filterByOpp(Map<String, dynamic> schedule, int opponentId) {
       // Create a new map to store filtered games
       Map<String, dynamic> filteredSchedule = {};
 
@@ -136,8 +137,7 @@ class _TeamGamesState extends State<TeamGames> {
     }
     // Both filters
     else {
-      return filterByOpp(
-          filterByMonth(widget.schedule, monthsMap[month]!), opponentId!);
+      return filterByOpp(filterByMonth(widget.schedule, monthsMap[month]!), opponentId!);
     }
   }
 
@@ -146,8 +146,7 @@ class _TeamGamesState extends State<TeamGames> {
     var entries = teamGames.entries.toList();
 
     // Sort the entries by the GAME_DATE value
-    entries
-        .sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
+    entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
 
     // Extract the sorted keys
     var gameIndex = entries.map((e) => e.key).toList();
@@ -157,8 +156,7 @@ class _TeamGamesState extends State<TeamGames> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.opponent == null ||
-        widget.opponent == 0 && widget.selectedMonth != 'All') {
+    if (widget.opponent == null || widget.opponent == 0 && widget.selectedMonth != 'All') {
       teamGames = getGames(
         widget.selectedSeason,
         widget.selectedMonth,
@@ -184,13 +182,14 @@ class _TeamGamesState extends State<TeamGames> {
             ),
           )
         : SliverPadding(
-            padding: const EdgeInsets.only(bottom: 0.0),
+            padding: const EdgeInsets.only(
+              bottom: 2 * kBottomNavigationBarHeight,
+            ),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
                   // Get the current game date
-                  List<String> gameDate =
-                      formatDate(teamGames[gamesList[index]]['GAME_DATE']);
+                  List<String> gameDate = formatDate(teamGames[gamesList[index]]['GAME_DATE']);
 
                   // List to hold the widgets to be returned
                   List<Widget> widgets = [];
@@ -201,8 +200,7 @@ class _TeamGamesState extends State<TeamGames> {
                           teamGames[gamesList[index - 1]]['SEASON_ID']) {
                     widgets.add(
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15.0, vertical: 8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
                         alignment: Alignment.centerLeft,
                         child: Text(
                           seasonTypes[teamGames[gamesList[index]]['SEASON_ID']
@@ -218,14 +216,12 @@ class _TeamGamesState extends State<TeamGames> {
                   Widget gameContainer = GestureDetector(
                     onTap: () {},
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14.0, vertical: 10.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
                       height: MediaQuery.sizeOf(context).height * 0.065,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade900,
                         border: const Border(
-                            bottom: BorderSide(
-                                color: Colors.white70, width: 0.125)),
+                            bottom: BorderSide(color: Colors.white70, width: 0.125)),
                       ),
                       child: Row(
                         children: [
@@ -237,12 +233,12 @@ class _TeamGamesState extends State<TeamGames> {
                               children: [
                                 Text(
                                   gameDate[0],
-                                  style: kBebasBold.copyWith(
+                                  style: kBebasNormal.copyWith(
                                       fontSize: 13.0, color: Colors.white70),
                                 ),
                                 Text(
                                   gameDate[1],
-                                  style: kBebasBold.copyWith(fontSize: 13.0),
+                                  style: kBebasNormal.copyWith(fontSize: 13.0),
                                 ),
                               ],
                             ),
@@ -262,9 +258,8 @@ class _TeamGamesState extends State<TeamGames> {
                                 SizedBox(
                                   width: 24.0,
                                   height: 24.0,
-                                  child: kTeamNames[teamGames[gamesList[index]]
-                                                  ['OPP']
-                                              .toString()] ==
+                                  child: kTeamNames[
+                                              teamGames[gamesList[index]]['OPP'].toString()] ==
                                           null
                                       ? const Text('')
                                       : Image.asset(
@@ -276,12 +271,10 @@ class _TeamGamesState extends State<TeamGames> {
                                 ),
                                 const SizedBox(width: 15.0),
                                 Text(
-                                  kTeamNames[teamGames[gamesList[index]]['OPP']
-                                              .toString()] !=
+                                  kTeamNames[teamGames[gamesList[index]]['OPP'].toString()] !=
                                           null
-                                      ? kTeamNames[teamGames[gamesList[index]]
-                                              ['OPP']
-                                          .toString()][0]
+                                      ? kTeamNames[
+                                          teamGames[gamesList[index]]['OPP'].toString()][0]
                                       : 'INT\'L',
                                   style: kBebasBold.copyWith(fontSize: 18.0),
                                 ),
@@ -297,7 +290,7 @@ class _TeamGamesState extends State<TeamGames> {
                                 Text(
                                   'Final',
                                   textAlign: TextAlign.end,
-                                  style: kBebasBold.copyWith(
+                                  style: kBebasNormal.copyWith(
                                       fontSize: 12.0, color: Colors.grey),
                                 ),
                                 Row(
@@ -305,36 +298,29 @@ class _TeamGamesState extends State<TeamGames> {
                                   children: [
                                     Text(
                                       teamGames[gamesList[index]]['RESULT'],
-                                      style: kBebasBold.copyWith(
+                                      style: kBebasNormal.copyWith(
                                         fontSize: 14.0,
-                                        color: teamGames[gamesList[index]]
-                                                    ['RESULT'] ==
-                                                'W'
+                                        color: teamGames[gamesList[index]]['RESULT'] == 'W'
                                             ? Colors.green
                                             : Colors.red,
                                       ),
                                     ),
                                     const SizedBox(width: 5.0),
                                     Text(
-                                      teamGames[gamesList[index]]['TEAM_PTS']
-                                          .toString(),
-                                      style:
-                                          kBebasBold.copyWith(fontSize: 14.0),
+                                      teamGames[gamesList[index]]['TEAM_PTS'].toString(),
+                                      style: kBebasNormal.copyWith(fontSize: 14.0),
                                     ),
                                     SizedBox(
                                       width: 10.0,
                                       child: Text(
                                         '-',
                                         textAlign: TextAlign.center,
-                                        style:
-                                            kBebasBold.copyWith(fontSize: 14.0),
+                                        style: kBebasNormal.copyWith(fontSize: 14.0),
                                       ),
                                     ),
                                     Text(
-                                      teamGames[gamesList[index]]['OPP_PTS']
-                                          .toString(),
-                                      style:
-                                          kBebasBold.copyWith(fontSize: 14.0),
+                                      teamGames[gamesList[index]]['OPP_PTS'].toString(),
+                                      style: kBebasNormal.copyWith(fontSize: 14.0),
                                     ),
                                   ],
                                 ),

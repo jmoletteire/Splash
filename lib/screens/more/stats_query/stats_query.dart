@@ -4,8 +4,10 @@ import 'package:splash/screens/more/stats_query/players_table.dart';
 import 'package:splash/screens/more/stats_query/util/column_options.dart';
 import 'package:splash/screens/more/stats_query/util/custom_bottom_sheet.dart';
 import 'package:splash/utilities/constants.dart';
+import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
 import '../../../components/custom_icon_button.dart';
+import '../../../utilities/scroll/scroll_controller_provider.dart';
 import '../../player/career/player_career.dart';
 import '../../search_screen.dart';
 
@@ -22,7 +24,8 @@ class _StatsQueryState extends State<StatsQuery> {
   String? selectedSeasonType;
   String? selectedPosition;
   List<ColumnOption> selectedColumns = [];
-  final ScrollController _scrollController = ScrollController();
+  late ScrollController _scrollController;
+  late ScrollControllerNotifier _notifier;
 
   void _handleFiltersDone(Map<String, dynamic> data) {
     setState(() {
@@ -58,6 +61,21 @@ class _StatsQueryState extends State<StatsQuery> {
   void initState() {
     super.initState();
     selectedColumns = List.from(kAllColumns); // Initially select all columns
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _scrollController = ScrollController();
+    _notifier.addController(_scrollController);
+  }
+
+  @override
+  void dispose() {
+    _notifier.removeController(_scrollController);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override

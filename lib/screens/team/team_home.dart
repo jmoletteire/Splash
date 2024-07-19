@@ -11,6 +11,8 @@ import 'package:splash/screens/team/team_roster.dart';
 import 'package:splash/screens/team/team_stats.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../../utilities/scroll/scroll_controller_notifier.dart';
+import '../../utilities/scroll/scroll_controller_provider.dart';
 import '../../utilities/team.dart';
 import '../search_screen.dart';
 import 'comparison/team_comparison.dart';
@@ -28,6 +30,7 @@ class TeamHome extends StatefulWidget {
 class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
+  late ScrollControllerNotifier _notifier;
   late Map<String, dynamic> team;
   bool _title = false;
   bool _isLoading = true;
@@ -90,6 +93,19 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
     return _scrollController.hasClients && _scrollController.offset > (200 - kToolbarHeight);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _scrollController = ScrollController()
+      ..addListener(() {
+        setState(() {
+          _title = _isSliverAppBarExpanded;
+        });
+      });
+    _notifier.addController(_scrollController);
+  }
+
   /// ******************************************************
   ///    Dispose of Tab Controller with page to conserve
   ///    memory & improve performance.
@@ -98,6 +114,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
   @override
   void dispose() {
     _tabController.dispose();
+    _notifier.removeController(_scrollController);
     _scrollController.dispose();
     super.dispose();
   }
@@ -106,12 +123,20 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
   ///      Initialize each tab via anonymous function.
   /// ******************************************************
 
-  final List<Widget Function({required Map<String, dynamic> team})> _teamPages = [
-    ({required Map<String, dynamic> team}) => TeamOverview(team: team),
-    ({required Map<String, dynamic> team}) => TeamSchedule(team: team),
-    ({required Map<String, dynamic> team}) => TeamStats(team: team),
-    ({required Map<String, dynamic> team}) => TeamRoster(team: team),
-    ({required Map<String, dynamic> team}) => TeamHistory(team: team),
+  final List<
+      Widget Function(
+          {required Map<String, dynamic> team,
+          required ScrollController controller})> _teamPages = [
+    ({required Map<String, dynamic> team, required ScrollController controller}) =>
+        TeamOverview(team: team, controller: controller),
+    ({required Map<String, dynamic> team, required ScrollController controller}) =>
+        TeamSchedule(team: team, controller: controller),
+    ({required Map<String, dynamic> team, required ScrollController controller}) =>
+        TeamStats(team: team, controller: controller),
+    ({required Map<String, dynamic> team, required ScrollController controller}) =>
+        TeamRoster(team: team, controller: controller),
+    ({required Map<String, dynamic> team, required ScrollController controller}) =>
+        TeamHistory(team: team, controller: controller),
   ];
 
   /// ******************************************************
@@ -227,6 +252,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                 children: _teamPages.map((page) {
                   return page(
                     team: team,
+                    controller: _scrollController,
                   ); // Pass team object to each page
                 }).toList(),
               ),

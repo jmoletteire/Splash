@@ -4,7 +4,8 @@ import 'package:splash/utilities/constants.dart';
 
 class TeamSchedule extends StatefulWidget {
   final Map<String, dynamic> team;
-  const TeamSchedule({super.key, required this.team});
+  final ScrollController controller;
+  const TeamSchedule({super.key, required this.controller, required this.team});
 
   @override
   State<TeamSchedule> createState() => _TeamScheduleState();
@@ -19,7 +20,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
   late String selectedOpp;
   late int oppId;
   late TeamGames games;
-  late List<bool> _isExpandedList;
+
   List<String> months = [
     'All',
     'October',
@@ -88,13 +89,13 @@ class _TeamScheduleState extends State<TeamSchedule> {
     super.initState();
     schedule = widget.team['seasons'][kCurrentSeason]['GAMES'];
     seasons = widget.team['seasons'].keys.toList().reversed.toList();
-    _isExpandedList = List.filled(seasons.length, false);
     selectedSeason = seasons.first;
     selectedSeasonType = '2';
     selectedMonth = months.first;
     selectedOpp = 'ALL';
     oppId = 0;
     games = TeamGames(
+        scrollController: widget.controller,
         team: widget.team,
         schedule: schedule,
         selectedSeason: selectedSeason,
@@ -149,18 +150,16 @@ class _TeamScheduleState extends State<TeamSchedule> {
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 25.0, vertical: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
                               child: Column(
                                 children: [
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         'Filter',
-                                        style:
-                                            kBebasBold.copyWith(fontSize: 22.0),
+                                        style: kBebasBold.copyWith(fontSize: 22.0),
                                       ),
                                       TextButton(
                                         onPressed: () {
@@ -179,29 +178,24 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                       Container(
                                         decoration: BoxDecoration(
                                             color: Colors.grey.shade900,
-                                            border:
-                                                Border.all(color: teamColor),
-                                            borderRadius:
-                                                BorderRadius.circular(10.0)),
+                                            border: Border.all(color: teamColor),
+                                            borderRadius: BorderRadius.circular(10.0)),
                                         child: DropdownButton<String>(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 15.0),
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
+                                          padding:
+                                              const EdgeInsets.symmetric(horizontal: 15.0),
+                                          borderRadius: BorderRadius.circular(10.0),
                                           menuMaxHeight: 300.0,
                                           dropdownColor: Colors.grey.shade900,
                                           isExpanded: false,
                                           underline: Container(),
                                           value: selectedSeason,
                                           items: seasons
-                                              .map<DropdownMenuItem<String>>(
-                                                  (String value) {
+                                              .map<DropdownMenuItem<String>>((String value) {
                                             return DropdownMenuItem<String>(
                                               value: value,
                                               child: Text(
                                                 value,
-                                                style: kBebasNormal.copyWith(
-                                                    fontSize: 18.0),
+                                                style: kBebasNormal.copyWith(fontSize: 18.0),
                                               ),
                                             );
                                           }).toList(),
@@ -209,6 +203,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                             setState(() {
                                               selectedSeason = value!;
                                               games = TeamGames(
+                                                scrollController: widget.controller,
                                                 team: widget.team,
                                                 schedule: schedule,
                                                 selectedSeason: value,
@@ -229,16 +224,14 @@ class _TeamScheduleState extends State<TeamSchedule> {
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15.0, vertical: 10.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
                       child: Row(
                         children: [
                           Text(
                             selectedSeason,
                             style: kBebasNormal.copyWith(fontSize: 18.0),
                           ),
-                          const Icon(Icons.arrow_drop_down,
-                              color: Colors.white),
+                          const Icon(Icons.arrow_drop_down, color: Colors.white),
                         ],
                       ),
                     ),
@@ -271,6 +264,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                       setState(() {
                         selectedMonth = value!;
                         games = TeamGames(
+                          scrollController: widget.controller,
                           team: widget.team,
                           schedule: schedule,
                           selectedSeason: selectedSeason,
@@ -296,8 +290,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                     underline: Container(),
                     value: selectedOpp,
                     items: teamAbbr.keys
-                        .where((String value) =>
-                            value != widget.team['ABBREVIATION'])
+                        .where((String value) => value != widget.team['ABBREVIATION'])
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -327,6 +320,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                         selectedOpp = value!;
                         oppId = int.parse(teamAbbr[selectedOpp]!);
                         games = TeamGames(
+                          scrollController: widget.controller,
                           team: widget.team,
                           schedule: schedule,
                           selectedSeason: selectedSeason,
