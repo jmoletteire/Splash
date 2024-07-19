@@ -12,17 +12,36 @@ class TapStatusBarToScroll extends StatelessWidget {
   Widget build(BuildContext context) {
     final ScrollControllerNotifier notifier = ScrollControllerNotifier();
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTapUp: (details) {
-        if (details.globalPosition.dy < MediaQuery.of(context).padding.top + kToolbarHeight) {
-          notifier.scrollToTop();
-        }
-      },
-      child: ScrollControllerProvider(
-        notifier: notifier,
-        child: child,
-      ),
+    return Stack(
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTapUp: (details) {
+            if (details.globalPosition.dy <= MediaQuery.of(context).padding.top) {
+              notifier.scrollToTop();
+            }
+          },
+          child: ScrollControllerProvider(
+            notifier: notifier,
+            child: child,
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: MediaQuery.of(context).padding.top,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              notifier.scrollToTop();
+            },
+            child: Container(
+              color: Colors.transparent,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
