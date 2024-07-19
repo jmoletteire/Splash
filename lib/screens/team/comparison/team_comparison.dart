@@ -810,7 +810,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                             ),
                             const SizedBox(height: 5.0),
                             ComparisonRow(
-                              statName: 'FG%',
+                              statName: 'FT%',
                               teamOne: roundToDecimalPlaces(
                                   (teamOne['seasons'][selectedSeasonOne]['STATS']
                                           [selectedSeasonTypeOne]['BASIC']['FT_PCT'] *

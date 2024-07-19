@@ -172,12 +172,23 @@ class _TeamGamesState extends State<TeamGames> {
     gamesList = sortGames();
 
     return teamGames.isEmpty
-        ? const SliverToBoxAdapter(
+        ? SliverToBoxAdapter(
             child: Center(
-              heightFactor: 12.5,
-              child: Text(
-                'No Games Available',
-                style: kBebasNormal,
+              heightFactor: 5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.sports_basketball,
+                    color: Colors.white38,
+                    size: 40.0,
+                  ),
+                  const SizedBox(height: 15.0),
+                  Text(
+                    'No Games Available',
+                    style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
+                  ),
+                ],
               ),
             ),
           )

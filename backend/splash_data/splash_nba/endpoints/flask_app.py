@@ -225,6 +225,33 @@ def get_games():
         return jsonify({"error": "Failed to retrieve games"}), 500
 
 
+@app.route('/get_game', methods=['GET'])
+def get_game():
+    try:
+        # logging.info(f"(get_game) {request.args}")
+        query_params = request.args.to_dict()
+        # logging.info(f"(get_game) {query_params}")
+
+        game_id = query_params['gameId']
+
+        # Query the database
+        game = games_collection.find_one(
+            {f"GAMES.{game_id}": {"$exists": True}},
+            {"_id": 0, f"GAMES.{game_id}": 1}
+        )
+
+        if game:
+            # logging.info(f"(get_game) Retrieved game {game_id} from MongoDB")
+            return jsonify(game["GAMES"][game_id])
+        else:
+            logging.warning("(get_game) No games found in MongoDB")
+            return jsonify({"error": "No games found"})
+
+    except Exception as e:
+        logging.error(f"(get_game) Error retrieving games: {e}")
+        return jsonify({"error": "Failed to retrieve games"}), 500
+
+
 @app.route('/get_player', methods=['GET'])
 def get_player():
     try:

@@ -212,7 +212,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                             ),
                             const SizedBox(height: 15.0),
                             Text(
-                              'No games available',
+                              'No Games Available',
                               style:
                                   kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
                             ),
@@ -221,11 +221,13 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                       );
                     } else if (gamesData[gameKey] is Map) {
                       Map<String, dynamic> game = gamesData[gameKey];
-                      gameCards.add(GameCard(
-                        game: game,
-                        homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
-                        awayTeam: game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'],
-                      ));
+                      gameCards.add(
+                        GameCard(
+                          game: game,
+                          homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
+                          awayTeam: game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'],
+                        ),
+                      );
                     }
                   }
 
@@ -247,7 +249,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                         ),
                         const SizedBox(height: 15.0),
                         Text(
-                          'No games available',
+                          'No Games Available',
                           style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
                         ),
                       ],

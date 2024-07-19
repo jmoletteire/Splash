@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../screens/game/game_home.dart';
+
 class GameCard extends StatefulWidget {
   final Map<String, dynamic> game;
   final int homeTeam;
   final int awayTeam;
 
-  const GameCard(
-      {super.key,
-      required this.game,
-      required this.homeTeam,
-      required this.awayTeam});
+  const GameCard({
+    super.key,
+    required this.game,
+    required this.homeTeam,
+    required this.awayTeam,
+  });
 
   @override
   _GameCardState createState() => _GameCardState();
@@ -22,9 +25,25 @@ class _GameCardState extends State<GameCard> {
   Widget build(BuildContext context) {
     var summary = widget.game['SUMMARY']['GameSummary'][0];
     var linescore = widget.game['SUMMARY']['LineScore'];
+
+    Map<String, dynamic> homeLinescore =
+        linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[0] : linescore[1];
+    Map<String, dynamic> awayLinescore =
+        linescore[0]['TEAM_ID'] == widget.awayTeam ? linescore[0] : linescore[1];
+
     return GestureDetector(
       onTap: () {
-        //TODO: Navigate to game page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GameHome(
+              gameData: widget.game,
+              gameId: widget.game['GAME_ID'],
+              homeId: widget.homeTeam.toString(),
+              awayId: widget.awayTeam.toString(),
+            ),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -48,22 +67,18 @@ class _GameCardState extends State<GameCard> {
                       children: [
                         Text(
                           summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
-                          style: kGameCardTextStyle.copyWith(
-                              color: Colors.white70),
+                          style: kGameCardTextStyle.copyWith(color: Colors.white70),
                           textAlign: TextAlign.start,
                         ),
-                        if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] !=
-                            null) ...[
+                        if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
                           const SizedBox(width: 5),
-                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] !=
-                              'NBA TV')
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV')
                             const Icon(
                               Icons.tv_sharp, // TV icon
                               color: Colors.white70,
                               size: 14.0,
                             ),
-                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] ==
-                              'NBA TV')
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
                             SvgPicture.asset(
                               'images/NBA_TV.svg',
                               width: 12.0,
@@ -124,18 +139,9 @@ class _GameCardState extends State<GameCard> {
                             children: [
                               Text(
                                 kTeamNames[widget.awayTeam.toString()][0] ??
-                                    (linescore[0]['TEAM_ID'] != widget.awayTeam
-                                        ? linescore[0]['TEAM_NICKNAME']
-                                        : linescore[1]['TEAM_NICKNAME']),
+                                    awayLinescore['TEAM_NICKNAME'],
                                 style: kGameCardTextStyle.copyWith(
-                                  color: (linescore[0]['TEAM_ID'] ==
-                                                  widget.awayTeam
-                                              ? linescore[0]['PTS']
-                                              : linescore[1]['PTS']) >
-                                          (linescore[0]['TEAM_ID'] ==
-                                                  widget.homeTeam
-                                              ? linescore[0]['PTS']
-                                              : linescore[1]['PTS'])
+                                  color: awayLinescore['PTS'] > homeLinescore['PTS']
                                       ? Colors.white // Away team won
                                       : (summary['GAME_STATUS_TEXT'] == 'Final'
                                           ? Colors.grey
@@ -147,9 +153,7 @@ class _GameCardState extends State<GameCard> {
                                 width: 4.0,
                               ),
                               Text(
-                                linescore[0]['TEAM_ID'] == widget.awayTeam
-                                    ? linescore[0]['TEAM_WINS_LOSSES']
-                                    : linescore[1]['TEAM_WINS_LOSSES'],
+                                awayLinescore['TEAM_WINS_LOSSES'],
                                 style: kGameCardTextStyle,
                               ),
                             ],
@@ -165,22 +169,12 @@ class _GameCardState extends State<GameCard> {
                               Expanded(
                                 flex: 1,
                                 child: Text(
-                                  linescore[0]['TEAM_ID'] == widget.awayTeam
-                                      ? linescore[0]['PTS'].toString()
-                                      : linescore[1]['PTS'].toString(),
+                                  awayLinescore['PTS'].toString(),
                                   textAlign: TextAlign.right,
                                   style: kGameCardTextStyle.copyWith(
-                                    color: (linescore[0]['TEAM_ID'] ==
-                                                    widget.awayTeam
-                                                ? linescore[0]['PTS']
-                                                : linescore[1]['PTS']) >
-                                            (linescore[0]['TEAM_ID'] ==
-                                                    widget.homeTeam
-                                                ? linescore[0]['PTS']
-                                                : linescore[1]['PTS'])
+                                    color: awayLinescore['PTS'] > homeLinescore['PTS']
                                         ? Colors.white // Away team won
-                                        : (summary['GAME_STATUS_TEXT'] ==
-                                                'Final'
+                                        : (summary['GAME_STATUS_TEXT'] == 'Final'
                                             ? Colors.grey
                                             : Colors.white), // Away team lost
                                     fontSize: 22.0,
@@ -239,14 +233,7 @@ class _GameCardState extends State<GameCard> {
                               Text(
                                 kTeamNames[widget.homeTeam.toString()][0],
                                 style: kGameCardTextStyle.copyWith(
-                                  color: (linescore[0]['TEAM_ID'] ==
-                                                  widget.homeTeam
-                                              ? linescore[0]['PTS']
-                                              : linescore[1]['PTS']) >
-                                          (linescore[0]['TEAM_ID'] ==
-                                                  widget.awayTeam
-                                              ? linescore[0]['PTS']
-                                              : linescore[1]['PTS'])
+                                  color: homeLinescore['PTS'] > awayLinescore['PTS']
                                       ? Colors.white // Home team won
                                       : (summary['GAME_STATUS_TEXT'] == 'Final'
                                           ? Colors.grey
@@ -258,9 +245,7 @@ class _GameCardState extends State<GameCard> {
                                 width: 4.0,
                               ),
                               Text(
-                                linescore[0]['TEAM_ID'] == widget.homeTeam
-                                    ? linescore[0]['TEAM_WINS_LOSSES']
-                                    : linescore[1]['TEAM_WINS_LOSSES'],
+                                homeLinescore['TEAM_WINS_LOSSES'],
                                 style: kGameCardTextStyle,
                               ),
                             ],
@@ -276,22 +261,12 @@ class _GameCardState extends State<GameCard> {
                               Expanded(
                                 flex: 1,
                                 child: Text(
-                                  linescore[0]['TEAM_ID'] == widget.homeTeam
-                                      ? linescore[0]['PTS'].toString()
-                                      : linescore[1]['PTS'].toString(),
+                                  homeLinescore['PTS'].toString(),
                                   textAlign: TextAlign.right,
                                   style: kGameCardTextStyle.copyWith(
-                                    color: (linescore[0]['TEAM_ID'] ==
-                                                    widget.homeTeam
-                                                ? linescore[0]['PTS']
-                                                : linescore[1]['PTS']) >
-                                            (linescore[0]['TEAM_ID'] ==
-                                                    widget.awayTeam
-                                                ? linescore[0]['PTS']
-                                                : linescore[1]['PTS'])
+                                    color: homeLinescore['PTS'] > awayLinescore['PTS']
                                         ? Colors.white // Home team won
-                                        : (summary['GAME_STATUS_TEXT'] ==
-                                                'Final'
+                                        : (summary['GAME_STATUS_TEXT'] == 'Final'
                                             ? Colors.grey
                                             : Colors.white), // Home team lost
                                     fontSize: 22.0,
