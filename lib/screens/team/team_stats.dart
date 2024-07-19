@@ -346,7 +346,11 @@ class _TeamStatsState extends State<TeamStats> {
                   },
                 ),
               ),
-              if (widget.team['seasons'][selectedSeason]['STATS'].containsKey('PLAYOFFS'))
+
+              /// NOTE: Mistake in data. All teams have PLAYOFFS key, but
+              /// not PLAYOFFS.ADV, which is why it is used instead.
+              if (widget.team['seasons'][selectedSeason]['STATS']['PLAYOFFS']
+                  .containsKey('ADV'))
                 Expanded(
                   flex: 1,
                   child: Stack(

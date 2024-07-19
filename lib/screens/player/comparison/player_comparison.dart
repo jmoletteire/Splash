@@ -8,11 +8,11 @@ import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/player_home.dart';
 import 'package:splash/utilities/constants.dart';
 
-import '../../components/custom_icon_button.dart';
-import '../../components/player_avatar.dart';
-import '../../components/search_widget.dart';
-import '../../utilities/player.dart';
-import '../search_screen.dart';
+import '../../../components/custom_icon_button.dart';
+import '../../../components/player_avatar.dart';
+import '../../../utilities/player.dart';
+import '../../search_screen.dart';
+import 'player_search_widget.dart';
 
 class PlayerComparison extends StatefulWidget {
   final Map<String, dynamic> player;
@@ -59,7 +59,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
       context: context,
       builder: (context) => ChangeNotifierProvider(
         create: (_) => SearchProvider(),
-        child: SearchWidget(
+        child: PlayerSearchWidget(
           onPlayerSelected: (player) async {
             playerTwo = await getPlayer(player["PERSON_ID"].toString());
             setState(() {
@@ -191,7 +191,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               context: context,
                               builder: (context) => ChangeNotifierProvider(
                                 create: (_) => SearchProvider(),
-                                child: SearchWidget(
+                                child: PlayerSearchWidget(
                                   onPlayerSelected: (player) async {
                                     playerOne =
                                         await getPlayer(player["PERSON_ID"].toString());
@@ -285,7 +285,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             context: context,
                             builder: (context) => ChangeNotifierProvider(
                               create: (_) => SearchProvider(),
-                              child: SearchWidget(
+                              child: PlayerSearchWidget(
                                 onPlayerSelected: (player) async {
                                   playerTwo = await getPlayer(player["PERSON_ID"].toString());
                                   setState(() {

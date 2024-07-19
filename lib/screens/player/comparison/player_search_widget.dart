@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/utilities/constants.dart';
 
-import '../screens/search_screen.dart';
+import '../../search_screen.dart';
 
-class SearchWidget extends StatelessWidget {
+class PlayerSearchWidget extends StatelessWidget {
   final Function(Map<String, dynamic>) onPlayerSelected;
 
-  SearchWidget({required this.onPlayerSelected});
+  PlayerSearchWidget({required this.onPlayerSelected});
 
   final TextEditingController _textEditingController = TextEditingController();
 

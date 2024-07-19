@@ -13,6 +13,7 @@ import 'package:splash/utilities/constants.dart';
 
 import '../../utilities/team.dart';
 import '../search_screen.dart';
+import 'comparison/team_comparison.dart';
 
 class TeamHome extends StatefulWidget {
   static const String id = 'team_home';
@@ -207,9 +208,14 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                         },
                       ),
                       CustomIconButton(
-                        icon: Icons.star_outline,
+                        icon: Icons.compare_arrows,
                         onPressed: () {
-                          // TODO: Implement "Favorite" button functionality.
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeamComparison(team: team),
+                            ),
+                          );
                         },
                       ),
                     ],

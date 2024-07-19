@@ -7,8 +7,8 @@ import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/player/career/player_career.dart';
+import 'package:splash/screens/player/comparison/player_comparison.dart';
 import 'package:splash/screens/player/player_cache.dart';
-import 'package:splash/screens/player/player_comparison.dart';
 import 'package:splash/screens/player/player_contract.dart';
 import 'package:splash/screens/player/player_stats.dart';
 import 'package:splash/screens/player/profile/player_profile.dart';
@@ -31,8 +31,7 @@ class PlayerHome extends StatefulWidget {
   State<PlayerHome> createState() => _PlayerHomeState();
 }
 
-class _PlayerHomeState extends State<PlayerHome>
-    with SingleTickerProviderStateMixin {
+class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
   Map<String, dynamic> player = {};
@@ -122,8 +121,7 @@ class _PlayerHomeState extends State<PlayerHome>
   }
 
   bool get _isSliverAppBarExpanded {
-    return _scrollController.hasClients &&
-        _scrollController.offset > (200 - kToolbarHeight);
+    return _scrollController.hasClients && _scrollController.offset > (200 - kToolbarHeight);
   }
 
   /// ******************************************************
@@ -146,21 +144,13 @@ class _PlayerHomeState extends State<PlayerHome>
       Widget Function(
           {required Map<String, dynamic> team,
           required Map<String, dynamic> player})> _playerPages = [
-    (
-            {required Map<String, dynamic> team,
-            required Map<String, dynamic> player}) =>
+    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
         PlayerProfile(team: team, player: player),
-    (
-            {required Map<String, dynamic> team,
-            required Map<String, dynamic> player}) =>
+    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
         PlayerStats(team: team, player: player),
-    (
-            {required Map<String, dynamic> team,
-            required Map<String, dynamic> player}) =>
+    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
         PlayerContract(team: team, player: player),
-    (
-            {required Map<String, dynamic> team,
-            required Map<String, dynamic> player}) =>
+    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
         PlayerCareer(team: team, player: player),
   ];
 
@@ -181,12 +171,10 @@ class _PlayerHomeState extends State<PlayerHome>
             )
           : NestedScrollView(
               controller: _scrollController,
-              headerSliverBuilder:
-                  (BuildContext context, bool innerBoxIsScrolled) {
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return [
                   SliverAppBar(
-                    backgroundColor:
-                        kTeamColors[team['ABBREVIATION']]!['primaryColor']!,
+                    backgroundColor: kTeamColors[team['ABBREVIATION']]!['primaryColor']!,
                     pinned: true,
                     expandedHeight: MediaQuery.of(context).size.height * 0.28,
                     title: Row(
@@ -225,13 +213,10 @@ class _PlayerHomeState extends State<PlayerHome>
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                kTeamColors[team['ABBREVIATION']]![
-                                        'primaryColor']!
-                                    .withOpacity(kTeamColorOpacity[
-                                            team['ABBREVIATION']]![
+                                kTeamColors[team['ABBREVIATION']]!['primaryColor']!
+                                    .withOpacity(kTeamColorOpacity[team['ABBREVIATION']]![
                                         'opacity']!), // Transparent at the top
-                                kTeamColors[team['ABBREVIATION']]![
-                                        'primaryColor']!
+                                kTeamColors[team['ABBREVIATION']]!['primaryColor']!
                                     .withOpacity(1.0), // Opaque at the bottom
                               ],
                             ),
@@ -250,8 +235,7 @@ class _PlayerHomeState extends State<PlayerHome>
                     bottom: TabBar(
                       controller: _tabController,
                       indicatorSize: TabBarIndicatorSize.tab,
-                      indicatorColor:
-                          kTeamColors[team['ABBREVIATION']]!['secondaryColor']!,
+                      indicatorColor: kTeamColors[team['ABBREVIATION']]!['secondaryColor']!,
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
@@ -281,8 +265,7 @@ class _PlayerHomeState extends State<PlayerHome>
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  PlayerComparison(player: player),
+                              builder: (context) => PlayerComparison(player: player),
                             ),
                           );
                         },
@@ -356,8 +339,7 @@ class PlayerInfo extends StatelessWidget {
               ),
               Text(
                 '${player['POSITION']} • #${player['JERSEY']}',
-                style: kBebasNormal.copyWith(
-                    fontSize: 19.0, color: Colors.white60),
+                style: kBebasNormal.copyWith(fontSize: 19.0, color: Colors.white60),
               ),
               if (team['CITY'] != 'Free Agent')
                 GestureDetector(
@@ -375,8 +357,7 @@ class PlayerInfo extends StatelessWidget {
                     children: [
                       Text(
                         '${team['CITY']} ${team['NICKNAME']}',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 19.0, color: Colors.white60),
+                        style: kBebasNormal.copyWith(fontSize: 19.0, color: Colors.white60),
                       ),
                       const SizedBox(width: 5.0),
                       ConstrainedBox(
