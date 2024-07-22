@@ -183,6 +183,12 @@ def search():
         return jsonify({"error": "Search failed"}), 500
 
 
+@app.route('/game_dates', methods=['GET'])
+def get_dates():
+    dates = games_collection.distinct('GAME_DATE')
+    return jsonify(dates)
+
+
 @app.route('/get_games', methods=['GET'])
 def get_games():
     try:

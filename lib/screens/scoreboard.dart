@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:splash/components/custom_icon_button.dart';
+import 'package:provider/provider.dart';
 import 'package:splash/components/game_card.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/search_screen.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/nba_api/library/network.dart';
 
+import '../components/custom_icon_button.dart';
+import '../utilities/game_dates.dart';
 import '../utilities/scroll/scroll_controller_notifier.dart';
 import '../utilities/scroll/scroll_controller_provider.dart';
 
@@ -23,28 +25,50 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   late TabController _tabController;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+  late DatesProvider _datesProvider;
 
   List<DateTime> _dates = List.generate(15, (index) {
     return DateTime.now().subtract(const Duration(days: 7)).add(Duration(days: index));
   });
   Map<String, dynamic> cachedGames = {};
   bool _isLoading = false;
+  bool _pageInitLoad = false;
+
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+  }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _dates.length, vsync: this);
-    _tabController.index = 7; // Default to today
-
-    _tabController.addListener(() {
-      if (!_isLoading) {
-        fetchGamesAndTeams(_dates[_tabController.index]);
-      }
-      setState(() {}); // Update the UI when the tab index changes
+    setState(() {
+      _pageInitLoad = true;
     });
 
-    setDates(DateTime.now());
-    fetchGamesAndTeams(_dates[_tabController.index]);
+    _datesProvider = Provider.of<DatesProvider>(context, listen: false);
+    _datesProvider.fetchDates().then((_) {
+      if (_datesProvider.dates.isNotEmpty) {
+        DateTime maxDate =
+            DateTime.parse(_datesProvider.dates.reduce((a, b) => a.compareTo(b) > 0 ? a : b));
+        _tabController = TabController(length: _dates.length, vsync: this);
+        _tabController.index = _dates.indexWhere((date) => isSameDay(date, DateTime.now()));
+        _tabController.addListener(() {
+          fetchGames(_dates[_tabController.index]);
+          setState(() {}); // Update the UI when the tab index changes
+        });
+
+        setDates(maxDate);
+        fetchGames(maxDate).then((_) {
+          setState(() {
+            _pageInitLoad = false;
+          });
+        });
+      } else {
+        setState(() {
+          _pageInitLoad = false;
+        });
+      }
+    });
   }
 
   @override
@@ -71,7 +95,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     });
   }
 
-  Future<void> fetchGamesAndTeams(DateTime date) async {
+  Future<void> fetchGames(DateTime date) async {
     String formattedDate = date.toIso8601String().split('T').first;
 
     if (cachedGames.containsKey(formattedDate)) {
@@ -107,157 +131,177 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    DateTime today = DateTime.now();
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
-        child: AppBar(
-          backgroundColor: Colors.grey.shade900,
-          title: kSplashText,
-          actions: [
-            CustomIconButton(
-              icon: Icons.search,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchScreen(),
-                  ),
-                );
-              },
-            ),
-            CustomIconButton(
-              icon: Icons.calendar_month,
-              onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: Colors.grey.shade900,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Theme(
-                      data: Theme.of(context).copyWith(
-                        colorScheme: const ColorScheme.dark(
-                          primary: Colors.deepOrange,
-                          onPrimary: Colors.white,
-                          secondary: Colors.white,
+    return _pageInitLoad
+        ? const SpinningIcon()
+        : Scaffold(
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
+              child: AppBar(
+                backgroundColor: Colors.grey.shade900,
+                title: kSplashText,
+                actions: [
+                  CustomIconButton(
+                    icon: Icons.search,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchScreen(),
                         ),
-                      ),
-                      child: CalendarDatePicker(
-                        initialDate: _dates[_tabController.index],
-                        firstDate: DateTime(2013, 11, 3),
-                        lastDate: DateTime(today.year + 1, today.month, today.day),
-                        onDateChanged: (date) async {
-                          setDates(date);
-                          _tabController.index = 7;
-                          Navigator.pop(context);
-                          await fetchGamesAndTeams(date);
+                      );
+                    },
+                  ),
+                  CustomIconButton(
+                    icon: Icons.calendar_month,
+                    onPressed: () {
+                      showModalBottomSheet(
+                        backgroundColor: Colors.grey.shade900,
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: const ColorScheme.dark(
+                                primary: Colors.deepOrange,
+                                onPrimary: Colors.white,
+                                secondary: Colors.white,
+                              ),
+                            ),
+                            child: Consumer<DatesProvider>(
+                              builder: (ctx, datesProvider, child) {
+                                String sanitizeDateTime(DateTime dateTime) {
+                                  String day = dateTime.day.toString().padLeft(2, '0');
+                                  String month = dateTime.month.toString().padLeft(2, '0');
+                                  String year = dateTime.year.toString();
+
+                                  return "$year-$month-$day";
+                                }
+
+                                return CalendarDatePicker(
+                                  initialDate: DateTime(2024, 6, 17),
+                                  firstDate: DateTime(2017, 9, 30),
+                                  lastDate: DateTime(DateTime.now().year + 1),
+                                  onDateChanged: (date) async {
+                                    setDates(date); // Assuming setDates is defined
+                                    _tabController.index =
+                                        7; // Assuming _tabController is defined
+                                    Navigator.pop(context);
+                                    await fetchGames(date); // Assuming fetchGames is defined
+                                  },
+                                  selectableDayPredicate: (DateTime val) {
+                                    String sanitized = sanitizeDateTime(val);
+                                    return datesProvider.dates.contains(sanitized);
+                                  },
+                                );
+                              },
+                            ),
+                          );
                         },
+                      );
+                    },
+                  ),
+                ],
+                bottom: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.center,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicatorWeight: 3.0,
+                  indicatorColor: Colors.deepOrange,
+                  unselectedLabelColor: Colors.white70,
+                  labelColor: Colors.deepOrangeAccent,
+                  labelStyle: kBebasNormal,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  tabs: _dates.map((date) {
+                    return Tab(
+                      height: 55.0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(DateFormat('E').format(date)),
+                          Text(
+                              '${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}'),
+                        ],
                       ),
                     );
-                  },
-                );
-              },
-            ),
-          ],
-          bottom: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            tabAlignment: TabAlignment.center,
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicatorWeight: 3.0,
-            indicatorColor: Colors.deepOrange,
-            unselectedLabelColor: Colors.white70,
-            labelColor: Colors.deepOrangeAccent,
-            labelStyle: kBebasNormal,
-            labelPadding: const EdgeInsets.symmetric(horizontal: 20.0),
-            tabs: _dates.map((date) {
-              return Tab(
-                height: 55.0,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(DateFormat('E').format(date)),
-                    Text('${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}'),
-                  ],
+                  }).toList(),
                 ),
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-      body: _isLoading
-          ? const Center(
-              child: SpinningIcon(
-                color: Colors.deepOrange,
               ),
-            )
-          : TabBarView(
-              controller: _tabController,
-              children: _dates.map((date) {
-                String formattedDate = date.toIso8601String().split('T').first;
-                var gamesData = cachedGames[formattedDate];
-
-                if (gamesData is Map && !gamesData.containsKey('error')) {
-                  List<Widget> gameCards = [];
-
-                  for (String gameKey in gamesData.keys) {
-                    if (gameKey == 'error') {
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.sports_basketball,
-                              color: Colors.white38,
-                              size: 40.0,
-                            ),
-                            const SizedBox(height: 15.0),
-                            Text(
-                              'No Games Available',
-                              style:
-                                  kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else if (gamesData[gameKey] is Map) {
-                      Map<String, dynamic> game = gamesData[gameKey];
-                      gameCards.add(
-                        GameCard(
-                          game: game,
-                          homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
-                          awayTeam: game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'],
-                        ),
-                      );
-                    }
-                  }
-
-                  return SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(
-                      children: gameCards,
-                    ),
-                  );
-                } else {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.sports_basketball,
-                          color: Colors.white38,
-                          size: 40.0,
-                        ),
-                        const SizedBox(height: 15.0),
-                        Text(
-                          'No Games Available',
-                          style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              }).toList(),
             ),
-    );
+            body: _isLoading
+                ? const Center(
+                    child: SpinningIcon(
+                      color: Colors.deepOrange,
+                    ),
+                  )
+                : TabBarView(
+                    controller: _tabController,
+                    children: _dates.map((date) {
+                      String formattedDate = date.toIso8601String().split('T').first;
+                      var gamesData = cachedGames[formattedDate];
+
+                      if (gamesData is Map && !gamesData.containsKey('error')) {
+                        List<Widget> gameCards = [];
+
+                        for (String gameKey in gamesData.keys) {
+                          if (gameKey == 'error') {
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.sports_basketball,
+                                    color: Colors.white38,
+                                    size: 40.0,
+                                  ),
+                                  const SizedBox(height: 15.0),
+                                  Text(
+                                    'No Games Available',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 20.0, color: Colors.white54),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else if (gamesData[gameKey] is Map) {
+                            Map<String, dynamic> game = gamesData[gameKey];
+                            gameCards.add(
+                              GameCard(
+                                game: game,
+                                homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
+                                awayTeam: game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'],
+                              ),
+                            );
+                          }
+                        }
+
+                        return SingleChildScrollView(
+                          controller: _scrollController,
+                          child: Column(
+                            children: gameCards,
+                          ),
+                        );
+                      } else {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.sports_basketball,
+                                color: Colors.white38,
+                                size: 40.0,
+                              ),
+                              const SizedBox(height: 15.0),
+                              Text(
+                                'No Games Available',
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0, color: Colors.white54),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    }).toList(),
+                  ),
+          );
   }
 }

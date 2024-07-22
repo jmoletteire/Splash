@@ -4,6 +4,7 @@ import 'package:splash/screens/game/game_cache.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/search_screen.dart';
 import 'package:splash/screens/team/team_cache.dart';
+import 'package:splash/utilities/game_dates.dart';
 import 'package:splash/utilities/scroll/tap_status_bar_to_scroll.dart';
 import 'package:splash/utilities/tab_home.dart';
 
@@ -15,6 +16,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => TeamCache()),
         ChangeNotifierProvider(create: (_) => GameCache()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ChangeNotifierProvider(create: (_) => DatesProvider()..fetchDates()),
       ],
       child: Splash(),
     ),
