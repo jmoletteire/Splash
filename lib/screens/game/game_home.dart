@@ -10,7 +10,7 @@ import '../../utilities/game.dart';
 import '../../utilities/scroll/scroll_controller_provider.dart';
 import '../search_screen.dart';
 import '../team/team_home.dart';
-import 'game_boxscore.dart';
+import 'boxscore/game_boxscore.dart';
 import 'game_cache.dart';
 import 'summary/game_summary.dart';
 
