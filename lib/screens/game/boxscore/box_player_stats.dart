@@ -4,6 +4,7 @@ import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
 
+import '../../../components/player_avatar.dart';
 import '../../../utilities/constants.dart';
 import '../../player/player_home.dart';
 
@@ -60,7 +61,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       columns: [
         /// PLAYER
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.2,
+          width: MediaQuery.of(context).size.width * 0.3,
           freezePriority: 1,
         ),
 
@@ -210,14 +211,28 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         int firstSpaceIndex = widget.players[row]['PLAYER_NAME'].indexOf(' ');
         return Container(
           alignment: Alignment.centerLeft,
-          child: Text(
-            '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(firstSpaceIndex + 1)}',
-            textAlign: TextAlign.start,
-            overflow: TextOverflow.ellipsis,
-            style: kBebasNormal.copyWith(
-              color: Colors.white70,
-              fontSize: 15.0,
-            ),
+          child: Row(
+            children: [
+              PlayerAvatar(
+                radius: 10.0,
+                backgroundColor: Colors.white12,
+                playerImageUrl:
+                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PLAYER_ID']}.png',
+              ),
+              const SizedBox(width: 5.0),
+              Flexible(
+                child: Text(
+                  '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(firstSpaceIndex + 1)}',
+                  textAlign: TextAlign.start,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: kBebasNormal.copyWith(
+                    color: Colors.white70,
+                    fontSize: 15.0,
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       case 1:

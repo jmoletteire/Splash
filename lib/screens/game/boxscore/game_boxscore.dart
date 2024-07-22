@@ -17,6 +17,7 @@ class GameBoxScore extends StatefulWidget {
 
 class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMixin {
   late TabController _boxscoreTabController;
+  ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
   late Map<String, dynamic> gameBoxscore;
   late Map<String, dynamic> gameAdv;
 
@@ -26,6 +27,9 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     gameBoxscore = widget.game['BOXSCORE'];
     gameAdv = widget.game['ADV'];
     _boxscoreTabController = TabController(length: 3, vsync: this);
+    _boxscoreTabController.addListener(() {
+      _selectedIndex.value = _boxscoreTabController.index;
+    });
   }
 
   @override
@@ -74,9 +78,13 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
       children: [
         TabBar.secondary(
           controller: _boxscoreTabController,
-          indicatorSize: TabBarIndicatorSize.tab,
-          indicatorColor: Colors.deepOrange,
-          indicatorWeight: 3.0,
+          //indicatorSize: TabBarIndicatorSize.tab,
+          //indicatorColor: Colors.deepOrange,
+          //indicatorWeight: 3.0,
+          indicator: CustomTabIndicator(
+              controller: _boxscoreTabController,
+              homeTeam: homePlayerStats[0]['TEAM_ABBREVIATION'],
+              awayTeam: awayPlayerStats[0]['TEAM_ABBREVIATION']),
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
           labelStyle: kBebasNormal,
@@ -104,5 +112,54 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         ),
       ],
     );
+  }
+}
+
+class CustomTabIndicator extends Decoration {
+  final TabController controller;
+  final String homeTeam;
+  final String awayTeam;
+
+  CustomTabIndicator(
+      {required this.controller, required this.homeTeam, required this.awayTeam});
+
+  @override
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) {
+    return _CustomPainter(controller: controller, homeTeam: homeTeam, awayTeam: awayTeam);
+  }
+}
+
+class _CustomPainter extends BoxPainter {
+  final TabController controller;
+  final String homeTeam;
+  final String awayTeam;
+
+  _CustomPainter({required this.controller, required this.homeTeam, required this.awayTeam});
+
+  @override
+  void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
+    Paint paint = Paint();
+    if (controller.index == 0) {
+      paint.color = kDarkSecondaryColors.contains(awayTeam)
+          ? (kTeamColors[awayTeam]!['primaryColor']!)
+          : (kTeamColors[awayTeam]!['secondaryColor']!);
+      ;
+    } else if (controller.index == 1) {
+      paint.color = Colors.deepOrange;
+    } else if (controller.index == 2) {
+      paint.color = kDarkSecondaryColors.contains(homeTeam)
+          ? (kTeamColors[homeTeam]!['primaryColor']!)
+          : (kTeamColors[homeTeam]!['secondaryColor']!);
+      ;
+    } else {
+      paint.color = Colors.transparent;
+    }
+
+    final double indicatorHeight = 3.0;
+    final Offset start = offset + Offset(0, configuration.size!.height - indicatorHeight);
+    final Offset end = offset +
+        Offset(configuration.size!.width, configuration.size!.height - indicatorHeight);
+    canvas.drawLine(start, end, paint);
+    canvas.drawLine(start, end, paint..strokeWidth = indicatorHeight);
   }
 }

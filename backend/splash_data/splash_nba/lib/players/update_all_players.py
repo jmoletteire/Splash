@@ -37,7 +37,7 @@ def new_player_info(player):
         logging.error(f" Failed to add info for {player}: {e}")
 
 
-def restructure_docs():
+def restructure_new_docs():
     # Loop through each document in the collection
     for i, player in enumerate(players_collection.find({"player_info": {"$exists": True}})):
         player_info = player.get('player_info', [])
@@ -117,8 +117,8 @@ if __name__ == "__main__":
         logging.info("Connected to MongoDB")
 
         try:
-            #add_players()
-            #restructure_docs()
+            # add_players()
+            # restructure_new_docs()
             update_player_info()
         except Exception as e:
             logging.error(f"Error adding players: {e}")

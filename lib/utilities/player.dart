@@ -18,7 +18,7 @@ class Player {
     }
 
     // Create the URL with query parameters
-    var url = Uri.http(
+    var url = Uri.https(
       kFlaskUrl,
       '/get_player',
       queryParams,

@@ -33,16 +33,14 @@ class _PlayerProfileState extends State<PlayerProfile> {
 
   @override
   Widget build(BuildContext context) {
-    var key = widget.team['TEAM_ID'] == 0
-        ? 'Last Played'
-        : convertDate(widget.player['BIRTHDATE']);
+    var key =
+        widget.team['TEAM_ID'] == 0 ? 'Last Played' : convertDate(widget.player['BIRTHDATE']);
     var value = widget.team['TEAM_ID'] == 0
         ? widget.player['TO_YEAR'].toString()
         : '${calculateAge(widget.player['BIRTHDATE'])} yrs';
 
     var height = widget.player['HEIGHT'].toString().split('-');
-    var heightFinal =
-        widget.player['HEIGHT'] == "" ? "" : '${height[0]}\'${height[1]}\"';
+    var heightFinal = widget.player['HEIGHT'] == "" ? "" : '${height[0]}\'${height[1]}\"';
 
     return SingleChildScrollView(
       child: Padding(
@@ -131,10 +129,25 @@ class InfoCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        AutoSizeText(
-                          entry.value,
-                          textAlign: TextAlign.center,
-                          style: kBebasNormal.copyWith(fontSize: 18),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: AutoSizeText(
+                                entry.value,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                style: kBebasNormal.copyWith(fontSize: 18),
+                              ),
+                            ),
+                            if (entry.key == 'Country') const SizedBox(width: 5.0),
+                            if (entry.key == 'Country')
+                              CircleAvatar(
+                                radius: 8.0,
+                                backgroundImage: AssetImage(
+                                    'images/flags/${kCountryCodes[entry.value]?.toLowerCase()}.png'),
+                              )
+                          ],
                         ),
                         const SizedBox(height: 5),
                         Text(

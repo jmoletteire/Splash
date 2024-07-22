@@ -4,14 +4,13 @@ import 'package:splash/utilities/nba_api/library/network.dart';
 class Team {
   Network network = Network();
 
-  Future<Map<String, dynamic>> getTeam(String teamId,
-      [List<String>? fields]) async {
+  Future<Map<String, dynamic>> getTeam(String teamId, [List<String>? fields]) async {
     Map<String, String> queryParams = {'team_id': teamId};
     if (fields != null && fields.isNotEmpty) {
       queryParams['fields'] = fields.join(',');
     }
 
-    var url = Uri.http(
+    var url = Uri.https(
       kFlaskUrl,
       '/get_team',
       queryParams,
@@ -22,9 +21,8 @@ class Team {
     return team;
   }
 
-  Future<Map<String, dynamic>> getTeamStats(
-      String teamId, String season) async {
-    var url = Uri.http(
+  Future<Map<String, dynamic>> getTeamStats(String teamId, String season) async {
+    var url = Uri.https(
       kFlaskUrl,
       '/get_team_stats',
       {'team_id': teamId, 'season': season},

@@ -79,6 +79,7 @@ flutter:
     - images/NBA_TV.svg
     - images/playoffs.svg
     - images/default_player_image.png
+    - images/flags/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
