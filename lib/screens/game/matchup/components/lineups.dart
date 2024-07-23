@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:splash/utilities/constants.dart';
 
-import '../../../components/player_avatar.dart';
-import '../../player/player_home.dart';
+import '../../../../components/player_avatar.dart';
+import '../../../player/player_home.dart';
 
 class Lineups extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -55,9 +55,16 @@ class _LineupsState extends State<Lineups> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
-                  'Lineups',
-                  style: kBebasBold.copyWith(fontSize: 22.0),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                    ),
+                  ),
+                  child: Text(
+                    'Lineups',
+                    style: kBebasBold.copyWith(fontSize: 22.0),
+                  ),
                 ),
               ],
             ),
@@ -238,129 +245,11 @@ class PlayerCard extends StatelessWidget {
   }
 }
 
-class HalfCourtPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white10
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-
-    final centerCircleRadius = size.width * 0.1;
-    final threePointLineRadius = size.width * 0.8;
-    final keyWidth = size.width * 0.4;
-    final keyHeight = size.height * 0.365;
-
-    // Draw center arc
-    canvas.drawArc(
-      Rect.fromCircle(center: Offset(size.width * 1.95 / 2, 0), radius: keyWidth / 2),
-      0,
-      3.14,
-      false,
-      paint,
-    );
-
-    // Draw baseline
-    canvas.drawLine(
-      Offset(0, size.height * 0.98),
-      Offset(size.width * 1.95, size.height * 0.98),
-      paint,
-    );
-
-    // Draw key (free throw lane)
-    canvas.drawRect(
-      Rect.fromCenter(
-        center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 2)),
-        width: keyWidth,
-        height: keyHeight,
-      ),
-      paint,
-    );
-
-    // Draw free throw line arc
-    canvas.drawArc(
-      Rect.fromCircle(
-          center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - keyHeight),
-          radius: keyWidth / 2),
-      3.14,
-      3.14,
-      false,
-      paint,
-    );
-
-    // Draw the inner part of the free throw line arc (dashed)
-    const dashWidth = 5.0;
-    const dashSpace = 5.0;
-    final arcRect = Rect.fromCircle(
-      center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - keyHeight),
-      radius: keyWidth / 2,
-    );
-
-    final path = Path();
-    const totalAngle = 3.14; // The arc's angle in radians (half-circle in this case)
-    const segments = 10; // Increase for smoother dash transitions
-    const segmentAngle = totalAngle / segments;
-    bool draw = true;
-
-    for (int i = 0; i < segments; i++) {
-      final startAngle = segmentAngle * i;
-      final endAngle = startAngle + segmentAngle;
-
-      if (draw) {
-        path.addArc(arcRect, startAngle, segmentAngle * (dashWidth / (dashWidth + dashSpace)));
-      }
-
-      draw = !draw;
-    }
-
-    canvas.drawPath(path, paint);
-
-    // Draw restricted area
-    canvas.drawArc(
-      Rect.fromCircle(
-          center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 4)),
-          radius: centerCircleRadius),
-      3.14,
-      3.14,
-      false,
-      paint,
-    );
-
-    // Draw three-point line with flattened ends
-    canvas.drawLine(
-      Offset((size.width * 1.95 / 2) + threePointLineRadius, size.height * 0.98),
-      Offset((size.width * 1.95 / 2) + threePointLineRadius,
-          (size.height * 0.98) - (keyHeight / 2)),
-      paint,
-    );
-    canvas.drawLine(
-      Offset((size.width * 1.95 / 2) - threePointLineRadius, size.height * 0.98),
-      Offset((size.width * 1.95 / 2) - threePointLineRadius,
-          (size.height * 0.98) - (keyHeight / 2)),
-      paint,
-    );
-    canvas.drawArc(
-      Rect.fromCircle(
-          center: Offset(size.width * 1.95 / 2, (size.height * 0.98) - (keyHeight / 2)),
-          radius: threePointLineRadius),
-      3.14,
-      3.14,
-      false,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}
-
 class FullCourtPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white10
+      ..color = Colors.grey.shade800
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 
@@ -390,8 +279,8 @@ class FullCourtPainter extends CustomPainter {
 
       // Draw baseline
       canvas.drawLine(
-        Offset(offsetX, size.height * 0.98),
-        Offset(halfCourtWidth * 1.95 + offsetX, size.height * 0.98),
+        Offset(offsetX + 4, size.height * 0.98),
+        Offset(halfCourtWidth * 1.95 + offsetX + 4, size.height * 0.98),
         paint,
       );
 
@@ -480,13 +369,13 @@ class FullCourtPainter extends CustomPainter {
     }
 
     // Draw the first half court
-    drawHalfCourt(0);
+    drawHalfCourt(-4);
 
     // Draw the second half court, mirrored
     canvas.save();
     canvas.translate(size.width, size.height);
     canvas.rotate(3.14);
-    drawHalfCourt(-size.width);
+    drawHalfCourt(-size.width + 4);
     canvas.restore();
   }
 

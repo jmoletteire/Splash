@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:splash/screens/game/summary/team_season_stats.dart';
 
-import 'game_basic_info.dart';
-import 'head_to_head.dart';
-import 'last_meeting.dart';
-import 'lineups.dart';
+import 'components/game_basic_info.dart';
+import 'components/head_to_head.dart';
+import 'components/inactives.dart';
+import 'components/last_meeting.dart';
+import 'components/lineups.dart';
+import 'components/team_season_stats.dart';
 
-class GameSummary extends StatefulWidget {
+class GameMatchup extends StatefulWidget {
   final Map<String, dynamic> game;
   final String homeId;
   final String awayId;
-  const GameSummary(
+  const GameMatchup(
       {super.key, required this.game, required this.homeId, required this.awayId});
 
   @override
-  State<GameSummary> createState() => _GameSummaryState();
+  State<GameMatchup> createState() => _GameMatchupState();
 }
 
-class _GameSummaryState extends State<GameSummary> {
+class _GameMatchupState extends State<GameMatchup> {
   late Map<String, dynamic> summary;
   late List<dynamic> linescore;
   late Map<String, dynamic> homeLinescore;
@@ -45,6 +46,10 @@ class _GameSummaryState extends State<GameSummary> {
               [
                 GameBasicInfo(game: widget.game),
                 Lineups(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
+                Inactives(
+                    inactivePlayers: widget.game['SUMMARY']['InactivePlayers'],
+                    homeId: widget.homeId,
+                    awayId: widget.awayId),
                 H2H(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
                 LastMeeting(
                     lastMeeting: widget.game['SUMMARY']['LastMeeting'][0],

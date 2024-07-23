@@ -216,7 +216,7 @@ class HalfCourtPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white10
+      ..color = Colors.grey.shade800
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 

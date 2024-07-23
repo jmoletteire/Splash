@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../utilities/constants.dart';
+import '../../../../utilities/constants.dart';
 
 class H2H extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -104,11 +104,13 @@ class ComparisonBar extends StatelessWidget {
                           topLeft: Radius.circular(20.0),
                           bottomLeft: Radius.circular(20.0),
                         ),
-                        color: awayTeamColor,
+                        color: awayTeamPercentage > 0 ? awayTeamColor : homeTeamColor,
                       ),
                       child: Center(
                         child: Text(
-                          '${(awayTeamPercentage * 100).toStringAsFixed(1)}%',
+                          awayTeamPercentage > 0
+                              ? '${(awayTeamPercentage * 100).toStringAsFixed(1)}%'
+                              : '    ',
                           style: kBebasNormal.copyWith(fontSize: 15.0),
                         ),
                       ),
@@ -123,11 +125,13 @@ class ComparisonBar extends StatelessWidget {
                           topRight: Radius.circular(20.0),
                           bottomRight: Radius.circular(20.0),
                         ),
-                        color: homeTeamColor,
+                        color: homeTeamPercentage > 0 ? homeTeamColor : awayTeamColor,
                       ),
                       child: Center(
                         child: Text(
-                          '${(homeTeamPercentage * 100).toStringAsFixed(1)}%',
+                          homeTeamPercentage > 0
+                              ? '${(homeTeamPercentage * 100).toStringAsFixed(1)}%'
+                              : '    ',
                           style: kBebasNormal.copyWith(fontSize: 15.0),
                         ),
                       ),

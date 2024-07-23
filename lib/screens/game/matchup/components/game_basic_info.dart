@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../utilities/constants.dart';
+import '../../../../utilities/constants.dart';
 
 class GameBasicInfo extends StatelessWidget {
   const GameBasicInfo({
@@ -65,17 +65,21 @@ class GameBasicInfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 22.0,
+        Wrap(
+          children: [
+            Icon(
+              icon,
+              size: 22.0,
+            ),
+            const SizedBox(width: 15.0),
+            ...List.generate(data.length, (index) {
+              return Text(
+                index != data.length - 1 ? '${data[index]}, ' : data[index],
+                style: kBebasNormal.copyWith(fontSize: 16.0),
+              );
+            }),
+          ],
         ),
-        const SizedBox(width: 15.0),
-        ...List.generate(data.length, (index) {
-          return Text(
-            index != data.length - 1 ? '${data[index]}, ' : data[index],
-            style: kBebasNormal.copyWith(fontSize: 16.0),
-          );
-        }),
       ],
     );
   }

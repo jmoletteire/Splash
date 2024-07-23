@@ -12,7 +12,7 @@ import '../search_screen.dart';
 import '../team/team_home.dart';
 import 'boxscore/game_boxscore.dart';
 import 'game_cache.dart';
-import 'summary/game_summary.dart';
+import 'matchup/game_matchup.dart';
 
 class GameHome extends StatefulWidget {
   static const String id = 'game_home';
@@ -150,7 +150,7 @@ class _GameHomeState extends State<GameHome> with SingleTickerProviderStateMixin
           required String homeId,
           required String awayId})> _gamePages = [
     ({required Map<String, dynamic> game, required String homeId, required String awayId}) =>
-        GameSummary(
+        GameMatchup(
           game: game,
           homeId: homeId,
           awayId: awayId,
@@ -297,7 +297,7 @@ class _GameHomeState extends State<GameHome> with SingleTickerProviderStateMixin
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
                 labelStyle: kBebasNormal,
-                tabs: const [Tab(text: 'Summary'), Tab(text: 'Box Score')],
+                tabs: const [Tab(text: 'Matchup'), Tab(text: 'Box Score')],
               ),
               actions: [
                 CustomIconButton(

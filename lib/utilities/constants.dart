@@ -20,12 +20,6 @@ const kGameCardTextStyle = TextStyle(
   fontFamily: 'Bebas_Neue',
   fontSize: 15.0,
   fontWeight: FontWeight.bold,
-);
-
-const kBebasWhite = TextStyle(
-  color: Colors.white,
-  fontFamily: 'Bebas_Neue',
-  fontSize: 16.0,
   textBaseline: TextBaseline.alphabetic,
 );
 
