@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:splash/utilities/constants.dart';
 
-import '../screens/game/game_home.dart';
+import 'game_home.dart';
 
 class GameCard extends StatefulWidget {
   final Map<String, dynamic> game;

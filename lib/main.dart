@@ -18,7 +18,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => DatesProvider()..fetchDates()),
       ],
-      child: Splash(),
+      child: const Splash(),
     ),
   );
 }
@@ -37,7 +37,7 @@ class Splash extends StatelessWidget {
           bodyMedium: const TextStyle(fontSize: 18.0),
         ),
       ),
-      home: TapStatusBarToScroll(child: TabHomeScreen()),
+      home: TapStatusBarToScroll(child: const TabHomeScreen()),
     );
   }
 }

@@ -18,13 +18,17 @@ class BoxTeamStats extends StatefulWidget {
 class _BoxTeamStatsState extends State<BoxTeamStats> {
   List columnNames = [
     'TEAM',
-    '+/-',
+    'POSS',
     'PTS',
     'REB',
     'AST',
     'STL',
     'BLK',
     'TOV',
+    '+/-',
+    'ORTG',
+    'DRTG',
+    'NRTG',
     'FGM',
     'FGA',
     'FG%',
@@ -63,11 +67,11 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
           freezePriority: 1,
         ),
 
-        /// +/-
+        /// POSS
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
 
         /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
 
         /// REB
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
@@ -83,6 +87,18 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
 
         /// TOV
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+
+        /// +/-
+        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+
+        /// ORTG
+        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+
+        /// DRTG
+        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+
+        /// NRTG
+        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
 
         /// FGM
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
@@ -202,21 +218,28 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
       Map<String, dynamic> playerSeasons, int row, int column, BuildContext context) {
     switch (column) {
       case 0:
-        return Center(
-          child: Text(
-            '${widget.teams[row]['TEAM_ABBREVIATION']}',
-            textAlign: TextAlign.start,
-            overflow: TextOverflow.ellipsis,
-            style: kBebasNormal.copyWith(
-              color: Colors.white70,
-              fontSize: 19.0,
+        return Row(
+          children: [
+            Text(
+              '${widget.teams[row]['TEAM_ABBREVIATION']}',
+              textAlign: TextAlign.start,
+              overflow: TextOverflow.ellipsis,
+              style: kBebasNormal.copyWith(
+                color: Colors.grey.shade200,
+                fontSize: 19.0,
+              ),
             ),
-          ),
+            const SizedBox(width: 8.0),
+            Image.asset(
+              'images/NBA_Logos/${widget.teams[row]['TEAM_ID']}.png',
+              width: 18.0,
+              height: 18.0,
+            )
+          ],
         );
       case 1:
         try {
-          return BoxscoreDataText(
-              text: '${widget.teams[row]['PLUS_MINUS'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.teams[row]['POSS'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -258,55 +281,83 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
         }
       case 8:
         try {
-          return BoxscoreDataText(text: '${widget.teams[row]['FGM'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text: '${widget.teams[row]['PLUS_MINUS'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 9:
         try {
-          return BoxscoreDataText(text: '${widget.teams[row]['FGA'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text: '${widget.teams[row]['OFF_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 10:
         try {
           return BoxscoreDataText(
-              text: '${(widget.teams[row]['FG_PCT'] * 100).toStringAsFixed(1)}%');
+              text: '${widget.teams[row]['DEF_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 11:
         try {
-          return BoxscoreDataText(text: '${widget.teams[row]['FG3M'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text: '${widget.teams[row]['NET_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 12:
         try {
-          return BoxscoreDataText(text: '${widget.teams[row]['FG3A'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.teams[row]['FGM'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 13:
+        try {
+          return BoxscoreDataText(text: '${widget.teams[row]['FGA'].toStringAsFixed(0)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 14:
+        try {
+          return BoxscoreDataText(
+              text: '${(widget.teams[row]['FG_PCT'] * 100).toStringAsFixed(1)}%');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 15:
+        try {
+          return BoxscoreDataText(text: '${widget.teams[row]['FG3M'].toStringAsFixed(0)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 16:
+        try {
+          return BoxscoreDataText(text: '${widget.teams[row]['FG3A'].toStringAsFixed(0)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 17:
         try {
           return BoxscoreDataText(
               text: '${(widget.teams[row]['FG3_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 14:
+      case 18:
         try {
           return BoxscoreDataText(text: '${widget.teams[row]['FTM'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 15:
+      case 19:
         try {
           return BoxscoreDataText(text: '${widget.teams[row]['FTA'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 16:
+      case 20:
         try {
           return BoxscoreDataText(
               text: '${(widget.teams[row]['FT_PCT'] * 100).toStringAsFixed(1)}%');

@@ -10,33 +10,40 @@ import '../../player/player_home.dart';
 
 class BoxPlayerStats extends StatefulWidget {
   final List<dynamic> players;
-  const BoxPlayerStats({super.key, required this.players});
+  final String playerGroup;
+  const BoxPlayerStats({super.key, required this.players, required this.playerGroup});
 
   @override
   State<BoxPlayerStats> createState() => _BoxPlayerStatsState();
 }
 
 class _BoxPlayerStatsState extends State<BoxPlayerStats> {
-  List columnNames = [
-    'PLAYER',
-    'POS',
-    '+/-',
-    'PTS',
-    'REB',
-    'AST',
-    'STL',
-    'BLK',
-    'TOV',
-    'FGM',
-    'FGA',
-    'FG%',
-    '3PM',
-    '3PA',
-    '3P%',
-    'FTM',
-    'FTA',
-    'FT%',
-  ];
+  List columnNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    columnNames = [
+      widget.playerGroup,
+      'POS',
+      'POSS',
+      'MIN',
+      'PTS',
+      'REB',
+      'AST',
+      'STL',
+      'BLK',
+      'TOV',
+      'USG%',
+      '+/-',
+      'FG',
+      'FG%',
+      '3P',
+      '3P%',
+      'FT',
+      'FT%',
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,11 +75,14 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         /// START
         TableColumn(width: MediaQuery.of(context).size.width * 0.08),
 
-        /// +/-
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        /// POSS
+        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+
+        /// MIN
+        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
 
         /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
 
         /// REB
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
@@ -89,29 +99,26 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         /// TOV
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
 
-        /// FGM
+        /// USG%
+        TableColumn(width: MediaQuery.of(context).size.width * 0.145),
+
+        /// +/-
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
 
-        /// FGA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        /// FGM - FGA
+        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
 
         /// FG%
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
 
-        /// 3PM
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
-
-        /// 3PA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        /// 3PM - 3PA
+        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
 
         /// 3P%
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
 
-        /// FTM
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
-
-        /// FTA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        /// FTM - FTA
+        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
 
         /// FT%
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
@@ -244,94 +251,113 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         );
       case 2:
         try {
-          return BoxscoreDataText(
-              text: '${widget.players[row]['PLUS_MINUS'].toStringAsFixed(0)}');
+          return Container(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '${widget.players[row]['POSS']}',
+              style: kBebasNormal.copyWith(fontSize: 16.0),
+            ),
+          );
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 3:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['PTS'].toStringAsFixed(0)}');
+          return Container(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '${widget.players[row]['MIN'].replaceAll(RegExp(r'\..*?(?=:)'), '')}',
+              style: kBebasNormal.copyWith(fontSize: 16.0),
+            ),
+          );
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 4:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['REB'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['PTS'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 5:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['AST'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['REB'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 6:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['STL'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['AST'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 7:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['BLK'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['STL'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 8:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['TO'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['BLK'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 9:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['FGM'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['TO'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 10:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['FGA'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text: '${(widget.players[row]['USG_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 11:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['FG_PCT'] * 100).toStringAsFixed(1)}%');
+              text: '${widget.players[row]['PLUS_MINUS'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 12:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['FG3M'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${widget.players[row]['FGM'].toStringAsFixed(0)}-${widget.players[row]['FGA'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 13:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['FG3A'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text: '${(widget.players[row]['FG_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 14:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['FG3_PCT'] * 100).toStringAsFixed(1)}%');
+              text:
+                  '${widget.players[row]['FG3M'].toStringAsFixed(0)}-${widget.players[row]['FG3A'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 15:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['FTM'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text: '${(widget.players[row]['FG3_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 16:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['FTA'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${widget.players[row]['FTM'].toStringAsFixed(0)}-${widget.players[row]['FTA'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }

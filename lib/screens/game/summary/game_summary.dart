@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:splash/screens/game/summary/team_season_stats.dart';
 
 import 'game_basic_info.dart';
+import 'head_to_head.dart';
+import 'last_meeting.dart';
+import 'lineups.dart';
 
 class GameSummary extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -35,17 +38,26 @@ class _GameSummaryState extends State<GameSummary> {
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        SliverList(
-          delegate: SliverChildListDelegate(
-            [
-              GameBasicInfo(game: widget.game),
-              TeamSeasonStats(
-                season:
-                    '${summary['SEASON']}-${(int.parse(summary['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                homeId: widget.homeId,
-                awayId: widget.awayId,
-              )
-            ],
+        SliverPadding(
+          padding: const EdgeInsets.only(bottom: 50.0),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                GameBasicInfo(game: widget.game),
+                Lineups(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
+                H2H(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
+                LastMeeting(
+                    lastMeeting: widget.game['SUMMARY']['LastMeeting'][0],
+                    homeId: widget.homeId,
+                    awayId: widget.awayId),
+                TeamSeasonStats(
+                  season:
+                      '${summary['SEASON']}-${(int.parse(summary['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                  homeId: widget.homeId,
+                  awayId: widget.awayId,
+                )
+              ],
+            ),
           ),
         ),
       ],

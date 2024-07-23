@@ -39,7 +39,7 @@ class _GameHomeState extends State<GameHome> with SingleTickerProviderStateMixin
   late ScrollControllerNotifier _notifier;
   Map<String, dynamic> game = {};
   bool _showImages = false;
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   Map<int, double> _scrollPositions = {};
 
@@ -59,6 +59,9 @@ class _GameHomeState extends State<GameHome> with SingleTickerProviderStateMixin
   }
 
   Future<void> setValues(String gameId) async {
+    setState(() {
+      _isLoading = true;
+    });
     await getGame(gameId);
     setState(() {
       _isLoading = false;
@@ -166,6 +169,10 @@ class _GameHomeState extends State<GameHome> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const SpinningIcon();
+    }
+
     var summary = game['SUMMARY']['GameSummary'][0];
     var linescore = game['SUMMARY']['LineScore'];
 
@@ -175,156 +182,150 @@ class _GameHomeState extends State<GameHome> with SingleTickerProviderStateMixin
         linescore[0]['TEAM_ID'].toString() == widget.awayId ? linescore[0] : linescore[1];
 
     return Scaffold(
-      body: _isLoading
-          ? const Center(
-              child: SpinningIcon(
-                color: Colors.deepOrange,
+      body: NestedScrollView(
+        controller: _scrollController,
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              backgroundColor: Colors.grey.shade900,
+              pinned: true,
+              expandedHeight: MediaQuery.of(context).size.height * 0.28,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_showImages) ...[
+                    Image.asset(
+                      'images/NBA_Logos/${widget.awayId}.png',
+                      width: MediaQuery.of(context).size.width * 0.09,
+                    ),
+                    const SizedBox(width: 15.0),
+                    Text(
+                      awayLinescore['PTS'].toString(),
+                      style: kBebasBold.copyWith(
+                          fontSize: 20.0,
+                          color: awayLinescore['PTS'] > homeLinescore['PTS']
+                              ? Colors.white
+                              : (summary['GAME_STATUS_TEXT'] == 'Final'
+                                  ? Colors.grey
+                                  : Colors.white)),
+                    ),
+                    const SizedBox(width: 15.0),
+                    Text('-', style: kBebasBold.copyWith(fontSize: 20.0)),
+                    const SizedBox(width: 15.0),
+                    Text(
+                      homeLinescore['PTS'].toString(),
+                      style: kBebasBold.copyWith(
+                          fontSize: 20.0,
+                          color: homeLinescore['PTS'] > awayLinescore['PTS']
+                              ? Colors.white
+                              : (summary['GAME_STATUS_TEXT'] == 'Final'
+                                  ? Colors.grey
+                                  : Colors.white)),
+                    ),
+                    const SizedBox(width: 15.0),
+                    Image.asset(
+                      'images/NBA_Logos/${widget.homeId}.png',
+                      width: MediaQuery.of(context).size.width * 0.09,
+                    ),
+                  ],
+                ],
               ),
-            )
-          : NestedScrollView(
-              controller: _scrollController,
-              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                return [
-                  SliverAppBar(
-                    backgroundColor: Colors.grey.shade900,
-                    pinned: true,
-                    expandedHeight: MediaQuery.of(context).size.height * 0.28,
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (_showImages) ...[
-                          Image.asset(
-                            'images/NBA_Logos/${widget.awayId}.png',
-                            width: MediaQuery.of(context).size.width * 0.09,
-                          ),
-                          const SizedBox(width: 15.0),
-                          Text(
-                            awayLinescore['PTS'].toString(),
-                            style: kBebasBold.copyWith(
-                                fontSize: 20.0,
-                                color: awayLinescore['PTS'] > homeLinescore['PTS']
-                                    ? Colors.white
-                                    : (summary['GAME_STATUS_TEXT'] == 'Final'
-                                        ? Colors.grey
-                                        : Colors.white)),
-                          ),
-                          const SizedBox(width: 15.0),
-                          Text('-', style: kBebasBold.copyWith(fontSize: 20.0)),
-                          const SizedBox(width: 15.0),
-                          Text(
-                            homeLinescore['PTS'].toString(),
-                            style: kBebasBold.copyWith(
-                                fontSize: 20.0,
-                                color: homeLinescore['PTS'] > awayLinescore['PTS']
-                                    ? Colors.white
-                                    : (summary['GAME_STATUS_TEXT'] == 'Final'
-                                        ? Colors.grey
-                                        : Colors.white)),
-                          ),
-                          const SizedBox(width: 15.0),
-                          Image.asset(
-                            'images/NBA_Logos/${widget.homeId}.png',
-                            width: MediaQuery.of(context).size.width * 0.09,
-                          ),
+              centerTitle: true,
+              flexibleSpace: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Gradient mask to fade out the image towards the bottom
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          kTeamColors[kTeamNames[widget.awayId][1]]![
+                              'primaryColor']!, // Transparent at the top
+                          kTeamColors[kTeamNames[widget.homeId][1]]![
+                              'primaryColor']!, // Opaque at the bottom
                         ],
-                      ],
-                    ),
-                    centerTitle: true,
-                    flexibleSpace: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Gradient mask to fade out the image towards the bottom
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                kTeamColors[kTeamNames[widget.awayId][1]]![
-                                    'primaryColor']!, // Transparent at the top
-                                kTeamColors[kTeamNames[widget.homeId][1]]![
-                                    'primaryColor']!, // Opaque at the bottom
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: -MediaQuery.of(context).size.width * 0.5,
-                          child: Opacity(
-                            opacity: 0.97 -
-                                kTeamColorOpacity[kTeamNames[widget.awayId][1]]!['opacity']!,
-                            child: SvgPicture.asset(
-                              'images/NBA_Logos/${widget.awayId}.svg',
-                              width: MediaQuery.of(context).size.width / 1.1,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: -MediaQuery.of(context).size.width * 0.5,
-                          child: Opacity(
-                            opacity: 0.97 -
-                                kTeamColorOpacity[kTeamNames[widget.homeId][1]]!['opacity']!,
-                            child: SvgPicture.asset(
-                              'images/NBA_Logos/${widget.homeId}.svg',
-                              width: MediaQuery.of(context).size.width / 1.1,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
-                          child: FlexibleSpaceBar(
-                            centerTitle: true,
-                            background: GameInfo(
-                              gameSummary: summary,
-                              homeLinescore: homeLinescore,
-                              awayLinescore: awayLinescore,
-                              homeId: widget.homeId,
-                              awayId: widget.awayId,
-                            ),
-                            collapseMode: CollapseMode.pin,
-                          ),
-                        ),
-                      ],
-                    ),
-                    bottom: TabBar(
-                      controller: _tabController,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicatorColor: Colors.deepOrange,
-                      indicatorWeight: 3.0,
-                      unselectedLabelColor: Colors.grey,
-                      labelColor: Colors.white,
-                      labelStyle: kBebasNormal,
-                      tabs: const [Tab(text: 'Summary'), Tab(text: 'Box Score')],
-                    ),
-                    actions: [
-                      CustomIconButton(
-                        icon: Icons.search,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SearchScreen(),
-                            ),
-                          );
-                        },
                       ),
-                    ],
+                    ),
                   ),
-                ];
-              },
-              body: TabBarView(
-                controller: _tabController,
-                children: _gamePages.map((page) {
-                  return page(
-                    game: game,
-                    homeId: widget.homeId,
-                    awayId: widget.awayId,
-                  ); // Pass team object to each page
-                }).toList(),
+                  Positioned(
+                    left: -MediaQuery.of(context).size.width * 0.5,
+                    child: Opacity(
+                      opacity:
+                          0.97 - kTeamColorOpacity[kTeamNames[widget.awayId][1]]!['opacity']!,
+                      child: SvgPicture.asset(
+                        'images/NBA_Logos/${widget.awayId}.svg',
+                        width: MediaQuery.of(context).size.width / 1.1,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: -MediaQuery.of(context).size.width * 0.5,
+                    child: Opacity(
+                      opacity:
+                          0.97 - kTeamColorOpacity[kTeamNames[widget.homeId][1]]!['opacity']!,
+                      child: SvgPicture.asset(
+                        'images/NBA_Logos/${widget.homeId}.svg',
+                        width: MediaQuery.of(context).size.width / 1.1,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: FlexibleSpaceBar(
+                      centerTitle: true,
+                      background: GameInfo(
+                        gameSummary: summary,
+                        homeLinescore: homeLinescore,
+                        awayLinescore: awayLinescore,
+                        homeId: widget.homeId,
+                        awayId: widget.awayId,
+                      ),
+                      collapseMode: CollapseMode.pin,
+                    ),
+                  ),
+                ],
               ),
+              bottom: TabBar(
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorColor: Colors.deepOrange,
+                indicatorWeight: 3.0,
+                unselectedLabelColor: Colors.grey,
+                labelColor: Colors.white,
+                labelStyle: kBebasNormal,
+                tabs: const [Tab(text: 'Summary'), Tab(text: 'Box Score')],
+              ),
+              actions: [
+                CustomIconButton(
+                  icon: Icons.search,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
+          ];
+        },
+        body: TabBarView(
+          controller: _tabController,
+          children: _gamePages.map((page) {
+            return page(
+              game: game,
+              homeId: widget.homeId,
+              awayId: widget.awayId,
+            ); // Pass team object to each page
+          }).toList(),
+        ),
+      ),
     );
   }
 }

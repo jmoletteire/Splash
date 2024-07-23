@@ -17,7 +17,7 @@ class GameBoxScore extends StatefulWidget {
 
 class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMixin {
   late TabController _boxscoreTabController;
-  ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
+  final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
   late Map<String, dynamic> gameBoxscore;
   late Map<String, dynamic> gameAdv;
 
@@ -78,9 +78,6 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
       children: [
         TabBar.secondary(
           controller: _boxscoreTabController,
-          //indicatorSize: TabBarIndicatorSize.tab,
-          //indicatorColor: Colors.deepOrange,
-          //indicatorWeight: 3.0,
           indicator: CustomTabIndicator(
               controller: _boxscoreTabController,
               homeTeam: homePlayerStats[0]['TEAM_ABBREVIATION'],
@@ -101,17 +98,60 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           ],
         ),
         Expanded(
-          child: TabBarView(
-            controller: _boxscoreTabController,
-            children: [
-              CustomScrollView(slivers: [BoxPlayerStats(players: awayPlayerStats)]),
-              CustomScrollView(slivers: [BoxTeamStats(teams: teamStats)]),
-              CustomScrollView(slivers: [BoxPlayerStats(players: homePlayerStats)]),
-            ],
+          child: ScrollConfiguration(
+            behavior: MyCustomScrollBehavior(),
+            child: TabBarView(
+              controller: _boxscoreTabController,
+              children: [
+                CustomScrollView(slivers: [
+                  BoxPlayerStats(
+                    players: awayPlayerStats.sublist(0, 5),
+                    playerGroup: 'STARTERS',
+                  ),
+                  BoxPlayerStats(
+                    players: awayPlayerStats.sublist(5),
+                    playerGroup: 'BENCH',
+                  ),
+                ]),
+                CustomScrollView(slivers: [BoxTeamStats(teams: teamStats)]),
+                CustomScrollView(slivers: [
+                  BoxPlayerStats(
+                    players: homePlayerStats.sublist(0, 5),
+                    playerGroup: 'STARTERS',
+                  ),
+                  BoxPlayerStats(
+                    players: homePlayerStats.sublist(5),
+                    playerGroup: 'BENCH',
+                  ),
+                ]),
+              ],
+            ),
           ),
         ),
       ],
     );
+  }
+}
+
+class MyCustomScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails axisDirection) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return CustomScrollPhysics();
+  }
+}
+
+class CustomScrollPhysics extends ClampingScrollPhysics {
+  CustomScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
+
+  @override
+  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return CustomScrollPhysics(parent: buildParent(ancestor));
   }
 }
 

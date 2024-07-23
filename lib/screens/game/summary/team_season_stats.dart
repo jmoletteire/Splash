@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../utilities/constants.dart';
 import '../../../utilities/team.dart';
@@ -23,8 +24,11 @@ class TeamSeasonStats extends StatefulWidget {
 }
 
 class _TeamSeasonStatsState extends State<TeamSeasonStats> {
-  late Map<String, dynamic> homeTeam;
-  late Map<String, dynamic> awayTeam;
+  Map<String, dynamic>? homeTeam;
+  Map<String, dynamic>? awayTeam;
+  Color homeTeamColor = Colors.transparent;
+  Color awayTeamColor = Colors.transparent;
+  bool _isLoading = true;
 
   Future<Map<String, dynamic>> getTeam(String teamId) async {
     final teamCache = Provider.of<TeamCache>(context, listen: false);
@@ -45,6 +49,20 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
     setState(() {
       homeTeam = teams[0];
       awayTeam = teams[1];
+
+      if (awayTeam != null && awayTeam!.isNotEmpty) {
+        awayTeamColor = kDarkPrimaryColors.contains(awayTeam!['ABBREVIATION'])
+            ? (kTeamColors[awayTeam!['ABBREVIATION']]!['secondaryColor']!)
+            : (kTeamColors[awayTeam!['ABBREVIATION']]!['primaryColor']!);
+      }
+
+      if (homeTeam != null && homeTeam!.isNotEmpty) {
+        homeTeamColor = kDarkPrimaryColors.contains(homeTeam!['ABBREVIATION'])
+            ? (kTeamColors[homeTeam!['ABBREVIATION']]!['secondaryColor']!)
+            : (kTeamColors[homeTeam!['ABBREVIATION']]!['primaryColor']!);
+      }
+
+      _isLoading = false;
     });
   }
 
@@ -61,197 +79,202 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
 
   @override
   Widget build(BuildContext context) {
-    Color awayTeamColor = kDarkPrimaryColors.contains(awayTeam['ABBREVIATION'])
-        ? (kTeamColors[awayTeam['ABBREVIATION']]!['secondaryColor']!)
-        : (kTeamColors[awayTeam['ABBREVIATION']]!['primaryColor']!);
-
-    Color homeTeamColor = Colors.transparent;
-    if (homeTeam.isNotEmpty) {
-      homeTeamColor = kDarkPrimaryColors.contains(homeTeam['ABBREVIATION'])
-          ? (kTeamColors[homeTeam['ABBREVIATION']]!['secondaryColor']!)
-          : (kTeamColors[homeTeam['ABBREVIATION']]!['primaryColor']!);
-    }
-
-    return Card(
-      margin: const EdgeInsets.fromLTRB(11.0, 0.0, 11.0, 11.0),
-      color: Colors.grey.shade900,
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          children: [
-            Text(
-              'Season Stats',
-              style: kBebasNormal,
+    return Skeletonizer(
+      enabled: _isLoading,
+      effect: const ShimmerEffect(
+          baseColor: Colors.grey,
+          highlightColor: Colors.white,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          duration: Duration(seconds: 1)),
+      child: _isLoading || homeTeam == null || awayTeam == null
+          ? Container(
+              height: 300.0, // or whatever height your skeleton should be
+              color: Colors.grey.shade900,
+            )
+          : Card(
+              margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
+              color: Colors.grey.shade900,
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Season Stats',
+                      style: kBebasBold,
+                    ),
+                    const SizedBox(height: 10.0),
+                    ComparisonRow(
+                      statName: 'ORTG',
+                      awayTeam: roundToDecimalPlaces(
+                          awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                              ['OFF_RATING'],
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                              ['OFF_RATING'],
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 5.0),
+                    ComparisonRow(
+                      statName: 'DRTG',
+                      awayTeam: roundToDecimalPlaces(
+                          awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                              ['DEF_RATING'],
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                              ['DEF_RATING'],
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 5.0),
+                    ComparisonRow(
+                      statName: 'NRTG',
+                      awayTeam: roundToDecimalPlaces(
+                          awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                              ['NET_RATING'],
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                              ['NET_RATING'],
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 5.0),
+                    ComparisonRow(
+                      statName: 'PACE',
+                      awayTeam: roundToDecimalPlaces(
+                          awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                              ['PACE'],
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                              ['PACE'],
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 15.0),
+                    ComparisonRow(
+                      statName: 'FG%',
+                      awayTeam: roundToDecimalPlaces(
+                          (awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['BASIC']['FG_PCT'] *
+                              100),
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          (homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['BASIC']['FG_PCT'] *
+                              100),
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 5.0),
+                    ComparisonRow(
+                      statName: '3P%',
+                      awayTeam: roundToDecimalPlaces(
+                          (awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['BASIC']['FG3_PCT'] *
+                              100),
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          (homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['BASIC']['FG3_PCT'] *
+                              100),
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 5.0),
+                    ComparisonRow(
+                      statName: 'FT%',
+                      awayTeam: roundToDecimalPlaces(
+                          (awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['BASIC']['FT_PCT'] *
+                              100),
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          (homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['BASIC']['FT_PCT'] *
+                              100),
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 15.0),
+                    ComparisonRow(
+                      statName: 'EFG%',
+                      awayTeam: roundToDecimalPlaces(
+                          (awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['ADV']['EFG_PCT'] *
+                              100),
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          (homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['ADV']['EFG_PCT'] *
+                              100),
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 5.0),
+                    ComparisonRow(
+                      statName: 'TS%',
+                      awayTeam: roundToDecimalPlaces(
+                          (awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['ADV']['TS_PCT'] *
+                              100),
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          (homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']
+                                  ['ADV']['TS_PCT'] *
+                              100),
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 5.0),
+                    ComparisonRow(
+                      statName: 'OREB%',
+                      awayTeam: roundToDecimalPlaces(
+                          awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                  ['OREB_PCT'] *
+                              100,
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                  ['OREB_PCT'] *
+                              100,
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                    const SizedBox(height: 5.0),
+                    ComparisonRow(
+                      statName: 'TOV%',
+                      awayTeam: roundToDecimalPlaces(
+                          awayTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                  ['TM_TOV_PCT'] *
+                              100,
+                          1),
+                      homeTeam: roundToDecimalPlaces(
+                          homeTeam?['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                  ['TM_TOV_PCT'] *
+                              100,
+                          1),
+                      awayTeamColor: awayTeamColor,
+                      homeTeamColor: homeTeamColor,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 10.0),
-            ComparisonRow(
-              statName: 'ORTG',
-              awayTeam: roundToDecimalPlaces(
-                  awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['OFF_RATING'],
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['OFF_RATING'],
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 5.0),
-            ComparisonRow(
-              statName: 'DRTG',
-              awayTeam: roundToDecimalPlaces(
-                  awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['DEF_RATING'],
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['DEF_RATING'],
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 5.0),
-            ComparisonRow(
-              statName: 'NRTG',
-              awayTeam: roundToDecimalPlaces(
-                  awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['NET_RATING'],
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['NET_RATING'],
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 5.0),
-            ComparisonRow(
-              statName: 'PACE',
-              awayTeam: roundToDecimalPlaces(
-                  awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']['PACE'],
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']['PACE'],
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 15.0),
-            ComparisonRow(
-              statName: 'FG%',
-              awayTeam: roundToDecimalPlaces(
-                  (awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                          ['FG_PCT'] *
-                      100),
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  (homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                          ['FG_PCT'] *
-                      100),
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 5.0),
-            ComparisonRow(
-              statName: '3P%',
-              awayTeam: roundToDecimalPlaces(
-                  (awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                          ['FG3_PCT'] *
-                      100),
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  (homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                          ['FG3_PCT'] *
-                      100),
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 5.0),
-            ComparisonRow(
-              statName: 'FT%',
-              awayTeam: roundToDecimalPlaces(
-                  (awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                          ['FT_PCT'] *
-                      100),
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  (homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                          ['FT_PCT'] *
-                      100),
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 15.0),
-            ComparisonRow(
-              statName: 'EFG%',
-              awayTeam: roundToDecimalPlaces(
-                  (awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                          ['EFG_PCT'] *
-                      100),
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  (homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                          ['EFG_PCT'] *
-                      100),
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 5.0),
-            ComparisonRow(
-              statName: 'TS%',
-              awayTeam: roundToDecimalPlaces(
-                  (awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                          ['TS_PCT'] *
-                      100),
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  (homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                          ['TS_PCT'] *
-                      100),
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 5.0),
-            ComparisonRow(
-              statName: 'OREB%',
-              awayTeam: roundToDecimalPlaces(
-                  awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                          ['OREB_PCT'] *
-                      100,
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                          ['OREB_PCT'] *
-                      100,
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-            const SizedBox(height: 5.0),
-            ComparisonRow(
-              statName: 'TOV%',
-              awayTeam: roundToDecimalPlaces(
-                  awayTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                          ['TM_TOV_PCT'] *
-                      100,
-                  1),
-              homeTeam: roundToDecimalPlaces(
-                  homeTeam['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                          ['TM_TOV_PCT'] *
-                      100,
-                  1),
-              awayTeamColor: awayTeamColor,
-              homeTeamColor: homeTeamColor,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

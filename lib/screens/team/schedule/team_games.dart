@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../utilities/constants.dart';
+import '../../game/game_home.dart';
 
 class TeamGames extends StatefulWidget {
   final ScrollController scrollController;
@@ -225,7 +226,22 @@ class _TeamGamesState extends State<TeamGames> {
 
                   // Define the main container to return
                   Widget gameContainer = GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameHome(
+                            gameId: gamesList[index].toString(),
+                            homeId: teamGames[gamesList[index]]['HOME_AWAY'] == 'vs'
+                                ? widget.team['TEAM_ID'].toString()
+                                : teamGames[gamesList[index]]['OPP'].toString(),
+                            awayId: teamGames[gamesList[index]]['HOME_AWAY'] == '@'
+                                ? widget.team['TEAM_ID'].toString()
+                                : teamGames[gamesList[index]]['OPP'].toString(),
+                          ),
+                        ),
+                      );
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
                       height: MediaQuery.sizeOf(context).height * 0.065,

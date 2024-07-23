@@ -18,7 +18,7 @@ class GameBasicInfo extends StatelessWidget {
     }
 
     return Card(
-      margin: const EdgeInsets.all(11.0),
+      margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
       color: Colors.grey.shade900,
       child: Padding(
         padding: const EdgeInsets.all(15.0),

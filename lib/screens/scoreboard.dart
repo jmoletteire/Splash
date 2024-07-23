@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:splash/components/game_card.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
+import 'package:splash/screens/game/game_card.dart';
 import 'package:splash/screens/search_screen.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/nba_api/library/network.dart';

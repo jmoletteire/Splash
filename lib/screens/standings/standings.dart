@@ -24,7 +24,7 @@ class Standings extends StatefulWidget {
 class _StandingsState extends State<Standings> {
   List<Map<String, dynamic>> eastTeams = [];
   List<Map<String, dynamic>> westTeams = [];
-  bool isLoading = true;
+  bool _isLoading = true;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
 
@@ -96,7 +96,7 @@ class _StandingsState extends State<Standings> {
 
   void setTeams() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
@@ -106,12 +106,12 @@ class _StandingsState extends State<Standings> {
       setState(() {
         eastTeams = fetchedEastTeams;
         westTeams = fetchedWestTeams;
-        isLoading = false;
+        _isLoading = false;
       });
     } catch (e) {
       print('Error in setTeams: $e');
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
@@ -139,7 +139,7 @@ class _StandingsState extends State<Standings> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
+    return _isLoading
         ? const Center(
             child: SpinningIcon(
               color: Colors.deepOrange,
