@@ -170,14 +170,16 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
               ComparisonRow(
                 statName: 'FG%',
                 awayTeam: roundToDecimalPlaces(
-                    (awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                            ['FG_PCT'] ??
-                        0.0 * 100),
+                    ((awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
+                                ['FG_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 homeTeam: roundToDecimalPlaces(
-                    (homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                            ['FG_PCT'] ??
-                        0.0 * 100),
+                    ((homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
+                                ['FG_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
@@ -186,14 +188,16 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
               ComparisonRow(
                 statName: '3P%',
                 awayTeam: roundToDecimalPlaces(
-                    (awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                            ['FG3_PCT'] ??
-                        0.0 * 100),
+                    ((awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
+                                ['FG3_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 homeTeam: roundToDecimalPlaces(
-                    (homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                            ['FG3_PCT'] ??
-                        0.0 * 100),
+                    ((homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
+                                ['FG3_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
@@ -202,14 +206,16 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
               ComparisonRow(
                 statName: 'FT%',
                 awayTeam: roundToDecimalPlaces(
-                    (awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                            ['FT_PCT'] ??
-                        0.0 * 100),
+                    ((awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
+                                ['FT_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 homeTeam: roundToDecimalPlaces(
-                    (homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
-                            ['FT_PCT'] ??
-                        0.0 * 100),
+                    ((homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['BASIC']
+                                ['FT_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
@@ -218,14 +224,16 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
               ComparisonRow(
                 statName: 'EFG%',
                 awayTeam: roundToDecimalPlaces(
-                    (awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
-                            ['EFG_PCT'] ??
-                        0.0 * 100),
+                    ((awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                ['EFG_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 homeTeam: roundToDecimalPlaces(
-                    (homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
-                            ['EFG_PCT'] ??
-                        0.0 * 100),
+                    ((homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                ['EFG_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
@@ -234,14 +242,16 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
               ComparisonRow(
                 statName: 'TS%',
                 awayTeam: roundToDecimalPlaces(
-                    (awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
-                            ['TS_PCT'] ??
-                        0.0 * 100),
+                    ((awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                ['TS_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 homeTeam: roundToDecimalPlaces(
-                    (homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
-                            ['TS_PCT'] ??
-                        0.0 * 100),
+                    ((homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                ['TS_PCT'] ??
+                            0.0) *
+                        100),
                     1),
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
@@ -250,14 +260,16 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
               ComparisonRow(
                 statName: 'OREB%',
                 awayTeam: roundToDecimalPlaces(
-                    awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
-                            ['OREB_PCT'] ??
-                        0.0 * 100,
+                    (awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                ['OREB_PCT'] ??
+                            0.0) *
+                        100,
                     1),
                 homeTeam: roundToDecimalPlaces(
-                    homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
-                            ['OREB_PCT'] ??
-                        0.0 * 100,
+                    (homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                ['OREB_PCT'] ??
+                            0.0) *
+                        100,
                     1),
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
@@ -266,14 +278,16 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
               ComparisonRow(
                 statName: 'TOV%',
                 awayTeam: roundToDecimalPlaces(
-                    awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
-                            ['TM_TOV_PCT'] ??
-                        0.0 * 100,
+                    (awayTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                ['TM_TOV_PCT'] ??
+                            0.0) *
+                        100,
                     1),
                 homeTeam: roundToDecimalPlaces(
-                    homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
-                            ['TM_TOV_PCT'] ??
-                        0.0 * 100,
+                    (homeTeam['seasons']?[widget.season]['STATS']['REGULAR SEASON']['ADV']
+                                ['TM_TOV_PCT'] ??
+                            0.0) *
+                        100,
                     1),
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,

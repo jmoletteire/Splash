@@ -11,7 +11,13 @@ import '../../player/player_home.dart';
 class BoxPlayerStats extends StatefulWidget {
   final List<dynamic> players;
   final String playerGroup;
-  const BoxPlayerStats({super.key, required this.players, required this.playerGroup});
+  final ScrollController controller;
+  const BoxPlayerStats({
+    super.key,
+    required this.players,
+    required this.playerGroup,
+    required this.controller,
+  });
 
   @override
   State<BoxPlayerStats> createState() => _BoxPlayerStatsState();
@@ -48,6 +54,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
   @override
   Widget build(BuildContext context) {
     return SliverTableView.builder(
+      horizontalScrollController: widget.controller,
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
           vertical: TableViewVerticalDividersStyle.symmetric(

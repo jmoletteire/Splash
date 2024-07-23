@@ -49,6 +49,7 @@ dependencies:
   webview_flutter: ^4.8.0
   dropdown_search: ^5.0.6
   skeletonizer: ^1.4.1+1
+  linked_scroll_controller: ^0.2.0
 
 dev_dependencies:
   flutter_test:

@@ -11,8 +11,12 @@ class GameMatchup extends StatefulWidget {
   final Map<String, dynamic> game;
   final String homeId;
   final String awayId;
-  const GameMatchup(
-      {super.key, required this.game, required this.homeId, required this.awayId});
+  const GameMatchup({
+    super.key,
+    required this.game,
+    required this.homeId,
+    required this.awayId,
+  });
 
   @override
   State<GameMatchup> createState() => _GameMatchupState();

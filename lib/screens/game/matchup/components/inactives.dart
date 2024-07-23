@@ -63,6 +63,7 @@ class _InactivesState extends State<Inactives> {
                   Text('None', style: kBebasNormal.copyWith(fontSize: 16.0))
               ],
             ),
+            const SizedBox(height: 8.0),
             Wrap(
               children: [
                 Text('${kTeamNames[widget.homeId][1]}:',
