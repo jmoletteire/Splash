@@ -24,10 +24,10 @@ import '../team/team_home.dart';
 
 class PlayerHome extends StatefulWidget {
   static const String id = 'player_home';
-  final String teamId;
+  final String? teamId;
   final String playerId;
 
-  const PlayerHome({super.key, required this.teamId, required this.playerId});
+  const PlayerHome({super.key, this.teamId, required this.playerId});
 
   @override
   State<PlayerHome> createState() => _PlayerHomeState();
@@ -75,11 +75,16 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
     }
   }
 
-  Future<void> setValues(String player, String teamId) async {
-    await Future.wait([
-      getPlayer(player),
-      getTeam(teamId),
-    ]);
+  Future<void> setValues(String playerId, String? teamId) async {
+    if (teamId != null) {
+      await Future.wait([
+        getPlayer(playerId),
+        getTeam(teamId),
+      ]);
+    } else {
+      await getPlayer(playerId);
+      await getTeam(player['TEAM_ID'].toString());
+    }
     setState(() {
       _isLoading = false;
     });

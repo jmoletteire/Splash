@@ -190,145 +190,146 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     Map<String, dynamic> awayLinescore =
         linescore[0]['TEAM_ID'].toString() == widget.awayId ? linescore[0] : linescore[1];
 
-    return NestedScrollView(
-      controller: _scrollController,
-      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-        return [
-          SliverAppBar(
-            backgroundColor: Colors.grey.shade900,
-            pinned: true,
-            expandedHeight: MediaQuery.of(context).size.height * 0.28,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (_showImages) ...[
-                  Image.asset(
-                    'images/NBA_Logos/${widget.awayId}.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+    return Scaffold(
+      body: NestedScrollView(
+        controller: _scrollController,
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              backgroundColor: Colors.grey.shade900,
+              pinned: true,
+              expandedHeight: MediaQuery.of(context).size.height * 0.28,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_showImages) ...[
+                    Image.asset(
+                      'images/NBA_Logos/${widget.awayId}.png',
+                      width: MediaQuery.of(context).size.width * 0.09,
+                    ),
+                    const SizedBox(width: 15.0),
+                    Text(
+                      awayLinescore['PTS'].toString(),
+                      style: kBebasBold.copyWith(
+                          fontSize: 24.0,
+                          color: awayLinescore['PTS'] > homeLinescore['PTS']
+                              ? Colors.white
+                              : (summary['GAME_STATUS_TEXT'] == 'Final'
+                                  ? Colors.grey
+                                  : Colors.white)),
+                    ),
+                    const SizedBox(width: 15.0),
+                    Text('-', style: kBebasBold.copyWith(fontSize: 24.0)),
+                    const SizedBox(width: 15.0),
+                    Text(
+                      homeLinescore['PTS'].toString(),
+                      style: kBebasBold.copyWith(
+                          fontSize: 24.0,
+                          color: homeLinescore['PTS'] > awayLinescore['PTS']
+                              ? Colors.white
+                              : (summary['GAME_STATUS_TEXT'] == 'Final'
+                                  ? Colors.grey
+                                  : Colors.white)),
+                    ),
+                    const SizedBox(width: 15.0),
+                    Image.asset(
+                      'images/NBA_Logos/${widget.homeId}.png',
+                      width: MediaQuery.of(context).size.width * 0.09,
+                    ),
+                  ],
+                ],
+              ),
+              centerTitle: true,
+              flexibleSpace: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Gradient mask to fade out the image towards the bottom
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          kTeamColors[kTeamNames[widget.awayId][1]]![
+                              'primaryColor']!, // Transparent at the top
+                          kTeamColors[kTeamNames[widget.homeId][1]]![
+                              'primaryColor']!, // Opaque at the bottom
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 15.0),
-                  Text(
-                    awayLinescore['PTS'].toString(),
-                    style: kBebasBold.copyWith(
-                        fontSize: 24.0,
-                        color: awayLinescore['PTS'] > homeLinescore['PTS']
-                            ? Colors.white
-                            : (summary['GAME_STATUS_TEXT'] == 'Final'
-                                ? Colors.grey
-                                : Colors.white)),
+                  Positioned(
+                    left: -MediaQuery.of(context).size.width * 0.5,
+                    child: Opacity(
+                      opacity:
+                          0.97 - kTeamColorOpacity[kTeamNames[widget.awayId][1]]!['opacity']!,
+                      child: SvgPicture.asset(
+                        'images/NBA_Logos/${widget.awayId}.svg',
+                        width: MediaQuery.of(context).size.width / 1.1,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 15.0),
-                  Text('-', style: kBebasBold.copyWith(fontSize: 24.0)),
-                  const SizedBox(width: 15.0),
-                  Text(
-                    homeLinescore['PTS'].toString(),
-                    style: kBebasBold.copyWith(
-                        fontSize: 24.0,
-                        color: homeLinescore['PTS'] > awayLinescore['PTS']
-                            ? Colors.white
-                            : (summary['GAME_STATUS_TEXT'] == 'Final'
-                                ? Colors.grey
-                                : Colors.white)),
+                  Positioned(
+                    right: -MediaQuery.of(context).size.width * 0.5,
+                    child: Opacity(
+                      opacity:
+                          0.97 - kTeamColorOpacity[kTeamNames[widget.homeId][1]]!['opacity']!,
+                      child: SvgPicture.asset(
+                        'images/NBA_Logos/${widget.homeId}.svg',
+                        width: MediaQuery.of(context).size.width / 1.1,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 15.0),
-                  Image.asset(
-                    'images/NBA_Logos/${widget.homeId}.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: FlexibleSpaceBar(
+                      background: GameInfo(
+                        gameSummary: summary,
+                        homeLinescore: homeLinescore,
+                        awayLinescore: awayLinescore,
+                        homeId: widget.homeId,
+                        awayId: widget.awayId,
+                      ),
+                      collapseMode: CollapseMode.pin,
+                    ),
                   ),
                 ],
-              ],
-            ),
-            centerTitle: true,
-            flexibleSpace: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Gradient mask to fade out the image towards the bottom
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        kTeamColors[kTeamNames[widget.awayId][1]]![
-                            'primaryColor']!, // Transparent at the top
-                        kTeamColors[kTeamNames[widget.homeId][1]]![
-                            'primaryColor']!, // Opaque at the bottom
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: -MediaQuery.of(context).size.width * 0.5,
-                  child: Opacity(
-                    opacity:
-                        0.97 - kTeamColorOpacity[kTeamNames[widget.awayId][1]]!['opacity']!,
-                    child: SvgPicture.asset(
-                      'images/NBA_Logos/${widget.awayId}.svg',
-                      width: MediaQuery.of(context).size.width / 1.1,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: -MediaQuery.of(context).size.width * 0.5,
-                  child: Opacity(
-                    opacity:
-                        0.97 - kTeamColorOpacity[kTeamNames[widget.homeId][1]]!['opacity']!,
-                    child: SvgPicture.asset(
-                      'images/NBA_Logos/${widget.homeId}.svg',
-                      width: MediaQuery.of(context).size.width / 1.1,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 15.0),
-                  child: FlexibleSpaceBar(
-                    centerTitle: true,
-                    background: GameInfo(
-                      gameSummary: summary,
-                      homeLinescore: homeLinescore,
-                      awayLinescore: awayLinescore,
-                      homeId: widget.homeId,
-                      awayId: widget.awayId,
-                    ),
-                    collapseMode: CollapseMode.pin,
-                  ),
-                ),
-              ],
-            ),
-            bottom: TabBar(
-              controller: _tabController,
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicatorColor: Colors.white70,
-              indicatorWeight: 3.0,
-              unselectedLabelColor: Colors.grey,
-              labelColor: Colors.white,
-              labelStyle: kBebasNormal,
-              tabs: const [Tab(text: 'Matchup'), Tab(text: 'Box Score')],
-            ),
-            actions: [
-              CustomIconButton(
-                icon: Icons.search,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SearchScreen(),
-                    ),
-                  );
-                },
               ),
-            ],
-          ),
-        ];
-      },
-      body: TabBarView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        controller: _tabController,
-        children: _gamePages.map((page) {
-          return page(game: game, homeId: widget.homeId, awayId: widget.awayId);
-        }).toList(),
+              bottom: TabBar(
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorColor: Colors.white70,
+                indicatorWeight: 3.0,
+                unselectedLabelColor: Colors.grey,
+                labelColor: Colors.white,
+                labelStyle: kBebasNormal,
+                tabs: const [Tab(text: 'Matchup'), Tab(text: 'Box Score')],
+              ),
+              actions: [
+                CustomIconButton(
+                  icon: Icons.search,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ];
+        },
+        body: TabBarView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          controller: _tabController,
+          children: _gamePages.map((page) {
+            return page(game: game, homeId: widget.homeId, awayId: widget.awayId);
+          }).toList(),
+        ),
       ),
     );
   }
@@ -375,15 +376,69 @@ class GameInfo extends StatelessWidget {
     }
   }
 
+  Widget gameTitle(String gameId) {
+    String seasonTypeCode = gameId[2];
+
+    Map<String, String> seasonTypes = {
+      '1': 'Pre-Season',
+      '2': 'Regular Season',
+      '4': 'Playoffs',
+      '5': 'Play-In',
+      '6': 'In-Season Tournament',
+    };
+
+    switch (seasonTypes[seasonTypeCode]) {
+      case 'Playoffs':
+        String gameNum = gameId[9];
+        String conf;
+        String roundId = gameId[7];
+
+        switch (roundId) {
+          case '1':
+            conf = int.parse(gameId[8]) < 4 ? 'East' : 'West';
+          case '2':
+            conf = int.parse(gameId[8]) < 2 ? 'East' : 'West';
+          case '3':
+            conf = gameId[8] == '0' ? 'East' : 'West';
+          default:
+            conf = '';
+        }
+
+        Map<String, String> poRounds = {
+          '1': '1st Round',
+          '2': 'Semis',
+          '3': 'Conf Finals',
+          '4': 'NBA Finals',
+        };
+
+        return Text('Game $gameNum - $conf ${poRounds[roundId]}',
+            style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+      case 'Play-In':
+        return Text('Play-In Tourney',
+            style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+      case 'In-Season Tournament':
+        return Text('Emirates NBA Cup Final',
+            style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+      default:
+        return const Text('');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.center,
       children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            gameTitle(gameSummary['GAME_ID']),
+            SizedBox(height: MediaQuery.sizeOf(context).height / 7)
+          ],
+        ),
         Padding(
           padding: const EdgeInsets.all(15.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               GestureDetector(
                 onTap: () {
@@ -424,7 +479,12 @@ class GameInfo extends StatelessWidget {
                             : Colors.white)),
               ),
               const Spacer(),
-              getStatus(gameSummary['GAME_STATUS_TEXT']),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  getStatus(gameSummary['GAME_STATUS_TEXT']),
+                ],
+              ),
               const Spacer(),
               Text(
                 homeLinescore['PTS'].toString(),

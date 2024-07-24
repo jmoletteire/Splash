@@ -63,24 +63,23 @@ class GameBasicInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Wrap(
-          children: [
-            Icon(
-              icon,
-              size: 22.0,
-            ),
-            const SizedBox(width: 15.0),
-            ...List.generate(data.length, (index) {
-              return Text(
-                index != data.length - 1 ? '${data[index]}, ' : data[index],
-                style: kBebasNormal.copyWith(fontSize: 16.0),
-              );
-            }),
-          ],
-        ),
-      ],
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Wrap(
+        children: [
+          Icon(
+            icon,
+            size: 22.0,
+          ),
+          const SizedBox(width: 15.0),
+          ...List.generate(data.length, (index) {
+            return Text(
+              index != data.length - 1 ? '${data[index]}, ' : data[index],
+              style: kBebasNormal.copyWith(fontSize: 16.0),
+            );
+          }),
+        ],
+      ),
     );
   }
 }

@@ -55,10 +55,11 @@ class _GameMatchupState extends State<GameMatchup> {
                     homeId: widget.homeId,
                     awayId: widget.awayId),
                 H2H(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
-                LastMeeting(
-                    lastMeeting: widget.game['SUMMARY']['LastMeeting'][0],
-                    homeId: widget.homeId,
-                    awayId: widget.awayId),
+                if (widget.game['SUMMARY']['LastMeeting'].isNotEmpty)
+                  LastMeeting(
+                      lastMeeting: widget.game['SUMMARY']['LastMeeting'][0],
+                      homeId: widget.homeId,
+                      awayId: widget.awayId),
                 TeamSeasonStats(
                   season:
                       '${summary['SEASON']}-${(int.parse(summary['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',

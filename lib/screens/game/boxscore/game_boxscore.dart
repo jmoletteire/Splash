@@ -3,7 +3,7 @@ import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:splash/screens/game/boxscore/box_player_stats.dart';
 import 'package:splash/utilities/constants.dart';
 
-import 'new_box_team_stats.dart';
+import 'box_team_stats.dart';
 
 class GameBoxScore extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -25,6 +25,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
   final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
   late Map<String, dynamic> gameBoxscore;
   late Map<String, dynamic> gameAdv;
+  late List<dynamic> gameOtherStats;
   late LinkedScrollControllerGroup _awayControllers;
   late LinkedScrollControllerGroup _homeControllers;
   late ScrollController _awayStartersController;
@@ -42,6 +43,8 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     super.initState();
     gameBoxscore = widget.game['BOXSCORE'];
     gameAdv = widget.game['ADV'];
+    gameOtherStats = widget.game['SUMMARY']['OtherStats'];
+
     _boxscoreTabController = TabController(length: 3, vsync: this);
     _boxscoreTabController.addListener(() {
       _selectedIndex.value = _boxscoreTabController.index;
@@ -49,19 +52,19 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         case 0:
           setState(() {
             awayContainerColor = kTeamColors[kTeamNames[widget.awayId][1]]!['primaryColor']!;
-            homeContainerColor = const Color(0xFF111111);
+            homeContainerColor = Colors.grey.shade900;
             teamContainerColor = const Color(0xFF111111);
           });
         case 2:
           setState(() {
-            awayContainerColor = const Color(0xFF111111);
+            awayContainerColor = Colors.grey.shade900;
             homeContainerColor = kTeamColors[kTeamNames[widget.homeId][1]]!['primaryColor']!;
             teamContainerColor = const Color(0xFF111111);
           });
         default:
           setState(() {
-            awayContainerColor = const Color(0xFF111111);
-            homeContainerColor = const Color(0xFF111111);
+            awayContainerColor = Colors.grey.shade900;
+            homeContainerColor = Colors.grey.shade900;
             teamContainerColor = Colors.grey.shade900;
           });
       }
@@ -122,7 +125,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     List<dynamic> teamStats = [];
 
     for (int i = 0; i < boxTeamStats.length; i++) {
-      teamStats.add({...boxTeamStats[i], ...advTeamStats[i]});
+      teamStats.add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[i]});
     }
 
     return Column(
@@ -215,7 +218,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 ),
                 CustomScrollView(
                   slivers: [
-                    NewBoxTeamStats(
+                    BoxTeamStats(
                       teams: teamStats,
                       homeId: widget.homeId,
                       awayId: widget.awayId,

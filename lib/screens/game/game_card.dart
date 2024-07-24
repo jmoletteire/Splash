@@ -21,6 +21,66 @@ class GameCard extends StatefulWidget {
 }
 
 class _GameCardState extends State<GameCard> {
+  Widget gameTitle(String gameId) {
+    String seasonTypeCode = gameId[2];
+
+    Map<String, String> seasonTypes = {
+      '1': 'Pre-Season',
+      '2': 'Regular Season',
+      '4': 'Playoffs',
+      '5': 'Play-In',
+      '6': 'In-Season Tournament',
+    };
+
+    switch (seasonTypes[seasonTypeCode]) {
+      case 'Playoffs':
+        String gameNum = gameId[9];
+        String conf;
+        String roundId = gameId[7];
+
+        switch (roundId) {
+          case '1':
+            conf = int.parse(gameId[8]) < 4 ? 'East' : 'West';
+          case '2':
+            conf = int.parse(gameId[8]) < 2 ? 'East' : 'West';
+          case '3':
+            conf = gameId[8] == '0' ? 'East' : 'West';
+          default:
+            conf = '';
+        }
+
+        Map<String, String> poRounds = {
+          '1': '1st Round',
+          '2': 'Semis',
+          '3': 'Conf Finals',
+          '4': 'NBA Finals',
+        };
+
+        return Text(
+          'Game $gameNum - $conf ${poRounds[roundId]}',
+          style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+          textAlign: TextAlign.end,
+        );
+      case 'Play-In':
+        return Text(
+          'Play-In Tourney',
+          style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+          textAlign: TextAlign.end,
+        );
+      case 'In-Season Tournament':
+        return Text(
+          'Emirates NBA Cup Final',
+          style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+          textAlign: TextAlign.end,
+        );
+      default:
+        return const Text(
+          '',
+          textAlign: TextAlign.end,
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var summary = widget.game['SUMMARY']['GameSummary'][0];
@@ -88,8 +148,9 @@ class _GameCardState extends State<GameCard> {
                       ],
                     ),
                   ),
+                  Expanded(flex: 8, child: gameTitle(summary['GAME_ID'])),
                   Expanded(
-                    flex: 8,
+                    flex: 7,
                     child: Text(
                       summary['GAME_STATUS_TEXT'] == 'Final'
                           ? summary['GAME_STATUS_TEXT']
@@ -103,6 +164,7 @@ class _GameCardState extends State<GameCard> {
                   )
                 ],
               ),
+              const SizedBox(height: 5.0),
 
               /// AWAY TEAM ROW
               Row(

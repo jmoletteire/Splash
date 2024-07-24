@@ -37,17 +37,22 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       'PTS',
       'REB',
       'AST',
-      'STL',
-      'BLK',
-      'TOV',
-      'USG%',
-      '+/-',
       'FG',
       'FG%',
       '3P',
       '3P%',
       'FT',
       'FT%',
+      'STL',
+      'BLK',
+      'TOV',
+      'eFG%',
+      'TS%',
+      'USG%',
+      '+/-',
+      'ORTG',
+      'DRTG',
+      'NRTG',
     ];
   }
 
@@ -97,21 +102,6 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         /// AST
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
 
-        /// STL
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
-
-        /// BLK
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
-
-        /// TOV
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
-
-        /// USG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.145),
-
-        /// +/-
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
-
         /// FGM - FGA
         TableColumn(width: MediaQuery.of(context).size.width * 0.14),
 
@@ -129,6 +119,36 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 
         /// FT%
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
+
+        /// STL
+        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+
+        /// BLK
+        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+
+        /// TOV
+        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+
+        /// FT%
+        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
+
+        /// FT%
+        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
+
+        /// USG%
+        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
+
+        /// +/-
+        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+
+        /// ORTG
+        TableColumn(width: MediaQuery.of(context).size.width * 0.145),
+
+        /// DRTG
+        TableColumn(width: MediaQuery.of(context).size.width * 0.145),
+
+        /// NRTG
+        TableColumn(width: MediaQuery.of(context).size.width * 0.145),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -228,7 +248,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           child: Row(
             children: [
               PlayerAvatar(
-                radius: 10.0,
+                radius: 12.0,
                 backgroundColor: Colors.white12,
                 playerImageUrl:
                     'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PLAYER_ID']}.png',
@@ -242,7 +262,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                   maxLines: 1,
                   style: kBebasNormal.copyWith(
                     color: Colors.white70,
-                    fontSize: 15.0,
+                    fontSize: 16.0,
                   ),
                 ),
               ),
@@ -300,52 +320,20 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         }
       case 7:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['STL'].toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 8:
-        try {
-          return BoxscoreDataText(text: '${widget.players[row]['BLK'].toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 9:
-        try {
-          return BoxscoreDataText(text: '${widget.players[row]['TO'].toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 10:
-        try {
-          return BoxscoreDataText(
-              text: '${(widget.players[row]['USG_PCT'] * 100).toStringAsFixed(1)}%');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 11:
-        try {
-          return BoxscoreDataText(
-              text: '${widget.players[row]['PLUS_MINUS'].toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 12:
-        try {
           return BoxscoreDataText(
               text:
                   '${widget.players[row]['FGM'].toStringAsFixed(0)}-${widget.players[row]['FGA'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 13:
+      case 8:
         try {
           return BoxscoreDataText(
               text: '${(widget.players[row]['FG_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 14:
+      case 9:
         try {
           return BoxscoreDataText(
               text:
@@ -353,14 +341,14 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 15:
+      case 10:
         try {
           return BoxscoreDataText(
               text: '${(widget.players[row]['FG3_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 16:
+      case 11:
         try {
           return BoxscoreDataText(
               text:
@@ -368,10 +356,77 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 17:
+      case 12:
         try {
           return BoxscoreDataText(
               text: '${(widget.players[row]['FT_PCT'] * 100).toStringAsFixed(1)}%');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 13:
+        try {
+          return BoxscoreDataText(text: '${widget.players[row]['STL'].toStringAsFixed(0)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 14:
+        try {
+          return BoxscoreDataText(text: '${widget.players[row]['BLK'].toStringAsFixed(0)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 15:
+        try {
+          return BoxscoreDataText(text: '${widget.players[row]['TO'].toStringAsFixed(0)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 16:
+        try {
+          return BoxscoreDataText(
+              text: '${(widget.players[row]['EFG_PCT'] * 100).toStringAsFixed(1)}%');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 17:
+        try {
+          return BoxscoreDataText(
+              text: '${(widget.players[row]['TS_PCT'] * 100).toStringAsFixed(1)}%');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 18:
+        try {
+          return BoxscoreDataText(
+              text: '${(widget.players[row]['USG_PCT'] * 100).toStringAsFixed(1)}%');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 19:
+        try {
+          return BoxscoreDataText(
+              text: '${widget.players[row]['PLUS_MINUS'].toStringAsFixed(0)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 20:
+        try {
+          return BoxscoreDataText(
+              text: '${widget.players[row]['OFF_RATING'].toStringAsFixed(1)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 21:
+        try {
+          return BoxscoreDataText(
+              text: '${widget.players[row]['DEF_RATING'].toStringAsFixed(1)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 22:
+        try {
+          return BoxscoreDataText(
+              text: '${widget.players[row]['NET_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }

@@ -272,7 +272,7 @@ class StatisticRow extends StatelessWidget {
               value = convert == 'true' ? value * 100 : value;
               return Text(
                 round == '0'
-                    ? (perMode == 'PER_75' &&
+                    ? (perMode == 'PER_100' &&
                             statName != 'MIN' &&
                             statName != 'GP' &&
                             statName != 'POSS'

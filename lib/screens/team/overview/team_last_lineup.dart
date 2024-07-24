@@ -184,7 +184,6 @@ class PlayerCard extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => PlayerHome(
-              teamId: team["TEAM_ID"].toString(),
               playerId: playerId,
             ),
           ),
