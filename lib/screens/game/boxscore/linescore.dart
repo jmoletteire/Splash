@@ -30,7 +30,7 @@ class LineScore extends StatelessWidget {
               Expanded(
                   flex: 2,
                   child: Container(
-                      color: const Color(0xFF111111),
+                      color: const Color(0xFF1B1B1B),
                       child: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 15.0),
                         child: Text('', textAlign: TextAlign.start, style: kBebasBold),
@@ -38,7 +38,7 @@ class LineScore extends StatelessWidget {
               for (int i = 1; i <= totalQuarters; i++)
                 Expanded(
                     child: Container(
-                        color: const Color(0xFF111111),
+                        color: const Color(0xFF1B1B1B),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text('Q$i',
@@ -49,7 +49,7 @@ class LineScore extends StatelessWidget {
                 for (int i = 1; i <= overtimes; i++)
                   Expanded(
                       child: Container(
-                          color: const Color(0xFF111111),
+                          color: const Color(0xFF1B1B1B),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text('OT$i',

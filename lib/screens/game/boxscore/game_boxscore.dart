@@ -53,20 +53,20 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         case 0:
           setState(() {
             awayContainerColor = kTeamColors[kTeamNames[widget.awayId][1]]!['primaryColor']!;
-            homeContainerColor = Colors.grey.shade900;
-            teamContainerColor = const Color(0xFF111111);
+            homeContainerColor = Color(0xFF1B1B1B);
+            teamContainerColor = const Color(0xFF1B1B1B);
           });
         case 2:
           setState(() {
-            awayContainerColor = Colors.grey.shade900;
+            awayContainerColor = Color(0xFF1B1B1B);
             homeContainerColor = kTeamColors[kTeamNames[widget.homeId][1]]!['primaryColor']!;
-            teamContainerColor = const Color(0xFF111111);
+            teamContainerColor = const Color(0xFF1B1B1B);
           });
         default:
           setState(() {
-            awayContainerColor = Colors.grey.shade900;
-            homeContainerColor = Colors.grey.shade900;
-            teamContainerColor = Colors.grey.shade900;
+            awayContainerColor = Color(0xFF1B1B1B);
+            homeContainerColor = Color(0xFF1B1B1B);
+            teamContainerColor = Color(0xFF1B1B1B);
           });
       }
     });
@@ -170,10 +170,10 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         Container(
           height: (kToolbarHeight - 15) / 4.5,
           decoration: const BoxDecoration(
-            color: Color(0xFF111111),
+            color: Color(0xFF1B1B1B),
             border: Border(
-              top: BorderSide(color: Colors.white12),
-              bottom: BorderSide(color: Colors.white10),
+              top: BorderSide(color: Color(0xFF333333)),
+              bottom: BorderSide(color: Color(0xFF2A2A2A)),
             ),
           ),
         ),
@@ -195,11 +195,11 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         ),
         Container(
           height: (kToolbarHeight - 15),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade900,
-            border: const Border(
+          decoration: const BoxDecoration(
+            color: Color(0xFF1B1B1B),
+            border: Border(
               top: BorderSide(color: Colors.white12),
-              bottom: BorderSide(color: Colors.white12),
+              bottom: BorderSide(color: Color(0xFF333333)),
             ),
           ),
           child: Row(
@@ -241,7 +241,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                     decoration: BoxDecoration(
                       color: awayContainerColor,
                       gradient: LinearGradient(
-                        colors: [const Color(0xFF111111), awayContainerColor],
+                        colors: [const Color(0xFF1B1B1B), awayContainerColor],
                         begin: Alignment.centerRight,
                         end: Alignment.centerLeft,
                       ),
@@ -259,7 +259,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 Expanded(
                   child: Container(
                     margin: const EdgeInsets.only(bottom: 3.0),
-                    color: const Color(0xFF111111),
+                    color: const Color(0xFF1B1B1B),
                     child: const Tab(
                       text: "TEAM",
                     ),
@@ -274,7 +274,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                     margin: const EdgeInsets.only(bottom: 3.0),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [const Color(0xFF111111), homeContainerColor],
+                        colors: [const Color(0xFF1B1B1B), homeContainerColor],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
@@ -310,10 +310,13 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 ),
                 CustomScrollView(
                   slivers: [
-                    BoxTeamStats(
-                      teams: teamStats,
-                      homeId: widget.homeId,
-                      awayId: widget.awayId,
+                    SliverPadding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      sliver: BoxTeamStats(
+                        teams: teamStats,
+                        homeId: widget.homeId,
+                        awayId: widget.awayId,
+                      ),
                     )
                   ],
                 ),
