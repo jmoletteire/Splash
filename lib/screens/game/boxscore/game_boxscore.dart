@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:splash/screens/game/boxscore/box_player_stats.dart';
+import 'package:splash/screens/game/boxscore/linescore.dart';
 import 'package:splash/utilities/constants.dart';
 
 import 'box_team_stats.dart';
@@ -128,8 +129,99 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
       teamStats.add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[i]});
     }
 
+    var linescore = widget.game['SUMMARY']['LineScore'];
+
+    Map<String, dynamic> homeLinescore =
+        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+    Map<String, dynamic> awayLinescore =
+        linescore[0]['TEAM_ID'].toString() == widget.awayId ? linescore[0] : linescore[1];
+
+    String topScorer = '';
+    String topRebounder = '';
+    String topAssistant = '';
+
+    int highestPTS = 0;
+    int highestREB = 0;
+    int highestAST = 0;
+
+    for (var player in playerStats) {
+      if ((player['PTS'] ?? 0) > highestPTS) {
+        highestPTS = player['PTS'];
+        topScorer = player['PLAYER_NAME'].toString();
+        int firstSpaceIndex = topScorer.indexOf(' ');
+        topScorer = '${topScorer[0]}. ${topScorer.substring(firstSpaceIndex + 1)}';
+      }
+      if ((player['REB'] ?? 0) > highestREB) {
+        highestREB = player['REB'];
+        topRebounder = player['PLAYER_NAME'].toString();
+        int firstSpaceIndex = topRebounder.indexOf(' ');
+        topRebounder = '${topRebounder[0]}. ${topRebounder.substring(firstSpaceIndex + 1)}';
+      }
+      if ((player['AST'] ?? 0) > highestAST) {
+        highestAST = player['AST'];
+        topAssistant = player['PLAYER_NAME'].toString();
+        int firstSpaceIndex = topAssistant.indexOf(' ');
+        topAssistant = '${topAssistant[0]}. ${topAssistant.substring(firstSpaceIndex + 1)}';
+      }
+    }
+
     return Column(
       children: [
+        Container(
+          height: (kToolbarHeight - 15) / 4.5,
+          decoration: const BoxDecoration(
+            color: Color(0xFF111111),
+            border: Border(
+              top: BorderSide(color: Colors.white12),
+              bottom: BorderSide(color: Colors.white10),
+            ),
+          ),
+        ),
+        LineScore(
+          homeTeam: widget.homeId,
+          awayTeam: widget.awayId,
+          homeScores: [
+            homeLinescore['PTS_QTR1'],
+            homeLinescore['PTS_QTR2'],
+            homeLinescore['PTS_QTR3'],
+            homeLinescore['PTS_QTR4'],
+          ],
+          awayScores: [
+            awayLinescore['PTS_QTR1'],
+            awayLinescore['PTS_QTR2'],
+            awayLinescore['PTS_QTR3'],
+            awayLinescore['PTS_QTR4'],
+          ],
+        ),
+        Container(
+          height: (kToolbarHeight - 15),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade900,
+            border: const Border(
+              top: BorderSide(color: Colors.white12),
+              bottom: BorderSide(color: Colors.white12),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$topScorer  - $highestPTS  PTS',
+                style: kBebasNormal.copyWith(fontSize: 14.0, color: Colors.grey.shade300),
+              ),
+              const SizedBox(width: 25.0),
+              Text(
+                '$topRebounder  - $highestREB  REB',
+                style: kBebasNormal.copyWith(fontSize: 14.0, color: Colors.grey.shade300),
+              ),
+              const SizedBox(width: 25.0),
+              Text(
+                '$topAssistant  - $highestAST  AST',
+                style: kBebasNormal.copyWith(fontSize: 14.0, color: Colors.grey.shade300),
+              ),
+            ],
+          ),
+        ),
         TabBar.secondary(
           padding: const EdgeInsets.symmetric(horizontal: 0.0),
           labelPadding: const EdgeInsets.symmetric(horizontal: 0.0),

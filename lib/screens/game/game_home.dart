@@ -412,13 +412,13 @@ class GameInfo extends StatelessWidget {
         };
 
         return Text('Game $gameNum - $conf ${poRounds[roundId]}',
-            style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+            style: kBebasBold.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
       case 'Play-In':
         return Text('Play-In Tourney',
-            style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+            style: kBebasBold.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
       case 'In-Season Tournament':
         return Text('Emirates NBA Cup Final',
-            style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+            style: kBebasBold.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
       default:
         return const Text('');
     }
