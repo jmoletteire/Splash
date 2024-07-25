@@ -7,6 +7,83 @@ import logging
 from splash_nba.util.env import uri
 
 app = Flask(__name__)
+bytes_transferred = 0
+
+
+@app.route('/team_schedule_query', methods=['POST'])
+def query_schedules_database():
+    data = request.json
+    selected_season = data.get('selectedSeason')
+    selected_season_type = data.get('selectedSeasonType')
+
+    filters = data.get('filters')
+
+    if filters:
+        results = apply_team_schedule_filters(selected_season, selected_season_type, filters)
+    else:
+        query = {f"seasons.{selected_season}": {"$exists": True}}
+        results = list(teams_collection.find(
+            query,
+            {'TEAM_ID': 1, f'seasons.{selected_season}.GAMES': 1, '_id': 0}
+        ))
+
+    return jsonify(results)
+
+
+def apply_team_schedule_filters(season, season_type, filters):
+    initial_match_stage = {"$match": {}}
+
+    results = None
+    for stat_filter in filters:
+        operator = stat_filter['operation']
+        value = stat_filter['value']
+        location = stat_filter['location']
+
+        path = f"STATS.{season}.{season_type}.{location}"
+
+        try:
+            value = float(value)  # Try to convert value to a float for numerical comparisons
+        except ValueError:
+            pass  # Keep value as a string for non-numerical comparisons
+
+        pipeline = [initial_match_stage]
+
+        if operator == 'greater than':
+            pipeline.append({"$match": {path: {"$gt": value}}})
+        elif operator == 'less than':
+            pipeline.append({"$match": {path: {"$lt": value}}})
+        elif operator == 'equals':
+            pipeline.append({"$match": {path: value}})
+        elif operator == 'contains':
+            pipeline.append({"$match": {path: {"$regex": value, "$options": "i"}}})
+        elif operator == 'top':
+            pipeline.append({"$sort": {path: -1}})
+            pipeline.append({"$limit": int(value)})
+        elif operator == 'bottom':
+            pipeline.append({"$sort": {path: 1}})
+            pipeline.append({"$limit": int(value)})
+
+        pipeline.append({"$project": {'GAME_ID': 1}})
+
+        current_results = list(players_collection.aggregate(pipeline))
+
+        if results is None:
+            results = current_results
+        else:
+            # Intersect current results with previous results
+            current_ids = {game['GAME_ID'] for game in current_results}
+            results = [game for game in results if game['GAME_ID'] in current_ids]
+
+    if results:
+        game_ids = [game['GAME_ID'] for game in results]
+        final_results = list(players_collection.find(
+            {'GAME_ID': {'$in': game_ids}},
+            {'GAME_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{season}.{season_type}': 1, '_id': 0}
+        ))
+    else:
+        final_results = []
+
+    return final_results
 
 
 @app.route('/stats_query', methods=['POST'])
@@ -31,7 +108,7 @@ def query_database():
     filters = data.get('filters')
 
     if filters:
-        results = apply_filters(selected_season, selected_season_type, filters, position)
+        results = apply_player_filters(selected_season, selected_season_type, filters, position)
     else:
         query = {f"STATS.{selected_season}.{selected_season_type}": {"$exists": True}}
         if position:
@@ -44,7 +121,7 @@ def query_database():
     return jsonify(results)
 
 
-def apply_filters(season, season_type, filters, position):
+def apply_player_filters(season, season_type, filters, position):
     initial_match_stage = {"$match": {}}
     if position:
         initial_match_stage["$match"]['POSITION'] = position
@@ -357,6 +434,15 @@ def get_team():
     except Exception as e:
         logging.error(f"(get_team) Error retrieving team: {e}")
         return jsonify({"error": "Failed to retrieve team"}), 500
+
+
+@app.after_request
+def log_response_size(response):
+    global bytes_transferred
+    response_size = len(response.get_data())
+    bytes_transferred += response_size
+    logging.info(f"Endpoint: {request.path}, Response Size: {response_size} bytes, Session: {bytes_transferred} bytes, {round(bytes_transferred / 1000000000, 2)} GB")
+    return response
 
 
 if __name__ == '__main__':

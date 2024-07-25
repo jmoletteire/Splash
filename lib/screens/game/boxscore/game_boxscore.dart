@@ -126,7 +126,10 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     List<dynamic> teamStats = [];
 
     for (int i = 0; i < boxTeamStats.length; i++) {
-      teamStats.add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[i]});
+      int otherStatsIndex =
+          gameOtherStats.indexWhere((stat) => stat['TEAM_ID'] == boxTeamStats[i]['TEAM_ID']);
+      teamStats
+          .add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[otherStatsIndex]});
     }
 
     var linescore = widget.game['SUMMARY']['LineScore'];

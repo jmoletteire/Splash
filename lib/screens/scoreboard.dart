@@ -26,6 +26,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
   late DatesProvider _datesProvider;
+  late DateTime selectedDate;
 
   List<DateTime> _dates = List.generate(15, (index) {
     return DateTime.now().subtract(const Duration(days: 7)).add(Duration(days: index));
@@ -50,16 +51,21 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
       if (_datesProvider.dates.isNotEmpty) {
         DateTime maxDate =
             DateTime.parse(_datesProvider.dates.reduce((a, b) => a.compareTo(b) > 0 ? a : b));
+
         _tabController = TabController(length: _dates.length, vsync: this);
         _tabController.index = _dates.indexWhere((date) => isSameDay(date, DateTime.now()));
+
         _tabController.addListener(() {
-          fetchGames(_dates[_tabController.index]);
-          setState(() {}); // Update the UI when the tab index changes
+          if (_tabController.indexIsChanging) {
+            fetchGames(_dates[_tabController.index]);
+            setState(() {}); // Update the UI when the tab index changes
+          }
         });
 
         setDates(maxDate);
         fetchGames(maxDate).then((_) {
           setState(() {
+            selectedDate = maxDate;
             _pageInitLoad = false;
           });
         });
@@ -177,15 +183,15 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                                 }
 
                                 return CalendarDatePicker(
-                                  initialDate: DateTime(2024, 6, 17),
+                                  initialDate: selectedDate,
                                   firstDate: DateTime(2017, 9, 30),
                                   lastDate: DateTime(DateTime.now().year + 1),
                                   onDateChanged: (date) async {
-                                    setDates(date); // Assuming setDates is defined
-                                    _tabController.index =
-                                        7; // Assuming _tabController is defined
+                                    setDates(date);
+                                    selectedDate = date;
+                                    _tabController.index = 7;
                                     Navigator.pop(context);
-                                    await fetchGames(date); // Assuming fetchGames is defined
+                                    await fetchGames(date);
                                   },
                                   selectableDayPredicate: (DateTime val) {
                                     String sanitized = sanitizeDateTime(val);

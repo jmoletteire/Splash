@@ -168,8 +168,8 @@ class _PlayerAwardsState extends State<PlayerAwards> {
                 ),
               ],
             ),
-          for (String award in widget.playerAwards.keys)
-            if (awards.contains(award)) ...[
+          for (String award in awards)
+            if (widget.playerAwards.keys.contains(award)) ...[
               const SizedBox(height: 10.0),
               awardCount(award),
               awardYears(award),
