@@ -200,7 +200,7 @@ class _GameCardState extends State<GameCard> {
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             children: [
                               Text(
-                                kTeamNames[widget.awayTeam.toString()][0] ??
+                                kTeamNames[widget.awayTeam.toString()]?[0] ??
                                     awayLinescore['TEAM_NICKNAME'],
                                 style: kGameCardTextStyle.copyWith(
                                   color: awayLinescore['PTS'] > homeLinescore['PTS']

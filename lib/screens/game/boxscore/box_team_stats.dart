@@ -479,7 +479,7 @@ class NonComparisonRow extends StatelessWidget {
             child: Text(
               awayTeam,
               textAlign: TextAlign.start,
-              style: kBebasNormal.copyWith(fontSize: 18.0, color: Colors.grey.shade300),
+              style: kBebasNormal.copyWith(fontSize: 17.0, color: Colors.grey.shade300),
             ),
           ),
         ),
@@ -502,7 +502,7 @@ class NonComparisonRow extends StatelessWidget {
             child: Text(
               homeTeam,
               textAlign: TextAlign.end,
-              style: kBebasNormal.copyWith(fontSize: 18.0, color: Colors.grey.shade300),
+              style: kBebasNormal.copyWith(fontSize: 17.0, color: Colors.grey.shade300),
             ),
           ),
         ),
@@ -602,16 +602,16 @@ class StatValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map<Color, Color> lightColors = {
-      const Color(0xFFFFFFFF): Color(0xFF000000),
-      const Color(0xFFFEC524): Color(0xFF0E2240),
-      const Color(0xFFFDBB30): Color(0xFF002D62),
-      const Color(0xFFED184D): Color(0xFF0B2240),
-      const Color(0xFF78BE20): Color(0xFF0B233F),
-      const Color(0xFF85714D): Color(0xFF0C2340),
-      const Color(0xFFE56020): Color(0xFF1D1160),
-      const Color(0xFFC4CED4): Color(0xFF000000),
-      const Color(0xFFFCA200): Color(0xFF002B5C),
-      const Color(0xFFE31837): Color(0xFF002B5C),
+      const Color(0xFFFFFFFF): const Color(0xFF000000),
+      const Color(0xFFFEC524): const Color(0xFF0E2240),
+      const Color(0xFFFDBB30): const Color(0xFF002D62),
+      const Color(0xFFED184D): const Color(0xFF0B2240),
+      const Color(0xFF78BE20): const Color(0xFF0B233F),
+      const Color(0xFF85714D): const Color(0xFF0C2340),
+      const Color(0xFFE56020): const Color(0xFF1D1160),
+      const Color(0xFFC4CED4): const Color(0xFF000000),
+      const Color(0xFFFCA200): const Color(0xFF002B5C),
+      const Color(0xFFE31837): const Color(0xFF002B5C),
     };
 
     return Container(
@@ -623,8 +623,8 @@ class StatValue extends StatelessWidget {
       child: Text(
         isPercentage ? '$value%' : '$value',
         style: isHighlighted && lightColors.containsKey(color)
-            ? kBebasNormal.copyWith(color: lightColors[color])
-            : kBebasNormal,
+            ? kBebasNormal.copyWith(fontSize: 18.0, color: lightColors[color])
+            : kBebasNormal.copyWith(fontSize: 18.0),
       ),
     );
   }

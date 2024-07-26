@@ -27,6 +27,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   late ScrollControllerNotifier _notifier;
   late DatesProvider _datesProvider;
   late DateTime selectedDate;
+  late DateTime lastSelectedDate;
 
   List<DateTime> _dates = List.generate(15, (index) {
     return DateTime.now().subtract(const Duration(days: 7)).add(Duration(days: index));
@@ -66,6 +67,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
         fetchGames(maxDate).then((_) {
           setState(() {
             selectedDate = maxDate;
+            lastSelectedDate = selectedDate;
             _pageInitLoad = false;
           });
         });
@@ -164,6 +166,18 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                         backgroundColor: Colors.grey.shade900,
                         context: context,
                         builder: (BuildContext context) {
+                          void onDateChanged(DateTime date) async {
+                            // Only update if the day or month has changed
+                            if (date.day != lastSelectedDate.day ||
+                                date.month != lastSelectedDate.month) {
+                              lastSelectedDate = date;
+                              setDates(date);
+                              _tabController.index = 7;
+                              Navigator.pop(context);
+                              await fetchGames(date);
+                            }
+                          }
+
                           return Theme(
                             data: Theme.of(context).copyWith(
                               colorScheme: const ColorScheme.dark(
@@ -183,16 +197,12 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                                 }
 
                                 return CalendarDatePicker(
-                                  initialDate: selectedDate,
+                                  initialDate: lastSelectedDate.isBefore(DateTime(2017, 9, 30))
+                                      ? DateTime(2017, 9, 30)
+                                      : lastSelectedDate,
                                   firstDate: DateTime(2017, 9, 30),
                                   lastDate: DateTime(DateTime.now().year + 1),
-                                  onDateChanged: (date) async {
-                                    setDates(date);
-                                    selectedDate = date;
-                                    _tabController.index = 7;
-                                    Navigator.pop(context);
-                                    await fetchGames(date);
-                                  },
+                                  onDateChanged: onDateChanged,
                                   selectableDayPredicate: (DateTime val) {
                                     String sanitized = sanitizeDateTime(val);
                                     return datesProvider.dates.contains(sanitized);
@@ -307,7 +317,12 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                         );
                       }
                     }).toList(),
-                  ),
+                  ), /*
+            floatingActionButton: lastSelectedDate != selectedDate
+                ? FloatingActionButton(onPressed: () {
+                    print(selectedDate);
+                  })
+                : null,*/
           );
   }
 }

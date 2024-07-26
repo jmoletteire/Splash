@@ -250,9 +250,11 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
-                          kTeamColors[kTeamNames[widget.awayId][1]]![
-                              'primaryColor']!, // Transparent at the top
-                          kTeamColors[kTeamNames[widget.homeId][1]]![
+                          kTeamNames[widget.awayId] == null
+                              ? Colors.grey
+                              : kTeamColors[kTeamNames[widget.awayId]![1]]![
+                                  'primaryColor']!, // Transparent at the top
+                          kTeamColors[kTeamNames[widget.homeId]?[1]]![
                               'primaryColor']!, // Opaque at the bottom
                         ],
                       ),
