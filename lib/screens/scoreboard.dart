@@ -26,8 +26,10 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
   late DatesProvider _datesProvider;
+  late DateTime maxDate;
   late DateTime selectedDate;
   late DateTime lastSelectedDate;
+  bool _showFab = false;
 
   List<DateTime> _dates = List.generate(15, (index) {
     return DateTime.now().subtract(const Duration(days: 7)).add(Duration(days: index));
@@ -66,6 +68,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
         setDates(maxDate);
         fetchGames(maxDate).then((_) {
           setState(() {
+            this.maxDate = maxDate;
             selectedDate = maxDate;
             lastSelectedDate = selectedDate;
             _pageInitLoad = false;
@@ -137,6 +140,19 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     }
   }
 
+  void goToMaxDate() {
+    if (lastSelectedDate != maxDate) {
+      setState(() {
+        lastSelectedDate = maxDate;
+        _showFab = false;
+      });
+
+      setDates(maxDate);
+      _tabController.index = 7;
+      fetchGames(maxDate);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return _pageInitLoad
@@ -173,6 +189,13 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                               lastSelectedDate = date;
                               setDates(date);
                               _tabController.index = 7;
+
+                              if (lastSelectedDate != maxDate) {
+                                _showFab = true;
+                              } else {
+                                _showFab = false;
+                              }
+
                               Navigator.pop(context);
                               await fetchGames(date);
                             }
@@ -197,9 +220,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                                 }
 
                                 return CalendarDatePicker(
-                                  initialDate: lastSelectedDate.isBefore(DateTime(2017, 9, 30))
-                                      ? DateTime(2017, 9, 30)
-                                      : lastSelectedDate,
+                                  initialDate: lastSelectedDate,
                                   firstDate: DateTime(2017, 9, 30),
                                   lastDate: DateTime(DateTime.now().year + 1),
                                   onDateChanged: onDateChanged,
@@ -227,6 +248,16 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                   labelColor: Colors.deepOrangeAccent,
                   labelStyle: kBebasNormal,
                   labelPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  onTap: (index) {
+                    setState(() {
+                      lastSelectedDate = _dates[index];
+                      if (lastSelectedDate != maxDate) {
+                        _showFab = true;
+                      } else {
+                        _showFab = false;
+                      }
+                    });
+                  },
                   tabs: _dates.map((date) {
                     return Tab(
                       height: 55.0,
@@ -317,12 +348,19 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                         );
                       }
                     }).toList(),
-                  ), /*
-            floatingActionButton: lastSelectedDate != selectedDate
-                ? FloatingActionButton(onPressed: () {
-                    print(selectedDate);
-                  })
-                : null,*/
+                  ),
+            floatingActionButton: _showFab
+                ? FloatingActionButton(
+                    onPressed: () {
+                      goToMaxDate();
+                    },
+                    backgroundColor: Colors.deepOrange,
+                    child: const Icon(
+                      Icons.home,
+                      size: 28.0,
+                    ),
+                  )
+                : null,
           );
   }
 }
