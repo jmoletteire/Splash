@@ -219,15 +219,34 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                                   return "$year-$month-$day";
                                 }
 
+                                bool selectableDayPredicate(DateTime val) {
+                                  String sanitized = sanitizeDateTime(val);
+                                  return datesProvider.dates.contains(sanitized);
+                                }
+
+                                DateTime findNearestValidDate(DateTime date) {
+                                  DateTime beforeDate = date;
+                                  DateTime afterDate = date;
+
+                                  while (!selectableDayPredicate(beforeDate) &&
+                                      !selectableDayPredicate(afterDate)) {
+                                    beforeDate = beforeDate.subtract(const Duration(days: 1));
+                                    afterDate = afterDate.add(const Duration(days: 1));
+                                  }
+
+                                  if (selectableDayPredicate(beforeDate)) {
+                                    return beforeDate;
+                                  } else {
+                                    return afterDate;
+                                  }
+                                }
+
                                 return CalendarDatePicker(
-                                  initialDate: lastSelectedDate,
+                                  initialDate: findNearestValidDate(lastSelectedDate),
                                   firstDate: DateTime(2017, 9, 30),
                                   lastDate: DateTime(DateTime.now().year + 1),
                                   onDateChanged: onDateChanged,
-                                  selectableDayPredicate: (DateTime val) {
-                                    String sanitized = sanitizeDateTime(val);
-                                    return datesProvider.dates.contains(sanitized);
-                                  },
+                                  selectableDayPredicate: selectableDayPredicate,
                                 );
                               },
                             ),
@@ -320,6 +339,20 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                             );
                           }
                         }
+
+                        gameCards.add(
+                          const Column(
+                            children: [
+                              SizedBox(height: 50.0),
+                              Icon(
+                                Icons.sports_basketball,
+                                color: Colors.white38,
+                                size: 40.0,
+                              ),
+                              SizedBox(height: 50.0),
+                            ],
+                          ),
+                        );
 
                         return SingleChildScrollView(
                           controller: _scrollController,
