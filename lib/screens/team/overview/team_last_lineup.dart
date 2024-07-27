@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/components/player_avatar.dart';
@@ -197,8 +198,9 @@ class PlayerCard extends StatelessWidget {
             playerImageUrl: 'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
           ),
           const SizedBox(height: 5.0),
-          Text(
+          AutoSizeText(
             name,
+            maxLines: 1,
             style: kBebasNormal.copyWith(fontSize: 16.0),
           ),
           Text(

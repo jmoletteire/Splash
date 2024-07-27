@@ -253,26 +253,28 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
               const SizedBox(width: 5.0),
               Flexible(
                 child: RichText(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text:
-                          '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(firstSpaceIndex + 1)}',
-                      style: kBebasNormal.copyWith(
-                        color: Colors.white70,
-                        fontSize: 15.0,
-                      ),
-                    ),
-                    if (widget.playerGroup == 'STARTERS')
-                      TextSpan(
-                        text: ', ${widget.players[row]['START_POSITION']}',
-                        style: kBebasNormal.copyWith(
-                          color: Colors.white,
-                          fontSize: 15.0,
+                      children: [
+                        TextSpan(
+                          text:
+                              '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(firstSpaceIndex + 1)}',
+                          style: kBebasNormal.copyWith(
+                            color: Colors.white70,
+                            fontSize: 15.0,
+                          ),
                         ),
-                      ),
-                  ],
-                )),
+                        if (widget.playerGroup == 'STARTERS')
+                          TextSpan(
+                            text: ', ${widget.players[row]['START_POSITION']}',
+                            style: kBebasNormal.copyWith(
+                              color: Colors.white,
+                              fontSize: 15.0,
+                            ),
+                          ),
+                      ],
+                    )),
               ),
             ],
           ),

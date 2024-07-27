@@ -7,10 +7,12 @@ from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
 from splash_nba.util.env import uri
 import logging
 
+
 # Function to fetch box score stats for a game
 def fetch_live_scores():
     scores = scoreboard.ScoreBoard().get_dict()['scoreboard']['games']
     return scores
+
 
 def process_documents(documents):
     game_counter = 0

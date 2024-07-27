@@ -4,8 +4,7 @@ import 'package:splash/utilities/constants.dart';
 
 class TeamHistory extends StatefulWidget {
   final Map<String, dynamic> team;
-  final ScrollController controller;
-  const TeamHistory({super.key, required this.controller, required this.team});
+  const TeamHistory({super.key, required this.team});
 
   @override
   State<TeamHistory> createState() => _TeamHistoryState();

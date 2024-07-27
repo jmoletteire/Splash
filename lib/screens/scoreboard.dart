@@ -28,7 +28,6 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   late DatesProvider _datesProvider;
   late DateTime maxDate;
   late DateTime selectedDate;
-  late DateTime lastSelectedDate;
   bool _showFab = false;
 
   List<DateTime> _dates = List.generate(15, (index) {
@@ -59,9 +58,17 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
         _tabController.index = _dates.indexWhere((date) => isSameDay(date, DateTime.now()));
 
         _tabController.addListener(() {
-          if (_tabController.indexIsChanging) {
+          if (_tabController.indexIsChanging ||
+              _tabController.index != _tabController.previousIndex) {
             fetchGames(_dates[_tabController.index]);
-            setState(() {}); // Update the UI when the tab index changes
+            setState(() {
+              selectedDate = _dates[_tabController.index];
+              if (_dates[_tabController.index] != this.maxDate) {
+                _showFab = true;
+              } else {
+                _showFab = false;
+              }
+            }); // Update the UI when the tab index changes
           }
         });
 
@@ -70,7 +77,6 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
           setState(() {
             this.maxDate = maxDate;
             selectedDate = maxDate;
-            lastSelectedDate = selectedDate;
             _pageInitLoad = false;
           });
         });
@@ -141,9 +147,9 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   }
 
   void goToMaxDate() {
-    if (lastSelectedDate != maxDate) {
+    if (selectedDate != maxDate) {
       setState(() {
-        lastSelectedDate = maxDate;
+        selectedDate = maxDate;
         _showFab = false;
       });
 
@@ -184,13 +190,13 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                         builder: (BuildContext context) {
                           void onDateChanged(DateTime date) async {
                             // Only update if the day or month has changed
-                            if (date.day != lastSelectedDate.day ||
-                                date.month != lastSelectedDate.month) {
-                              lastSelectedDate = date;
+                            if (date.day != selectedDate.day ||
+                                date.month != selectedDate.month) {
+                              selectedDate = date;
                               setDates(date);
                               _tabController.index = 7;
 
-                              if (lastSelectedDate != maxDate) {
+                              if (selectedDate != maxDate) {
                                 _showFab = true;
                               } else {
                                 _showFab = false;
@@ -242,7 +248,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                                 }
 
                                 return CalendarDatePicker(
-                                  initialDate: findNearestValidDate(lastSelectedDate),
+                                  initialDate: findNearestValidDate(selectedDate),
                                   firstDate: DateTime(2017, 9, 30),
                                   lastDate: DateTime(DateTime.now().year + 1),
                                   onDateChanged: onDateChanged,
@@ -269,8 +275,8 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                   labelPadding: const EdgeInsets.symmetric(horizontal: 20.0),
                   onTap: (index) {
                     setState(() {
-                      lastSelectedDate = _dates[index];
-                      if (lastSelectedDate != maxDate) {
+                      selectedDate = _dates[index];
+                      if (selectedDate != maxDate) {
                         _showFab = true;
                       } else {
                         _showFab = false;
@@ -330,26 +336,30 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                             );
                           } else if (gamesData[gameKey] is Map) {
                             Map<String, dynamic> game = gamesData[gameKey];
-                            gameCards.add(
-                              GameCard(
-                                game: game,
-                                homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
-                                awayTeam: game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'],
-                              ),
-                            );
+                            // Skip if All-Star weekend
+                            if (!game["SEASON_ID"].toString().startsWith("3")) {
+                              gameCards.add(
+                                GameCard(
+                                  game: game,
+                                  homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
+                                  awayTeam: game['SUMMARY']['GameSummary'][0]
+                                      ['VISITOR_TEAM_ID'],
+                                ),
+                              );
+                            }
                           }
                         }
 
                         gameCards.add(
-                          const Column(
+                          Column(
                             children: [
-                              SizedBox(height: 50.0),
-                              Icon(
+                              SizedBox(height: MediaQuery.sizeOf(context).height / 10),
+                              const Icon(
                                 Icons.sports_basketball,
                                 color: Colors.white38,
                                 size: 40.0,
                               ),
-                              SizedBox(height: 50.0),
+                              SizedBox(height: MediaQuery.sizeOf(context).height / 10),
                             ],
                           ),
                         );

@@ -6,8 +6,7 @@ import 'package:splash/utilities/constants.dart';
 
 class TeamRoster extends StatefulWidget {
   final Map<String, dynamic> team;
-  final ScrollController controller;
-  const TeamRoster({super.key, required this.controller, required this.team});
+  const TeamRoster({super.key, required this.team});
 
   @override
   State<TeamRoster> createState() => _TeamRosterState();

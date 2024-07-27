@@ -4,8 +4,7 @@ import 'package:splash/utilities/constants.dart';
 
 class TeamSchedule extends StatefulWidget {
   final Map<String, dynamic> team;
-  final ScrollController controller;
-  const TeamSchedule({super.key, required this.controller, required this.team});
+  const TeamSchedule({super.key, required this.team});
 
   @override
   State<TeamSchedule> createState() => _TeamScheduleState();
@@ -69,19 +68,12 @@ class _TeamScheduleState extends State<TeamSchedule> {
   };
 
   Map<String, String> seasonTypes = {
+    'All': '*',
     'Pre-Season': '1',
     'Regular Season': '2',
     'Playoffs': '4',
     'Play-In': '5',
-    'IST': '6',
-  };
-
-  Map<String, bool> _selectedSeasonTypes = {
-    'Pre-Season': false,
-    'Regular Season': false,
-    'Playoffs': false,
-    'Play-In': false,
-    'IST': false,
+    'NBA Cup': '6',
   };
 
   @override
@@ -90,15 +82,15 @@ class _TeamScheduleState extends State<TeamSchedule> {
     schedule = widget.team['seasons'][kCurrentSeason]['GAMES'];
     seasons = widget.team['seasons'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
-    selectedSeasonType = '2';
+    selectedSeasonType = 'All';
     selectedMonth = months.first;
     selectedOpp = 'ALL';
     oppId = 0;
     games = TeamGames(
-        scrollController: widget.controller,
         team: widget.team,
         schedule: schedule,
         selectedSeason: selectedSeason,
+        selectedSeasonType: selectedSeasonType,
         selectedMonth: selectedMonth,
         opponent: oppId);
   }
@@ -139,86 +131,148 @@ class _TeamScheduleState extends State<TeamSchedule> {
                     onTap: () {
                       showModalBottomSheet(
                         backgroundColor: Colors.grey.shade900,
+                        scrollControlDisabledMaxHeightRatio: 0.25,
                         context: context,
                         builder: (BuildContext context) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: ColorScheme.dark(
-                                primary: teamColor,
-                                onPrimary: Colors.white,
-                                secondary: Colors.white,
-                              ),
-                            ),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          return StatefulBuilder(
+                            builder: (BuildContext context, StateSetter setModalState) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.dark(
+                                    primary: teamColor,
+                                    onPrimary: Colors.white,
+                                    secondary: Colors.white,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 25.0, vertical: 10.0),
+                                  child: Column(
                                     children: [
-                                      Text(
-                                        'Filter',
-                                        style: kBebasBold.copyWith(fontSize: 22.0),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Filter',
+                                            style: kBebasBold.copyWith(fontSize: 22.0),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              'Done',
+                                              style: kBebasNormal.copyWith(color: teamColor),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text(
-                                          'Done',
-                                          style: kBebasNormal,
-                                        ),
+                                      const SizedBox(height: 10.0),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey.shade900,
+                                                border: Border.all(color: teamColor),
+                                                borderRadius: BorderRadius.circular(10.0)),
+                                            child: DropdownButton<String>(
+                                              padding:
+                                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                                              borderRadius: BorderRadius.circular(10.0),
+                                              menuMaxHeight: 300.0,
+                                              dropdownColor: Colors.grey.shade900,
+                                              isExpanded: false,
+                                              underline: Container(),
+                                              value: selectedSeason,
+                                              items: seasons.map<DropdownMenuItem<String>>(
+                                                  (String value) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Text(
+                                                    value,
+                                                    style:
+                                                        kBebasNormal.copyWith(fontSize: 18.0),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              onChanged: (String? value) {
+                                                /// Updates displayed values in bottom sheet
+                                                setModalState(() {
+                                                  selectedSeason = value!;
+                                                });
+
+                                                /// Updates displayed values in schedule view
+                                                setState(() {
+                                                  selectedSeason = value!;
+                                                  schedule =
+                                                      widget.team['seasons'][value]['GAMES'];
+                                                  games = TeamGames(
+                                                    team: widget.team,
+                                                    schedule: schedule,
+                                                    selectedSeason: value,
+                                                    selectedSeasonType: selectedSeasonType,
+                                                    selectedMonth: selectedMonth,
+                                                    opponent: oppId,
+                                                  );
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey.shade900,
+                                                border: Border.all(color: teamColor),
+                                                borderRadius: BorderRadius.circular(10.0)),
+                                            child: DropdownButton<String>(
+                                              padding:
+                                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                                              borderRadius: BorderRadius.circular(10.0),
+                                              menuMaxHeight: 300.0,
+                                              dropdownColor: Colors.grey.shade900,
+                                              isExpanded: false,
+                                              underline: Container(),
+                                              value: selectedSeasonType,
+                                              items: seasonTypes.keys
+                                                  .map<DropdownMenuItem<String>>(
+                                                      (String value) {
+                                                return DropdownMenuItem<String>(
+                                                  value: value,
+                                                  child: Text(
+                                                    value,
+                                                    style:
+                                                        kBebasNormal.copyWith(fontSize: 18.0),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              onChanged: (String? value) {
+                                                /// Updates displayed values in bottom sheet
+                                                setModalState(() {
+                                                  selectedSeasonType = value!;
+                                                });
+
+                                                /// Updates displayed values in schedule view
+                                                setState(() {
+                                                  selectedSeasonType = value!;
+                                                  games = TeamGames(
+                                                    team: widget.team,
+                                                    schedule: schedule,
+                                                    selectedSeason: selectedSeason,
+                                                    selectedSeasonType: value,
+                                                    selectedMonth: selectedMonth,
+                                                    opponent: oppId,
+                                                  );
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 10.0),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.grey.shade900,
-                                            border: Border.all(color: teamColor),
-                                            borderRadius: BorderRadius.circular(10.0)),
-                                        child: DropdownButton<String>(
-                                          padding:
-                                              const EdgeInsets.symmetric(horizontal: 15.0),
-                                          borderRadius: BorderRadius.circular(10.0),
-                                          menuMaxHeight: 300.0,
-                                          dropdownColor: Colors.grey.shade900,
-                                          isExpanded: false,
-                                          underline: Container(),
-                                          value: selectedSeason,
-                                          items: seasons
-                                              .map<DropdownMenuItem<String>>((String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(
-                                                value,
-                                                style: kBebasNormal.copyWith(fontSize: 18.0),
-                                              ),
-                                            );
-                                          }).toList(),
-                                          onChanged: (String? value) {
-                                            setState(() {
-                                              selectedSeason = value!;
-                                              games = TeamGames(
-                                                scrollController: widget.controller,
-                                                team: widget.team,
-                                                schedule: schedule,
-                                                selectedSeason: value,
-                                                selectedMonth: selectedMonth,
-                                                opponent: oppId,
-                                              );
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
+                                ),
+                              );
+                            },
                           );
                         },
                       );
@@ -264,10 +318,10 @@ class _TeamScheduleState extends State<TeamSchedule> {
                       setState(() {
                         selectedMonth = value!;
                         games = TeamGames(
-                          scrollController: widget.controller,
                           team: widget.team,
                           schedule: schedule,
                           selectedSeason: selectedSeason,
+                          selectedSeasonType: selectedSeasonType,
                           selectedMonth: value,
                           opponent: oppId,
                         );
@@ -320,10 +374,10 @@ class _TeamScheduleState extends State<TeamSchedule> {
                         selectedOpp = value!;
                         oppId = int.parse(teamAbbr[selectedOpp]!);
                         games = TeamGames(
-                          scrollController: widget.controller,
                           team: widget.team,
                           schedule: schedule,
                           selectedSeason: selectedSeason,
+                          selectedSeasonType: selectedSeasonType,
                           selectedMonth: selectedMonth,
                           opponent: oppId,
                         );

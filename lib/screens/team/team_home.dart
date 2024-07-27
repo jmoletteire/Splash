@@ -123,20 +123,12 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
   ///      Initialize each tab via anonymous function.
   /// ******************************************************
 
-  final List<
-      Widget Function(
-          {required Map<String, dynamic> team,
-          required ScrollController controller})> _teamPages = [
-    ({required Map<String, dynamic> team, required ScrollController controller}) =>
-        TeamOverview(team: team, controller: controller),
-    ({required Map<String, dynamic> team, required ScrollController controller}) =>
-        TeamSchedule(team: team, controller: controller),
-    ({required Map<String, dynamic> team, required ScrollController controller}) =>
-        TeamStats(team: team, controller: controller),
-    ({required Map<String, dynamic> team, required ScrollController controller}) =>
-        TeamRoster(team: team, controller: controller),
-    ({required Map<String, dynamic> team, required ScrollController controller}) =>
-        TeamHistory(team: team, controller: controller),
+  final List<Widget Function({required Map<String, dynamic> team})> _teamPages = [
+    ({required Map<String, dynamic> team}) => TeamOverview(team: team),
+    ({required Map<String, dynamic> team}) => TeamSchedule(team: team),
+    ({required Map<String, dynamic> team}) => TeamStats(team: team),
+    ({required Map<String, dynamic> team}) => TeamRoster(team: team),
+    ({required Map<String, dynamic> team}) => TeamHistory(team: team),
   ];
 
   /// ******************************************************
@@ -250,10 +242,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
               body: TabBarView(
                 controller: _tabController,
                 children: _teamPages.map((page) {
-                  return page(
-                    team: team,
-                    controller: _scrollController,
-                  ); // Pass team object to each page
+                  return page(team: team); // Pass team object to each page
                 }).toList(),
               ),
             ),

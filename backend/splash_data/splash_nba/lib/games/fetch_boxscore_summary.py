@@ -5,10 +5,12 @@ from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
 
+
 # Function to fetch box score stats for a game
 def fetch_box_score_summary(game_id):
     boxscore = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id).get_normalized_dict()
     return boxscore
+
 
 def process_documents(documents):
     game_counter = 0
@@ -45,6 +47,7 @@ def process_documents(documents):
                 time.sleep(10)
 
     print("Batch processing complete.")
+
 
 if __name__ == "__main__":
     # Configure logging

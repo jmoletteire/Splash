@@ -188,12 +188,16 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
             homeLinescore['PTS_QTR2'],
             homeLinescore['PTS_QTR3'],
             homeLinescore['PTS_QTR4'],
+            for (int i = 1; i < 11; i++)
+              if (homeLinescore['PTS_OT$i'] > 0) homeLinescore['PTS_OT$i']
           ],
           awayScores: [
             awayLinescore['PTS_QTR1'],
             awayLinescore['PTS_QTR2'],
             awayLinescore['PTS_QTR3'],
             awayLinescore['PTS_QTR4'],
+            for (int i = 1; i < 11; i++)
+              if (awayLinescore['PTS_OT$i'] > 0) awayLinescore['PTS_OT$i']
           ],
         ),
         Container(

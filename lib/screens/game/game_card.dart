@@ -59,24 +59,24 @@ class _GameCardState extends State<GameCard> {
         return Text(
           'Game $gameNum - $conf ${poRounds[roundId]}',
           style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
-          textAlign: TextAlign.end,
+          textAlign: TextAlign.center,
         );
       case 'Play-In':
         return Text(
           'Play-In Tourney',
           style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
-          textAlign: TextAlign.end,
+          textAlign: TextAlign.center,
         );
       case 'In-Season Tournament':
         return Text(
           'Emirates NBA Cup Final',
           style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
-          textAlign: TextAlign.end,
+          textAlign: TextAlign.center,
         );
       default:
         return const Text(
           '',
-          textAlign: TextAlign.end,
+          textAlign: TextAlign.center,
         );
     }
   }
@@ -121,13 +121,12 @@ class _GameCardState extends State<GameCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    flex: 4,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
-                          style: kGameCardTextStyle.copyWith(color: Colors.white70),
+                          style: kBebasNormal.copyWith(fontSize: 14.0, color: Colors.white70),
                           textAlign: TextAlign.start,
                         ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
@@ -136,7 +135,7 @@ class _GameCardState extends State<GameCard> {
                             const Icon(
                               Icons.tv_sharp, // TV icon
                               color: Colors.white70,
-                              size: 14.0,
+                              size: 11.0,
                             ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
                             SvgPicture.asset(
@@ -148,16 +147,16 @@ class _GameCardState extends State<GameCard> {
                       ],
                     ),
                   ),
-                  Expanded(flex: 8, child: gameTitle(summary['GAME_ID'])),
+                  Expanded(flex: 3, child: gameTitle(summary['GAME_ID'])),
                   Expanded(
-                    flex: 7,
                     child: Text(
                       summary['GAME_STATUS_TEXT'] == 'Final'
                           ? summary['GAME_STATUS_TEXT']
                           : '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ',
-                      style: kGameCardTextStyle.copyWith(
+                      style: kBebasNormal.copyWith(
+                          fontSize: 15.0,
                           color: summary['GAME_STATUS_TEXT'] == 'Final'
-                              ? Colors.white70
+                              ? Colors.grey.shade300
                               : Colors.white),
                       textAlign: TextAlign.end,
                     ),

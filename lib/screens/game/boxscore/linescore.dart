@@ -44,7 +44,8 @@ class LineScore extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text('Q$i',
                               textAlign: TextAlign.end,
-                              style: kBebasBold.copyWith(color: Colors.grey.shade400)),
+                              style: kBebasBold.copyWith(
+                                  fontSize: 16.0, color: Colors.grey.shade400)),
                         ))),
               if (overtimes > 0)
                 for (int i = 1; i <= overtimes; i++)
@@ -53,9 +54,10 @@ class LineScore extends StatelessWidget {
                           color: const Color(0xFF1B1B1B),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('OT$i',
+                            child: Text(i == 1 ? 'OT' : '${i}OT',
                                 textAlign: TextAlign.end,
-                                style: kBebasBold.copyWith(color: Colors.grey.shade400)),
+                                style: kBebasBold.copyWith(
+                                    fontSize: 16.0, color: Colors.grey.shade400)),
                           ))),
               Expanded(
                   child: Container(
@@ -64,7 +66,8 @@ class LineScore extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text('F',
                             textAlign: TextAlign.end,
-                            style: kBebasBold.copyWith(color: Colors.grey.shade400)),
+                            style: kBebasBold.copyWith(
+                                fontSize: 16.0, color: Colors.grey.shade400)),
                       ))),
             ],
           ),

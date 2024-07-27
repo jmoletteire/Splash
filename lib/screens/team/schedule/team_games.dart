@@ -5,19 +5,19 @@ import '../../../utilities/constants.dart';
 import '../../game/game_home.dart';
 
 class TeamGames extends StatefulWidget {
-  final ScrollController scrollController;
   final Map<String, dynamic> team;
   final Map<String, dynamic> schedule;
   final String selectedSeason;
+  final String selectedSeasonType;
   final String selectedMonth;
   final int? opponent;
 
   const TeamGames({
     super.key,
-    required this.scrollController,
     required this.team,
     required this.schedule,
     required this.selectedSeason,
+    required this.selectedSeasonType,
     required this.selectedMonth,
     this.opponent,
   });
@@ -32,11 +32,12 @@ class _TeamGamesState extends State<TeamGames> {
   double topPadding = 0.0;
 
   Map<String, String> seasonTypes = {
+    '*': 'All',
     '1': 'Pre-Season',
     '2': 'Regular Season',
     '4': 'Playoffs',
     '5': 'Play-In',
-    '6': 'In-Season Tournament',
+    '6': 'NBA Cup',
   };
 
   List<String> formatDate(String date) {
@@ -54,7 +55,8 @@ class _TeamGamesState extends State<TeamGames> {
     return [dayOfWeek, monthDate];
   }
 
-  Map<String, dynamic> getGames(String season, String month, int? opponentId) {
+  Map<String, dynamic> getGames(
+      String season, String month, int? opponentId, String seasonType) {
     Map<String, int> monthsMap = {
       'October': 10,
       'November': 11,
@@ -107,38 +109,67 @@ class _TeamGamesState extends State<TeamGames> {
 
     // Function to filter games by month
     Map<String, dynamic> filterBySeasonType(
-        Map<String, dynamic> schedule, String selectedSeason) {
+        Map<String, dynamic> schedule, String selectedSeasonType) {
       // Create a new map to store filtered games
       Map<String, dynamic> filteredSchedule = {};
 
       // Iterate through the schedule map
       schedule.forEach((key, game) {
-        // Parse the GAME_DATE field
-        String seasonType = game['SEASON_ID'];
+        String seasonType = game['SEASON_ID'].toString().substring(0, 1);
 
-        // Check if the opponent matches
-        if (seasonType == selectedSeason) {
+        // Check if the season type matches
+        if (seasonTypes[seasonType] == selectedSeasonType) {
           filteredSchedule[key] = game;
         }
       });
       return filteredSchedule;
     }
 
-    // No filters
-    if ((opponentId == null || opponentId == 0) && month == 'All') {
-      return widget.schedule;
-    }
     // Month filter only
-    else if ((opponentId == null || opponentId == 0) && month != 'All') {
+    if ((opponentId == null || opponentId == 0) && month != 'All' && seasonType == 'All') {
+      print('Filtering by Month only');
       return filterByMonth(widget.schedule, monthsMap[month]!);
     }
-    // Opp filter only
-    else if (opponentId != null && opponentId != 0 && month == 'All') {
-      return filterByOpp(widget.schedule, opponentId!);
+// Opp filter only
+    else if (opponentId != null && opponentId != 0 && month == 'All' && seasonType == 'All') {
+      print('Filtering by Opp only');
+      return filterByOpp(widget.schedule, opponentId);
     }
-    // Both filters
-    else {
+// Season Type filter only
+    else if ((opponentId == null || opponentId == 0) &&
+        month == 'All' &&
+        seasonType != 'All') {
+      print('Filtering by Season Type only');
+      return filterBySeasonType(widget.schedule, seasonType);
+    }
+// Month & Opp filters
+    else if (opponentId != 0 && month != 'All' && seasonType == 'All') {
+      print('Filtering by Month & Opp');
       return filterByOpp(filterByMonth(widget.schedule, monthsMap[month]!), opponentId!);
+    }
+// Month & Season Type filters
+    else if ((opponentId == null || opponentId == 0) &&
+        month != 'All' &&
+        seasonType != 'All') {
+      print('Filtering by Month & Season Type');
+      return filterByMonth(filterBySeasonType(widget.schedule, seasonType), monthsMap[month]!);
+    }
+// Season Type & Opp filters
+    else if (opponentId != 0 && month == 'All' && seasonType != 'All') {
+      print('Filtering by Season Type & Opp');
+      return filterByOpp(filterBySeasonType(widget.schedule, seasonType), opponentId!);
+    }
+// All filters
+    else if (opponentId != 0 && month != 'All' && seasonType != 'All') {
+      print('Filtering by all filters');
+      return filterByOpp(
+          filterByMonth(filterBySeasonType(widget.schedule, seasonType), monthsMap[month]!),
+          opponentId!);
+    }
+// No filters
+    else {
+      print('No filters');
+      return widget.schedule;
     }
   }
 
@@ -162,13 +193,11 @@ class _TeamGamesState extends State<TeamGames> {
         widget.selectedSeason,
         widget.selectedMonth,
         null,
+        widget.selectedSeasonType,
       );
     } else {
-      teamGames = getGames(
-        widget.selectedSeason,
-        widget.selectedMonth,
-        widget.opponent,
-      );
+      teamGames = getGames(widget.selectedSeason, widget.selectedMonth, widget.opponent,
+          widget.selectedSeasonType);
     }
     gamesList = sortGames();
 
