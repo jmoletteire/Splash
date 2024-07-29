@@ -86,6 +86,33 @@ def apply_team_schedule_filters(season, season_type, filters):
     return final_results
 
 
+@app.route('/get_draft', methods=['GET'])
+def get_draft():
+    try:
+        # logging.info(f"(get_draft) {request.args}")
+        query_params = request.args.to_dict()
+        # logging.info(f"(get_draft) {query_params}")
+
+        draft_year = query_params['draftYear']
+
+        # Query the database
+        draft = draft_collection.find_one(
+            {"YEAR": draft_year},
+            {"_id": 0, f"SELECTIONS": 1}
+        )
+
+        if draft:
+            # logging.info(f"(get_draft) Retrieved {draft_year} NBA Draft from MongoDB")
+            return jsonify(draft)
+        else:
+            logging.warning("(get_draft) No draft data found in MongoDB")
+            return jsonify({"error": "No draft found"})
+
+    except Exception as e:
+        logging.error(f"(get_draft) Error retrieving draft: {e}")
+        return jsonify({"error": "Failed to retrieve draft"}), 500
+
+
 @app.route('/stats_query', methods=['POST'])
 def query_database():
     data = request.json
@@ -456,6 +483,7 @@ if __name__ == '__main__':
         games_collection = db.nba_games
         teams_collection = db.nba_teams
         players_collection = db.nba_players
+        draft_collection = db.nba_draft_history
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

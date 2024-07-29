@@ -2,15 +2,6 @@ from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-
-# Connect to MongoDB
-client = MongoClient(uri)
-db = client.splash
-players_collection = db.nba_players
-logging.info("Connected to MongoDB")
-
 
 # Function to calculate per-75 possession values and update the document
 def calculate_and_update_per_75_possessions(player_doc, playoffs):
@@ -28,7 +19,8 @@ def calculate_and_update_per_75_possessions(player_doc, playoffs):
 
             adv_stats = playoff_stats.get("ADV", {})
         else:
-            adv_stats = season_stats.get("ADV", {})
+            reg_season_stats = season_stats.get("REGULAR SEASON", {})
+            adv_stats = reg_season_stats.get("ADV", {})
 
         possessions = adv_stats.get("POSS", None)
 
@@ -36,6 +28,8 @@ def calculate_and_update_per_75_possessions(player_doc, playoffs):
             for stat_key, location in stats_to_calculate:
                 if playoffs:
                     location = 'PLAYOFFS.' + location
+                else:
+                    location = 'REGULAR SEASON.' + location
 
                 loc = location.split('.')
 
@@ -62,68 +56,105 @@ def calculate_and_update_per_75_possessions(player_doc, playoffs):
             continue
 
 
-# List of tuples specifying the stats to calculate per-75 possession values for
-# Each tuple should be in the format ("stat_key", "location")
-# Example: [("PTS", "BASIC"), ("AST", "BASIC")]
-stats_to_calculate = [
-    # BASIC
-    ("FGM", "BASIC"),
-    ("FGA", "BASIC"),
-    ("FTM", "BASIC"),
-    ("FTA", "BASIC"),
-    ("FG3M", "BASIC"),
-    ("FG3A", "BASIC"),
-    ("STL", "BASIC"),
-    ("BLK", "BASIC"),
-    ("REB", "BASIC"),
-    ("OREB", "BASIC"),
-    ("DREB", "BASIC"),
-    ("TOV", "BASIC"),
-    ("PF", "BASIC"),
-    ("PFD", "BASIC"),
-    ("PTS", "BASIC"),
+if __name__ == '__main__':
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
 
-    # HUSTLE
-    ("CONTESTED_SHOTS", "HUSTLE"),
-    ("SCREEN_ASSISTS", "HUSTLE"),
-    ("SCREEN_AST_PTS", "HUSTLE"),
-    ("BOX_OUTS", "HUSTLE"),
-    ("OFF_BOXOUTS", "HUSTLE"),
-    ("DEF_BOXOUTS", "HUSTLE"),
-    ("DEFLECTIONS", "HUSTLE"),
-    ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
+    # Connect to MongoDB
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    logging.info("Connected to MongoDB")
 
-    # ADV -> PASSING
-    ("PASSES_MADE", "ADV.PASSING"),
-    ("PASSES_RECEIVED", "ADV.PASSING"),
-    ("AST", "ADV.PASSING"),
-    ("FT_AST", "ADV.PASSING"),
-    ("SECONDARY_AST", "ADV.PASSING"),
-    ("POTENTIAL_AST", "ADV.PASSING"),
-    ("AST_PTS_CREATED", "ADV.PASSING"),
-    ("AST_ADJ", "ADV.PASSING"),
+    # List of tuples specifying the stats to calculate per-75 possession values for
+    # Each tuple should be in the format ("stat_key", "location")
+    # Example: [("PTS", "BASIC"), ("AST", "BASIC")]
+    stats_to_calculate = [
+        # BASIC
+        # ("FGM", "BASIC"),
+        # ("FGA", "BASIC"),
+        # ("FTM", "BASIC"),
+        # ("FTA", "BASIC"),
+        # ("FG3M", "BASIC"),
+        # ("FG3A", "BASIC"),
+        # ("STL", "BASIC"),
+        # ("BLK", "BASIC"),
+        # ("REB", "BASIC"),
+        # ("OREB", "BASIC"),
+        # ("DREB", "BASIC"),
+        # ("TOV", "BASIC"),
+        # ("PF", "BASIC"),
+        # ("PFD", "BASIC"),
+        # ("PTS", "BASIC"),
+        ("PLUS_MINUS", "BASIC"),
 
-    # ADV -> TOUCHES
-    ("TOUCHES", "ADV.TOUCHES"),
-    ("FRONT_CT_TOUCHES", "ADV.TOUCHES"),
-]
+        # HUSTLE
+        # ("CONTESTED_SHOTS", "HUSTLE"),
+        # ("SCREEN_ASSISTS", "HUSTLE"),
+        # ("SCREEN_AST_PTS", "HUSTLE"),
+        # ("BOX_OUTS", "HUSTLE"),
+        # ("OFF_BOXOUTS", "HUSTLE"),
+        # ("DEF_BOXOUTS", "HUSTLE"),
+        # ("DEFLECTIONS", "HUSTLE"),
+        # ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
+        # ("CHARGES_DRAWN", "HUSTLE"),
 
-playoffs = True
+        # ADV -> PASSING
+        # ("PASSES_MADE", "ADV.PASSING"),
+        # ("PASSES_RECEIVED", "ADV.PASSING"),
+        # ("AST", "ADV.PASSING"),
+        # ("FT_AST", "ADV.PASSING"),
+        # ("SECONDARY_AST", "ADV.PASSING"),
+        # ("POTENTIAL_AST", "ADV.PASSING"),
+        # ("AST_PTS_CREATED", "ADV.PASSING"),
+        # ("AST_ADJ", "ADV.PASSING"),
 
-# Set the batch size
-batch_size = 25  # Adjust this value based on your needs and system performance
+        # ADV -> TOUCHES
+        # ("TOUCHES", "ADV.TOUCHES"),
+        # "FRONT_CT_TOUCHES", "ADV.TOUCHES"),
 
-# Get the total number of documents
-total_documents = players_collection.count_documents({})
-logging.info(f'Total player documents to process: {total_documents}')
+        # ADV -> DRIVES
+        # ("DRIVES", "ADV.DRIVES"),
+        # ("DRIVE_FGM", "ADV.DRIVES"),
+        # ("DRIVE_FGA", "ADV.DRIVES"),
+        # ("DRIVE_FTM", "ADV.DRIVES"),
+        # ("DRIVE_FTA", "ADV.DRIVES"),
+        # ("DRIVE_PTS", "ADV.DRIVES"),
+        # ("DRIVE_PASSES", "ADV.DRIVES"),
+        # ("DRIVE_AST", "ADV.DRIVES"),
+        # ("DRIVE_TOV", "ADV.DRIVES"),
 
-# Process documents in batches
-for batch_start in range(0, total_documents, batch_size):
-    logging.info(f'Processing batch starting at {batch_start}')
-    batch_cursor = players_collection.find().skip(batch_start).limit(batch_size)
+        # ADV -> REBOUNDING
+        # ("OREB_CONTEST", "ADV.REBOUNDING"),
+        # ("OREB_UNCONTEST", "ADV.REBOUNDING"),
+        # ("OREB_CHANCES", "ADV.REBOUNDING"),
+        # ("OREB_CHANCE_DEFER", "ADV.REBOUNDING"),
+        # ("DREB_CONTEST", "ADV.REBOUNDING"),
+        # ("DREB_UNCONTEST", "ADV.REBOUNDING"),
+        # ("DREB_CHANCES", "ADV.REBOUNDING"),
+        # ("DREB_CHANCE_DEFER", "ADV.REBOUNDING"),
+        # ("REB_CONTEST", "ADV.REBOUNDING"),
+        # ("REB_UNCONTEST", "ADV.REBOUNDING"),
+        # ("REB_CHANCES", "ADV.REBOUNDING"),
+        # ("REB_CHANCE_DEFER", "ADV.REBOUNDING")
+    ]
 
-    for i, player_doc in enumerate(batch_cursor):
-        logging.info(f'Processing {i + 1} of {batch_size}')
-        calculate_and_update_per_75_possessions(player_doc, playoffs)
+    playoffs = True
 
-print("Per-75 possession values have been calculated and updated.")
+    # Set the batch size
+    batch_size = 25  # Adjust this value based on your needs and system performance
+
+    # Get the total number of documents
+    total_documents = players_collection.count_documents({})
+    logging.info(f"Total player documents to process: {total_documents}")
+
+    # Process documents in batches
+    for batch_start in range(0, total_documents, batch_size):
+        logging.info(f"Processing batch starting at {batch_start}")
+        batch_cursor = players_collection.find().skip(batch_start).limit(batch_size)
+
+        for i, player_doc in enumerate(batch_cursor):
+            logging.info(f"Processing {i + 1} of {batch_size}")
+            calculate_and_update_per_75_possessions(player_doc, playoffs)
+
+    print("Per-75 possession values have been calculated and updated.")

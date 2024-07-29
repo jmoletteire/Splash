@@ -32,26 +32,41 @@ def fetch_playoff_stats(seasons):
 
 def fetch_player_stats(seasons):
     for season in seasons:
+        # Fetch basic and advanced stats for the given season
         basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=season).get_normalized_dict()['LeagueDashPlayerStats']
         adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=season).get_normalized_dict()['LeagueDashPlayerStats']
 
+        # Combine basic and advanced stats based on PLAYER_ID
         combined_list = [(d1, d2) for d1 in basic_stats for d2 in adv_stats if d1['PLAYER_ID'] == d2['PLAYER_ID']]
 
-        for season in seasons:
-            logging.info(f'Processing stats for {season}...')
-            player_stats = combined_list
-            num_players = len(player_stats)
+        logging.info(f'Processing stats for {season}...')
+        player_stats = combined_list
+        num_players = len(player_stats)
 
-            logging.info(f'Adding data for {len(player_stats)} players.')
-            for player in player_stats:
-                try:
-                    players_collection.update_one(
-                        {'PERSON_ID': player[0]['PLAYER_ID']},
-                        {'$set': {f'STATS.{season}.BASIC': player[0], f'STATS.{season}.BASIC.NUM_PLAYERS': num_players, f'STATS.{season}.ADV': player[1]}}
-                    )
-                except Exception as e:
-                    logging.error(f'Unable to add stats for {player[0]}: {e}')
-                    continue
+        logging.info(f'Adding data for {len(player_stats)} players.')
+        for i, player in enumerate(player_stats):
+            try:
+                # player[0]['NUM_PLAYERS'] = num_players
+
+                # Only update if BASIC does not exist, or exists but is empty
+                players_collection.update_one(
+                    {
+                        'PERSON_ID': player[1]['PLAYER_ID'],
+                        '$or': [
+                            {f'STATS.{season}.REGULAR SEASON.ADV.POSS': {'$exists': False}},
+                            {f'STATS.{season}.REGULAR SEASON.ADV.POSS': {'$eq': {}}}
+                        ]
+                    },
+                    {
+                        '$set': {
+                            # f'STATS.{season}.REGULAR SEASON.BASIC': player[0],
+                            f'STATS.{season}.REGULAR SEASON.ADV.POSS': player[1]['POSS']
+                        }
+                    }
+                )
+            except Exception as e:
+                logging.error(f"Unable to add stats for {player[1]['PLAYER_NAME']}: {e}")
+                continue
 
 
 if __name__ == '__main__':
@@ -96,5 +111,5 @@ if __name__ == '__main__':
         '1996-97'
     ]
 
-    # fetch_player_stats(seasons)
-    fetch_playoff_stats(seasons)
+    fetch_player_stats(seasons)
+    # fetch_playoff_stats(seasons)

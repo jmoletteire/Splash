@@ -216,7 +216,6 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                 MaterialPageRoute(
                   builder: (context) => PlayerHome(
                     playerId: widget.players[row]['PLAYER_ID'].toString(),
-                    teamId: widget.players[row]['TEAM_ID'].toString(),
                   ),
                 ),
               );

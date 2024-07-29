@@ -90,53 +90,6 @@ class _PlayerStatCardState extends State<PlayerStatCard> {
                   padding: const EdgeInsets.fromLTRB(15.0, 0.0, 5.0, 15.0),
                   child: Column(
                     children: [
-                      /*
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                'Name',
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  fontFamily: 'Anton',
-                                  fontSize: 12.0,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                'Value',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: 'Anton',
-                                  fontSize: 12.0,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                'Rank',
-                                textAlign: TextAlign.end,
-                                style: TextStyle(
-                                  fontFamily: 'Anton',
-                                  fontSize: 12.0,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 5.0),
-                          ],
-                        ),
-                      ),
-                      // */
                       for (dynamic stat in stats.keys) ...[
                         if (stat.toString().contains('fill') &&
                             int.parse(widget.selectedSeason.substring(0, 4)) >=

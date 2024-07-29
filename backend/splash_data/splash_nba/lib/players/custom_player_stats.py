@@ -2,6 +2,7 @@ from nba_api.stats.endpoints import teamplayeronoffdetails, leaguedashptstats, p
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
+from collections import defaultdict
 
 seasons = [
     '2023-24',
@@ -33,74 +34,47 @@ seasons = [
     '1997-98',
     '1996-97'
 ]
-season_types = ['REGULAR_SEASON', 'PLAYOFFS']
+season_types = ['REGULAR SEASON', 'PLAYOFFS']
 
 
-def touches_breakdown():
+def touches_breakdown(season_type):
     # Update each document in the collection
     for i, player in enumerate(players_collection.find()):
         logging.info(f'Processing {i} of {players_collection.count_documents({})}...')
         if 'STATS' in player:
             for season in player['STATS']:
                 if season in seasons:
-                    for season_type in season.keys():
-                        try:
-                            # Extract the values needed for calculation
-                            fga = player['STATS'][season][season_type]['BASIC'].get('FGA', 0)
-                            passes = player['STATS'][season][season_type]['ADV']['PASSING'].get('PASSES_MADE', 0)
-                            turnovers = player['STATS'][season][season_type]['BASIC'].get('TOV', 0)
-                            fouled = player['STATS'][season][season_type]['BASIC'].get('PFD', 0)
-                            touches = player['STATS'][season][season_type]['ADV']['TOUCHES'].get('TOUCHES',
-                                                                                                 1)  # Avoid division by zero
-                            # Calculate POSS PER GAME
-                            percent_shot = fga / touches
-                            percent_pass = passes / touches
-                            percent_turnover = turnovers / touches
-                            percent_fouled = fouled / touches
+                    try:
+                        # Extract the values needed for calculation
+                        fga = player['STATS'][season][season_type]['BASIC'].get('FGA', 0)
+                        passes = player['STATS'][season][season_type]['ADV']['PASSING'].get('PASSES_MADE', 0)
+                        turnovers = player['STATS'][season][season_type]['BASIC'].get('TOV', 0)
+                        fouled = player['STATS'][season][season_type]['BASIC'].get('PFD', 0)
+                        touches = player['STATS'][season][season_type]['ADV']['TOUCHES'].get('TOUCHES',
+                                                                                             1)  # Avoid division by zero
 
-                            # Update the document with the new field
-                            players_collection.update_one(
-                                {'PERSON_ID': player['PERSON_ID']},
-                                {'$set': {f'STATS.{season}.{season_type}.ADV.TOUCHES.FGA_PER_TOUCH': percent_shot,
-                                          f'STATS.{season}.{season_type}.ADV.TOUCHES.PASSES_PER_TOUCH': percent_pass,
-                                          f'STATS.{season}.{season_type}.ADV.TOUCHES.TOV_PER_TOUCH': percent_turnover,
-                                          f'STATS.{season}.{season_type}.ADV.TOUCHES.PFD_PER_TOUCH': percent_fouled,
-                                          }
-                                 }
-                            )
-                        except Exception as e:
-                            print(f"Key error for document with _id {player['PERSON_ID']}: {e}")
-                            continue
+                        # Calculate touch splits
+                        percent_shot = fga / touches
+                        percent_pass = passes / touches
+                        percent_turnover = turnovers / touches
+                        percent_fouled = fouled / touches
 
-
-def poss_per_game():
-    # Update each document in the collection
-    for i, player in enumerate(players_collection.find()):
-        logging.info(f'Processing {i} of {players_collection.count_documents({})}...')
-        if 'STATS' in player:
-            for season in player['STATS']:
-                if season in seasons:
-                    for season_type in season.keys():
-                        try:
-                            # Extract the values needed for calculation
-                            poss = player['STATS'][season][season_type]['ADV'].get('POSS', 0)
-                            gp = player['STATS'][season][season_type]['ADV'].get('GP', 1)  # Avoid division by zero
-                            # Calculate POSS PER GAME
-                            poss_per_game = poss / gp
-
-                            # Update the document with the new field
-                            players_collection.update_one(
-                                {'PERSON_ID': player['PERSON_ID']},
-                                {'$set': {f'STATS.{season}.{season_type}.ADV.POSS_PER_GM': poss_per_game}
-                                 }
-                            )
-
-                        except Exception as e:
-                            print(f"Key error for document with _id {player['PERSON_ID']}: {e}")
-                            continue
+                        # Update the document with the new field
+                        players_collection.update_one(
+                            {'PERSON_ID': player['PERSON_ID']},
+                            {'$set': {f'STATS.{season}.{season_type}.ADV.TOUCHES.FGA_PER_TOUCH': percent_shot,
+                                      f'STATS.{season}.{season_type}.ADV.TOUCHES.PASSES_PER_TOUCH': percent_pass,
+                                      f'STATS.{season}.{season_type}.ADV.TOUCHES.TOV_PER_TOUCH': percent_turnover,
+                                      f'STATS.{season}.{season_type}.ADV.TOUCHES.PFD_PER_TOUCH': percent_fouled,
+                                      }
+                             }
+                        )
+                    except Exception as e:
+                        print(f"Key error for document with _id {player['PERSON_ID']}: {e}")
+                        continue
 
 
-def shot_distribution():
+def shot_distribution(season_type):
     avail_seasons = [
         '2023-24',
         '2022-23',
@@ -139,59 +113,58 @@ def shot_distribution():
 
                 for season in stats:
                     if season in avail_seasons:
-                        for season_type in stats[season]:
-                            team_id = stats[season][season_type]['BASIC'].get('TEAM_ID', None)
+                        team_id = stats[season][season_type]['BASIC'].get('TEAM_ID', None)
 
-                            if team_id is None:
-                                continue
+                        if team_id is None:
+                            continue
 
-                            if season_type == 'PLAYOFFS':
-                                player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
-                                                                                      player_id=player_id,
-                                                                                      season=season,
-                                                                                      season_type_all_star='Playoffs'
-                                                                                      ).get_normalized_dict()
-                            else:
-                                player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
-                                                                                      player_id=player_id,
-                                                                                      season=season
-                                                                                      ).get_normalized_dict()
+                        if season_type == 'PLAYOFFS':
+                            player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
+                                                                                  player_id=player_id,
+                                                                                  season=season,
+                                                                                  season_type_all_star='Playoffs'
+                                                                                  ).get_normalized_dict()
+                        else:
+                            player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
+                                                                                  player_id=player_id,
+                                                                                  season=season
+                                                                                  ).get_normalized_dict()
 
-                            shot_type = player_shooting['GeneralShooting']
-                            closest_defender = player_shooting['ClosestDefenderShooting']
+                        shot_type = player_shooting['GeneralShooting']
+                        closest_defender = player_shooting['ClosestDefenderShooting']
 
-                            try:
-                                for j in range(len(shot_type)):
-                                    shot_type_keys = list(shot_type[j].keys())[6:]
+                        try:
+                            for j in range(len(shot_type)):
+                                shot_type_keys = list(shot_type[j].keys())[6:]
 
-                                    players_collection.update_one(
-                                        {'PERSON_ID': player_id},
-                                        {'$set': {
-                                            f'STATS.{season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type[j]["SHOT_TYPE"]}': {
-                                                key: shot_type[j][key] for key in shot_type_keys}
-                                        }
-                                        },
-                                    )
-                                for j in range(len(closest_defender)):
-                                    closest_defender_keys = list(closest_defender[j].keys())[6:]
+                                players_collection.update_one(
+                                    {'PERSON_ID': player_id},
+                                    {'$set': {
+                                        f'STATS.{season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type[j]["SHOT_TYPE"]}': {
+                                            key: shot_type[j][key] for key in shot_type_keys}
+                                    }
+                                    },
+                                )
+                            for j in range(len(closest_defender)):
+                                closest_defender_keys = list(closest_defender[j].keys())[6:]
 
-                                    players_collection.update_one(
-                                        {'PERSON_ID': player_id},
-                                        {'$set': {
-                                            f'STATS.{season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender[j]["CLOSE_DEF_DIST_RANGE"]}': {
-                                                key: closest_defender[j][key] for key in closest_defender_keys}
-                                        }
-                                        },
-                                    )
-                            except Exception as e:
-                                logging.error(f'Unable to add stats for {player_id}: {e}')
-                                continue
+                                players_collection.update_one(
+                                    {'PERSON_ID': player_id},
+                                    {'$set': {
+                                        f'STATS.{season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender[j]["CLOSE_DEF_DIST_RANGE"]}': {
+                                            key: closest_defender[j][key] for key in closest_defender_keys}
+                                    }
+                                    },
+                                )
+                        except Exception as e:
+                            logging.error(f'Unable to add stats for {player_id}: {e}')
+                            continue
             except Exception as e:
                 logging.error(f'Unable to add stats for {player["PERSON_ID"]}: {e}')
                 continue
 
 
-def passes_and_touches():
+def player_tracking_stats(season_type):
     avail_seasons = [
         '2023-24',
         '2022-23',
@@ -207,158 +180,250 @@ def passes_and_touches():
     ]
 
     for season in avail_seasons:
-        for season_type in season_types:
-            if season_type == 'PLAYOFFS':
-                player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
-                                                                     season=season,
-                                                                     season_type_all_star='Playoffs').get_normalized_dict()[
+        if season_type == 'PLAYOFFS':
+            # player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
+            #                                                     season=season,
+            #                                                     season_type_all_star='Playoffs').get_normalized_dict()[
+            #    'LeagueDashPtStats']
+            # player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
+            #                                                     season=season,
+            #                                                     season_type_all_star='Playoffs').get_normalized_dict()[
+            #    'LeagueDashPtStats']
+            player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Drives',
+                                                                season=season,
+                                                                season_type_all_star='Playoffs').get_normalized_dict()[
+                'LeagueDashPtStats']
+            player_rebounding = \
+                leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Rebounding',
+                                                    season=season,
+                                                    season_type_all_star='Playoffs').get_normalized_dict()[
                     'LeagueDashPtStats']
-                player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
-                                                                     season=season,
-                                                                     season_type_all_star='Playoffs').get_normalized_dict()[
+        else:
+            player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
+                                                                 season=season).get_normalized_dict()[
+                'LeagueDashPtStats']
+            player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
+                                                                 season=season).get_normalized_dict()[
+                'LeagueDashPtStats']
+            player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Drives',
+                                                                season=season).get_normalized_dict()[
+                'LeagueDashPtStats']
+            player_rebounding = \
+                leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Rebounding',
+                                                    season=season).get_normalized_dict()[
                     'LeagueDashPtStats']
-            else:
-                player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
-                                                                     season=season,).get_normalized_dict()[
-                    'LeagueDashPtStats']
-                player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
-                                                                     season=season,).get_normalized_dict()[
-                    'LeagueDashPtStats']
 
-            num_players = len(player_touches)
+        num_players = len(player_drives)
 
-            logging.info(f'Processing {num_players} for season {season} {season_type}...')
+        logging.info(f'Processing {num_players} for season {season} {season_type}...')
 
-            touch_keys = list(player_touches[0].keys())[9:15]
-            passing_keys = list(player_passing[0].keys())[8:]
+        # touch_keys = list(player_touches[0].keys())[9:15]
+        # passing_keys = list(player_passing[0].keys())[8:]
+        drives_keys = list(player_drives[0].keys())[8:]
+        rebounding_keys = list(player_rebounding[0].keys())[8:]
 
-            for i in range(0, num_players):
-                try:
-                    players_collection.update_one(
-                        {'PERSON_ID': player_touches[i]['PLAYER_ID']},
-                        {'$set': {
-                            f'STATS.{season}.{season_type}.ADV.TOUCHES': {key: player_touches[i][key] for key in touch_keys},
-                            f'STATS.{season}.{season_type}.ADV.PASSING': {key: player_passing[i][key] for key in
-                                                                     passing_keys}
-                        }
-                        },
-                    )
-                except Exception as e:
-                    logging.error(f'Unable to add stats for {player_touches[i]["PLAYER_NAME"]}: {e}')
-                    continue
+        # Initialize dictionaries for each data type
+        player_data = defaultdict(lambda: {'touches': {}, 'passing': {}, 'drives': {}, 'rebounding': {}})
 
+        # Fill in the player data from each list
+        # for player in player_touches:
+        #    player_id = player['PLAYER_ID']
+        #    player_data[player_id]['touches'] = {key: player[key] for key in touch_keys}
 
-def player_on_off():
-    for season in seasons:
-        logging.info(f'Processing season {season}...')
-        for team in teams_collection.find({}, {'TEAM_ID': 1, '_id': 0}):
-            logging.info(f'Processing team {team["TEAM_ID"]}...')
+        # for player in player_passing:
+        #    player_id = player['PLAYER_ID']
+        #    player_data[player_id]['passing'] = {key: player[key] for key in passing_keys}
 
-            # PLAYOFFS
-            for season_type in season_types:
-                if season_type == 'PLAYOFFS':
-                    player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=season,
-                                                                              season_type_all_star='Playoffs',
-                                                                              measure_type_detailed_defense='Advanced').get_normalized_dict()
+        for player in player_drives:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['drives'] = {key: player[key] for key in drives_keys}
 
-                    player_on = player_on_off['PlayersOnCourtTeamPlayerOnOffDetails']
-                    player_off = player_on_off['PlayersOffCourtTeamPlayerOnOffDetails']
+        for player in player_rebounding:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['rebounding'] = {key: player[key] for key in rebounding_keys}
 
-                    keys = ['OFF_RATING', 'DEF_RATING', 'NET_RATING']
-                    for i in range(len(player_on)):
-                        player_id = player_on[i]['VS_PLAYER_ID']  # Player ID
-
-                        for key in keys:
-                            on_value = player_on[i][key]
-                            off_value = player_off[i][key]
-                            on_off_value = on_value - off_value
-
-                            # Update the document with the new field
-                            players_collection.update_one(
-                                {'PERSON_ID': player_id},
-                                {'$set': {f'STATS.{season}.PLAYOFFS.ADV.{key}_ON_OFF': on_off_value}}
-                            )
-                    logging.info(f'Added data for {len(player_on)} players for {season}.')
-
-                # REGULAR SEASON
-                else:
-                    player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=season,
-                                                                                  measure_type_detailed_defense='Advanced').get_normalized_dict()
-
-                    player_on = player_on_off['PlayersOnCourtTeamPlayerOnOffDetails']
-                    player_off = player_on_off['PlayersOffCourtTeamPlayerOnOffDetails']
-
-                    keys = ['OFF_RATING', 'DEF_RATING', 'NET_RATING']
-                    for i in range(len(player_on)):
-                        player_id = player_on[i]['VS_PLAYER_ID']  # Player ID
-                        poss = player_on[i]['POSS']  # Possessions played with team
-
-                        for key in keys:
-                            on_value = player_on[i][key]
-                            off_value = player_off[i][key]
-                            on_off_value = on_value - off_value
-
-                            # Check if player has existing stats for this season
-                            existing_stats = players_collection.find_one(
-                                {'PERSON_ID': player_id},
-                                {'_id': 0, f'STATS.{season}.{season_type}.ADV.{key}_ON_OFF': 1, f'STATS.{season}.{season_type}.ADV.POSS': 1}
-                            )
-
-                            # If existing, calculate weighted average on/off by possessions played.
-                            if existing_stats and f'STATS.{season}.{season_type}.ADV.{key}_ON_OFF' in existing_stats['STATS'][season][season_type][
-                                'ADV']:
-                                existing_on_off = existing_stats['STATS'][season][season_type]['ADV'][key + '_ON_OFF']
-                                existing_poss = existing_stats['STATS'][season][season_type]['ADV']['POSS']
-
-                                # Calculate weighted average
-                                new_on_off_value = ((existing_on_off * existing_poss) + (on_off_value * poss)) / (
-                                        existing_poss + poss)
-                                new_poss = existing_poss + poss
-                            else:
-                                new_on_off_value = on_off_value
-                                new_poss = poss
-
-                            # Update the document with the new field
-                            players_collection.update_one(
-                                {'PERSON_ID': player_id},
-                                {'$set': {f'STATS.{season}.{season_type}.ADV.{key}_ON_OFF': new_on_off_value,
-                                          f'STATS.{season}.{season_type}.ADV.POSS': new_poss}}
-                            )
-                logging.info(f'Added data for {len(player_on)} players for {season} {season_type}.')
+        # Update the MongoDB collection
+        for player_id, data in player_data.items():
+            try:
+                players_collection.update_one(
+                    {'PERSON_ID': player_id},
+                    {'$set': {
+                        # f'STATS.{season}.{season_type}.ADV.TOUCHES': data['touches'],
+                        # f'STATS.{season}.{season_type}.ADV.PASSING': data['passing'],
+                        f'STATS.{season}.{season_type}.ADV.DRIVES': data['drives'],
+                        f'STATS.{season}.{season_type}.ADV.REBOUNDING': data['rebounding'],
+                    }},
+                )
+            except Exception as e:
+                logging.error(f'Unable to add stats for player with ID {player_id}: {e}')
+                continue
 
 
-def three_and_ft_rate():
+def three_and_ft_rate(season_type):
     # Update each document in the collection
     for i, player in enumerate(players_collection.find()):
         logging.info(f'Processing {i} of {players_collection.count_documents({})}...')
         if 'STATS' in player:
             for season in player['STATS']:
                 if season in seasons:
-                    for season_type in season.keys():
-                        try:
-                            # Extract the values needed for calculation
-                            fg3a = player['STATS'][season][season_type]['BASIC'].get('FG3A', 0)
-                            fta = player['STATS'][season][season_type]['BASIC'].get('FTA', 0)
-                            ftm = player['STATS'][season][season_type]['BASIC'].get('FTM', 0)
-                            fga = player['STATS'][season][season_type]['BASIC'].get('FGA', 1)  # Avoid division by zero
-                            fgm = player['STATS'][season][season_type]['BASIC'].get('FGM', 1)
-                            # Calculate 3PAr
-                            three_pt_rate = fg3a / fga
-                            fta_rate = fta / fga
-                            ft_per_fgm = ftm / fgm
+                    try:
+                        # Extract the values needed for calculation
+                        fg3a = player['STATS'][season][season_type]['BASIC'].get('FG3A', 0)
+                        fta = player['STATS'][season][season_type]['BASIC'].get('FTA', 0)
+                        ftm = player['STATS'][season][season_type]['BASIC'].get('FTM', 0)
+                        fga = player['STATS'][season][season_type]['BASIC'].get('FGA', 1)  # Avoid division by zero
 
-                            # Update the document with the new field
-                            players_collection.update_one(
-                                {'PERSON_ID': player['PERSON_ID']},
-                                {'$set': {f'STATS.{season}.{season_type}.BASIC.3PAr': three_pt_rate,
-                                          f'STATS.{season}.{season_type}.BASIC.FTAr': fta_rate,
-                                          f'STATS.{season}.{season_type}.BASIC.FT_PER_FGM': ft_per_fgm}
-                                 }
-                            )
+                        # Calculate 3PAr
+                        three_pt_rate = fg3a / fga
+                        fta_rate = fta / fga
+                        ft_per_fga = ftm / fga
 
-                        except Exception as e:
-                            print(f"Key error for document with _id {player['PERSON_ID']}: {e}")
-                            continue
+                        # Update the document with the new field
+                        players_collection.update_one(
+                            {'PERSON_ID': player['PERSON_ID']},
+                            {'$set': {f'STATS.{season}.{season_type}.BASIC.3PAr': three_pt_rate,
+                                      f'STATS.{season}.{season_type}.BASIC.FTAr': fta_rate,
+                                      f'STATS.{season}.{season_type}.BASIC.FT_PER_FGA': ft_per_fga}
+                             }
+                        )
+
+                    except Exception as e:
+                        print(f"Key error for document with _id {player['PERSON_ID']}: {e}")
+                        continue
+
+
+def poss_per_game(season_type):
+    # Update each document in the collection
+    for i, player in enumerate(players_collection.find()):
+        logging.info(f'Processing {i} of {players_collection.count_documents({})}...')
+        if 'STATS' in player:
+            for season in player['STATS']:
+                if season in seasons:
+                    try:
+                        # Extract the values needed for calculation
+                        poss = player['STATS'][season][season_type]['ADV'].get('POSS', 0)
+                        gp = player['STATS'][season][season_type]['ADV'].get('GP', 1)  # Avoid division by zero
+
+                        # Calculate POSS PER GAME
+                        poss_per_game = poss / gp
+
+                        # Update the document with the new field
+                        players_collection.update_one(
+                            {'PERSON_ID': player['PERSON_ID']},
+                            {'$set': {f'STATS.{season}.{season_type}.ADV.POSS_PER_GM': poss_per_game}
+                             }
+                        )
+
+                    except Exception as e:
+                        print(f"Key error for document with _id {player['PERSON_ID']}: {e}")
+                        continue
+
+
+def player_on_off(season_type):
+    avail_seasons = [
+        '2023-24',
+        '2022-23',
+        '2021-22',
+        '2020-21',
+        '2019-20',
+        '2018-19',
+        '2017-18',
+        '2016-17',
+        '2015-16',
+        '2014-15',
+        '2013-14',
+        '2012-13',
+        '2011-12',
+        '2010-11',
+        '2009-10',
+        '2008-09',
+        '2007-08'
+    ]
+
+    for season in avail_seasons:
+        logging.info(f'Processing season {season}...')
+        for team in teams_collection.find({}, {'TEAM_ID': 1, '_id': 0}):
+            if team['TEAM_ID'] == 0:
+                continue
+
+            logging.info(f'Processing team {team["TEAM_ID"]}...')
+
+            # PLAYOFFS
+            if season_type == 'PLAYOFFS':
+                player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=season,
+                                                                              season_type_all_star='Playoffs',
+                                                                              measure_type_detailed_defense='Advanced').get_normalized_dict()
+
+                player_on = player_on_off['PlayersOnCourtTeamPlayerOnOffDetails']
+                player_off = player_on_off['PlayersOffCourtTeamPlayerOnOffDetails']
+
+                keys = ['OFF_RATING', 'DEF_RATING', 'NET_RATING']
+                for i in range(len(player_on)):
+                    player_id = player_on[i]['VS_PLAYER_ID']  # Player ID
+
+                    for key in keys:
+                        on_value = player_on[i][key]
+                        off_value = player_off[i][key]
+                        on_off_value = on_value - off_value
+
+                        # Update the document with the new field
+                        players_collection.update_one(
+                            {'PERSON_ID': player_id},
+                            {'$set': {f'STATS.{season}.PLAYOFFS.ADV.{key}_ON_OFF': on_off_value}}
+                        )
+                logging.info(f'Added data for {len(player_on)} players for {season}.')
+
+            # REGULAR SEASON
+            else:
+                player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=season,
+                                                                              measure_type_detailed_defense='Advanced').get_normalized_dict()
+
+                player_on = player_on_off['PlayersOnCourtTeamPlayerOnOffDetails']
+                player_off = player_on_off['PlayersOffCourtTeamPlayerOnOffDetails']
+
+                keys = ['OFF_RATING', 'DEF_RATING', 'NET_RATING']
+                for i in range(len(player_on)):
+                    player_id = player_on[i]['VS_PLAYER_ID']  # Player ID
+
+                    for key in keys:
+                        on_value = player_on[i][key]
+                        off_value = player_off[i][key]
+                        on_off_value = on_value - off_value
+
+                        stat_name = f'{key}_ON_OFF'
+                        poss = player_on[i]['POSS']  # Possessions played with team
+
+                        # Check player's existing stats for this season
+                        existing_stats = players_collection.find_one(
+                            {'PERSON_ID': player_id},
+                            {'_id': 0, f'STATS.{season}.{season_type}.ADV.{key}_ON_OFF': 1,
+                             f'STATS.{season}.{season_type}.ADV.{stat_name}_POSS': 1}
+                        )
+
+                        # If existing, calculate weighted average on/off by possessions played for each team.
+                        if existing_stats and stat_name in existing_stats['STATS'][season][season_type]['ADV']:
+                            existing_on_off = existing_stats['STATS'][season][season_type]['ADV'][stat_name]
+                            existing_poss = existing_stats['STATS'][season][season_type]['ADV'][f'{stat_name}_POSS']
+
+                            # Calculate weighted average
+                            new_on_off_value = ((existing_on_off * existing_poss) + (on_off_value * poss)) / (
+                                    existing_poss + poss)
+                            new_poss = existing_poss + poss
+                        else:
+                            new_on_off_value = on_off_value
+                            new_poss = poss
+
+                        # Update the document with the new field
+                        players_collection.update_one(
+                            {'PERSON_ID': player_id},
+                            {'$set': {
+                                f'STATS.{season}.{season_type}.ADV.{stat_name}_POSS': new_poss,
+                                f'STATS.{season}.{season_type}.ADV.{stat_name}': new_on_off_value
+                            }
+                            }
+                        )
+
+            logging.info(f'Added data for {len(player_on)} players for {season} {season_type}.')
 
 
 if __name__ == "__main__":
@@ -372,22 +437,22 @@ if __name__ == "__main__":
     teams_collection = db.nba_teams
     logging.info("Connected to MongoDB")
 
-    # logging.info("\nAdding 3PAr and FTAr data...\n")
-    # three_and_ft_rate()
-
     # logging.info("\nAdding Player On/Off data...\n")
-    # player_on_off()
-
-    # logging.info("\nAdding Player Tracking data...\n")
-    # passes_and_touches()
-
-    logging.info("\nAdding Shot Distribution data...\n")
-    shot_distribution()
+    # player_on_off(season_types[0])
 
     # logging.info("\nAdding Poss Per Game data...\n")
-    # poss_per_game()
+    # poss_per_game(season_types[0])
+
+    # logging.info("\nAdding 3PAr and FTAr data...\n")
+    # three_and_ft_rate(season_types[0])
+
+    logging.info("\nAdding Passes and Touches data...\n")
+    player_tracking_stats(season_types[1])
 
     # logging.info("\nAdding Touches Breakdown data...\n")
-    # touches_breakdown()
+    # touches_breakdown(season_types[0])
+
+    # logging.info("\nAdding Shot Distribution data...\n")
+    # shot_distribution(season_types[0])
 
     logging.info("Update complete.")

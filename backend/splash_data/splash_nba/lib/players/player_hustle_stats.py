@@ -5,10 +5,11 @@ import logging
 
 
 def fetch_player_playoff_hustle_stats(seasons):
-
     for season in seasons:
         logging.info(f'Processing stats for {season}...')
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=season, season_type_all_star='Playoffs').get_normalized_dict()['HustleStatsPlayer']
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=season,
+                                                                              season_type_all_star='Playoffs').get_normalized_dict()[
+            'HustleStatsPlayer']
 
         logging.info(f'Adding data for {len(player_hustle_stats)} players.')
         for player in player_hustle_stats:
@@ -25,14 +26,21 @@ def fetch_player_playoff_hustle_stats(seasons):
 def fetch_player_hustle_stats(seasons):
     for season in seasons:
         logging.info(f'Processing stats for {season}...')
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=season).get_normalized_dict()['HustleStatsPlayer']
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=season).get_normalized_dict()[
+            'HustleStatsPlayer']
 
         logging.info(f'Adding data for {len(player_hustle_stats)} players.')
         for player in player_hustle_stats:
             try:
                 players_collection.update_one(
-                    {'PERSON_ID': player['PLAYER_ID']},
-                    {'$set': {f'STATS.{season}.HUSTLE': player}}
+                    {
+                        'PERSON_ID': player['PLAYER_ID'],
+                        '$or': [
+                            {f'STATS.{season}.REGULAR SEASON.HUSTLE': {'$exists': False}},
+                            {f'STATS.{season}.REGULAR SEASON.HUSTLE': {'$eq': {}}}
+                        ]
+                    },
+                    {'$set': {f'STATS.{season}.REGULAR SEASON.HUSTLE': player}}
                 )
             except Exception as e:
                 logging.error(f'Unable to add stats for {player}: {e}')
@@ -61,7 +69,5 @@ if __name__ == '__main__':
         '2016-17',
     ]
 
-    # fetch_player_hustle_stats(seasons)
-    fetch_player_playoff_hustle_stats(seasons)
-
-
+    fetch_player_hustle_stats(seasons)
+    # fetch_player_playoff_hustle_stats(seasons)

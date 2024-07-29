@@ -249,7 +249,7 @@ class _CareerStatsState extends State<CareerStats> {
             Expanded(
               flex: 4,
               child: Text(
-                widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'],
+                widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'] ?? '-',
                 style: kBebasBold,
               ),
             ),
@@ -257,61 +257,69 @@ class _CareerStatsState extends State<CareerStats> {
         );
       case 2:
         return StandingsDataText(
-            text: widget.seasons[season][widget.seasonType]['BASIC']['GP'].toStringAsFixed(0));
+            text:
+                widget.seasons[season][widget.seasonType]?['BASIC']['GP'].toStringAsFixed(0) ??
+                    '-');
       case 3:
         return StandingsDataText(
             text: (widget.seasons[season][widget.seasonType]['BASIC']['PTS'] /
-                    widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                .toStringAsFixed(1));
+                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                    .toStringAsFixed(1) ??
+                '-');
       case 4:
         return StandingsDataText(
             text: (widget.seasons[season][widget.seasonType]['BASIC']['REB'] /
-                    widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                .toStringAsFixed(1));
+                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                    .toStringAsFixed(1) ??
+                '-');
       case 5:
         return StandingsDataText(
             text: (widget.seasons[season][widget.seasonType]['BASIC']['AST'] /
-                    widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                .toStringAsFixed(1));
+                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                    .toStringAsFixed(1) ??
+                '-');
       case 6:
         return StandingsDataText(
             text: (widget.seasons[season][widget.seasonType]['BASIC']['STL'] /
-                    widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                .toStringAsFixed(1));
+                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                    .toStringAsFixed(1) ??
+                '-');
       case 7:
         return StandingsDataText(
             text: (widget.seasons[season][widget.seasonType]['BASIC']['BLK'] /
-                    widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                .toStringAsFixed(1));
+                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                    .toStringAsFixed(1) ??
+                '-');
       case 8:
         return StandingsDataText(
             text: (widget.seasons[season][widget.seasonType]['BASIC']['TOV'] /
-                    widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                .toStringAsFixed(1));
+                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                    .toStringAsFixed(1) ??
+                '-');
       case 9:
         return StandingsDataText(
             text:
-                '${(widget.seasons[season][widget.seasonType]['BASIC']['FG_PCT'] * 100).toStringAsFixed(1)}%');
+                '${(widget.seasons[season][widget.seasonType]['BASIC']['FG_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
       case 10:
         return StandingsDataText(
             text:
-                '${(widget.seasons[season][widget.seasonType]['BASIC']['FG3_PCT'] * 100).toStringAsFixed(1)}%');
+                '${(widget.seasons[season][widget.seasonType]['BASIC']['FG3_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
       case 11:
         return StandingsDataText(
             text:
-                '${(widget.seasons[season][widget.seasonType]['BASIC']['FT_PCT'] * 100).toStringAsFixed(1)}%');
+                '${(widget.seasons[season][widget.seasonType]['BASIC']['FT_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
       case 12:
         return StandingsDataText(
             text:
-                '${(widget.seasons[season][widget.seasonType]['ADV']['EFG_PCT'] * 100).toStringAsFixed(1)}%');
+                '${(widget.seasons[season][widget.seasonType]['ADV']['EFG_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
       case 13:
         return StandingsDataText(
             text:
-                '${(widget.seasons[season][widget.seasonType]['ADV']['TS_PCT'] * 100).toStringAsFixed(1)}%');
+                '${(widget.seasons[season][widget.seasonType]['ADV']['TS_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
       case 14:
         return StandingsDataText(
             text:
-                '${(widget.seasons[season][widget.seasonType]['ADV']['USG_PCT'] * 100).toStringAsFixed(1)}%');
+                '${(widget.seasons[season][widget.seasonType]['ADV']['USG_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
       case 15:
         return StandingsDataText(
             text: int.parse(season.substring(0, 4)) > 2007

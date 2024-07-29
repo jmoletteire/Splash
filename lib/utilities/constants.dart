@@ -2047,6 +2047,298 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
   },
+  'DRIVES': {
+    'DRIVES': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVES',
+        'rank_nba_name': 'DRIVES_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVES_PER_75',
+        'rank_nba_name': 'DRIVES_PER_75_RANK',
+      },
+      'splash_name': 'DRIVES',
+      'full_name': 'Drives',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'fill': {'first_available': '2013'},
+    'DRIVE PTS': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_PTS',
+        'rank_nba_name': 'DRIVE_PTS_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_PTS_PER_75',
+        'rank_nba_name': 'DRIVE_PTS_PER_75_RANK',
+      },
+      'splash_name': 'PTS',
+      'full_name': 'Drives',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'PTS PER DRIVE': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_PTS_PCT',
+        'rank_nba_name': 'DRIVE_PTS_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_PTS_PCT',
+        'rank_nba_name': 'DRIVE_PTS_PCT_RANK',
+      },
+      'splash_name': 'PTS PER DRIVE',
+      'full_name': 'Points per Drive',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '2',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'fill2': {'first_available': '2013'},
+    'DRIVE FGM': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_FGM',
+        'rank_nba_name': 'DRIVE_FGM_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_FGM_PER_75',
+        'rank_nba_name': 'DRIVE_FGM_PER_75_RANK',
+      },
+      'splash_name': 'DRIVE FGM',
+      'full_name': 'Drives',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE FGA': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_FGA',
+        'rank_nba_name': 'DRIVE_FGA_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_FGA_PER_75',
+        'rank_nba_name': 'DRIVE_FGA_PER_75_RANK',
+      },
+      'splash_name': 'DRIVE FGA',
+      'full_name': 'Drives',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE FG%': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_FG_PCT',
+        'rank_nba_name': 'DRIVE_FG_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_FG_PCT',
+        'rank_nba_name': 'DRIVE_FG_PCT_RANK',
+      },
+      'splash_name': 'DRIVE FG%',
+      'full_name': 'Drives',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'fill3': {'first_available': '2013'},
+    'DRIVE FTM': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_FTM',
+        'rank_nba_name': 'DRIVE_FTM_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_FTM_PER_75',
+        'rank_nba_name': 'DRIVE_FTM_PER_75_RANK',
+      },
+      'splash_name': 'DRIVE FTM',
+      'full_name': 'Drive - Free Throws Made',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE FTA': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_FTA',
+        'rank_nba_name': 'DRIVE_FGA_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_FTA_PER_75',
+        'rank_nba_name': 'DRIVE_FTA_PER_75_RANK',
+      },
+      'splash_name': 'DRIVE FTA',
+      'full_name': 'Drive - Free Throw Attempts',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE FT%': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_FT_PCT',
+        'rank_nba_name': 'DRIVE_FT_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_FT_PCT',
+        'rank_nba_name': 'DRIVE_FT_PCT_RANK',
+      },
+      'splash_name': 'DRIVE FT%',
+      'full_name': 'Drive Free Throw %',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'fill4': {'first_available': '2013'},
+    'DRIVE PASSES': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_PASSES',
+        'rank_nba_name': 'DRIVE_PASSES_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_PASSES_PER_75',
+        'rank_nba_name': 'DRIVE_PASSES_PER_75_RANK',
+      },
+      'splash_name': 'PASSES MADE',
+      'full_name': 'Drive Passes',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE PASS%': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_PASSES_PCT',
+        'rank_nba_name': 'DRIVE_PASSES_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_PASSES_PCT',
+        'rank_nba_name': 'DRIVE_PASSES_PCT_RANK',
+      },
+      'splash_name': 'PASS %',
+      'full_name': 'Drive Pass %',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE AST': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_AST',
+        'rank_nba_name': 'DRIVE_AST_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_AST_PER_75',
+        'rank_nba_name': 'DRIVE_AST_PER_75_RANK',
+      },
+      'splash_name': 'AST',
+      'full_name': 'Drive Assists',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE AST%': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_AST_PCT',
+        'rank_nba_name': 'DRIVE_AST_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_AST_PCT',
+        'rank_nba_name': 'DRIVE_AST_PCT_RANK',
+      },
+      'splash_name': 'ASSIST %',
+      'full_name': 'Assists per Drive',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'fill5': {'first_available': '2013'},
+    'DRIVE TOV': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_TOV',
+        'rank_nba_name': 'DRIVE_TOV_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_TOV_PER_75',
+        'rank_nba_name': 'DRIVE_TOV_PER_75_RANK',
+      },
+      'splash_name': 'TOV',
+      'full_name': 'Drives',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE TOV%': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_TOV_PCT',
+        'rank_nba_name': 'DRIVE_TOV_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_TOV_PCT',
+        'rank_nba_name': 'DRIVE_TOV_PCT_RANK',
+      },
+      'splash_name': 'TURNOVER %',
+      'full_name': 'Turnovers per Drive',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+  },
   'REBOUNDING': {
     'REB': {
       'location': ['BASIC'],
@@ -2141,7 +2433,159 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of available defensive rebounds a player obtains while on the floor.',
       'formula': ''
     },
-    'fill2': {'first_available': '2016'},
+    'fill2': {'first_available': '2013'},
+    'OREB CHANCES': {
+      'location': ['ADV', 'REBOUNDING'],
+      'TOTAL': {
+        'nba_name': 'OREB_CHANCES',
+        'rank_nba_name': 'OREB_CHANCES_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'OREB_CHANCES_PER_75_PCT',
+        'rank_nba_name': 'OREB_CHANCES_PER_75_RANK',
+      },
+      'splash_name': 'OREB CHANCES',
+      'full_name': 'Offensive Rebound Chances',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'A player has a rebound chance if they are the closest player to the ball at any point in time between when the ball has crossed below the rim to when it is fully rebounded.',
+      'formula': ''
+    },
+    'DREB CHANCES': {
+      'location': ['ADV', 'REBOUNDING'],
+      'TOTAL': {
+        'nba_name': 'DREB_CHANCES',
+        'rank_nba_name': 'DREB_CHANCES_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DREB_CHANCES_PER_75',
+        'rank_nba_name': 'DREB_CHANCES_PER_75_RANK',
+      },
+      'splash_name': 'DREB CHANCES',
+      'full_name': 'Defensive Rebound Chances',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'A player has a rebound chance if they are the closest player to the ball at any point in time between when the ball has crossed below the rim to when it is fully rebounded.',
+      'formula': ''
+    },
+    'OREB DEFER': {
+      'location': ['ADV', 'REBOUNDING'],
+      'TOTAL': {
+        'nba_name': 'OREB_CHANCE_DEFER',
+        'rank_nba_name': 'OREB_CHANCE_DEFER_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'OREB_CHANCE_DEFER_PER_75',
+        'rank_nba_name': 'OREB_CHANCE_DEFER_PER_75_RANK',
+      },
+      'splash_name': 'OREB DEFER',
+      'full_name': 'Offensive Rebound Chances Deferred',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'The number of times that a player has an offensive rebound chance, but defers the rebound to a teammate',
+      'formula': ''
+    },
+    'DREB DEFER': {
+      'location': ['ADV', 'REBOUNDING'],
+      'TOTAL': {
+        'nba_name': 'DREB_CHANCE_DEFER',
+        'rank_nba_name': 'DREB_CHANCE_DEFER_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DREB_CHANCE_DEFER_PER_75',
+        'rank_nba_name': 'DREB_CHANCE_DEFER_PER_75_RANK',
+      },
+      'splash_name': 'DREB DEFER',
+      'full_name': 'Defensive Rebound Chances Deferred',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'The number of times that a player has a defensive rebound chance, but defers the rebound to a teammate',
+      'formula': ''
+    },
+    'fill3': {'first_available': '2013'},
+    'OREB CHANCE %': {
+      'location': ['ADV', 'REBOUNDING'],
+      'TOTAL': {
+        'nba_name': 'OREB_CHANCE_PCT',
+        'rank_nba_name': 'OREB_CHANCE_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'OREB_CHANCE_PCT',
+        'rank_nba_name': 'OREB_CHANCE_PCT_RANK',
+      },
+      'splash_name': 'OREB CHANCE %',
+      'full_name': 'Offensive Rebound Chance Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition': 'Percentage of rebounds gathered when given a rebound chance on offense.',
+      'formula': 'OREB / OREB Chances'
+    },
+    'DREB CHANCE %': {
+      'location': ['ADV', 'REBOUNDING'],
+      'TOTAL': {
+        'nba_name': 'DREB_CHANCE_PCT',
+        'rank_nba_name': 'DREB_CHANCE_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DREB_CHANCE_PCT',
+        'rank_nba_name': 'DREB_CHANCE_PCT_RANK',
+      },
+      'splash_name': 'DREB CHANCE %',
+      'full_name': 'Defensive Rebound Chance Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition': 'Percentage of rebounds gathered when given a rebound chance on defense.',
+      'formula': 'DREB / DREB Chances'
+    },
+    'ADJ OREB CHANCE %': {
+      'location': ['ADV', 'REBOUNDING'],
+      'TOTAL': {
+        'nba_name': 'OREB_CHANCE_PCT_ADJ',
+        'rank_nba_name': 'OREB_CHANCE_PCT_ADJ_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'OREB_CHANCE_PCT_ADJ',
+        'rank_nba_name': 'OREB_CHANCE_PCT_ADJ_RANK',
+      },
+      'splash_name': 'ADJ OREB CHANCE %',
+      'full_name': 'Adjusted Offensive Rebound Chance Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Percentage of rebounds gathered when given a rebound chance on offense; excludes all deferred rebounds.',
+      'formula': '(OREB)/(OREB Chances - Deferred OREB Chances)'
+    },
+    'ADJ DREB CHANCE %': {
+      'location': ['ADV', 'REBOUNDING'],
+      'TOTAL': {
+        'nba_name': 'DREB_CHANCE_PCT_ADJ',
+        'rank_nba_name': 'DREB_CHANCE_PCT_ADJ_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DREB_CHANCE_PCT_ADJ',
+        'rank_nba_name': 'DREB_CHANCE_PCT_ADJ_RANK',
+      },
+      'splash_name': 'ADJ DREB CHANCE %',
+      'full_name': 'Adjusted Defensive Rebound Chance Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Percentage of rebounds gathered when given a rebound chance on defense; excludes all deferred rebounds.',
+      'formula': '(DREB)/(DREB Chances - Deferred DREB Chances)'
+    },
+    'fill4': {'first_available': '2016'},
     'BOX OUTS': {
       'location': ['HUSTLE'],
       'TOTAL': {
