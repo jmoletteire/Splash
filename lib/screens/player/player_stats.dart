@@ -24,6 +24,7 @@ class _PlayerStatsState extends State<PlayerStats> {
   List<String> modes = ['TOTAL', 'PER_75'];
   bool _playoffSwitch = false;
   int perModeInitialLabelIndex = 0;
+  bool expandAll = true;
 
   double getPercentile(List<String> location, String stat) {
     num rank = (location.length == 1
@@ -52,27 +53,26 @@ class _PlayerStatsState extends State<PlayerStats> {
         return getPercentile(['ADV'], 'TS_PCT');
       case 'Defense':
         double result = (getPercentile(['ADV'], 'DEF_RATING_ON_OFF') +
+                getPercentile(['ADV'], 'DPS_PER_75') +
                 getPercentile(['BASIC'], 'STL_PER_75') +
                 getPercentile(['BASIC'], 'BLK_PER_75') +
                 getPercentile(['HUSTLE'], 'DEFLECTIONS_PER_75') +
                 getPercentile(['HUSTLE'], 'CONTESTED_SHOTS_PER_75')) /
-            5;
+            6;
         return result;
       case 'Rebounding':
         double result = (getPercentile(['ADV'], 'OREB_PCT') +
                 getPercentile(['ADV'], 'DREB_PCT') +
                 getPercentile(['HUSTLE'], 'BOX_OUTS_PER_75') +
-                getPercentile(['HUSTLE'], 'OFF_BOXOUTS_PER_75') +
-                getPercentile(['HUSTLE'], 'DEF_BOXOUTS_PER_75')) /
-            5;
+                getPercentile(['ADV', 'REBOUNDING'], 'REB_CHANCE_PCT_ADJ')) /
+            4;
         return result;
-      case 'Passing':
-        double result = (getPercentile(['BASIC'], 'AST_PER_75') +
-                getPercentile(['ADV', 'PASSING'], 'AST_ADJ_PER_75') +
-                getPercentile(['ADV', 'PASSING'], 'AST_TO_PASS_PCT') +
+      case 'Playmaking':
+        double result = (getPercentile(['ADV', 'PASSING'], 'AST_ADJ_PER_75') +
                 getPercentile(['ADV', 'PASSING'], 'AST_TO_PASS_PCT_ADJ') +
-                getPercentile(['ADV', 'PASSING'], 'POTENTIAL_AST_PER_75')) /
-            5;
+                getPercentile(['ADV', 'PASSING'], 'POTENTIAL_AST_PER_75') +
+                getPercentile(['ADV'], 'BOX_CREATION')) /
+            4;
         return result;
       case 'Hustle':
         double result = (getPercentile(['ADV'], 'PACE') +
@@ -265,7 +265,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                 values: [
                                   getFinalPercentile('Defense'),
                                   getFinalPercentile('Rebounding'),
-                                  getFinalPercentile('Passing'),
+                                  getFinalPercentile('Playmaking'),
                                   getFinalPercentile('Hustle'),
                                   getFinalPercentile('Efficiency'),
                                   getFinalPercentile('Shooting'),
@@ -273,7 +273,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                 colors: [
                                   teamColor.withOpacity(getFinalPercentile('Defense')),
                                   teamColor.withOpacity(getFinalPercentile('Rebounding')),
-                                  teamColor.withOpacity(getFinalPercentile('Passing')),
+                                  teamColor.withOpacity(getFinalPercentile('Playmaking')),
                                   teamColor.withOpacity(getFinalPercentile('Hustle')),
                                   teamColor.withOpacity(getFinalPercentile('Efficiency')),
                                   teamColor.withOpacity(getFinalPercentile('Shooting')),
@@ -281,7 +281,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                 labels: const [
                                   'Defense',
                                   'Rebounding',
-                                  'Passing',
+                                  'Playmaking',
                                   'Hustle',
                                   'Efficiency',
                                   'Shooting',
@@ -342,7 +342,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                           PlayerStatCard(
                             playerStats: widget.player['STATS'][selectedSeason],
                             selectedSeason: selectedSeason,
-                            statGroup: 'PASSING',
+                            statGroup: 'PLAYMAKING',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
                           ),

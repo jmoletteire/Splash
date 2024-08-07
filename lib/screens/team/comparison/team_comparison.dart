@@ -842,17 +842,15 @@ class _TeamComparisonState extends State<TeamComparison> {
                             ),
                             const SizedBox(height: 5.0),
                             ComparisonRow(
-                              statName: 'FTA Rate%',
+                              statName: 'FT/FGA',
                               teamOne: roundToDecimalPlaces(
-                                  (teamOne['seasons'][selectedSeasonOne]['STATS']
-                                          [selectedSeasonTypeOne]['BASIC']['FTAr'] *
-                                      100),
-                                  1),
+                                  teamOne['seasons'][selectedSeasonOne]['STATS']
+                                      [selectedSeasonTypeOne]['BASIC']['FT_PER_FGA'],
+                                  2),
                               teamTwo: roundToDecimalPlaces(
-                                  (teamTwo['seasons'][selectedSeasonTwo]['STATS']
-                                          [selectedSeasonTypeTwo]['BASIC']['FTAr'] *
-                                      100),
-                                  1),
+                                  teamTwo['seasons'][selectedSeasonTwo]['STATS']
+                                      [selectedSeasonTypeTwo]['BASIC']['FT_PER_FGA'],
+                                  2),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),

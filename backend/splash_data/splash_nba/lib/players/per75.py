@@ -77,8 +77,10 @@ if __name__ == '__main__':
         # ("FTA", "BASIC"),
         # ("FG3M", "BASIC"),
         # ("FG3A", "BASIC"),
+        # ("AST", "BASIC"),
         # ("STL", "BASIC"),
         # ("BLK", "BASIC"),
+        # ("BLKA", "BASIC"),
         # ("REB", "BASIC"),
         # ("OREB", "BASIC"),
         # ("DREB", "BASIC"),
@@ -86,7 +88,7 @@ if __name__ == '__main__':
         # ("PF", "BASIC"),
         # ("PFD", "BASIC"),
         # ("PTS", "BASIC"),
-        ("PLUS_MINUS", "BASIC"),
+        # ("PLUS_MINUS", "BASIC"),
 
         # HUSTLE
         # ("CONTESTED_SHOTS", "HUSTLE"),
@@ -111,7 +113,8 @@ if __name__ == '__main__':
 
         # ADV -> TOUCHES
         # ("TOUCHES", "ADV.TOUCHES"),
-        # "FRONT_CT_TOUCHES", "ADV.TOUCHES"),
+        # ("FRONT_CT_TOUCHES", "ADV.TOUCHES"),
+        ("TIME_OF_POSS", "ADV.TOUCHES"),
 
         # ADV -> DRIVES
         # ("DRIVES", "ADV.DRIVES"),
@@ -139,7 +142,7 @@ if __name__ == '__main__':
         # ("REB_CHANCE_DEFER", "ADV.REBOUNDING")
     ]
 
-    playoffs = True
+    playoffs = False
 
     # Set the batch size
     batch_size = 25  # Adjust this value based on your needs and system performance

@@ -20,9 +20,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
   @override
   void initState() {
     super.initState();
-    widget.player.keys.contains('STATS')
-        ? seasons = widget.player['STATS']
-        : seasons = {};
+    widget.player.keys.contains('STATS') ? seasons = widget.player['STATS'] : seasons = {};
 
     playoffSeasons = {};
     for (var season in seasons.keys) {
@@ -32,8 +30,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
     }
 
     _scrollController.addListener(() {
-      if (_scrollController.offset <=
-              _scrollController.position.minScrollExtent &&
+      if (_scrollController.offset <= _scrollController.position.minScrollExtent &&
           !_scrollController.position.outOfRange) {}
     });
   }
@@ -46,8 +43,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
 
   @override
   Widget build(BuildContext context) {
-    return !widget.player.keys.contains('STATS') ||
-            !widget.player['STATS'].isNotEmpty
+    return !widget.player.keys.contains('STATS') || !widget.player['STATS'].isNotEmpty
         ? Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -60,41 +56,36 @@ class _PlayerCareerState extends State<PlayerCareer> {
                 const SizedBox(height: 15.0),
                 Text(
                   'No Stats Available',
-                  style: kBebasNormal.copyWith(
-                      fontSize: 20.0, color: Colors.white54),
+                  style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
                 ),
               ],
             ),
           )
-        : ScrollConfiguration(
-            behavior: MyCustomScrollBehavior(),
-            child: CustomScrollView(
-              slivers: [
-                CareerStats(
-                  player: widget.player,
-                  seasons: seasons,
-                  seasonType: 'REGULAR SEASON',
-                ),
-                if (playoffSeasons.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15.0, vertical: 8.0),
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Playoffs',
-                        style: kBebasNormal.copyWith(fontSize: 14.0),
-                      ),
+        : CustomScrollView(
+            slivers: [
+              CareerStats(
+                player: widget.player,
+                seasons: seasons,
+                seasonType: 'REGULAR SEASON',
+              ),
+              if (playoffSeasons.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Playoffs',
+                      style: kBebasNormal.copyWith(fontSize: 14.0),
                     ),
                   ),
-                if (playoffSeasons.isNotEmpty)
-                  CareerStats(
-                    player: widget.player,
-                    seasons: playoffSeasons,
-                    seasonType: 'PLAYOFFS',
-                  )
-              ],
-            ),
+                ),
+              if (playoffSeasons.isNotEmpty)
+                CareerStats(
+                  player: widget.player,
+                  seasons: playoffSeasons,
+                  seasonType: 'PLAYOFFS',
+                )
+            ],
           );
   }
 }

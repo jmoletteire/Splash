@@ -46,26 +46,26 @@ def fetch_player_stats(seasons):
         logging.info(f'Adding data for {len(player_stats)} players.')
         for i, player in enumerate(player_stats):
             try:
-                # player[0]['NUM_PLAYERS'] = num_players
+                player[0]['NUM_PLAYERS'] = num_players
 
                 # Only update if BASIC does not exist, or exists but is empty
                 players_collection.update_one(
                     {
-                        'PERSON_ID': player[1]['PLAYER_ID'],
+                        'PERSON_ID': player[0]['PLAYER_ID'],
                         '$or': [
-                            {f'STATS.{season}.REGULAR SEASON.ADV.POSS': {'$exists': False}},
-                            {f'STATS.{season}.REGULAR SEASON.ADV.POSS': {'$eq': {}}}
+                            {f'STATS.{season}.REGULAR SEASON.BASIC': {'$exists': False}},
+                            {f'STATS.{season}.REGULAR SEASON.BASIC': {'$eq': {}}}
                         ]
                     },
                     {
                         '$set': {
-                            # f'STATS.{season}.REGULAR SEASON.BASIC': player[0],
-                            f'STATS.{season}.REGULAR SEASON.ADV.POSS': player[1]['POSS']
+                            f'STATS.{season}.REGULAR SEASON.BASIC': player[0],
+                            f'STATS.{season}.REGULAR SEASON.ADV': player[1]
                         }
                     }
                 )
             except Exception as e:
-                logging.error(f"Unable to add stats for {player[1]['PLAYER_NAME']}: {e}")
+                logging.error(f"Unable to add stats for {player[0]['PLAYER_NAME']}: {e}")
                 continue
 
 

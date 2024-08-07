@@ -231,7 +231,7 @@ class StatisticRow extends StatelessWidget {
                             statName != 'POSS'
                         ? value.toStringAsFixed(1)
                         : value.toStringAsFixed(0))
-                    : convert == 'true'
+                    : convert == 'true' || statName == 'OFF LOAD'
                         ? '${value.toStringAsFixed(int.parse(round))}%'
                         : value.toStringAsFixed(int.parse(round)),
                 textAlign: TextAlign.right,

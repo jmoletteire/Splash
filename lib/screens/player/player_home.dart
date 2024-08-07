@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,8 +9,8 @@ import 'package:splash/components/player_avatar.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/player/career/player_career.dart';
 import 'package:splash/screens/player/comparison/player_comparison.dart';
+import 'package:splash/screens/player/gamelogs/player_gamelogs.dart';
 import 'package:splash/screens/player/player_cache.dart';
-import 'package:splash/screens/player/player_contract.dart';
 import 'package:splash/screens/player/player_stats.dart';
 import 'package:splash/screens/player/profile/player_profile.dart';
 import 'package:splash/utilities/constants.dart';
@@ -172,7 +173,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
     ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
         PlayerStats(team: team, player: player),
     ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
-        PlayerContract(team: team, player: player),
+        PlayerGamelogs(team: team, player: player),
     ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
         PlayerCareer(team: team, player: player),
   ];
@@ -192,7 +193,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                     : (kTeamColors[team['ABBREVIATION']]?['primaryColor']),
               ),
             )
-          : NestedScrollView(
+          : ExtendedNestedScrollView(
               controller: _scrollController,
               headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return [
@@ -266,7 +267,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       tabs: const [
                         Tab(text: 'Profile'),
                         Tab(text: 'Stats'),
-                        Tab(text: 'Contract'),
+                        Tab(text: 'Gamelog'),
                         Tab(text: 'Career'),
                       ],
                     ),
@@ -297,6 +298,10 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                   ),
                 ];
               },
+              pinnedHeaderSliverHeightBuilder: () {
+                return (210 - kToolbarHeight);
+              },
+              onlyOneScrollInBody: false,
               body: TabBarView(
                 controller: _tabController,
                 children: _playerPages.map((page) {

@@ -1,3 +1,4 @@
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -142,7 +143,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
             color: Colors.deepOrange,
           )
         : Scaffold(
-            body: NestedScrollView(
+            body: ExtendedNestedScrollView(
               controller: _scrollController,
               headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return [
@@ -239,6 +240,10 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                   ),
                 ];
               },
+              pinnedHeaderSliverHeightBuilder: () {
+                return (210 - kToolbarHeight);
+              },
+              onlyOneScrollInBody: false,
               body: TabBarView(
                 controller: _tabController,
                 children: _teamPages.map((page) {

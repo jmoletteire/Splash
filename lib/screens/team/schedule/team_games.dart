@@ -30,6 +30,8 @@ class _TeamGamesState extends State<TeamGames> {
   late List<String> gamesList;
   late Map<String, dynamic> teamGames;
   double topPadding = 0.0;
+  bool _showStickyHeader = false;
+  late String seasonType;
 
   Map<String, String> seasonTypes = {
     '*': 'All',
@@ -222,181 +224,223 @@ class _TeamGamesState extends State<TeamGames> {
               ),
             ),
           )
-        : SliverPadding(
-            padding: const EdgeInsets.only(
-              bottom: 2 * kBottomNavigationBarHeight,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  // Get the current game date
-                  List<String> gameDate = formatDate(teamGames[gamesList[index]]['GAME_DATE']);
+        : CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.only(
+                  bottom: 2 * kBottomNavigationBarHeight,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      // Get the current game date
+                      List<String> gameDate =
+                          formatDate(teamGames[gamesList[index]]['GAME_DATE']);
 
-                  // List to hold the widgets to be returned
-                  List<Widget> widgets = [];
+                      // List to hold the widgets to be returned
+                      List<Widget> widgets = [];
 
-                  // Check if we need to add the season separator
-                  if (index == 0 ||
-                      teamGames[gamesList[index]]['SEASON_ID'] !=
-                          teamGames[gamesList[index - 1]]['SEASON_ID']) {
-                    widgets.add(
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          seasonTypes[teamGames[gamesList[index]]['SEASON_ID']
-                              .toString()
-                              .substring(0, 1)]!,
-                          style: kBebasNormal.copyWith(fontSize: 14.0),
-                        ),
-                      ),
-                    );
-                  }
-
-                  // Define the main container to return
-                  Widget gameContainer = GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GameHome(
-                            gameId: gamesList[index].toString(),
-                            homeId: teamGames[gamesList[index]]['HOME_AWAY'] == 'vs'
-                                ? widget.team['TEAM_ID'].toString()
-                                : teamGames[gamesList[index]]['OPP'].toString(),
-                            awayId: teamGames[gamesList[index]]['HOME_AWAY'] == '@'
-                                ? widget.team['TEAM_ID'].toString()
-                                : teamGames[gamesList[index]]['OPP'].toString(),
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
-                      height: MediaQuery.sizeOf(context).height * 0.065,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade900,
-                        border: const Border(
-                            bottom: BorderSide(color: Colors.white70, width: 0.125)),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  gameDate[0],
-                                  style: kBebasNormal.copyWith(
-                                      fontSize: 13.0, color: Colors.white70),
-                                ),
-                                Text(
-                                  gameDate[1],
-                                  style: kBebasNormal.copyWith(fontSize: 13.0),
-                                ),
-                              ],
+                      // Check if we need to add the season separator
+                      if (index == 0 ||
+                          teamGames[gamesList[index]]['SEASON_ID'] !=
+                              teamGames[gamesList[index - 1]]['SEASON_ID']) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          setState(() {
+                            seasonType = seasonTypes[teamGames[gamesList[index]]['SEASON_ID']
+                                .toString()
+                                .substring(0, 1)]!;
+                          });
+                        });
+                        widgets.add(
+                          Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              seasonTypes[teamGames[gamesList[index]]['SEASON_ID']
+                                  .toString()
+                                  .substring(0, 1)]!,
+                              style: kBebasNormal.copyWith(fontSize: 14.0),
                             ),
                           ),
-                          Expanded(
-                            flex: 3,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 30.0,
-                                  child: Text(
-                                    teamGames[gamesList[index]]['HOME_AWAY'],
-                                    style: kBebasBold.copyWith(fontSize: 14.0),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 24.0,
-                                  height: 24.0,
-                                  child: kTeamNames[
-                                              teamGames[gamesList[index]]['OPP'].toString()] ==
-                                          null
-                                      ? const Text('')
-                                      : Image.asset(
-                                          'images/NBA_Logos/${teamGames[gamesList[index]]['OPP']}.png',
-                                          fit: BoxFit.contain,
-                                          width: 16.0,
-                                          height: 16.0,
-                                        ),
-                                ),
-                                const SizedBox(width: 15.0),
-                                Text(
-                                  kTeamNames[teamGames[gamesList[index]]['OPP'].toString()] !=
-                                          null
-                                      ? kTeamNames[
-                                          teamGames[gamesList[index]]['OPP'].toString()][0]
-                                      : 'INT\'L',
-                                  style: kBebasBold.copyWith(fontSize: 18.0),
-                                ),
-                              ],
+                        );
+                      }
+
+                      // Define the main container to return
+                      Widget gameContainer = GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GameHome(
+                                gameId: gamesList[index].toString(),
+                                homeId: teamGames[gamesList[index]]['HOME_AWAY'] == 'vs'
+                                    ? widget.team['TEAM_ID'].toString()
+                                    : teamGames[gamesList[index]]['OPP'].toString(),
+                                awayId: teamGames[gamesList[index]]['HOME_AWAY'] == '@'
+                                    ? widget.team['TEAM_ID'].toString()
+                                    : teamGames[gamesList[index]]['OPP'].toString(),
+                              ),
                             ),
+                          );
+                        },
+                        child: Container(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                          height: MediaQuery.sizeOf(context).height * 0.065,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            border: const Border(
+                                bottom: BorderSide(color: Colors.white70, width: 0.125)),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'Final',
-                                  textAlign: TextAlign.end,
-                                  style: kBebasNormal.copyWith(
-                                      fontSize: 12.0, color: Colors.grey),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      teamGames[gamesList[index]]['RESULT'],
+                                      gameDate[0],
                                       style: kBebasNormal.copyWith(
-                                        fontSize: 14.0,
-                                        color: teamGames[gamesList[index]]['RESULT'] == 'W'
-                                            ? Colors.green
-                                            : Colors.red,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5.0),
-                                    Text(
-                                      teamGames[gamesList[index]]['TEAM_PTS'].toString(),
-                                      style: kBebasNormal.copyWith(fontSize: 14.0),
-                                    ),
-                                    SizedBox(
-                                      width: 10.0,
-                                      child: Text(
-                                        '-',
-                                        textAlign: TextAlign.center,
-                                        style: kBebasNormal.copyWith(fontSize: 14.0),
-                                      ),
+                                          fontSize: 13.0, color: Colors.white70),
                                     ),
                                     Text(
-                                      teamGames[gamesList[index]]['OPP_PTS'].toString(),
-                                      style: kBebasNormal.copyWith(fontSize: 14.0),
+                                      gameDate[1],
+                                      style: kBebasNormal.copyWith(fontSize: 13.0),
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 30.0,
+                                      child: Text(
+                                        teamGames[gamesList[index]]['HOME_AWAY'],
+                                        style: kBebasBold.copyWith(fontSize: 14.0),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 24.0,
+                                      height: 24.0,
+                                      child: kTeamNames[teamGames[gamesList[index]]['OPP']
+                                                  .toString()] ==
+                                              null
+                                          ? const Text('')
+                                          : Image.asset(
+                                              'images/NBA_Logos/${teamGames[gamesList[index]]['OPP']}.png',
+                                              fit: BoxFit.contain,
+                                              width: 16.0,
+                                              height: 16.0,
+                                            ),
+                                    ),
+                                    const SizedBox(width: 15.0),
+                                    Text(
+                                      kTeamNames[teamGames[gamesList[index]]['OPP']
+                                                  .toString()] !=
+                                              null
+                                          ? kTeamNames[
+                                              teamGames[gamesList[index]]['OPP'].toString()][0]
+                                          : 'INT\'L',
+                                      style: kBebasBold.copyWith(fontSize: 18.0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Final',
+                                      textAlign: TextAlign.end,
+                                      style: kBebasNormal.copyWith(
+                                          fontSize: 12.0, color: Colors.grey),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          teamGames[gamesList[index]]['RESULT'],
+                                          style: kBebasNormal.copyWith(
+                                            fontSize: 14.0,
+                                            color: teamGames[gamesList[index]]['RESULT'] == 'W'
+                                                ? Colors.green
+                                                : Colors.red,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5.0),
+                                        Text(
+                                          teamGames[gamesList[index]]['TEAM_PTS'].toString(),
+                                          style: kBebasNormal.copyWith(fontSize: 14.0),
+                                        ),
+                                        SizedBox(
+                                          width: 10.0,
+                                          child: Text(
+                                            '-',
+                                            textAlign: TextAlign.center,
+                                            style: kBebasNormal.copyWith(fontSize: 14.0),
+                                          ),
+                                        ),
+                                        Text(
+                                          teamGames[gamesList[index]]['OPP_PTS'].toString(),
+                                          style: kBebasNormal.copyWith(fontSize: 14.0),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  );
+                        ),
+                      );
 
-                  widgets.add(gameContainer);
+                      widgets.add(gameContainer);
 
-                  return Column(
-                    children: widgets,
-                  );
-                },
-                childCount: gamesList.length,
+                      return Column(
+                        children: widgets,
+                      );
+                    },
+                    childCount: gamesList.length,
+                  ),
+                ),
               ),
-            ),
+            ],
           );
   }
+}
+
+class MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final String seasonType;
+
+  const MySliverPersistentHeaderDelegate({required this.seasonType});
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        seasonType,
+        style: kBebasNormal.copyWith(fontSize: 14.0),
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 60.0;
+
+  @override
+  double get minExtent => 60.0;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => false;
 }

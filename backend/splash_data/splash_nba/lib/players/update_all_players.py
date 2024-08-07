@@ -117,8 +117,8 @@ if __name__ == "__main__":
         logging.info("Connected to MongoDB")
 
         try:
-            # add_players()
-            # restructure_new_docs()
+            add_players()
+            restructure_new_docs()
             update_player_info()
         except Exception as e:
             logging.error(f"Error adding players: {e}")

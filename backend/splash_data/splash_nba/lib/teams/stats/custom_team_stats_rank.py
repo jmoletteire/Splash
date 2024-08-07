@@ -29,6 +29,7 @@ custom_stats = [
     # ("PF_PER_100", "PLAYOFFS.BASIC", 1),
     # ("PFD_PER_100", "PLAYOFFS.BASIC", -1),
     # ("PTS_PER_100", "PLAYOFFS.BASIC", -1),
+    ("FT_PER_FGA", "PLAYOFFS.BASIC", -1),
 
     # HUSTLE
     # ("CONTESTED_SHOTS_PER_100", "PLAYOFFS.HUSTLE", -1),
@@ -41,15 +42,15 @@ custom_stats = [
     # ("LOOSE_BALLS_RECOVERED_PER_100", "PLAYOFFS.HUSTLE", -1),
     # ("CHARGES_DRAWN_PER_100", "PLAYOFFS.HUSTLE", -1),
 
-    ("CONTESTED_SHOTS", "PLAYOFFS.HUSTLE", -1),
-    ("SCREEN_ASSISTS", "PLAYOFFS.HUSTLE", -1),
-    ("SCREEN_AST_PTS", "PLAYOFFS.HUSTLE", -1),
-    ("BOX_OUTS", "PLAYOFFS.HUSTLE", -1),
-    ("OFF_BOXOUTS", "PLAYOFFS.HUSTLE", -1),
-    ("DEF_BOXOUTS", "PLAYOFFS.HUSTLE", -1),
-    ("DEFLECTIONS", "PLAYOFFS.HUSTLE", -1),
-    ("LOOSE_BALLS_RECOVERED", "PLAYOFFS.HUSTLE", -1),
-    ("CHARGES_DRAWN", "PLAYOFFS.HUSTLE", -1),
+    # ("CONTESTED_SHOTS", "PLAYOFFS.HUSTLE", -1),
+    # ("SCREEN_ASSISTS", "PLAYOFFS.HUSTLE", -1),
+    # ("SCREEN_AST_PTS", "PLAYOFFS.HUSTLE", -1),
+    # ("BOX_OUTS", "PLAYOFFS.HUSTLE", -1),
+    # ("OFF_BOXOUTS", "PLAYOFFS.HUSTLE", -1),
+    # ("DEF_BOXOUTS", "PLAYOFFS.HUSTLE", -1),
+    # ("DEFLECTIONS", "PLAYOFFS.HUSTLE", -1),
+    # ("LOOSE_BALLS_RECOVERED", "PLAYOFFS.HUSTLE", -1),
+    # ("CHARGES_DRAWN", "PLAYOFFS.HUSTLE", -1),
 ]
 
 # List of seasons
@@ -127,7 +128,11 @@ for season in seasons:
             else:
                 res = result['seasons'][season]['STATS'][stat[1]][f'{stat[0]}_RANK']
 
-            teams_collection.update_one(
-                {"_id": result["_id"]},
-                {"$set": {f"seasons.{season}.STATS.{stat[1]}.{stat[0]}_RANK": res}}
-            )
+            try:
+                teams_collection.update_one(
+                    {"_id": result["_id"]},
+                    {"$set": {f"seasons.{season}.STATS.{stat[1]}.{stat[0]}_RANK": res}}
+                )
+            except Exception as e:
+                logging.error(e)
+                continue

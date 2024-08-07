@@ -20,38 +20,26 @@ class MyDropdownSearch extends StatefulWidget {
 
 class _MyDropdownSearchState extends State<MyDropdownSearch> {
   Map<String, List<String>> categorizedFields = {
-    "Efficiency": kPlayerStatLabelMap['EFFICIENCY']
-        .keys
-        .where((key) => !key.contains("fill"))
-        .toList(),
-    "Scoring": kPlayerStatLabelMap['SCORING']
-        .keys
-        .where((key) => !key.contains("fill"))
-        .toList(),
-    "Shot Type": kPlayerStatLabelMap['SHOT TYPE']
-        .keys
-        .where((key) => !key.contains("fill"))
-        .toList(),
+    "Efficiency":
+        kPlayerStatLabelMap['EFFICIENCY'].keys.where((key) => !key.contains("fill")).toList(),
+    "Scoring":
+        kPlayerStatLabelMap['SCORING'].keys.where((key) => !key.contains("fill")).toList(),
+    "Shot Type":
+        kPlayerStatLabelMap['SHOT TYPE'].keys.where((key) => !key.contains("fill")).toList(),
     'Closest Defender': kPlayerStatLabelMap['CLOSEST DEFENDER']
         .keys
         .where((key) => !key.contains("fill"))
         .toList(),
-    "Rebounding": kPlayerStatLabelMap['REBOUNDING']
-        .keys
-        .where((key) => !key.contains("fill"))
-        .toList(),
-    "Passing": kPlayerStatLabelMap['PASSING']
-        .keys
-        .where((key) => !key.contains("fill"))
-        .toList(),
-    "Defense": kPlayerStatLabelMap['DEFENSE']
-        .keys
-        .where((key) => !key.contains("fill"))
-        .toList(),
-    "Hustle": kPlayerStatLabelMap['HUSTLE']
-        .keys
-        .where((key) => !key.contains("fill"))
-        .toList(),
+    'Drives':
+        kPlayerStatLabelMap['DRIVES'].keys.where((key) => !key.contains("fill")).toList(),
+    "Rebounding":
+        kPlayerStatLabelMap['REBOUNDING'].keys.where((key) => !key.contains("fill")).toList(),
+    "Passing":
+        kPlayerStatLabelMap['PASSING'].keys.where((key) => !key.contains("fill")).toList(),
+    "Defense":
+        kPlayerStatLabelMap['DEFENSE'].keys.where((key) => !key.contains("fill")).toList(),
+    "Hustle":
+        kPlayerStatLabelMap['HUSTLE'].keys.where((key) => !key.contains("fill")).toList(),
   };
 
   @override
@@ -124,19 +112,17 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                             onTap: () {
                               widget.selectedItemNotifier.value = item;
                               widget.onChanged(item);
-                              widget
-                                  .onLocationChanged(_getLocation(item) ?? '');
+                              widget.onLocationChanged(_getLocation(item) ?? '');
                               Navigator.pop(context, item);
                             },
                             child: GridTile(
                               child: Container(
                                 margin: const EdgeInsets.all(5.0),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5.0, vertical: 0.0),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
                                 decoration: BoxDecoration(
                                     color: Colors.grey.shade900,
-                                    border:
-                                        Border.all(color: Colors.deepOrange),
+                                    border: Border.all(color: Colors.deepOrange),
                                     borderRadius: BorderRadius.circular(10.0)),
                                 child: Center(
                                   child: AutoSizeText(

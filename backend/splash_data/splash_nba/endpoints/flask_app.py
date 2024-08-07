@@ -4,7 +4,6 @@ from flask import Flask, jsonify, request
 from pymongo import MongoClient
 import logging
 
-from splash_nba.util.env import uri
 
 app = Flask(__name__)
 bytes_transferred = 0
@@ -478,7 +477,7 @@ if __name__ == '__main__':
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient('mongodb+srv://jmoletteire:J%40ckpa%24%245225@splash.p0xumnu.mongodb.net/')
         db = client.splash
         games_collection = db.nba_games
         teams_collection = db.nba_teams

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:splash/screens/team/schedule/team_games.dart';
+import 'package:splash/screens/player/gamelogs/player_games.dart';
 import 'package:splash/utilities/constants.dart';
 
-class TeamSchedule extends StatefulWidget {
+class PlayerGamelogs extends StatefulWidget {
   final Map<String, dynamic> team;
-  const TeamSchedule({super.key, required this.team});
+  final Map<String, dynamic> player;
+  const PlayerGamelogs({super.key, required this.team, required this.player});
 
   @override
-  State<TeamSchedule> createState() => _TeamScheduleState();
+  State<PlayerGamelogs> createState() => _PlayerGamelogsState();
 }
 
-class _TeamScheduleState extends State<TeamSchedule> {
+class _PlayerGamelogsState extends State<PlayerGamelogs> {
   late Map<String, dynamic> schedule;
   late List<String> seasons;
   late String selectedSeason;
@@ -18,7 +19,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
   late String selectedMonth;
   late String selectedOpp;
   late int oppId;
-  late TeamGames games;
+  late PlayerGames games;
 
   List<String> months = [
     'All',
@@ -68,26 +69,26 @@ class _TeamScheduleState extends State<TeamSchedule> {
   };
 
   Map<String, String> seasonTypes = {
-    'All': '*',
-    'Pre-Season': '1',
-    'Regular Season': '2',
-    'Playoffs': '4',
-    'Play-In': '5',
-    'NBA Cup': '6',
+    'ALL': '*',
+    'PRE-SEASON': '1',
+    'REGULAR SEASON': '2',
+    'PLAYOFFS': '4',
+    'PLAY-IN': '5',
+    'NBA CUP': '6',
   };
 
   @override
   void initState() {
     super.initState();
-    schedule = widget.team['seasons'][kCurrentSeason]['GAMES'];
-    seasons = widget.team['seasons'].keys.toList().reversed.toList();
+    schedule = widget.player['STATS'][kCurrentSeason]['GAMELOGS']['REGULAR SEASON'];
+    seasons = widget.player['STATS'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
-    selectedSeasonType = 'All';
+    selectedSeasonType = 'REGULAR SEASON';
     selectedMonth = months.first;
     selectedOpp = 'ALL';
     oppId = 0;
-    games = TeamGames(
-        team: widget.team,
+    games = PlayerGames(
+        player: widget.player,
         schedule: schedule,
         selectedSeason: selectedSeason,
         selectedSeasonType: selectedSeasonType,
@@ -203,10 +204,10 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                                 /// Updates displayed values in schedule view
                                                 setState(() {
                                                   selectedSeason = value!;
-                                                  schedule =
-                                                      widget.team['seasons'][value]['GAMES'];
-                                                  games = TeamGames(
-                                                    team: widget.team,
+                                                  schedule = widget.player['STATS'][value]
+                                                      ['GAMELOGS'][selectedSeasonType];
+                                                  games = PlayerGames(
+                                                    player: widget.player,
                                                     schedule: schedule,
                                                     selectedSeason: value,
                                                     selectedSeasonType: selectedSeasonType,
@@ -252,8 +253,8 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                                 /// Updates displayed values in schedule view
                                                 setState(() {
                                                   selectedSeasonType = value!;
-                                                  games = TeamGames(
-                                                    team: widget.team,
+                                                  games = PlayerGames(
+                                                    player: widget.player,
                                                     schedule: schedule,
                                                     selectedSeason: selectedSeason,
                                                     selectedSeasonType: value,
@@ -315,8 +316,8 @@ class _TeamScheduleState extends State<TeamSchedule> {
                     onChanged: (String? value) {
                       setState(() {
                         selectedMonth = value!;
-                        games = TeamGames(
-                          team: widget.team,
+                        games = PlayerGames(
+                          player: widget.player,
                           schedule: schedule,
                           selectedSeason: selectedSeason,
                           selectedSeasonType: selectedSeasonType,
@@ -371,8 +372,8 @@ class _TeamScheduleState extends State<TeamSchedule> {
                       setState(() {
                         selectedOpp = value!;
                         oppId = int.parse(teamAbbr[selectedOpp]!);
-                        games = TeamGames(
-                          team: widget.team,
+                        games = PlayerGames(
+                          player: widget.player,
                           schedule: schedule,
                           selectedSeason: selectedSeason,
                           selectedSeasonType: selectedSeasonType,

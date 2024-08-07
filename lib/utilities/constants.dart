@@ -176,6 +176,40 @@ Map<String, dynamic> kTeamNames = {
   '1610612763': ['Grizzlies', 'MEM']
 };
 
+Map<String, String> kTeamIds = {
+  'FA': '0',
+  'ATL': '1610612737',
+  'BOS': '1610612738',
+  'CLE': '1610612739',
+  'CHI': '1610612741',
+  'MIA': '1610612748',
+  'MIL': '1610612749',
+  'BKN': '1610612751',
+  'NYK': '1610612752',
+  'ORL': '1610612753',
+  'IND': '1610612754',
+  'PHI': '1610612755',
+  'TOR': '1610612761',
+  'WAS': '1610612764',
+  'DET': '1610612765',
+  'CHA': '1610612766',
+  'NOP': '1610612740',
+  'DAL': '1610612742',
+  'DEN': '1610612743',
+  'GSW': '1610612744',
+  'HOU': '1610612745',
+  'LAC': '1610612746',
+  'LAL': '1610612747',
+  'MIN': '1610612750',
+  'PHX': '1610612756',
+  'POR': '1610612757',
+  'SAC': '1610612758',
+  'SAS': '1610612759',
+  'OKC': '1610612760',
+  'UTA': '1610612762',
+  'MEM': '1610612763'
+};
+
 const Map<String, dynamic> kTeamStatLabelMap = {
   'EFFICIENCY': {
     'ORTG': {
@@ -528,25 +562,25 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'definition': 'The percentage of free throw attempts that a team makes.',
       'formula': 'FTM / FTA'
     },
-    'FTAr': {
+    'FT/FGA': {
       'location': ['BASIC'],
       'secondaryLocation': '',
       'TOTAL': {
-        'nba_name': 'FTAr',
-        'rank_nba_name': 'FTAr_RANK',
+        'nba_name': 'FT_PER_FGA',
+        'rank_nba_name': 'FT_PER_FGA_RANK',
       },
       'PER_100': {
-        'nba_name': 'FTAr',
-        'rank_nba_name': 'FTAr_RANK',
+        'nba_name': 'FT_PER_FGA',
+        'rank_nba_name': 'FT_PER_FGA_RANK',
       },
-      'splash_name': 'FTAr',
-      'full_name': 'Free Throw Attempt Rate',
+      'splash_name': 'FT/FGA',
+      'full_name': 'Free Throws per Field Goal Attempt',
       'first_available': '1996',
       'convert': 'false',
-      'round': '3',
+      'round': '2',
       'definition':
-          'The number of free throw attempts a team shoots compared to the number of field goal attempts they shoot.',
-      'formula': 'FTA / FGA'
+          'The number of free throws a team makes compared to the number of field goal attempts they shoot.',
+      'formula': 'FTM / FGA'
     },
   },
   'DEFENSE': {
@@ -993,11 +1027,11 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'location': ['ADV'],
       'TOTAL': {
         'nba_name': 'POSS',
-        'rank_nba_name': 'POSS_PER_GM_RANK',
+        'rank_nba_name': 'POSS_RANK',
       },
       'PER_75': {
         'nba_name': 'POSS',
-        'rank_nba_name': 'POSS_PER_GM_RANK',
+        'rank_nba_name': 'POSS_RANK',
       },
       'splash_name': 'POSS',
       'full_name': 'Possessions Played',
@@ -1109,8 +1143,8 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'PLUS_MINUS_RANK',
       },
       'PER_75': {
-        'nba_name': 'PLUS_MINUS',
-        'rank_nba_name': 'PLUS_MINUS_RANK',
+        'nba_name': 'PLUS_MINUS_PER_75',
+        'rank_nba_name': 'PLUS_MINUS_PER_75_RANK',
       },
       'splash_name': 'P/M',
       'full_name': 'Plus/Minus',
@@ -1140,6 +1174,26 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The percentage of team plays used by a player when they are on the floor.',
       'formula': '(FGA + Possession Ending FTA + TO) / Plays'
     },
+    'OFF LOAD': {
+      'location': ['ADV'],
+      'TOTAL': {
+        'nba_name': 'OFFENSIVE_LOAD',
+        'rank_nba_name': 'OFFENSIVE_LOAD_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'OFFENSIVE_LOAD',
+        'rank_nba_name': 'OFFENSIVE_LOAD_RANK',
+      },
+      'splash_name': 'OFF LOAD',
+      'full_name': 'Offensive Load',
+      'first_available': '1996',
+      'convert': 'false',
+      'round': '1',
+      'definition':
+          'Estimates percentage of team plays a player contributes to when they are on the floor. Unlike Usage, Offensive Load includes passing and creation.',
+      'formula':
+          '((AST - (0.38 * BOX CREATION) * 0.75) + (FTA * 0.44) + FGA + BOX CREATION + TOV'
+    },
     'TOUCHES': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
@@ -1158,23 +1212,42 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The number of times a player possessed the ball.',
       'formula': ''
     },
-    'fill3': {'first_available': '2013'},
-    'PTS PER TOUCH': {
-      'location': ['ADV', 'TOUCHES'],
+    'TOV': {
+      'location': ['BASIC'],
       'TOTAL': {
-        'nba_name': 'PTS_PER_TOUCH',
-        'rank_nba_name': 'PTS_PER_TOUCH_RANK',
+        'nba_name': 'TOV',
+        'rank_nba_name': 'TOV_RANK',
       },
       'PER_75': {
-        'nba_name': 'PTS_PER_TOUCH',
-        'rank_nba_name': 'PTS_PER_TOUCH_RANK',
+        'nba_name': 'TOV_PER_75',
+        'rank_nba_name': 'TOV_PER_75_RANK',
       },
-      'splash_name': 'PTS PER TOUCH',
-      'full_name': 'Points Per Touch',
+      'splash_name': 'TOV',
+      'full_name': 'Turnovers',
+      'first_available': '1996',
+      'convert': 'false',
+      'round': '0',
+      'definition':
+          'A turnover occurs when the player or team on offense loses the ball to the defense.',
+      'formula': ''
+    },
+    'fill3': {'first_available': '2013'},
+    'TIME OF POSS': {
+      'location': ['ADV', 'TOUCHES'],
+      'TOTAL': {
+        'nba_name': 'TIME_OF_POSS',
+        'rank_nba_name': 'TIME_OF_POSS_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'TIME_OF_POSS_PER_75',
+        'rank_nba_name': 'TIME_OF_POSS_PER_75_RANK',
+      },
+      'splash_name': 'TIME OF POSS',
+      'full_name': 'Time of Possession',
       'first_available': '2013',
       'convert': 'false',
-      'round': '2',
-      'definition': 'The number of points scored by a player per touch.',
+      'round': '1',
+      'definition': 'The number of minutes a player possessed the ball.',
       'formula': ''
     },
     'SECONDS PER TOUCH': {
@@ -1344,6 +1417,24 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'A shooting percentage that factors in the value of 3-point field goals and free throws in addition to conventional 2-point field goals (assuming 44% of FTAs end possessions).',
       'formula': 'PTS / [2 * (FGA + (0.44 * FTA))]'
     },
+    '% UAST': {
+      'location': ['ADV', 'SCORING_BREAKDOWN'],
+      'TOTAL': {
+        'nba_name': 'PCT_UAST_FGM',
+        'rank_nba_name': 'PCT_UAST_FGM_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'PCT_UAST_FGM',
+        'rank_nba_name': 'PCT_UAST_FGM_RANK',
+      },
+      'splash_name': '% UAST',
+      'full_name': 'Percent Unassisted',
+      'first_available': '1996',
+      'convert': 'true',
+      'round': '1',
+      'definition': 'Percentage of this player\'s FGM that were not assisted by a teammate.',
+      'formula': ''
+    },
     'fill': {'first_available': '1996'},
     'FGM': {
       'location': ['BASIC'],
@@ -1473,6 +1564,24 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of 3-point field goal attempts a player shoots compared to the number of total field goal attempts they shoot.',
       'formula': '3PA / FGA'
     },
+    '% 3P UAST': {
+      'location': ['ADV', 'SCORING_BREAKDOWN'],
+      'TOTAL': {
+        'nba_name': 'PCT_UAST_3PM',
+        'rank_nba_name': 'PCT_UAST_3PM_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'PCT_UAST_3PM',
+        'rank_nba_name': 'PCT_UAST_3PM_RANK',
+      },
+      'splash_name': '% 3P UAST',
+      'full_name': 'Percent 3-Point Field Goals Unassisted',
+      'first_available': '1996',
+      'convert': 'true',
+      'round': '1',
+      'definition': 'Percentage of this player\'s 3PM that were not assisted by a teammate.',
+      'formula': ''
+    },
     'fill4': {'first_available': '1996'},
     'FTM': {
       'location': ['BASIC'],
@@ -1528,24 +1637,24 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'The percentage of free throw attempts that a player makes.',
       'formula': 'FTM / FTA'
     },
-    'FTA RATE': {
+    'FT/FGA': {
       'location': ['BASIC'],
       'TOTAL': {
-        'nba_name': 'FTAr',
-        'rank_nba_name': 'FTAr_RANK',
+        'nba_name': 'FT_PER_FGA',
+        'rank_nba_name': 'FT_PER_FGA_RANK',
       },
       'PER_75': {
-        'nba_name': 'FTAr',
-        'rank_nba_name': 'FTAr_RANK',
+        'nba_name': 'FT_PER_FGA',
+        'rank_nba_name': 'FT_PER_FGA_RANK',
       },
-      'splash_name': 'FTAr',
-      'full_name': 'Free Throw Attempt Rate',
+      'splash_name': 'FT/FGA',
+      'full_name': 'Free Throws per Field Goal Attempt',
       'first_available': '1996',
-      'convert': 'true',
-      'round': '1',
+      'convert': 'false',
+      'round': '2',
       'definition':
-          'The number of free throw attempts a player shoots compared to the number of field goal attempts they shoot.',
-      'formula': 'FTA / FGA'
+          'The number of free throws a player makes compared to the number of field goal attempts they shoot.',
+      'formula': 'FTM / FGA'
     },
   },
   'SHOT TYPE': {
@@ -2067,6 +2176,25 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
       'formula': ''
     },
+    '% DRIVE': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVES_PER_TOUCH',
+        'rank_nba_name': 'DRIVES_PER_TOUCH_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVES_PER_TOUCH',
+        'rank_nba_name': 'DRIVES_PER_TOUCH_RANK',
+      },
+      'splash_name': '% DRIVE',
+      'full_name': 'Drive Percentage',
+      'first_available': '2013',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
     'fill': {'first_available': '2013'},
     'DRIVE PTS': {
       'location': ['ADV', 'DRIVES'],
@@ -2165,59 +2293,40 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
     'fill3': {'first_available': '2013'},
-    'DRIVE FTM': {
+    'DRIVE TS%': {
       'location': ['ADV', 'DRIVES'],
       'TOTAL': {
-        'nba_name': 'DRIVE_FTM',
-        'rank_nba_name': 'DRIVE_FTM_RANK',
+        'nba_name': 'DRIVE_TS_PCT',
+        'rank_nba_name': 'DRIVE_TS_PCT_RANK',
       },
       'PER_75': {
-        'nba_name': 'DRIVE_FTM_PER_75',
-        'rank_nba_name': 'DRIVE_FTM_PER_75_RANK',
+        'nba_name': 'DRIVE_TS_PCT',
+        'rank_nba_name': 'DRIVE_TS_PCT_RANK',
       },
-      'splash_name': 'DRIVE FTM',
-      'full_name': 'Drive - Free Throws Made',
-      'first_available': '2013',
-      'convert': 'false',
-      'round': '0',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
-      'formula': ''
-    },
-    'DRIVE FTA': {
-      'location': ['ADV', 'DRIVES'],
-      'TOTAL': {
-        'nba_name': 'DRIVE_FTA',
-        'rank_nba_name': 'DRIVE_FGA_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'DRIVE_FTA_PER_75',
-        'rank_nba_name': 'DRIVE_FTA_PER_75_RANK',
-      },
-      'splash_name': 'DRIVE FTA',
-      'full_name': 'Drive - Free Throw Attempts',
-      'first_available': '2013',
-      'convert': 'false',
-      'round': '0',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
-      'formula': ''
-    },
-    'DRIVE FT%': {
-      'location': ['ADV', 'DRIVES'],
-      'TOTAL': {
-        'nba_name': 'DRIVE_FT_PCT',
-        'rank_nba_name': 'DRIVE_FT_PCT_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'DRIVE_FT_PCT',
-        'rank_nba_name': 'DRIVE_FT_PCT_RANK',
-      },
-      'splash_name': 'DRIVE FT%',
-      'full_name': 'Drive Free Throw %',
+      'splash_name': 'DRIVE TS%',
+      'full_name': 'Drive - True Shooting %',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
+      'definition':
+          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'formula': ''
+    },
+    'DRIVE FT/FGA': {
+      'location': ['ADV', 'DRIVES'],
+      'TOTAL': {
+        'nba_name': 'DRIVE_FT_PER_FGA',
+        'rank_nba_name': 'DRIVE_FT_PER_FGA_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DRIVE_FT_PER_FGA',
+        'rank_nba_name': 'DRIVE_FT_PER_FGA_RANK',
+      },
+      'splash_name': 'DRIVE FT/FGA',
+      'full_name': 'Drive - Free Throws per Field Goal Attempt',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '2',
       'definition':
           'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
       'formula': ''
@@ -2242,7 +2351,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
       'formula': ''
     },
-    'DRIVE PASS%': {
+    'DRIVE PASS %': {
       'location': ['ADV', 'DRIVES'],
       'TOTAL': {
         'nba_name': 'DRIVE_PASSES_PCT',
@@ -2280,7 +2389,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
       'formula': ''
     },
-    'DRIVE AST%': {
+    'DRIVE AST %': {
       'location': ['ADV', 'DRIVES'],
       'TOTAL': {
         'nba_name': 'DRIVE_AST_PCT',
@@ -2319,7 +2428,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
       'formula': ''
     },
-    'DRIVE TOV%': {
+    'DRIVE TOV %': {
       'location': ['ADV', 'DRIVES'],
       'TOTAL': {
         'nba_name': 'DRIVE_TOV_PCT',
@@ -2441,7 +2550,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'OREB_CHANCES_RANK',
       },
       'PER_75': {
-        'nba_name': 'OREB_CHANCES_PER_75_PCT',
+        'nba_name': 'OREB_CHANCES_PER_75',
         'rank_nba_name': 'OREB_CHANCES_PER_75_RANK',
       },
       'splash_name': 'OREB CHANCES',
@@ -2644,7 +2753,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': ''
     },
   },
-  'PASSING': {
+  'PLAYMAKING': {
     'PASSES': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
@@ -2741,6 +2850,25 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula': 'AST + FT AST + Secondary AST'
     },
     'fill2': {'first_available': '2013'},
+    'BOX CREATION': {
+      'location': ['ADV'],
+      'TOTAL': {
+        'nba_name': 'BOX_CREATION',
+        'rank_nba_name': 'BOX_CREATION_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'BOX_CREATION',
+        'rank_nba_name': 'BOX_CREATION_RANK',
+      },
+      'splash_name': 'BOX CREATION',
+      'full_name': 'Box Creation',
+      'first_available': '1996',
+      'convert': 'false',
+      'round': '1',
+      'definition':
+          'Estimates number of scoring opportunities created for teammates per 75 possessions. Goes beyond Potential Assists by factoring in the passer\'s usage, shooting proficiency, and more.',
+      'formula': ''
+    },
     'POT. AST': {
       'location': ['ADV', 'PASSING'],
       'TOTAL': {
@@ -2853,6 +2981,24 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'convert': 'false',
       'round': '1',
       'definition': 'Team\'s points allowed per 100 possessions when player is on court.',
+      'formula': ''
+    },
+    'DEF PTS SAVED': {
+      'location': ['ADV'],
+      'TOTAL': {
+        'nba_name': 'DPS_PER_75',
+        'rank_nba_name': 'DPS_PER_75_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DPS_PER_75',
+        'rank_nba_name': 'DPS_PER_75_RANK',
+      },
+      'splash_name': 'DPS',
+      'full_name': 'Defensive Points Saved',
+      'first_available': '2017',
+      'convert': 'false',
+      'round': '1',
+      'definition': 'Points below expected when this player is the primary defender.',
       'formula': ''
     },
     'fill': {'first_available': '2016'},

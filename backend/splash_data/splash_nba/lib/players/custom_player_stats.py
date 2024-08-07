@@ -1,4 +1,7 @@
-from nba_api.stats.endpoints import teamplayeronoffdetails, leaguedashptstats, playerdashptshots
+import math
+
+from nba_api.stats.endpoints import teamplayeronoffdetails, leaguedashptstats, playerdashptshots, leagueseasonmatchups, \
+    leaguedashplayerstats
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
@@ -35,6 +38,404 @@ seasons = [
     '1996-97'
 ]
 season_types = ['REGULAR SEASON', 'PLAYOFFS']
+
+
+def scoring_breakdown_and_pct_unassisted(season_type):
+    for season in seasons:
+        if season_type == 'PLAYOFFS':
+            player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
+                                                                      season=season,
+                                                                      season_type_all_star='Playoffs').get_normalized_dict()[
+                'LeagueDashPlayerStats']
+        else:
+            player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
+                                                                      season=season).get_normalized_dict()[
+                'LeagueDashPlayerStats']
+
+        num_players = len(player_uast)
+
+        logging.info(f'Processing {num_players} for season {season} {season_type}...')
+
+        uast_keys = list(player_uast[0].keys())[11:26] + list(player_uast[0].keys())[34:49]
+
+        # Initialize dictionaries for each data type
+        player_data = defaultdict(lambda: {'scoring': {}})
+
+        # Fill in the player data from each list
+        for player in player_uast:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['scoring'] = {key: player[key] for key in uast_keys}
+
+        # Update the MongoDB collection
+        for player_id, data in player_data.items():
+            try:
+                players_collection.update_one(
+                    {'PERSON_ID': player_id},
+                    {'$set': {
+                        f'STATS.{season}.{season_type}.ADV.SCORING_BREAKDOWN': data['scoring'],
+                    }},
+                )
+            except Exception as e:
+                logging.error(f'Unable to add stats for player with ID {player_id}: {e}')
+                continue
+
+
+def adj_turnover_pct(season_type):
+    # Set batch size to process documents
+    batch_size = 25
+    total_documents = players_collection.count_documents({})
+    processed_count = 0
+    i = 0
+
+    while processed_count < total_documents:
+        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+                batch_size).batch_size(batch_size) as cursor:
+            documents = list(cursor)
+            if not documents:
+                break
+            processed_count += len(documents)
+
+            for player in documents:
+                i += 1
+                logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
+
+                stats = player.get('STATS', None)
+                if not stats:
+                    continue
+
+                for season, season_stats in stats.items():
+                    if season_type not in season_stats.keys():
+                        continue
+
+                    try:
+                        tov = season_stats[season_type]['BASIC']['TOV_PER_75']
+                        off_load = season_stats[season_type]['ADV']['OFFENSIVE_LOAD']
+
+                        adj_tov_pct = tov / off_load
+
+                        players_collection.update_one(
+                            {'PERSON_ID': player['PERSON_ID']},
+                            {'$set': {
+                                f'STATS.{season}.{season_type}.ADV.ADJ_TOV_PCT': adj_tov_pct
+                            }
+                            },
+                        )
+                    except Exception as e:
+                        logging.error(f'Could not process {season} for player {player["PERSON_ID"]}: {e}')
+                        continue
+
+
+def offensive_load(season_type):
+    # Set batch size to process documents
+    batch_size = 25
+    total_documents = players_collection.count_documents({})
+    processed_count = 0
+    i = 0
+
+    while processed_count < total_documents:
+        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+                batch_size).batch_size(batch_size) as cursor:
+            documents = list(cursor)
+            if not documents:
+                break
+            processed_count += len(documents)
+
+            for player in documents:
+                i += 1
+                logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
+
+                stats = player.get('STATS', None)
+                if not stats:
+                    continue
+
+                for season, season_stats in stats.items():
+                    if season_type not in season_stats.keys():
+                        continue
+
+                    try:
+                        ast = season_stats[season_type]['BASIC']['AST_PER_75']
+                        tov = season_stats[season_type]['BASIC']['TOV_PER_75']
+                        fga = season_stats[season_type]['BASIC']['FGA_PER_75']
+                        fta = season_stats[season_type]['BASIC']['FTA_PER_75']
+                        box_create = season_stats[season_type]['ADV']['BOX_CREATION']
+
+                        off_load = ((ast - (0.38 * box_create)) * 0.75) + fga + (fta * 0.44) + box_create + tov
+
+                        players_collection.update_one(
+                            {'PERSON_ID': player['PERSON_ID']},
+                            {'$set': {
+                                f'STATS.{season}.{season_type}.ADV.OFFENSIVE_LOAD': off_load
+                            }
+                            },
+                        )
+                    except Exception as e:
+                        logging.error(f'Could not process {season} for player {player["PERSON_ID"]}: {e}')
+                        continue
+
+
+def box_creation(season_type):
+    def calculate_3pt_proficiency(three_pa, three_p_percent):
+        # Calculate the sigmoid part of the formula
+        sigmoid_value = 2 / (1 + math.exp(-three_pa)) - 1
+
+        # Multiply by the three-point percentage
+        three_pt_proficiency = sigmoid_value * three_p_percent
+
+        return three_pt_proficiency
+
+    # Set batch size to process documents
+    batch_size = 25
+    total_documents = players_collection.count_documents({})
+    processed_count = 0
+    i = 0
+
+    while processed_count < total_documents:
+        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+                batch_size).batch_size(batch_size) as cursor:
+            documents = list(cursor)
+            if not documents:
+                break
+            processed_count += len(documents)
+
+            for player in documents:
+                i += 1
+                logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
+
+                stats = player.get('STATS', None)
+                if not stats:
+                    continue
+
+                for season, season_stats in stats.items():
+                    if season_type not in season_stats.keys():
+                        continue
+
+                    try:
+                        ast = (season_stats[season_type]['BASIC']['AST_PER_75'] / 75) * 100
+                        pts = (season_stats[season_type]['BASIC']['PTS_PER_75'] / 75) * 100
+                        tov = (season_stats[season_type]['BASIC']['TOV_PER_75'] / 75) * 100
+                        fg3a = (season_stats[season_type]['BASIC']['FG3A_PER_75'] / 75) * 100
+                        fg3_pct = season_stats[season_type]['BASIC']['FG3_PCT']
+
+                        three_pt_prof = calculate_3pt_proficiency(fg3a, fg3_pct)
+                        box_create = ast * 0.1843 + (pts + tov) * 0.0969 - 2.3021 * three_pt_prof + 0.0582 * (
+                                    ast * (pts + tov) * three_pt_prof) - 1.1942
+                        box_create = box_create * 0.75
+
+                        players_collection.update_one(
+                            {'PERSON_ID': player['PERSON_ID']},
+                            {'$set': {
+                                f'STATS.{season}.{season_type}.ADV.BOX_CREATION': box_create
+                            }
+                            },
+                        )
+                    except Exception as e:
+                        logging.error(f'Could not process {season} for player {player["PERSON_ID"]}: {e}')
+                        continue
+
+
+def defensive_points_saved(season_type):
+    def expected_pts(player_data, matchup_data):
+        try:
+            xFTM = (player_data.get('FTA_PER_75', 0) / 75) * matchup_data['PARTIAL_POSS'] * player_data.get('FT_PCT', 0)
+        except ZeroDivisionError:
+            xFTM = 0
+
+        try:
+            xFG2M = ((player_data.get('FGA_PER_75', 0) - player_data.get('FG3A_PER_75', 0)) / 75) * matchup_data[
+                'PARTIAL_POSS'] * (
+                            (player_data.get('FGM', 0) - player_data.get('FG3M', 0)) / (
+                                player_data.get('FGA', 0) - player_data.get('FG3A', 0)))
+        except ZeroDivisionError:
+            xFG2M = 0
+
+        try:
+            xFG3M = (player_data.get('FG3A_PER_75', 0) / 75) * matchup_data['PARTIAL_POSS'] * player_data.get('FG3_PCT',
+                                                                                                              0)
+        except ZeroDivisionError:
+            xFG3M = 0
+
+        try:
+            xTOV = (player_data.get('TOV_PER_75', 0) / 75) * matchup_data['PARTIAL_POSS']
+        except ZeroDivisionError:
+            xTOV = 0
+
+        try:
+            xBLKA = (player_data.get('BLKA_PER_75', 0) / 75) * matchup_data['PARTIAL_POSS']
+        except ZeroDivisionError:
+            xBLKA = 0
+
+        xPTS = ((xFG2M * 2) + (xFG3M * 3) + xFTM) - (xBLKA * player_data['PPS']) - (xTOV * player_data['PPP'])
+
+        return xPTS
+
+    # Set batch size to process documents
+    batch_size = 25
+    total_documents = players_collection.count_documents({})
+    processed_count = 0
+    i = 0
+
+    while processed_count < total_documents:
+        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+                batch_size).batch_size(batch_size) as cursor:
+            documents = list(cursor)
+            if not documents:
+                break
+            processed_count += len(documents)
+
+            for player in documents:
+                i += 1
+                logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
+
+                stats = player.get('STATS', None)
+                if not stats:
+                    continue
+
+                for season in stats.keys():
+                    if season < '2017-18':
+                        continue
+
+                    logging.info(f'Processing {season}...')
+                    try:
+                        if season_type == 'REGULAR SEASON':
+                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
+                                                                             def_player_id_nullable=player['PERSON_ID'])
+                        else:
+                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
+                                                                             season_type_playoffs='Playoffs',
+                                                                             def_player_id_nullable=player['PERSON_ID'])
+
+                        raw_data = data.get_normalized_dict()['SeasonMatchups']
+                        dps = 0
+                        partial_poss = 0
+
+                        for matchup in raw_data:
+                            off_player = players_collection.find_one(
+                                {'PERSON_ID': matchup['OFF_PLAYER_ID']},
+                                {
+                                    f'STATS.{season}.{season_type}.BASIC.FGM': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.FGA': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.FG3M': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.FG3A': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.FT_PCT': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.FG3_PCT': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.FGA_PER_75': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.FG3A_PER_75': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.FTA_PER_75': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.TOV_PER_75': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.BLKA_PER_75': 1,
+                                    f'STATS.{season}.{season_type}.BASIC.PTS': 1,
+                                    f'STATS.2023-24.{season_type}.ADV.OFF_RATING': 1,
+                                    '_id': 0
+                                }
+                            )
+
+                            player_stats = off_player['STATS'][season][season_type]['BASIC']
+
+                            try:
+                                player_stats['PPS'] = off_player['STATS'][season][season_type]['BASIC']['PTS'] / \
+                                                      off_player['STATS'][season][season_type]['BASIC']['FGA']
+                            except ZeroDivisionError:
+                                player_stats['PPS'] = 1
+
+                            try:
+                                player_stats['PPP'] = off_player['STATS']['2023-24'][season_type]['ADV'][
+                                                          'OFF_RATING'] / 100
+                            except ZeroDivisionError:
+                                player_stats['PPP'] = 1
+
+                            x_pts = expected_pts(player_stats, matchup)
+
+                            player_pts = matchup['PLAYER_PTS']
+                            blk_pts = matchup['MATCHUP_BLK'] * player_stats['PPS']
+                            tov_pts = matchup['MATCHUP_TOV'] * player_stats['PPP']
+
+                            dps += (x_pts - (player_pts - blk_pts - tov_pts))
+                            partial_poss += matchup['PARTIAL_POSS']
+
+                        try:
+                            dps_per_75 = (dps / partial_poss) * 75
+                        except ZeroDivisionError:
+                            dps_per_75 = 0
+
+                        players_collection.update_one(
+                            {'PERSON_ID': player['PERSON_ID']},
+                            {'$set': {
+                                f'STATS.{season}.{season_type}.ADV.DEF_PTS_SAVED': dps,
+                                f'STATS.{season}.{season_type}.ADV.PARTIAL_POSS': partial_poss,
+                                f'STATS.{season}.{season_type}.ADV.DPS_PER_75': dps_per_75,
+                            }
+                            },
+                        )
+                    except Exception as e:
+                        logging.error(f'Could not process {season} for player {player["PERSON_ID"]}: {e}')
+                        continue
+
+
+def drive_stats(season_type):
+    # Set batch size to process documents
+    batch_size = 25
+    total_documents = players_collection.count_documents({})
+    processed_count = 0
+    i = 0
+
+    while processed_count < total_documents:
+        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+                batch_size).batch_size(batch_size) as cursor:
+            documents = list(cursor)
+            if not documents:
+                break
+            processed_count += len(documents)
+
+            for player in documents:
+                i += 1
+                logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
+
+                stats = player.get('STATS', None)
+                if not stats:
+                    continue
+
+                for season, season_stats in stats.items():
+                    if season < '2013-2014':
+                        break
+
+                    if season_type not in season_stats.keys():
+                        continue
+
+                    try:
+                        touches = season_stats[season_type]['ADV']['TOUCHES']['TOUCHES']
+                        drives = season_stats[season_type]['ADV']['DRIVES']['DRIVES']
+                        drive_pts = season_stats[season_type]['ADV']['DRIVES']['DRIVE_PTS']
+                        drive_fga = season_stats[season_type]['ADV']['DRIVES']['DRIVE_FGA']
+                        drive_fta = season_stats[season_type]['ADV']['DRIVES']['DRIVE_FTA']
+                        drive_ftm = season_stats[season_type]['ADV']['DRIVES']['DRIVE_FTM']
+
+                        try:
+                            drive_ts = drive_pts / (2 * (drive_fga + (0.44 * drive_fta)))
+                        except ZeroDivisionError:
+                            drive_ts = 0
+
+                        try:
+                            drive_ft_per_fga = drive_ftm / drive_fga
+                        except ZeroDivisionError:
+                            drive_ft_per_fga = 0
+
+                        try:
+                            drives_per_touch = drives / touches
+                        except ZeroDivisionError:
+                            drives_per_touch = 0
+
+                        players_collection.update_one(
+                            {'PERSON_ID': player['PERSON_ID']},
+                            {'$set': {
+                                f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_TS_PCT': drive_ts,
+                                f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_FT_PER_FGA': drive_ft_per_fga,
+                                f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVES_PER_TOUCH': drives_per_touch
+                            }
+                            },
+                        )
+                    except Exception as e:
+                        logging.error(f'Could not process {season} for player {player["PERSON_ID"]}: {e}')
+                        continue
 
 
 def touches_breakdown(season_type):
@@ -181,14 +582,14 @@ def player_tracking_stats(season_type):
 
     for season in avail_seasons:
         if season_type == 'PLAYOFFS':
-            # player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
-            #                                                     season=season,
-            #                                                     season_type_all_star='Playoffs').get_normalized_dict()[
-            #    'LeagueDashPtStats']
-            # player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
-            #                                                     season=season,
-            #                                                     season_type_all_star='Playoffs').get_normalized_dict()[
-            #    'LeagueDashPtStats']
+            player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
+                                                                 season=season,
+                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
+                'LeagueDashPtStats']
+            player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
+                                                                 season=season,
+                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
+                'LeagueDashPtStats']
             player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Drives',
                                                                 season=season,
                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
@@ -217,8 +618,8 @@ def player_tracking_stats(season_type):
 
         logging.info(f'Processing {num_players} for season {season} {season_type}...')
 
-        # touch_keys = list(player_touches[0].keys())[9:15]
-        # passing_keys = list(player_passing[0].keys())[8:]
+        touch_keys = list(player_touches[0].keys())[9:15]
+        passing_keys = list(player_passing[0].keys())[8:]
         drives_keys = list(player_drives[0].keys())[8:]
         rebounding_keys = list(player_rebounding[0].keys())[8:]
 
@@ -226,13 +627,13 @@ def player_tracking_stats(season_type):
         player_data = defaultdict(lambda: {'touches': {}, 'passing': {}, 'drives': {}, 'rebounding': {}})
 
         # Fill in the player data from each list
-        # for player in player_touches:
-        #    player_id = player['PLAYER_ID']
-        #    player_data[player_id]['touches'] = {key: player[key] for key in touch_keys}
+        for player in player_touches:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['touches'] = {key: player[key] for key in touch_keys}
 
-        # for player in player_passing:
-        #    player_id = player['PLAYER_ID']
-        #    player_data[player_id]['passing'] = {key: player[key] for key in passing_keys}
+        for player in player_passing:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['passing'] = {key: player[key] for key in passing_keys}
 
         for player in player_drives:
             player_id = player['PLAYER_ID']
@@ -248,8 +649,8 @@ def player_tracking_stats(season_type):
                 players_collection.update_one(
                     {'PERSON_ID': player_id},
                     {'$set': {
-                        # f'STATS.{season}.{season_type}.ADV.TOUCHES': data['touches'],
-                        # f'STATS.{season}.{season_type}.ADV.PASSING': data['passing'],
+                        f'STATS.{season}.{season_type}.ADV.TOUCHES': data['touches'],
+                        f'STATS.{season}.{season_type}.ADV.PASSING': data['passing'],
                         f'STATS.{season}.{season_type}.ADV.DRIVES': data['drives'],
                         f'STATS.{season}.{season_type}.ADV.REBOUNDING': data['rebounding'],
                     }},
@@ -439,20 +840,50 @@ if __name__ == "__main__":
 
     # logging.info("\nAdding Player On/Off data...\n")
     # player_on_off(season_types[0])
+    # player_on_off(season_types[1])
 
     # logging.info("\nAdding Poss Per Game data...\n")
     # poss_per_game(season_types[0])
+    # poss_per_game(season_types[1])
 
     # logging.info("\nAdding 3PAr and FTAr data...\n")
     # three_and_ft_rate(season_types[0])
+    # three_and_ft_rate(season_types[1])
 
-    logging.info("\nAdding Passes and Touches data...\n")
-    player_tracking_stats(season_types[1])
+    # logging.info("\nAdding Passes and Touches data...\n")
+    # player_tracking_stats(season_types[0])
+    # player_tracking_stats(season_types[1])
 
     # logging.info("\nAdding Touches Breakdown data...\n")
     # touches_breakdown(season_types[0])
+    # touches_breakdown(season_types[1])
 
     # logging.info("\nAdding Shot Distribution data...\n")
     # shot_distribution(season_types[0])
+    # shot_distribution(season_types[1])
+
+    # logging.info("\nAdding DPS data...\n")
+    # defensive_points_saved(season_types[0])
+    # defensive_points_saved(season_types[1])
+
+    # logging.info("\nAdding BOX CREATION data...\n")
+    # box_creation(season_types[0])
+    # box_creation(season_types[1])
+
+    # logging.info("\nAdding DRIVE STATS data...\n")
+    # drive_stats(season_types[0])
+    # drive_stats(season_types[1])
+
+    # logging.info("\nAdding SCORING BREAKDOWN data...\n")
+    # scoring_breakdown_and_pct_unassisted(season_types[0])
+    # scoring_breakdown_and_pct_unassisted(season_types[1])
+
+    # logging.info("\nAdding OFFENSIVE LOAD data...\n")
+    # offensive_load(season_types[0])
+    # offensive_load(season_types[1])
+
+    # logging.info("\nAdding OFFENSIVE LOAD data...\n")
+    # offensive_load(season_types[0])
+    # offensive_load(season_types[1])
 
     logging.info("Update complete.")

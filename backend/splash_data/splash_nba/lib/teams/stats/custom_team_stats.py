@@ -86,7 +86,7 @@ def avg_category_rankings():
                 logging.error(f"Error processing documents for season {season}: {e}")
 
 
-def three_and_ft_rate():
+def three_and_ft_rate(season_type):
     seasons = [
         '2023-24',
         '2022-23',
@@ -126,30 +126,29 @@ def three_and_ft_rate():
             if season in seasons:
                 try:
                     # Extract the values needed for calculation
-                    fg3a = document['seasons'][season]['STATS']['BASIC'].get('FG3A', 0)
-                    fta = document['seasons'][season]['STATS']['BASIC'].get('FTA', 0)
-                    ftm = document['seasons'][season]['STATS']['BASIC'].get('FTM', 1)
-                    fga = document['seasons'][season]['STATS']['BASIC'].get('FGA', 1)  # Avoid division by zero
-                    fgm = document['seasons'][season]['STATS']['BASIC'].get('FGM', 1)
+                    fg3a = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FG3A', 0)
+                    fta = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FTA', 0)
+                    ftm = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FTM', 1)
+                    fga = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FGA', 1)  # Avoid division by zero
                     # Calculate 3PAr
                     three_pt_rate = fg3a / fga
                     fta_rate = fta / fga
-                    ft_per_fgm = ftm / fgm
+                    ft_per_fga = ftm / fga
                     logging.info(f'Calculated for {season}')
 
                     # Update the document with the new field
                     teams_collection.update_one(
                         {'TEAM_ID': document['TEAM_ID']},
-                        {'$set': {f'seasons.{season}.STATS.BASIC.3PAr': three_pt_rate,
-                                  f'seasons.{season}.STATS.BASIC.FTAr': fta_rate,
-                                  f'seasons.{season}.STATS.BASIC.FT_PER_FGM': ft_per_fgm}
+                        {'$set': {# f'seasons.{season}.STATS.BASIC.3PAr': three_pt_rate,
+                                  # f'seasons.{season}.STATS.BASIC.FTAr': fta_rate,
+                                  f'seasons.{season}.STATS.{season_type}.BASIC.FT_PER_FGA': ft_per_fga}
                          }
                     )
 
                     logging.info(f'Added stats for {season} for team {team_id}')
 
                 except KeyError as e:
-                    print(f"Key error for document with _id {document['_id']}: {e}")
+                    print(f"Key error for document {document['TEAM_ID']}: {e}")
 
 
 if __name__ == "__main__":
@@ -162,7 +161,7 @@ if __name__ == "__main__":
     teams_collection = db.nba_teams
     logging.info("Connected to MongoDB")
 
-    #three_and_ft_rate()
-    avg_category_rankings()
+    three_and_ft_rate('PLAYOFFS')
+    # avg_category_rankings()
 
     logging.info("Update complete.")

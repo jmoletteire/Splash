@@ -56,12 +56,14 @@ seasons = [
     '2013-14',
 ]
 
+season_type = 'REGULAR SEASON'
+
 for season in seasons:
     logging.info(f"Season: {season}")
-    for shot_type in shot_types:
-    # for closest_defender in closest_defender_types:
-        logging.info(f"Shot Type: {shot_type}")
-        # logging.info(f"Closest Defender: {closest_defender}")
+    # for shot_type in shot_types:
+    for closest_defender in closest_defender_types:
+        # logging.info(f"Shot Type: {shot_type}")
+        logging.info(f"Closest Defender: {closest_defender}")
         for stat in shooting:
 
             logging.info(f"\nCalculating {stat} rank...")
@@ -70,21 +72,21 @@ for season in seasons:
             pipeline = [
                 {
                     "$match": {
-                        f"STATS.{season}.PLAYOFFS.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": {"$exists": True}
+                        f"STATS.{season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": {"$exists": True}
                     }
                 },
                 {
                     "$project": {
-                        f"STATS.{season}.PLAYOFFS.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": 1
+                        f"STATS.{season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": 1
                     }
                 },
                 {
                     "$setWindowFields": {
                         "sortBy": {
-                            f"STATS.{season}.PLAYOFFS.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": -1
+                            f"STATS.{season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": -1
                         },
                         "output": {
-                            f"STATS.{season}.PLAYOFFS.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}_RANK": {
+                            f"STATS.{season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}_RANK": {
                                 "$documentNumber": {}
                             }
                         }
@@ -99,14 +101,14 @@ for season in seasons:
 
             # Update each document with the new rank field
             for result in results:
-                res = result['STATS'][season]['PLAYOFFS']['ADV']['SHOOTING']['SHOT_TYPE'][shot_type][f'{stat}_RANK']
-                # res = result['STATS'][season]['PLAYOFFS']['ADV']['SHOOTING']['CLOSEST_DEFENDER'][closest_defender][f'{stat}_RANK']
+                # res = result['STATS'][season][season_type]['ADV']['SHOOTING']['SHOT_TYPE'][shot_type][f'{stat}_RANK']
+                res = result['STATS'][season][season_type]['ADV']['SHOOTING']['CLOSEST_DEFENDER'][closest_defender][f'{stat}_RANK']
 
                 players_collection.update_one(
                     {"_id": result["_id"]},
                     {"$set": {
-                        f"STATS.{season}.PLAYOFFS.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}_RANK": res
-                        # f"STATS.{season}.PLAYOFFS.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}_RANK": res
+                        # f"STATS.{season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}_RANK": res
+                        f"STATS.{season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}_RANK": res
                     }
                     }
                 )

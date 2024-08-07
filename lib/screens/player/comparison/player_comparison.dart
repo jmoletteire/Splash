@@ -40,7 +40,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
   late ScrollControllerNotifier _notifier;
   double _opacity = 0.0;
 
-  double roundToDecimalPlaces(double value, int decimalPlaces) {
+  double roundToDecimalPlaces(num value, int decimalPlaces) {
     num factor = pow(10, decimalPlaces);
     return (value * factor).round() / factor;
   }
@@ -616,6 +616,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                     ),
                   ],
                 ),
+
+                /// PLAYER INFO
                 if (playerTwo.isNotEmpty)
                   Card(
                     color: Colors.grey.shade900,
@@ -624,11 +626,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                       padding: const EdgeInsets.all(15.0),
                       child: Column(
                         children: [
+                          /// POSITION
                           NonComparisonRow(
                             statName: 'POSITION',
                             playerOne: playerOne['POSITION'],
                             playerTwo: playerTwo['POSITION'],
                           ),
+
+                          /// AGE
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
                             statName: 'AGE',
@@ -639,24 +644,42 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                     [selectedSeasonTypeTwo]['BASIC']['AGE']
                                 .toStringAsFixed(0),
                           ),
+
+                          /// HEIGHT
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
                             statName: 'HEIGHT',
                             playerOne: playerOneHeight,
                             playerTwo: playerTwoHeight,
                           ),
+
+                          /// WEIGHT
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
                             statName: 'WEIGHT',
                             playerOne: playerOne['WEIGHT'],
                             playerTwo: playerTwo['WEIGHT'],
                           ),
+
+                          /// EXP
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
                             statName: 'EXP',
-                            playerOne: playerOne['SEASON_EXP'].toString(),
-                            playerTwo: playerTwo['SEASON_EXP'].toString(),
+                            playerOne: int.parse(selectedSeasonOne.substring(0, 4)) ==
+                                    playerOne['FROM_YEAR']
+                                ? 'R'
+                                : (int.parse(selectedSeasonOne.substring(0, 4)) -
+                                        playerOne['FROM_YEAR'])
+                                    .toString(),
+                            playerTwo: int.parse(selectedSeasonTwo.substring(0, 4)) ==
+                                    playerTwo['FROM_YEAR']
+                                ? 'R'
+                                : (int.parse(selectedSeasonTwo.substring(0, 4)) -
+                                        playerTwo['FROM_YEAR'])
+                                    .toString(),
                           ),
+
+                          /// DRAFT
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
                             statName: 'DRAFT',
@@ -673,6 +696,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                       ),
                     ),
                   ),
+
+                /// TOP STATS
                 if (playerTwo.isNotEmpty)
                   if (int.parse(selectedSeasonOne.substring(0, 4)) >= 1996 &&
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
@@ -689,6 +714,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 Text('Top Stats', style: kBebasBold.copyWith(fontSize: 20.0))
                               ],
                             ),
+
+                            /// GP
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'Games Played',
@@ -699,6 +726,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// MIN
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'Min Per Game',
@@ -713,6 +742,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// POSS PER G
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'Poss Per Game',
@@ -727,6 +758,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// PPG
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'PPG',
@@ -745,6 +778,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// RPG
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'RPG',
@@ -763,6 +798,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// APG
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'APG',
@@ -781,6 +818,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// USG%
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'Usage %',
@@ -797,6 +836,24 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// OFFENSIVE LOAD
+                            const SizedBox(height: 5.0),
+                            ComparisonRow(
+                              statName: 'LOAD%',
+                              playerOne: roundToDecimalPlaces(
+                                  playerOne['STATS'][selectedSeasonOne][selectedSeasonTypeOne]
+                                      ['ADV']['OFFENSIVE_LOAD'],
+                                  1),
+                              playerTwo: roundToDecimalPlaces(
+                                  playerTwo['STATS'][selectedSeasonTwo][selectedSeasonTypeTwo]
+                                      ['ADV']['OFFENSIVE_LOAD'],
+                                  1),
+                              teamOneColor: teamOneColor,
+                              teamTwoColor: teamTwoColor,
+                            ),
+
+                            /// TOUCHES PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2013 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2013)
                               const SizedBox(height: 5.0),
@@ -817,6 +874,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// PTS PER 75
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'PTS per 75',
@@ -831,9 +890,51 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// TOV PER 75
+                            const SizedBox(height: 15.0),
+                            ComparisonRow(
+                              statName: 'TOV PER 75',
+                              playerOne: roundToDecimalPlaces(
+                                  playerOne['STATS'][selectedSeasonOne][selectedSeasonTypeOne]
+                                      ['BASIC']['TOV_PER_75'],
+                                  1),
+                              playerTwo: roundToDecimalPlaces(
+                                  playerTwo['STATS'][selectedSeasonTwo][selectedSeasonTypeTwo]
+                                      ['BASIC']['TOV_PER_75'],
+                                  1),
+                              teamOneColor: teamOneColor,
+                              teamTwoColor: teamTwoColor,
+                            ),
+
+                            /// TOV PER TOUCH
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2013 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2013)
+                              const SizedBox(height: 5.0),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2013 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2013)
+                              ComparisonRow(
+                                statName: 'TOV %',
+                                playerOne: roundToDecimalPlaces(
+                                    playerOne['STATS'][selectedSeasonOne]
+                                                [selectedSeasonTypeOne]['ADV']['TOUCHES']
+                                            ['TOV_PER_TOUCH'] *
+                                        100,
+                                    1),
+                                playerTwo: roundToDecimalPlaces(
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                                [selectedSeasonTypeTwo]['ADV']['TOUCHES']
+                                            ['TOV_PER_TOUCH'] *
+                                        100,
+                                    1),
+                                teamOneColor: teamOneColor,
+                                teamTwoColor: teamTwoColor,
+                              ),
+
+                            /// OFF - ON/OFF
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2007 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2007)
-                              const SizedBox(height: 5.0),
+                              const SizedBox(height: 15.0),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2007 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2007)
                               ComparisonRow(
@@ -849,6 +950,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// DEF - ON/OFF
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2007 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2007)
                               const SizedBox(height: 5.0),
@@ -867,6 +970,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// NET - ON/OFF
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2007 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2007)
                               const SizedBox(height: 5.0),
@@ -885,10 +990,28 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// +/-
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 1996 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
+                              const SizedBox(height: 5.0),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 1996 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
+                              ComparisonRow(
+                                statName: '+/-',
+                                playerOne: playerOne['STATS'][selectedSeasonOne]
+                                    [selectedSeasonTypeOne]['BASIC']['PLUS_MINUS'],
+                                playerTwo: playerTwo['STATS'][selectedSeasonTwo]
+                                    [selectedSeasonTypeTwo]['BASIC']['PLUS_MINUS'],
+                                teamOneColor: teamOneColor,
+                                teamTwoColor: teamTwoColor,
+                              ),
                           ],
                         ),
                       ),
                     ),
+
+                /// SHOOTING
                 if (playerTwo.isNotEmpty)
                   if (int.parse(selectedSeasonOne.substring(0, 4)) >= 1996 &&
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
@@ -905,6 +1028,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 Text('Shooting', style: kBebasBold.copyWith(fontSize: 20.0))
                               ],
                             ),
+
+                            /// FG%
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'FG%',
@@ -921,6 +1046,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// 3P%
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: '3P%',
@@ -937,6 +1064,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// FT%
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'FT%',
@@ -953,6 +1082,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// 3PAr
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: '3PA Rate%',
@@ -969,22 +1100,24 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// FT/FGA
                             const SizedBox(height: 5.0),
                             ComparisonRow(
-                              statName: 'FTA Rate%',
+                              statName: 'FT/FGA',
                               playerOne: roundToDecimalPlaces(
-                                  (playerOne['STATS'][selectedSeasonOne][selectedSeasonTypeOne]
-                                          ['BASIC']['FTAr'] *
-                                      100),
-                                  1),
+                                  playerOne['STATS'][selectedSeasonOne][selectedSeasonTypeOne]
+                                      ['BASIC']['FT_PER_FGA'],
+                                  2),
                               playerTwo: roundToDecimalPlaces(
-                                  (playerTwo['STATS'][selectedSeasonTwo][selectedSeasonTypeTwo]
-                                          ['BASIC']['FTAr'] *
-                                      100),
-                                  1),
+                                  playerTwo['STATS'][selectedSeasonTwo][selectedSeasonTypeTwo]
+                                      ['BASIC']['FT_PER_FGA'],
+                                  2),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// eFG%
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'EFG%',
@@ -1001,6 +1134,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// TS%
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'TS%',
@@ -1017,10 +1152,48 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// % UAST
+                            const SizedBox(height: 15.0),
+                            ComparisonRow(
+                              statName: '% UAST',
+                              playerOne: roundToDecimalPlaces(
+                                  (playerOne['STATS'][selectedSeasonOne][selectedSeasonTypeOne]
+                                          ['ADV']['SCORING_BREAKDOWN']['PCT_UAST_FGM'] *
+                                      100),
+                                  1),
+                              playerTwo: roundToDecimalPlaces(
+                                  (playerTwo['STATS'][selectedSeasonTwo][selectedSeasonTypeTwo]
+                                          ['ADV']['SCORING_BREAKDOWN']['PCT_UAST_FGM'] *
+                                      100),
+                                  1),
+                              teamOneColor: teamOneColor,
+                              teamTwoColor: teamTwoColor,
+                            ),
+
+                            /// % 3UAST
+                            const SizedBox(height: 5.0),
+                            ComparisonRow(
+                              statName: '% 3P UAST',
+                              playerOne: roundToDecimalPlaces(
+                                  (playerOne['STATS'][selectedSeasonOne][selectedSeasonTypeOne]
+                                          ['ADV']['SCORING_BREAKDOWN']['PCT_UAST_3PM'] *
+                                      100),
+                                  1),
+                              playerTwo: roundToDecimalPlaces(
+                                  (playerTwo['STATS'][selectedSeasonTwo][selectedSeasonTypeTwo]
+                                          ['ADV']['SCORING_BREAKDOWN']['PCT_UAST_3PM'] *
+                                      100),
+                                  1),
+                              teamOneColor: teamOneColor,
+                              teamTwoColor: teamTwoColor,
+                            ),
                           ],
                         ),
                       ),
                     ),
+
+                /// REBOUNDING
                 if (playerTwo.isNotEmpty)
                   if (int.parse(selectedSeasonOne.substring(0, 4)) >= 1996 &&
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
@@ -1037,6 +1210,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 Text('Rebounding', style: kBebasBold.copyWith(fontSize: 20.0))
                               ],
                             ),
+
+                            /// REB PER 75
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'REB PER 75',
@@ -1051,6 +1226,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// OREB PER 75
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'OREB PER 75',
@@ -1065,6 +1242,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// DREB PER 75
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'DREB PER 75',
@@ -1079,6 +1258,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// OREB%
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'OREB%',
@@ -1095,6 +1276,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// DREB%
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'DREB%',
@@ -1111,6 +1294,56 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// ADJ OREB CHANCE %
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2013 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2013)
+                              const SizedBox(height: 15.0),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2013 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2013)
+                              ComparisonRow(
+                                statName: 'ADJ OREB CHANCE %',
+                                playerOne: roundToDecimalPlaces(
+                                    playerOne['STATS'][selectedSeasonOne]
+                                                [selectedSeasonTypeOne]['ADV']['REBOUNDING']
+                                            ['OREB_CHANCE_PCT_ADJ'] *
+                                        100,
+                                    1),
+                                playerTwo: roundToDecimalPlaces(
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                                [selectedSeasonTypeTwo]['ADV']['REBOUNDING']
+                                            ['OREB_CHANCE_PCT_ADJ'] *
+                                        100,
+                                    1),
+                                teamOneColor: teamOneColor,
+                                teamTwoColor: teamTwoColor,
+                              ),
+
+                            /// ADJ DEF REB CHANCE %
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2013 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2013)
+                              const SizedBox(height: 5.0),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2013 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2013)
+                              ComparisonRow(
+                                statName: 'ADJ DREB CHANCE %',
+                                playerOne: roundToDecimalPlaces(
+                                    playerOne['STATS'][selectedSeasonOne]
+                                                [selectedSeasonTypeOne]['ADV']['REBOUNDING']
+                                            ['DREB_CHANCE_PCT_ADJ'] *
+                                        100,
+                                    1),
+                                playerTwo: roundToDecimalPlaces(
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                                [selectedSeasonTypeTwo]['ADV']['REBOUNDING']
+                                            ['DREB_CHANCE_PCT_ADJ'] *
+                                        100,
+                                    1),
+                                teamOneColor: teamOneColor,
+                                teamTwoColor: teamTwoColor,
+                              ),
+
+                            /// BOX OUTS PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               const SizedBox(height: 15.0),
@@ -1129,6 +1362,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// OFF BOX OUTS PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               const SizedBox(height: 5.0),
@@ -1149,6 +1384,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// DEF BOX OUTS PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               const SizedBox(height: 5.0),
@@ -1173,6 +1410,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                         ),
                       ),
                     ),
+
+                /// PLAYMAKING
                 if (playerTwo.isNotEmpty)
                   if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2013 &&
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 2013)
@@ -1186,9 +1425,11 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Passing', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Playmaking', style: kBebasBold.copyWith(fontSize: 20.0))
                               ],
                             ),
+
+                            /// AST PER 75
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'AST PER 75',
@@ -1203,6 +1444,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// ADJ AST PER 75
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'ADJ AST PER 75',
@@ -1217,6 +1460,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// POTENTIAL AST PER 75
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'POT. AST PER 75',
@@ -1231,6 +1476,28 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// BOX CREATION
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2017 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2017)
+                              const SizedBox(height: 5.0),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2017 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2017)
+                              ComparisonRow(
+                                statName: 'BOX CREATION',
+                                playerOne: roundToDecimalPlaces(
+                                    playerOne['STATS'][selectedSeasonOne]
+                                        [selectedSeasonTypeOne]['ADV']['BOX_CREATION'],
+                                    1),
+                                playerTwo: roundToDecimalPlaces(
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                        [selectedSeasonTypeTwo]['ADV']['BOX_CREATION'],
+                                    1),
+                                teamOneColor: teamOneColor,
+                                teamTwoColor: teamTwoColor,
+                              ),
+
+                            /// AST PTS CREATED PER 75
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'AST PTS CREATED PER 75',
@@ -1245,6 +1512,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// AST - PASS %
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'AST - PASS %',
@@ -1261,6 +1530,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// ADJ AST - PASS %
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'ADJ AST - PASS %',
@@ -1281,6 +1552,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                         ),
                       ),
                     ),
+
+                /// DEFENSE
                 if (playerTwo.isNotEmpty)
                   if (int.parse(selectedSeasonOne.substring(0, 4)) >= 1996 &&
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
@@ -1297,6 +1570,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 Text('Defense', style: kBebasBold.copyWith(fontSize: 20.0))
                               ],
                             ),
+
+                            /// DRTG - ON
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'DRTG - ON',
@@ -1311,6 +1586,26 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// DPS PER 75
+                            const SizedBox(height: 5.0),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2017 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2017)
+                              ComparisonRow(
+                                statName: 'DPS PER 75',
+                                playerOne: roundToDecimalPlaces(
+                                    playerOne['STATS'][selectedSeasonOne]
+                                        [selectedSeasonTypeOne]['ADV']['DPS_PER_75'],
+                                    1),
+                                playerTwo: roundToDecimalPlaces(
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                        [selectedSeasonTypeTwo]['ADV']['DPS_PER_75'],
+                                    1),
+                                teamOneColor: teamOneColor,
+                                teamTwoColor: teamTwoColor,
+                              ),
+
+                            /// STL PER 75
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'STL PER 75',
@@ -1325,6 +1620,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// DEFLECTIONS PER 75
                             const SizedBox(height: 5.0),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
@@ -1343,6 +1640,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// BLK PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               const SizedBox(height: 15.0),
@@ -1359,6 +1658,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// CONTESTS PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               const SizedBox(height: 5.0),
@@ -1383,6 +1684,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                         ),
                       ),
                     ),
+
+                /// HUSTLE
                 if (playerTwo.isNotEmpty)
                   if (int.parse(selectedSeasonOne.substring(0, 4)) >= 1996 &&
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
@@ -1399,6 +1702,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 Text('Hustle', style: kBebasBold.copyWith(fontSize: 20.0))
                               ],
                             ),
+
+                            /// SCREEN AST PER 75
                             const SizedBox(height: 15.0),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
@@ -1417,6 +1722,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// SCREEN AST PTS PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               const SizedBox(height: 5.0),
@@ -1437,6 +1744,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// LOOSE BALLS PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               const SizedBox(height: 15.0),
@@ -1457,6 +1766,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
                               ),
+
+                            /// FOULS PER 75
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               const SizedBox(height: 15.0),
@@ -1473,6 +1784,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
+
+                            /// FOULS DRAWN PER 75
                             const SizedBox(height: 5.0),
                             ComparisonRow(
                               statName: 'FOULS DRAWN PER 75',
@@ -1723,14 +2036,20 @@ class ComparisonRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool oneIsBetter =
-        (statName == 'DEF - On/Off' || statName.contains('DRTG') || statName == 'FOULS PER 75')
-            ? playerOne < playerTwo
-            : playerOne > playerTwo;
-    bool twoIsBetter =
-        (statName == 'DEF - On/Off' || statName.contains('DRTG') || statName == 'FOULS PER 75')
-            ? playerTwo < playerOne
-            : playerTwo > playerOne;
+    bool oneIsBetter = (statName == 'DEF - On/Off' ||
+            statName.contains('DRTG') ||
+            statName == 'FOULS PER 75' ||
+            statName == 'TOV PER 75' ||
+            statName == 'TOV %')
+        ? playerOne < playerTwo
+        : playerOne > playerTwo;
+    bool twoIsBetter = (statName == 'DEF - On/Off' ||
+            statName.contains('DRTG') ||
+            statName == 'FOULS PER 75' ||
+            statName == 'TOV PER 75' ||
+            statName == 'TOV %')
+        ? playerTwo < playerOne
+        : playerTwo > playerOne;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
