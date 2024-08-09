@@ -1,24 +1,42 @@
 import random
 import time
-
 from nba_api.stats.endpoints import playergamelogs
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
 
 
-def gamelogs(player_id, season, season_type):
-    gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season).get_normalized_dict()['PlayerGameLogs']
+def gamelogs(player_id, season, season_type, measure_type):
+    if season_type == 'PLAYOFFS':
+        gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs', measure_type_player_game_logs_nullable=measure_type).get_normalized_dict()['PlayerGameLogs']
+    else:
+        gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable=measure_type).get_normalized_dict()['PlayerGameLogs']
 
-    keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:32]
+    if measure_type == 'Base':
+        keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:32]
+    else:
+        keys = list(gamelog[0].keys())[7:39]
+
+    # Retrieve existing gamelog data
+    existing_data = players_collection.find_one(
+        {'PERSON_ID': player_id},
+        {f'STATS.{season}.GAMELOGS.{season_type}': 1, '_id': 0}
+    )
 
     # Initialize dictionaries for each data type
-    gamelog_data = {}
+    if existing_data:
+        gamelog_data = existing_data
+    else:
+        gamelog_data = {}
 
     # Fill in the player data from each list
     for game in gamelog:
         game_id = game['GAME_ID']
-        gamelog_data[game_id] = {key: game[key] for key in keys}
+        if existing_data:
+            for key in keys:
+                gamelog_data[game_id][key] = game[key]
+        else:
+            gamelog_data[game_id] = {key: game[key] for key in keys}
 
     players_collection.update_one(
         {'PERSON_ID': player_id},
@@ -38,6 +56,7 @@ if __name__ == "__main__":
     logging.info("Connected to MongoDB")
 
     season_types = ['REGULAR SEASON', 'PLAYOFFS']
+    measure = 'Advanced'
 
     # Set batch size to process documents
     batch_size = 25
@@ -67,7 +86,7 @@ if __name__ == "__main__":
                             continue
                         else:
                             try:
-                                gamelogs(player['PERSON_ID'], season, season_type)
+                                gamelogs(player['PERSON_ID'], season, season_type, measure)
                             except Exception as e:
                                 logging.error(f'Could not add gamelogs for player {player["PERSON_ID"]}: {e}')
                                 continue

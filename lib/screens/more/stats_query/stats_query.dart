@@ -34,7 +34,6 @@ class _StatsQueryState extends State<StatsQuery> {
       selectedSeasonType = data['selectedSeasonType'];
       selectedPosition = data['selectedPosition'];
     });
-    print(queryData?.length);
   }
 
   void _showColumnSelector() {

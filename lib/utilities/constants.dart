@@ -1184,33 +1184,15 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'nba_name': 'OFFENSIVE_LOAD',
         'rank_nba_name': 'OFFENSIVE_LOAD_RANK',
       },
-      'splash_name': 'OFF LOAD',
+      'splash_name': 'LOAD%',
       'full_name': 'Offensive Load',
       'first_available': '1996',
       'convert': 'false',
       'round': '1',
       'definition':
-          'Estimates percentage of team plays a player contributes to when they are on the floor. Unlike Usage, Offensive Load includes passing and creation.',
+          'Estimates percentage of team plays a player contributes to when they are on the floor. Unlike Usage, Offensive Load incorporates passing and creation.',
       'formula':
           '((AST - (0.38 * BOX CREATION) * 0.75) + (FTA * 0.44) + FGA + BOX CREATION + TOV'
-    },
-    'TOUCHES': {
-      'location': ['ADV', 'TOUCHES'],
-      'TOTAL': {
-        'nba_name': 'TOUCHES',
-        'rank_nba_name': 'TOUCHES_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'TOUCHES_PER_75',
-        'rank_nba_name': 'TOUCHES_PER_75_RANK',
-      },
-      'splash_name': 'TOUCHES',
-      'full_name': 'Touches',
-      'first_available': '2013',
-      'convert': 'false',
-      'round': '0',
-      'definition': 'The number of times a player possessed the ball.',
-      'formula': ''
     },
     'TOV': {
       'location': ['BASIC'],
@@ -1231,7 +1213,44 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'A turnover occurs when the player or team on offense loses the ball to the defense.',
       'formula': ''
     },
+    'C-TOV%': {
+      'location': ['ADV'],
+      'TOTAL': {
+        'nba_name': 'ADJ_TOV_PCT',
+        'rank_nba_name': 'ADJ_TOV_PCT_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'ADJ_TOV_PCT',
+        'rank_nba_name': 'ADJ_TOV_PCT_RANK',
+      },
+      'splash_name': 'cTOV%',
+      'full_name': 'Creation-Based (Adjusted) Turnover %',
+      'first_available': '1996',
+      'convert': 'true',
+      'round': '1',
+      'definition':
+          'Turnover percentage based on possessions the player was involved rather than possessions the player ended.',
+      'formula': 'TOV / (LOAD% * 100)'
+    },
     'fill3': {'first_available': '2013'},
+    'TOUCHES': {
+      'location': ['ADV', 'TOUCHES'],
+      'TOTAL': {
+        'nba_name': 'TOUCHES',
+        'rank_nba_name': 'TOUCHES_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'TOUCHES_PER_75',
+        'rank_nba_name': 'TOUCHES_PER_75_RANK',
+      },
+      'splash_name': 'TOUCHES',
+      'full_name': 'Touches',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '0',
+      'definition': 'The number of times a player possessed the ball.',
+      'formula': ''
+    },
     'TIME OF POSS': {
       'location': ['ADV', 'TOUCHES'],
       'TOTAL': {
@@ -2078,6 +2097,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Wide Open - No defender within 6+ feet of the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
+    /*
     'fill3': {'first_available': '2013'},
     'VERY TIGHT eFG%': {
       'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '0-2 Feet - Very Tight'],
@@ -2155,6 +2175,8 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Wide Open - No defender within 6+ feet of the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
+
+     */
   },
   'DRIVES': {
     'DRIVES': {
@@ -2191,8 +2213,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'Percentage of touches on which a player drives to the rim.',
       'formula': ''
     },
     'fill': {'first_available': '2013'},
@@ -2207,12 +2228,11 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'DRIVE_PTS_PER_75_RANK',
       },
       'splash_name': 'PTS',
-      'full_name': 'Drives',
+      'full_name': 'Points Scored (Drives)',
       'first_available': '2013',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'The number of points scored by a player on drives to the basket.',
       'formula': ''
     },
     'PTS PER DRIVE': {
@@ -2230,8 +2250,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'false',
       'round': '2',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'The number of points scored by a player per drive to the basket.',
       'formula': ''
     },
     'fill2': {'first_available': '2013'},
@@ -2250,8 +2269,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'The number of field goals made by a player on drives to the basket.',
       'formula': ''
     },
     'DRIVE FGA': {
@@ -2269,8 +2287,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'The number of field goals attempted by a player on drives to the basket.',
       'formula': ''
     },
     'DRIVE FG%': {
@@ -2288,8 +2305,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'Player\'s field goal percentage on drives to the basket.',
       'formula': ''
     },
     'fill3': {'first_available': '2013'},
@@ -2308,8 +2324,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'Player\'s True Shooting% on drives to the basket.',
       'formula': ''
     },
     'DRIVE FT/FGA': {
@@ -2328,7 +2343,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'convert': 'false',
       'round': '2',
       'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+          'The number of field throws made by a player from drives to the basket per driving field goal attempt.',
       'formula': ''
     },
     'fill4': {'first_available': '2013'},
@@ -2347,8 +2362,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'The number of passes made by a player on drives to the basket.',
       'formula': ''
     },
     'DRIVE PASS %': {
@@ -2366,8 +2380,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'Percentage of drives where a player passes the ball to a teammate.',
       'formula': ''
     },
     'DRIVE AST': {
@@ -2385,8 +2398,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'The number of assists by a player on drives to the basket.',
       'formula': ''
     },
     'DRIVE AST %': {
@@ -2404,8 +2416,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'Percentage of drives where the player recorded an assist.',
       'formula': ''
     },
     'fill5': {'first_available': '2013'},
@@ -2420,12 +2431,11 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'DRIVE_TOV_PER_75_RANK',
       },
       'splash_name': 'TOV',
-      'full_name': 'Drives',
+      'full_name': 'Turnovers (Drives)',
       'first_available': '2013',
       'convert': 'false',
       'round': '0',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
+      'definition': 'The number of turnovers by a player on drives to the basket.',
       'formula': ''
     },
     'DRIVE TOV %': {
@@ -2443,9 +2453,8 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition':
-          'When a player attacks the basket off the dribble in the halfcourt offense. Does not include situations where the player starts close to the basket, catches on the move, or immediately gets cut off on the perimeter.',
-      'formula': ''
+      'definition': 'Percentage of drives where the player turned the ball over.',
+      'formula': 'Drive TOV / DRIVES'
     },
   },
   'REBOUNDING': {
@@ -2982,6 +2991,26 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'round': '1',
       'definition': 'Team\'s points allowed per 100 possessions when player is on court.',
       'formula': ''
+    },
+    'VERSATILITY': {
+      'location': ['ADV'],
+      'TOTAL': {
+        'nba_name': 'VERSATILITY_SCORE',
+        'rank_nba_name': 'VERSATILITY_SCORE_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'VERSATILITY_SCORE',
+        'rank_nba_name': 'VERSATILITY_SCORE_RANK',
+      },
+      'splash_name': 'VERSATILITY',
+      'full_name': 'VERSATILITY SCORE',
+      'first_available': '2017',
+      'convert': 'true',
+      'round': '0',
+      'definition':
+          'A measure of the time spent guarding different positions (G, F, C) on a 0-100 scale. A player who guarded all 3 positions equally ( ⅓ of the time each) will have a score of 100, while a player who only guarded one position will have a score of 0.',
+      'formula':
+          '1 - ( | Gₜ - ⅓ | + | Fₜ - ⅓ | + | Cₜ - ⅓ | )\n\n*Where Gₜ, Fₜ, Cₜ represent % of time spent guarding each position.'
     },
     'DEF PTS SAVED': {
       'location': ['ADV'],

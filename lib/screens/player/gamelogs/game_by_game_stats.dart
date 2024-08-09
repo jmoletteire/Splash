@@ -13,14 +13,12 @@ class GameByGameStats extends StatefulWidget {
   final Map<String, dynamic> player;
   final List<String> gameIds;
   final Map<String, dynamic> schedule;
-  final String seasonType;
 
   const GameByGameStats({
     super.key,
     required this.player,
     required this.gameIds,
     required this.schedule,
-    required this.seasonType,
   });
 
   @override
@@ -35,9 +33,9 @@ class _GameByGameStatsState extends State<GameByGameStats> {
     'PTS',
     'REB',
     'AST',
+    'TOV',
     'STL',
     'BLK',
-    'TOV',
     'FG%',
     '3P%',
     'FT%',
@@ -48,6 +46,51 @@ class _GameByGameStatsState extends State<GameByGameStats> {
     'DRTG',
     'NRTG',
   ];
+
+  Map<String, String> seasonTypes = {
+    '*': 'ALL',
+    '1': 'PRE-SEASON',
+    '2': 'REGULAR SEASON',
+    '4': 'PLAYOFFS',
+    '5': 'PLAY-IN',
+    '6': 'NBA CUP',
+  };
+
+  void _prepareGameIds() {
+    if (widget.gameIds.isNotEmpty) {
+      // Get the first game in the list
+      var firstGame = widget.schedule[widget.gameIds.first];
+
+      if (firstGame != null) {
+        // Insert the season type for the first game at the beginning of the list
+        String firstSeasonType = seasonTypes[firstGame['GAME_ID'][2]]!;
+        widget.gameIds.insert(0, firstSeasonType);
+      }
+    }
+
+    Map<String, dynamic>? lastValidGame;
+
+    // Start loop from index 1 since we already handled the first element
+    for (int i = 1; i < widget.gameIds.length; i++) {
+      var game = widget.schedule[widget.gameIds[i]];
+
+      // If it's a regular game entry, update lastValidGame
+      if (game != null) {
+        if (lastValidGame != null && game['GAME_ID'][2] != lastValidGame['GAME_ID'][2]) {
+          String newSeasonType = seasonTypes[game['GAME_ID'][2]]!;
+          widget.gameIds.insert(i, newSeasonType);
+          i++; // Skip the inserted row to avoid re-checking it
+        }
+        lastValidGame = game; // Update last valid game
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _prepareGameIds();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +110,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
       ),
       headerHeight: MediaQuery.of(context).size.height * 0.045,
       rowCount: widget.gameIds.length,
-      rowHeight: MediaQuery.of(context).size.height * 0.06,
+      rowHeight: MediaQuery.of(context).size.height * 0.055,
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
       columns: [
         /// DATE
@@ -86,40 +129,40 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         TableColumn(width: MediaQuery.of(context).size.width * 0.12),
 
         /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
 
         /// REB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.09),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
 
         /// AST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.09),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
 
         /// STL
-        TableColumn(width: MediaQuery.of(context).size.width * 0.09),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
 
         /// BLK
-        TableColumn(width: MediaQuery.of(context).size.width * 0.09),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
 
         /// TOV
-        TableColumn(width: MediaQuery.of(context).size.width * 0.09),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
 
         /// FG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
 
         /// 3P%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
 
         /// FT%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
 
         /// eFG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
 
         /// TS%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
 
         /// USG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
 
         /// ORTG
         TableColumn(width: MediaQuery.of(context).size.width * 0.13),
@@ -187,7 +230,23 @@ class _GameByGameStatsState extends State<GameByGameStats> {
       );
 
   Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
-    Map<String, dynamic> game = widget.schedule[widget.gameIds[row]];
+    var gameId = widget.gameIds[row];
+
+    // Check if the row is a season type (not a regular game ID)
+    if (seasonTypes.values.contains(gameId)) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+        alignment: Alignment.centerLeft,
+        child: Text(
+          gameId,
+          style: kBebasNormal.copyWith(fontSize: 14.0),
+        ),
+      );
+    }
+
+    // Normal row rendering
+    var game = widget.schedule[gameId];
+
     String matchup = game['MATCHUP'].toString();
     String teamId = game['TEAM_ID'].toString();
     String oppId = kTeamIds[matchup.substring(matchup.length - 3)]!;
@@ -270,7 +329,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
               game['MATCHUP'][4] == '@'
                   ? game['MATCHUP'].substring(4)
                   : game['MATCHUP'].substring(8) ?? '-',
-              style: kBebasBold.copyWith(fontSize: 14.0),
+              style: kBebasBold.copyWith(fontSize: 15.0),
             ),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 15.0),
@@ -345,7 +404,7 @@ class StandingsDataText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: AutoSizeText(
         text,
-        style: kBebasNormal.copyWith(fontSize: 16.0),
+        style: kBebasNormal.copyWith(fontSize: 17.0),
         maxLines: 1,
       ),
     );

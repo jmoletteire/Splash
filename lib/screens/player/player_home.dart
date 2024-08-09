@@ -11,8 +11,8 @@ import 'package:splash/screens/player/career/player_career.dart';
 import 'package:splash/screens/player/comparison/player_comparison.dart';
 import 'package:splash/screens/player/gamelogs/player_gamelogs.dart';
 import 'package:splash/screens/player/player_cache.dart';
-import 'package:splash/screens/player/player_stats.dart';
 import 'package:splash/screens/player/profile/player_profile.dart';
+import 'package:splash/screens/player/stats/player_stats.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
@@ -267,7 +267,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       tabs: const [
                         Tab(text: 'Profile'),
                         Tab(text: 'Stats'),
-                        Tab(text: 'Gamelog'),
+                        Tab(text: 'Game Logs'),
                         Tab(text: 'Career'),
                       ],
                     ),

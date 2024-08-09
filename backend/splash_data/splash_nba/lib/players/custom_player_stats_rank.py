@@ -51,6 +51,10 @@ custom_stats = [
     # ("BOX_CREATION", "PLAYOFFS.ADV", -1),
     # ("OFFENSIVE_LOAD", "REGULAR SEASON.ADV", -1),
     # ("OFFENSIVE_LOAD", "PLAYOFFS.ADV", -1),
+    # ("ADJ_TOV_PCT", "REGULAR SEASON.ADV", 1),
+    # ("ADJ_TOV_PCT", "PLAYOFFS.ADV", 1),
+    ("VERSATILITY_SCORE", "REGULAR SEASON.ADV", -1),
+    ("VERSATILITY_SCORE", "PLAYOFFS.ADV", -1),
 
     # ADV -> PASSING
     # ("PASSES_MADE", "REGULAR SEASON.ADV.PASSING", -1),
@@ -176,6 +180,7 @@ seasons = [
     '2019-20',
     '2018-19',
     '2017-18',
+    '''
     '2016-17',
     '2015-16',
     '2014-15',
@@ -197,6 +202,7 @@ seasons = [
     '1998-99',
     '1997-98',
     '1996-97'
+    '''
 ]
 
 for season in seasons:

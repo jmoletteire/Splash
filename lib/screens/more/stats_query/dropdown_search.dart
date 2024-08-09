@@ -35,7 +35,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
     "Rebounding":
         kPlayerStatLabelMap['REBOUNDING'].keys.where((key) => !key.contains("fill")).toList(),
     "Passing":
-        kPlayerStatLabelMap['PASSING'].keys.where((key) => !key.contains("fill")).toList(),
+        kPlayerStatLabelMap['PLAYMAKING'].keys.where((key) => !key.contains("fill")).toList(),
     "Defense":
         kPlayerStatLabelMap['DEFENSE'].keys.where((key) => !key.contains("fill")).toList(),
     "Hustle":
@@ -63,7 +63,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
       if (category.value.containsKey(field)) {
         List<dynamic> locations = category.value[field]['location'];
         String loc = locations.join('.');
-        loc += '.' + category.value[field]['TOTAL']['nba_name'];
+        loc += '.${category.value[field]['TOTAL']['nba_name']}';
         return loc;
       }
     }

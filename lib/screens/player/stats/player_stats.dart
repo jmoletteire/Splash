@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
-import '../../components/animated_polar_chart.dart';
-import '../../components/player_stat_card.dart';
-import '../../utilities/constants.dart';
+import '../../../components/animated_polar_chart.dart';
+import '../../../components/expandable_card_controller.dart';
+import '../../../utilities/constants.dart';
+import 'player_stat_card.dart';
 
 class PlayerStats extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -25,6 +26,7 @@ class _PlayerStatsState extends State<PlayerStats> {
   bool _playoffSwitch = false;
   int perModeInitialLabelIndex = 0;
   bool expandAll = true;
+  late final ExpandableCardController _controller;
 
   double getPercentile(List<String> location, String stat) {
     num rank = (location.length == 1
@@ -96,6 +98,7 @@ class _PlayerStatsState extends State<PlayerStats> {
     selectedSeason = seasons.first;
     selectedSeasonType = 'REGULAR SEASON';
     perMode = modes[0];
+    _controller = ExpandableCardController(true); // Set initial expanded state
   }
 
   @override
@@ -127,6 +130,7 @@ class _PlayerStatsState extends State<PlayerStats> {
         : Stack(
             children: [
               CustomScrollView(
+                cacheExtent: 5000.0,
                 slivers: [
                   SliverList(
                     delegate: SliverChildListDelegate(
@@ -290,6 +294,29 @@ class _PlayerStatsState extends State<PlayerStats> {
                               ),
                             ),
                           ),
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 20.0, vertical: 11.0),
+                          child: Row(
+                            children: [
+                              Text('Expand/Collapse All',
+                                  style: kBebasNormal.copyWith(fontSize: 18.0)),
+                              const SizedBox(width: 10.0),
+                              Transform.scale(
+                                scale: 0.9,
+                                child: CupertinoSwitch(
+                                  activeColor: teamColor,
+                                  value: _controller.isExpandedNotifier.value,
+                                  onChanged: (bool value) {
+                                    setState(() {
+                                      _controller.isExpandedNotifier.value = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 1996)
                           PlayerStatCard(
                             playerStats: widget.player['STATS'][selectedSeason],
@@ -297,6 +324,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'EFFICIENCY',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 1996)
                           PlayerStatCard(
@@ -305,6 +333,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'SCORING',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
                           PlayerStatCard(
@@ -313,6 +342,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'SHOT TYPE',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
                           PlayerStatCard(
@@ -321,6 +351,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'CLOSEST DEFENDER',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
                           PlayerStatCard(
@@ -329,6 +360,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'DRIVES',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 1996)
                           PlayerStatCard(
@@ -337,6 +369,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'REBOUNDING',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
                           PlayerStatCard(
@@ -345,6 +378,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'PLAYMAKING',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) >= 1996)
                           PlayerStatCard(
@@ -353,6 +387,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'DEFENSE',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         if (int.parse(selectedSeason.substring(0, 4)) > 2015)
                           PlayerStatCard(
@@ -361,6 +396,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             statGroup: 'HUSTLE',
                             perMode: perMode,
                             selectedSeasonType: selectedSeasonType,
+                            expandableController: _controller,
                           ),
                         const Padding(
                           padding: EdgeInsets.only(bottom: 100),

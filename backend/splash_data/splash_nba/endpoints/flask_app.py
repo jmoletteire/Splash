@@ -184,7 +184,7 @@ def apply_player_filters(season, season_type, filters, position):
 
         pipeline.append({"$project": {'PERSON_ID': 1}})
 
-        current_results = list(players_collection.aggregate(pipeline))
+        current_results = list(players_collection.aggregate(pipeline, allowDiskUse=True))
 
         if results is None:
             results = current_results

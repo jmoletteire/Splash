@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-import '../utilities/constants.dart';
+import '../../../components/expandable_card_controller.dart';
+import '../../../utilities/constants.dart';
 
 class PlayerStatCard extends StatefulWidget {
   const PlayerStatCard({
@@ -11,6 +12,7 @@ class PlayerStatCard extends StatefulWidget {
     required this.selectedSeasonType,
     required this.statGroup,
     required this.perMode,
+    required this.expandableController,
   });
 
   final Map<String, dynamic> playerStats;
@@ -18,6 +20,7 @@ class PlayerStatCard extends StatefulWidget {
   final String selectedSeasonType;
   final String statGroup;
   final String perMode;
+  final ExpandableCardController expandableController;
 
   @override
   _PlayerStatCardState createState() => _PlayerStatCardState();
@@ -25,6 +28,24 @@ class PlayerStatCard extends StatefulWidget {
 
 class _PlayerStatCardState extends State<PlayerStatCard> {
   bool _isExpanded = true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.expandableController.isExpandedNotifier.addListener(_updateExpandedState);
+  }
+
+  @override
+  void dispose() {
+    widget.expandableController.isExpandedNotifier.removeListener(_updateExpandedState);
+    super.dispose();
+  }
+
+  void _updateExpandedState() {
+    setState(() {
+      _isExpanded = widget.expandableController.isExpandedNotifier.value;
+    });
+  }
 
   dynamic getValueFromMap(Map<String, dynamic> map, List<String> keys, String stat) {
     dynamic value = map;
@@ -228,10 +249,11 @@ class StatisticRow extends StatelessWidget {
                     ? (perMode == 'PER_75' &&
                             statName != 'MIN' &&
                             statName != 'GP' &&
-                            statName != 'POSS'
+                            statName != 'POSS' &&
+                            statName != 'VERSATILITY'
                         ? value.toStringAsFixed(1)
                         : value.toStringAsFixed(0))
-                    : convert == 'true' || statName == 'OFF LOAD'
+                    : convert == 'true' || statName == 'LOAD%'
                         ? '${value.toStringAsFixed(int.parse(round))}%'
                         : value.toStringAsFixed(int.parse(round)),
                 textAlign: TextAlign.right,

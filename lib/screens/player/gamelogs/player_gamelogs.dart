@@ -80,10 +80,10 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> {
   @override
   void initState() {
     super.initState();
-    schedule = widget.player['STATS'][kCurrentSeason]['GAMELOGS']['REGULAR SEASON'];
+    schedule = updateSchedule(kCurrentSeason, 'ALL');
     seasons = widget.player['STATS'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
-    selectedSeasonType = 'REGULAR SEASON';
+    selectedSeasonType = 'ALL';
     selectedMonth = months.first;
     selectedOpp = 'ALL';
     oppId = 0;
@@ -94,6 +94,24 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> {
         selectedSeasonType: selectedSeasonType,
         selectedMonth: selectedMonth,
         opponent: oppId);
+  }
+
+  Map<String, dynamic> updateSchedule(String season, String seasonType) {
+    Map<String, dynamic> gamelogs = widget.player['STATS'][season]['GAMELOGS'];
+    if (seasonType == 'ALL') {
+      Map<String, dynamic> allGames = {};
+
+      // Loop through the keys and append only if the map exists
+      for (String key in seasonTypes.keys) {
+        if (gamelogs.containsKey(key)) {
+          allGames.addAll(gamelogs[key]);
+        }
+      }
+
+      return allGames;
+    } else {
+      return gamelogs[seasonType];
+    }
   }
 
   @override
@@ -204,8 +222,8 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> {
                                                 /// Updates displayed values in schedule view
                                                 setState(() {
                                                   selectedSeason = value!;
-                                                  schedule = widget.player['STATS'][value]
-                                                      ['GAMELOGS'][selectedSeasonType];
+                                                  schedule = updateSchedule(
+                                                      selectedSeason, selectedSeasonType);
                                                   games = PlayerGames(
                                                     player: widget.player,
                                                     schedule: schedule,
@@ -255,7 +273,8 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> {
                                                   selectedSeasonType = value!;
                                                   games = PlayerGames(
                                                     player: widget.player,
-                                                    schedule: schedule,
+                                                    schedule: updateSchedule(
+                                                        selectedSeason, selectedSeasonType),
                                                     selectedSeason: selectedSeason,
                                                     selectedSeasonType: value,
                                                     selectedMonth: selectedMonth,

@@ -31,9 +31,10 @@ class _PlayerGamesState extends State<PlayerGames> {
   late Map<String, dynamic> playerGames;
   double topPadding = 0.0;
   bool _includesPlayoffs = false;
+  bool _includesRegSeason = false;
 
   Map<String, String> seasonTypes = {
-    '*': 'All',
+    '*': 'ALL',
     '1': 'PRE-SEASON',
     '2': 'REGULAR SEASON',
     '4': 'PLAYOFFS',
@@ -128,24 +129,24 @@ class _PlayerGamesState extends State<PlayerGames> {
     }
 
     // Month filter only
-    if ((opponentId == null || opponentId == 0) && month != 'All' && seasonType == 'All') {
+    if ((opponentId == null || opponentId == 0) && month != 'All' && seasonType == 'ALL') {
       print('Filtering by Month only');
       return filterByMonth(widget.schedule, monthsMap[month]!);
     }
     // Opp filter only
-    else if (opponentId != null && opponentId != 0 && month == 'All' && seasonType == 'All') {
+    else if (opponentId != null && opponentId != 0 && month == 'All' && seasonType == 'ALL') {
       print('Filtering by Opp only');
       return filterByOpp(widget.schedule, opponentId);
     }
     // Season Type filter only
     else if ((opponentId == null || opponentId == 0) &&
         month == 'All' &&
-        seasonType != 'All') {
+        seasonType != 'ALL') {
       print('Filtering by Season Type only');
       return filterBySeasonType(widget.schedule, seasonType);
     }
     // Month & Opp filters
-    else if (opponentId != 0 && month != 'All' && seasonType == 'All') {
+    else if (opponentId != 0 && month != 'All' && seasonType == 'ALL') {
       print('Filtering by Month & Opp');
       return filterByOpp(filterByMonth(widget.schedule, monthsMap[month]!), opponentId!);
     }
@@ -157,12 +158,12 @@ class _PlayerGamesState extends State<PlayerGames> {
       return filterByMonth(filterBySeasonType(widget.schedule, seasonType), monthsMap[month]!);
     }
     // Season Type & Opp filters
-    else if (opponentId != 0 && month == 'All' && seasonType != 'All') {
+    else if (opponentId != 0 && month == 'All' && seasonType != 'ALL') {
       print('Filtering by Season Type & Opp');
       return filterByOpp(filterBySeasonType(widget.schedule, seasonType), opponentId!);
     }
     // All filters
-    else if (opponentId != 0 && month != 'All' && seasonType != 'All') {
+    else if (opponentId != 0 && month != 'All' && seasonType != 'ALL') {
       print('Filtering by all filters');
       return filterByOpp(
           filterByMonth(filterBySeasonType(widget.schedule, seasonType), monthsMap[month]!),
@@ -193,6 +194,8 @@ class _PlayerGamesState extends State<PlayerGames> {
     super.initState();
     _includesPlayoffs =
         widget.selectedSeasonType == 'ALL' || widget.selectedSeasonType == 'PLAYOFFS';
+    _includesRegSeason =
+        widget.selectedSeasonType == 'ALL' || widget.selectedSeasonType == 'REGULAR SEASON';
   }
 
   @override
@@ -210,52 +213,45 @@ class _PlayerGamesState extends State<PlayerGames> {
     }
     gamesList = sortGames();
 
+    _includesPlayoffs =
+        widget.selectedSeasonType == 'ALL' || widget.selectedSeasonType == 'PLAYOFFS';
+    _includesRegSeason =
+        widget.selectedSeasonType == 'ALL' || widget.selectedSeasonType == 'REGULAR SEASON';
+
     return playerGames.isEmpty
-        ? SliverToBoxAdapter(
-            child: Center(
-              heightFactor: 5,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.sports_basketball,
-                    color: Colors.white38,
-                    size: 40.0,
+        ? CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Center(
+                  heightFactor: 5,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.sports_basketball,
+                        color: Colors.white38,
+                        size: 40.0,
+                      ),
+                      const SizedBox(height: 15.0),
+                      Text(
+                        'No Games Available',
+                        style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 15.0),
-                  Text(
-                    'No Games Available',
-                    style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           )
         : CustomScrollView(
             slivers: [
-              if (_includesPlayoffs)
-                SliverToBoxAdapter(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Playoffs',
-                      style: kBebasNormal.copyWith(fontSize: 14.0),
-                    ),
-                  ),
-                ),
-              if (_includesPlayoffs)
-                GameByGameStats(
+              SliverPadding(
+                padding: const EdgeInsets.only(bottom: 100.0),
+                sliver: GameByGameStats(
                   player: widget.player,
                   gameIds: gamesList,
                   schedule: playerGames,
-                  seasonType: 'PLAYOFFS',
                 ),
-              GameByGameStats(
-                player: widget.player,
-                gameIds: gamesList,
-                schedule: playerGames,
-                seasonType: 'REGULAR SEASON',
               ),
             ],
           );
