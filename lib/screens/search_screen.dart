@@ -66,6 +66,7 @@ class SearchScreen extends StatelessWidget {
         surfaceTintColor: Colors.grey.shade900,
         title: TextField(
           autofocus: true,
+          autocorrect: false,
           controller: _textEditingController,
           onChanged: (query) =>
               Provider.of<SearchProvider>(context, listen: false).onSearchChanged(query),

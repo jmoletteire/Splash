@@ -12,6 +12,7 @@ import 'package:splash/screens/player/comparison/player_comparison.dart';
 import 'package:splash/screens/player/gamelogs/player_gamelogs.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/profile/player_profile.dart';
+import 'package:splash/screens/player/shot_chart/shot_chart.dart';
 import 'package:splash/screens/player/stats/player_stats.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
@@ -175,6 +176,8 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
     ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
         PlayerGamelogs(team: team, player: player),
     ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
+        PlayerShotChart(team: team, player: player),
+    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
         PlayerCareer(team: team, player: player),
   ];
 
@@ -264,10 +267,13 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
                       labelStyle: kBebasNormal,
+                      isScrollable: true,
+                      tabAlignment: TabAlignment.start,
                       tabs: const [
                         Tab(text: 'Profile'),
                         Tab(text: 'Stats'),
                         Tab(text: 'Game Logs'),
+                        Tab(text: 'Shot Chart'),
                         Tab(text: 'Career'),
                       ],
                     ),

@@ -45,22 +45,29 @@ class _PlayerStatsState extends State<PlayerStats> {
   double getFinalPercentile(String group) {
     switch (group) {
       case 'Efficiency':
-        double result = (getPercentile(['ADV'], 'OFF_RATING_ON_OFF') +
-                getPercentile(['ADV'], 'DEF_RATING_ON_OFF') +
-                getPercentile(['ADV'], 'NET_RATING_ON_OFF') +
-                getPercentile(['ADV', 'TOUCHES'], 'TOV_PER_TOUCH')) /
+        double result = (getPercentile(['ADV'], 'NET_RATING_ON_OFF') +
+                getPercentile(['ADV'], 'PLUS_MINUS_PER_75') +
+                getPercentile(['ADV'], 'OFFENSIVE_LOAD') +
+                getPercentile(['ADV'], 'ADJ_TOV_PCT')) /
             4;
+        result = result > 1
+            ? 1
+            : result < 0
+                ? 0
+                : result;
         return result;
       case 'Shooting':
         return getPercentile(['ADV'], 'TS_PCT');
       case 'Defense':
-        double result = (getPercentile(['ADV'], 'DEF_RATING_ON_OFF') +
-                getPercentile(['ADV'], 'DPS_PER_75') +
-                getPercentile(['BASIC'], 'STL_PER_75') +
-                getPercentile(['BASIC'], 'BLK_PER_75') +
-                getPercentile(['HUSTLE'], 'DEFLECTIONS_PER_75') +
-                getPercentile(['HUSTLE'], 'CONTESTED_SHOTS_PER_75')) /
-            6;
+        double result = (getPercentile(['ADV'], 'DEF_IMPACT_EST') +
+                getPercentile(['ADV'], 'MATCHUP_DIFFICULTY') +
+                getPercentile(['ADV'], 'VERSATILITY_SCORE')) /
+            3;
+        result = result > 1
+            ? 1
+            : result < 0
+                ? 0
+                : result;
         return result;
       case 'Rebounding':
         double result = (getPercentile(['ADV'], 'OREB_PCT') +
@@ -68,6 +75,11 @@ class _PlayerStatsState extends State<PlayerStats> {
                 getPercentile(['HUSTLE'], 'BOX_OUTS_PER_75') +
                 getPercentile(['ADV', 'REBOUNDING'], 'REB_CHANCE_PCT_ADJ')) /
             4;
+        result = result > 1
+            ? 1
+            : result < 0
+                ? 0
+                : result;
         return result;
       case 'Playmaking':
         double result = (getPercentile(['ADV', 'PASSING'], 'AST_ADJ_PER_75') +
@@ -75,6 +87,11 @@ class _PlayerStatsState extends State<PlayerStats> {
                 getPercentile(['ADV', 'PASSING'], 'POTENTIAL_AST_PER_75') +
                 getPercentile(['ADV'], 'BOX_CREATION')) /
             4;
+        result = result > 1
+            ? 1
+            : result < 0
+                ? 0
+                : result;
         return result;
       case 'Hustle':
         double result = (getPercentile(['ADV'], 'PACE') +
@@ -83,6 +100,11 @@ class _PlayerStatsState extends State<PlayerStats> {
                 getPercentile(['HUSTLE'], 'SCREEN_AST_PTS_PER_75') +
                 getPercentile(['HUSTLE'], 'LOOSE_BALLS_RECOVERED_PER_75')) /
             5;
+        result = result > 1
+            ? 1
+            : result < 0
+                ? 0
+                : result;
         return result;
       default:
         return 0.0;

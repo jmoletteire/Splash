@@ -1587,19 +1587,55 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                               teamTwoColor: teamTwoColor,
                             ),
 
-                            /// DPS PER 75
+                            /// VERSATILITY
                             const SizedBox(height: 5.0),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2017 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2017)
                               ComparisonRow(
-                                statName: 'DPS PER 75',
+                                statName: 'VERSATILITY',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        [selectedSeasonTypeOne]['ADV']['DPS_PER_75'],
+                                        [selectedSeasonTypeOne]['ADV']['VERSATILITY_SCORE'],
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        [selectedSeasonTypeTwo]['ADV']['DPS_PER_75'],
+                                        [selectedSeasonTypeTwo]['ADV']['VERSATILITY_SCORE'],
+                                    1),
+                                teamOneColor: teamOneColor,
+                                teamTwoColor: teamTwoColor,
+                              ),
+
+                            /// MATCHUP DIFFICULTY
+                            const SizedBox(height: 5.0),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2017 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2017)
+                              ComparisonRow(
+                                statName: 'MATCHUP DIFFICULTY',
+                                playerOne: roundToDecimalPlaces(
+                                    playerOne['STATS'][selectedSeasonOne]
+                                        [selectedSeasonTypeOne]['ADV']['MATCHUP_DIFFICULTY'],
+                                    1),
+                                playerTwo: roundToDecimalPlaces(
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                        [selectedSeasonTypeTwo]['ADV']['MATCHUP_DIFFICULTY'],
+                                    1),
+                                teamOneColor: teamOneColor,
+                                teamTwoColor: teamTwoColor,
+                              ),
+
+                            /// DEF IMPACT ESTIMATE
+                            const SizedBox(height: 5.0),
+                            if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2017 &&
+                                int.parse(selectedSeasonTwo.substring(0, 4)) >= 2017)
+                              ComparisonRow(
+                                statName: 'DIE',
+                                playerOne: roundToDecimalPlaces(
+                                    playerOne['STATS'][selectedSeasonOne]
+                                        [selectedSeasonTypeOne]['ADV']['DEF_IMPACT_EST'],
+                                    1),
+                                playerTwo: roundToDecimalPlaces(
+                                    playerTwo['STATS'][selectedSeasonTwo]
+                                        [selectedSeasonTypeTwo]['ADV']['DEF_IMPACT_EST'],
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,

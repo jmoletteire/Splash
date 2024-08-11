@@ -26,17 +26,15 @@ def gamelogs(player_id, season, season_type, measure_type):
     # Initialize dictionaries for each data type
     if existing_data:
         gamelog_data = existing_data
+        logging.debug(f'Existing gamelog data: {gamelog_data}')
     else:
         gamelog_data = {}
 
     # Fill in the player data from each list
     for game in gamelog:
-        game_id = game['GAME_ID']
-        if existing_data:
-            for key in keys:
-                gamelog_data[game_id][key] = game[key]
-        else:
-            gamelog_data[game_id] = {key: game[key] for key in keys}
+        game_id = int(game['GAME_ID'])
+        for key in keys:
+            gamelog_data[game_id][key] = game[key]
 
     players_collection.update_one(
         {'PERSON_ID': player_id},

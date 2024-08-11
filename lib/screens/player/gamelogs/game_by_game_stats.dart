@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:material_table_view/default_animated_switcher_transition_builder.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
@@ -26,6 +25,8 @@ class GameByGameStats extends StatefulWidget {
 }
 
 class _GameByGameStatsState extends State<GameByGameStats> {
+  bool _gameIdsPrepared = false;
+
   List columnNames = [
     'DATE',
     'OPP',
@@ -62,9 +63,11 @@ class _GameByGameStatsState extends State<GameByGameStats> {
       var firstGame = widget.schedule[widget.gameIds.first];
 
       if (firstGame != null) {
-        // Insert the season type for the first game at the beginning of the list
+        // Check if the season type row is already present at the beginning
         String firstSeasonType = seasonTypes[firstGame['GAME_ID'][2]]!;
-        widget.gameIds.insert(0, firstSeasonType);
+        if (widget.gameIds.first != firstSeasonType) {
+          widget.gameIds.insert(0, firstSeasonType);
+        }
       }
     }
 
@@ -76,10 +79,16 @@ class _GameByGameStatsState extends State<GameByGameStats> {
 
       // If it's a regular game entry, update lastValidGame
       if (game != null) {
-        if (lastValidGame != null && game['GAME_ID'][2] != lastValidGame['GAME_ID'][2]) {
-          String newSeasonType = seasonTypes[game['GAME_ID'][2]]!;
-          widget.gameIds.insert(i, newSeasonType);
-          i++; // Skip the inserted row to avoid re-checking it
+        String currentSeasonType = seasonTypes[game['GAME_ID'][2]]!;
+
+        // Check if the previous item is not the same season type
+        if (lastValidGame != null &&
+            currentSeasonType != seasonTypes[lastValidGame['GAME_ID'][2]]!) {
+          // Check if the season type row already exists before inserting
+          if (widget.gameIds[i - 1] != currentSeasonType) {
+            widget.gameIds.insert(i, currentSeasonType);
+            i++; // Skip the inserted row to avoid re-checking it
+          }
         }
         lastValidGame = game; // Update last valid game
       }
@@ -87,13 +96,9 @@ class _GameByGameStatsState extends State<GameByGameStats> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _prepareGameIds();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    _prepareGameIds();
+
     return SliverTableView.builder(
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
@@ -221,11 +226,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
               ),
             ),
           ),
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            transitionBuilder: tableRowDefaultAnimatedSwitcherTransitionBuilder,
-            child: child,
-          ),
+          child: child,
         ),
       );
 

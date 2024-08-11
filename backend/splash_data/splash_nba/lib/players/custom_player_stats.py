@@ -120,6 +120,10 @@ def matchup_difficulty_and_dps(season_type):
                                                                              def_player_id_nullable=player['PERSON_ID'])
 
                         raw_data = data.get_normalized_dict()['SeasonMatchups']
+
+                        if len(raw_data) == 0:
+                            continue
+
                         load = 0  # Matchup Difficulty
                         x_team_pts = 0  # DPS
                         partial_poss = 0
@@ -1022,12 +1026,12 @@ if __name__ == "__main__":
     # defensive_points_saved(season_types[0])
     # defensive_points_saved(season_types[1])
 
-    logging.info("\nAdding Versatility Score data...\n")
-    versatility_score(season_types[0])
-    versatility_score(season_types[1])
+    # logging.info("\nAdding Versatility Score data...\n")
+    # versatility_score(season_types[0])
+    # versatility_score(season_types[1])
 
-    # logging.info("\nAdding Matchup Difficulty data...\n")
+    logging.info("\nAdding Matchup Difficulty data...\n")
     # matchup_difficulty_and_dps(season_types[0])
-    # matchup_difficulty_and_dps(season_types[1])
+    matchup_difficulty_and_dps(season_types[1])
 
     logging.info("Update complete.")

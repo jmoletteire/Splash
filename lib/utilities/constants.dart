@@ -3012,22 +3012,42 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'formula':
           '1 - ( | Gₜ - ⅓ | + | Fₜ - ⅓ | + | Cₜ - ⅓ | )\n\n*Where Gₜ, Fₜ, Cₜ represent % of time spent guarding each position.'
     },
-    'DEF PTS SAVED': {
+    'MATCHUP DIFFICULTY': {
       'location': ['ADV'],
       'TOTAL': {
-        'nba_name': 'DPS_PER_75',
-        'rank_nba_name': 'DPS_PER_75_RANK',
+        'nba_name': 'MATCHUP_DIFFICULTY',
+        'rank_nba_name': 'MATCHUP_DIFFICULTY_RANK',
       },
       'PER_75': {
-        'nba_name': 'DPS_PER_75',
-        'rank_nba_name': 'DPS_PER_75_RANK',
+        'nba_name': 'MATCHUP_DIFFICULTY',
+        'rank_nba_name': 'MATCHUP_DIFFICULTY_RANK',
       },
-      'splash_name': 'DPS',
-      'full_name': 'Defensive Points Saved',
+      'splash_name': 'MATCHUP DIFFICULTY',
+      'full_name': 'Matchup Difficulty',
       'first_available': '2017',
       'convert': 'false',
       'round': '1',
-      'definition': 'Points below expected when this player is the primary defender.',
+      'definition':
+          'The season-average Offensive Load of this player\'s defensive matchups. Players with high Matchup Difficulty guarded players who were heavily involved in their team\'s offense.',
+      'formula': ''
+    },
+    'DEF IMPACT EST': {
+      'location': ['ADV'],
+      'TOTAL': {
+        'nba_name': 'DEF_IMPACT_EST',
+        'rank_nba_name': 'DEF_IMPACT_EST_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DEF_IMPACT_EST',
+        'rank_nba_name': 'DEF_IMPACT_EST_RANK',
+      },
+      'splash_name': 'DEF IMPACT',
+      'full_name': 'Defensive Impact Estimate',
+      'first_available': '2017',
+      'convert': 'false',
+      'round': '1',
+      'definition':
+          'Difference in opponent ORTG vs. expected, based on whom this player guarded. For example, if player A\'s team normally has a 110.0 ORTG when he is on the court, but it drops to 108.0 when player B is guarding him, then player B\'s DIE is 2.0.\n\nOver a full season, this tells us how many points a player may have "saved" per 100 possessions on defense.',
       'formula': ''
     },
     'fill': {'first_available': '2016'},

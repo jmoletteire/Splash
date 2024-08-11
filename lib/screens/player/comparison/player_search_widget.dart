@@ -20,6 +20,7 @@ class PlayerSearchWidget extends StatelessWidget {
         children: [
           TextField(
             autofocus: true,
+            autocorrect: false,
             controller: _textEditingController,
             onChanged: (query) =>
                 Provider.of<SearchProvider>(context, listen: false).onSearchChanged(query),
