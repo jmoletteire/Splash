@@ -93,7 +93,6 @@ class HalfCourtPainter extends CustomPainter {
     final restrictedAreaRadius = size.width * (4 / 50);
     final threePointLineRadius = size.height * (23.75 / 47);
     final keyWidth = size.width * (12 / 50);
-    final keyHeight = size.height * (25 / 47);
     final outerKeyWidth = size.width * (16 / 50);
     final freeThrowLine = size.height * (18.87 / 47);
 
@@ -190,7 +189,7 @@ class HalfCourtPainter extends CustomPainter {
       paint,
     );
 
-    // Short Corner (Left)
+// Short Corner (Left)
     canvas.drawLine(
       Offset((size.width / 2) - size.width * (22 / 50), size.height),
       Offset(
@@ -198,28 +197,14 @@ class HalfCourtPainter extends CustomPainter {
       paint,
     );
 
-    // Above the Break
+// Above the Break (Arc)
     canvas.drawArc(
       Rect.fromCircle(
-          center: Offset(size.width / 2, size.height - (keyHeight / 4)),
+          center: Offset(size.width / 2, size.height - (size.height * (5 / 47))),
           radius: threePointLineRadius),
-      3.14 * (256.87 / 50),
-      3.14 * (37 / 50),
+      -3.14 + (0.123 * 3.14), // Start angle in quadrant 2
+      (3.14 - (0.123 * 2 * 3.14)),
       false,
-      paint,
-    );
-
-    // Sideline (Right)
-    canvas.drawLine(
-      Offset(size.width, size.height),
-      Offset(size.width, size.height - size.height),
-      paint,
-    );
-
-    // Sideline (Left)
-    canvas.drawLine(
-      Offset(0, size.height),
-      Offset(0, size.height - size.height),
       paint,
     );
   }
