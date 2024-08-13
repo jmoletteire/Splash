@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'hex_aggregator.dart';
+
 class HexMapPainter extends CustomPainter {
   final List<HexagonData> hexagons;
 
@@ -9,19 +11,26 @@ class HexMapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = Paint();
+    Paint fillPaint = Paint()..style = PaintingStyle.fill;
+
+    Paint borderPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..color = Colors.black // Set the border color
+      ..strokeWidth = 1.0; // Adjust the stroke width as needed
+
     for (var hex in hexagons) {
-      paint.color = hex.color;
-      _drawHexagon(canvas, paint, hex.x, hex.y, hex.size);
+      fillPaint.color = hex.color;
+      _drawHexagon(canvas, fillPaint, borderPaint, hex.x, hex.y, hex.width, hex.height);
     }
   }
 
-  void _drawHexagon(Canvas canvas, Paint paint, double x, double y, double size) {
+  void _drawHexagon(Canvas canvas, Paint fillPaint, Paint borderPaint, double x, double y,
+      double width, double height) {
     var path = Path();
     for (int i = 0; i < 6; i++) {
       double angle = (pi / 3) * i;
-      double x_i = x + size * cos(angle);
-      double y_i = y + size * sin(angle);
+      double x_i = x + width * cos(angle);
+      double y_i = y + height * sin(angle);
       if (i == 0) {
         path.moveTo(x_i, y_i);
       } else {
@@ -29,20 +38,12 @@ class HexMapPainter extends CustomPainter {
       }
     }
     path.close();
-    canvas.drawPath(path, paint);
+    canvas.drawPath(path, fillPaint); // Draw the filled hexagon
+    canvas.drawPath(path, borderPaint); // Draw the border around the hexagon
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
   }
-}
-
-class HexagonData {
-  final double x;
-  final double y;
-  final double size;
-  final Color color;
-
-  HexagonData({required this.x, required this.y, required this.size, required this.color});
 }

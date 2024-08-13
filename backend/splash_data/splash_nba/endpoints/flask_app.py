@@ -361,6 +361,46 @@ def get_game():
         return jsonify({"error": "Failed to retrieve games"}), 500
 
 
+@app.route('/get_player_shot_chart', methods=['GET'])
+def get_player_shot_chart():
+    try:
+        # logging.info(f"(get_player) {request.args}")
+        query_params = request.args.to_dict()
+        # logging.info(f"(get_player) {query_params}")
+
+        # Retrieve the required parameters
+        person_id = query_params.get('person_id')
+        if not person_id:
+            return jsonify({"error": "person_id is required"}), 400
+
+        season = query_params.get('season')
+        if not season:
+            return jsonify({"error": "season is required"}), 400
+
+        # Convert the person_id to an integer
+        try:
+            player_id = int(person_id)
+        except ValueError:
+            return jsonify({"error": "person_id must be an integer"}), 400
+
+        # Query the database to find the player by PERSON_ID
+        player = player_shots_collection.find_one(
+            {"PLAYER_ID": player_id},
+            {"_id": 0, f"SEASON.{season}.Shot_Chart_Detail": 1}
+        )
+
+        if player:
+            # logging.info(f"(get_player) Retrieved player {person_id} from MongoDB")
+            return jsonify(player)
+        else:
+            logging.warning("(get_player) No player found in MongoDB")
+            return jsonify({"error": "No player found"}), 404
+
+    except Exception as e:
+        logging.error(f"(get_player) Error retrieving player: {e}")
+        return jsonify({"error": "Failed to retrieve player"}), 500
+
+
 @app.route('/get_player', methods=['GET'])
 def get_player():
     try:
@@ -482,6 +522,7 @@ if __name__ == '__main__':
         games_collection = db.nba_games
         teams_collection = db.nba_teams
         players_collection = db.nba_players
+        player_shots_collection = db.nba_player_shot_data
         draft_collection = db.nba_draft_history
         logging.info("Connected to MongoDB")
     except Exception as e:

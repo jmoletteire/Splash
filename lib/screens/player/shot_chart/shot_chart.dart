@@ -1,5 +1,11 @@
-import 'package:flutter/material.dart';
+import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:splash/components/spinning_ball_loading.dart';
+import 'package:splash/utilities/constants.dart';
+
+import '../../../utilities/player.dart';
+import 'hex_aggregator.dart';
 import 'hex_map_painter.dart';
 
 class PlayerShotChart extends StatefulWidget {
@@ -13,8 +19,127 @@ class PlayerShotChart extends StatefulWidget {
 }
 
 class _PlayerShotChartState extends State<PlayerShotChart> {
+  late Map<String, dynamic> shotChart;
+  Map<String, HexagonData> hexagonMap = {};
+  List<HexagonData> hexagons = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch the shot chart data and process it
+    fetchShotChart();
+  }
+
+  Future<void> fetchShotChart() async {
+    setState(() {
+      _isLoading = true;
+    });
+    shotChart =
+        await Player().getShotChart(widget.player['PERSON_ID'].toString(), kCurrentSeason);
+    processShotChart(shotChart);
+  }
+
+  void processShotChart(Map<String, dynamic> shotChart) {
+    List<Map<String, dynamic>> shotData =
+        shotChart['SEASON'][kCurrentSeason]['Shot_Chart_Detail']
+            .map<Map<String, dynamic>>((item) => {
+                  'x': item['LOC_X'], // x coordinate in your data
+                  'y': item['LOC_Y'], // y coordinate in your data
+                  'FGA': item['SHOT_ATTEMPTED_FLAG'] == 1 ? 1 : 0,
+                  'FGM': item['SHOT_MADE_FLAG'] == 1 ? 1 : 0
+                })
+            .toList();
+
+    hexagons = generateHexagonGrid(
+      hexSizeInFeet: 1.5,
+      courtWidthInFeet: 50,
+      courtHeightInFeet: 47,
+      canvasWidth: 368,
+      canvasHeight: 346,
+    );
+
+    // Create an instance of the aggregator
+    HexagonAggregator aggregator = HexagonAggregator(hexagons[0].width, hexagons[0].height);
+
+    // Aggregate shots by hexagon
+    hexagonMap = aggregator.aggregateShots(shotData, hexagons);
+
+    // Adjust hexagons based on aggregated data
+    aggregator.adjustHexagons(hexagonMap);
+
+    print(hexagonMap.keys);
+
+    // Update the hexagons list with data from hexagonMap
+    for (int i = 0; i < hexagons.length; i++) {
+      String key = '${hexagons[i].x},${hexagons[i].y}';
+      print(key);
+      if (hexagonMap.containsKey(key)) {
+        hexagons[i] = hexagonMap[key]!;
+        print('Found');
+      }
+    }
+
+    // Refresh the UI
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  List<HexagonData> generateHexagonGrid({
+    required double hexSizeInFeet,
+    required double courtWidthInFeet,
+    required double courtHeightInFeet,
+    required double canvasWidth,
+    required double canvasHeight,
+  }) {
+    List<HexagonData> hexagons = [];
+
+    double hexMaxWidth = canvasWidth / courtWidthInFeet;
+    double hexMaxHeight = canvasHeight / courtHeightInFeet;
+    double hexWidth = hexMaxWidth;
+    double hexHeight = hexMaxHeight * sqrt(3) / 1.55;
+
+    int cols = (courtWidthInFeet / (hexSizeInFeet * 2)).ceil();
+    int rows = 47;
+
+    for (int row = 0; row < rows; row++) {
+      for (int col = 0; col < cols; col++) {
+        double x = (col * hexWidth * 4) + ((row % 2) * (hexWidth * 2));
+        double y = row * hexHeight * 1.2;
+
+        double adjustedX = x - canvasWidth / 1.515;
+        double adjustedY = canvasHeight - y + (6 * hexMaxHeight * sqrt(3));
+
+        hexagons.add(HexagonData(
+            x: adjustedX,
+            y: adjustedY,
+            width: hexWidth,
+            height: hexHeight,
+            color: Colors.transparent));
+      }
+    }
+
+    return hexagons;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const SpinningIcon();
+    }
+
+    const double canvasWidth = 368;
+    const double canvasHeight = 346;
+
+    List<HexagonData> hexagons = generateHexagonGrid(
+      hexSizeInFeet: 1.5,
+      courtWidthInFeet: 50,
+      courtHeightInFeet: 47,
+      canvasWidth: canvasWidth,
+      canvasHeight: canvasHeight,
+    );
+
     return Card(
       margin: const EdgeInsets.all(11.0),
       color: Colors.grey.shade900,
@@ -25,12 +150,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
           child: Stack(
             children: [
               HexMap(
-                hexagons: [
-                  // Example hexagons, replace with your processed data
-                  HexagonData(x: 0, y: 0, size: 10, color: Colors.red),
-                  HexagonData(x: 88, y: 239, size: 10, color: Colors.green),
-                  HexagonData(x: 131, y: 225, size: 10, color: Colors.blue),
-                ],
+                hexagons: hexagons,
               ),
               CustomPaint(
                 size: const Size(368, 346),
@@ -54,11 +174,11 @@ class HexMap extends StatelessWidget {
     const double canvasWidth = 368; // 368 pixels
     const double canvasHeight = 346; // 346 pixels
 
-    // Assume the hoop is 40 units in front of the baseline (4 feet)
-    final double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units
+    // Assume the hoop is 4 feet in front of the baseline
+    const double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units
 
-    final double basketX = canvasWidth / 2;
-    final double basketY = canvasHeight - hoopOffset;
+    const double basketX = canvasWidth / 2;
+    const double basketY = canvasHeight - hoopOffset;
 
     List<HexagonData> mappedHexagons = hexagons.map((hex) {
       // Normalize Python data: (0,0) at the basket
@@ -69,11 +189,12 @@ class HexMap extends StatelessWidget {
       double mappedX = basketX + (normalizedX * basketX); // Centered horizontally
       double mappedY = basketY - (normalizedY * canvasHeight); // Bottom to top, adjusted
 
-      return HexagonData(x: mappedX, y: mappedY, size: hex.size, color: hex.color);
+      return HexagonData(
+          x: mappedX, y: mappedY, width: hex.width, height: hex.height, color: hex.color);
     }).toList();
 
     return CustomPaint(
-      size: Size(canvasWidth, canvasHeight),
+      size: const Size(canvasWidth, canvasHeight),
       painter: HexMapPainter(hexagons: mappedHexagons),
     );
   }

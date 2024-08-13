@@ -29,4 +29,21 @@ class Player {
     Map<String, dynamic> player = jsonData;
     return player;
   }
+
+  Future<Map<String, dynamic>> getShotChart(String personId, String season) async {
+    // Create the query parameters map
+    Map<String, String> queryParams = {'person_id': personId, 'season': season};
+
+    // Create the URL with query parameters
+    var url = Uri.https(
+      kFlaskUrl,
+      '/get_player_shot_chart',
+      queryParams,
+    );
+
+    // Fetch the data from the network
+    dynamic jsonData = await network.getData(url);
+    Map<String, dynamic> shotChart = jsonData;
+    return shotChart;
+  }
 }
