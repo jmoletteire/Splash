@@ -41,7 +41,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
   }
 
   void processShotChart(Map<String, dynamic> shotChart) {
-    List<Map<String, dynamic>> shotData =
+    List<Map<String, dynamic>> playerShotData =
         shotChart['SEASON'][kCurrentSeason]['Shot_Chart_Detail']
             .map<Map<String, dynamic>>((item) => {
                   'x': item['LOC_X'], // x coordinate in your data
@@ -50,6 +50,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
                   'FGM': item['SHOT_MADE_FLAG'] == 1 ? 1 : 0
                 })
             .toList();
+
+    List leagueAverages = shotChart['SEASON'][kCurrentSeason]['LeagueAverages'];
 
     hexagons = generateHexagonGrid(
       hexSizeInFeet: 1.5,
@@ -63,20 +65,18 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     HexagonAggregator aggregator = HexagonAggregator(hexagons[0].width, hexagons[0].height);
 
     // Aggregate shots by hexagon
-    hexagonMap = aggregator.aggregateShots(shotData, hexagons);
+    hexagonMap = aggregator.aggregateShots(playerShotData, hexagons);
 
     // Adjust hexagons based on aggregated data
-    aggregator.adjustHexagons(hexagonMap);
-
-    print(hexagonMap.keys);
+    aggregator.adjustHexagons(hexagonMap, playerShotData.length);
 
     // Update the hexagons list with data from hexagonMap
     for (int i = 0; i < hexagons.length; i++) {
       String key = '${hexagons[i].x},${hexagons[i].y}';
-      print(key);
       if (hexagonMap.containsKey(key)) {
-        hexagons[i] = hexagonMap[key]!;
-        print('Found');
+        setState(() {
+          hexagons[i] = hexagonMap[key]!;
+        });
       }
     }
 
@@ -128,17 +128,6 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     if (_isLoading) {
       return const SpinningIcon();
     }
-
-    const double canvasWidth = 368;
-    const double canvasHeight = 346;
-
-    List<HexagonData> hexagons = generateHexagonGrid(
-      hexSizeInFeet: 1.5,
-      courtWidthInFeet: 50,
-      courtHeightInFeet: 47,
-      canvasWidth: canvasWidth,
-      canvasHeight: canvasHeight,
-    );
 
     return Card(
       margin: const EdgeInsets.all(11.0),

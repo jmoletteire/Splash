@@ -15,7 +15,7 @@ class HexMapPainter extends CustomPainter {
 
     Paint borderPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = Colors.black // Set the border color
+      ..color = Colors.transparent // Set the border color
       ..strokeWidth = 1.0; // Adjust the stroke width as needed
 
     for (var hex in hexagons) {

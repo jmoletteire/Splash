@@ -386,7 +386,7 @@ def get_player_shot_chart():
         # Query the database to find the player by PERSON_ID
         player = player_shots_collection.find_one(
             {"PLAYER_ID": player_id},
-            {"_id": 0, f"SEASON.{season}.Shot_Chart_Detail": 1}
+            {"_id": 0, f"SEASON.{season}": 1}
         )
 
         if player:
