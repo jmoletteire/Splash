@@ -377,6 +377,10 @@ def get_player_shot_chart():
         if not season:
             return jsonify({"error": "season is required"}), 400
 
+        season_type = query_params.get('season_type')
+        if not season:
+            return jsonify({"error": "season_type is required"}), 400
+
         # Convert the person_id to an integer
         try:
             player_id = int(person_id)
@@ -386,7 +390,7 @@ def get_player_shot_chart():
         # Query the database to find the player by PERSON_ID
         player = player_shots_collection.find_one(
             {"PLAYER_ID": player_id},
-            {"_id": 0, f"SEASON.{season}": 1}
+            {"_id": 0, f"SEASON.{season}.{season_type}": 1}
         )
 
         if player:

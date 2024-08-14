@@ -49,7 +49,8 @@ class HexagonAggregator {
     return hexagonMap;
   }
 
-  void adjustHexagons(Map<String, HexagonData> hexagonMap, int totalFGA) {
+  void adjustHexagons(
+      Map<String, HexagonData> hexagonMap, int totalFGA, Map<String, dynamic> leagueAverages) {
     for (var hex in hexagonMap.values) {
       double freq = hex.FGA / totalFGA;
       if (freq == 0) {
@@ -57,14 +58,14 @@ class HexagonAggregator {
         hex.height = 0;
       } else {
         // Set discrete sizes based on FGA thresholds
-        if (freq < 0.0025) {
+        if (hex.FGA < 2) {
           // Small size
-          hex.width *= 0.5; // or any small multiplier
-          hex.height *= 0.5;
-        } else if (freq >= 0.0025 && freq < 0.01) {
+          hex.width *= 0.3; // or any small multiplier
+          hex.height *= 0.3;
+        } else if (hex.FGA >= 2 && hex.FGA < 4) {
           // Medium size
-          hex.width *= 0.75; // or any medium multiplier
-          hex.height *= 0.75;
+          hex.width *= 0.5; // or any medium multiplier
+          hex.height *= 0.5;
         } else {
           // Large size
           hex.width *= 1.0; // or retain original size
@@ -73,17 +74,21 @@ class HexagonAggregator {
       }
 
       double FGPercentage = hex.FGM / hex.FGA;
+      double shotTypeAverage =
+          leagueAverages[hex.shotZoneRange['Zone']][hex.shotZoneRange['Range']];
+      double percentDiff = FGPercentage - shotTypeAverage;
+
       // Assign colors based on FG% ranges
-      if (FGPercentage < 0.2) {
+      if (percentDiff < -0.1) {
         hex.color = Colors.blue.shade900; // Dark Blue
-      } else if (FGPercentage >= 0.2 && FGPercentage < 0.4) {
-        hex.color = Colors.blue.shade300; // Light Blue
-      } else if (FGPercentage >= 0.4 && FGPercentage < 0.6) {
-        hex.color = Colors.yellow.shade600; // Yellow
-      } else if (FGPercentage >= 0.6 && FGPercentage < 0.8) {
-        hex.color = Colors.orange.shade600; // Orange
+      } else if (percentDiff >= -0.1 && percentDiff < -0.05) {
+        hex.color = Colors.blue.shade600; // Light Blue
+      } else if (percentDiff >= 0.05 && percentDiff < 0.05) {
+        hex.color = Colors.yellow.shade100; // Yellow
+      } else if (percentDiff >= 0.05 && percentDiff < 0.1) {
+        hex.color = Colors.orange.shade900; // Orange
       } else {
-        hex.color = Colors.red.shade900; // Dark Red
+        hex.color = const Color(0xFF8B0000); // Dark Red
       }
     }
   }
@@ -97,6 +102,7 @@ class HexagonData {
   Color color;
   num FGA;
   num FGM;
+  late Map<String, String> shotZoneRange;
   late List<Offset> vertices;
 
   HexagonData({
@@ -108,6 +114,7 @@ class HexagonData {
     this.FGA = 0,
     this.FGM = 0,
   }) {
+    shotZoneRange = _shotZoneRange();
     vertices = _calculateVertices(x, y, width, height);
   }
 
@@ -121,5 +128,48 @@ class HexagonData {
       points.add(Offset(x_i, y_i));
     }
     return points;
+  }
+
+  Map<String, String> _shotZoneRange() {
+    Map<String, String> results = {};
+
+    // Calculate pixels per foot
+    double heightPixelsPerFt = (346 / 47) * 2;
+
+    // Convert from pixels to feet
+    double xInFeet = x / 10;
+    double yInFeet = y / heightPixelsPerFt;
+
+    double shotDistance = sqrt(xInFeet * xInFeet + yInFeet * yInFeet);
+
+    if (shotDistance < 8) {
+      results['Zone'] = 'Center(C)';
+    } else if (shotDistance > 47) {
+      results['Zone'] = 'Back Court(BC)';
+    } else if (x <= -150 || (shotDistance < 16 && x >= -150 && x < -50)) {
+      results['Zone'] = 'Left Side(L)';
+    } else if (shotDistance > 16 && x > -150 && x <= -50) {
+      results['Zone'] = 'Left Side Center(LC)';
+    } else if (x > -50 && x < 50) {
+      results['Zone'] = 'Center(C)';
+    } else if (shotDistance > 16 && x >= 50 && x < 150) {
+      results['Zone'] = 'Right Side Center(RC)';
+    } else if (x >= 150 || (shotDistance < 16 && x >= 50 && x < 150)) {
+      results['Zone'] = 'Right Side(R)';
+    }
+
+    if (shotDistance < 8) {
+      results['Range'] = 'Less Than 8 ft.';
+    } else if (shotDistance < 16) {
+      results['Range'] = '8-16 ft.';
+    } else if (shotDistance < 24) {
+      results['Range'] = '16-24 ft.';
+    } else if (shotDistance > 24 && shotDistance < 47) {
+      results['Range'] = '24+ ft.';
+    } else {
+      results['Range'] = 'Back Court Shot';
+    }
+
+    return results;
   }
 }

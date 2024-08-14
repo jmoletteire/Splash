@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
+import 'package:splash/screens/player/shot_chart/shot_chart_cache.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../utilities/player.dart';
@@ -20,29 +22,79 @@ class PlayerShotChart extends StatefulWidget {
 
 class _PlayerShotChartState extends State<PlayerShotChart> {
   late Map<String, dynamic> shotChart;
+  Map<String, dynamic> lgAvg = {};
   Map<String, HexagonData> hexagonMap = {};
   List<HexagonData> hexagons = [];
-  bool _isLoading = false;
+  late List<String> seasons;
+  late List<String> seasonTypes;
+  late String selectedSeason;
+  late String selectedSeasonType;
+  bool _isLoading = true;
+
+  void setSeasonTypes() {
+    widget.player['STATS'][selectedSeason].containsKey('PLAYOFFS')
+        ? seasonTypes = ['Regular Season', 'Playoffs']
+        : seasonTypes = ['Regular Season'];
+  }
 
   @override
   void initState() {
     super.initState();
+
+    widget.player.keys.contains('STATS') && widget.player['STATS'].isNotEmpty
+        ? seasons = widget.player['STATS'].keys.toList().reversed.toList()
+        : seasons = [kCurrentSeason];
+    selectedSeason = seasons.first;
+
+    setSeasonTypes();
+    selectedSeasonType = seasonTypes.first;
+
     // Fetch the shot chart data and process it
-    fetchShotChart();
+    fetchShotChart(widget.player['PERSON_ID'].toString(), selectedSeason, selectedSeasonType);
   }
 
-  Future<void> fetchShotChart() async {
-    setState(() {
-      _isLoading = true;
-    });
-    shotChart =
-        await Player().getShotChart(widget.player['PERSON_ID'].toString(), kCurrentSeason);
+  Future<void> fetchShotChart(String playerId, String season, String seasonType) async {
+    final shotChartCache = Provider.of<PlayerShotChartCache>(context, listen: false);
+    if (shotChartCache.containsPlayer(playerId, season, seasonType)) {
+      setState(() {
+        shotChart = shotChartCache.getPlayer(playerId)!;
+      });
+    } else {
+      var fetchedPlayerShotChart = await Player().getShotChart(playerId, selectedSeason);
+      setState(() {
+        shotChart = fetchedPlayerShotChart;
+      });
+      shotChartCache.addPlayer(playerId, shotChart);
+    }
+    await fetchLgAvg(selectedSeason, selectedSeasonType);
     processShotChart(shotChart);
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> fetchLgAvg(String season, String seasonType) async {
+    final shotChartCache = Provider.of<PlayerShotChartCache>(context, listen: false);
+    if (shotChartCache.containsPlayer('0', season, seasonType)) {
+      setState(() {
+        lgAvg = shotChartCache.getPlayer('0')!;
+      });
+    } else {
+      var fetchedPlayerShotChart = await Player().getShotChart('0', selectedSeason);
+      setState(() {
+        lgAvg = fetchedPlayerShotChart;
+      });
+      shotChartCache.addPlayer('0', lgAvg);
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void processShotChart(Map<String, dynamic> shotChart) {
     List<Map<String, dynamic>> playerShotData =
-        shotChart['SEASON'][kCurrentSeason]['Shot_Chart_Detail']
+        shotChart['SEASON'][selectedSeason][selectedSeasonType]
             .map<Map<String, dynamic>>((item) => {
                   'x': item['LOC_X'], // x coordinate in your data
                   'y': item['LOC_Y'], // y coordinate in your data
@@ -50,8 +102,6 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
                   'FGM': item['SHOT_MADE_FLAG'] == 1 ? 1 : 0
                 })
             .toList();
-
-    List leagueAverages = shotChart['SEASON'][kCurrentSeason]['LeagueAverages'];
 
     hexagons = generateHexagonGrid(
       hexSizeInFeet: 1.5,
@@ -68,7 +118,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     hexagonMap = aggregator.aggregateShots(playerShotData, hexagons);
 
     // Adjust hexagons based on aggregated data
-    aggregator.adjustHexagons(hexagonMap, playerShotData.length);
+    aggregator.adjustHexagons(hexagonMap, playerShotData.length,
+        lgAvg['SEASON'][selectedSeason][selectedSeasonType]);
 
     // Update the hexagons list with data from hexagonMap
     for (int i = 0; i < hexagons.length; i++) {
@@ -125,8 +176,15 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
 
   @override
   Widget build(BuildContext context) {
+    Color teamColor = kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
+        ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
+        : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
+    Color teamSecondaryColor = kDarkSecondaryColors.contains(widget.team['ABBREVIATION'])
+        ? (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!)
+        : (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!);
+
     if (_isLoading) {
-      return const SpinningIcon();
+      return SpinningIcon(color: teamColor);
     }
 
     return Card(
@@ -144,6 +202,114 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
               CustomPaint(
                 size: const Size(368, 346),
                 painter: HalfCourtPainter(),
+              ),
+              Positioned(
+                bottom: kBottomNavigationBarHeight - kToolbarHeight,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    border: Border(
+                      top: BorderSide(color: Colors.grey.shade800, width: 0.75),
+                      bottom: BorderSide(color: Colors.grey.shade800, width: 0.2),
+                    ),
+                  ),
+                  width: 368,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            border: Border.all(color: teamColor),
+                            borderRadius: BorderRadius.circular(10.0)),
+                        margin: const EdgeInsets.all(11.0),
+                        child: DropdownButton<String>(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          borderRadius: BorderRadius.circular(10.0),
+                          menuMaxHeight: 300.0,
+                          dropdownColor: Colors.grey.shade900,
+                          isExpanded: false,
+                          underline: Container(),
+                          value: selectedSeason,
+                          items: seasons.map<DropdownMenuItem<String>>((String value) {
+                            var teamId = widget.player['STATS'][value]?['REGULAR SEASON']
+                                ?['BASIC']?['TEAM_ID'];
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    value,
+                                    style: kBebasNormal.copyWith(fontSize: 19.0),
+                                  ),
+                                  const SizedBox(width: 10.0),
+                                  if (teamId != null)
+                                    Image.asset(
+                                      'images/NBA_Logos/$teamId.png',
+                                      fit: BoxFit.scaleDown,
+                                      width: 25.0,
+                                      height: 25.0,
+                                      alignment: Alignment.center,
+                                    )
+                                  else
+                                    const SizedBox(
+                                      width: 25.0,
+                                      height: 25.0,
+                                    ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedSeason = value!;
+                              selectedSeasonType = 'Regular Season';
+                              fetchShotChart(widget.player['PERSON_ID'].toString(),
+                                  selectedSeason, selectedSeasonType);
+                            });
+                          },
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            border: Border.all(color: teamColor),
+                            borderRadius: BorderRadius.circular(10.0)),
+                        margin: const EdgeInsets.all(11.0),
+                        child: DropdownButton<String>(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          borderRadius: BorderRadius.circular(10.0),
+                          menuMaxHeight: 300.0,
+                          dropdownColor: Colors.grey.shade900,
+                          isExpanded: false,
+                          underline: Container(),
+                          value: selectedSeasonType,
+                          items: seasonTypes.map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    value,
+                                    style: kBebasNormal.copyWith(fontSize: 19.0),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedSeasonType = value!;
+                              setSeasonTypes();
+                              fetchShotChart(widget.player['PERSON_ID'].toString(),
+                                  selectedSeason, selectedSeasonType);
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -193,7 +359,7 @@ class HalfCourtPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey.shade800
+      ..color = Colors.grey.shade700
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 

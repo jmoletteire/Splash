@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:splash/screens/game/game_cache.dart';
 import 'package:splash/screens/more/draft/draft_cache.dart';
 import 'package:splash/screens/player/player_cache.dart';
+import 'package:splash/screens/player/shot_chart/shot_chart_cache.dart';
 import 'package:splash/screens/search_screen.dart';
 import 'package:splash/screens/team/team_cache.dart';
 import 'package:splash/utilities/game_dates.dart';
@@ -14,6 +15,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => PlayerCache()),
+        ChangeNotifierProvider(create: (_) => PlayerShotChartCache()),
         ChangeNotifierProvider(create: (_) => TeamCache()),
         ChangeNotifierProvider(create: (_) => GameCache()),
         ChangeNotifierProvider(create: (_) => DraftCache()),
