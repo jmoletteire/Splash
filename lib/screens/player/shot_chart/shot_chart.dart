@@ -21,8 +21,8 @@ class PlayerShotChart extends StatefulWidget {
 }
 
 class _PlayerShotChartState extends State<PlayerShotChart> {
-  late Map<String, dynamic> shotChart;
-  Map<String, dynamic> lgAvg = {};
+  late List shotChart;
+  List lgAvg = [];
   Map<String, HexagonData> hexagonMap = {};
   List<HexagonData> hexagons = [];
   late List<String> seasons;
@@ -55,17 +55,20 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
 
   Future<void> fetchShotChart(String playerId, String season, String seasonType) async {
     final shotChartCache = Provider.of<PlayerShotChartCache>(context, listen: false);
+
     if (shotChartCache.containsPlayer(playerId, season, seasonType)) {
       setState(() {
-        shotChart = shotChartCache.getPlayer(playerId)!;
+        shotChart = shotChartCache.getPlayer(playerId, season, seasonType)!;
       });
     } else {
-      var fetchedPlayerShotChart = await Player().getShotChart(playerId, selectedSeason);
+      var fetchedPlayerShotChart =
+          await Player().getShotChart(playerId, selectedSeason, selectedSeasonType);
       setState(() {
-        shotChart = fetchedPlayerShotChart;
+        shotChart = fetchedPlayerShotChart['SEASON'][selectedSeason][selectedSeasonType];
       });
-      shotChartCache.addPlayer(playerId, shotChart);
+      shotChartCache.addPlayer(playerId, selectedSeason, selectedSeasonType, shotChart);
     }
+
     await fetchLgAvg(selectedSeason, selectedSeasonType);
     processShotChart(shotChart);
     setState(() {
@@ -77,14 +80,15 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     final shotChartCache = Provider.of<PlayerShotChartCache>(context, listen: false);
     if (shotChartCache.containsPlayer('0', season, seasonType)) {
       setState(() {
-        lgAvg = shotChartCache.getPlayer('0')!;
+        lgAvg = shotChartCache.getPlayer('0', selectedSeason, selectedSeasonType)!;
       });
     } else {
-      var fetchedPlayerShotChart = await Player().getShotChart('0', selectedSeason);
+      var fetchedPlayerShotChart =
+          await Player().getShotChart('0', selectedSeason, selectedSeasonType);
       setState(() {
-        lgAvg = fetchedPlayerShotChart;
+        lgAvg = [fetchedPlayerShotChart['SEASON'][selectedSeason][selectedSeasonType]];
       });
-      shotChartCache.addPlayer('0', lgAvg);
+      shotChartCache.addPlayer('0', selectedSeason, selectedSeasonType, lgAvg);
     }
 
     setState(() {
@@ -92,17 +96,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     });
   }
 
-  void processShotChart(Map<String, dynamic> shotChart) {
-    List<Map<String, dynamic>> playerShotData =
-        shotChart['SEASON'][selectedSeason][selectedSeasonType]
-            .map<Map<String, dynamic>>((item) => {
-                  'x': item['LOC_X'], // x coordinate in your data
-                  'y': item['LOC_Y'], // y coordinate in your data
-                  'FGA': item['SHOT_ATTEMPTED_FLAG'] == 1 ? 1 : 0,
-                  'FGM': item['SHOT_MADE_FLAG'] == 1 ? 1 : 0
-                })
-            .toList();
-
+  void processShotChart(List shotChart) {
     hexagons = generateHexagonGrid(
       hexSizeInFeet: 1.5,
       courtWidthInFeet: 50,
@@ -115,11 +109,10 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     HexagonAggregator aggregator = HexagonAggregator(hexagons[0].width, hexagons[0].height);
 
     // Aggregate shots by hexagon
-    hexagonMap = aggregator.aggregateShots(playerShotData, hexagons);
+    hexagonMap = aggregator.aggregateShots(shotChart, hexagons);
 
     // Adjust hexagons based on aggregated data
-    aggregator.adjustHexagons(hexagonMap, playerShotData.length,
-        lgAvg['SEASON'][selectedSeason][selectedSeasonType]);
+    aggregator.adjustHexagons(hexagonMap, shotChart.length, lgAvg[0]);
 
     // Update the hexagons list with data from hexagonMap
     for (int i = 0; i < hexagons.length; i++) {
@@ -167,6 +160,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
             y: adjustedY,
             width: hexWidth,
             height: hexHeight,
+            opacity: 1.0,
             color: Colors.transparent));
       }
     }
@@ -345,7 +339,12 @@ class HexMap extends StatelessWidget {
       double mappedY = basketY - (normalizedY * canvasHeight); // Bottom to top, adjusted
 
       return HexagonData(
-          x: mappedX, y: mappedY, width: hex.width, height: hex.height, color: hex.color);
+          x: mappedX,
+          y: mappedY,
+          width: hex.width,
+          height: hex.height,
+          opacity: hex.opacity,
+          color: hex.color);
     }).toList();
 
     return CustomPaint(

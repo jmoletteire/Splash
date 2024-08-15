@@ -12,7 +12,7 @@ def update_current_season(team_id):
     team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id).get_normalized_dict()['TeamStats']
 
     # Only for current season
-    # season_stats_dict = {"2024-25": { data }}
+    # EXAMPLE: season_stats_dict = {"2024-25": { data }}
     season_stats_dict = {
         season_dict['YEAR']: dict(list(season_dict.items())[:15])
         for season_dict in team_seasons_list
@@ -45,7 +45,7 @@ def fetch_all_seasons(team_id):
 
     for season in season_stats_dict.keys():
         # Stats only available since 1996-97
-        if season >= '1995-96':
+        if season >= '1996-97':
             # Fetch team stats for this team in given season
             season_stats_dict[season]['STATS'] = fetch_team_stats(team_id=team_id, season=season)
             time.sleep(5)

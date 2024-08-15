@@ -3,12 +3,38 @@ import 'package:flutter/material.dart';
 class PlayerShotChartCache extends ChangeNotifier {
   final Map<String, Map<String, dynamic>> _cache = {};
 
-  Map<String, dynamic>? getPlayer(String playerId) {
-    return _cache[playerId];
+  List? getPlayer(String playerId, String season, String seasonType) {
+    return _cache[playerId]![season][seasonType];
   }
 
-  void addPlayer(String playerId, Map<String, dynamic> playerData) {
-    _cache[playerId] = playerData;
+  void addPlayer(String playerId, String season, String seasonType, List shotData) {
+    // Check if the playerId exists in the cache
+    if (_cache.containsKey(playerId)) {
+      // Check if the season exists for this player
+      if (_cache[playerId]!.containsKey(season)) {
+        // Check if the seasonType exists for this season
+        if (_cache[playerId]![season]!.containsKey(seasonType)) {
+          // Update the existing seasonType data
+          _cache[playerId]![season]![seasonType] = shotData;
+        } else {
+          // Create a new seasonType entry
+          _cache[playerId]![season]![seasonType] = shotData;
+        }
+      } else {
+        // Create a new season entry with the seasonType
+        _cache[playerId]![season] = {
+          seasonType: shotData,
+        };
+      }
+    } else {
+      // If the playerId doesn't exist, create a new entry with season and seasonType
+      _cache[playerId] = {
+        season: {
+          seasonType: shotData,
+        }
+      };
+    }
+
     notifyListeners();
   }
 

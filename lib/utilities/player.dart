@@ -30,9 +30,14 @@ class Player {
     return player;
   }
 
-  Future<Map<String, dynamic>> getShotChart(String personId, String season) async {
+  Future<Map<String, dynamic>> getShotChart(
+      String personId, String season, String seasonType) async {
     // Create the query parameters map
-    Map<String, String> queryParams = {'person_id': personId, 'season': season};
+    Map<String, String> queryParams = {
+      'person_id': personId,
+      'season': season,
+      'season_type': seasonType
+    };
 
     // Create the URL with query parameters
     var url = Uri.https(

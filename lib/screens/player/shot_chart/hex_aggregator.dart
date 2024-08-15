@@ -24,13 +24,12 @@ class HexagonAggregator {
     return inside;
   }
 
-  Map<String, HexagonData> aggregateShots(
-      List<Map<String, dynamic>> shotData, List<HexagonData> hexagons) {
+  Map<String, HexagonData> aggregateShots(List shotData, List<HexagonData> hexagons) {
     Map<String, HexagonData> hexagonMap = {};
 
     for (var shot in shotData) {
-      double x = shot['x'].toDouble();
-      double y = shot['y'].toDouble();
+      double x = shot['LOC_X'].toDouble();
+      double y = shot['LOC_Y'].toDouble();
       Offset shotPoint = Offset(x, y);
 
       for (var hexagon in hexagons) {
@@ -39,8 +38,8 @@ class HexagonAggregator {
           if (!hexagonMap.containsKey(key)) {
             hexagonMap[key] = hexagon;
           }
-          hexagonMap[key]!.FGA += shot['FGA'];
-          hexagonMap[key]!.FGM += shot['FGM'];
+          hexagonMap[key]!.FGA += shot['SHOT_ATTEMPTED_FLAG'];
+          hexagonMap[key]!.FGM += shot['SHOT_MADE_FLAG'];
           break; // Stop checking after finding the first hexagon that contains the shot
         }
       }
@@ -56,20 +55,23 @@ class HexagonAggregator {
       if (freq == 0) {
         hex.width = 0;
         hex.height = 0;
+        //hex.opacity = 0;
       } else {
         // Set discrete sizes based on FGA thresholds
         if (hex.FGA < 2) {
           // Small size
           hex.width *= 0.3; // or any small multiplier
           hex.height *= 0.3;
+          //hex.opacity *= 0.33;
         } else if (hex.FGA >= 2 && hex.FGA < 4) {
           // Medium size
           hex.width *= 0.5; // or any medium multiplier
           hex.height *= 0.5;
+          //hex.opacity = 0.67;
         } else {
           // Large size
-          hex.width *= 1.0; // or retain original size
-          hex.height *= 1.0;
+          hex.width *= .88; // or retain original size
+          hex.height *= .9;
         }
       }
 
@@ -80,15 +82,15 @@ class HexagonAggregator {
 
       // Assign colors based on FG% ranges
       if (percentDiff < -0.1) {
-        hex.color = Colors.blue.shade900; // Dark Blue
+        hex.color = const Color(0xFF1060BF);
       } else if (percentDiff >= -0.1 && percentDiff < -0.05) {
-        hex.color = Colors.blue.shade600; // Light Blue
-      } else if (percentDiff >= 0.05 && percentDiff < 0.05) {
-        hex.color = Colors.yellow.shade100; // Yellow
+        hex.color = const Color(0xFF468FDF);
+      } else if (percentDiff >= -0.05 && percentDiff < 0.05) {
+        hex.color = const Color(0xFFFFD9C4);
       } else if (percentDiff >= 0.05 && percentDiff < 0.1) {
-        hex.color = Colors.orange.shade900; // Orange
+        hex.color = const Color(0xFFDE441B);
       } else {
-        hex.color = const Color(0xFF8B0000); // Dark Red
+        hex.color = const Color(0xFFA0261D);
       }
     }
   }
@@ -99,6 +101,7 @@ class HexagonData {
   final double y;
   double width;
   double height;
+  double opacity;
   Color color;
   num FGA;
   num FGM;
@@ -110,6 +113,7 @@ class HexagonData {
     required this.y,
     required this.width,
     required this.height,
+    required this.opacity,
     required this.color,
     this.FGA = 0,
     this.FGM = 0,
