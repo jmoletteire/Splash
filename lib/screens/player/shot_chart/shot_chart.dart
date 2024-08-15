@@ -8,7 +8,7 @@ import 'package:splash/utilities/constants.dart';
 
 import '../../../utilities/player.dart';
 import 'hex_aggregator.dart';
-import 'hex_map_painter.dart';
+import 'hex_map.dart';
 
 class PlayerShotChart extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -190,12 +190,14 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
           color: Colors.white10,
           child: Stack(
             children: [
+              IgnorePointer(
+                child: CustomPaint(
+                  size: const Size(368, 346),
+                  painter: HalfCourtPainter(),
+                ),
+              ),
               HexMap(
                 hexagons: hexagons,
-              ),
-              CustomPaint(
-                size: const Size(368, 346),
-                painter: HalfCourtPainter(),
               ),
               Positioned(
                 bottom: kBottomNavigationBarHeight - kToolbarHeight,
@@ -309,47 +311,6 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class HexMap extends StatelessWidget {
-  final List<HexagonData> hexagons;
-
-  HexMap({required this.hexagons});
-
-  @override
-  Widget build(BuildContext context) {
-    const double canvasWidth = 368; // 368 pixels
-    const double canvasHeight = 346; // 346 pixels
-
-    // Assume the hoop is 4 feet in front of the baseline
-    const double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units
-
-    const double basketX = canvasWidth / 2;
-    const double basketY = canvasHeight - hoopOffset;
-
-    List<HexagonData> mappedHexagons = hexagons.map((hex) {
-      // Normalize Python data: (0,0) at the basket
-      double normalizedX = hex.x / 250; // Range -1 to 1
-      double normalizedY = hex.y / 470; // Range 0 to 1
-
-      // Map to Flutter Canvas, adjusting for (0,0) at the basket with an offset
-      double mappedX = basketX + (normalizedX * basketX); // Centered horizontally
-      double mappedY = basketY - (normalizedY * canvasHeight); // Bottom to top, adjusted
-
-      return HexagonData(
-          x: mappedX,
-          y: mappedY,
-          width: hex.width,
-          height: hex.height,
-          opacity: hex.opacity,
-          color: hex.color);
-    }).toList();
-
-    return CustomPaint(
-      size: const Size(canvasWidth, canvasHeight),
-      painter: HexMapPainter(hexagons: mappedHexagons),
     );
   }
 }

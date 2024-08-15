@@ -134,6 +134,22 @@ class HexagonData {
     return points;
   }
 
+  bool contains(Offset point) {
+    int n = vertices.length;
+    bool inside = false;
+    for (int i = 0, j = n - 1; i < n; j = i++) {
+      if (((vertices[i].dy > point.dy) != (vertices[j].dy > point.dy)) &&
+          (point.dx <
+              (vertices[j].dx - vertices[i].dx) *
+                      (point.dy - vertices[i].dy) /
+                      (vertices[j].dy - vertices[i].dy) +
+                  vertices[i].dx)) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
   Map<String, String> _shotZoneRange() {
     Map<String, String> results = {};
 
