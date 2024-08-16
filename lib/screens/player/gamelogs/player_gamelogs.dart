@@ -80,11 +80,11 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> {
   @override
   void initState() {
     super.initState();
-    schedule = updateSchedule(kCurrentSeason, 'ALL');
     seasons = widget.player['STATS'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
     selectedSeasonType = 'ALL';
     selectedMonth = months.first;
+    schedule = updateSchedule(selectedSeason, 'ALL');
     selectedOpp = 'ALL';
     oppId = 0;
     games = PlayerGames(

@@ -250,7 +250,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
 
     String matchup = game['MATCHUP'].toString();
     String teamId = game['TEAM_ID'].toString();
-    String oppId = kTeamIds[matchup.substring(matchup.length - 3)]!;
+    String oppId = kTeamIds[matchup.substring(matchup.length - 3)] ?? '0';
     game['OPP_ID'] = oppId;
     bool homeAway = matchup[4] != '@';
     return _wrapRow(

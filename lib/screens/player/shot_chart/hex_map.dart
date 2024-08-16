@@ -56,13 +56,13 @@ class _HexMapState extends State<HexMap> {
 
           // Check if the tooltip would overflow the bottom edge
           if (adjustedY + tooltipHeight > canvasHeight) {
-            adjustedY = tapPosition.dy - tooltipHeight - 10; // Place it above
+            adjustedY = tapPosition.dy - tooltipHeight - 30; // Place it above
           }
 
           // Set the final tooltip position
           _tooltipPosition = Offset(adjustedX, adjustedY);
           _tooltipMessage =
-              'Zone: ${hex.shotZoneRange['Zone']}\nDistance: ${hex.shotZoneRange['Range']}\nFG: ${hex.FGM}/${hex.FGA}  (${(100 * hex.FGM / hex.FGA).toStringAsFixed(1)}%)';
+              'Zone: ${hex.shotZoneRange['Zone']}\nAvg Dist: ${hex.shotZoneRange['Distance']}\nFG: ${hex.FGM}/${hex.FGA}  (${(100 * hex.FGM / hex.FGA).toStringAsFixed(1)}%)';
         });
         break;
       }

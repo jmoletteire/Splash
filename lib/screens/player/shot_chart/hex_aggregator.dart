@@ -145,6 +145,9 @@ class HexagonData {
     // Calculate the distance from the point to the center of the hexagon
     double distance = sqrt(pow(point.dx - centerX, 2) + pow(point.dy - centerY, 2));
 
+    if (distance <= apothem) {
+      print('Hex: ${x.toStringAsFixed(2)}, ${y.toStringAsFixed(2)}');
+    }
     // If the distance is less than the apothem, the point is inside the hexagon
     return distance <= apothem;
   }
@@ -153,13 +156,13 @@ class HexagonData {
     Map<String, String> results = {};
 
     // Calculate pixels per foot
-    double heightPixelsPerFt = (346 / 47) * 2;
+    double heightPixelsPerFt = 19.74 / 1.85;
 
     // Convert from pixels to feet
     double xInFeet = x / 10;
-    double yInFeet = y / heightPixelsPerFt;
+    double yInFeet = y / (sqrt(3) + 9);
 
-    double shotDistance = sqrt(xInFeet * xInFeet + yInFeet * yInFeet);
+    double shotDistance = sqrt(pow(xInFeet, 2) + pow(yInFeet, 2));
 
     if (shotDistance < 8) {
       results['Zone'] = 'Center(C)';
@@ -188,6 +191,8 @@ class HexagonData {
     } else {
       results['Range'] = 'Back Court Shot';
     }
+
+    results['Distance'] = shotDistance.toStringAsFixed(1);
 
     return results;
   }
