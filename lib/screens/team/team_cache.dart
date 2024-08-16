@@ -15,4 +15,7 @@ class TeamCache extends ChangeNotifier {
   bool containsTeam(String teamId) {
     return _cache.containsKey(teamId);
   }
+
+  // Getter to access the cache
+  Map<String, Map<String, dynamic>> get cache => _cache;
 }

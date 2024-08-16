@@ -35,6 +35,9 @@ class _TeamScheduleState extends State<TeamSchedule> {
 
   Map<String, String> teamAbbr = {
     'ALL': '0',
+    'TOP NET': '1',
+    'TOP OFF': '2',
+    'TOP DEF': '3',
     'ATL': '1610612737',
     'BOS': '1610612738',
     'BKN': '1610612751',
@@ -80,9 +83,12 @@ class _TeamScheduleState extends State<TeamSchedule> {
   void initState() {
     super.initState();
     schedule = widget.team['seasons'][kCurrentSeason]['GAMES'];
+
     seasons = widget.team['seasons'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
+
     selectedSeasonType = 'All';
+
     selectedMonth = months.first;
     selectedOpp = 'ALL';
     oppId = 0;
@@ -352,7 +358,11 @@ class _TeamScheduleState extends State<TeamSchedule> {
                             ConstrainedBox(
                               constraints: const BoxConstraints(maxWidth: 20.0),
                               child: Image.asset(
-                                'images/NBA_Logos/${teamAbbr[value]!}.png',
+                                teamAbbr[value]! == '1' ||
+                                        teamAbbr[value]! == '2' ||
+                                        teamAbbr[value]! == '3'
+                                    ? 'images/NBA_Logos/0.png'
+                                    : 'images/NBA_Logos/${teamAbbr[value]!}.png',
                                 fit: BoxFit.contain,
                                 width: 20.0,
                                 height: 20.0,

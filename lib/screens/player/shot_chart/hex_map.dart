@@ -16,6 +16,7 @@ class HexMap extends StatefulWidget {
 class _HexMapState extends State<HexMap> {
   Offset? _tooltipPosition;
   String _tooltipMessage = '';
+  HexagonData? _selectedHexagon; // Track the selected hexagon
 
   void _handleTap(BuildContext context, Offset tapPosition) {
     const double canvasWidth = 368;
@@ -38,11 +39,12 @@ class _HexMapState extends State<HexMap> {
     // Now check against the original hexagons before they were mapped
     for (var hex in widget.hexagons) {
       if (hex.contains(normalizedTapPosition)) {
-        if (hex.FGA == 0) {
+        if (hex.FGA == 0 || hex == _selectedHexagon) {
           _dismissTooltip();
           break;
         }
         setState(() {
+          _selectedHexagon = hex; // Set the selected hexagon
           // Determine the tooltip position, adjusting for edges
           double adjustedX = tapPosition.dx + 10; // Default offset to the right
           double adjustedY = tapPosition.dy + 10; // Default offset to the bottom
@@ -70,6 +72,7 @@ class _HexMapState extends State<HexMap> {
   void _dismissTooltip() {
     setState(() {
       _tooltipPosition = null;
+      _selectedHexagon = null; // Clear the selection
     });
   }
 
@@ -93,13 +96,30 @@ class _HexMapState extends State<HexMap> {
       double mappedX = basketX + (normalizedX * basketX); // Centered horizontally
       double mappedY = basketY - (normalizedY * canvasHeight); // Bottom to top, adjusted
 
-      return HexagonData(
+      if (hex == _selectedHexagon) {
+        // Highlight the selected hexagon by changing its color or opacity
+        return HexagonData(
+          x: mappedX,
+          y: mappedY,
+          width: hex.width * 1.2,
+          height: hex.height * 1.2,
+          opacity: 1.0, // Full opacity to highlight
+          color: hex.color, // Or any other highlight color
+          borderColor: Colors.white,
+          FGA: hex.FGA,
+          FGM: hex.FGM,
+        );
+      } else {
+        return HexagonData(
           x: mappedX,
           y: mappedY,
           width: hex.width,
           height: hex.height,
           opacity: hex.opacity,
-          color: hex.color);
+          color: hex.color,
+          borderColor: Colors.transparent,
+        );
+      }
     }).toList();
 
     return GestureDetector(

@@ -156,12 +156,14 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
         double adjustedY = canvasHeight - y + (6 * hexMaxHeight * sqrt(3));
 
         hexagons.add(HexagonData(
-            x: adjustedX,
-            y: adjustedY,
-            width: hexWidth,
-            height: hexHeight,
-            opacity: 1.0,
-            color: Colors.transparent));
+          x: adjustedX,
+          y: adjustedY,
+          width: hexWidth,
+          height: hexHeight,
+          opacity: 1.0,
+          color: Colors.transparent,
+          borderColor: Colors.transparent,
+        ));
       }
     }
 

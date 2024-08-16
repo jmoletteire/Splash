@@ -34,12 +34,12 @@ class _GameByGameStatsState extends State<GameByGameStats> {
     'PTS',
     'REB',
     'AST',
-    'TOV',
     'STL',
     'BLK',
-    'FG%',
-    '3P%',
-    'FT%',
+    'TOV',
+    'FG',
+    '3P',
+    'FT',
     'eFG%',
     'TS%',
     'USG%',
@@ -358,11 +358,11 @@ class _GameByGameStatsState extends State<GameByGameStats> {
       case 5:
         return StandingsDataText(text: game['AST'].toStringAsFixed(0) ?? '-');
       case 6:
-        return StandingsDataText(text: game['TOV'].toStringAsFixed(0) ?? '-');
-      case 7:
         return StandingsDataText(text: game['STL'].toStringAsFixed(0) ?? '-');
-      case 8:
+      case 7:
         return StandingsDataText(text: game['BLK'].toStringAsFixed(0) ?? '-');
+      case 8:
+        return StandingsDataText(text: game['TOV'].toStringAsFixed(0) ?? '-');
       case 9:
         String fgm = game['FGM'].toStringAsFixed(0);
         String fga = game['FGA'].toStringAsFixed(0);

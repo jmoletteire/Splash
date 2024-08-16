@@ -43,6 +43,7 @@ class _CareerStatsState extends State<CareerStats> {
     'ORTG',
     'DRTG',
     'NRTG',
+    'DIE',
   ];
 
   @override
@@ -68,13 +69,13 @@ class _CareerStatsState extends State<CareerStats> {
       columns: [
         /// YEAR
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.165,
+          width: MediaQuery.of(context).size.width * 0.145,
           freezePriority: 1,
         ),
 
         /// TEAM
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.18,
+          width: MediaQuery.of(context).size.width * 0.15,
           freezePriority: 1,
         ),
 
@@ -124,6 +125,9 @@ class _CareerStatsState extends State<CareerStats> {
         TableColumn(width: MediaQuery.of(context).size.width * 0.13),
 
         /// NRTG
+        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+
+        /// DIE
         TableColumn(width: MediaQuery.of(context).size.width * 0.13),
       ],
       rowBuilder: _rowBuilder,
@@ -226,7 +230,7 @@ class _CareerStatsState extends State<CareerStats> {
             textAlign: TextAlign.center,
             style: kBebasNormal.copyWith(
               color: Colors.white70,
-              fontSize: 19.0,
+              fontSize: 17.0,
             ),
           ),
         );
@@ -250,7 +254,7 @@ class _CareerStatsState extends State<CareerStats> {
               flex: 4,
               child: Text(
                 widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'] ?? '-',
-                style: kBebasBold,
+                style: kBebasBold.copyWith(fontSize: 17.0),
               ),
             ),
           ],
@@ -322,20 +326,26 @@ class _CareerStatsState extends State<CareerStats> {
                 '${(widget.seasons[season][widget.seasonType]['ADV']['USG_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
       case 15:
         return StandingsDataText(
-            text: int.parse(season.substring(0, 4)) > 2007
+            text: int.parse(season.substring(0, 4)) >= 2007
                 ? widget.seasons[season][widget.seasonType]['ADV']['OFF_RATING_ON_OFF']
                     .toStringAsFixed(1)
                 : '-');
       case 16:
         return StandingsDataText(
-            text: int.parse(season.substring(0, 4)) > 2007
+            text: int.parse(season.substring(0, 4)) >= 2007
                 ? widget.seasons[season][widget.seasonType]['ADV']['DEF_RATING_ON_OFF']
                     .toStringAsFixed(1)
                 : '-');
       case 17:
         return StandingsDataText(
-            text: int.parse(season.substring(0, 4)) > 2007
+            text: int.parse(season.substring(0, 4)) >= 2007
                 ? widget.seasons[season][widget.seasonType]['ADV']['NET_RATING_ON_OFF']
+                    .toStringAsFixed(1)
+                : '-');
+      case 18:
+        return StandingsDataText(
+            text: int.parse(season.substring(0, 4)) >= 2017
+                ? widget.seasons[season][widget.seasonType]['ADV']['DEF_IMPACT_EST']
                     .toStringAsFixed(1)
                 : '-');
       default:

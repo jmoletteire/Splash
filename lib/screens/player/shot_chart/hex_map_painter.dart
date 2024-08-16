@@ -15,12 +15,12 @@ class HexMapPainter extends CustomPainter {
 
     Paint borderPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = Colors.transparent // Set the border color
       ..strokeWidth = 1.0; // Adjust the stroke width as needed
 
     for (var hex in hexagons) {
       if (hex.color != Colors.transparent) {
         fillPaint.color = hex.color.withOpacity(hex.opacity);
+        borderPaint.color = hex.borderColor;
         _drawHexagon(canvas, fillPaint, borderPaint, hex.x, hex.y, hex.width, hex.height);
       }
     }

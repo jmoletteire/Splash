@@ -103,6 +103,7 @@ class HexagonData {
   double height;
   double opacity;
   Color color;
+  Color borderColor;
   num FGA;
   num FGM;
   late Map<String, String> shotZoneRange;
@@ -115,6 +116,7 @@ class HexagonData {
     required this.height,
     required this.opacity,
     required this.color,
+    required this.borderColor,
     this.FGA = 0,
     this.FGM = 0,
   }) {
@@ -135,19 +137,16 @@ class HexagonData {
   }
 
   bool contains(Offset point) {
-    int n = vertices.length;
-    bool inside = false;
-    for (int i = 0, j = n - 1; i < n; j = i++) {
-      if (((vertices[i].dy > point.dy) != (vertices[j].dy > point.dy)) &&
-          (point.dx <
-              (vertices[j].dx - vertices[i].dx) *
-                      (point.dy - vertices[i].dy) /
-                      (vertices[j].dy - vertices[i].dy) +
-                  vertices[i].dx)) {
-        inside = !inside;
-      }
-    }
-    return inside;
+    double centerX = x;
+    double centerY = y;
+    double apothem =
+        346 / 47 * sqrt(3); // The distance from the center to the middle of any side
+
+    // Calculate the distance from the point to the center of the hexagon
+    double distance = sqrt(pow(point.dx - centerX, 2) + pow(point.dy - centerY, 2));
+
+    // If the distance is less than the apothem, the point is inside the hexagon
+    return distance <= apothem;
   }
 
   Map<String, String> _shotZoneRange() {
