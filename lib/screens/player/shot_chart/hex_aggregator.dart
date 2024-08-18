@@ -33,7 +33,7 @@ class HexagonAggregator {
       Offset shotPoint = Offset(x, y);
 
       for (var hexagon in hexagons) {
-        if (isPointInHexagon(shotPoint, hexagon.vertices)) {
+        if (hexagon.contains(shotPoint)) {
           String key = '${hexagon.x},${hexagon.y}';
           if (!hexagonMap.containsKey(key)) {
             hexagonMap[key] = hexagon;
@@ -53,8 +53,7 @@ class HexagonAggregator {
   void adjustHexagons(
       Map<String, HexagonData> hexagonMap, int totalFGA, Map<String, dynamic> leagueAverages) {
     for (var hex in hexagonMap.values) {
-      double freq = hex.FGA / totalFGA;
-      if (freq == 0) {
+      if (hex.FGA == 0) {
         hex.width = 0;
         hex.height = 0;
         //hex.opacity = 0;
@@ -103,7 +102,6 @@ class HexagonData {
   final double y;
   double width;
   double height;
-  double opacity;
   Color color;
   Color borderColor;
   num FGA;
@@ -118,7 +116,6 @@ class HexagonData {
     required this.y,
     required this.width,
     required this.height,
-    required this.opacity,
     required this.color,
     required this.borderColor,
     this.FGA = 0,
@@ -169,15 +166,15 @@ class HexagonData {
     } else if (shotDistance > 47) {
       results['Zone'] = 'Back Court(BC)';
     } else if (x <= -150 || (shotDistance < 16 && x >= -150 && x < -50)) {
-      results['Zone'] = 'Right Side(R)';
+      results['Zone'] = 'Left Side(L)';
     } else if (shotDistance > 16 && x > -150 && x <= -50) {
-      results['Zone'] = 'Right Side Center(RC)';
+      results['Zone'] = 'Left Side Center(LC)';
     } else if (x > -50 && x < 50) {
       results['Zone'] = 'Center(C)';
     } else if (shotDistance > 16 && x >= 50 && x < 150) {
-      results['Zone'] = 'Left Side Center(LC)';
+      results['Zone'] = 'Right Side Center(RC)';
     } else if (x >= 150 || (shotDistance < 16 && x >= 50 && x < 150)) {
-      results['Zone'] = 'Left Side(L)';
+      results['Zone'] = 'Right Side(R)';
     }
 
     if (shotDistance < 8) {

@@ -19,7 +19,7 @@ class HexMapPainter extends CustomPainter {
 
     for (var hex in hexagons) {
       if (hex.color != Colors.transparent) {
-        fillPaint.color = hex.color.withOpacity(hex.opacity);
+        fillPaint.color = hex.color;
         borderPaint.color = hex.borderColor;
         _drawHexagon(canvas, fillPaint, borderPaint, hex.x, hex.y, hex.width, hex.height);
       }

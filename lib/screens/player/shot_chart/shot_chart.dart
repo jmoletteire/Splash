@@ -171,7 +171,6 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
           y: adjustedY,
           width: hexWidth,
           height: hexHeight,
-          opacity: 1.0,
           color: Colors.transparent,
           borderColor: Colors.transparent,
         ));
@@ -206,6 +205,10 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
           modifiedShotType = 'Fadeaway Jumper';
         } else if (modifiedShotType.contains('Alley Oop')) {
           modifiedShotType = 'Alley-Oop';
+        } else if (modifiedShotType.contains('Reverse Dunk')) {
+          modifiedShotType = 'Dunk';
+        } else if (modifiedShotType.contains('Reverse Layup')) {
+          modifiedShotType = 'Layup';
         } else {
           // Remove specific words and replace "Jump" with "Jumper"
           modifiedShotType = modifiedShotType
