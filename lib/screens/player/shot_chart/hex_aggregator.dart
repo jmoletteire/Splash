@@ -40,6 +40,8 @@ class HexagonAggregator {
           }
           hexagonMap[key]!.FGA += shot['SHOT_ATTEMPTED_FLAG'];
           hexagonMap[key]!.FGM += shot['SHOT_MADE_FLAG'];
+          hexagonMap[key]!.totalDistance += shot['DISTANCE'];
+          hexagonMap[key]!.avgDistance = hexagonMap[key]!.totalDistance / hexagonMap[key]!.FGA;
           break; // Stop checking after finding the first hexagon that contains the shot
         }
       }
@@ -106,6 +108,8 @@ class HexagonData {
   Color borderColor;
   num FGA;
   num FGM;
+  num totalDistance;
+  num avgDistance;
   late Map<String, String> shotZoneRange;
   late List<Offset> vertices;
 
@@ -119,6 +123,8 @@ class HexagonData {
     required this.borderColor,
     this.FGA = 0,
     this.FGM = 0,
+    this.totalDistance = 0,
+    this.avgDistance = 0,
   }) {
     shotZoneRange = _shotZoneRange();
     vertices = _calculateVertices(x, y, width, height);
@@ -145,18 +151,12 @@ class HexagonData {
     // Calculate the distance from the point to the center of the hexagon
     double distance = sqrt(pow(point.dx - centerX, 2) + pow(point.dy - centerY, 2));
 
-    if (distance <= apothem) {
-      print('Hex: ${x.toStringAsFixed(2)}, ${y.toStringAsFixed(2)}');
-    }
     // If the distance is less than the apothem, the point is inside the hexagon
     return distance <= apothem;
   }
 
   Map<String, String> _shotZoneRange() {
     Map<String, String> results = {};
-
-    // Calculate pixels per foot
-    double heightPixelsPerFt = 19.74 / 1.85;
 
     // Convert from pixels to feet
     double xInFeet = x / 10;
@@ -169,15 +169,15 @@ class HexagonData {
     } else if (shotDistance > 47) {
       results['Zone'] = 'Back Court(BC)';
     } else if (x <= -150 || (shotDistance < 16 && x >= -150 && x < -50)) {
-      results['Zone'] = 'Left Side(L)';
+      results['Zone'] = 'Right Side(R)';
     } else if (shotDistance > 16 && x > -150 && x <= -50) {
-      results['Zone'] = 'Left Side Center(LC)';
+      results['Zone'] = 'Right Side Center(RC)';
     } else if (x > -50 && x < 50) {
       results['Zone'] = 'Center(C)';
     } else if (shotDistance > 16 && x >= 50 && x < 150) {
-      results['Zone'] = 'Right Side Center(RC)';
+      results['Zone'] = 'Left Side Center(LC)';
     } else if (x >= 150 || (shotDistance < 16 && x >= 50 && x < 150)) {
-      results['Zone'] = 'Right Side(R)';
+      results['Zone'] = 'Left Side(L)';
     }
 
     if (shotDistance < 8) {

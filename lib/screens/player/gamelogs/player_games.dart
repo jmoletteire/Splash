@@ -130,48 +130,48 @@ class _PlayerGamesState extends State<PlayerGames> {
 
     // Month filter only
     if ((opponentId == null || opponentId == 0) && month != 'All' && seasonType == 'ALL') {
-      print('Filtering by Month only');
+      //print('Filtering by Month only');
       return filterByMonth(widget.schedule, monthsMap[month]!);
     }
     // Opp filter only
     else if (opponentId != null && opponentId != 0 && month == 'All' && seasonType == 'ALL') {
-      print('Filtering by Opp only');
+      //print('Filtering by Opp only');
       return filterByOpp(widget.schedule, opponentId);
     }
     // Season Type filter only
     else if ((opponentId == null || opponentId == 0) &&
         month == 'All' &&
         seasonType != 'ALL') {
-      print('Filtering by Season Type only');
+      //print('Filtering by Season Type only');
       return filterBySeasonType(widget.schedule, seasonType);
     }
     // Month & Opp filters
     else if (opponentId != 0 && month != 'All' && seasonType == 'ALL') {
-      print('Filtering by Month & Opp');
+      //print('Filtering by Month & Opp');
       return filterByOpp(filterByMonth(widget.schedule, monthsMap[month]!), opponentId!);
     }
     // Month & Season Type filters
     else if ((opponentId == null || opponentId == 0) &&
         month != 'All' &&
         seasonType != 'All') {
-      print('Filtering by Month & Season Type');
+      //print('Filtering by Month & Season Type');
       return filterByMonth(filterBySeasonType(widget.schedule, seasonType), monthsMap[month]!);
     }
     // Season Type & Opp filters
     else if (opponentId != 0 && month == 'All' && seasonType != 'ALL') {
-      print('Filtering by Season Type & Opp');
+      //print('Filtering by Season Type & Opp');
       return filterByOpp(filterBySeasonType(widget.schedule, seasonType), opponentId!);
     }
     // All filters
     else if (opponentId != 0 && month != 'All' && seasonType != 'ALL') {
-      print('Filtering by all filters');
+      //print('Filtering by all filters');
       return filterByOpp(
           filterByMonth(filterBySeasonType(widget.schedule, seasonType), monthsMap[month]!),
           opponentId!);
     }
     // No filters
     else {
-      print('No filters');
+      //print('No filters');
       return widget.schedule;
     }
   }

@@ -30,7 +30,7 @@ class _HexMapState extends State<HexMap> {
     const double basketY = canvasHeight - hoopOffset;
 
     // Map the tap position to the normalized court coordinate space
-    double normalizedX = (tapPosition.dx - basketX) / basketX; // Normalize to range -1 to 1
+    double normalizedX = (basketX - tapPosition.dx) / basketX; // Normalize to range -1 to 1
     double normalizedY =
         (basketY - tapPosition.dy) / canvasHeight; // Normalize to range 0 to 1
 
@@ -51,18 +51,18 @@ class _HexMapState extends State<HexMap> {
 
           // Check if the tooltip would overflow the right edge
           if (adjustedX + tooltipWidth > canvasWidth) {
-            adjustedX = tapPosition.dx - tooltipWidth - 10; // Place it to the left
+            adjustedX = tapPosition.dx - tooltipWidth + 30; // Place it to the left
           }
 
           // Check if the tooltip would overflow the bottom edge
-          if (adjustedY + tooltipHeight > canvasHeight) {
+          if (adjustedY + tooltipHeight > canvasHeight - 30) {
             adjustedY = tapPosition.dy - tooltipHeight - 30; // Place it above
           }
 
           // Set the final tooltip position
           _tooltipPosition = Offset(adjustedX, adjustedY);
           _tooltipMessage =
-              'Zone: ${hex.shotZoneRange['Zone']}\nAvg Dist: ${hex.shotZoneRange['Distance']}\nFG: ${hex.FGM}/${hex.FGA}  (${(100 * hex.FGM / hex.FGA).toStringAsFixed(1)}%)';
+              'Zone: ${hex.shotZoneRange['Zone']}\nAvg Dist: ${hex.avgDistance.toStringAsFixed(1) ?? 0}\nFG: ${hex.FGM}/${hex.FGA}  (${(100 * hex.FGM / hex.FGA).toStringAsFixed(1)}%)';
         });
         break;
       }
@@ -93,7 +93,7 @@ class _HexMapState extends State<HexMap> {
       double normalizedY = hex.y / 470; // Range 0 to 1
 
       // Map to Flutter Canvas, adjusting for (0,0) at the basket with an offset
-      double mappedX = basketX + (normalizedX * basketX); // Centered horizontally
+      double mappedX = basketX - (normalizedX * basketX); // Centered horizontally
       double mappedY = basketY - (normalizedY * canvasHeight); // Bottom to top, adjusted
 
       if (hex == _selectedHexagon) {
