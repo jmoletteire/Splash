@@ -192,7 +192,7 @@ class _TeamHistoryState extends State<TeamHistory> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade800.withOpacity(0.5),
+                  color: Colors.grey.shade900,
                   border: const Border(
                     bottom: BorderSide(
                       color: Colors.white70,
@@ -210,7 +210,7 @@ class _TeamHistoryState extends State<TeamHistory> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade800.withOpacity(0.75),
+                  color: Colors.grey.shade800,
                   border: const Border(
                     bottom: BorderSide(
                       color: Colors.white70,

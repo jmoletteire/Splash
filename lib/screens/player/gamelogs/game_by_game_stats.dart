@@ -347,7 +347,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         String convertMinutes(double decimalMinutes) {
           int wholeMinutes = decimalMinutes.floor();
           int seconds = ((decimalMinutes - wholeMinutes) * 60).round();
-          return '${wholeMinutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+          return '${wholeMinutes.toString()}:${seconds.toString().padLeft(2, '0')}';
         }
         return StandingsDataText(
             text: game['MIN'].toStringAsFixed(0) == '0' ? '-' : convertMinutes(game['MIN']));

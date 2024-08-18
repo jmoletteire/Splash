@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
+import 'package:splash/screens/player/shot_chart/court_zone_painter.dart';
 import 'package:splash/screens/player/shot_chart/shot_chart_cache.dart';
-import 'package:splash/screens/player/shot_chart/zone_map.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../utilities/player.dart';
@@ -21,7 +21,7 @@ class PlayerShotChart extends StatefulWidget {
   State<PlayerShotChart> createState() => _PlayerShotChartState();
 }
 
-class _PlayerShotChartState extends State<PlayerShotChart> {
+class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAliveClientMixin {
   late List shotChart;
   List filteredShotChart = [];
   List lgAvg = [];
@@ -39,6 +39,9 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
 
   bool _isLoading = true;
   String _displayMap = 'Hex';
+
+  @override
+  bool get wantKeepAlive => true;
 
   void setSeasonTypes() {
     widget.player['STATS'][selectedSeason].containsKey('PLAYOFFS')
@@ -81,7 +84,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     await fetchLgAvg(selectedSeason, selectedSeasonType);
     // Get distinct SHOT_TYPE values
     distinctShotTypes = collectDistinctShotTypes(shotChart);
-    processShotChart(shotChart);
+    filterShotChart();
+    processShotChart(filteredShotChart);
     setState(() {
       _isLoading = false;
     });
@@ -315,7 +319,11 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
                           HexMap(
                             hexagons: hexagons,
                           ),
-                        if (_displayMap == 'Zone') ZoneMap(),
+                        if (_displayMap == 'Zone')
+                          CustomPaint(
+                            size: const Size(368, 346),
+                            painter: ZonePainter(),
+                          ),
                       ],
                     ),
                     Row(
@@ -525,6 +533,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
                       setState(() {
                         selectedSeason = value!;
                         selectedSeasonType = 'Regular Season';
+                        setSeasonTypes();
                         fetchShotChart(widget.player['PERSON_ID'].toString(), selectedSeason,
                             selectedSeasonType);
                       });
@@ -600,6 +609,29 @@ class HalfCourtPainter extends CustomPainter {
       0,
       3.14,
       false,
+      paint,
+    );
+
+    // Draw inner center arc
+    canvas.drawArc(
+      Rect.fromCircle(center: Offset((size.width / 2), 0), radius: keyWidth / 6),
+      0,
+      3.14,
+      false,
+      paint,
+    );
+
+    // Left Hash
+    canvas.drawLine(
+      Offset(0, size.height - (size.height * 28 / 47)),
+      Offset(size.width * (3 / 50), size.height - (size.height * (28 / 47))),
+      paint,
+    );
+
+    // Right Hash
+    canvas.drawLine(
+      Offset(size.width - size.width * (3 / 50), size.height - (size.height * 28 / 47)),
+      Offset(size.width, size.height - (size.height * (28 / 47))),
       paint,
     );
 

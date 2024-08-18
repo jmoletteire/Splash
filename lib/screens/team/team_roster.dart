@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/player/player_home.dart';
@@ -93,11 +94,11 @@ class _TeamRosterState extends State<TeamRoster> {
           )
         : CustomScrollView(
             slivers: [
-              SliverToBoxAdapter(
+              SliverPinnedHeader(
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade800.withOpacity(0.75),
+                    color: Colors.grey.shade800,
                     border: const Border(
                       bottom: BorderSide(
                         color: Colors.white70,

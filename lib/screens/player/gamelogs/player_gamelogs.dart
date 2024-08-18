@@ -11,7 +11,7 @@ class PlayerGamelogs extends StatefulWidget {
   State<PlayerGamelogs> createState() => _PlayerGamelogsState();
 }
 
-class _PlayerGamelogsState extends State<PlayerGamelogs> {
+class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAliveClientMixin {
   late Map<String, dynamic> schedule;
   late List<String> seasons;
   late String selectedSeason;
@@ -76,6 +76,9 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> {
     'PLAY-IN': '5',
     'NBA CUP': '6',
   };
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
