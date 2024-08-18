@@ -245,6 +245,33 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     processShotChart(filteredShotChart); // Update the hexagon map after filtering
   }
 
+  Map<String, dynamic> calculateFGStats(List shotChart) {
+    int fgm = 0;
+    int fga = 0;
+
+    if (shotChart.isEmpty) {
+      fgm = widget.player['STATS'][selectedSeason][selectedSeasonType.toUpperCase()]['BASIC']
+          ['FGM'];
+      fga = widget.player['STATS'][selectedSeason][selectedSeasonType.toUpperCase()]['BASIC']
+          ['FGA'];
+    } else {
+      for (var shot in shotChart) {
+        fga++;
+        if (shot['SHOT_MADE_FLAG'] == 1) {
+          fgm++;
+        }
+      }
+    }
+
+    double fgPercentage = fga > 0 ? (fgm / fga) * 100 : 0.0;
+
+    return {
+      'FGM': fgm,
+      'FGA': fga,
+      'FG%': fgPercentage.toStringAsFixed(1), // Limit FG% to one decimal place
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     Color teamColor = kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
@@ -257,6 +284,9 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
     if (_isLoading) {
       return SpinningIcon(color: teamColor);
     }
+
+    // Calculate FGM, FGA, and FG%
+    Map<String, dynamic> fgStats = calculateFGStats(filteredShotChart);
 
     return Stack(
       children: [
@@ -306,6 +336,76 @@ class _PlayerShotChartState extends State<PlayerShotChart> {
                         )
                       ],
                     ),
+                    const SizedBox(height: 6.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center, // Align center
+                      children: [
+                        Column(
+                          children: [
+                            TweenAnimationBuilder<int>(
+                              tween: IntTween(begin: 0, end: fgStats['FGM']),
+                              duration: const Duration(milliseconds: 200),
+                              builder: (context, value, child) {
+                                return Text(
+                                  "$value",
+                                  style: kBebasNormal.copyWith(
+                                      color: Colors.white, fontSize: 20.0),
+                                );
+                              },
+                            ),
+                            Text(
+                              "FGM",
+                              style:
+                                  kBebasNormal.copyWith(color: Colors.white70, fontSize: 14.0),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 50.0),
+                        Column(
+                          children: [
+                            TweenAnimationBuilder<int>(
+                              tween: IntTween(begin: 0, end: fgStats['FGA']),
+                              duration: const Duration(milliseconds: 200),
+                              builder: (context, value, child) {
+                                return Text(
+                                  "$value",
+                                  style: kBebasNormal.copyWith(
+                                      color: Colors.white, fontSize: 20.0),
+                                );
+                              },
+                            ),
+                            Text(
+                              "FGA",
+                              style:
+                                  kBebasNormal.copyWith(color: Colors.white70, fontSize: 14.0),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 50.0),
+                        Column(
+                          children: [
+                            TweenAnimationBuilder<double>(
+                              tween:
+                                  Tween<double>(begin: 0, end: double.parse(fgStats['FG%'])),
+                              duration: const Duration(milliseconds: 200),
+                              builder: (context, value, child) {
+                                return Text(
+                                  "${value.toStringAsFixed(1)}%",
+                                  style: kBebasNormal.copyWith(
+                                      color: Colors.white, fontSize: 20.0),
+                                );
+                              },
+                            ),
+                            Text(
+                              "FG%",
+                              style:
+                                  kBebasNormal.copyWith(color: Colors.white70, fontSize: 14.0),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10.0),
                     Wrap(
                       children: distinctShotTypes.map((shotType) {
                         bool isSelected = selectedShotTypes.contains(shotType);
