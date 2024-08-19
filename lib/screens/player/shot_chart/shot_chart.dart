@@ -3,13 +3,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
-import 'package:splash/screens/player/shot_chart/court_zone_painter.dart';
 import 'package:splash/screens/player/shot_chart/shot_chart_cache.dart';
+import 'package:splash/screens/player/shot_chart/zone/zone_aggregator.dart';
+import 'package:splash/screens/player/shot_chart/zone/zone_map.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../utilities/player.dart';
-import 'hex_aggregator.dart';
-import 'hex_map.dart';
+import 'hex/hex_aggregator.dart';
+import 'hex/hex_map.dart';
 
 class PlayerShotChart extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -138,6 +139,12 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
         });
       }
     }
+
+    ZoneAggregator zoneAggregator = ZoneAggregator(const Size(368, 346));
+    Map<String, ZoneData> aggregatedZones = zoneAggregator.aggregateShots(filteredShotChart);
+
+    // Adjust hexagons based on aggregated data
+    zoneAggregator.adjustZones(aggregatedZones, filteredShotChart.length, lgAvg[0]);
 
     // Refresh the UI
     setState(() {
@@ -320,10 +327,10 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                             hexagons: hexagons,
                           ),
                         if (_displayMap == 'Zone')
-                          CustomPaint(
-                            size: const Size(368, 346),
-                            painter: ZonePainter(),
-                          ),
+                          ZoneMap(
+                              shotData: filteredShotChart,
+                              lgAvg: lgAvg[0],
+                              courtSize: const Size(368, 346))
                       ],
                     ),
                     Row(
