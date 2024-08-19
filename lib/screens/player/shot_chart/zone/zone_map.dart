@@ -106,8 +106,8 @@ class _ZoneMapState extends State<ZoneMap> {
                   child: Text(
                     'Zone: ${_selectedZone!.zoneName}\n'
                     'Avg Dist: ${_selectedZone!.avgDistance.toStringAsFixed(1)} ft.\n'
-                    'FG: ${_selectedZone!.FGM}/${_selectedZone!.FGA}\n'
-                    'FG%: ${(100 * _selectedZone!.FGM / _selectedZone!.FGA).toStringAsFixed(1)}%',
+                    'LA: ${(100 * widget.lgAvg['Zone'][_selectedZone!.zoneName]['FG_PCT']).toStringAsFixed(1)}%\n'
+                    'FG: ${_selectedZone!.FGM}/${_selectedZone!.FGA} (${(100 * _selectedZone!.FGM / _selectedZone!.FGA).toStringAsFixed(1)}%)',
                     style: kBebasNormal.copyWith(fontSize: 16.0),
                   ),
                 ),

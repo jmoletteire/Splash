@@ -232,9 +232,9 @@ class ZoneAggregator {
         } else if (percentDiff >= -0.1 && percentDiff < -0.05) {
           zone.color = const Color(0xFF468FDF);
         } else if (percentDiff >= -0.05 && percentDiff < 0.05) {
-          zone.color = const Color(0xFFFFF9C4);
+          zone.color = const Color(0xFFFFFFFF);
         } else if (percentDiff >= 0.05 && percentDiff < 0.1) {
-          zone.color = const Color(0xFFDE441B);
+          zone.color = const Color(0xFFFE441B);
         } else {
           zone.color = const Color(0xFFA0261D);
         }
