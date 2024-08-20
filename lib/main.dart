@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/game/game_cache.dart';
 import 'package:splash/screens/more/draft/draft_cache.dart';
+import 'package:splash/screens/more/transactions/transactions_cache.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/shot_chart/shot_chart_cache.dart';
 import 'package:splash/screens/search_screen.dart';
@@ -18,6 +19,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => PlayerShotChartCache()),
         ChangeNotifierProvider(create: (_) => TeamCache()),
         ChangeNotifierProvider(create: (_) => GameCache()),
+        ChangeNotifierProvider(create: (_) => TransactionsCache()),
         ChangeNotifierProvider(create: (_) => DraftCache()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => DatesProvider()..fetchDates()),

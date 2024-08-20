@@ -112,6 +112,29 @@ def get_draft():
         return jsonify({"error": "Failed to retrieve draft"}), 500
 
 
+@app.route('/get_transactions', methods=['GET'])
+def get_transactions():
+    try:
+        # Query the database
+        transactions = transactions_collection.find(
+            {},
+            {"_id": 0}
+        )
+
+        transactions = list(transactions)
+
+        if transactions:
+            # logging.info(f"(get_transactions) Retrieved transactions from MongoDB")
+            return transactions
+        else:
+            logging.warning("(get_transactions) No transactions data found in MongoDB")
+            return jsonify({"error": "No transactions found"})
+
+    except Exception as e:
+        logging.error(f"(get_transactions) Error retrieving transactions: {e}")
+        return jsonify({"error": "Failed to retrieve transactions"}), 500
+
+
 @app.route('/stats_query', methods=['POST'])
 def query_database():
     data = request.json
@@ -528,6 +551,7 @@ if __name__ == '__main__':
         players_collection = db.nba_players
         player_shots_collection = db.nba_player_shot_data
         draft_collection = db.nba_draft_history
+        transactions_collection = db.nba_transactions
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

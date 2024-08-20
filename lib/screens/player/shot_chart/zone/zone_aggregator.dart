@@ -187,7 +187,7 @@ class ZoneAggregator {
     double normalizedY = y / 470; // Range 0 to 1
 
     // Map to Flutter Canvas, adjusting for (0,0) at the basket with an offset
-    double mappedX = basketX + (normalizedX * basketX); // Centered horizontally
+    double mappedX = basketX - (normalizedX * basketX); // Centered horizontally
     double mappedY = basketY - (normalizedY * canvasHeight); // Bottom to top, adjusted
 
     return Offset(mappedX, mappedY);

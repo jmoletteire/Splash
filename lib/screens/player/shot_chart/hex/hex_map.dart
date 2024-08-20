@@ -30,7 +30,7 @@ class _HexMapState extends State<HexMap> {
     const double basketY = canvasHeight - hoopOffset;
 
     // Map the tap position to the normalized court coordinate space
-    double normalizedX = (tapPosition.dx - basketX) / basketX; // Normalize to range -1 to 1
+    double normalizedX = (basketX - tapPosition.dx) / basketX; // Normalize to range -1 to 1
     double normalizedY =
         (basketY - tapPosition.dy) / canvasHeight; // Normalize to range 0 to 1
 
@@ -93,7 +93,7 @@ class _HexMapState extends State<HexMap> {
       double normalizedY = hex.y / 470; // Range 0 to 1
 
       // Map to Flutter Canvas, adjusting for (0,0) at the basket with an offset
-      double mappedX = basketX + (normalizedX * basketX); // Centered horizontally
+      double mappedX = basketX - (normalizedX * basketX); // Centered horizontally
       double mappedY = basketY - (normalizedY * canvasHeight); // Bottom to top, adjusted
 
       if (hex == _selectedHexagon) {

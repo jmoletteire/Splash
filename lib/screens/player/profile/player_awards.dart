@@ -18,6 +18,7 @@ class _PlayerAwardsState extends State<PlayerAwards> {
   ];
 
   List<String> awards = [
+    'Hall of Fame Inductee',
     'NBA Champion',
     'NBA Finals Most Valuable Player',
     'NBA Most Valuable Player',

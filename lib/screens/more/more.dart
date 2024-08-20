@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:splash/screens/more/draft/draft.dart';
 import 'package:splash/screens/more/league_history.dart';
 import 'package:splash/screens/more/stats_query/stats_query.dart';
+import 'package:splash/screens/more/transactions/league_transactions.dart';
 import 'package:splash/screens/search_screen.dart';
 
 import '../../components/custom_icon_button.dart';
@@ -17,6 +18,7 @@ class More extends StatefulWidget {
 class _MoreState extends State<More> {
   Map<String, dynamic> pages = {
     'Stats': [Icons.leaderboard, StatsQuery()],
+    'Transactions': [Icons.compare_arrows, LeagueTransactions()],
     'Draft': [Icons.format_list_numbered, Draft()],
     'League History': [Icons.history, LeagueHistory()],
   };

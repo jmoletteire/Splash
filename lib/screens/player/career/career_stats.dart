@@ -235,119 +235,186 @@ class _CareerStatsState extends State<CareerStats> {
           ),
         );
       case 1:
-        return Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 20.0),
-                child: Image.asset(
-                  'images/NBA_Logos/${widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ID']}.png',
-                  fit: BoxFit.contain,
-                  alignment: Alignment.center,
-                  width: 20.0,
+        try {
+          return Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 20.0),
+                  child: Image.asset(
+                    'images/NBA_Logos/${widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ID']}.png',
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    width: 20.0,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 8.0),
-            Expanded(
-              flex: 4,
-              child: Text(
-                widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'] ?? '-',
-                style: kBebasBold.copyWith(fontSize: 17.0),
+              const SizedBox(width: 8.0),
+              Expanded(
+                flex: 4,
+                child: Text(
+                  widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'] ??
+                      '-',
+                  style: kBebasBold.copyWith(fontSize: 17.0),
+                ),
               ),
-            ),
-          ],
-        );
+            ],
+          );
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 2:
-        return StandingsDataText(
-            text:
-                widget.seasons[season][widget.seasonType]?['BASIC']['GP'].toStringAsFixed(0) ??
-                    '-');
+        try {
+          return StandingsDataText(
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                      .toStringAsFixed(0) ??
+                  '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 3:
-        return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['PTS'] /
-                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                    .toStringAsFixed(1) ??
-                '-');
+        try {
+          return StandingsDataText(
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['PTS'] /
+                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                      .toStringAsFixed(1) ??
+                  '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 4:
-        return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['REB'] /
-                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                    .toStringAsFixed(1) ??
-                '-');
+        try {
+          return StandingsDataText(
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['REB'] /
+                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                      .toStringAsFixed(1) ??
+                  '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 5:
-        return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['AST'] /
-                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                    .toStringAsFixed(1) ??
-                '-');
+        try {
+          return StandingsDataText(
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['AST'] /
+                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                      .toStringAsFixed(1) ??
+                  '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 6:
-        return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['STL'] /
-                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                    .toStringAsFixed(1) ??
-                '-');
+        try {
+          return StandingsDataText(
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['STL'] /
+                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                      .toStringAsFixed(1) ??
+                  '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 7:
-        return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['BLK'] /
-                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                    .toStringAsFixed(1) ??
-                '-');
+        try {
+          return StandingsDataText(
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['BLK'] /
+                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                      .toStringAsFixed(1) ??
+                  '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 8:
-        return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['TOV'] /
-                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                    .toStringAsFixed(1) ??
-                '-');
+        try {
+          return StandingsDataText(
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['TOV'] /
+                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                      .toStringAsFixed(1) ??
+                  '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 9:
-        return StandingsDataText(
-            text:
-                '${(widget.seasons[season][widget.seasonType]['BASIC']['FG_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
+        try {
+          double fgPct = widget.seasons[season][widget.seasonType]['BASIC']['FG_PCT'] * 100;
+          return StandingsDataText(text: '${fgPct.toStringAsFixed(1)}%');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 10:
-        return StandingsDataText(
-            text:
-                '${(widget.seasons[season][widget.seasonType]['BASIC']['FG3_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
+        try {
+          double fg3Pct = widget.seasons[season][widget.seasonType]['BASIC']['FG3_PCT'] * 100;
+          return StandingsDataText(text: '${fg3Pct.toStringAsFixed(1)}%');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 11:
-        return StandingsDataText(
-            text:
-                '${(widget.seasons[season][widget.seasonType]['BASIC']['FT_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
+        try {
+          double ftPct = widget.seasons[season][widget.seasonType]['BASIC']['FT_PCT'] * 100;
+          return StandingsDataText(text: '${ftPct.toStringAsFixed(1)}%');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 12:
-        return StandingsDataText(
-            text:
-                '${(widget.seasons[season][widget.seasonType]['ADV']['EFG_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
+        try {
+          double efgPct = widget.seasons[season][widget.seasonType]['ADV']['EFG_PCT'] * 100;
+          return StandingsDataText(text: '${efgPct.toStringAsFixed(1)}%');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 13:
-        return StandingsDataText(
-            text:
-                '${(widget.seasons[season][widget.seasonType]['ADV']['TS_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
+        try {
+          double tsPct = widget.seasons[season][widget.seasonType]['ADV']['TS_PCT'] * 100;
+          return StandingsDataText(text: '${tsPct.toStringAsFixed(1)}%');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 14:
-        return StandingsDataText(
-            text:
-                '${(widget.seasons[season][widget.seasonType]['ADV']['USG_PCT'] * 100).toStringAsFixed(1) ?? '-'}%');
+        try {
+          double usgPct = widget.seasons[season][widget.seasonType]['ADV']['USG_PCT'] * 100;
+          return StandingsDataText(text: '${usgPct.toStringAsFixed(1)}%');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 15:
-        return StandingsDataText(
-            text: int.parse(season.substring(0, 4)) >= 2007
-                ? widget.seasons[season][widget.seasonType]['ADV']['OFF_RATING_ON_OFF']
-                    .toStringAsFixed(1)
-                : '-');
+        try {
+          return StandingsDataText(
+              text: int.parse(season.substring(0, 4)) >= 2007
+                  ? widget.seasons[season][widget.seasonType]['ADV']['OFF_RATING_ON_OFF']
+                      .toStringAsFixed(1)
+                  : '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 16:
-        return StandingsDataText(
-            text: int.parse(season.substring(0, 4)) >= 2007
-                ? widget.seasons[season][widget.seasonType]['ADV']['DEF_RATING_ON_OFF']
-                    .toStringAsFixed(1)
-                : '-');
+        try {
+          return StandingsDataText(
+              text: int.parse(season.substring(0, 4)) >= 2007
+                  ? widget.seasons[season][widget.seasonType]['ADV']['DEF_RATING_ON_OFF']
+                      .toStringAsFixed(1)
+                  : '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 17:
-        return StandingsDataText(
-            text: int.parse(season.substring(0, 4)) >= 2007
-                ? widget.seasons[season][widget.seasonType]['ADV']['NET_RATING_ON_OFF']
-                    .toStringAsFixed(1)
-                : '-');
+        try {
+          return StandingsDataText(
+              text: int.parse(season.substring(0, 4)) >= 2007
+                  ? widget.seasons[season][widget.seasonType]['ADV']['NET_RATING_ON_OFF']
+                      .toStringAsFixed(1)
+                  : '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       case 18:
-        return StandingsDataText(
-            text: int.parse(season.substring(0, 4)) >= 2017
-                ? widget.seasons[season][widget.seasonType]['ADV']['DEF_IMPACT_EST']
-                    .toStringAsFixed(1)
-                : '-');
+        try {
+          return StandingsDataText(
+              text: int.parse(season.substring(0, 4)) >= 2017
+                  ? widget.seasons[season][widget.seasonType]['ADV']['DEF_IMPACT_EST']
+                      .toStringAsFixed(1)
+                  : '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
       default:
         return const Text('-');
     }

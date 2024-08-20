@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
-import 'package:splash/screens/more/draft/draft_network_helper.dart';
+import 'package:splash/screens/more/transactions/transactions_cache.dart';
+import 'package:splash/screens/more/transactions/transactions_network_helper.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/custom_icon_button.dart';
@@ -11,36 +13,35 @@ import '../../../utilities/scroll/scroll_controller_notifier.dart';
 import '../../../utilities/scroll/scroll_controller_provider.dart';
 import '../../player/player_home.dart';
 import '../../search_screen.dart';
-import 'draft_cache.dart';
 
-class Draft extends StatefulWidget {
-  const Draft({super.key});
+class LeagueTransactions extends StatefulWidget {
+  const LeagueTransactions({super.key});
 
   @override
-  State<Draft> createState() => _DraftState();
+  State<LeagueTransactions> createState() => _LeagueTransactionsState();
 }
 
-class _DraftState extends State<Draft> {
-  late List<dynamic> draft;
+class _LeagueTransactionsState extends State<LeagueTransactions> {
+  late List transactions;
   late String selectedSeason;
   bool _isLoading = true;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
 
-  Future<void> getDraft(String draftYear) async {
-    final draftCache = Provider.of<DraftCache>(context, listen: false);
-    if (draftCache.containsDraft(draftYear)) {
+  Future<void> getTransactions() async {
+    final transactionsCache = Provider.of<TransactionsCache>(context, listen: false);
+    if (transactionsCache.containsTransactions()) {
       setState(() {
-        draft = draftCache.getDraft(draftYear)!;
+        transactions = transactionsCache.getTransactions()!;
         _isLoading = false;
       });
     } else {
-      var fetchedDraft = await DraftNetworkHelper().getDraft(draftYear);
+      var fetchedTransactions = await TransactionsNetworkHelper().getTransactions();
       setState(() {
-        draft = fetchedDraft;
+        transactions = fetchedTransactions;
         _isLoading = false;
       });
-      draftCache.addDraft(draftYear, draft);
+      transactionsCache.addTransactions(transactions);
     }
   }
 
@@ -48,7 +49,7 @@ class _DraftState extends State<Draft> {
   void initState() {
     super.initState();
     selectedSeason = kCurrentSeason;
-    getDraft(selectedSeason.substring(0, 4));
+    getTransactions();
   }
 
   @override
@@ -75,7 +76,7 @@ class _DraftState extends State<Draft> {
               backgroundColor: Colors.grey.shade900,
               surfaceTintColor: Colors.grey.shade900,
               title: Text(
-                'Draft History',
+                'Transactions',
                 style: kBebasBold.copyWith(fontSize: 24.0),
               ),
               actions: [
@@ -107,7 +108,7 @@ class _DraftState extends State<Draft> {
                         selectedSeason = newValue!.substring(0, 4);
                         _scrollController.jumpTo(0);
                       });
-                      getDraft(selectedSeason);
+                      getTransactions();
                     },
                   ),
                 ),
@@ -141,7 +142,7 @@ class _DraftState extends State<Draft> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  'PICK',
+                                  'Date',
                                   style: kBebasNormal.copyWith(fontSize: 18.0),
                                 ),
                               ),
@@ -152,18 +153,10 @@ class _DraftState extends State<Draft> {
                                 ),
                               ),
                               Expanded(
-                                flex: 4,
+                                flex: 6,
                                 child: Text(
-                                  'PLAYER',
-                                  textAlign: TextAlign.center,
-                                  style: kBebasNormal.copyWith(fontSize: 18.0),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  'ORGANIZATION',
-                                  textAlign: TextAlign.end,
+                                  'Details',
+                                  textAlign: TextAlign.start,
                                   style: kBebasNormal.copyWith(fontSize: 18.0),
                                 ),
                               ),
@@ -184,6 +177,13 @@ class _DraftState extends State<Draft> {
                         // List to hold the widgets to be returned
                         List<Widget> widgets = [];
 
+                        String formatDate(String date) {
+                          DateTime dateTime = DateTime.parse(date);
+
+                          String formattedDate = DateFormat('M/d/yy').format(dateTime);
+                          return formattedDate;
+                        }
+
                         // Define the main container to return
                         Widget gameContainer = GestureDetector(
                           onTap: () {
@@ -191,7 +191,8 @@ class _DraftState extends State<Draft> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PlayerHome(
-                                  playerId: draft[index]['PERSON_ID'].toString(),
+                                  playerId:
+                                      transactions[index]['PLAYER_ID'].toStringAsFixed(0),
                                 ),
                               ),
                             );
@@ -208,36 +209,31 @@ class _DraftState extends State<Draft> {
                             child: Row(
                               children: [
                                 Expanded(
+                                  flex: 1,
                                   child: Text(
-                                    draft[index]['OVERALL_PICK'].toString(),
-                                    style: kBebasNormal.copyWith(color: Colors.grey),
+                                    formatDate(transactions[index]['TRANSACTION_DATE']),
+                                    style: kBebasNormal.copyWith(
+                                        color: Colors.grey, fontSize: 14.0),
                                   ),
                                 ),
+                                const SizedBox(width: 8.0),
                                 Image.asset(
-                                  'images/NBA_Logos/${draft[index]['TEAM_ID']}.png',
+                                  'images/NBA_Logos/${transactions[index]['TEAM_ID'].toStringAsFixed(0)}.png',
                                   width: 28.0,
                                 ),
-                                const Spacer(),
+                                const SizedBox(width: 12.0),
                                 Expanded(
                                   child: PlayerAvatar(
-                                    radius: 15.0,
+                                    radius: 12.0,
                                     backgroundColor: Colors.white10,
                                     playerImageUrl:
-                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${draft[index]['PERSON_ID']}.png',
+                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${transactions[index]['PLAYER_ID'].toStringAsFixed(0)}.png',
                                   ),
                                 ),
                                 Expanded(
-                                  flex: 3,
+                                  flex: 6,
                                   child: AutoSizeText(
-                                    draft[index]['PLAYER_NAME'],
-                                    maxLines: 1,
-                                    style: kBebasNormal.copyWith(fontSize: 16.0),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: AutoSizeText(
-                                    draft[index]['ORGANIZATION'],
+                                    transactions[index]['TRANSACTION_DESCRIPTION'],
                                     maxLines: 1,
                                     textAlign: TextAlign.end,
                                     style: kBebasNormal.copyWith(fontSize: 16.0),
@@ -254,7 +250,7 @@ class _DraftState extends State<Draft> {
                           children: widgets,
                         );
                       },
-                      childCount: draft.length,
+                      childCount: transactions.length,
                     ),
                   ),
                 ),

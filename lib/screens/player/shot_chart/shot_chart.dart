@@ -342,7 +342,10 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                               _displayMap = 'Hex';
                             });
                           },
-                          icon: const Icon(Icons.hexagon_outlined),
+                          icon: _displayMap == 'Hex'
+                              ? const Icon(Icons.hexagon)
+                              : const Icon(Icons.hexagon_outlined),
+                          color: _displayMap == 'Hex' ? Colors.white : Colors.grey,
                         ),
                         IconButton(
                           onPressed: () {
@@ -350,7 +353,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                               _displayMap = 'Zone';
                             });
                           },
-                          icon: const Icon(Icons.square),
+                          icon: const Icon(Icons.percent),
+                          color: _displayMap == 'Zone' ? Colors.white : Colors.grey,
                         )
                       ],
                     ),
