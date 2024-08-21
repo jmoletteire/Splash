@@ -137,7 +137,7 @@ List<String> kSeasons = [
 /// ******************************************************
 
 const kCurrentSeason = '2023-24';
-const kLeagueSalaryCap = 141000000;
+const kLeagueSalaryCap = 140588000;
 
 /// ******************************************************
 ///                        MAPS

@@ -43,7 +43,7 @@ custom_stats = [
     # ("OFF_RATING_ON_OFF", "REGULAR SEASON.ADV", -1),
     # ("DEF_RATING_ON_OFF", "REGULAR SEASON.ADV", 1),
     # ("NET_RATING_ON_OFF", "REGULAR SEASON.ADV", -1),
-    # ("POSS", "REGULAR SEASON.ADV", -1),
+    ("POSS", "PLAYOFFS.ADV", -1),
     # ("POSS_PER_GM", "REGULAR SEASON.ADV", -1),
     # ("DEF_PTS_SAVED", "REGULAR SEASON.ADV", -1),
     # ("PARTIAL_POSS", "REGULAR SEASON.ADV", -1),
@@ -56,9 +56,9 @@ custom_stats = [
     # ("VERSATILITY_SCORE", "REGULAR SEASON.ADV", -1),
     # ("VERSATILITY_SCORE", "PLAYOFFS.ADV", -1),
     # ("MATCHUP_DIFFICULTY", "REGULAR SEASON.ADV", -1),
-    ("MATCHUP_DIFFICULTY", "PLAYOFFS.ADV", -1),
+    # ("MATCHUP_DIFFICULTY", "PLAYOFFS.ADV", -1),
     # ("DEF_IMPACT_EST", "REGULAR SEASON.ADV", -1),
-    ("DEF_IMPACT_EST", "PLAYOFFS.ADV", -1),
+    # ("DEF_IMPACT_EST", "PLAYOFFS.ADV", -1),
 
     # ADV -> PASSING
     # ("PASSES_MADE", "REGULAR SEASON.ADV.PASSING", -1),
@@ -184,7 +184,6 @@ seasons = [
     '2019-20',
     '2018-19',
     '2017-18',
-    '''
     '2016-17',
     '2015-16',
     '2014-15',
@@ -206,7 +205,6 @@ seasons = [
     '1998-99',
     '1997-98',
     '1996-97'
-    '''
 ]
 
 for season in seasons:

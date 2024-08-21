@@ -71,7 +71,7 @@ class _PlayerProfileState extends State<PlayerProfile> {
               playerAwards: widget.player['AWARDS'],
             ),
             PlayerContract(
-              playerContract: widget.player['CONTRACTS'][0],
+              playerContracts: widget.player['CONTRACTS'],
             ),
           ],
         ),
