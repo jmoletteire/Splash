@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/screens/player/profile/player_awards.dart';
+import 'package:splash/screens/player/profile/player_contract.dart';
 import 'package:splash/utilities/constants.dart';
 
 class PlayerProfile extends StatefulWidget {
@@ -68,6 +69,9 @@ class _PlayerProfileState extends State<PlayerProfile> {
             ),
             PlayerAwards(
               playerAwards: widget.player['AWARDS'],
+            ),
+            PlayerContract(
+              playerContract: widget.player['CONTRACTS'][0],
             ),
           ],
         ),

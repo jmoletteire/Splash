@@ -3,23 +3,42 @@ from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 
-# Replace with your MongoDB connection string
-client = MongoClient(uri)
-db = client.splash
-transactions_collection = db.nba_transactions
-logging.info("Connected to MongoDB")
+# Function to compare old data with new data and find new entries
+def find_new_data(old_data, new_data):
+    if not old_data:
+        return new_data  # If old data is empty, all new data is considered new
 
-# Fetch the data from the URL
-url = "https://stats.nba.com/js/data/playermovement/NBA_Player_Movement.json"
-response = requests.get(url)
+    # Use a set of unique identifiers from the old data
+    old_ids = {transaction['GroupSort'] for transaction in old_data}
 
-# Check if the request was successful
-if response.status_code == 200:
-    data = response.json()
+    # Find new entries that aren't in the old data
+    new_entries = [transaction for transaction in new_data if transaction['GroupSort'] not in old_ids]
 
-    transactions_collection.insert_many(data['NBA_Player_Movement']['rows'])
-else:
-    print(f"Failed to fetch data. Status code: {response.status_code}")
+    return new_entries
+
+
+if __name__ == "__main__":
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    # Replace with your MongoDB connection string
+    client = MongoClient(uri)
+    db = client.splash
+    transactions_collection = db.nba_transactions
+    logging.info("Connected to MongoDB")
+
+    # Fetch the data from the URL
+    url = "https://stats.nba.com/js/data/playermovement/NBA_Player_Movement.json"
+    response = requests.get(url)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        data = response.json()
+
+        existing_data = transactions_collection.find({}, {'GroupSort': 1, '_id': 0})
+        new_data = find_new_data(existing_data, data)
+
+        transactions_collection.insert_many(new_data)
+    else:
+        print(f"Failed to fetch data. Status code: {response.status_code}")
