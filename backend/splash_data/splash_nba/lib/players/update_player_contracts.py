@@ -6,7 +6,7 @@ import json
 import difflib
 
 
-def is_similar(description1, description2, threshold=0.8):
+def is_similar(description1, description2, threshold=0.5):
     similarity = difflib.SequenceMatcher(None, description1, description2).ratio()
     return similarity >= threshold
 
@@ -16,8 +16,8 @@ def keep_most_informative(records):
     seen_combinations = {}
 
     for record in records:
-        # Create a key based on the teamId, date, and transactionType
-        key = (record['teamId'], record['date'], record['transactionType'])
+        # Create a key based on the teamId, year, month, and transactionType
+        key = (record['teamId'], record['date'][:4], record['date'][5:7], record['transactionType'])
 
         if key not in seen_combinations:
             seen_combinations[key] = record

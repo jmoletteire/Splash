@@ -3266,7 +3266,7 @@ const kTeamColors = {
   }, // Golden State Warriors
   "HOU": {
     "primaryColor": Color(0xFFCD1041),
-    "secondaryColor": Color(0xFF000000),
+    "secondaryColor": Color(0xFF919798),
   }, // Houston Rockets
   "IND": {
     "primaryColor": Color(0xFF002D62),
@@ -3336,7 +3336,7 @@ const kTeamColors = {
     "primaryColor": Color(0xFFCE1141),
     "secondaryColor": Color(0xFF000000)
   }, // Toronto Raptors
-  "UTA": {"primaryColor": Color(0xFF002B5C), "secondaryColor": Color(0xFFFCA200)}, // Utah Jazz
+  "UTA": {"primaryColor": Color(0xFF2F0370), "secondaryColor": Color(0xFF57A0CB)}, // Utah Jazz
   "WAS": {
     "primaryColor": Color(0xFF002B5C),
     "secondaryColor": Color(0xFFE31837)
@@ -3355,7 +3355,7 @@ const kTeamColorOpacity = {
   "DEN": {"opacity": 0.94}, // Denver Nuggets
   "DET": {"opacity": 0.86}, // Detroit Pistons
   "GSW": {"opacity": 0.80}, // Golden State Warriors
-  "HOU": {"opacity": 0.92}, // Houston Rockets
+  "HOU": {"opacity": 0.90}, // Houston Rockets
   "IND": {"opacity": 0.90}, // Indiana Pacers
   "LAC": {"opacity": 0.94}, // LA Clippers
   "LAL": {"opacity": 0.94}, // Los Angeles Lakers
@@ -3385,12 +3385,12 @@ const List<String> kDarkPrimaryColors = [
   'MIN',
   'NOP',
   'PHX',
-  'SAS',
   'UTA',
+  'SAS',
   'WAS'
 ];
 
-const List<String> kDarkSecondaryColors = ['CHA', 'CHI', 'DET', 'HOU', 'POR', 'TOR'];
+const List<String> kDarkSecondaryColors = ['CHA', 'CHI', 'DET', 'POR', 'TOR'];
 
 const Map<String, String> kCountryCodes = {
   "Andorra": "AD",

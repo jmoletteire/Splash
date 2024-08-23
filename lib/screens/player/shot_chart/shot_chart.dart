@@ -459,8 +459,10 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20.0),
                                   side: BorderSide(
-                                    color:
-                                        isSelected ? teamSecondaryColor : Colors.grey.shade600,
+                                    color: isSelected
+                                        ? kTeamColors[widget.team['ABBREVIATION']]![
+                                            'secondaryColor']!
+                                        : Colors.grey.shade600,
                                     width: 2.0,
                                   ),
                                 ),

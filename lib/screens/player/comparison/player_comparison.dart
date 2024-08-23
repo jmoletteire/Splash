@@ -1595,11 +1595,15 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 statName: 'VERSATILITY',
                                 playerOne: roundToDecimalPlaces(
                                     playerOne['STATS'][selectedSeasonOne]
-                                        [selectedSeasonTypeOne]['ADV']['VERSATILITY_SCORE'],
+                                                [selectedSeasonTypeOne]['ADV']
+                                            ['VERSATILITY_SCORE'] *
+                                        100,
                                     1),
                                 playerTwo: roundToDecimalPlaces(
                                     playerTwo['STATS'][selectedSeasonTwo]
-                                        [selectedSeasonTypeTwo]['ADV']['VERSATILITY_SCORE'],
+                                                [selectedSeasonTypeTwo]['ADV']
+                                            ['VERSATILITY_SCORE'] *
+                                        100,
                                     1),
                                 teamOneColor: teamOneColor,
                                 teamTwoColor: teamTwoColor,
@@ -2155,7 +2159,7 @@ class StatValue extends StatelessWidget {
       const Color(0xFF85714D): Color(0xFF0C2340),
       const Color(0xFFE56020): Color(0xFF1D1160),
       const Color(0xFFC4CED4): Color(0xFF000000),
-      const Color(0xFFFCA200): Color(0xFF002B5C),
+      const Color(0xFF57A0CB): Color(0xFF2F0370),
       const Color(0xFFE31837): Color(0xFF002B5C),
     };
 

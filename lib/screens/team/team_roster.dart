@@ -228,7 +228,7 @@ class _TeamRosterState extends State<TeamRoster> {
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                        height: 50,
+                        height: MediaQuery.of(context).size.height * 0.055,
                         decoration: BoxDecoration(
                             color: Colors.grey.shade900,
                             border: const Border(
@@ -241,7 +241,7 @@ class _TeamRosterState extends State<TeamRoster> {
                               child: Row(
                                 children: [
                                   PlayerAvatar(
-                                    radius: 20.0,
+                                    radius: 18.0,
                                     backgroundColor: Colors.white12,
                                     playerImageUrl:
                                         'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png',

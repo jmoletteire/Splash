@@ -170,7 +170,7 @@ class _CapSheetState extends State<CapSheet> {
 
   void _addSalaryCapDifferenceRow(Map<String, dynamic> totalsRow) {
     Map<String, dynamic> differenceRow = {
-      'player': {'id': 'salary_cap_diff', 'firstName': '', 'lastName': 'Cap Difference'},
+      'player': {'id': 'salary_cap_diff', 'firstName': '', 'lastName': 'Cap Space'},
       'years': {
         for (var year in columnNames.sublist(3)) '20${year.substring(1, 3)}': {'capHitDiff': 0}
       }
@@ -178,6 +178,44 @@ class _CapSheetState extends State<CapSheet> {
 
     for (var yearKey in differenceRow['years'].keys) {
       int leagueCap = kLeagueSalaryCap[yearKey]!;
+      int totalCapHit = totalsRow['years'][yearKey]['capHit'];
+      differenceRow['years'][yearKey]['capHitDiff'] = leagueCap - totalCapHit;
+    }
+
+    // Add the salary cap difference row to the contracts list
+    contracts.add(differenceRow);
+    _addFirstApronDifferenceRow(totalsRow);
+  }
+
+  void _addFirstApronDifferenceRow(Map<String, dynamic> totalsRow) {
+    Map<String, dynamic> differenceRow = {
+      'player': {'id': 'salary_cap_diff', 'firstName': '', 'lastName': 'First Apron'},
+      'years': {
+        for (var year in columnNames.sublist(3)) '20${year.substring(1, 3)}': {'capHitDiff': 0}
+      }
+    };
+
+    for (var yearKey in differenceRow['years'].keys) {
+      int leagueCap = kLeagueFirstApron[yearKey]!;
+      int totalCapHit = totalsRow['years'][yearKey]['capHit'];
+      differenceRow['years'][yearKey]['capHitDiff'] = leagueCap - totalCapHit;
+    }
+
+    // Add the salary cap difference row to the contracts list
+    contracts.add(differenceRow);
+    _addSecondApronDifferenceRow(totalsRow);
+  }
+
+  void _addSecondApronDifferenceRow(Map<String, dynamic> totalsRow) {
+    Map<String, dynamic> differenceRow = {
+      'player': {'id': 'salary_cap_diff', 'firstName': '', 'lastName': 'Second Apron'},
+      'years': {
+        for (var year in columnNames.sublist(3)) '20${year.substring(1, 3)}': {'capHitDiff': 0}
+      }
+    };
+
+    for (var yearKey in differenceRow['years'].keys) {
+      int leagueCap = kLeagueSecondApron[yearKey]!;
       int totalCapHit = totalsRow['years'][yearKey]['capHit'];
       differenceRow['years'][yearKey]['capHitDiff'] = leagueCap - totalCapHit;
     }
@@ -192,8 +230,10 @@ class _CapSheetState extends State<CapSheet> {
       _isAscending = ascending;
 
       // Separate the Total and Salary Cap Difference rows
-      var totalRow = contracts[contracts.length - 2];
-      var salaryCapDiffRow = contracts[contracts.length - 1];
+      var totalRow = contracts[contracts.length - 4];
+      var salaryCapDiffRow = contracts[contracts.length - 3];
+      var firstApronDiffRow = contracts[contracts.length - 2];
+      var secondApronDiffRow = contracts[contracts.length - 1];
 
       // Remove these rows from the list before sorting
       contracts.removeWhere((contract) =>
@@ -222,6 +262,8 @@ class _CapSheetState extends State<CapSheet> {
       // Add the Total and Salary Cap Difference rows back to the end of the list
       if (totalRow != null) contracts.add(totalRow);
       if (salaryCapDiffRow != null) contracts.add(salaryCapDiffRow);
+      if (firstApronDiffRow != null) contracts.add(firstApronDiffRow);
+      if (secondApronDiffRow != null) contracts.add(secondApronDiffRow);
     });
   }
 
@@ -243,7 +285,7 @@ class _CapSheetState extends State<CapSheet> {
       ),
       headerHeight: MediaQuery.of(context).size.height * 0.045,
       rowCount: contracts.length,
-      rowHeight: MediaQuery.of(context).size.height * 0.06,
+      rowHeight: MediaQuery.of(context).size.height * 0.055,
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
       columns: [
         /// PLAYER
@@ -331,9 +373,12 @@ class _CapSheetState extends State<CapSheet> {
         child: DecoratedBox(
           position: DecorationPosition.foreground,
           decoration: BoxDecoration(
-            color: contracts[index]['player']['id'] == 'totals' ||
-                    contracts[index]['player']['id'] == 'salary_cap_diff'
-                ? Colors.grey.shade800
+            color: ['totals', 'salary_cap_diff'].contains(contracts[index]['player']['id'])
+                ? contracts[index]['player']['lastName'] == 'First Apron'
+                    ? const Color(0xFF7EB8EA)
+                    : contracts[index]['player']['lastName'] == 'Second Apron'
+                        ? const Color(0xFF1060BF)
+                        : Colors.grey.shade800
                 : Colors.grey.shade900,
             border: contracts[index]['player']['id'] == 'totals' ||
                     contracts[index]['player']['id'] == 'salary_cap_diff'
@@ -368,17 +413,20 @@ class _CapSheetState extends State<CapSheet> {
         type: MaterialType.transparency,
         child: InkWell(
           onTap: () {
-            setState(() {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PlayerHome(
-                    playerId: contracts[row]['playerId'],
-                    teamId: kTeamIds[contractTeamIds[contracts[row]['player']['teamId']]],
+            if (contracts[row]['player']['id'] != 'totals' &&
+                contracts[row]['player']['id'] != 'salary_cap_diff') {
+              setState(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PlayerHome(
+                      playerId: contracts[row]['playerId'],
+                      teamId: kTeamIds[contractTeamIds[contracts[row]['player']['teamId']]],
+                    ),
                   ),
-                ),
-              );
-            });
+                );
+              });
+            }
           },
           splashColor: Colors.white,
           highlightColor: Colors.white,
@@ -445,7 +493,7 @@ class _CapSheetState extends State<CapSheet> {
     if (player['player']['id'] == 'salary_cap_diff') {
       switch (column) {
         case 0:
-          return const CapSheetText(text: 'Cap Space', alignment: Alignment.center);
+          return CapSheetText(text: player['player']['lastName'], alignment: Alignment.center);
         case 1:
         case 2:
           return const CapSheetText(text: '-');
@@ -454,6 +502,7 @@ class _CapSheetState extends State<CapSheet> {
           int capHitDiff = player['years'][yearKey]['capHitDiff'];
           return CapSheetText(
             text: formatCurrency(capHitDiff),
+            color: capHitDiff < 0 ? Colors.red.shade400 : Colors.white,
           );
       }
     }
@@ -657,9 +706,9 @@ class _CapSheetState extends State<CapSheet> {
             bool restrictedFreeAgent = player['signedUsing'] == 'rookie-scale-exception' ||
                 year - player['player']['fromYear'] <= 3;
             return Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+              padding: const EdgeInsets.fromLTRB(11.0, 11.0, 0.0, 11.0),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 11.0),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: restrictedFreeAgent ? Colors.red.shade900 : Colors.lightBlueAccent,
@@ -667,7 +716,7 @@ class _CapSheetState extends State<CapSheet> {
                 ),
                 child: Text(
                   restrictedFreeAgent ? 'RFA' : 'UFA',
-                  style: kBebasNormal.copyWith(fontSize: 18.0),
+                  style: kBebasNormal.copyWith(fontSize: 17.0),
                 ),
               ),
             );
@@ -701,7 +750,7 @@ class CapSheetText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasNormal.copyWith(fontSize: 18.0, color: color ?? Colors.white),
+        style: kBebasNormal.copyWith(fontSize: 17.0, color: color ?? Colors.white),
       ),
     );
   }
