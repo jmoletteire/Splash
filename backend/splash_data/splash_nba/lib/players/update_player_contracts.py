@@ -3,6 +3,35 @@ from splash_nba.util.env import uri
 import logging
 import requests
 import json
+import difflib
+
+
+def is_similar(description1, description2, threshold=0.8):
+    similarity = difflib.SequenceMatcher(None, description1, description2).ratio()
+    return similarity >= threshold
+
+
+def keep_most_informative(records):
+    unique_records = []
+    seen_combinations = {}
+
+    for record in records:
+        # Create a key based on the teamId, date, and transactionType
+        key = (record['teamId'], record['date'], record['transactionType'])
+
+        if key not in seen_combinations:
+            seen_combinations[key] = record
+        else:
+            existing_record = seen_combinations[key]
+            if is_similar(existing_record['description'], record['description']):
+                # Choose the record with the most informative description
+                if len(record['description']) > len(existing_record['description']):
+                    seen_combinations[key] = record
+            else:
+                unique_records.append(record)
+
+    unique_records.extend(seen_combinations.values())
+    return unique_records
 
 
 def fetch_player_contract_data(url, player_id, headers):
@@ -114,7 +143,8 @@ def fetch_player_contract_data(url, player_id, headers):
         # Parse the JSON response
         data = response.json()
         player_contract = data['data']['nba_player']['contracts']
-        return player_contract
+        player_transactions = data['data']['nba_player']['transactions']
+        return player_contract, player_transactions
     else:
         print(f"Request failed with status code {response.status_code}")
         print(response.text)
@@ -138,10 +168,10 @@ if __name__ == '__main__':
         "Content-Type": "application/json"
     }
 
-    # Start updating from the 1372nd document
+    # Start updating from index
     starting_index = 1692
 
-    # Update each document in the collection starting from the 1372nd
+    # Update each document in the collection starting from index
     for i, player in enumerate(players_collection.find().skip(starting_index)):
         logging.info(f'Processing {starting_index + i} of {players_collection.count_documents({})}...')
 
@@ -153,9 +183,10 @@ if __name__ == '__main__':
         }
 
         # Fetch all paginated data
-        contracts = fetch_player_contract_data(url, variables, headers)
+        contracts, transactions = fetch_player_contract_data(url, variables, headers)
+        transactions = keep_most_informative(transactions)
 
         players_collection.update_one(
             {"PERSON_ID": int(player_id)},
-            {"$set": {'CONTRACTS': contracts}},
+            {"$set": {'CONTRACTS': contracts, 'TRANSACTIONS': transactions}},
         )

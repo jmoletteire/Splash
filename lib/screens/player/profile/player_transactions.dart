@@ -1,0 +1,129 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../utilities/constants.dart';
+
+class PlayerTransactions extends StatefulWidget {
+  final List playerTransactions;
+  const PlayerTransactions({super.key, required this.playerTransactions});
+
+  @override
+  State<PlayerTransactions> createState() => _PlayerTransactionsState();
+}
+
+class _PlayerTransactionsState extends State<PlayerTransactions> {
+  Map<String, String> fanspoTeamIds = {
+    '1': 'ATL',
+    '2': 'BOS',
+    '3': 'BKN',
+    '4': 'CHA',
+    '5': 'CHI',
+    '6': 'CLE',
+    '7': 'DAL',
+    '8': 'DEN',
+    '9': 'DET',
+    '10': 'GSW',
+    '11': 'HOU',
+    '12': 'IND',
+    '13': 'LAC',
+    '14': 'LAL',
+    '15': 'MEM',
+    '16': 'MIA',
+    '17': 'MIL',
+    '18': 'MIN',
+    '19': 'NOP',
+    '20': 'NYK',
+    '21': 'OKC',
+    '22': 'ORL',
+    '23': 'PHI',
+    '24': 'PHX',
+    '25': 'POR',
+    '26': 'SAC',
+    '27': 'SAS',
+    '28': 'TOR',
+    '29': 'UTA',
+    '30': 'WAS'
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    String formatDate(String date) {
+      // Parse the string to a DateTime object
+      DateTime dateTime = DateTime.parse(date);
+
+      // Create a DateFormat for the month and date
+      DateFormat monthDateFormat = DateFormat('MMM d, yyyy');
+      String monthDate = monthDateFormat.format(dateTime);
+
+      return monthDate;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade900,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.all(15.0),
+      margin: const EdgeInsets.only(bottom: 11.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+              ),
+            ),
+            child: Text(
+              'Transactions',
+              style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
+            ),
+          ),
+          if (widget.playerTransactions.isEmpty)
+            const Row(
+              children: [
+                Text(
+                  'No Transactions',
+                  style: kBebasNormal,
+                ),
+              ],
+            ),
+          for (var transaction in widget.playerTransactions)
+            if (!['fined', 'suspended'].contains(transaction['transactionType'])) ...[
+              const SizedBox(height: 20.0),
+              Wrap(
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        'images/NBA_Logos/${kTeamIds[fanspoTeamIds[transaction['teamId']]] ?? 0}.png',
+                        width: 30.0,
+                        height: 30.0,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              transaction['description'],
+                              style: kBebasNormal.copyWith(fontSize: 16.0),
+                            ),
+                            Text(
+                              formatDate(transaction['date']),
+                              style:
+                                  kBebasNormal.copyWith(fontSize: 14.0, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+        ],
+      ),
+    );
+  }
+}

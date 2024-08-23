@@ -43,7 +43,7 @@ custom_stats = [
     # ("OFF_RATING_ON_OFF", "REGULAR SEASON.ADV", -1),
     # ("DEF_RATING_ON_OFF", "REGULAR SEASON.ADV", 1),
     # ("NET_RATING_ON_OFF", "REGULAR SEASON.ADV", -1),
-    ("POSS", "PLAYOFFS.ADV", -1),
+    # ("POSS", "PLAYOFFS.ADV", -1),
     # ("POSS_PER_GM", "REGULAR SEASON.ADV", -1),
     # ("DEF_PTS_SAVED", "REGULAR SEASON.ADV", -1),
     # ("PARTIAL_POSS", "REGULAR SEASON.ADV", -1),

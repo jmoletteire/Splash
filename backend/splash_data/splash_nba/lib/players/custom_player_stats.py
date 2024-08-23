@@ -809,21 +809,21 @@ def three_and_ft_rate(season_type):
                 if season in seasons:
                     try:
                         # Extract the values needed for calculation
-                        #fg3a = player['STATS'][season][season_type]['BASIC'].get('FG3A', 0)
-                        #fta = player['STATS'][season][season_type]['BASIC'].get('FTA', 0)
+                        fg3a = player['STATS'][season][season_type]['BASIC'].get('FG3A', 0)
+                        fta = player['STATS'][season][season_type]['BASIC'].get('FTA', 0)
                         ftm = player['STATS'][season][season_type]['BASIC'].get('FTM', 0)
                         fga = player['STATS'][season][season_type]['BASIC'].get('FGA', 1)  # Avoid division by zero
 
                         # Calculate 3PAr
-                        #three_pt_rate = fg3a / fga
-                        #fta_rate = fta / fga
+                        three_pt_rate = fg3a / fga
+                        fta_rate = fta / fga
                         ft_per_fga = ftm / fga
 
                         # Update the document with the new field
                         players_collection.update_one(
                             {'PERSON_ID': player['PERSON_ID']},
-                            {'$set': {#f'STATS.{season}.{season_type}.BASIC.3PAr': three_pt_rate,
-                                      #f'STATS.{season}.{season_type}.BASIC.FTAr': fta_rate,
+                            {'$set': {f'STATS.{season}.{season_type}.BASIC.3PAr': three_pt_rate,
+                                      f'STATS.{season}.{season_type}.BASIC.FTAr': fta_rate,
                                       f'STATS.{season}.{season_type}.BASIC.FT_PER_FGA': ft_per_fga}
                              }
                         )

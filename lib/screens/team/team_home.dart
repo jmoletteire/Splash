@@ -16,6 +16,7 @@ import '../../utilities/scroll/scroll_controller_notifier.dart';
 import '../../utilities/scroll/scroll_controller_provider.dart';
 import '../../utilities/team.dart';
 import '../search_screen.dart';
+import 'cap_sheet/team_cap_sheet.dart';
 import 'comparison/team_comparison.dart';
 
 class TeamHome extends StatefulWidget {
@@ -129,6 +130,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
     ({required Map<String, dynamic> team}) => TeamSchedule(team: team),
     ({required Map<String, dynamic> team}) => TeamStats(team: team),
     ({required Map<String, dynamic> team}) => TeamRoster(team: team),
+    ({required Map<String, dynamic> team}) => TeamCapSheet(team: team),
     ({required Map<String, dynamic> team}) => TeamHistory(team: team),
   ];
 
@@ -210,6 +212,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                         Tab(text: 'Schedule'),
                         Tab(text: 'Stats'),
                         Tab(text: 'Players'),
+                        Tab(text: 'Cap Sheet'),
                         Tab(text: 'History'),
                       ],
                     ),
@@ -241,7 +244,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                 ];
               },
               pinnedHeaderSliverHeightBuilder: () {
-                return (210 - kToolbarHeight);
+                return (208 - kToolbarHeight);
               },
               onlyOneScrollInBody: false,
               body: TabBarView(

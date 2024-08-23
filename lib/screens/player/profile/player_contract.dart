@@ -69,11 +69,14 @@ class _PlayerContractState extends State<PlayerContract> {
   @override
   void initState() {
     super.initState();
+    selectedIndex = 0;
+
     int currentYear = int.parse(kCurrentSeason.substring(0, 4));
     for (var contract in widget.playerContracts) {
-      int endYear = contract['freeAgentYear'] == 0
-          ? contract['startYear'] + contract['yearsTotal']
-          : contract['freeAgentYear'];
+      int endYear =
+          contract['freeAgentYear'] == 0 || (contract['freeAgentYear'] == null ?? true)
+              ? contract['startYear'] + contract['yearsTotal']
+              : contract['freeAgentYear'];
       if (currentYear >= contract['startYear'] && currentYear < endYear) {
         selectedIndex = currentContractIndex;
       } else {
@@ -85,9 +88,10 @@ class _PlayerContractState extends State<PlayerContract> {
   @override
   Widget build(BuildContext context) {
     final currentContract = widget.playerContracts[selectedIndex];
-    int endYear = currentContract['freeAgentYear'] == 0
-        ? currentContract['startYear'] + currentContract['yearsTotal']
-        : currentContract['freeAgentYear'];
+    int endYear =
+        (currentContract['contractType'] == 'dead') || currentContract['freeAgentYear'] == 0
+            ? currentContract['startYear'] + currentContract['yearsTotal']
+            : currentContract['freeAgentYear'];
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade900,
@@ -100,11 +104,16 @@ class _PlayerContractState extends State<PlayerContract> {
         children: [
           Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                onPressed: _nextContract,
-              ),
+              if (selectedIndex != widget.playerContracts.length - 1)
+                Expanded(
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                    onPressed: _nextContract,
+                  ),
+                ),
+              if (selectedIndex == widget.playerContracts.length - 1) const Spacer(),
               Expanded(
+                flex: 4,
                 child: Center(
                   child: Text(
                     'Contract (\'${currentContract['startYear'].toString().substring(2)}-${endYear.toString().substring(2)})',
@@ -112,10 +121,14 @@ class _PlayerContractState extends State<PlayerContract> {
                   ),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
-                onPressed: _previousContract,
-              ),
+              if (selectedIndex == 0) const Spacer(),
+              if (selectedIndex != 0)
+                Expanded(
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                    onPressed: _previousContract,
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 8.0),
@@ -149,7 +162,7 @@ class _PlayerContractState extends State<PlayerContract> {
               Column(
                 children: [
                   Text(
-                    '$endYear / ${currentContract['freeAgentType'] == "" ? 'RFA' : currentContract['freeAgentType']}',
+                    '$endYear / ${currentContract['freeAgentType'] == "" ? 'RFA' : currentContract['freeAgentType'] ?? 'UFA'}',
                     style: kBebasNormal.copyWith(fontSize: 18.0),
                   ),
                   Text(
@@ -200,7 +213,7 @@ class _PlayerContractState extends State<PlayerContract> {
                           children: [
                             tableCell(
                               '\'${year['fromYear'].toString().substring(2)}-${year['toYear'].toString().substring(2)}',
-                              year['deadYear']
+                              year['deadYear'] ?? true
                                   ? Colors.white24
                                   : year['fromYear'].toString() ==
                                           kCurrentSeason.substring(0, 4)
@@ -215,8 +228,8 @@ class _PlayerContractState extends State<PlayerContract> {
                           ],
                         ),
                         tableCell(
-                          year['age'].toString(),
-                          year['deadYear']
+                          (year['age'] ?? '-').toString(),
+                          year['deadYear'] ?? true
                               ? Colors.white24
                               : year['fromYear'].toString() == kCurrentSeason.substring(0, 4)
                                   ? Colors.white
@@ -224,27 +237,27 @@ class _PlayerContractState extends State<PlayerContract> {
                         ),
                         tableCell(
                           formatCurrency(year['capHit']),
-                          year['deadYear']
+                          year['deadYear'] ?? true
                               ? Colors.white24
                               : year['fromYear'].toString() == kCurrentSeason.substring(0, 4)
                                   ? Colors.white
                                   : Colors.white70,
                         ),
                         tableCell(
-                          '${(100 * year['capHit'] / kLeagueSalaryCap).toStringAsFixed(1)}%',
-                          year['deadYear']
+                          '${(100 * year['capHit'] / kLeagueSalaryCap['${year['fromYear'].toString()}']!).toStringAsFixed(1)}%',
+                          year['deadYear'] ?? true
                               ? Colors.white24
                               : year['fromYear'].toString() == kCurrentSeason.substring(0, 4)
                                   ? Colors.white
                                   : Colors.white70,
                         ),
                         tableCell(
-                            year['playerOption']
+                            year['playerOption'] ?? true
                                 ? 'Player'
                                 : year['teamOption']
                                     ? 'Team'
                                     : '',
-                            year['deadYear']
+                            year['deadYear'] ?? true
                                 ? Colors.white24
                                 : year['fromYear'].toString() == kCurrentSeason.substring(0, 4)
                                     ? Colors.white

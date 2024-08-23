@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/screens/player/profile/player_awards.dart';
 import 'package:splash/screens/player/profile/player_contract.dart';
+import 'package:splash/screens/player/profile/player_transactions.dart';
 import 'package:splash/utilities/constants.dart';
 
 class PlayerProfile extends StatefulWidget {
@@ -55,7 +56,7 @@ class _PlayerProfileState extends State<PlayerProfile> {
                     ? 'Rookie'
                     : widget.player['SEASON_EXP'].toString(),
                 key: value, // Last Played or Age/DOB
-                'Prev. Affiliate': widget.player['SCHOOL'],
+                'Prev. Affiliate': widget.player['SCHOOL'] ?? '-',
                 'Draft': (widget.player['DRAFT_YEAR'] == 'Undrafted' ||
                         widget.player['DRAFT_ROUND'] == null ||
                         widget.player['DRAFT_ROUND'] == '0')
@@ -64,15 +65,20 @@ class _PlayerProfileState extends State<PlayerProfile> {
                         ? 'UDFA (${widget.player['FROM_YEAR']})'
                         : 'UDFA (${widget.player['DRAFT_YEAR']})'
                     : 'R${widget.player['DRAFT_ROUND']}:${widget.player['DRAFT_NUMBER']} (${widget.player['DRAFT_YEAR']})',
-                'Country': widget.player['COUNTRY'],
+                'Country': widget.player['COUNTRY'] ?? '-',
               },
             ),
             PlayerAwards(
               playerAwards: widget.player['AWARDS'],
             ),
-            PlayerContract(
-              playerContracts: widget.player['CONTRACTS'],
-            ),
+            if (widget.player['CONTRACTS'].isNotEmpty)
+              PlayerContract(
+                playerContracts: widget.player['CONTRACTS'],
+              ),
+            if (widget.player['TRANSACTIONS'].isNotEmpty)
+              PlayerTransactions(
+                playerTransactions: widget.player['TRANSACTIONS'],
+              ),
           ],
         ),
       ),

@@ -137,7 +137,58 @@ List<String> kSeasons = [
 /// ******************************************************
 
 const kCurrentSeason = '2023-24';
-const kLeagueSalaryCap = 140588000;
+const kLeagueSalaryCap = {
+  '1996': 24693000,
+  '1997': 26900000,
+  '1998': 30000000,
+  '1999': 34000000,
+  '2000': 35500000,
+  '2001': 42500000,
+  '2002': 40271000,
+  '2003': 43840000,
+  '2004': 43870000,
+  '2005': 49500000,
+  '2006': 53135000,
+  '2007': 55630000,
+  '2008': 58680000,
+  '2009': 57700000,
+  '2010': 58040000,
+  '2011': 58044000,
+  '2012': 58044000,
+  '2013': 58679000,
+  '2014': 63065000,
+  '2015': 70000000,
+  '2016': 94143000,
+  '2017': 99093000,
+  '2018': 101869000,
+  '2019': 109140000,
+  '2020': 109140000,
+  '2021': 112414000,
+  '2022': 123655000,
+  '2023': 136021000,
+  '2024': 140588000,
+  '2025': 154647000,
+  '2026': 170112000,
+  '2027': 187123000,
+  '2028': 205835000,
+  '2029': 226418000,
+};
+const kLeagueFirstApron = {
+  '2024': 178132000,
+  '2025': 195946000,
+  '2026': 215541000,
+  '2027': 237096000,
+  '2028': 260806000,
+  '2029': 286887000,
+};
+const kLeagueSecondApron = {
+  '2024': 188931000,
+  '2025': 207825000,
+  '2026': 228608000,
+  '2027': 251469000,
+  '2028': 276616000,
+  '2029': 304277000,
+};
 
 /// ******************************************************
 ///                        MAPS
@@ -1689,12 +1740,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'FGA_FREQUENCY_RANK',
       },
       'splash_name': 'C&S FREQ',
-      'full_name': 'Frequency',
+      'full_name': 'Catch & Shoot - Frequency',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
       'definition':
-          'The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
+          'The number of Catch & Shoot field goal attempts taken by a player compared to the total field goal attempts by the player.\n\n"Catch & Shoot" is a shot in which a player catches a pass and shoots the ball without dribbling or waiting.',
       'formula': ''
     },
     'PULL UP FREQ': {
@@ -1707,13 +1758,13 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'nba_name': 'FGA_FREQUENCY',
         'rank_nba_name': 'FGA_FREQUENCY_RANK',
       },
-      'splash_name': 'PULL UP FREQ',
-      'full_name': 'Frequency',
+      'splash_name': 'PULL-UP FREQ',
+      'full_name': 'Pull-Up Frequency',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
       'definition':
-          'The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
+          'The number of Pull-Up field goal attempts taken by a player compared to the total field goal attempts by the player.\n\nA pull-up shot is one in which a player shoots the ball directly off of a dribble.',
       'formula': ''
     },
     '< 10FT FREQ': {
@@ -1727,12 +1778,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'FGA_FREQUENCY_RANK',
       },
       'splash_name': '< 10FT FREQ',
-      'full_name': 'Frequency',
+      'full_name': 'Less Than 10 Feet - Frequency',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
       'definition':
-          'The number of field goal attempts of this type taken by a player compared to the total field goal attempts by the player.',
+          'The number of field goal attempts within 10 feet of the basket taken by a player compared to the total field goal attempts by the player.',
       'formula': ''
     },
     'fill': {'first_available': '2013'},
@@ -1747,11 +1798,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'FG_PCT_RANK',
       },
       'splash_name': 'C&S FG%',
-      'full_name': 'Field Goal Percentage',
+      'full_name': 'Catch & Shoot - Field Goal Percentage',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition': 'The percentage of field goal attempts that a player makes.',
+      'definition':
+          'The percentage of Catch & Shoot field goal attempts that a player makes.\n\n"Catch & Shoot" is a shot in which a player catches a pass and shoots the ball without dribbling or waiting.',
       'formula': 'FGM / FGA'
     },
     'PULL UP FG%': {
@@ -1765,11 +1817,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'FG_PCT_RANK',
       },
       'splash_name': 'PULL UP FG%',
-      'full_name': 'Field Goal Percentage',
+      'full_name': 'Pull-Up - Field Goal Percentage',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition': 'The percentage of field goal attempts that a player makes.',
+      'definition':
+          'The percentage of Pull-Up field goal attempts that a player makes.\n\nA pull-up shot is one in which a player shoots the ball directly off of a dribble.',
       'formula': 'FGM / FGA'
     },
     '< 10FT FG%': {
@@ -1783,11 +1836,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'FG_PCT_RANK',
       },
       'splash_name': '< 10FT FG%',
-      'full_name': 'Field Goal Percentage',
+      'full_name': 'Less Than 10 Feet - Field Goal Percentage',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
-      'definition': 'The percentage of field goal attempts that a player makes.',
+      'definition':
+          'The percentage of field goal attempts within 10 feet of the basket that a player makes.',
       'formula': 'FGM / FGA'
     },
     'fill2': {'first_available': '2013'},
@@ -1802,11 +1856,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'FG3_PCT_RANK',
       },
       'splash_name': 'C&S 3P%',
-      'full_name': 'Three-Point Field Goal Percentage',
+      'full_name': 'Catch & Shoot - Three-Point Field Goal Percentage',
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition': 'The percentage of 3-point field goal attempts that a player makes.',
+      'definition':
+          'The percentage of Catch & Shoot 3-point field goal attempts that a player makes.\n\n"Catch & Shoot" is a shot in which a player catches a pass and shoots the ball without dribbling or waiting.',
       'formula': '3PM / 3PA'
     },
     'PULL UP 3P%': {
@@ -1820,11 +1875,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'FG3_PCT_RANK',
       },
       'splash_name': 'PULL UP 3P%',
-      'full_name': 'Three-Point Field Goal Percentage',
+      'full_name': 'Pull-Up - Three-Point Field Goal Percentage',
       'first_available': '1996',
       'convert': 'true',
       'round': '1',
-      'definition': 'The percentage of 3-point field goal attempts that a player makes.',
+      'definition':
+          'The percentage of Pull-Up 3-point field goal attempts that a player makes.\n\nA pull-up shot is one in which a player shoots the ball directly off of a dribble.',
       'formula': '3PM / 3PA'
     },
     'fill3': {'first_available': '2013'},
@@ -1839,12 +1895,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'EFG_PCT_RANK',
       },
       'splash_name': 'C&S eFG%',
-      'full_name': 'Effective Field Goal Percentage',
+      'full_name': 'Catch & Shoot - Effective Field Goal Percentage',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
       'definition':
-          'Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
+          'Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.\n\n"Catch & Shoot" is a shot in which a player catches a pass and shoots the ball without dribbling or waiting.',
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
     'PULL UP eFG%': {
@@ -1858,12 +1914,12 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'EFG_PCT_RANK',
       },
       'splash_name': 'PULL UP eFG%',
-      'full_name': 'Effective Field Goal Percentage',
+      'full_name': 'Pull-Up - Effective Field Goal Percentage',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
       'definition':
-          'Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
+          'Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.\n\nA pull-up shot is one in which a player shoots the ball directly off of a dribble.',
       'formula': '((FGM + (0.5 * 3PM)) / FGA'
     },
   },
@@ -1956,7 +2012,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'FG_PCT_RANK',
       },
       'splash_name': 'VERY TIGHT - FG%',
-      'full_name': 'Field Goal Percentage',
+      'full_name': 'Field Goal Percentage (Very Tight)',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
@@ -2098,86 +2154,6 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'Wide Open - No defender within 6+ feet of the player.\n\n3P% - The percentage of 3-point field goal attempts that a player makes.',
       'formula': '3PM / 3PA'
     },
-    /*
-    'fill3': {'first_available': '2013'},
-    'VERY TIGHT eFG%': {
-      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '0-2 Feet - Very Tight'],
-      'TOTAL': {
-        'nba_name': 'EFG_PCT',
-        'rank_nba_name': 'EFG_PCT_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'EFG_PCT',
-        'rank_nba_name': 'EFG_PCT_RANK',
-      },
-      'splash_name': 'VERY TIGHT - eFG%',
-      'full_name': 'Effective Field Goal Percentage (Very Tight)',
-      'first_available': '2013',
-      'convert': 'true',
-      'round': '1',
-      'definition':
-          'Very Tight - Closest defender is within 2 feet of the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
-      'formula': '((FGM + (0.5 * 3PM)) / FGA'
-    },
-    'TIGHT eFG%': {
-      'location': ['ADV', 'SHOOTING', 'SHOT_TYPE', 'Pull Ups'],
-      'TOTAL': {
-        'nba_name': 'EFG_PCT',
-        'rank_nba_name': 'EFG_PCT_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'EFG_PCT',
-        'rank_nba_name': 'EFG_PCT_RANK',
-      },
-      'splash_name': 'TIGHT - eFG%',
-      'full_name': 'Effective Field Goal Percentage (Tight)',
-      'first_available': '2013',
-      'convert': 'true',
-      'round': '1',
-      'definition':
-          'Tight - Closest defender is 2-4 feet from the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
-      'formula': '((FGM + (0.5 * 3PM)) / FGA'
-    },
-    'OPEN eFG%': {
-      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '4-6 Feet - Open'],
-      'TOTAL': {
-        'nba_name': 'EFG_PCT',
-        'rank_nba_name': 'EFG_PCT_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'EFG_PCT',
-        'rank_nba_name': 'EFG_PCT_RANK',
-      },
-      'splash_name': 'OPEN - eFG%',
-      'full_name': 'Effective Field Goal Percentage (Open)',
-      'first_available': '2013',
-      'convert': 'true',
-      'round': '1',
-      'definition':
-          'Open - Closest defender is 4-6 feet from the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
-      'formula': '((FGM + (0.5 * 3PM)) / FGA'
-    },
-    'WIDE OPEN eFG%': {
-      'location': ['ADV', 'SHOOTING', 'CLOSEST_DEFENDER', '6+ Feet - Wide Open'],
-      'TOTAL': {
-        'nba_name': 'EFG_PCT',
-        'rank_nba_name': 'EFG_PCT_RANK',
-      },
-      'PER_75': {
-        'nba_name': 'EFG_PCT',
-        'rank_nba_name': 'EFG_PCT_RANK',
-      },
-      'splash_name': 'WIDE OPEN - eFG%',
-      'full_name': 'Effective Field Goal Percentage (Wide Open)',
-      'first_available': '2013',
-      'convert': 'true',
-      'round': '1',
-      'definition':
-          'Wide Open - No defender within 6+ feet of the player.\n\neFG% - Measures field goal percentage adjusting for made 3-point field goals being 1.5 times more valuable than made 2-point field goals.',
-      'formula': '((FGM + (0.5 * 3PM)) / FGA'
-    },
-
-     */
   },
   'DRIVES': {
     'DRIVES': {
@@ -2266,7 +2242,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'DRIVE_FGM_PER_75_RANK',
       },
       'splash_name': 'DRIVE FGM',
-      'full_name': 'Drives',
+      'full_name': 'Field Goals Made (Drives)',
       'first_available': '2013',
       'convert': 'false',
       'round': '0',
@@ -2284,7 +2260,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'DRIVE_FGA_PER_75_RANK',
       },
       'splash_name': 'DRIVE FGA',
-      'full_name': 'Drives',
+      'full_name': 'Field Goal Attempts (Drives)',
       'first_available': '2013',
       'convert': 'false',
       'round': '0',
@@ -2302,7 +2278,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'DRIVE_FG_PCT_RANK',
       },
       'splash_name': 'DRIVE FG%',
-      'full_name': 'Drives',
+      'full_name': 'Field Goal Percentage (Drives)',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
