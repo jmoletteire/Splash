@@ -350,7 +350,9 @@ class _GameByGameStatsState extends State<GameByGameStats> {
           return '${wholeMinutes.toString()}:${seconds.toString().padLeft(2, '0')}';
         }
         return StandingsDataText(
-            text: game['MIN'].toStringAsFixed(0) == '0' ? '-' : convertMinutes(game['MIN']));
+          text: game['MIN'].toStringAsFixed(0) == '0' ? '-' : convertMinutes(game['MIN']),
+          size: 15.0,
+        );
       case 3:
         return StandingsDataText(text: game['PTS'].toStringAsFixed(0) ?? '-');
       case 4:
@@ -394,10 +396,11 @@ class _GameByGameStatsState extends State<GameByGameStats> {
 }
 
 class StandingsDataText extends StatelessWidget {
-  const StandingsDataText({super.key, required this.text, this.alignment});
+  const StandingsDataText({super.key, required this.text, this.size, this.alignment});
 
   final Alignment? alignment;
   final String text;
+  final double? size;
 
   @override
   Widget build(BuildContext context) {
@@ -405,7 +408,7 @@ class StandingsDataText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: AutoSizeText(
         text,
-        style: kBebasNormal.copyWith(fontSize: 17.0),
+        style: kBebasNormal.copyWith(fontSize: size ?? 17.0),
         maxLines: 1,
       ),
     );

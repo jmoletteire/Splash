@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:splash/screens/player/gamelogs/game_by_game_stats.dart';
 
 import '../../../utilities/constants.dart';
+import '../../team/team_cache.dart';
 
 class PlayerGames extends StatefulWidget {
   final Map<String, dynamic> player;
@@ -41,6 +43,22 @@ class _PlayerGamesState extends State<PlayerGames> {
     '5': 'PLAY-IN',
     '6': 'NBA CUP',
   };
+
+  List<String> getTop10(String stat) {
+    final teamCache = Provider.of<TeamCache>(context, listen: false);
+
+    // Create a list to store the team IDs and their corresponding NET_RATING
+    List<String> top10Teams = [];
+
+    // Iterate through the cache and extract NET_RATING
+    teamCache.cache.forEach((teamId, values) {
+      int stat_rank =
+          values['seasons'][widget.selectedSeason]['STATS']['REGULAR SEASON']['ADV'][stat];
+      if (stat_rank <= 10) top10Teams.add(teamId);
+    });
+
+    return top10Teams;
+  }
 
   List<String> formatDate(String date) {
     // Parse the string to a DateTime object
@@ -95,6 +113,26 @@ class _PlayerGamesState extends State<PlayerGames> {
     Map<String, dynamic> filterByOpp(Map<String, dynamic> schedule, int opponentId) {
       // Create a new map to store filtered games
       Map<String, dynamic> filteredSchedule = {};
+
+      if (opponentId < 4) {
+        List<String> teamIds = [];
+        if (opponentId == 1) teamIds = getTop10('NET_RATING_RANK');
+        if (opponentId == 2) teamIds = getTop10('OFF_RATING_RANK');
+        if (opponentId == 3) teamIds = getTop10('DEF_RATING_RANK');
+
+        // Iterate through the schedule map
+        schedule.forEach((key, game) {
+          // Parse the GAME_DATE field
+          String matchup = game['MATCHUP'].toString();
+          int oppId = int.parse(kTeamIds[matchup.substring(matchup.length - 3)]!);
+
+          // Check if the opponent matches
+          if (teamIds.contains(oppId.toString())) {
+            filteredSchedule[key] = game;
+          }
+        });
+        return filteredSchedule;
+      }
 
       // Iterate through the schedule map
       schedule.forEach((key, game) {

@@ -36,6 +36,9 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
 
   Map<String, String> teamAbbr = {
     'ALL': '0',
+    'TOP NET': '1',
+    'TOP OFF': '2',
+    'TOP DEF': '3',
     'ATL': '1610612737',
     'BOS': '1610612738',
     'BKN': '1610612751',
@@ -375,7 +378,11 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
                             ConstrainedBox(
                               constraints: const BoxConstraints(maxWidth: 20.0),
                               child: Image.asset(
-                                'images/NBA_Logos/${teamAbbr[value]!}.png',
+                                teamAbbr[value]! == '1' ||
+                                        teamAbbr[value]! == '2' ||
+                                        teamAbbr[value]! == '3'
+                                    ? 'images/NBA_Logos/0.png'
+                                    : 'images/NBA_Logos/${teamAbbr[value]!}.png',
                                 fit: BoxFit.contain,
                                 width: 20.0,
                                 height: 20.0,
