@@ -24,11 +24,12 @@ class Standings extends StatefulWidget {
 class _StandingsState extends State<Standings> {
   List<Map<String, dynamic>> eastTeams = [];
   List<Map<String, dynamic>> westTeams = [];
+  late String selectedSeason;
   bool _isLoading = true;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
 
-  int selectedYear = DateTime.now().year;
+  int selectedYear = 2023;
 
   Future<void> _showYearPicker(BuildContext context) async {
     final int? pickedYear = await showDialog<int>(
@@ -68,9 +69,8 @@ class _StandingsState extends State<Standings> {
     if (pickedYear != null && pickedYear != selectedYear) {
       setState(() {
         selectedYear = pickedYear;
+        selectedSeason = '$selectedYear-${(selectedYear + 1).toString().substring(2)}';
       });
-      // Do something with the selected year
-      print('Selected year: $selectedYear');
     }
   }
 
@@ -86,7 +86,6 @@ class _StandingsState extends State<Standings> {
           return fetchedTeam;
         }
       } catch (e) {
-        print('Error fetching team $teamId: $e');
         return {'error': 'not found'}; // Return an empty map in case of an error
       }
     }).toList();
@@ -109,7 +108,6 @@ class _StandingsState extends State<Standings> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error in setTeams: $e');
       setState(() {
         _isLoading = false;
       });
@@ -120,6 +118,7 @@ class _StandingsState extends State<Standings> {
   void initState() {
     super.initState();
     setTeams();
+    selectedSeason = kCurrentSeason;
   }
 
   @override
@@ -202,6 +201,7 @@ class _StandingsState extends State<Standings> {
                       'SW',
                     ],
                     standings: eastTeams,
+                    season: selectedSeason,
                   ),
                   ConferenceStandings(
                     columnNames: const [
@@ -229,6 +229,7 @@ class _StandingsState extends State<Standings> {
                       'SW',
                     ],
                     standings: westTeams,
+                    season: selectedSeason,
                   ),
                 ],
               ),

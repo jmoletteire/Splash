@@ -307,7 +307,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
               pinnedHeaderSliverHeightBuilder: () {
                 return (208 - kToolbarHeight);
               },
-              onlyOneScrollInBody: false,
+              onlyOneScrollInBody: true,
               body: TabBarView(
                 controller: _tabController,
                 children: _playerPages.map((page) {

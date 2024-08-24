@@ -7,6 +7,7 @@ import 'package:splash/screens/search_screen.dart';
 
 import '../../components/custom_icon_button.dart';
 import '../../utilities/constants.dart';
+import 'glossary/glossary.dart';
 
 class More extends StatefulWidget {
   const More({super.key});
@@ -21,6 +22,7 @@ class _MoreState extends State<More> {
     'Transactions': [Icons.compare_arrows, LeagueTransactions()],
     'Draft': [Icons.format_list_numbered, Draft()],
     'League History': [Icons.history, LeagueHistory()],
+    'Glossary': [Icons.menu_book, Glossary()],
   };
 
   @override

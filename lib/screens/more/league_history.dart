@@ -1,7 +1,5 @@
-import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:splash/screens/standings/conference_standings.dart';
 
 import '../../utilities/constants.dart';
 import '../../utilities/team.dart';
@@ -71,116 +69,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final double statusBarHeight = MediaQuery.of(context).padding.top;
-    //var tabBarHeight = primaryTabBar.preferredSize.height;
-    var pinnedHeaderHeight =
-        //statusBar height
-        statusBarHeight +
-            //pinned SliverAppBar height in header
-            kToolbarHeight;
-
-    return Scaffold(
-      body: ExtendedNestedScrollView(
-          headerSliverBuilder: (c, f) {
-            return <Widget>[
-              SliverAppBar(
-                pinned: true,
-                expandedHeight: 200.0,
-                title: Text('Title'),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Image.network(
-                    "https://images.pexels.com/photos/396547/pexels-photo-396547.jpeg?auto=compress&cs=tinysrgb&h=350",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ];
-          },
-          pinnedHeaderSliverHeightBuilder: () {
-            return pinnedHeaderHeight;
-          },
-          onlyOneScrollInBody: false,
-          body: Column(
-            children: <Widget>[
-              TabBar(
-                controller: primaryTC,
-                labelColor: Colors.black87,
-                unselectedLabelColor: Colors.grey,
-                tabs: [
-                  Tab(text: "Tab1"),
-                  Tab(text: "Tab2"),
-                  Tab(text: "Tab3"),
-                ],
-              ),
-              Expanded(
-                child: TabBarView(
-                  controller: primaryTC,
-                  children: <Widget>[
-                    MyHomePage(),
-                    CustomScrollView(
-                      slivers: [
-                        ConferenceStandings(
-                          columnNames: const [
-                            'EASTERN',
-                            'W',
-                            'L',
-                            'PCT',
-                            'GB',
-                            'NRTG',
-                            'ORTG',
-                            'DRTG',
-                            'PACE',
-                            'STREAK',
-                            'Last 10',
-                            'HOME',
-                            'ROAD',
-                            '> .500',
-                            'EAST',
-                            'WEST',
-                            'ATL',
-                            'CEN',
-                            'SE',
-                            'NW',
-                            'PAC',
-                            'SW',
-                          ],
-                          standings: eastTeams,
-                        ),
-                        ConferenceStandings(
-                          columnNames: const [
-                            'WESTERN',
-                            'W',
-                            'L',
-                            'PCT',
-                            'GB',
-                            'NRTG',
-                            'ORTG',
-                            'DRTG',
-                            'PACE',
-                            'STREAK',
-                            'Last 10',
-                            'HOME',
-                            'ROAD',
-                            '> .500',
-                            'EAST',
-                            'WEST',
-                            'ATL',
-                            'CEN',
-                            'SE',
-                            'NW',
-                            'PAC',
-                            'SW',
-                          ],
-                          standings: westTeams,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            ],
-          )),
-    );
+    return Placeholder();
   }
 }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:material_table_view/default_animated_switcher_transition_builder.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
@@ -10,10 +9,12 @@ import '../team/team_home.dart';
 class ConferenceStandings extends StatefulWidget {
   final List columnNames;
   final List<Map<String, dynamic>> standings;
+  final String season;
 
   ConferenceStandings({
     required this.columnNames,
     required this.standings,
+    required this.season,
   });
 
   @override
@@ -22,6 +23,7 @@ class ConferenceStandings extends StatefulWidget {
 
 class _ConferenceStandingsState extends State<ConferenceStandings> {
   late ScrollController scrollController;
+  List<Map<String, dynamic>> teams = [];
 
   String getClinched(Map<String, dynamic> standings) {
     if (standings['ClinchedConferenceTitle'] == 1) {
@@ -34,6 +36,17 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
       return ' -o';
     }
     return ' -pi';
+  }
+
+  void _checkSeasons() {
+    for (var team in widget.standings) {
+      if (!teams.contains(team) && team['seasons'].keys.toList().contains(widget.season)) {
+        teams.add(team);
+      }
+      if (teams.contains(team) && !team['seasons'].keys.toList().contains(widget.season)) {
+        teams.remove(team);
+      }
+    }
   }
 
   @override
@@ -50,9 +63,11 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
 
   @override
   Widget build(BuildContext context) {
-    widget.standings.sort((a, b) {
-      return a['seasons'][kCurrentSeason]['CONF_RANK']
-          .compareTo(b['seasons'][kCurrentSeason]['CONF_RANK']);
+    _checkSeasons();
+
+    teams.sort((a, b) {
+      return a['seasons'][widget.season]['CONF_RANK']
+          .compareTo(b['seasons'][widget.season]['CONF_RANK']);
     });
 
     return SliverTableView.builder(
@@ -71,7 +86,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
         ),
       ),
       headerHeight: MediaQuery.of(context).size.height * 0.045,
-      rowCount: widget.standings.length,
+      rowCount: teams.length,
       rowHeight: MediaQuery.of(context).size.height * 0.055,
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
       columns: [
@@ -174,25 +189,40 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
   /// transition between them and to insert optional row divider.
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
-        child: DecoratedBox(
-          position: DecorationPosition.foreground,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade900.withOpacity(0.75),
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.white,
-                width: index == 9 ? 3.0 : (index == 5 ? 1.0 : 0.125),
-                style: index == 5
-                    ? BorderStyle.solid
-                    : (index == 9 ? BorderStyle.solid : BorderStyle.solid),
+        child: Stack(
+          children: [
+            DecoratedBox(
+              position: DecorationPosition.foreground,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade900.withOpacity(0.75),
+                border: index != 5
+                    ? Border(
+                        bottom: BorderSide(
+                          color: Colors.white,
+                          width: index == 9 ? 3.0 : 0.125,
+                          style: BorderStyle.solid,
+                        ),
+                      )
+                    : null,
               ),
+              child: child,
             ),
-          ),
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            transitionBuilder: tableRowDefaultAnimatedSwitcherTransitionBuilder,
-            child: child,
-          ),
+            if (index == 5)
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: CustomPaint(
+                  painter: DashedLinePainter(
+                    color: Colors.white,
+                    strokeWidth: 2.0,
+                  ),
+                  child: Container(
+                    height: 1.0,
+                  ),
+                ),
+              ),
+          ],
         ),
       );
 
@@ -211,7 +241,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
               context,
               MaterialPageRoute(
                 builder: (context) => TeamHome(
-                  teamId: widget.standings[row]['TEAM_ID'].toString(),
+                  teamId: teams[row]['TEAM_ID'].toString(),
                 ),
               ),
             );
@@ -220,7 +250,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
           child: contentBuilder(context, (context, column) {
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: getContent(widget.standings, row, column, context),
+              child: getContent(teams, row, column, context),
             );
           }),
         ),
@@ -239,7 +269,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
               Expanded(
                 flex: 1,
                 child: Text(
-                  widget.standings[row]['seasons'][kCurrentSeason]['CONF_RANK'].toString(),
+                  teams[row]['seasons'][widget.season]['CONF_RANK'].toString(),
                   textAlign: TextAlign.center,
                   style: kBebasNormal.copyWith(
                     color: Colors.white70,
@@ -252,20 +282,12 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 24.0),
                   child: Image.asset(
-                    'images/NBA_Logos/${widget.standings[row]['TEAM_ID']}.png',
+                    'images/NBA_Logos/${teams[row]['TEAM_ID']}.png',
                     fit: BoxFit.contain,
                     width: 24.0,
                     height: 24.0,
                   ),
                 ),
-                /*
-                SvgPicture.string(
-                  widget.standings[row]['LOGO'][0],
-                  alignment: Alignment.center,
-                  width: 24,
-                  height: 24,
-                ),
-                 */
               ),
               Expanded(
                 flex: 2,
@@ -274,12 +296,11 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: widget.standings[row]['ABBREVIATION'],
+                        text: teams[row]['ABBREVIATION'],
                         style: kBebasBold.copyWith(fontSize: 20.0),
                       ),
                       TextSpan(
-                        text: getClinched(
-                            widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']),
+                        text: getClinched(teams[row]['seasons'][widget.season]['STANDINGS']),
                         style: kBebasNormal.copyWith(
                             fontFamily: 'Anton', fontSize: 12.0, letterSpacing: 0.8),
                       ),
@@ -292,98 +313,156 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
         );
       case 1:
         return StandingsDataText(
-            text:
-                widget.standings[row]['seasons'][kCurrentSeason]['WINS']!.toStringAsFixed(0));
+            text: teams[row]['seasons'][widget.season]['WINS']!.toStringAsFixed(0));
       case 2:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['LOSSES']!
-                .toStringAsFixed(0));
+            text: teams[row]['seasons'][widget.season]['LOSSES']!.toStringAsFixed(0));
       case 3:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['WIN_PCT']!
-                .toStringAsFixed(3));
+            text: teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3));
       case 4:
         return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                    ['ConferenceGamesBack']!
+            text: teams[row]['seasons'][widget.season]['STANDINGS']['ConferenceGamesBack']!
                 .toString());
       case 5:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']
-                    ['ADV']['NET_RATING']!
-                .toStringAsFixed(1));
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                      ['NET_RATING']!
+                  .toStringAsFixed(1));
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 6:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']
-                    ['ADV']['OFF_RATING']!
-                .toStringAsFixed(1));
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                      ['OFF_RATING']!
+                  .toStringAsFixed(1));
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 7:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']
-                    ['ADV']['DEF_RATING']!
-                .toStringAsFixed(1));
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                      ['DEF_RATING']!
+                  .toStringAsFixed(1));
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 8:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']
-                    ['ADV']['PACE']!
-                .toStringAsFixed(1));
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+                      ['PACE']!
+                  .toStringAsFixed(1));
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 9:
-        return Container(
-          alignment: Alignment.centerRight,
-          child: Text(
-            widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['strCurrentStreak']!,
-            style: kBebasNormal.copyWith(
-                fontSize: 18.0,
-                color: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                            ['strCurrentStreak']!
-                        .contains('W')
-                    ? Colors.green
-                    : Colors.red),
-          ),
-        );
+        try {
+          return Container(
+            alignment: Alignment.centerRight,
+            child: Text(
+              teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!,
+              style: kBebasNormal.copyWith(
+                  fontSize: 18.0,
+                  color: teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!
+                          .contains('W')
+                      ? Colors.green
+                      : Colors.red),
+            ),
+          );
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 10:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['L10']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['L10']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 11:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['HOME']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['HOME']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 12:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['ROAD']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['ROAD']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 13:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['OppOver500']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['OppOver500']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 14:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['vsEast']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsEast']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 15:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['vsWest']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsWest']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 16:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['vsAtlantic']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 17:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['vsCentral']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 18:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['vsSoutheast']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 19:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['vsNorthwest']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 20:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']['vsPacific']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 21:
-        return StandingsDataText(
-            text: widget.standings[row]['seasons'][kCurrentSeason]['STANDINGS']
-                ['vsSouthwest']!);
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       default:
-        return Text('');
+        return const Text('');
     }
   }
 }
@@ -406,63 +485,31 @@ class StandingsDataText extends StatelessWidget {
   }
 }
 
-class DashedBorderPainter extends CustomPainter {
+class DashedLinePainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
 
-  DashedBorderPainter({required this.color, required this.strokeWidth});
+  DashedLinePainter({required this.color, required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
+      ..strokeWidth = strokeWidth;
 
-    final path = Path();
-    double dashWidth = 5.0;
-    double dashSpace = 3.0;
+    const dashWidth = 8.0;
+    const dashSpace = 4.0;
     double startX = 0;
-    double startY = 0;
+    final double y = size.height;
 
-    // Top side
     while (startX < size.width) {
-      path.moveTo(startX, startY);
-      path.lineTo(startX + dashWidth, startY);
+      canvas.drawLine(
+        Offset(startX, y),
+        Offset(startX + dashWidth, y),
+        paint,
+      );
       startX += dashWidth + dashSpace;
     }
-
-    startX = size.width;
-    startY = 0;
-
-    // Right side
-    while (startY < size.height) {
-      path.moveTo(startX, startY);
-      path.lineTo(startX, startY + dashWidth);
-      startY += dashWidth + dashSpace;
-    }
-
-    startX = size.width;
-    startY = size.height;
-
-    // Bottom side
-    while (startX > 0) {
-      path.moveTo(startX, startY);
-      path.lineTo(startX - dashWidth, startY);
-      startX -= dashWidth + dashSpace;
-    }
-
-    startX = 0;
-    startY = size.height;
-
-    // Left side
-    while (startY > 0) {
-      path.moveTo(startX, startY);
-      path.lineTo(startX, startY - dashWidth);
-      startY -= dashWidth + dashSpace;
-    }
-
-    canvas.drawPath(path, paint);
   }
 
   @override

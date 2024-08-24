@@ -377,7 +377,7 @@ class _CapSheetState extends State<CapSheet> {
                 ? contracts[index]['player']['lastName'] == 'First Apron'
                     ? const Color(0xFF7EB8EA)
                     : contracts[index]['player']['lastName'] == 'Second Apron'
-                        ? const Color(0xFF1060BF)
+                        ? const Color(0xFF0F3665)
                         : Colors.grey.shade800
                 : Colors.grey.shade900,
             border: contracts[index]['player']['id'] == 'totals' ||

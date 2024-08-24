@@ -39,6 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   dropdown_search: ^5.0.6
   extended_nested_scroll_view: ^6.2.1
+  flutter_dash: ^1.0.0
   flutter_svg: ^2.0.10+1
   http: ^1.2.1
   intl: ^0.18.0

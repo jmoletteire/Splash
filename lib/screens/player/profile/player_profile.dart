@@ -35,9 +35,10 @@ class _PlayerProfileState extends State<PlayerProfile> {
 
   @override
   Widget build(BuildContext context) {
-    var key =
-        widget.team['TEAM_ID'] == 0 ? 'Last Played' : convertDate(widget.player['BIRTHDATE']);
-    var value = widget.team['TEAM_ID'] == 0
+    var key = widget.player['ROSTERSTATUS'] == 'Inactive'
+        ? 'Last Played'
+        : convertDate(widget.player['BIRTHDATE']);
+    var value = widget.player['ROSTERSTATUS'] == "Inactive"
         ? widget.player['TO_YEAR'].toString()
         : '${calculateAge(widget.player['BIRTHDATE'])} yrs';
 

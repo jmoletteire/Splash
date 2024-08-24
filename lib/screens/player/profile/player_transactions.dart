@@ -46,6 +46,22 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    widget.playerTransactions.sort((a, b) {
+      // Check if either transactionType is "drafted"
+      if (a['transactionType'] == "drafted" && b['transactionType'] != "drafted") {
+        return 1; // a comes after b
+      } else if (a['transactionType'] != "drafted" && b['transactionType'] == "drafted") {
+        return -1; // b comes after a
+      } else {
+        // If neither or both are "drafted", sort by date
+        return b['date'].compareTo(a['date']);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     String formatDate(String date) {
       // Parse the string to a DateTime object
