@@ -26,16 +26,29 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
   List<Map<String, dynamic>> teams = [];
 
   String getClinched(Map<String, dynamic> standings) {
-    if (standings['ClinchedConferenceTitle'] == 1) {
-      return ' -z';
-    } else if (standings['ClinchedDivisionTitle'] == 1) {
-      return ' -y';
-    } else if (standings['ClinchedPlayoffBirth'] == 1) {
-      return ' -x';
-    } else if (standings['EliminatedConference'] == 1) {
+    if (int.parse(widget.season.substring(0, 4)) >= 2019) {
+      if (standings['ClinchedConferenceTitle'] == 1) {
+        return ' -z';
+      } else if (standings['ClinchedDivisionTitle'] == 1) {
+        return ' -y';
+      } else if (standings['ClinchedPlayoffBirth'] == 1) {
+        return ' -x';
+      } else if (standings['EliminatedConference'] == 1) {
+        return ' -o';
+      }
+      return ' -pi';
+    } else {
+      if (standings['PlayoffRank'] > 8) {
+        return ' -o';
+      } else if (standings['PlayoffRank'] == 1) {
+        return ' -z';
+      } else if (standings['DivisionRank'] == 1) {
+        return ' -y';
+      } else if (standings['PlayoffRank'] <= 8) {
+        return ' -x';
+      }
       return ' -o';
     }
-    return ' -pi';
   }
 
   void _checkSeasons() {
@@ -66,8 +79,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
     _checkSeasons();
 
     teams.sort((a, b) {
-      return a['seasons'][widget.season]['CONF_RANK']
-          .compareTo(b['seasons'][widget.season]['CONF_RANK']);
+      return a['seasons'][widget.season]['STANDINGS']['PlayoffRank']
+          .compareTo(b['seasons'][widget.season]['STANDINGS']['PlayoffRank']);
     });
 
     return SliverTableView.builder(
@@ -195,11 +208,15 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
               position: DecorationPosition.foreground,
               decoration: BoxDecoration(
                 color: Colors.grey.shade900.withOpacity(0.75),
-                border: index != 5
+                border: int.parse(widget.season.substring(0, 4)) < 2019 || index != 5
                     ? Border(
                         bottom: BorderSide(
                           color: Colors.white,
-                          width: index == 9 ? 3.0 : 0.125,
+                          width: int.parse(widget.season.substring(0, 4)) >= 2019 && index == 9
+                              ? 3.0
+                              : int.parse(widget.season.substring(0, 4)) < 2019 && index == 7
+                                  ? 3.0
+                                  : 0.125,
                           style: BorderStyle.solid,
                         ),
                       )
@@ -207,7 +224,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
               ),
               child: child,
             ),
-            if (index == 5)
+            if (int.parse(widget.season.substring(0, 4)) >= 2019 && index == 5)
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -269,7 +286,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
               Expanded(
                 flex: 1,
                 child: Text(
-                  teams[row]['seasons'][widget.season]['CONF_RANK'].toString(),
+                  teams[row]['seasons'][widget.season]['STANDINGS']['PlayoffRank'].toString(),
                   textAlign: TextAlign.center,
                   style: kBebasNormal.copyWith(
                     color: Colors.white70,
@@ -301,8 +318,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                       ),
                       TextSpan(
                         text: getClinched(teams[row]['seasons'][widget.season]['STANDINGS']),
-                        style: kBebasNormal.copyWith(
-                            fontFamily: 'Anton', fontSize: 12.0, letterSpacing: 0.8),
+                        style: kBebasNormal.copyWith(fontSize: 12.0, letterSpacing: 0.8),
                       ),
                     ],
                   ),
