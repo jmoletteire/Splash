@@ -300,9 +300,9 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         return StandingsDataText(
             text: teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3));
       case 4:
-        return StandingsDataText(
-            text: teams[row]['seasons'][widget.season]['STANDINGS']['DivisionGamesBack']!
-                .toString());
+        String gb =
+            teams[row]['seasons'][widget.season]['STANDINGS']['DivisionGamesBack']!.toString();
+        return StandingsDataText(text: gb == '0.0' ? '-' : gb);
       case 5:
         try {
           return StandingsDataText(

@@ -1,11 +1,13 @@
 import os
 
 from flask import Flask, jsonify, request
+from flask_compress import Compress
 from pymongo import MongoClient
 import logging
 
 
 app = Flask(__name__)
+Compress(app)
 bytes_transferred = 0
 
 
@@ -220,7 +222,88 @@ def apply_player_filters(season, season_type, filters, position):
         person_ids = [player['PERSON_ID'] for player in results]
         final_results = list(players_collection.find(
             {'PERSON_ID': {'$in': person_ids}},
-            {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{season}.{season_type}': 1, '_id': 0}
+            {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1,
+             f'STATS.{season}.{season_type}.BASIC.AGE': 1,
+             f'STATS.{season}.{season_type}.BASIC.MIN': 1,
+             f'STATS.{season}.{season_type}.ADV.MIN': 1,
+             f'STATS.{season}.{season_type}.ADV.POSS': 1,
+             f'STATS.{season}.{season_type}.ADV.POSS_PER_GM': 1,
+             f'STATS.{season}.{season_type}.BASIC.PTS': 1,
+             f'STATS.{season}.{season_type}.BASIC.REB': 1,
+             f'STATS.{season}.{season_type}.BASIC.AST': 1,
+             f'STATS.{season}.{season_type}.BASIC.STL': 1,
+             f'STATS.{season}.{season_type}.BASIC.BLK': 1,
+             f'STATS.{season}.{season_type}.BASIC.TOV': 1,
+             f'STATS.{season}.{season_type}.BASIC.FGM': 1,
+             f'STATS.{season}.{season_type}.BASIC.FGA': 1,
+             f'STATS.{season}.{season_type}.BASIC.FG_PCT': 1,
+             f'STATS.{season}.{season_type}.BASIC.FG3M': 1,
+             f'STATS.{season}.{season_type}.BASIC.FG3A': 1,
+             f'STATS.{season}.{season_type}.BASIC.FG3_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.6+ Feet - Wide Open.FG3_PCT': 1,
+             f'STATS.{season}.{season_type}.BASIC.3PAr': 1,
+             f'STATS.{season}.{season_type}.BASIC.FTM': 1,
+             f'STATS.{season}.{season_type}.BASIC.FTA': 1,
+             f'STATS.{season}.{season_type}.BASIC.FT_PCT': 1,
+             f'STATS.{season}.{season_type}.BASIC.FT_PER_FGA': 1,
+             f'STATS.{season}.{season_type}.ADV.EFG_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.TS_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.SCORING_BREAKDOWN.PCT_UAST_FGM': 1,
+             f'STATS.{season}.{season_type}.ADV.SCORING_BREAKDOWN.PCT_UAST_3PM': 1,
+             f'STATS.{season}.{season_type}.ADV.USG_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.OFFENSIVE_LOAD': 1,
+             f'STATS.{season}.{season_type}.ADV.ADJ_TOV_PCT': 1,
+             f'STATS.{season}.{season_type}.BASIC.PLUS_MINUS': 1,
+             f'STATS.{season}.{season_type}.ADV.NET_RATING_ON_OFF': 1,
+             f'STATS.{season}.{season_type}.ADV.OFF_RATING_ON_OFF': 1,
+             f'STATS.{season}.{season_type}.ADV.DEF_RATING_ON_OFF': 1,
+             f'STATS.{season}.{season_type}.ADV.TOUCHES.TOUCHES': 1,
+             f'STATS.{season}.{season_type}.ADV.TOUCHES.TIME_OF_POSS': 1,
+             f'STATS.{season}.{season_type}.ADV.TOUCHES.AVG_SEC_PER_TOUCH': 1,
+             f'STATS.{season}.{season_type}.ADV.TOUCHES.AVG_DRIB_PER_TOUCH': 1,
+             f'STATS.{season}.{season_type}.ADV.TOUCHES.FGA_PER_TOUCH': 1,
+             f'STATS.{season}.{season_type}.ADV.TOUCHES.PASSES_PER_TOUCH': 1,
+             f'STATS.{season}.{season_type}.ADV.TOUCHES.TOV_PER_TOUCH': 1,
+             f'STATS.{season}.{season_type}.ADV.TOUCHES.PFD_PER_TOUCH': 1,
+             f'STATS.{season}.{season_type}.ADV.REBOUNDING.REB': 1,
+             f'STATS.{season}.{season_type}.ADV.REBOUNDING.OREB': 1,
+             f'STATS.{season}.{season_type}.ADV.OREB_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.REBOUNDING.OREB_CHANCE_PCT_ADJ': 1,
+             f'STATS.{season}.{season_type}.ADV.REBOUNDING.DREB': 1,
+             f'STATS.{season}.{season_type}.ADV.DREB_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.REBOUNDING.DREB_CHANCE_PCT_ADJ': 1,
+             f'STATS.{season}.{season_type}.ADV.PASSING.PASSES_MADE': 1,
+             f'STATS.{season}.{season_type}.ADV.AST_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.PASSING.SECONDARY_AST': 1,
+             f'STATS.{season}.{season_type}.ADV.PASSING.FT_AST': 1,
+             f'STATS.{season}.{season_type}.ADV.PASSING.AST_ADJ': 1,
+             f'STATS.{season}.{season_type}.ADV.BOX_CREATION': 1,
+             f'STATS.{season}.{season_type}.ADV.PASSING.POTENTIAL_AST': 1,
+             f'STATS.{season}.{season_type}.ADV.PASSING.AST_PTS_CREATED': 1,
+             f'STATS.{season}.{season_type}.ADV.PASSING.AST_TO_PASS_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.PASSING.AST_TO_PASS_PCT_ADJ': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVES': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVES_PER_TOUCH': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_PTS_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_FT_PER_FGA': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_FG_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_TS_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_PASSES_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_AST_PCT': 1,
+             f'STATS.{season}.{season_type}.ADV.DRIVES.DRIVE_TOV_PCT': 1,
+             f'STATS.{season}.{season_type}.HUSTLE.SCREEN_ASSISTS': 1,
+             f'STATS.{season}.{season_type}.HUSTLE.SCREEN_AST_PTS': 1,
+             f'STATS.{season}.{season_type}.BASIC.PF': 1,
+             f'STATS.{season}.{season_type}.BASIC.PFD': 1,
+             f'STATS.{season}.{season_type}.HUSTLE.LOOSE_BALLS_RECOVERED': 1,
+             f'STATS.{season}.{season_type}.HUSTLE.CHARGES_DRAWN': 1,
+             f'STATS.{season}.{season_type}.ADV.DEF_RATING': 1,
+             f'STATS.{season}.{season_type}.ADV.VERSATILITY_SCORE': 1,
+             f'STATS.{season}.{season_type}.ADV.MATCHUP_DIFFICULTY': 1,
+             f'STATS.{season}.{season_type}.ADV.DEF_IMPACT_EST': 1,
+             f'STATS.{season}.{season_type}.HUSTLE.DEFLECTIONS': 1,
+             f'STATS.{season}.{season_type}.HUSTLE.CONTESTED_SHOTS': 1,
+             '_id': 0}
         ))
     else:
         final_results = []
