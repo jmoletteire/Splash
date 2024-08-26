@@ -12,6 +12,7 @@ import '../../utilities/scroll/scroll_controller_provider.dart';
 import '../../utilities/team.dart';
 import '../search_screen.dart';
 import 'conference_standings.dart';
+import 'division_standings.dart';
 
 class Standings extends StatefulWidget {
   static const String id = 'standings';
@@ -21,13 +22,15 @@ class Standings extends StatefulWidget {
   State<Standings> createState() => _StandingsState();
 }
 
-class _StandingsState extends State<Standings> {
+class _StandingsState extends State<Standings> with SingleTickerProviderStateMixin {
   List<Map<String, dynamic>> eastTeams = [];
   List<Map<String, dynamic>> westTeams = [];
+  late Map<String, dynamic> divisions;
   late String selectedSeason;
   bool _isLoading = true;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+  late TabController _tabController;
 
   int selectedYear = 2023;
 
@@ -46,12 +49,12 @@ class _StandingsState extends State<Standings> {
             height: 300,
             child: Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: const ColorScheme.light(
-                  primary: Colors.deepOrange, // Selected item color
-                  onPrimary: Colors.white, // Selected item text color
-                  onSurface: Colors.white, // Unselected item text color
-                ),
-              ),
+                  colorScheme: const ColorScheme.light(
+                    primary: Colors.deepOrange, // Selected item color
+                    onPrimary: Colors.white, // Selected item text color
+                    onSurface: Colors.white, // Unselected item text color
+                  ),
+                  textTheme: const TextTheme(bodyLarge: kBebasNormal)),
               child: YearPicker(
                 firstDate: DateTime(1981),
                 lastDate: DateTime.now(),
@@ -70,8 +73,35 @@ class _StandingsState extends State<Standings> {
       setState(() {
         selectedYear = pickedYear;
         selectedSeason = '$selectedYear-${(selectedYear + 1).toString().substring(2)}';
+        setDivisions();
       });
     }
+  }
+
+  void setDivisions() {
+    setState(() {
+      divisions = {};
+
+      for (var team in eastTeams) {
+        if (team['seasons'].containsKey(selectedSeason)) {
+          String div = team['seasons'][selectedSeason]['STANDINGS']['Division'];
+          if (!divisions.containsKey(div)) {
+            divisions[div] = [];
+          }
+          divisions[div]!.add(team);
+        }
+      }
+
+      for (var team in westTeams) {
+        if (team['seasons'].containsKey(selectedSeason)) {
+          String div = team['seasons'][selectedSeason]['STANDINGS']['Division'];
+          if (!divisions.containsKey(div)) {
+            divisions[div] = [];
+          }
+          divisions[div]!.add(team);
+        }
+      }
+    });
   }
 
   Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
@@ -105,6 +135,7 @@ class _StandingsState extends State<Standings> {
       setState(() {
         eastTeams = fetchedEastTeams;
         westTeams = fetchedWestTeams;
+        setDivisions();
         _isLoading = false;
       });
     } catch (e) {
@@ -119,6 +150,7 @@ class _StandingsState extends State<Standings> {
     super.initState();
     setTeams();
     selectedSeason = kCurrentSeason;
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -131,6 +163,7 @@ class _StandingsState extends State<Standings> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _notifier.removeController(_scrollController);
     _scrollController.dispose();
     super.dispose();
@@ -169,70 +202,126 @@ class _StandingsState extends State<Standings> {
                   },
                 ),
               ],
-            ),
-            body: ScrollConfiguration(
-              behavior: MyCustomScrollBehavior(),
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  ConferenceStandings(
-                    columnNames: const [
-                      'EASTERN',
-                      'W',
-                      'L',
-                      'PCT',
-                      'GB',
-                      'NRTG',
-                      'ORTG',
-                      'DRTG',
-                      'PACE',
-                      'STREAK',
-                      'Last 10',
-                      'HOME',
-                      'ROAD',
-                      '> .500',
-                      'EAST',
-                      'WEST',
-                      'ATL',
-                      'CEN',
-                      'SE',
-                      'NW',
-                      'PAC',
-                      'SW',
-                    ],
-                    standings: eastTeams,
-                    season: selectedSeason,
-                  ),
-                  ConferenceStandings(
-                    columnNames: const [
-                      'WESTERN',
-                      'W',
-                      'L',
-                      'PCT',
-                      'GB',
-                      'NRTG',
-                      'ORTG',
-                      'DRTG',
-                      'PACE',
-                      'STREAK',
-                      'Last 10',
-                      'HOME',
-                      'ROAD',
-                      '> .500',
-                      'EAST',
-                      'WEST',
-                      'ATL',
-                      'CEN',
-                      'SE',
-                      'NW',
-                      'PAC',
-                      'SW',
-                    ],
-                    standings: westTeams,
-                    season: selectedSeason,
-                  ),
+              bottom: TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                tabAlignment: TabAlignment.start,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorColor: Colors.deepOrange,
+                indicatorWeight: 3.0,
+                unselectedLabelColor: Colors.grey,
+                labelColor: Colors.white,
+                labelStyle: kBebasNormal,
+                tabs: [
+                  const Tab(text: 'Conference'),
+                  const Tab(text: 'Division'),
+                  const Tab(text: 'Playoffs'),
+                  if (int.parse(selectedSeason.substring(0, 4)) >= 2023)
+                    const Tab(text: 'NBA Cup'),
                 ],
               ),
+            ),
+            body: TabBarView(
+              controller: _tabController,
+              children: [
+                ScrollConfiguration(
+                  behavior: MyCustomScrollBehavior(),
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      ConferenceStandings(
+                        columnNames: const [
+                          'EASTERN',
+                          'W',
+                          'L',
+                          'PCT',
+                          'GB',
+                          'NRTG',
+                          'ORTG',
+                          'DRTG',
+                          'PACE',
+                          'STREAK',
+                          'Last 10',
+                          'HOME',
+                          'ROAD',
+                          '> .500',
+                          'EAST',
+                          'WEST',
+                          'ATL',
+                          'CEN',
+                          'SE',
+                          'NW',
+                          'PAC',
+                          'SW',
+                        ],
+                        standings: eastTeams,
+                        season: selectedSeason,
+                      ),
+                      ConferenceStandings(
+                        columnNames: const [
+                          'WESTERN',
+                          'W',
+                          'L',
+                          'PCT',
+                          'GB',
+                          'NRTG',
+                          'ORTG',
+                          'DRTG',
+                          'PACE',
+                          'STREAK',
+                          'Last 10',
+                          'HOME',
+                          'ROAD',
+                          '> .500',
+                          'EAST',
+                          'WEST',
+                          'ATL',
+                          'CEN',
+                          'SE',
+                          'NW',
+                          'PAC',
+                          'SW',
+                        ],
+                        standings: westTeams,
+                        season: selectedSeason,
+                      ),
+                    ],
+                  ),
+                ),
+                ScrollConfiguration(
+                  behavior: MyCustomScrollBehavior(),
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: divisions.keys.map((divisionName) {
+                      return DivisionStandings(
+                        columnNames: [
+                          divisionName,
+                          'W',
+                          'L',
+                          'PCT',
+                          'GB',
+                          'NRTG',
+                          'ORTG',
+                          'DRTG',
+                          'PACE',
+                          'STREAK',
+                          'Last 10',
+                          'HOME',
+                          'ROAD',
+                          '> .500',
+                          'EAST',
+                          'WEST',
+                        ],
+                        standings: divisions[divisionName]!,
+                        season: selectedSeason,
+                      );
+                    }).toList(),
+                  ),
+                ),
+                // Other tabs
+                Placeholder(), // Replace with your Bracket Tab implementation
+                Placeholder(), // Replace with your IST Tab implementation
+              ],
             ),
           );
   }

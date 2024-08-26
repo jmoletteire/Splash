@@ -6,22 +6,22 @@ import 'package:splash/utilities/constants.dart';
 
 import '../team/team_home.dart';
 
-class ConferenceStandings extends StatefulWidget {
+class DivisionStandings extends StatefulWidget {
   final List columnNames;
-  final List<Map<String, dynamic>> standings;
+  final List standings;
   final String season;
 
-  ConferenceStandings({
+  DivisionStandings({
     required this.columnNames,
     required this.standings,
     required this.season,
   });
 
   @override
-  State<ConferenceStandings> createState() => _ConferenceStandingsState();
+  State<DivisionStandings> createState() => _DivisionStandingsState();
 }
 
-class _ConferenceStandingsState extends State<ConferenceStandings> {
+class _DivisionStandingsState extends State<DivisionStandings> {
   late ScrollController scrollController;
   List<Map<String, dynamic>> teams = [];
 
@@ -76,11 +76,14 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      teams = [];
+    });
     _checkSeasons();
 
     teams.sort((a, b) {
-      return a['seasons'][widget.season]['STANDINGS']['PlayoffRank']
-          .compareTo(b['seasons'][widget.season]['STANDINGS']['PlayoffRank']);
+      return a['seasons'][widget.season]['STANDINGS']['DivisionRank']
+          .compareTo(b['seasons'][widget.season]['STANDINGS']['DivisionRank']);
     });
 
     return SliverTableView.builder(
@@ -152,24 +155,6 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
 
         /// WEST
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// VS ATLANTIC
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
-
-        /// VS CENTRAL
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// VS SOUTHEAST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// VS NORTHWEST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// VS PACIFIC
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
-
-        /// VS SOUTHWEST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -207,43 +192,16 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
             DecoratedBox(
               position: DecorationPosition.foreground,
               decoration: BoxDecoration(
-                color: Colors.grey.shade900.withOpacity(0.75),
-                border: int.parse(widget.season.substring(0, 4)) < 2019 || index != 5
-                    ? Border(
-                        bottom: BorderSide(
-                          color: Colors.white,
-                          width: int.parse(widget.season.substring(0, 4)) >= 2019 && index == 9
-                              ? 3.0
-                              : int.parse(widget.season.substring(0, 4)) < 2019 &&
-                                      int.parse(widget.season.substring(0, 4)) > 1983 &&
-                                      index == 7
-                                  ? 3.0
-                                  : int.parse(widget.season.substring(0, 4)) <= 1983 &&
-                                          index == 5
-                                      ? 3.0
-                                      : 0.125,
-                          style: BorderStyle.solid,
-                        ),
-                      )
-                    : null,
-              ),
+                  color: Colors.grey.shade900.withOpacity(0.75),
+                  border: const Border(
+                    bottom: BorderSide(
+                      color: Colors.white,
+                      width: 0.125,
+                      style: BorderStyle.solid,
+                    ),
+                  )),
               child: child,
             ),
-            if (int.parse(widget.season.substring(0, 4)) >= 2019 && index == 5)
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: CustomPaint(
-                  painter: DashedLinePainter(
-                    color: Colors.white,
-                    strokeWidth: 2.0,
-                  ),
-                  child: Container(
-                    height: 1.0,
-                  ),
-                ),
-              ),
           ],
         ),
       );
@@ -291,7 +249,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
               Expanded(
                 flex: 1,
                 child: Text(
-                  teams[row]['seasons'][widget.season]['STANDINGS']['PlayoffRank'].toString(),
+                  teams[row]['seasons'][widget.season]['STANDINGS']['DivisionRank'].toString(),
                   textAlign: TextAlign.center,
                   style: kBebasNormal.copyWith(
                     color: Colors.white70,
@@ -343,7 +301,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
             text: teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3));
       case 4:
         return StandingsDataText(
-            text: teams[row]['seasons'][widget.season]['STANDINGS']['ConferenceGamesBack']!
+            text: teams[row]['seasons'][widget.season]['STANDINGS']['DivisionGamesBack']!
                 .toString());
       case 5:
         try {
@@ -440,48 +398,6 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 16:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
-      case 17:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
-      case 18:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
-      case 19:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
-      case 20:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
-      case 21:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
       default:
         return const Text('');
     }
@@ -503,38 +419,5 @@ class StandingsDataText extends StatelessWidget {
         style: kBebasNormal.copyWith(fontSize: 19.0),
       ),
     );
-  }
-}
-
-class DashedLinePainter extends CustomPainter {
-  final Color color;
-  final double strokeWidth;
-
-  DashedLinePainter({required this.color, required this.strokeWidth});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth;
-
-    const dashWidth = 8.0;
-    const dashSpace = 4.0;
-    double startX = 0;
-    final double y = size.height;
-
-    while (startX < size.width) {
-      canvas.drawLine(
-        Offset(startX, y),
-        Offset(startX + dashWidth, y),
-        paint,
-      );
-      startX += dashWidth + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }
