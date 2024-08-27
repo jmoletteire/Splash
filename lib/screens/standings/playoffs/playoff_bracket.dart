@@ -68,39 +68,91 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
       height: MediaQuery.of(context).size.height / 10,
       width: MediaQuery.of(context).size.width / 5,
       decoration: BoxDecoration(
-        color: Colors.grey.shade900,
+        //color: Colors.grey.shade900,
         borderRadius: BorderRadius.circular(10.0),
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            kTeamNames[series['TEAM_TWO'].toString()] == null
+                ? Colors.grey
+                : series['TEAM_TWO_WINS'] == 4
+                    ? Colors.grey.shade700
+                    : kTeamColors[kTeamNames[series['TEAM_ONE'].toString()]![1]]![
+                        'primaryColor']!, // Transparent at the top
+            series['TEAM_ONE_WINS'] == 4
+                ? Colors.grey.shade700
+                : kTeamColors[kTeamNames[series['TEAM_TWO'].toString()]?[1]]![
+                    'primaryColor']!, // Opaque at the bottom
+          ],
+        ),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Image.asset(
-                'images/NBA_Logos/$teamOne.png',
-                width: 25.0,
-                height: 25.0,
-              ),
-              Image.asset(
-                'images/NBA_Logos/$teamTwo.png',
-                width: 25.0,
-                height: 25.0,
-              ),
+              series['TEAM_TWO_WINS'] == 4
+                  ? GrayscaleImage(imagePath: 'images/NBA_Logos/$teamOne.png')
+                  : Image.asset(
+                      'images/NBA_Logos/$teamOne.png',
+                      width: 24.0,
+                      height: 24.0,
+                    ),
+              const Text(' '),
+              series['TEAM_ONE_WINS'] == 4
+                  ? GrayscaleImage(imagePath: 'images/NBA_Logos/$teamTwo.png')
+                  : Image.asset(
+                      'images/NBA_Logos/$teamTwo.png',
+                      width: 24.0,
+                      height: 24.0,
+                    ),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                series['TEAM_ONE_ABBR'].toString(),
-                style: kBebasBold.copyWith(fontSize: 16.0),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${series['TEAM_ONE_SEED'].toString()} ',
+                      style: kBebasBold.copyWith(
+                        fontSize: 12.0, // smaller font size for TEAM_TWO_SEED
+                        color: series['TEAM_TWO_WINS'] == 4 ? Colors.grey : Colors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: series['TEAM_ONE_ABBR'].toString(),
+                      style: kBebasBold.copyWith(
+                        fontSize: 16.0, // keep the current styling for TEAM_TWO_ABBR
+                        color: series['TEAM_TWO_WINS'] == 4 ? Colors.grey : Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const Text(' '),
-              Text(
-                series['TEAM_TWO_ABBR'].toString(),
-                style: kBebasBold.copyWith(fontSize: 16.0),
-              ),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '${series['TEAM_TWO_SEED'].toString()} ',
+                      style: kBebasBold.copyWith(
+                        fontSize: 12.0, // smaller font size for TEAM_TWO_SEED
+                        color: series['TEAM_ONE_WINS'] == 4 ? Colors.grey : Colors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: series['TEAM_TWO_ABBR'].toString(),
+                      style: kBebasBold.copyWith(
+                        fontSize: 16.0, // keep the current styling for TEAM_TWO_ABBR
+                        color: series['TEAM_ONE_WINS'] == 4 ? Colors.grey : Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
           Row(
@@ -108,15 +160,21 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
             children: [
               Text(
                 series['TEAM_ONE_WINS'].toString(),
-                style: kBebasNormal.copyWith(fontSize: 14.0),
+                style: kBebasBold.copyWith(
+                  fontSize: 15.0,
+                  color: series['TEAM_TWO_WINS'] == 4 ? Colors.grey : Colors.white,
+                ),
               ),
               Text(
                 '-',
-                style: kBebasNormal.copyWith(fontSize: 14.0),
+                style: kBebasNormal.copyWith(fontSize: 15.0),
               ),
               Text(
                 series['TEAM_TWO_WINS'].toString(),
-                style: kBebasNormal.copyWith(fontSize: 14.0),
+                style: kBebasBold.copyWith(
+                  fontSize: 15.0,
+                  color: series['TEAM_ONE_WINS'] == 4 ? Colors.grey : Colors.white,
+                ),
               ),
             ],
           ),
@@ -133,7 +191,8 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
           // CustomPaint for drawing lines
           CustomPaint(
             size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
-            painter: BracketPainter(),
+            painter: BracketPainter(eastFirstRound, eastConfSemis, eastConfFinals, nbaFinals,
+                westConfFinals, westConfSemis, westFirstRound),
           ),
           Column(
             children: [
@@ -202,162 +261,251 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
 }
 
 class BracketPainter extends CustomPainter {
+  final List eastFirstRound;
+  final List eastConfSemis;
+  final Map<String, dynamic> eastConfFinals;
+  final Map<String, dynamic> nbaFinals;
+  final Map<String, dynamic> westConfFinals;
+  final List westConfSemis;
+  final List westFirstRound;
+
+  BracketPainter(
+    this.eastFirstRound,
+    this.eastConfSemis,
+    this.eastConfFinals,
+    this.nbaFinals,
+    this.westConfFinals,
+    this.westConfSemis,
+    this.westFirstRound,
+  );
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
+      ..color = Colors.white54
       ..strokeWidth = 2.0;
+
+    Paint getPaint(String teamId) {
+      Color teamColor = kTeamColors[kTeamNames[teamId]?[1]]!['primaryColor']!;
+      return Paint()
+        ..color = teamColor
+        ..strokeWidth = 3;
+    }
+
+    Paint choosePaint(Map<String, dynamic> round) {
+      Paint result =
+          round.isEmpty || (round['TEAM_ONE_WINS'] < 4 && round['TEAM_TWO_WINS'] < 4)
+              ? paint
+              : round['TEAM_ONE_WINS'] == 4
+                  ? getPaint(round['TEAM_ONE'].toString())
+                  : getPaint(round['TEAM_TWO'].toString());
+
+      return result;
+    }
 
     // Draw lines between rounds
     /// EAST FIRST ROUND
     canvas.drawLine(
-      Offset(size.width * 0.13, size.height * 0.1), // Starting point
-      Offset(size.width * 0.13, size.height * 0.135), // Ending point
-      paint,
+      Offset(size.width * 0.13, size.height * 0.1),
+      Offset(size.width * 0.13, size.height * 0.135),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[0].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.375, size.height * 0.1),
       Offset(size.width * 0.375, size.height * 0.135),
-      paint,
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[3].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.13, size.height * 0.135),
+      Offset(size.width * 0.2525, size.height * 0.135),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[0].value),
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.2525, size.height * 0.135),
       Offset(size.width * 0.375, size.height * 0.135),
-      paint,
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[3].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.135),
       Offset(size.width * 0.2525, size.height * 0.18),
-      paint,
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0].value),
     );
 
     /// EAST FIRST ROUND
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.1),
       Offset(size.width * 0.625, size.height * 0.135),
-      paint,
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[2].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.875, size.height * 0.1),
       Offset(size.width * 0.875, size.height * 0.135),
-      paint,
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[1].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.135),
+      Offset(size.width * 0.7525, size.height * 0.135),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[2].value),
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.7525, size.height * 0.135),
       Offset(size.width * 0.875, size.height * 0.135),
-      paint,
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[1].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.135),
       Offset(size.width * 0.7525, size.height * 0.18),
-      paint,
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1].value),
     );
 
     /// EAST SEMIS
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.265),
       Offset(size.width * 0.7525, size.height * 0.29),
-      paint,
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.265),
       Offset(size.width * 0.2525, size.height * 0.29),
-      paint,
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.29),
+      Offset(size.width * 0.5, size.height * 0.29),
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0].value),
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.5, size.height * 0.29),
       Offset(size.width * 0.7525, size.height * 0.29),
-      paint,
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.29),
       Offset(size.width * 0.5, size.height * 0.325),
-      paint,
+      eastConfFinals.isEmpty ? paint : choosePaint(eastConfFinals),
     );
 
     /// EAST FINALS
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.42),
       Offset(size.width * 0.5, size.height * 0.465),
-      paint,
+      eastConfFinals.isEmpty ? paint : choosePaint(eastConfFinals),
     );
 
     /// WEST FINALS
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.56),
       Offset(size.width * 0.5, size.height * 0.6),
-      paint,
+      westConfFinals.isEmpty ? paint : choosePaint(westConfFinals),
     );
 
     /// WEST SEMIS
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.735),
       Offset(size.width * 0.7525, size.height * 0.8),
-      paint,
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.735),
       Offset(size.width * 0.2525, size.height * 0.8),
-      paint,
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.735),
+      Offset(size.width * 0.5, size.height * 0.735),
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value),
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.5, size.height * 0.735),
       Offset(size.width * 0.7525, size.height * 0.735),
-      paint,
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.6),
       Offset(size.width * 0.5, size.height * 0.735),
-      paint,
+      westConfFinals.isEmpty ? paint : choosePaint(westConfFinals),
     );
 
     /// WEST FIRST ROUND
     canvas.drawLine(
       Offset(size.width * 0.13, size.height * 0.89),
       Offset(size.width * 0.13, size.height * 0.925),
-      paint,
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.375, size.height * 0.89),
       Offset(size.width * 0.375, size.height * 0.925),
-      paint,
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.13, size.height * 0.89),
+      Offset(size.width * 0.2525, size.height * 0.89),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0].value),
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.2525, size.height * 0.89),
       Offset(size.width * 0.375, size.height * 0.89),
-      paint,
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.8),
       Offset(size.width * 0.2525, size.height * 0.89),
-      paint,
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value),
     );
 
     /// WEST FIRST ROUND
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.89),
       Offset(size.width * 0.625, size.height * 0.925),
-      paint,
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.875, size.height * 0.89),
       Offset(size.width * 0.875, size.height * 0.925),
-      paint,
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.89),
+      Offset(size.width * 0.7525, size.height * 0.89),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2].value),
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.7525, size.height * 0.89),
       Offset(size.width * 0.875, size.height * 0.89),
-      paint,
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1].value),
     );
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.8),
       Offset(size.width * 0.7525, size.height * 0.89),
-      paint,
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value),
     );
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return false;
+  }
+}
+
+class GrayscaleImage extends StatelessWidget {
+  final String imagePath;
+
+  GrayscaleImage({required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return ColorFiltered(
+      colorFilter: const ColorFilter.matrix(<double>[
+        0.2126, 0.7152, 0.0722, 0, 0, // Red channel
+        0.2126, 0.7152, 0.0722, 0, 0, // Green channel
+        0.2126, 0.7152, 0.0722, 0, 0, // Blue channel
+        0, 0, 0, 1, 0, // Alpha channel
+      ]),
+      child: Image.asset(
+        imagePath,
+        width: 24.0,
+        height: 24.0,
+      ),
+    );
   }
 }
