@@ -126,7 +126,7 @@ class _GameCardState extends State<GameCard> {
                       children: [
                         Text(
                           summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
-                          style: kBebasNormal.copyWith(fontSize: 14.0, color: Colors.white70),
+                          style: kBebasBold.copyWith(fontSize: 14.0, color: Colors.white70),
                           textAlign: TextAlign.start,
                         ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[

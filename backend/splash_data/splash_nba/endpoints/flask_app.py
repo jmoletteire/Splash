@@ -324,12 +324,28 @@ def search():
             {
                 "$search": {
                     "index": "person_id",
-                    "text": {
-                        "query": query,
-                        "path": "DISPLAY_FIRST_LAST",
-                        "fuzzy": {
-                            "maxEdits": 2
-                        }
+                    "compound": {
+                        "should": [
+                            {
+                                "autocomplete": {
+                                    "query": query,
+                                    "path": "DISPLAY_FIRST_LAST",
+                                    "fuzzy": {
+                                        "maxEdits": 2,
+                                        "prefixLength": 1
+                                    }
+                                }
+                            },
+                            {
+                                "text": {
+                                    "query": query,
+                                    "path": "DISPLAY_FIRST_LAST",
+                                    "fuzzy": {
+                                        "maxEdits": 2
+                                    }
+                                }
+                            }
+                        ]
                     }
                 },
             },
@@ -390,6 +406,32 @@ def search():
     except Exception as e:
         logging.error(f" Error searching: {e}")
         return jsonify({"error": "Search failed"}), 500
+
+
+@app.route('/get_playoffs', methods=['GET'])
+def get_playoff_bracket():
+    try:
+        # logging.info(f"(get_playoffs) {request.args}")
+        query_params = request.args.to_dict()
+        # logging.info(f"(get_playoffs) {query_params}")
+        season = query_params.get('season')
+
+        # Query the database
+        playoffs = playoff_collection.find_one(
+            {f"SEASON": season},
+            {"_id": 0}
+        )
+
+        if playoffs:
+            # logging.info(f"(get_playoffs) Retrieved {season} playoffs from MongoDB")
+            return jsonify(playoffs)
+        else:
+            logging.warning("(get_playoffs) No games found in MongoDB")
+            return jsonify({"error": "No games found"})
+
+    except Exception as e:
+        logging.error(f"(get_playoffs) Error retrieving playoff data: {e}")
+        return jsonify({"error": "Failed to retrieve playoff data"}), 500
 
 
 @app.route('/game_dates', methods=['GET'])
@@ -629,12 +671,20 @@ if __name__ == '__main__':
     try:
         client = MongoClient('mongodb+srv://jmoletteire:J%40ckpa%24%245225@splash.p0xumnu.mongodb.net/')
         db = client.splash
+
         games_collection = db.nba_games
+
         teams_collection = db.nba_teams
+
         players_collection = db.nba_players
         player_shots_collection = db.nba_player_shot_data
+
+        playoff_collection = db.nba_playoff_history
+
         draft_collection = db.nba_draft_history
+
         transactions_collection = db.nba_transactions
+
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

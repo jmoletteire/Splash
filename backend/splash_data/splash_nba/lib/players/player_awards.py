@@ -16,8 +16,6 @@ keys = [
     'DESCRIPTION',
     'ALL_NBA_TEAM_NUMBER',
     'SEASON',
-    'MONTH',
-    'WEEK',
     'CONFERENCE',
     'TYPE'
 ]

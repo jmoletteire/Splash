@@ -154,22 +154,22 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
         TableColumn(width: MediaQuery.of(context).size.width * 0.15),
 
         /// VS ATLANTIC
-        TableColumn(width: MediaQuery.of(context).size.width * 0.15),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.135),
 
         /// VS CENTRAL
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.115),
 
         /// VS SOUTHEAST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.115),
 
         /// VS NORTHWEST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.115),
 
         /// VS PACIFIC
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.115),
 
         /// VS SOUTHWEST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.14),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.115),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,

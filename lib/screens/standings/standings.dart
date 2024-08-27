@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
+import 'package:splash/screens/standings/playoffs/playoff_bracket.dart';
+import 'package:splash/screens/standings/playoffs/playoffs_cache.dart';
+import 'package:splash/screens/standings/playoffs/playoffs_network_helper.dart';
 import 'package:splash/screens/team/team_cache.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -22,10 +25,11 @@ class Standings extends StatefulWidget {
   State<Standings> createState() => _StandingsState();
 }
 
-class _StandingsState extends State<Standings> with SingleTickerProviderStateMixin {
+class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   List<Map<String, dynamic>> eastTeams = [];
   List<Map<String, dynamic>> westTeams = [];
   late Map<String, dynamic> divisions;
+  late Map<String, dynamic> playoffs;
   late String selectedSeason;
   bool _isLoading = true;
   late ScrollController _scrollController;
@@ -33,6 +37,16 @@ class _StandingsState extends State<Standings> with SingleTickerProviderStateMix
   late TabController _tabController;
 
   int selectedYear = 2023;
+
+  void _initializeTabController(int index) {
+    final int tabLength = selectedYear >= 2023 ? 4 : 3;
+
+    // Dispose the old TabController if it exists
+    _tabController.dispose();
+
+    // Initialize the new TabController
+    _tabController = TabController(length: tabLength, vsync: this, initialIndex: index);
+  }
 
   Future<void> _showYearPicker(BuildContext context) async {
     final int? pickedYear = await showDialog<int>(
@@ -73,7 +87,12 @@ class _StandingsState extends State<Standings> with SingleTickerProviderStateMix
       setState(() {
         selectedYear = pickedYear;
         selectedSeason = '$selectedYear-${(selectedYear + 1).toString().substring(2)}';
+
+        int tabIndex = _tabController.index;
+        _initializeTabController(tabIndex);
+
         setDivisions();
+        getPlayoffs(selectedSeason);
       });
     }
   }
@@ -101,7 +120,24 @@ class _StandingsState extends State<Standings> with SingleTickerProviderStateMix
           divisions[div]!.add(team);
         }
       }
+
+      _isLoading = false;
     });
+  }
+
+  Future<void> getPlayoffs(String season) async {
+    final playoffsCache = Provider.of<PlayoffCache>(context, listen: false);
+    if (playoffsCache.containsPlayoffs(season)) {
+      setState(() {
+        playoffs = playoffsCache.getPlayoffs(season)!;
+      });
+    } else {
+      var fetchedPlayoffs = await PlayoffsNetworkHelper().getPlayoffs(season);
+      setState(() {
+        playoffs = fetchedPlayoffs;
+      });
+      playoffsCache.addPlayoffs(season, playoffs);
+    }
   }
 
   Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
@@ -136,7 +172,6 @@ class _StandingsState extends State<Standings> with SingleTickerProviderStateMix
         eastTeams = fetchedEastTeams;
         westTeams = fetchedWestTeams;
         setDivisions();
-        _isLoading = false;
       });
     } catch (e) {
       setState(() {
@@ -150,6 +185,7 @@ class _StandingsState extends State<Standings> with SingleTickerProviderStateMix
     super.initState();
     setTeams();
     selectedSeason = kCurrentSeason;
+    getPlayoffs(selectedSeason);
     _tabController = TabController(length: 4, vsync: this);
   }
 
@@ -319,8 +355,12 @@ class _StandingsState extends State<Standings> with SingleTickerProviderStateMix
                   ),
                 ),
                 // Other tabs
-                Placeholder(), // Replace with your Bracket Tab implementation
-                Placeholder(), // Replace with your IST Tab implementation
+                PlayoffBracket(
+                  key: ValueKey(selectedYear),
+                  playoffData: playoffs,
+                ), // Replace with your Bracket Tab implementation
+                if (int.parse(selectedSeason.substring(0, 4)) >= 2023)
+                  const Placeholder(), // Replace with your IST Tab implementation
               ],
             ),
           );
