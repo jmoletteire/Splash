@@ -224,6 +224,7 @@ def apply_player_filters(season, season_type, filters, position):
             {'PERSON_ID': {'$in': person_ids}},
             {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1,
              f'STATS.{season}.{season_type}.BASIC.AGE': 1,
+             f'STATS.{season}.{season_type}.BASIC.GP': 1,
              f'STATS.{season}.{season_type}.BASIC.MIN': 1,
              f'STATS.{season}.{season_type}.ADV.MIN': 1,
              f'STATS.{season}.{season_type}.ADV.POSS': 1,

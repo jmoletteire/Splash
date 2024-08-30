@@ -35,6 +35,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
   late TabController _tabController;
+  late ValueNotifier<Map<String, dynamic>> playoffDataNotifier;
 
   int selectedYear = 2023;
 
@@ -128,15 +129,13 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   Future<void> getPlayoffs(String season) async {
     final playoffsCache = Provider.of<PlayoffCache>(context, listen: false);
     if (playoffsCache.containsPlayoffs(season)) {
-      setState(() {
-        playoffs = playoffsCache.getPlayoffs(season)!;
-      });
+      playoffDataNotifier.value = playoffsCache.getPlayoffs(season)!;
+      setState(() {});
     } else {
       var fetchedPlayoffs = await PlayoffsNetworkHelper().getPlayoffs(season);
-      setState(() {
-        playoffs = fetchedPlayoffs;
-      });
-      playoffsCache.addPlayoffs(season, playoffs);
+      playoffDataNotifier.value = fetchedPlayoffs;
+      playoffsCache.addPlayoffs(season, playoffDataNotifier.value);
+      setState(() {});
     }
   }
 
@@ -183,6 +182,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    playoffDataNotifier = ValueNotifier<Map<String, dynamic>>({});
     setTeams();
     selectedSeason = kCurrentSeason;
     getPlayoffs(selectedSeason);
@@ -354,10 +354,14 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                     }).toList(),
                   ),
                 ),
-                // Other tabs
-                PlayoffBracket(
-                  key: ValueKey(selectedYear),
-                  playoffData: playoffs,
+                ValueListenableBuilder<Map<String, dynamic>>(
+                  valueListenable: playoffDataNotifier,
+                  builder: (context, playoffData, _) {
+                    return PlayoffBracket(
+                      key: ValueKey(selectedYear),
+                      playoffData: playoffData,
+                    );
+                  },
                 ), // Replace with your Bracket Tab implementation
                 if (int.parse(selectedSeason.substring(0, 4)) >= 2023)
                   const Placeholder(), // Replace with your IST Tab implementation

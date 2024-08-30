@@ -164,7 +164,7 @@ class _LastMeetingState extends State<LastMeeting> {
                                       .toStringAsFixed(0)
                                   : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
                                       .toStringAsFixed(0),
-                              style: kBebasNormal),
+                              style: kBebasBold),
                           Text(
                             '@',
                             style: kBebasBold.copyWith(fontSize: 14.0),
@@ -176,7 +176,7 @@ class _LastMeetingState extends State<LastMeeting> {
                                       .toStringAsFixed(0)
                                   : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
                                       .toStringAsFixed(0),
-                              style: kBebasNormal),
+                              style: kBebasBold),
                           SizedBox(
                             width: 24.0,
                             height: 24.0,
