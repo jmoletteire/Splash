@@ -145,293 +145,295 @@ class _TeamStatsState extends State<TeamStats> {
         ? (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!);
 
-    return Stack(children: [
-      SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              margin: const EdgeInsets.all(11.0),
-              color: Colors.grey.shade900,
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            '${widget.team['seasons'][selectedSeason]['WINS']!.toString()}-${widget.team['seasons'][selectedSeason]['LOSSES']!.toString()} (${widget.team['seasons'][selectedSeason]['WIN_PCT']!.toStringAsFixed(3)})',
-                            textAlign: TextAlign.center,
-                            style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            '${getStanding(widget.team['seasons'][selectedSeason]['CONF_RANK']!)} ${widget.team['CONF'].substring(0, 4)}',
-                            textAlign: TextAlign.center,
-                            style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            getPlayoffs(widget.team['seasons'][selectedSeason]!),
-                            textAlign: TextAlign.center,
-                            style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            'RECORD',
-                            textAlign: TextAlign.center,
-                            style:
-                                kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            'CONF',
-                            textAlign: TextAlign.center,
-                            style:
-                                kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            'PLAYOFFS',
-                            textAlign: TextAlign.center,
-                            style:
-                                kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (seasons.indexOf(selectedSeason) < 8)
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               Card(
-                margin: const EdgeInsets.fromLTRB(11.0, 0.0, 11.0, 11.0),
+                margin: const EdgeInsets.all(11.0),
                 color: Colors.grey.shade900,
                 child: Padding(
-                  padding: const EdgeInsets.all(75.0),
-                  child: AnimatedPolarAreaChart(
-                    key: ValueKey(selectedSeason),
-                    selectedSeasonType: selectedSeasonType,
-                    values: [
-                      getFinalPercentile('Defense'),
-                      getFinalPercentile('Rebounding'),
-                      getFinalPercentile('Hustle'),
-                      getFinalPercentile('Efficiency'),
-                      getFinalPercentile('Shooting'),
-                    ],
-                    colors: [
-                      teamColor.withOpacity(getFinalPercentile('Defense')),
-                      teamColor.withOpacity(getFinalPercentile('Rebounding')),
-                      teamColor.withOpacity(getFinalPercentile('Hustle')),
-                      teamColor.withOpacity(getFinalPercentile('Efficiency')),
-                      teamColor.withOpacity(getFinalPercentile('Shooting')),
-                    ],
-                    labels: const [
-                      'Defense',
-                      'Rebounding',
-                      'Hustle',
-                      'Efficiency',
-                      'Shooting',
-                    ],
-                    maxPossibleValue: 1.0,
-                  ),
-                ),
-              ),
-            if (seasons.indexOf(selectedSeason) < 28)
-              TeamStatCard(
-                teamStats: widget.team['seasons'][selectedSeason]['STATS'],
-                selectedSeason: selectedSeason,
-                selectedSeasonType: selectedSeasonType,
-                statGroup: 'EFFICIENCY',
-                perMode: perMode,
-              ),
-            if (seasons.indexOf(selectedSeason) < 28)
-              TeamStatCard(
-                teamStats: widget.team['seasons'][selectedSeason]['STATS'],
-                selectedSeason: selectedSeason,
-                selectedSeasonType: selectedSeasonType,
-                statGroup: 'SCORING',
-                perMode: perMode,
-              ),
-            if (seasons.indexOf(selectedSeason) < 28)
-              TeamStatCard(
-                teamStats: widget.team['seasons'][selectedSeason]['STATS'],
-                selectedSeason: selectedSeason,
-                selectedSeasonType: selectedSeasonType,
-                statGroup: 'REBOUNDING',
-                perMode: perMode,
-              ),
-            if (seasons.indexOf(selectedSeason) < 28)
-              TeamStatCard(
-                teamStats: widget.team['seasons'][selectedSeason]['STATS'],
-                selectedSeason: selectedSeason,
-                selectedSeasonType: selectedSeasonType,
-                statGroup: 'DEFENSE',
-                perMode: perMode,
-              ),
-            if (seasons.indexOf(selectedSeason) < 8)
-              TeamStatCard(
-                teamStats: widget.team['seasons'][selectedSeason]['STATS'],
-                selectedSeason: selectedSeason,
-                selectedSeasonType: selectedSeasonType,
-                statGroup: 'HUSTLE',
-                perMode: perMode,
-              ),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 100),
-            ),
-          ],
-        ),
-      ),
-      Positioned(
-        bottom: kBottomNavigationBarHeight - kToolbarHeight,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey.shade900,
-            border: Border(
-              top: BorderSide(color: Colors.grey.shade800, width: 0.75),
-              bottom: BorderSide(color: Colors.grey.shade800, width: 0.2),
-            ),
-          ),
-          width: MediaQuery.sizeOf(context).width,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey.shade900,
-                    border: Border.all(color: teamColor),
-                    borderRadius: BorderRadius.circular(10.0)),
-                margin: const EdgeInsets.all(11.0),
-                child: DropdownButton<String>(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  borderRadius: BorderRadius.circular(10.0),
-                  menuMaxHeight: 300.0,
-                  dropdownColor: Colors.grey.shade900,
-                  isExpanded: false,
-                  underline: Container(),
-                  value: selectedSeason,
-                  items: seasons.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: kBebasNormal.copyWith(fontSize: 19.0),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedSeason = value!;
-                      selectedSeasonType = 'REGULAR SEASON';
-                    });
-                  },
-                ),
-              ),
-
-              /// NOTE: Mistake in data. All teams have PLAYOFFS key, but
-              /// not PLAYOFFS.ADV, which is why it is used instead.
-              if (widget.team['seasons'][selectedSeason]['STATS']['PLAYOFFS']
-                  .containsKey('ADV'))
-                Expanded(
-                  flex: 1,
-                  child: Stack(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Transform.scale(
-                        scale: 0.9,
-                        child: Transform.rotate(
-                          angle: -1.5708, // Rotate 90 degrees counterclockwise
-                          child: CupertinoSwitch(
-                            activeColor: teamColor,
-                            value: _playoffSwitch,
-                            onChanged: (value) {
-                              setState(() {
-                                _playoffSwitch = value;
-                                _playoffSwitch
-                                    ? selectedSeasonType = 'PLAYOFFS'
-                                    : selectedSeasonType = 'REGULAR SEASON';
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 2,
-                        left: 11, // Adjust based on your switch size
-                        child: IgnorePointer(
-                          ignoring: true,
-                          child: Visibility(
-                            visible: _playoffSwitch,
-                            child: SvgPicture.asset(
-                              'images/playoffs.svg',
-                              width: 16.0,
-                              height: 16.0,
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              '${widget.team['seasons'][selectedSeason]['WINS']!.toString()}-${widget.team['seasons'][selectedSeason]['LOSSES']!.toString()} (${widget.team['seasons'][selectedSeason]['WIN_PCT']!.toStringAsFixed(3)})',
+                              textAlign: TextAlign.center,
+                              style: kBebasOffWhite.copyWith(fontSize: 18.0),
                             ),
                           ),
-                        ),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              '${getStanding(widget.team['seasons'][selectedSeason]['CONF_RANK']!)} ${widget.team['CONF'].substring(0, 4)}',
+                              textAlign: TextAlign.center,
+                              style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              getPlayoffs(widget.team['seasons'][selectedSeason]!),
+                              textAlign: TextAlign.center,
+                              style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              'RECORD',
+                              textAlign: TextAlign.center,
+                              style:
+                                  kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              'CONF',
+                              textAlign: TextAlign.center,
+                              style:
+                                  kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text(
+                              'PLAYOFFS',
+                              textAlign: TextAlign.center,
+                              style:
+                                  kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-              const Spacer(),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey.shade900,
-                    border: Border.all(color: teamColor),
-                    borderRadius: BorderRadius.circular(25.0)),
-                margin: const EdgeInsets.all(11.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(3.0),
-                  child: ToggleSwitch(
-                    initialLabelIndex: initialLabelIndex,
-                    totalSwitches: 2,
-                    labels: const ['Total', 'Per 100'],
-                    animate: true,
-                    animationDuration: 200,
-                    curve: Curves.decelerate,
-                    cornerRadius: 20.0,
-                    customWidths: [
-                      (MediaQuery.sizeOf(context).width - 28) / 4,
-                      (MediaQuery.sizeOf(context).width - 28) / 4
-                    ],
-                    activeBgColor: [Colors.grey.shade800],
-                    activeFgColor: teamSecondaryColor,
-                    inactiveBgColor: Colors.grey.shade900,
-                    customTextStyles: [
-                      kBebasNormal.copyWith(fontSize: 16.0),
-                      kBebasNormal.copyWith(fontSize: 16.0)
-                    ],
-                    onToggle: (index) {
-                      setState(() {
-                        perMode = modes[index!];
-                        initialLabelIndex = index;
-                      });
-                    },
+              ),
+              if (seasons.indexOf(selectedSeason) < 8)
+                Card(
+                  margin: const EdgeInsets.fromLTRB(11.0, 0.0, 11.0, 11.0),
+                  color: Colors.grey.shade900,
+                  child: Padding(
+                    padding: const EdgeInsets.all(75.0),
+                    child: AnimatedPolarAreaChart(
+                      key: ValueKey(selectedSeason),
+                      selectedSeasonType: selectedSeasonType,
+                      values: [
+                        getFinalPercentile('Defense'),
+                        getFinalPercentile('Rebounding'),
+                        getFinalPercentile('Hustle'),
+                        getFinalPercentile('Efficiency'),
+                        getFinalPercentile('Shooting'),
+                      ],
+                      colors: [
+                        teamColor.withOpacity(getFinalPercentile('Defense')),
+                        teamColor.withOpacity(getFinalPercentile('Rebounding')),
+                        teamColor.withOpacity(getFinalPercentile('Hustle')),
+                        teamColor.withOpacity(getFinalPercentile('Efficiency')),
+                        teamColor.withOpacity(getFinalPercentile('Shooting')),
+                      ],
+                      labels: const [
+                        'Defense',
+                        'Rebounding',
+                        'Hustle',
+                        'Efficiency',
+                        'Shooting',
+                      ],
+                      maxPossibleValue: 1.0,
+                    ),
                   ),
                 ),
+              if (seasons.indexOf(selectedSeason) < 28)
+                TeamStatCard(
+                  teamStats: widget.team['seasons'][selectedSeason]['STATS'],
+                  selectedSeason: selectedSeason,
+                  selectedSeasonType: selectedSeasonType,
+                  statGroup: 'EFFICIENCY',
+                  perMode: perMode,
+                ),
+              if (seasons.indexOf(selectedSeason) < 28)
+                TeamStatCard(
+                  teamStats: widget.team['seasons'][selectedSeason]['STATS'],
+                  selectedSeason: selectedSeason,
+                  selectedSeasonType: selectedSeasonType,
+                  statGroup: 'SCORING',
+                  perMode: perMode,
+                ),
+              if (seasons.indexOf(selectedSeason) < 28)
+                TeamStatCard(
+                  teamStats: widget.team['seasons'][selectedSeason]['STATS'],
+                  selectedSeason: selectedSeason,
+                  selectedSeasonType: selectedSeasonType,
+                  statGroup: 'REBOUNDING',
+                  perMode: perMode,
+                ),
+              if (seasons.indexOf(selectedSeason) < 28)
+                TeamStatCard(
+                  teamStats: widget.team['seasons'][selectedSeason]['STATS'],
+                  selectedSeason: selectedSeason,
+                  selectedSeasonType: selectedSeasonType,
+                  statGroup: 'DEFENSE',
+                  perMode: perMode,
+                ),
+              if (seasons.indexOf(selectedSeason) < 8)
+                TeamStatCard(
+                  teamStats: widget.team['seasons'][selectedSeason]['STATS'],
+                  selectedSeason: selectedSeason,
+                  selectedSeasonType: selectedSeasonType,
+                  statGroup: 'HUSTLE',
+                  perMode: perMode,
+                ),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 100),
               ),
             ],
           ),
         ),
-      ),
-    ]);
+        Positioned(
+          bottom: kBottomNavigationBarHeight - kToolbarHeight,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade900,
+              border: Border(
+                top: BorderSide(color: Colors.grey.shade800, width: 0.75),
+                bottom: BorderSide(color: Colors.grey.shade800, width: 0.2),
+              ),
+            ),
+            width: MediaQuery.sizeOf(context).width,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade900,
+                      border: Border.all(color: teamColor),
+                      borderRadius: BorderRadius.circular(10.0)),
+                  margin: const EdgeInsets.all(11.0),
+                  child: DropdownButton<String>(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                    menuMaxHeight: 300.0,
+                    dropdownColor: Colors.grey.shade900,
+                    isExpanded: false,
+                    underline: Container(),
+                    value: selectedSeason,
+                    items: seasons.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: kBebasNormal.copyWith(fontSize: 19.0),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedSeason = value!;
+                        selectedSeasonType = 'REGULAR SEASON';
+                      });
+                    },
+                  ),
+                ),
+
+                /// NOTE: Mistake in data. All teams have PLAYOFFS key, but
+                /// not PLAYOFFS.ADV, which is why it is used instead.
+                if (widget.team['seasons'][selectedSeason]['STATS']['PLAYOFFS']
+                    .containsKey('ADV'))
+                  Expanded(
+                    flex: 1,
+                    child: Stack(
+                      children: [
+                        Transform.scale(
+                          scale: 0.9,
+                          child: Transform.rotate(
+                            angle: -1.5708, // Rotate 90 degrees counterclockwise
+                            child: CupertinoSwitch(
+                              activeColor: teamColor,
+                              value: _playoffSwitch,
+                              onChanged: (value) {
+                                setState(() {
+                                  _playoffSwitch = value;
+                                  _playoffSwitch
+                                      ? selectedSeasonType = 'PLAYOFFS'
+                                      : selectedSeasonType = 'REGULAR SEASON';
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 2,
+                          left: 11, // Adjust based on your switch size
+                          child: IgnorePointer(
+                            ignoring: true,
+                            child: Visibility(
+                              visible: _playoffSwitch,
+                              child: SvgPicture.asset(
+                                'images/playoffs.svg',
+                                width: 16.0,
+                                height: 16.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const Spacer(),
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade900,
+                      border: Border.all(color: teamColor),
+                      borderRadius: BorderRadius.circular(25.0)),
+                  margin: const EdgeInsets.all(11.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: ToggleSwitch(
+                      initialLabelIndex: initialLabelIndex,
+                      totalSwitches: 2,
+                      labels: const ['Total', 'Per 100'],
+                      animate: true,
+                      animationDuration: 200,
+                      curve: Curves.decelerate,
+                      cornerRadius: 20.0,
+                      customWidths: [
+                        (MediaQuery.sizeOf(context).width - 28) / 4,
+                        (MediaQuery.sizeOf(context).width - 28) / 4
+                      ],
+                      activeBgColor: [Colors.grey.shade800],
+                      activeFgColor: teamSecondaryColor,
+                      inactiveBgColor: Colors.grey.shade900,
+                      customTextStyles: [
+                        kBebasNormal.copyWith(fontSize: 16.0),
+                        kBebasNormal.copyWith(fontSize: 16.0)
+                      ],
+                      onToggle: (index) {
+                        setState(() {
+                          perMode = modes[index!];
+                          initialLabelIndex = index;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

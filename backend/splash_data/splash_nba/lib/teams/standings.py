@@ -247,6 +247,9 @@ def break_tie_multiple_teams(season, teams, rank, standings, step):
 
     original_rank = teams[0][rank]  # Assume all teams start with the same rank
 
+    if original_rank == 0:
+        original_rank = 1
+
     def update_team_ranks(grouped_teams, starting_rank, step):
         current_rank = starting_rank
         for group in grouped_teams:
@@ -368,6 +371,7 @@ def update_current_standings():
 
 def fetch_all_standings():
     seasons = [
+        '2020-21'
         #'2005-06',
         #'2004-05',
         #'2003-04',
@@ -375,7 +379,7 @@ def fetch_all_standings():
         #'2001-02',
         #'2000-01',
         #'1999-00',
-        '1998-99',
+        #'1998-99',
         #'1997-98',
         #'1996-97',
         #'1995-96',
