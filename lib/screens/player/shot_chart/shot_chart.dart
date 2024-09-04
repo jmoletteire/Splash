@@ -216,6 +216,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
           modifiedShotType = 'Fadeaway Jumper';
         } else if (modifiedShotType.contains('Alley Oop')) {
           modifiedShotType = 'Alley-Oop';
+        } else if (modifiedShotType.contains('Slam Dunk')) {
+          modifiedShotType = 'Dunk';
         } else if (modifiedShotType.contains('Reverse Dunk')) {
           modifiedShotType = 'Dunk';
         } else if (modifiedShotType.contains('Reverse Layup')) {

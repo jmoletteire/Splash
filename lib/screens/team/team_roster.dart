@@ -13,13 +13,16 @@ class TeamRoster extends StatefulWidget {
   State<TeamRoster> createState() => _TeamRosterState();
 }
 
-class _TeamRosterState extends State<TeamRoster> {
+class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMixin {
   late List<String> seasons;
   late String selectedSeason;
   List<dynamic> players = [];
   bool _isLoading = true;
   String sortedBy = 'Name';
   String sortOrder = 'ASC';
+
+  @override
+  bool get wantKeepAlive => true;
 
   void setPlayers(String sortBy, String order) {
     try {
@@ -97,12 +100,48 @@ class _TeamRosterState extends State<TeamRoster> {
               color: teamColor,
             ),
           )
-        : Stack(
-            children: [
-              CustomScrollView(
-                slivers: [
-                  SliverPinnedHeader(
-                    child: Container(
+        : CustomScrollView(
+            slivers: [
+              SliverPinnedHeader(
+                child: Column(
+                  children: [
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.045,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade900,
+                        border: const Border(
+                          bottom: BorderSide(
+                            color: Colors.white70,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: DropdownButton<String>(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                        menuMaxHeight: 300.0,
+                        dropdownColor: Colors.grey.shade900,
+                        isExpanded: true,
+                        underline: Container(),
+                        value: selectedSeason,
+                        items: seasons.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: kBebasOffWhite,
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedSeason = value!;
+                            setPlayers(sortedBy, sortOrder);
+                          });
+                        },
+                      ),
+                    ),
+                    Container(
                       padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade800,
@@ -149,7 +188,7 @@ class _TeamRosterState extends State<TeamRoster> {
                             ),
                           ),
                           Expanded(
-                            flex: 2,
+                            flex: 1,
                             child: GestureDetector(
                               child: Container(
                                 color: Colors.transparent,
@@ -217,136 +256,82 @@ class _TeamRosterState extends State<TeamRoster> {
                         ],
                       ),
                     ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PlayerHome(
-                                  teamId: widget.team["TEAM_ID"].toString(),
-                                  playerId: players[index],
-                                ),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                            height: MediaQuery.of(context).size.height * 0.05,
-                            decoration: BoxDecoration(
-                                color: Colors.grey.shade900,
-                                border: const Border(
-                                    bottom: BorderSide(color: Colors.white54, width: 0.125))),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 11,
-                                  child: Row(
-                                    children: [
-                                      PlayerAvatar(
-                                        radius: 16.0,
-                                        backgroundColor: Colors.white12,
-                                        playerImageUrl:
-                                            'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png',
-                                      ),
-                                      const SizedBox(
-                                        width: 15.0,
-                                      ),
-                                      Text(
-                                        widget.team['seasons'][selectedSeason]['ROSTER']
-                                            [players[index]]['PLAYER'],
-                                        style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    widget.team['seasons'][selectedSeason]['ROSTER']
-                                                [players[index]]['NUM'] !=
-                                            null
-                                        ? '${widget.team['seasons'][selectedSeason]['ROSTER'][players[index]]['NUM']}'
-                                        : '',
-                                    textAlign: TextAlign.center,
-                                    style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    widget.team['seasons'][selectedSeason]['ROSTER']
-                                        [players[index]]['POSITION'],
-                                    textAlign: TextAlign.center,
-                                    style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                                  ),
-                                ),
-                              ],
+                  ],
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PlayerHome(
+                              teamId: widget.team["TEAM_ID"].toString(),
+                              playerId: players[index],
                             ),
                           ),
                         );
                       },
-                      childCount: players.length,
-                    ),
-                  ),
-                  const SliverPadding(
-                      padding: EdgeInsets.only(
-                    bottom: kBottomNavigationBarHeight + kToolbarHeight,
-                  ))
-                ],
-              ),
-              Positioned(
-                bottom: kBottomNavigationBarHeight - kToolbarHeight,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade900,
-                    border: Border(
-                      top: BorderSide(color: Colors.grey.shade800, width: 0.75),
-                      bottom: BorderSide(color: Colors.grey.shade800, width: 0.2),
-                    ),
-                  ),
-                  width: MediaQuery.sizeOf(context).width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                        height: MediaQuery.of(context).size.height * 0.05,
                         decoration: BoxDecoration(
                             color: Colors.grey.shade900,
-                            border: Border.all(color: teamColor),
-                            borderRadius: BorderRadius.circular(10.0)),
-                        margin: const EdgeInsets.all(11.0),
-                        child: DropdownButton<String>(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          borderRadius: BorderRadius.circular(10.0),
-                          menuMaxHeight: 300.0,
-                          dropdownColor: Colors.grey.shade900,
-                          isExpanded: false,
-                          underline: Container(),
-                          value: selectedSeason,
-                          items: seasons.map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: kBebasNormal.copyWith(fontSize: 19.0),
+                            border: const Border(
+                                bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              flex: 11,
+                              child: Row(
+                                children: [
+                                  PlayerAvatar(
+                                    radius: 16.0,
+                                    backgroundColor: Colors.white12,
+                                    playerImageUrl:
+                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png',
+                                  ),
+                                  const SizedBox(
+                                    width: 15.0,
+                                  ),
+                                  Text(
+                                    widget.team['seasons'][selectedSeason]['ROSTER']
+                                        [players[index]]['PLAYER'],
+                                    style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                  ),
+                                ],
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? value) {
-                            setState(() {
-                              selectedSeason = value!;
-                              setPlayers("Name", "ASC");
-                            });
-                          },
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                widget.team['seasons'][selectedSeason]['ROSTER']
+                                            [players[index]]['NUM'] !=
+                                        null
+                                    ? '${widget.team['seasons'][selectedSeason]['ROSTER'][players[index]]['NUM']}'
+                                    : '',
+                                textAlign: TextAlign.center,
+                                style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                widget.team['seasons'][selectedSeason]['ROSTER']
+                                    [players[index]]['POSITION'],
+                                textAlign: TextAlign.center,
+                                style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    );
+                  },
+                  childCount: players.length,
                 ),
               ),
             ],

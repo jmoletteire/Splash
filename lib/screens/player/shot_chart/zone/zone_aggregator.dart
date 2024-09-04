@@ -23,7 +23,7 @@ class ZoneAggregator {
       clockwise: false,
     );
     aboveBreakThreeLeft.lineTo(0, courtSize.height - courtSize.height * (14 / 47));
-    zones.add(ZoneData(zoneName: 'AB3 (L)', zonePath: aboveBreakThreeLeft));
+    zones.add(ZoneData(zoneName: 'AB3 (R)', zonePath: aboveBreakThreeLeft));
 
     // AB3 RIGHT
     Path aboveBreakThreeRight = Path();
@@ -39,7 +39,7 @@ class ZoneAggregator {
     );
     aboveBreakThreeRight.lineTo(
         courtSize.width, courtSize.height - courtSize.height * (14 / 47));
-    zones.add(ZoneData(zoneName: 'AB3 (R)', zonePath: aboveBreakThreeRight));
+    zones.add(ZoneData(zoneName: 'AB3 (L)', zonePath: aboveBreakThreeRight));
 
     // AB3 CENTER
     Path aboveBreakThreeCenter = Path();
@@ -63,7 +63,7 @@ class ZoneAggregator {
       courtSize.width * (3 / 50),
       courtSize.height * (14 / 47),
     ));
-    zones.add(ZoneData(zoneName: 'C3 (L)', zonePath: cornerThreeLeft));
+    zones.add(ZoneData(zoneName: 'C3 (R)', zonePath: cornerThreeLeft));
 
     // C3 RIGHT
     Path cornerThreeRight = Path();
@@ -73,7 +73,7 @@ class ZoneAggregator {
       courtSize.width * (3 / 50),
       courtSize.height * (14 / 47),
     ));
-    zones.add(ZoneData(zoneName: 'C3 (R)', zonePath: cornerThreeRight));
+    zones.add(ZoneData(zoneName: 'C3 (L)', zonePath: cornerThreeRight));
 
     // LONG MID RANGE LEFT
     Path longMidRangeLeft = Path();
@@ -93,7 +93,7 @@ class ZoneAggregator {
       radius: Radius.circular(courtSize.width * (16 / 50)),
       clockwise: false,
     );
-    zones.add(ZoneData(zoneName: 'LONG MID RANGE (L)', zonePath: longMidRangeLeft));
+    zones.add(ZoneData(zoneName: 'LONG MID RANGE (R)', zonePath: longMidRangeLeft));
 
     // LONG MID RANGE RIGHT
     Path longMidRangeRight = Path();
@@ -115,7 +115,7 @@ class ZoneAggregator {
       radius: Radius.circular(courtSize.width * (16 / 50)),
       clockwise: true,
     );
-    zones.add(ZoneData(zoneName: 'LONG MID RANGE (R)', zonePath: longMidRangeRight));
+    zones.add(ZoneData(zoneName: 'LONG MID RANGE (L)', zonePath: longMidRangeRight));
 
     // LONG MID RANGE CENTER
     Path longMidRangeCenter = Path();

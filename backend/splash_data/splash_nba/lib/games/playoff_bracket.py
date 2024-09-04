@@ -138,7 +138,7 @@ def get_playoff_bracket_data(season, playoff_data):
                 game_info['BOXSCORE']['TeamStats'][0]['TEAM_ID'] == game['VISITOR_TEAM_ID'] else \
                 game_info['BOXSCORE']['TeamStats'][1]['PTS']
 
-                if i == 0:
+                if i == (len(games_list)-1):
                     series['TEAM_ONE_WINS'] = game_info['SUMMARY']['SeasonSeries'][0]['HOME_TEAM_WINS']
                     series['TEAM_TWO_WINS'] = game_info['SUMMARY']['SeasonSeries'][0]['HOME_TEAM_LOSSES']
 

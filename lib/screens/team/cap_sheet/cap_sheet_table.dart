@@ -62,7 +62,7 @@ class _CapSheetState extends State<CapSheet> {
   List columnNames = [
     'PLAYER',
     'AGE',
-    'POS',
+    'YRS',
     '\'24-25',
     '\'25-26',
     '\'26-27',
@@ -447,6 +447,8 @@ class _CapSheetState extends State<CapSheet> {
     // Identify the last year of the player's contract
     List<String> contractYears = player['years'].keys.toList();
     contractYears.sort(); // Sort the years to get the last one
+    int yearsRemaining =
+        int.parse(contractYears.last) - int.parse(kCurrentSeason.substring(0, 4));
 
     String freeAgentYear = contractYears.isNotEmpty
         ? '\'${(int.parse(contractYears.last) + 1).toString().substring(2)}-${(int.parse(contractYears.last) + 2).toString().substring(2)}'
@@ -544,10 +546,10 @@ class _CapSheetState extends State<CapSheet> {
           return const CapSheetText(text: '-');
         }
 
-      /// POSITION
+      /// YRS REMAINING
       case 2:
         try {
-          return const CapSheetText(text: ('-'));
+          return CapSheetText(text: '${yearsRemaining}Y');
         } catch (stack) {
           return const CapSheetText(text: '-');
         }

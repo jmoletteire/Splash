@@ -16,6 +16,9 @@ import '../../utilities/team.dart';
 import '../search_screen.dart';
 import 'conference_standings.dart';
 import 'division_standings.dart';
+import 'nba_cup/nba_cup.dart';
+import 'nba_cup/nba_cup_cache.dart';
+import 'nba_cup/nba_cup_network_helper.dart';
 
 class Standings extends StatefulWidget {
   static const String id = 'standings';
@@ -26,16 +29,17 @@ class Standings extends StatefulWidget {
 }
 
 class _StandingsState extends State<Standings> with TickerProviderStateMixin {
+  bool _isLoading = true;
   List<Map<String, dynamic>> eastTeams = [];
   List<Map<String, dynamic>> westTeams = [];
   late Map<String, dynamic> divisions;
   late Map<String, dynamic> playoffs;
   late String selectedSeason;
-  bool _isLoading = true;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
   late TabController _tabController;
   late ValueNotifier<Map<String, dynamic>> playoffDataNotifier;
+  late ValueNotifier<Map<String, dynamic>> cupDataNotifier;
 
   int selectedYear = 2023;
 
@@ -92,8 +96,10 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
         int tabIndex = _tabController.index;
         _initializeTabController(tabIndex);
 
+        setTeams();
         setDivisions();
         getPlayoffs(selectedSeason);
+        getNbaCup(selectedSeason);
       });
     }
   }
@@ -135,6 +141,19 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
       var fetchedPlayoffs = await PlayoffsNetworkHelper().getPlayoffs(season);
       playoffDataNotifier.value = fetchedPlayoffs;
       playoffsCache.addPlayoffs(season, playoffDataNotifier.value);
+      setState(() {});
+    }
+  }
+
+  Future<void> getNbaCup(String season) async {
+    final nbaCupCache = Provider.of<NbaCupCache>(context, listen: false);
+    if (nbaCupCache.containsNbaCup(season)) {
+      cupDataNotifier.value = nbaCupCache.getNbaCup(season)!;
+      setState(() {});
+    } else {
+      var fetchedCup = await NbaCupNetworkHelper().getNbaCup(season);
+      cupDataNotifier.value = fetchedCup;
+      nbaCupCache.addNbaCup(season, cupDataNotifier.value);
       setState(() {});
     }
   }
@@ -183,9 +202,11 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     playoffDataNotifier = ValueNotifier<Map<String, dynamic>>({});
-    setTeams();
+    cupDataNotifier = ValueNotifier<Map<String, dynamic>>({});
     selectedSeason = kCurrentSeason;
+    setTeams();
     getPlayoffs(selectedSeason);
+    getNbaCup(selectedSeason);
     _tabController = TabController(length: 4, vsync: this);
   }
 
@@ -362,9 +383,18 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                       playoffData: playoffData,
                     );
                   },
-                ), // Replace with your Bracket Tab implementation
+                ),
                 if (int.parse(selectedSeason.substring(0, 4)) >= 2023)
-                  const Placeholder(), // Replace with your IST Tab implementation
+                  ValueListenableBuilder<Map<String, dynamic>>(
+                    valueListenable: cupDataNotifier,
+                    builder: (context, cupData, _) {
+                      return NbaCup(
+                        key: ValueKey(selectedYear),
+                        cupData: cupData,
+                        selectedSeason: selectedSeason,
+                      );
+                    },
+                  ),
               ],
             ),
           );

@@ -6,6 +6,7 @@ import 'package:splash/screens/more/transactions/transactions_cache.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/shot_chart/shot_chart_cache.dart';
 import 'package:splash/screens/search_screen.dart';
+import 'package:splash/screens/standings/nba_cup/nba_cup_cache.dart';
 import 'package:splash/screens/standings/playoffs/playoffs_cache.dart';
 import 'package:splash/screens/team/team_cache.dart';
 import 'package:splash/utilities/game_dates.dart';
@@ -21,6 +22,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => TeamCache()),
         ChangeNotifierProvider(create: (_) => GameCache()),
         ChangeNotifierProvider(create: (_) => PlayoffCache()),
+        ChangeNotifierProvider(create: (_) => NbaCupCache()),
         ChangeNotifierProvider(create: (_) => TransactionsCache()),
         ChangeNotifierProvider(create: (_) => DraftCache()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),

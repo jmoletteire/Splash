@@ -47,7 +47,7 @@ class ZonePainter extends CustomPainter {
         // Move the canvas origin to the center of the text
         canvas.translate(center.dx, center.dy);
         // Rotate the canvas by 90 degrees counterclockwise
-        if (zone.zoneName == 'C3 (L)') {
+        if (zone.zoneName == 'C3 (R)') {
           canvas.rotate(-90 * 3.14159 / 180);
         } else {
           canvas.rotate(90 * 3.14159 / 180);

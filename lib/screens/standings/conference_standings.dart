@@ -391,8 +391,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
                   fontSize: 18.0,
                   color: teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!
                           .contains('W')
-                      ? Colors.green
-                      : Colors.red),
+                      ? const Color(0xFF35C759)
+                      : const Color(0xFFFF3B31)),
             ),
           );
         } catch (e) {
@@ -489,14 +489,16 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
 }
 
 class StandingsDataText extends StatelessWidget {
-  const StandingsDataText({super.key, required this.text, this.alignment});
+  const StandingsDataText({super.key, required this.text, this.color, this.alignment});
 
   final Alignment? alignment;
+  final Color? color;
   final String text;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: color ?? Colors.transparent,
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,

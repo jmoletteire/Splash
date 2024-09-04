@@ -409,6 +409,30 @@ def search():
         return jsonify({"error": "Search failed"}), 500
 
 
+@app.route('/get_nba_cup', methods=['GET'])
+def get_nba_cup():
+    try:
+        query_params = request.args.to_dict()
+        season = query_params.get('season')
+
+        # Query the database
+        nba_cup = cup_collection.find_one(
+            {f"SEASON": season},
+            {"_id": 0}
+        )
+
+        if nba_cup:
+            # logging.info(f"(get_nba_cup) Retrieved {season} NBA Cup from MongoDB")
+            return jsonify(nba_cup)
+        else:
+            logging.warning("(get_nba_cup) No games found in MongoDB")
+            return jsonify({"error": "No games found"})
+
+    except Exception as e:
+        logging.error(f"(get_nba_cup) Error retrieving cup data: {e}")
+        return jsonify({"error": "Failed to retrieve cup data"}), 500
+
+
 @app.route('/get_playoffs', methods=['GET'])
 def get_playoff_bracket():
     try:
@@ -681,6 +705,7 @@ if __name__ == '__main__':
         player_shots_collection = db.nba_player_shot_data
 
         playoff_collection = db.nba_playoff_history
+        cup_collection = db.nba_cup_history
 
         draft_collection = db.nba_draft_history
 
