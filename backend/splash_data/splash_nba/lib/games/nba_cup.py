@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+import requests
 from nba_api.stats.endpoints import iststandings
 from pymongo import MongoClient
 from splash_nba.util.env import uri
@@ -42,6 +43,19 @@ def fetch_all_cups():
             cup_collection.update_one(
                 {'SEASON': season},
                 {'$set': {f'WILD CARD.{wildcard_standings[0]["conference"]}': wildcard_standings}},
+                upsert=True
+            )
+
+        # Fetching the JSON data from the URL
+        url = f"https://cdn.nba.com/static/json/staticData/brackets/{season[0:4]}/ISTBracket.json"
+        response = requests.get(url)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            json_data = response.json()
+            cup_collection.update_one(
+                {'SEASON': season},
+                {'$set': {f'KNOCKOUT': json_data['bracket']['istBracketSeries']}},
                 upsert=True
             )
 

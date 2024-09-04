@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:splash/screens/standings/nba_cup/knockout_bracket.dart';
 import 'package:splash/screens/standings/nba_cup/wildcard_standings.dart';
 
 import '../../../utilities/constants.dart';
+import '../../../utilities/scroll/scroll_controller_notifier.dart';
+import '../../../utilities/scroll/scroll_controller_provider.dart';
 import 'group_standings.dart';
 
 class NbaCup extends StatefulWidget {
@@ -14,16 +17,31 @@ class NbaCup extends StatefulWidget {
 }
 
 class _NbaCupState extends State<NbaCup> with SingleTickerProviderStateMixin {
-  bool _isLoading = true;
-  late TabController _tabController;
+  late final TabController _tabController = TabController(length: 3, vsync: this);
   late Map<String, dynamic> groups;
-  final ScrollController _scrollController = ScrollController();
+  late ScrollController _scrollController;
+  late ScrollControllerNotifier _notifier;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     setGroups();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _scrollController = ScrollController();
+    _notifier.addController(_scrollController);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _notifier.removeController(_scrollController);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void setGroups() {
@@ -41,8 +59,6 @@ class _NbaCupState extends State<NbaCup> with SingleTickerProviderStateMixin {
           groups[group.key] = group.value;
         }
       }
-
-      _isLoading = false;
     });
   }
 
@@ -92,16 +108,17 @@ class _NbaCupState extends State<NbaCup> with SingleTickerProviderStateMixin {
               controller: _scrollController,
               slivers: [
                 WildcardStandings(
-                    columnNames: ['EAST', 'W', 'L', 'PCT', 'GB', 'DIFF', 'PTS', 'OPP'],
+                    columnNames: const ['EAST', 'W', 'L', 'PCT', 'GB', 'DIFF', 'PTS', 'OPP'],
                     standings: widget.cupData['WILD CARD']['East']!,
                     season: widget.selectedSeason),
                 WildcardStandings(
-                    columnNames: ['WEST', 'W', 'L', 'PCT', 'GB', 'DIFF', 'PTS', 'OPP'],
+                    columnNames: const ['WEST', 'W', 'L', 'PCT', 'GB', 'DIFF', 'PTS', 'OPP'],
                     standings: widget.cupData['WILD CARD']['West']!,
                     season: widget.selectedSeason),
               ],
             ),
           ),
+          KnockoutBracket(knockoutData: widget.cupData['KNOCKOUT'])
         ],
       ),
     );
