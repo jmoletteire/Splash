@@ -266,6 +266,178 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
   }
 
   Widget seriesCard(Map<String, dynamic> series, String round) {
+    Widget getFinals(bool teamOneWins, bool teamTwoWins) {
+      String teamOne = series['TEAM_ONE'].toString();
+      String teamTwo = series['TEAM_TWO'].toString();
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              teamTwoWins
+                  ? GrayscaleImage(
+                      imagePath: 'images/NBA_Logos/$teamOne.png',
+                      size: round == 'NBA Finals'
+                          ? 44.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 32.0
+                              : 28.0,
+                    )
+                  : Image.asset(
+                      'images/NBA_Logos/$teamOne.png',
+                      width: round == 'NBA Finals'
+                          ? 44.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 32.0
+                              : 28.0,
+                      height: round == 'NBA Finals'
+                          ? 44.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 32.0
+                              : 28.0,
+                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '${series['TEAM_ONE_SEED'].toString()} ',
+                          style: kBebasBold.copyWith(
+                            fontSize: round == 'NBA Finals'
+                                ? 16.0
+                                : round.substring(5) == 'Conference Finals'
+                                    ? 14.0
+                                    : 12.0,
+                            color: teamTwoWins ? Colors.grey : Colors.white,
+                          ),
+                        ),
+                        TextSpan(
+                          text: series['TEAM_ONE_ABBR'],
+                          style: kBebasBold.copyWith(
+                            fontSize: round == 'NBA Finals'
+                                ? 24.0
+                                : round.substring(5) == 'Conference Finals'
+                                    ? 18.0
+                                    : 16.0,
+                            color: teamTwoWins ? Colors.grey : Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    series['TEAM_ONE_WINS'].toString(),
+                    style: kBebasBold.copyWith(
+                      fontSize: round == 'NBA Finals'
+                          ? 28.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 24.0
+                              : 20.0,
+                      color: teamTwoWins ? Colors.grey : Colors.white,
+                    ),
+                  ),
+                  Text(
+                    round.substring(5) == 'Conf Semis' ? '  -  ' : '    -    ',
+                    style: kBebasNormal.copyWith(
+                      fontSize: round == 'NBA Finals'
+                          ? 28.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 24.0
+                              : 20.0,
+                    ),
+                  ),
+                  Text(
+                    series['TEAM_TWO_WINS'].toString(),
+                    style: kBebasBold.copyWith(
+                      fontSize: round == 'NBA Finals'
+                          ? 28.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 24.0
+                              : 20.0,
+                      color: teamOneWins ? Colors.grey : Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              teamOneWins
+                  ? GrayscaleImage(
+                      imagePath: 'images/NBA_Logos/$teamTwo.png',
+                      size: round == 'NBA Finals'
+                          ? 44.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 32.0
+                              : 28.0,
+                    )
+                  : Image.asset(
+                      'images/NBA_Logos/$teamTwo.png',
+                      width: round == 'NBA Finals'
+                          ? 44.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 32.0
+                              : 28.0,
+                      height: round == 'NBA Finals'
+                          ? 44.0
+                          : round.substring(5) == 'Conference Finals'
+                              ? 32.0
+                              : 28.0,
+                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '${series['TEAM_TWO_SEED'].toString()} ',
+                          style: kBebasBold.copyWith(
+                            fontSize: round == 'NBA Finals'
+                                ? 16.0
+                                : round.substring(5) == 'Conference Finals'
+                                    ? 14.0
+                                    : 12.0,
+                            color: teamOneWins ? Colors.grey : Colors.white,
+                          ),
+                        ),
+                        TextSpan(
+                          text: series['TEAM_TWO_ABBR'],
+                          style: kBebasBold.copyWith(
+                            fontSize: round == 'NBA Finals'
+                                ? 24.0
+                                : round.substring(5) == 'Conference Finals'
+                                    ? 18.0
+                                    : 16.0,
+                            color: teamOneWins ? Colors.grey : Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
     String teamOne = series['TEAM_ONE'].toString();
     String teamTwo = series['TEAM_TWO'].toString();
 
@@ -281,6 +453,13 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
 
     List<String> useSecondary = ['SAS'];
 
+    Map<String, double> widthFactor = {
+      'First Round': 5,
+      'Conf Semis': 2.75,
+      'Conference Finals': 2,
+      'inals': 1.25
+    };
+
     return GestureDetector(
       onTap: () {
         _showBottomSheet(series, round);
@@ -288,8 +467,10 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
       child: Container(
         padding: const EdgeInsets.all(8.0),
         margin: const EdgeInsets.all(8.0),
-        height: MediaQuery.of(context).size.height / 10,
-        width: MediaQuery.of(context).size.width / 5,
+        height: round == 'NBA Finals'
+            ? MediaQuery.of(context).size.height / 8
+            : MediaQuery.of(context).size.height / 10,
+        width: MediaQuery.of(context).size.width / widthFactor[round.substring(5)]!,
         decoration: BoxDecoration(
           //color: Colors.grey.shade900,
           borderRadius: BorderRadius.circular(10.0),
@@ -316,99 +497,107 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
             ],
           ),
         ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                teamTwoWinsSeries
-                    ? GrayscaleImage(imagePath: 'images/NBA_Logos/$teamOne.png')
-                    : Image.asset(
-                        'images/NBA_Logos/$teamOne.png',
-                        width: 24.0,
-                        height: 24.0,
-                      ),
-                const Text(' '),
-                teamOneWinsSeries
-                    ? GrayscaleImage(imagePath: 'images/NBA_Logos/$teamTwo.png')
-                    : Image.asset(
-                        'images/NBA_Logos/$teamTwo.png',
-                        width: 24.0,
-                        height: 24.0,
-                      ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                RichText(
-                  text: TextSpan(
+        child: round.substring(5) != 'First Round'
+            ? getFinals(teamOneWinsSeries, teamTwoWinsSeries)
+            : Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      TextSpan(
-                        text: '${series['TEAM_ONE_SEED'].toString()} ',
+                      teamTwoWinsSeries
+                          ? GrayscaleImage(
+                              imagePath: 'images/NBA_Logos/$teamOne.png',
+                              size: 24.0,
+                            )
+                          : Image.asset(
+                              'images/NBA_Logos/$teamOne.png',
+                              width: 24.0,
+                              height: 24.0,
+                            ),
+                      const Text(' '),
+                      teamOneWinsSeries
+                          ? GrayscaleImage(
+                              imagePath: 'images/NBA_Logos/$teamTwo.png',
+                              size: 24.0,
+                            )
+                          : Image.asset(
+                              'images/NBA_Logos/$teamTwo.png',
+                              width: 24.0,
+                              height: 24.0,
+                            ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${series['TEAM_ONE_SEED'].toString()} ',
+                              style: kBebasBold.copyWith(
+                                fontSize: 12.0, // smaller font size for TEAM_TWO_SEED
+                                color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                              ),
+                            ),
+                            TextSpan(
+                              text: series['TEAM_ONE_ABBR'].toString(),
+                              style: kBebasBold.copyWith(
+                                fontSize: 16.0, // keep the current styling for TEAM_TWO_ABBR
+                                color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Text(' '),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${series['TEAM_TWO_SEED'].toString()} ',
+                              style: kBebasBold.copyWith(
+                                fontSize: 12.0, // smaller font size for TEAM_TWO_SEED
+                                color: teamOneWinsSeries ? Colors.grey : Colors.white,
+                              ),
+                            ),
+                            TextSpan(
+                              text: series['TEAM_TWO_ABBR'].toString(),
+                              style: kBebasBold.copyWith(
+                                fontSize: 16.0, // keep the current styling for TEAM_TWO_ABBR
+                                color: teamOneWinsSeries ? Colors.grey : Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        series['TEAM_ONE_WINS'].toString(),
                         style: kBebasBold.copyWith(
-                          fontSize: 12.0, // smaller font size for TEAM_TWO_SEED
+                          fontSize: 15.0,
                           color: teamTwoWinsSeries ? Colors.grey : Colors.white,
                         ),
                       ),
-                      TextSpan(
-                        text: series['TEAM_ONE_ABBR'].toString(),
+                      Text(
+                        '-',
+                        style: kBebasNormal.copyWith(fontSize: 15.0),
+                      ),
+                      Text(
+                        series['TEAM_TWO_WINS'].toString(),
                         style: kBebasBold.copyWith(
-                          fontSize: 16.0, // keep the current styling for TEAM_TWO_ABBR
-                          color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                          fontSize: 15.0,
+                          color: teamOneWinsSeries ? Colors.grey : Colors.white,
                         ),
                       ),
                     ],
                   ),
-                ),
-                const Text(' '),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '${series['TEAM_TWO_SEED'].toString()} ',
-                        style: kBebasBold.copyWith(
-                          fontSize: 12.0, // smaller font size for TEAM_TWO_SEED
-                          color: teamOneWinsSeries ? Colors.grey : Colors.white,
-                        ),
-                      ),
-                      TextSpan(
-                        text: series['TEAM_TWO_ABBR'].toString(),
-                        style: kBebasBold.copyWith(
-                          fontSize: 16.0, // keep the current styling for TEAM_TWO_ABBR
-                          color: teamOneWinsSeries ? Colors.grey : Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  series['TEAM_ONE_WINS'].toString(),
-                  style: kBebasBold.copyWith(
-                    fontSize: 15.0,
-                    color: teamTwoWinsSeries ? Colors.grey : Colors.white,
-                  ),
-                ),
-                Text(
-                  '-',
-                  style: kBebasNormal.copyWith(fontSize: 15.0),
-                ),
-                Text(
-                  series['TEAM_TWO_WINS'].toString(),
-                  style: kBebasBold.copyWith(
-                    fontSize: 15.0,
-                    color: teamOneWinsSeries ? Colors.grey : Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                ],
+              ),
       ),
     );
   }
@@ -649,82 +838,82 @@ class BracketPainter extends CustomPainter {
 
     /// WEST SEMIS
     canvas.drawLine(
-      Offset(size.width * 0.7525, size.height * 0.735),
+      Offset(size.width * 0.7525, size.height * 0.755),
       Offset(size.width * 0.7525, size.height * 0.8),
       westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value, 2, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.2525, size.height * 0.735),
+      Offset(size.width * 0.2525, size.height * 0.755),
       Offset(size.width * 0.2525, size.height * 0.8),
       westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value, 2, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.2525, size.height * 0.735),
-      Offset(size.width * 0.5, size.height * 0.735),
+      Offset(size.width * 0.2525, size.height * 0.755),
+      Offset(size.width * 0.5, size.height * 0.755),
       westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value, 2, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.5, size.height * 0.735),
-      Offset(size.width * 0.7525, size.height * 0.735),
+      Offset(size.width * 0.5, size.height * 0.755),
+      Offset(size.width * 0.7525, size.height * 0.755),
       westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value, 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.6),
-      Offset(size.width * 0.5, size.height * 0.735),
+      Offset(size.width * 0.5, size.height * 0.755),
       westConfFinals.isEmpty ? paint : choosePaint(westConfFinals, 2, season),
     );
 
     /// WEST FIRST ROUND
     canvas.drawLine(
-      Offset(size.width * 0.13, size.height * 0.89),
-      Offset(size.width * 0.13, size.height * 0.925),
+      Offset(size.width * 0.13, size.height * 0.915),
+      Offset(size.width * 0.13, size.height * 0.95),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0].value, 1, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.375, size.height * 0.89),
-      Offset(size.width * 0.375, size.height * 0.925),
+      Offset(size.width * 0.375, size.height * 0.915),
+      Offset(size.width * 0.375, size.height * 0.95),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3].value, 1, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.13, size.height * 0.89),
-      Offset(size.width * 0.2525, size.height * 0.89),
+      Offset(size.width * 0.13, size.height * 0.915),
+      Offset(size.width * 0.2525, size.height * 0.915),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0].value, 1, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.2525, size.height * 0.89),
-      Offset(size.width * 0.375, size.height * 0.89),
+      Offset(size.width * 0.2525, size.height * 0.915),
+      Offset(size.width * 0.375, size.height * 0.915),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3].value, 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.8),
-      Offset(size.width * 0.2525, size.height * 0.89),
+      Offset(size.width * 0.2525, size.height * 0.915),
       westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value, 2, season),
     );
 
     /// WEST FIRST ROUND
     canvas.drawLine(
-      Offset(size.width * 0.625, size.height * 0.89),
-      Offset(size.width * 0.625, size.height * 0.925),
+      Offset(size.width * 0.625, size.height * 0.915),
+      Offset(size.width * 0.625, size.height * 0.95),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2].value, 1, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.875, size.height * 0.89),
-      Offset(size.width * 0.875, size.height * 0.925),
+      Offset(size.width * 0.875, size.height * 0.915),
+      Offset(size.width * 0.875, size.height * 0.95),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1].value, 1, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.625, size.height * 0.89),
-      Offset(size.width * 0.7525, size.height * 0.89),
+      Offset(size.width * 0.625, size.height * 0.915),
+      Offset(size.width * 0.7525, size.height * 0.915),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2].value, 1, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.7525, size.height * 0.89),
-      Offset(size.width * 0.875, size.height * 0.89),
+      Offset(size.width * 0.7525, size.height * 0.915),
+      Offset(size.width * 0.875, size.height * 0.915),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1].value, 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.8),
-      Offset(size.width * 0.7525, size.height * 0.89),
+      Offset(size.width * 0.7525, size.height * 0.915),
       westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value, 2, season),
     );
   }
@@ -737,8 +926,9 @@ class BracketPainter extends CustomPainter {
 
 class GrayscaleImage extends StatelessWidget {
   final String imagePath;
+  final double size;
 
-  GrayscaleImage({required this.imagePath});
+  GrayscaleImage({required this.imagePath, required this.size});
 
   @override
   Widget build(BuildContext context) {
@@ -751,8 +941,8 @@ class GrayscaleImage extends StatelessWidget {
       ]),
       child: Image.asset(
         imagePath,
-        width: 24.0,
-        height: 24.0,
+        width: size,
+        height: size,
       ),
     );
   }

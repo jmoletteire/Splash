@@ -16,11 +16,15 @@ class NbaCup extends StatefulWidget {
   State<NbaCup> createState() => _NbaCupState();
 }
 
-class _NbaCupState extends State<NbaCup> with SingleTickerProviderStateMixin {
-  late final TabController _tabController = TabController(length: 3, vsync: this);
+class _NbaCupState extends State<NbaCup>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  late TabController _tabController = TabController(length: 3, vsync: this);
   late Map<String, dynamic> groups;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
