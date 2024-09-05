@@ -11,6 +11,7 @@ import '../components/custom_icon_button.dart';
 import '../utilities/game_dates.dart';
 import '../utilities/scroll/scroll_controller_notifier.dart';
 import '../utilities/scroll/scroll_controller_provider.dart';
+import 'game/upcoming_game_card.dart';
 
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
@@ -50,9 +51,38 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
 
     _datesProvider = Provider.of<DatesProvider>(context, listen: false);
     _datesProvider.fetchDates().then((_) {
+      String sanitizeDateTime(DateTime dateTime) {
+        String day = dateTime.day.toString().padLeft(2, '0');
+        String month = dateTime.month.toString().padLeft(2, '0');
+        String year = dateTime.year.toString();
+
+        return "$year-$month-$day";
+      }
+
+      bool selectableDayPredicate(DateTime val) {
+        String sanitized = sanitizeDateTime(val);
+        return _datesProvider.dates.contains(sanitized);
+      }
+
+      DateTime findNearestValidDate(DateTime date) {
+        DateTime beforeDate = date;
+        DateTime afterDate = date;
+
+        while (!selectableDayPredicate(beforeDate) && !selectableDayPredicate(afterDate)) {
+          beforeDate = beforeDate.subtract(const Duration(days: 1));
+          afterDate = afterDate.add(const Duration(days: 1));
+        }
+
+        if (selectableDayPredicate(beforeDate)) {
+          return beforeDate;
+        } else {
+          return afterDate;
+        }
+      }
+
       if (_datesProvider.dates.isNotEmpty) {
-        DateTime maxDate =
-            DateTime.parse(_datesProvider.dates.reduce((a, b) => a.compareTo(b) > 0 ? a : b));
+        DateTime maxDate = findNearestValidDate(DateTime.now());
+        //DateTime.parse(_datesProvider.dates.reduce((a, b) => a.compareTo(b) > 0 ? a : b));
 
         _tabController = TabController(length: _dates.length, vsync: this);
         _tabController.index = _dates.indexWhere((date) => isSameDay(date, DateTime.now()));
@@ -327,7 +357,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                                   ),
                                   const SizedBox(height: 15.0),
                                   Text(
-                                    'No Games Available',
+                                    'No Games Today',
                                     style: kBebasNormal.copyWith(
                                         fontSize: 20.0, color: Colors.white54),
                                   ),
@@ -337,7 +367,17 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                           } else if (gamesData[gameKey] is Map) {
                             Map<String, dynamic> game = gamesData[gameKey];
                             // Skip if All-Star weekend
-                            if (!game["SEASON_ID"].toString().startsWith("3")) {
+                            if (selectedDate.compareTo(DateTime.now()) > 0 &&
+                                game["SUMMARY"]["LineScore"].isNotEmpty) {
+                              gameCards.add(
+                                UpcomingGameCard(
+                                  game: game,
+                                  homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
+                                  awayTeam: game['SUMMARY']['GameSummary'][0]
+                                      ['VISITOR_TEAM_ID'],
+                                ),
+                              );
+                            } else if (!game["SEASON_ID"].toString().startsWith("3")) {
                               gameCards.add(
                                 GameCard(
                                   game: game,
@@ -382,7 +422,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                               ),
                               const SizedBox(height: 15.0),
                               Text(
-                                'No Games Available',
+                                'No Games Today',
                                 style: kBebasNormal.copyWith(
                                     fontSize: 20.0, color: Colors.white54),
                               ),
