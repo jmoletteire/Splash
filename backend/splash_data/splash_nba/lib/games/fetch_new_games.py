@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        start_date = datetime(2024, 10, 4)
+        start_date = datetime(2024, 2, 21)
         end_date = datetime(2025, 4, 13)
 
         # Fetch games for each date in the range

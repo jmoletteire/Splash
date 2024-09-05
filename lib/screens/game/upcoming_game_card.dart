@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/utilities/constants.dart';
+import 'package:timezone/timezone.dart';
 
 import 'game_home.dart';
 
@@ -9,13 +10,14 @@ class UpcomingGameCard extends StatefulWidget {
   final Map<String, dynamic> game;
   final int homeTeam;
   final int awayTeam;
+  final Location userTZ;
 
-  const UpcomingGameCard({
-    super.key,
-    required this.game,
-    required this.homeTeam,
-    required this.awayTeam,
-  });
+  const UpcomingGameCard(
+      {super.key,
+      required this.game,
+      required this.homeTeam,
+      required this.awayTeam,
+      required this.userTZ});
 
   @override
   _UpcomingGameCardState createState() => _UpcomingGameCardState();
@@ -83,6 +85,18 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
   }
 
   String convertToDate(String dateString, String timeString) {
+    bool isDaylightSavingsTime(DateTime dateTime) {
+      // Get the current timezone offset
+      Duration currentOffset = dateTime.timeZoneOffset;
+
+      // Get the timezone offset for a known date during standard time (e.g., January 1st)
+      DateTime standardTime = DateTime(dateTime.year, 1, 1);
+      Duration standardOffset = standardTime.timeZoneOffset;
+
+      // If the current offset is different from the standard offset, it's DST
+      return currentOffset != standardOffset;
+    }
+
     // Parse the base date
     DateTime baseDate = DateTime.parse(dateString);
 
@@ -98,8 +112,12 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
       hour = 0;
     }
 
-    // Adjust for ET (Eastern Time), which is UTC-5 or UTC-4 depending on daylight saving
-    Duration timeZoneOffset = Duration(hours: 4); // Assuming daylight saving is active (UTC-4)
+    Duration timeZoneOffset = const Duration(hours: 0);
+
+    // Adjust for daylight savings
+    if (isDaylightSavingsTime(baseDate)) {
+      timeZoneOffset = const Duration(hours: 1);
+    }
 
     // Combine the base date and new time
     DateTime finalDateTime = DateTime(
@@ -108,11 +126,12 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
       baseDate.day,
       hour,
       minute,
-    );
+    ).subtract(timeZoneOffset);
 
-    // Convert to local time zone
-    DateTime localDateTime = finalDateTime.toLocal();
+    // Convert to local time zone using the 'timezone' package
+    final TZDateTime localDateTime = TZDateTime.from(finalDateTime, widget.userTZ);
 
+    // Format the time in "h:mm a" format
     String formattedTime = DateFormat.jm().format(localDateTime);
 
     return formattedTime;
@@ -163,15 +182,16 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                       children: [
                         Text(
                           summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
-                          style: kBebasBold.copyWith(fontSize: 14.0, color: Colors.white70),
+                          style:
+                              kBebasBold.copyWith(fontSize: 14.0, color: Colors.grey.shade300),
                           textAlign: TextAlign.start,
                         ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
                           const SizedBox(width: 5),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV')
-                            const Icon(
+                            Icon(
                               Icons.tv_sharp, // TV icon
-                              color: Colors.white70,
+                              color: Colors.grey.shade300,
                               size: 11.0,
                             ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
