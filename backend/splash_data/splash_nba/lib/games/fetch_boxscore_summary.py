@@ -16,10 +16,14 @@ def process_documents(documents):
     game_counter = 0
 
     for document in documents:
-        if document['GAME_DATE'] < '2024-07-01':
+        if document['GAME_DATE'] <= '2024-06-17':
             for game_id, game_data in document['GAMES'].items():
                 # Check if SUMMARY already exists for the game
-                if "AvailableVideo" not in game_data['SUMMARY'].keys():
+                summary = []
+                if "SUMMARY" in game_data.keys():
+                    if game_data["SUMMARY"] is not None:
+                        summary = game_data['SUMMARY'].keys()
+                if "AvailableVideo" not in summary:
                     # Fetch box score summary for the game
                     try:
                         stats = fetch_box_score_summary(game_id)
@@ -78,4 +82,4 @@ if __name__ == "__main__":
 
         print("Box score stats update complete.")
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+        logging.error(f"Failed to connect to MongoDB: {e.with_traceback()}")

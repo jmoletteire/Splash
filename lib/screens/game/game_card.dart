@@ -98,7 +98,7 @@ class _GameCardState extends State<GameCard> {
           MaterialPageRoute(
             builder: (context) => GameHome(
               gameData: widget.game,
-              gameId: widget.game['GAME_ID'],
+              gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
               homeId: widget.homeTeam.toString(),
               awayId: widget.awayTeam.toString(),
             ),
@@ -124,24 +124,40 @@ class _GameCardState extends State<GameCard> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
-                          style: kBebasBold.copyWith(fontSize: 14.0, color: Colors.white70),
-                          textAlign: TextAlign.start,
-                        ),
+                        if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
+                            summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
+                            summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT')
+                          Text(
+                            summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
+                            style: kBebasBold.copyWith(
+                                fontSize: 14.0, color: Colors.grey.shade300),
+                            textAlign: TextAlign.start,
+                          ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
                           const SizedBox(width: 5),
-                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV')
-                            const Icon(
-                              Icons.tv_sharp, // TV icon
-                              color: Colors.white70,
-                              size: 11.0,
-                            ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
                             SvgPicture.asset(
                               'images/NBA_TV.svg',
                               width: 12.0,
                               height: 12.0,
+                            ),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
+                            SvgPicture.asset(
+                              'images/TNT.svg',
+                              width: 18.0,
+                              height: 18.0,
+                            ),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
+                            SvgPicture.asset(
+                              'images/ESPN.svg',
+                              width: 7.0,
+                              height: 7.0,
+                            ),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
+                            SvgPicture.asset(
+                              'images/abc.svg',
+                              width: 18.0,
+                              height: 18.0,
                             ),
                         ],
                       ],

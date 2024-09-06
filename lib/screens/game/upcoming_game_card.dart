@@ -172,25 +172,40 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
-                          style:
-                              kBebasBold.copyWith(fontSize: 14.0, color: Colors.grey.shade300),
-                          textAlign: TextAlign.start,
-                        ),
+                        if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
+                            summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
+                            summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT')
+                          Text(
+                            summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
+                            style: kBebasBold.copyWith(
+                                fontSize: 14.0, color: Colors.grey.shade300),
+                            textAlign: TextAlign.start,
+                          ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
                           const SizedBox(width: 5),
-                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV')
-                            Icon(
-                              Icons.tv_sharp, // TV icon
-                              color: Colors.grey.shade300,
-                              size: 11.0,
-                            ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
                             SvgPicture.asset(
                               'images/NBA_TV.svg',
                               width: 12.0,
                               height: 12.0,
+                            ),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
+                            SvgPicture.asset(
+                              'images/TNT.svg',
+                              width: 18.0,
+                              height: 18.0,
+                            ),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
+                            SvgPicture.asset(
+                              'images/ESPN.svg',
+                              width: 7.0,
+                              height: 7.0,
+                            ),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
+                            SvgPicture.asset(
+                              'images/abc.svg',
+                              width: 18.0,
+                              height: 18.0,
                             ),
                         ],
                       ],

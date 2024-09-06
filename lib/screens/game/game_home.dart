@@ -12,6 +12,7 @@ import '../../utilities/scroll/scroll_controller_provider.dart';
 import '../search_screen.dart';
 import '../team/team_home.dart';
 import 'boxscore/game_boxscore.dart';
+import 'boxscore/game_preview_stats.dart';
 import 'game_cache.dart';
 import 'matchup/game_matchup.dart';
 
@@ -176,13 +177,22 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       required String homeId,
       required String awayId,
       required bool isUpcoming,
-    }) =>
-        GameBoxScore(
+    }) {
+      if (!isUpcoming) {
+        return GameBoxScore(
           game: game,
           homeId: homeId,
           awayId: awayId,
           isUpcoming: isUpcoming,
-        ),
+        );
+      } else {
+        return GamePreviewStats(
+          game: game,
+          homeId: homeId,
+          awayId: awayId,
+        );
+      }
+    }
   ];
 
   /// ******************************************************
@@ -339,7 +349,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
                 labelStyle: kBebasNormal,
-                tabs: const [Tab(text: 'Matchup'), Tab(text: 'Box Score')],
+                tabs: [
+                  const Tab(text: 'Matchup'),
+                  Tab(text: _isUpcoming ? 'Teams' : 'Box Score'),
+                ],
               ),
               actions: [
                 CustomIconButton(
@@ -411,8 +424,39 @@ class GameInfo extends StatelessWidget {
     } else {
       return Column(
         children: [
-          Text(gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS',
-              style: kBebasBold.copyWith(fontSize: 21.0)),
+          if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV' &&
+              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
+              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
+              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT')
+            Text(gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS',
+                style: kBebasBold.copyWith(fontSize: 21.0)),
+          if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
+            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
+              SvgPicture.asset(
+                'images/NBA_TV.svg',
+                width: 32.0,
+                height: 32.0,
+              ),
+            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
+              SvgPicture.asset(
+                'images/TNT.svg',
+                width: 34.0,
+                height: 34.0,
+              ),
+            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
+              SvgPicture.asset(
+                'images/ESPN.svg',
+                width: 14.0,
+                height: 14.0,
+              ),
+            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
+              SvgPicture.asset(
+                'images/abc.svg',
+                width: 34.0,
+                height: 34.0,
+              ),
+            const SizedBox(height: 8),
+          ],
           Text(gameTime!, style: kBebasBold.copyWith(fontSize: 21.0)),
         ],
       );
