@@ -39,8 +39,6 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
   Color homeContainerColor = const Color(0xFF111111);
   Color teamContainerColor = const Color(0xFF111111);
 
-  ScrollController awayTableViewController = ScrollController();
-
   @override
   void initState() {
     super.initState();
@@ -55,20 +53,20 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         case 0:
           setState(() {
             awayContainerColor = kTeamColors[kTeamNames[widget.awayId][1]]!['primaryColor']!;
-            homeContainerColor = Color(0xFF1B1B1B);
+            homeContainerColor = const Color(0xFF1B1B1B);
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         case 2:
           setState(() {
-            awayContainerColor = Color(0xFF1B1B1B);
+            awayContainerColor = const Color(0xFF1B1B1B);
             homeContainerColor = kTeamColors[kTeamNames[widget.homeId][1]]!['primaryColor']!;
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         default:
           setState(() {
-            awayContainerColor = Color(0xFF1B1B1B);
-            homeContainerColor = Color(0xFF1B1B1B);
-            teamContainerColor = Color(0xFF1B1B1B);
+            awayContainerColor = const Color(0xFF1B1B1B);
+            homeContainerColor = const Color(0xFF1B1B1B);
+            teamContainerColor = const Color(0xFF1B1B1B);
           });
       }
     });

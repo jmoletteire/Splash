@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:splash/screens/game/boxscore/team_player_stats.dart';
+import 'package:splash/screens/game/matchup/components/team_season_stats.dart';
 
 import '../../../utilities/constants.dart';
 import '../../../utilities/scroll/scroll_controller_notifier.dart';
 import '../../../utilities/scroll/scroll_controller_provider.dart';
+import '../../../utilities/team.dart';
+import '../../team/team_cache.dart';
 
 class GamePreviewStats extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -23,11 +28,17 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
+  late ScrollController _homeController;
+  late ScrollController _awayController;
   late ScrollControllerNotifier _notifier;
+  final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
+
+  bool _isLoading = false;
+  late Map<String, dynamic> homeTeam;
+  late Map<String, dynamic> awayTeam;
   Color awayContainerColor = const Color(0xFF111111);
   Color homeContainerColor = const Color(0xFF111111);
   Color teamContainerColor = const Color(0xFF111111);
-  final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
 
   @override
   bool get wantKeepAlive => true;
@@ -37,6 +48,8 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _scrollController = ScrollController();
+    _homeController = ScrollController();
+    _awayController = ScrollController();
 
     _tabController.addListener(() {
       _selectedIndex.value = _tabController.index;
@@ -78,6 +91,44 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     _notifier.removeController(_scrollController);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
+    final teamCache = Provider.of<TeamCache>(context, listen: false);
+    List<Future<Map<String, dynamic>>> teamFutures = teamIds.map((teamId) async {
+      try {
+        if (teamCache.containsTeam(teamId)) {
+          return teamCache.getTeam(teamId)!;
+        } else {
+          var fetchedTeam = await Team().getTeam(teamId);
+          teamCache.addTeam(teamId, fetchedTeam);
+          return fetchedTeam;
+        }
+      } catch (e) {
+        return {'error': 'not found'}; // Return an empty map in case of an error
+      }
+    }).toList();
+
+    return await Future.wait(teamFutures);
+  }
+
+  void setTeams() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      List<Map<String, dynamic>> fetchedTeams = await getTeams(kEastConfTeamIds);
+
+      setState(() {
+        homeTeam = fetchedTeams[0];
+        awayTeam = fetchedTeams[1];
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -151,8 +202,63 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
             ),
           ],
         ),
+        Expanded(
+          child: ScrollConfiguration(
+            behavior: MyCustomScrollBehavior(),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                CustomScrollView(
+                  slivers: [
+                    TeamPlayerStats(players: [], controller: _homeController),
+                  ],
+                ),
+                CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      sliver: TeamSeasonStats(
+                        season:
+                            '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                        homeId: widget.homeId,
+                        awayId: widget.awayId,
+                      ),
+                    )
+                  ],
+                ),
+                CustomScrollView(
+                  slivers: [
+                    TeamPlayerStats(players: [], controller: _awayController),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
+  }
+}
+
+class MyCustomScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails axisDirection) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return CustomScrollPhysics();
+  }
+}
+
+class CustomScrollPhysics extends ClampingScrollPhysics {
+  CustomScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
+
+  @override
+  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return CustomScrollPhysics(parent: buildParent(ancestor));
   }
 }
 
