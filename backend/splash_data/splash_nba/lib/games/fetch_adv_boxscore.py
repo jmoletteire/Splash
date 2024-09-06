@@ -17,34 +17,36 @@ def process_documents(documents):
 
     for document in documents:
         for game_id, game_data in document['GAMES'].items():
-            # Fetch box score summary for the game
-            try:
-                stats = fetch_box_score_adv(game_id)
-            except Exception as e:
-                stats = None
-                logging.error(f"Error fetching box score for game_id {game_id}: {e}")
+            # Check if ADV already exists for the game
+            if "ADV" not in game_data:
+                # Fetch box score summary for the game
+                try:
+                    stats = fetch_box_score_adv(game_id)
+                except Exception as e:
+                    stats = None
+                    logging.error(f"Error fetching box score for game_id {game_id}: {e}")
 
-            # Update the game data with the fetched summary
-            try:
-                # Update the MongoDB document with the fetched stats under the "SUMMARY" key
-                games_collection.update_one(
-                    {'_id': document['_id'], f"GAMES.{game_id}": {"$exists": True}},
-                    {"$set": {f"GAMES.{game_id}.ADV": stats}}
-                )
+                # Update the game data with the fetched summary
+                try:
+                    # Update the MongoDB document with the fetched stats under the "SUMMARY" key
+                    games_collection.update_one(
+                        {'_id': document['_id'], f"GAMES.{game_id}": {"$exists": True}},
+                        {"$set": {f"GAMES.{game_id}.ADV": stats}}
+                    )
 
-                print(f"Processed {document['GAME_DATE']} {game_id}")
-            except Exception as e:
-                logging.error(f"Error updating advanced stats for game_id {game_id}: {e}")
+                    print(f"Processed {document['GAME_DATE']} {game_id}")
+                except Exception as e:
+                    logging.error(f"Error updating advanced stats for game_id {game_id}: {e}")
 
-            game_counter += 1
+                game_counter += 1
 
-            # Pause for a random time between 0.5 and 1 second
-            time.sleep(random.uniform(0.5, 1.0))
+                # Pause for a random time between 0.5 and 1 second
+                time.sleep(random.uniform(0.5, 1.0))
 
-            # Pause for 10 seconds every 100 games processed
-            if game_counter % 100 == 0:
-                logging.info(f"Processed {game_counter} games. Pausing for 10 seconds...")
-                time.sleep(10)
+                # Pause for 10 seconds every 100 games processed
+                if game_counter % 100 == 0:
+                    logging.info(f"Processed {game_counter} games. Pausing for 10 seconds...")
+                    time.sleep(10)
 
     print("Batch processing complete.")
 

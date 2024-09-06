@@ -10,11 +10,13 @@ class GameBoxScore extends StatefulWidget {
   final Map<String, dynamic> game;
   final String homeId;
   final String awayId;
+  final bool isUpcoming;
   const GameBoxScore({
     super.key,
     required this.game,
     required this.homeId,
     required this.awayId,
+    required this.isUpcoming,
   });
 
   @override

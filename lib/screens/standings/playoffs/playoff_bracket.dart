@@ -94,6 +94,24 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
     return [dayOfWeek, monthDate];
   }
 
+  void _showErrorSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: kBebasNormal.copyWith(
+          color: Colors.white,
+          fontSize: 18.0,
+        ),
+      ),
+      backgroundColor: Colors.red,
+      duration: const Duration(seconds: 3),
+      showCloseIcon: true,
+      closeIconColor: Colors.white,
+      dismissDirection: DismissDirection.vertical,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void _showBottomSheet(Map<String, dynamic> selectedSeries, String round) {
     showModalBottomSheet(
       backgroundColor: Colors.grey.shade900,
@@ -153,16 +171,20 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
 
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GameHome(
-                            gameId: game['GAME_ID'],
-                            homeId: homeTeam,
-                            awayId: awayTeam,
+                      if (int.parse(widget.playoffData['SEASON'].substring(0, 4)) >= 2017) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GameHome(
+                              gameId: game['GAME_ID'],
+                              homeId: homeTeam,
+                              awayId: awayTeam,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        _showErrorSnackBar(context, 'GAMES ONLY AVAILABLE SINCE 2017-18');
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),

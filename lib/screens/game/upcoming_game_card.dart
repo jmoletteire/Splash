@@ -154,9 +154,10 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
           MaterialPageRoute(
             builder: (context) => GameHome(
               gameData: widget.game,
-              gameId: widget.game['GAME_ID'],
+              gameId: summary['GAME_ID'],
               homeId: widget.homeTeam.toString(),
               awayId: widget.awayTeam.toString(),
+              gameTime: convertToDate(summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT']),
             ),
           ),
         );

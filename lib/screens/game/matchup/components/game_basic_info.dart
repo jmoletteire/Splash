@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../utilities/constants.dart';
 
@@ -6,16 +7,28 @@ class GameBasicInfo extends StatelessWidget {
   const GameBasicInfo({
     super.key,
     required this.game,
+    required this.isUpcoming,
   });
 
   final Map<String, dynamic> game;
+  final bool isUpcoming;
 
   @override
   Widget build(BuildContext context) {
     List<String> officials = [];
-    for (Map<String, dynamic> official in game['SUMMARY']['Officials']) {
-      officials.add('${official['FIRST_NAME']} ${official['LAST_NAME']}');
+    if (!isUpcoming) {
+      for (Map<String, dynamic> official in game['SUMMARY']['Officials']) {
+        officials.add('${official['FIRST_NAME']} ${official['LAST_NAME']}');
+      }
+    } else {
+      officials.add('TBA');
     }
+
+    // Parse the input string into a DateTime object
+    DateTime parsedDate = DateTime.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST']);
+
+    // Format the DateTime object into the desired string format
+    String formattedDate = DateFormat('EEEE, MMMM d, y').format(parsedDate).toUpperCase();
 
     return Card(
       margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
@@ -27,7 +40,7 @@ class GameBasicInfo extends StatelessWidget {
             // Date
             GameBasicInfoRow(
               icon: Icons.calendar_month,
-              data: [game['SUMMARY']['GameInfo'][0]['GAME_DATE']],
+              data: [formattedDate],
             ),
             const SizedBox(height: 10.0),
             // Broadcast

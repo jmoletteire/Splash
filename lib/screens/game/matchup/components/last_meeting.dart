@@ -158,25 +158,37 @@ class _LastMeetingState extends State<LastMeeting> {
                                   ),
                           ),
                           Text(
-                              widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() ==
-                                      lastAwayId
-                                  ? widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS']
-                                      .toStringAsFixed(0)
-                                  : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
-                                      .toStringAsFixed(0),
-                              style: kBebasBold),
+                            widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() ==
+                                    lastAwayId
+                                ? widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS']
+                                    .toStringAsFixed(0)
+                                : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
+                                    .toStringAsFixed(0),
+                            style: kBebasBold.copyWith(
+                              color: widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS'] >
+                                      widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS']
+                                  ? Colors.white
+                                  : Colors.grey,
+                            ),
+                          ),
                           Text(
                             '@',
                             style: kBebasBold.copyWith(fontSize: 14.0),
                           ),
                           Text(
-                              widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() ==
-                                      lastHomeId
-                                  ? widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS']
-                                      .toStringAsFixed(0)
-                                  : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
-                                      .toStringAsFixed(0),
-                              style: kBebasBold),
+                            widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() ==
+                                    lastHomeId
+                                ? widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS']
+                                    .toStringAsFixed(0)
+                                : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
+                                    .toStringAsFixed(0),
+                            style: kBebasBold.copyWith(
+                              color: widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS'] >
+                                      widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
+                                  ? Colors.white
+                                  : Colors.grey,
+                            ),
+                          ),
                           SizedBox(
                             width: 24.0,
                             height: 24.0,

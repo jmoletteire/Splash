@@ -11,11 +11,13 @@ class GameMatchup extends StatefulWidget {
   final Map<String, dynamic> game;
   final String homeId;
   final String awayId;
+  final bool isUpcoming;
   const GameMatchup({
     super.key,
     required this.game,
     required this.homeId,
     required this.awayId,
+    required this.isUpcoming,
   });
 
   @override
@@ -48,14 +50,19 @@ class _GameMatchupState extends State<GameMatchup> {
           sliver: SliverList(
             delegate: SliverChildListDelegate(
               [
-                GameBasicInfo(game: widget.game),
-                Lineups(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
-                Inactives(
-                    inactivePlayers: widget.game['SUMMARY']['InactivePlayers'],
-                    homeId: widget.homeId,
-                    awayId: widget.awayId),
-                H2H(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
-                if (widget.game['SUMMARY']['LastMeeting'].isNotEmpty)
+                GameBasicInfo(game: widget.game, isUpcoming: widget.isUpcoming),
+                if (!widget.isUpcoming)
+                  Lineups(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
+                if (!widget.isUpcoming)
+                  Inactives(
+                      inactivePlayers: widget.game['SUMMARY']['InactivePlayers'],
+                      homeId: widget.homeId,
+                      awayId: widget.awayId),
+                if (widget.game['SUMMARY'].keys.toList().contains('SeasonSeries') &&
+                    widget.game['SUMMARY']['SeasonSeries'].isNotEmpty)
+                  H2H(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
+                if (widget.game['SUMMARY'].keys.toList().contains('LastMeeting') &&
+                    widget.game['SUMMARY']['LastMeeting'].isNotEmpty)
                   LastMeeting(
                       lastMeeting: widget.game['SUMMARY']['LastMeeting'][0],
                       homeId: widget.homeId,

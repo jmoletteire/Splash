@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
@@ -20,6 +21,7 @@ class GameHome extends StatefulWidget {
   final String gameId;
   final String homeId;
   final String awayId;
+  final String? gameTime;
 
   const GameHome({
     super.key,
@@ -27,6 +29,7 @@ class GameHome extends StatefulWidget {
     required this.gameId,
     required this.homeId,
     required this.awayId,
+    this.gameTime,
   });
 
   @override
@@ -40,6 +43,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   Map<String, dynamic> game = {};
   bool _showImages = false;
   bool _isLoading = false;
+  bool _isUpcoming = false;
 
   Map<int, double> _scrollPositions = {};
 
@@ -83,6 +87,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       game = widget.gameData!;
       _isLoading = false;
     }
+
+    _isUpcoming = DateTime.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'])
+            .compareTo(DateTime.now()) >
+        0;
 
     _tabController = TabController(length: _gamePages.length, vsync: this);
 
@@ -149,32 +157,70 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
         required Map<String, dynamic> game,
         required String homeId,
         required String awayId,
+        required bool isUpcoming,
       })> _gamePages = [
     ({
       required Map<String, dynamic> game,
       required String homeId,
       required String awayId,
+      required bool isUpcoming,
     }) =>
         GameMatchup(
           game: game,
           homeId: homeId,
           awayId: awayId,
+          isUpcoming: isUpcoming,
         ),
     ({
       required Map<String, dynamic> game,
       required String homeId,
       required String awayId,
+      required bool isUpcoming,
     }) =>
         GameBoxScore(
           game: game,
           homeId: homeId,
           awayId: awayId,
+          isUpcoming: isUpcoming,
         ),
   ];
 
   /// ******************************************************
   ///                   Build the page.
   /// ******************************************************
+
+  Widget getTitle(
+      String status, Map<String, dynamic> homeLinescore, Map<String, dynamic> awayLinescore) {
+    if (_isUpcoming) {
+      return Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 24.0));
+    } else {
+      int homeScore = homeLinescore['PTS'];
+      int awayScore = awayLinescore['PTS'];
+      return Row(
+        children: [
+          Text(
+            awayScore.toString(),
+            style: kBebasBold.copyWith(
+                fontSize: 24.0,
+                color: awayScore > homeScore
+                    ? Colors.white
+                    : (status == 'Final' ? Colors.grey : Colors.white)),
+          ),
+          const SizedBox(width: 15.0),
+          Text('-', style: kBebasBold.copyWith(fontSize: 24.0)),
+          const SizedBox(width: 15.0),
+          Text(
+            homeScore.toString(),
+            style: kBebasBold.copyWith(
+                fontSize: 24.0,
+                color: homeScore > awayScore
+                    ? Colors.white
+                    : (status == 'Final' ? Colors.grey : Colors.white)),
+          ),
+        ],
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -208,29 +254,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                       width: MediaQuery.of(context).size.width * 0.09,
                     ),
                     const SizedBox(width: 15.0),
-                    Text(
-                      awayLinescore['PTS'].toString(),
-                      style: kBebasBold.copyWith(
-                          fontSize: 24.0,
-                          color: awayLinescore['PTS'] > homeLinescore['PTS']
-                              ? Colors.white
-                              : (summary['GAME_STATUS_TEXT'] == 'Final'
-                                  ? Colors.grey
-                                  : Colors.white)),
-                    ),
-                    const SizedBox(width: 15.0),
-                    Text('-', style: kBebasBold.copyWith(fontSize: 24.0)),
-                    const SizedBox(width: 15.0),
-                    Text(
-                      homeLinescore['PTS'].toString(),
-                      style: kBebasBold.copyWith(
-                          fontSize: 24.0,
-                          color: homeLinescore['PTS'] > awayLinescore['PTS']
-                              ? Colors.white
-                              : (summary['GAME_STATUS_TEXT'] == 'Final'
-                                  ? Colors.grey
-                                  : Colors.white)),
-                    ),
+                    getTitle(summary['GAME_STATUS_TEXT'], homeLinescore, awayLinescore),
                     const SizedBox(width: 15.0),
                     Image.asset(
                       'images/NBA_Logos/${widget.homeId}.png',
@@ -293,6 +317,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         awayLinescore: awayLinescore,
                         homeId: widget.homeId,
                         awayId: widget.awayId,
+                        isUpcoming: _isUpcoming,
+                        gameTime: widget.gameTime,
                       ),
                       collapseMode: CollapseMode.pin,
                     ),
@@ -329,7 +355,12 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _tabController,
           children: _gamePages.map((page) {
-            return page(game: game, homeId: widget.homeId, awayId: widget.awayId);
+            return page(
+              game: game,
+              homeId: widget.homeId,
+              awayId: widget.awayId,
+              isUpcoming: _isUpcoming,
+            );
           }).toList(),
         ),
       ),
@@ -345,6 +376,8 @@ class GameInfo extends StatelessWidget {
     required this.awayLinescore,
     required this.homeId,
     required this.awayId,
+    required this.isUpcoming,
+    this.gameTime,
   });
 
   final Map<String, dynamic> gameSummary;
@@ -352,6 +385,8 @@ class GameInfo extends StatelessWidget {
   final Map<String, dynamic> awayLinescore;
   final String homeId;
   final String awayId;
+  final bool isUpcoming;
+  final String? gameTime;
 
   Widget getStatus(String status) {
     if (status == 'Final') {
@@ -371,8 +406,8 @@ class GameInfo extends StatelessWidget {
       return Column(
         children: [
           Text(gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS',
-              style: kBebasBold.copyWith(fontSize: 18.0)),
-          Text(status, style: kBebasBold.copyWith(fontSize: 18.0)),
+              style: kBebasBold.copyWith(fontSize: 21.0)),
+          Text(gameTime!, style: kBebasBold.copyWith(fontSize: 21.0)),
         ],
       );
     }
@@ -422,7 +457,16 @@ class GameInfo extends StatelessWidget {
         return Text('Emirates NBA Cup Final',
             style: kBebasBold.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
       default:
-        return const Text('');
+        // Parse the input string into a DateTime object
+        DateTime parsedDate = DateTime.parse(gameSummary['GAME_DATE_EST']);
+
+        // Format the DateTime object into the desired string format
+        String formattedDate = DateFormat('MMM d, y').format(parsedDate).toUpperCase();
+
+        return Text(
+          formattedDate,
+          style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300),
+        );
     }
   }
 
@@ -470,34 +514,36 @@ class GameInfo extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Text(
-                awayLinescore['PTS'].toString(),
-                style: kBebasBold.copyWith(
-                    fontSize: 40.0,
-                    color: awayLinescore['PTS'] > homeLinescore['PTS']
-                        ? Colors.white
-                        : (gameSummary['GAME_STATUS_TEXT'] == 'Final'
-                            ? Colors.grey
-                            : Colors.white)),
-              ),
-              const Spacer(),
+              if (!isUpcoming)
+                Text(
+                  awayLinescore['PTS'].toString(),
+                  style: kBebasBold.copyWith(
+                      fontSize: 40.0,
+                      color: awayLinescore['PTS'] > homeLinescore['PTS']
+                          ? Colors.white
+                          : (gameSummary['GAME_STATUS_TEXT'] == 'Final'
+                              ? Colors.grey
+                              : Colors.white)),
+                ),
+              if (!isUpcoming) const Spacer(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   getStatus(gameSummary['GAME_STATUS_TEXT']),
                 ],
               ),
-              const Spacer(),
-              Text(
-                homeLinescore['PTS'].toString(),
-                style: kBebasBold.copyWith(
-                    fontSize: 40.0,
-                    color: homeLinescore['PTS'] > awayLinescore['PTS']
-                        ? Colors.white
-                        : (gameSummary['GAME_STATUS_TEXT'] == 'Final'
-                            ? Colors.grey
-                            : Colors.white)),
-              ),
+              if (!isUpcoming) const Spacer(),
+              if (!isUpcoming)
+                Text(
+                  homeLinescore['PTS'].toString(),
+                  style: kBebasBold.copyWith(
+                      fontSize: 40.0,
+                      color: homeLinescore['PTS'] > awayLinescore['PTS']
+                          ? Colors.white
+                          : (gameSummary['GAME_STATUS_TEXT'] == 'Final'
+                              ? Colors.grey
+                              : Colors.white)),
+                ),
               const Spacer(),
               GestureDetector(
                 onTap: () {
