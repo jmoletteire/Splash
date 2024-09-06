@@ -192,7 +192,13 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   Widget getTitle(
       String status, Map<String, dynamic> homeLinescore, Map<String, dynamic> awayLinescore) {
     if (_isUpcoming) {
-      return Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 24.0));
+      return Row(
+        children: [
+          const SizedBox(width: 15.0),
+          Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 24.0)),
+          const SizedBox(width: 15.0),
+        ],
+      );
     } else {
       int homeScore = homeLinescore['PTS'];
       int awayScore = awayLinescore['PTS'];
@@ -461,7 +467,7 @@ class GameInfo extends StatelessWidget {
         DateTime parsedDate = DateTime.parse(gameSummary['GAME_DATE_EST']);
 
         // Format the DateTime object into the desired string format
-        String formattedDate = DateFormat('MMM d, y').format(parsedDate).toUpperCase();
+        String formattedDate = DateFormat('EEE, MMM d, y').format(parsedDate).toUpperCase();
 
         return Text(
           formattedDate,

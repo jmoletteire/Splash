@@ -112,24 +112,15 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
       hour = 0;
     }
 
-    Duration timeZoneOffset = const Duration(hours: 0);
+    // Load the EST timezone location
+    final Location est = getLocation('America/New_York'); // NBA data uses EST
 
-    // Adjust for daylight savings
-    if (isDaylightSavingsTime(baseDate)) {
-      timeZoneOffset = const Duration(hours: 1);
-    }
+    // Combine the base date and time in the EST timezone
+    final TZDateTime estDateTime =
+        TZDateTime(est, baseDate.year, baseDate.month, baseDate.day, hour, minute);
 
-    // Combine the base date and new time
-    DateTime finalDateTime = DateTime(
-      baseDate.year,
-      baseDate.month,
-      baseDate.day,
-      hour,
-      minute,
-    ).subtract(timeZoneOffset);
-
-    // Convert to local time zone using the 'timezone' package
-    final TZDateTime localDateTime = TZDateTime.from(finalDateTime, widget.userTZ);
+    // Convert to the user's local timezone
+    final TZDateTime localDateTime = TZDateTime.from(estDateTime, widget.userTZ);
 
     // Format the time in "h:mm a" format
     String formattedTime = DateFormat.jm().format(localDateTime);
