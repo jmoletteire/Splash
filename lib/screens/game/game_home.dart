@@ -1,3 +1,4 @@
+import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -84,14 +85,16 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
     if (widget.gameData == null) {
       setValues(widget.gameId);
+      _isUpcoming = DateTime.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'])
+              .compareTo(DateTime.now()) >
+          0;
     } else {
       game = widget.gameData!;
       _isLoading = false;
+      _isUpcoming = DateTime.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'])
+              .compareTo(DateTime.now()) >
+          0;
     }
-
-    _isUpcoming = DateTime.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'])
-            .compareTo(DateTime.now()) >
-        0;
 
     _tabController = TabController(length: _gamePages.length, vsync: this);
 
@@ -253,7 +256,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
         linescore[0]['TEAM_ID'].toString() == widget.awayId ? linescore[0] : linescore[1];
 
     return Scaffold(
-      body: NestedScrollView(
+      body: ExtendedNestedScrollView(
         controller: _scrollController,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
@@ -370,6 +373,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
             ),
           ];
         },
+        pinnedHeaderSliverHeightBuilder: () {
+          return MediaQuery.of(context).size.height * 0.001;
+        },
+        onlyOneScrollInBody: true,
         body: TabBarView(
           physics: const AlwaysScrollableScrollPhysics(),
           controller: _tabController,
