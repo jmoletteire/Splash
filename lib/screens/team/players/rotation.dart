@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -19,7 +18,8 @@ class TeamRotation extends StatefulWidget {
 class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClientMixin {
   late List<String> seasons;
   late String selectedSeason;
-  List<dynamic> players = [];
+  List<dynamic> starters = []; // Players for the first SliverList (Starters)
+  List<dynamic> bench = []; // Players for the second SliverList (Bench)
   bool _isLoading = true;
 
   @override
@@ -28,23 +28,57 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
   void setPlayers() {
     try {
       if (_isLoading == false) _isLoading = true;
+
+      // Define the custom position hierarchy
+      const List<String> positionHierarchy = ['G', 'G-F', 'F-G', 'F', 'F-C', 'C-F', 'C'];
+
       // Convert the map to a list of entries
       var entries = widget.team['seasons'][selectedSeason]['ROSTER'].entries.toList();
 
       // Sort the entries by minutes per game
       entries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
         // Ensure that 'MPG' is treated as a double or num for comparison
-        double mpgA = (a.value['MPG'] ?? 0 as num).toDouble();
-        double mpgB = (b.value['MPG'] ?? 0 as num).toDouble();
+        double mpgA = (a.value['GS'] ?? 0 as num).toDouble();
+        double mpgB = (b.value['GS'] ?? 0 as num).toDouble();
 
         return mpgB.compareTo(mpgA);
       });
 
-      // Extract the sorted keys
-      List<dynamic> fetchedPlayers = entries.map((e) => e.key).toList();
+      // Sort the entries by Position and MPG for starters
+      List<MapEntry<String, dynamic>> startersEntries = entries.take(5).toList();
+
+      startersEntries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
+        String positionA = a.value['POSITION'] ?? '';
+        String positionB = b.value['POSITION'] ?? '';
+
+        int positionComparison = positionHierarchy
+            .indexOf(positionA)
+            .compareTo(positionHierarchy.indexOf(positionB));
+
+        if (positionComparison != 0) {
+          return positionComparison; // If positions are different, return comparison result
+        } else {
+          double mpgA = (a.value['MPG'] ?? 0 as num).toDouble();
+          double mpgB = (b.value['MPG'] ?? 0 as num).toDouble();
+          return mpgB.compareTo(mpgA); // Higher MPG comes first
+        }
+      });
+
+      // Sort the entries by MPG for bench players
+      List<MapEntry<String, dynamic>> benchEntries = entries.skip(5).toList();
+      benchEntries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
+        double mpgA = (a.value['MPG'] ?? 0 as num).toDouble();
+        double mpgB = (b.value['MPG'] ?? 0 as num).toDouble();
+        return mpgB.compareTo(mpgA); // Higher MPG comes first
+      });
+
+      // Extract the sorted keys for both starters and bench
+      List<dynamic> fetchedStarters = startersEntries.map((e) => e.key).toList();
+      List<dynamic> fetchedBench = benchEntries.map((e) => e.key).toList();
 
       setState(() {
-        players = fetchedPlayers;
+        starters = fetchedStarters; // Set the starters for the first SliverList
+        bench = fetchedBench; // Set the bench players for the second SliverList
         _isLoading = false;
       });
     } catch (e) {
@@ -68,7 +102,6 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
     Color teamColor = kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
         ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
-    List coaches = widget.team['seasons'][selectedSeason]['COACHES'];
     return _isLoading
         ? Center(
             child: SpinningIcon(
@@ -131,14 +164,14 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            flex: 8,
+                            flex: 9,
                             child: Container(
                               color: Colors.transparent,
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Player',
+                                    'Starters',
                                     style: kBebasOffWhite,
                                   ),
                                 ],
@@ -161,6 +194,22 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                               ),
                             ),
                           ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'GS',
+                                    textAlign: TextAlign.start,
+                                    style: kBebasOffWhite,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -176,7 +225,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                           context,
                           MaterialPageRoute(
                             builder: (context) => PlayerHome(
-                              playerId: players[index],
+                              playerId: starters[index],
                             ),
                           ),
                         );
@@ -190,12 +239,12 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                 bottom: BorderSide(color: Colors.white54, width: 0.125))),
                         child: RotationRow(
                           player: widget.team['seasons'][selectedSeason]['ROSTER']
-                              [players[index]],
+                              [starters[index]],
                         ),
                       ),
                     );
                   },
-                  childCount: players.length,
+                  childCount: 5,
                 ),
               ),
               SliverPinnedHeader(
@@ -216,14 +265,46 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            flex: 5,
+                            flex: 9,
                             child: Container(
                               color: Colors.transparent,
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Coaches',
+                                    'Bench',
+                                    style: kBebasOffWhite,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'MIN',
+                                    textAlign: TextAlign.start,
+                                    style: kBebasOffWhite,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'GS',
+                                    textAlign: TextAlign.start,
                                     style: kBebasOffWhite,
                                   ),
                                 ],
@@ -239,50 +320,32 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                      height: MediaQuery.of(context).size.height * 0.05,
-                      decoration: BoxDecoration(
-                          color: Colors.grey.shade900,
-                          border: const Border(
-                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 11,
-                            child: Row(
-                              children: [
-                                PlayerAvatar(
-                                  radius: 16.0,
-                                  backgroundColor: Colors.white12,
-                                  playerImageUrl:
-                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${coaches[index]['COACH_ID']}.png',
-                                ),
-                                const SizedBox(
-                                  width: 15.0,
-                                ),
-                                Text(
-                                  coaches[index]['COACH_NAME'],
-                                  style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                                ),
-                              ],
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PlayerHome(
+                              playerId: bench[index],
                             ),
                           ),
-                          Expanded(
-                            flex: 4,
-                            child: AutoSizeText(
-                              coaches[index]['COACH_TYPE'],
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              style: kBebasOffWhite.copyWith(fontSize: 16.0),
-                            ),
-                          ),
-                        ],
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                        height: MediaQuery.of(context).size.height * 0.05,
+                        decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            border: const Border(
+                                bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                        child: RotationRow(
+                          player: widget.team['seasons'][selectedSeason]['ROSTER']
+                              [bench[index]],
+                        ),
                       ),
                     );
                   },
-                  childCount: coaches.length,
+                  childCount: bench.length,
                 ),
               ),
             ],
@@ -375,6 +438,24 @@ class RotationRow extends StatelessWidget {
             builder: (BuildContext context, num value, Widget? child) {
               return Text(
                 value.toStringAsFixed(1),
+                textAlign: TextAlign.center,
+                style: kBebasNormal.copyWith(fontSize: 17.0),
+              );
+            },
+          ),
+        ),
+
+        Expanded(
+          flex: 1,
+          child: TweenAnimationBuilder<num>(
+            tween: Tween(
+              begin: 0,
+              end: player['GS'],
+            ),
+            duration: const Duration(milliseconds: 250),
+            builder: (BuildContext context, num value, Widget? child) {
+              return Text(
+                value.toStringAsFixed(0),
                 textAlign: TextAlign.center,
                 style: kBebasNormal.copyWith(fontSize: 17.0),
               );

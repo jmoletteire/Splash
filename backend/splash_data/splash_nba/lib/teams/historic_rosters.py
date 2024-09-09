@@ -20,16 +20,25 @@ def fetch_roster(team_id, season):
         for player in team_roster:
             player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID']).get_normalized_dict()['SeasonTotalsRegularSeason']
             player_season_stats = [season_stats for season_stats in player_stats if season_stats['SEASON_ID'] == season]
-            player['GP'] = player_season_stats[0]['GP'] if player_season_stats[0]['GP'] is not None else 0
-            player['GS'] = player_season_stats[0]['GS'] if player_season_stats[0]['GS'] is not None else 0
-            player['MIN'] = player_season_stats[0]['MIN'] if player_season_stats[0]['MIN'] is not None else 0
-            if player['GP'] > 0:
-                player['MPG'] = player['MIN'] / player['GP']
-            else:
-                player['MPG'] = 0
+            try:
+                player['GP'] = player_season_stats[0]['GP'] if player_season_stats[0]['GP'] is not None else 0
+                player['GS'] = player_season_stats[0]['GS'] if player_season_stats[0]['GS'] is not None else 0
+                player['MIN'] = player_season_stats[0]['MIN'] if player_season_stats[0]['MIN'] is not None else 0
+                if player['GP'] > 0:
+                    player['MPG'] = player['MIN'] / player['GP']
+                else:
+                    player['MPG'] = 0
 
-            # Player dictionary {"player_id": {data}}
-            team_roster_dict[str(player['PLAYER_ID'])] = player
+                # Player dictionary {"player_id": {data}}
+                team_roster_dict[str(player['PLAYER_ID'])] = player
+            except Exception as e:
+                logging.error(f"Unable to fetch {player['PLAYER']} for team {team_id} for {season}: {e}")
+                player['GP'] = 0
+                player['GS'] = 0
+                player['MIN'] = 0
+                player['MPG'] = 0
+                team_roster_dict[str(player['PLAYER_ID'])] = player
+                continue
 
         # Update document
         teams_collection.update_one(
