@@ -85,11 +85,28 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
 
         if (positionComparison != 0) {
           return positionComparison; // If positions are different, return comparison result
-        } else {
-          double mpgA = (a.value['MPG'] ?? 0 as num).toDouble();
-          double mpgB = (b.value['MPG'] ?? 0 as num).toDouble();
-          return mpgB.compareTo(mpgA); // Higher MPG comes first
+        } else if (positionComparison == 0) {
+          // Convert heights from String format "6-10" to total inches for comparison
+          int heightA = convertHeightToInches(a.value['HEIGHT'] ?? '0-0');
+          int heightB = convertHeightToInches(b.value['HEIGHT'] ?? '0-0');
+          int heightComparison = heightA.compareTo(heightB); // Smaller height comes first
+          if (heightComparison != 0) {
+            return heightComparison;
+          } else if (heightComparison == 0) {
+            // Convert weights from String to int for comparison
+            int weightA = int.parse(a.value['WEIGHT'] ?? '0');
+            int weightB = int.parse(b.value['WEIGHT'] ?? '0');
+            int weightComparison = weightA.compareTo(weightB); // Smaller weight comes first
+            if (weightComparison != 0) {
+              return weightComparison;
+            } else {
+              double mpgA = (a.value['MPG'] ?? 0 as num).toDouble();
+              double mpgB = (b.value['MPG'] ?? 0 as num).toDouble();
+              return mpgB.compareTo(mpgA);
+            }
+          }
         }
+        return 0;
       });
 
       // Sort the remaining players (bench) by MPG
@@ -115,6 +132,18 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         _isLoading = false;
       });
     }
+  }
+
+  // Helper function to convert height from "6-10" to total inches
+  int convertHeightToInches(String height) {
+    // Split the height string by "-" and parse the feet and inches
+    List<String> parts = height.split('-');
+    if (parts.length != 2) {
+      return 0; // Return 0 if the format is invalid
+    }
+    int feet = int.tryParse(parts[0]) ?? 0;
+    int inches = int.tryParse(parts[1]) ?? 0;
+    return (feet * 12) + inches; // Convert feet to inches and add the remaining inches
   }
 
   @override
