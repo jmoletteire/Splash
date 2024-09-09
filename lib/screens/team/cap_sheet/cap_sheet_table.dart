@@ -335,7 +335,7 @@ class _CapSheetState extends State<CapSheet> {
               _sortContracts(column, ascending);
             },
             child: Material(
-              color: Colors.grey.shade800,
+              color: const Color(0xFF303030),
               child: Padding(
                 padding: column == 0
                     ? const EdgeInsets.only(left: 20.0)
@@ -378,7 +378,7 @@ class _CapSheetState extends State<CapSheet> {
                     ? const Color(0xFF7EB8EA)
                     : contracts[index]['player']['lastName'] == 'Second Apron'
                         ? const Color(0xFF0F3665)
-                        : Colors.grey.shade800
+                        : const Color(0xFF303030)
                 : Colors.grey.shade900,
             border: contracts[index]['player']['id'] == 'totals' ||
                     contracts[index]['player']['id'] == 'salary_cap_diff'

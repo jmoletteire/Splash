@@ -1,4 +1,6 @@
-from nba_api.stats.endpoints import commonteamroster
+import time
+
+from nba_api.stats.endpoints import commonteamroster, playercareerstats
 from pymongo import MongoClient
 from splash_nba.util.env import uri, k_current_season
 import logging
@@ -9,12 +11,25 @@ def fetch_roster(team_id, season):
         team_data = commonteamroster.CommonTeamRoster(team_id, season=season).get_normalized_dict()
         team_roster = team_data['CommonTeamRoster']
         team_coaches = team_data['Coaches']
+    except Exception as e:
+        logging.error(f"Unable to fetch {season} roster for team {team_id}: {e}")
 
-        # Player dictionary {"player_id": {data}}
-        team_roster_dict = {
-            str(roster_dict['PLAYER_ID']): roster_dict
-            for roster_dict in team_roster
-        }
+    try:
+        team_roster_dict = {}
+
+        for player in team_roster:
+            player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID']).get_normalized_dict()['SeasonTotalsRegularSeason']
+            player_season_stats = [season_stats for season_stats in player_stats if season_stats['SEASON_ID'] == season]
+            player['GP'] = player_season_stats[0]['GP'] if player_season_stats[0]['GP'] is not None else 0
+            player['GS'] = player_season_stats[0]['GS'] if player_season_stats[0]['GS'] is not None else 0
+            player['MIN'] = player_season_stats[0]['MIN'] if player_season_stats[0]['MIN'] is not None else 0
+            if player['GP'] > 0:
+                player['MPG'] = player['MIN'] / player['GP']
+            else:
+                player['MPG'] = 0
+
+            # Player dictionary {"player_id": {data}}
+            team_roster_dict[str(player['PLAYER_ID'])] = player
 
         # Update document
         teams_collection.update_one(
@@ -24,7 +39,7 @@ def fetch_roster(team_id, season):
         )
         logging.info(f"Updated {season} roster for team {team_id}")
     except Exception as e:
-        logging.error(f"Updated to fetch {season} roster for team {team_id}: {e}")
+        logging.error(f"Unable to update {season} roster for team {team_id}: {e}")
 
 
 if __name__ == "__main__":
@@ -36,6 +51,7 @@ if __name__ == "__main__":
         client = MongoClient(uri)
         db = client.splash
         teams_collection = db.nba_teams
+        players_collection = db.nba_players
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
@@ -48,6 +64,7 @@ if __name__ == "__main__":
             seasons = doc['seasons']
             for season in seasons.keys():
                 fetch_roster(team, season)
+                time.sleep(2)
             logging.info(f"Processed {i + 1} of 30")
         logging.info("Done")
     except Exception as e:

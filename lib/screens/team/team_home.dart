@@ -5,10 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/team/overview/team_overview.dart';
+import 'package:splash/screens/team/players/team_players_home.dart';
 import 'package:splash/screens/team/schedule/team_schedule.dart';
 import 'package:splash/screens/team/team_cache.dart';
 import 'package:splash/screens/team/team_history.dart';
-import 'package:splash/screens/team/team_roster.dart';
 import 'package:splash/screens/team/team_stats.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -129,7 +129,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
     ({required Map<String, dynamic> team}) => TeamOverview(team: team),
     ({required Map<String, dynamic> team}) => TeamSchedule(team: team),
     ({required Map<String, dynamic> team}) => TeamStats(team: team),
-    ({required Map<String, dynamic> team}) => TeamRoster(team: team),
+    ({required Map<String, dynamic> team}) => TeamPlayersHome(team: team),
     ({required Map<String, dynamic> team}) => TeamCapSheet(team: team),
     ({required Map<String, dynamic> team}) => TeamHistory(team: team),
   ];
@@ -147,6 +147,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
         : Scaffold(
             body: ExtendedNestedScrollView(
               controller: _scrollController,
+              floatHeaderSlivers: false,
               headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return [
                   SliverAppBar(
@@ -163,6 +164,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                         : null,
                     centerTitle: true,
                     pinned: true,
+                    floating: false,
                     expandedHeight: MediaQuery.of(context).size.height * 0.28,
                     flexibleSpace: Stack(
                       fit: StackFit.expand,

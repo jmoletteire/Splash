@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/components/player_avatar.dart';
@@ -94,6 +95,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
     Color teamColor = kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
         ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
+    List coaches = widget.team['seasons'][selectedSeason]['COACHES'];
     return _isLoading
         ? Center(
             child: SpinningIcon(
@@ -106,12 +108,12 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                 child: Column(
                   children: [
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.045,
+                      height: MediaQuery.of(context).size.height * 0.04,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade900,
                         border: const Border(
                           bottom: BorderSide(
-                            color: Colors.white70,
+                            color: Colors.white30,
                             width: 1,
                           ),
                         ),
@@ -143,11 +145,11 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                     ),
                     Container(
                       padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade800,
-                        border: const Border(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF303030),
+                        border: Border(
                           bottom: BorderSide(
-                            color: Colors.white70,
+                            color: Colors.white30,
                             width: 1,
                           ),
                         ),
@@ -268,7 +270,6 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                           context,
                           MaterialPageRoute(
                             builder: (context) => PlayerHome(
-                              teamId: widget.team["TEAM_ID"].toString(),
                               playerId: players[index],
                             ),
                           ),
@@ -332,6 +333,93 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                     );
                   },
                   childCount: players.length,
+                ),
+              ),
+              SliverPinnedHeader(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF303030),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.white30,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 5,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Coaches',
+                                    style: kBebasOffWhite,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                          color: Colors.grey.shade900,
+                          border: const Border(
+                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 11,
+                            child: Row(
+                              children: [
+                                PlayerAvatar(
+                                  radius: 16.0,
+                                  backgroundColor: Colors.white12,
+                                  playerImageUrl:
+                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${coaches[index]['COACH_ID']}.png',
+                                ),
+                                const SizedBox(
+                                  width: 15.0,
+                                ),
+                                Text(
+                                  coaches[index]['COACH_NAME'],
+                                  style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: AutoSizeText(
+                              coaches[index]['COACH_TYPE'],
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              style: kBebasOffWhite.copyWith(fontSize: 16.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  childCount: coaches.length,
                 ),
               ),
             ],

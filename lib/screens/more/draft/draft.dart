@@ -199,7 +199,7 @@ class _DraftState extends State<Draft> {
                           child: Container(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
-                            height: MediaQuery.sizeOf(context).height * 0.065,
+                            height: MediaQuery.sizeOf(context).height * 0.055,
                             decoration: const BoxDecoration(
                               color: Color(0xFF1B1B1B),
                               border: Border(

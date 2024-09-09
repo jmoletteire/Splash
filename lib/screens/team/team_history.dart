@@ -195,7 +195,7 @@ class _TeamHistoryState extends State<TeamHistory> {
                   color: Colors.grey.shade900,
                   border: const Border(
                     bottom: BorderSide(
-                      color: Colors.white70,
+                      color: Colors.white30,
                       width: 1,
                     ),
                   ),
@@ -209,11 +209,11 @@ class _TeamHistoryState extends State<TeamHistory> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade800,
-                  border: const Border(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF303030),
+                  border: Border(
                     bottom: BorderSide(
-                      color: Colors.white70,
+                      color: Colors.white30,
                       width: 1,
                     ),
                   ),
@@ -251,7 +251,7 @@ class _TeamHistoryState extends State<TeamHistory> {
                 decoration: BoxDecoration(
                     color: getColor(seasons[seasonIndex[index]]),
                     border:
-                        const Border(bottom: BorderSide(color: Colors.white70, width: 0.5))),
+                        const Border(bottom: BorderSide(color: Colors.white54, width: 0.25))),
                 child: Row(
                   children: [
                     Expanded(
