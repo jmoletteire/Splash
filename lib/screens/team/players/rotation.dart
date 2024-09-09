@@ -35,16 +35,21 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
       // Convert the map to a list of entries
       var entries = widget.team['seasons'][selectedSeason]['ROSTER'].entries.toList();
 
-      // Sort the entries by minutes per game
+      // Filter out players with GP == 0
+      entries = entries.where((entry) {
+        return entry.value['GP'] != 0;
+      }).toList();
+
+      // Sort the entries by % Start
       entries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
         // Ensure that 'MPG' is treated as a double or num for comparison
-        double mpgA = (a.value['GS'] / a.value['GP'] ?? 0 as num).toDouble();
-        double mpgB = (b.value['GS'] / b.value['GP'] ?? 0 as num).toDouble();
+        double startPercentA = (a.value['GS'] / a.value['GP'] ?? 0 as num).toDouble();
+        double startPercentB = (b.value['GS'] / b.value['GP'] ?? 0 as num).toDouble();
 
-        return mpgB.compareTo(mpgA);
+        return startPercentB.compareTo(startPercentA);
       });
 
-      // Sort the entries by Position and MPG for starters
+      // Sort the entries by Position and % Start for starters
       List<MapEntry<String, dynamic>> startersEntries = entries.take(5).toList();
 
       startersEntries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
@@ -111,242 +116,256 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         : CustomScrollView(
             slivers: [
               SliverPinnedHeader(
-                child: Column(
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade900,
-                        border: const Border(
-                          bottom: BorderSide(
-                            color: Colors.white30,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: DropdownButton<String>(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                        menuMaxHeight: 300.0,
-                        dropdownColor: Colors.grey.shade900,
-                        isExpanded: true,
-                        underline: Container(),
-                        value: selectedSeason,
-                        items: seasons.map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: kBebasOffWhite,
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedSeason = value!;
-                            setPlayers();
-                          });
-                        },
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.04,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    border: const Border(
+                      bottom: BorderSide(
+                        color: Colors.white30,
+                        width: 1,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF303030),
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.white30,
-                            width: 1,
-                          ),
+                  ),
+                  child: DropdownButton<String>(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                    menuMaxHeight: 300.0,
+                    dropdownColor: Colors.grey.shade900,
+                    isExpanded: true,
+                    underline: Container(),
+                    value: selectedSeason,
+                    items: seasons.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: kBebasOffWhite,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 9,
-                            child: Container(
-                              color: Colors.transparent,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Starters',
-                                    style: kBebasOffWhite,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              color: Colors.transparent,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'MIN',
-                                    textAlign: TextAlign.start,
-                                    style: kBebasOffWhite,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              color: Colors.transparent,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'GS',
-                                    textAlign: TextAlign.start,
-                                    style: kBebasOffWhite,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedSeason = value!;
+                        setPlayers();
+                      });
+                    },
+                  ),
                 ),
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PlayerHome(
-                              playerId: starters[index],
+              MultiSliver(
+                pushPinnedChildren: true,
+                children: [
+                  SliverPinnedHeader(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF303030),
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.white30,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 9,
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Starters',
+                                        style: kBebasOffWhite,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'MIN',
+                                        textAlign: TextAlign.start,
+                                        style: kBebasOffWhite,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'GS',
+                                        textAlign: TextAlign.start,
+                                        style: kBebasOffWhite,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlayerHome(
+                                  playerId: starters[index],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            decoration: BoxDecoration(
+                                color: Colors.grey.shade900,
+                                border: const Border(
+                                    bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                            child: RotationRow(
+                              player: widget.team['seasons'][selectedSeason]['ROSTER']
+                                  [starters[index]],
                             ),
                           ),
                         );
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                        height: MediaQuery.of(context).size.height * 0.05,
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade900,
-                            border: const Border(
-                                bottom: BorderSide(color: Colors.white54, width: 0.125))),
-                        child: RotationRow(
-                          player: widget.team['seasons'][selectedSeason]['ROSTER']
-                              [starters[index]],
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: 5,
-                ),
-              ),
-              SliverPinnedHeader(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF303030),
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.white30,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 9,
-                            child: Container(
-                              color: Colors.transparent,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Bench',
-                                    style: kBebasOffWhite,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              color: Colors.transparent,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'MIN',
-                                    textAlign: TextAlign.start,
-                                    style: kBebasOffWhite,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              color: Colors.transparent,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'GS',
-                                    textAlign: TextAlign.start,
-                                    style: kBebasOffWhite,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      childCount: 5,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PlayerHome(
-                              playerId: bench[index],
+              MultiSliver(
+                pushPinnedChildren: true,
+                children: [
+                  SliverPinnedHeader(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF303030),
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.white30,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 9,
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Bench',
+                                        style: kBebasOffWhite,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'MIN',
+                                        textAlign: TextAlign.start,
+                                        style: kBebasOffWhite,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'GS',
+                                        textAlign: TextAlign.start,
+                                        style: kBebasOffWhite,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlayerHome(
+                                  playerId: bench[index],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            decoration: BoxDecoration(
+                                color: Colors.grey.shade900,
+                                border: const Border(
+                                    bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                            child: RotationRow(
+                              player: widget.team['seasons'][selectedSeason]['ROSTER']
+                                  [bench[index]],
                             ),
                           ),
                         );
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                        height: MediaQuery.of(context).size.height * 0.05,
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade900,
-                            border: const Border(
-                                bottom: BorderSide(color: Colors.white54, width: 0.125))),
-                        child: RotationRow(
-                          player: widget.team['seasons'][selectedSeason]['ROSTER']
-                              [bench[index]],
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: bench.length,
-                ),
+                      childCount: bench.length,
+                    ),
+                  ),
+                ],
               ),
             ],
           );

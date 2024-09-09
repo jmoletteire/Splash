@@ -28,6 +28,7 @@ class _CareerStatsState extends State<CareerStats> {
     'YEAR',
     'TEAM',
     'GP',
+    'MPG',
     'PPG',
     'RPG',
     'APG',
@@ -82,8 +83,11 @@ class _CareerStatsState extends State<CareerStats> {
         /// GP
         TableColumn(width: MediaQuery.of(context).size.width * 0.08),
 
-        /// PPG
+        /// MPG
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+
+        /// PPG
+        TableColumn(width: MediaQuery.of(context).size.width * 0.115),
 
         /// RPG
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
@@ -276,7 +280,7 @@ class _CareerStatsState extends State<CareerStats> {
       case 3:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['PTS'] /
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['MIN'] /
                           widget.seasons[season][widget.seasonType]['BASIC']['GP'])
                       .toStringAsFixed(1) ??
                   '-');
@@ -286,7 +290,7 @@ class _CareerStatsState extends State<CareerStats> {
       case 4:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['REB'] /
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['PTS'] /
                           widget.seasons[season][widget.seasonType]['BASIC']['GP'])
                       .toStringAsFixed(1) ??
                   '-');
@@ -296,7 +300,7 @@ class _CareerStatsState extends State<CareerStats> {
       case 5:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['AST'] /
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['REB'] /
                           widget.seasons[season][widget.seasonType]['BASIC']['GP'])
                       .toStringAsFixed(1) ??
                   '-');
@@ -306,7 +310,7 @@ class _CareerStatsState extends State<CareerStats> {
       case 6:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['STL'] /
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['AST'] /
                           widget.seasons[season][widget.seasonType]['BASIC']['GP'])
                       .toStringAsFixed(1) ??
                   '-');
@@ -316,7 +320,7 @@ class _CareerStatsState extends State<CareerStats> {
       case 7:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['BLK'] /
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['STL'] /
                           widget.seasons[season][widget.seasonType]['BASIC']['GP'])
                       .toStringAsFixed(1) ??
                   '-');
@@ -326,7 +330,7 @@ class _CareerStatsState extends State<CareerStats> {
       case 8:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['TOV'] /
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['BLK'] /
                           widget.seasons[season][widget.seasonType]['BASIC']['GP'])
                       .toStringAsFixed(1) ??
                   '-');
@@ -335,47 +339,57 @@ class _CareerStatsState extends State<CareerStats> {
         }
       case 9:
         try {
+          return StandingsDataText(
+              text: (widget.seasons[season][widget.seasonType]['BASIC']['TOV'] /
+                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                      .toStringAsFixed(1) ??
+                  '-');
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
+      case 10:
+        try {
           double fgPct = widget.seasons[season][widget.seasonType]['BASIC']['FG_PCT'] * 100;
           return StandingsDataText(text: '${fgPct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 10:
+      case 11:
         try {
           double fg3Pct = widget.seasons[season][widget.seasonType]['BASIC']['FG3_PCT'] * 100;
           return StandingsDataText(text: '${fg3Pct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 11:
+      case 12:
         try {
           double ftPct = widget.seasons[season][widget.seasonType]['BASIC']['FT_PCT'] * 100;
           return StandingsDataText(text: '${ftPct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 12:
+      case 13:
         try {
           double efgPct = widget.seasons[season][widget.seasonType]['ADV']['EFG_PCT'] * 100;
           return StandingsDataText(text: '${efgPct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 13:
+      case 14:
         try {
           double tsPct = widget.seasons[season][widget.seasonType]['ADV']['TS_PCT'] * 100;
           return StandingsDataText(text: '${tsPct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 14:
+      case 15:
         try {
           double usgPct = widget.seasons[season][widget.seasonType]['ADV']['USG_PCT'] * 100;
           return StandingsDataText(text: '${usgPct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 15:
+      case 16:
         try {
           return StandingsDataText(
               text: int.parse(season.substring(0, 4)) >= 2007
@@ -385,7 +399,7 @@ class _CareerStatsState extends State<CareerStats> {
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 16:
+      case 17:
         try {
           return StandingsDataText(
               text: int.parse(season.substring(0, 4)) >= 2007
@@ -395,7 +409,7 @@ class _CareerStatsState extends State<CareerStats> {
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 17:
+      case 18:
         try {
           return StandingsDataText(
               text: int.parse(season.substring(0, 4)) >= 2007
@@ -405,7 +419,7 @@ class _CareerStatsState extends State<CareerStats> {
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 18:
+      case 19:
         try {
           return StandingsDataText(
               text: int.parse(season.substring(0, 4)) >= 2017

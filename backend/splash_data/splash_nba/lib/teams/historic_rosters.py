@@ -19,7 +19,7 @@ def fetch_roster(team_id, season):
 
         for player in team_roster:
             player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID']).get_normalized_dict()['SeasonTotalsRegularSeason']
-            player_season_stats = [season_stats for season_stats in player_stats if season_stats['SEASON_ID'] == season]
+            player_season_stats = [season_stats for season_stats in player_stats if season_stats['SEASON_ID'] == season and season_stats['TEAM_ID'] == team_id]
             try:
                 player['GP'] = player_season_stats[0]['GP'] if player_season_stats[0]['GP'] is not None else 0
                 player['GS'] = player_season_stats[0]['GS'] if player_season_stats[0]['GS'] is not None else 0
