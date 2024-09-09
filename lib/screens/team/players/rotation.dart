@@ -42,16 +42,39 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
 
       // Sort the entries by % Start
       entries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
-        // Ensure that 'MPG' is treated as a double or num for comparison
         double startPercentA = (a.value['GS'] / a.value['GP'] ?? 0 as num).toDouble();
         double startPercentB = (b.value['GS'] / b.value['GP'] ?? 0 as num).toDouble();
-
         return startPercentB.compareTo(startPercentA);
       });
 
-      // Sort the entries by Position and % Start for starters
-      List<MapEntry<String, dynamic>> startersEntries = entries.take(5).toList();
+      // Identify starters (first 5 players) and apply GS < 41 and MPG < 20.0 rule
+      List<MapEntry<String, dynamic>> startersEntries = [];
+      List<MapEntry<String, dynamic>> benchCandidates = [];
 
+      for (var entry in entries) {
+        // Check if player meets the condition for being a starter
+        if (startersEntries.length < 5) {
+          if ((entry.value['GS'] >= 41 || entry.value['MPG'] >= 20.0)) {
+            startersEntries.add(entry);
+          } else {
+            // If they don't meet the criteria, add them to the benchCandidates list
+            benchCandidates.add(entry);
+          }
+        } else {
+          benchCandidates.add(entry); // Remaining players are considered for the bench
+        }
+      }
+
+      // If we haven't filled all 5 starter spots, take the next players from benchCandidates
+      for (var candidate in benchCandidates) {
+        if (startersEntries.length < 5) {
+          if (candidate.value['GS'] >= 41 || candidate.value['MPG'] >= 20.0) {
+            startersEntries.add(candidate);
+          }
+        }
+      }
+
+      // Sort the starters by Position and MPG
       startersEntries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
         String positionA = a.value['POSITION'] ?? '';
         String positionB = b.value['POSITION'] ?? '';
@@ -69,8 +92,8 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         }
       });
 
-      // Sort the entries by MPG for bench players
-      List<MapEntry<String, dynamic>> benchEntries = entries.skip(5).toList();
+      // Sort the remaining players (bench) by MPG
+      List<MapEntry<String, dynamic>> benchEntries = benchCandidates;
       benchEntries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
         double mpgA = (a.value['MPG'] ?? 0 as num).toDouble();
         double mpgB = (b.value['MPG'] ?? 0 as num).toDouble();
