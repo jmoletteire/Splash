@@ -38,8 +38,8 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
       // Sort the entries by minutes per game
       entries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
         // Ensure that 'MPG' is treated as a double or num for comparison
-        double mpgA = (a.value['GS'] ?? 0 as num).toDouble();
-        double mpgB = (b.value['GS'] ?? 0 as num).toDouble();
+        double mpgA = (a.value['GS'] / a.value['GP'] ?? 0 as num).toDouble();
+        double mpgB = (b.value['GS'] / b.value['GP'] ?? 0 as num).toDouble();
 
         return mpgB.compareTo(mpgA);
       });
