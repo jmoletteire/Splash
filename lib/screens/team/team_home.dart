@@ -106,6 +106,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
         });
       });
     _notifier.addController(_scrollController);
+    _notifier.setCurrentController(_scrollController);
   }
 
   /// ******************************************************

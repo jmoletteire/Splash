@@ -146,6 +146,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
         });
       });
     _notifier.addController(_scrollController);
+    _notifier.setCurrentController(_scrollController);
   }
 
   /// ******************************************************

@@ -68,6 +68,7 @@ class _StatsQueryState extends State<StatsQuery> {
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController();
     _notifier.addController(_scrollController);
+    _notifier.setCurrentController(_scrollController);
   }
 
   @override

@@ -137,6 +137,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
         });
       });
     _notifier.addController(_scrollController);
+    _notifier.setCurrentController(_scrollController);
   }
 
   /// ******************************************************

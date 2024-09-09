@@ -129,6 +129,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController()..addListener(_scrollListener);
     _notifier.addController(_scrollController);
+    _notifier.setCurrentController(_scrollController);
   }
 
   @override

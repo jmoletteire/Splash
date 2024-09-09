@@ -144,6 +144,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController();
     _notifier.addController(_scrollController);
+    _notifier.setCurrentController(_scrollController);
   }
 
   @override

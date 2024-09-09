@@ -38,6 +38,7 @@ class _NbaCupState extends State<NbaCup>
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController();
     _notifier.addController(_scrollController);
+    _notifier.setCurrentController(_scrollController);
   }
 
   @override
