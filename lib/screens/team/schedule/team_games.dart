@@ -123,7 +123,7 @@ class _TeamGamesState extends State<TeamGames> {
         // Iterate through the schedule map
         schedule.forEach((key, game) {
           // Parse the GAME_DATE field
-          int oppId = game['OPP'];
+          int oppId = game['OPP'] ?? 0;
 
           // Check if the opponent matches
           if (teamIds.contains(oppId.toString())) {

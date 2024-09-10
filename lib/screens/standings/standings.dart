@@ -41,7 +41,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   late ValueNotifier<Map<String, dynamic>> playoffDataNotifier;
   late ValueNotifier<Map<String, dynamic>> cupDataNotifier;
 
-  int selectedYear = 2023;
+  int selectedYear = 2024;
 
   void _initializeTabController(int index) {
     final int tabLength = selectedYear >= 2023 ? 4 : 3;
@@ -76,7 +76,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                   textTheme: const TextTheme(bodyLarge: kBebasNormal)),
               child: YearPicker(
                 firstDate: DateTime(1981),
-                lastDate: DateTime.now(),
+                lastDate: DateTime.now().add(Duration(days: 365)),
                 selectedDate: DateTime(selectedYear),
                 onChanged: (DateTime dateTime) {
                   Navigator.pop(context, dateTime.year);
@@ -91,7 +91,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
     if (pickedYear != null && pickedYear != selectedYear) {
       setState(() {
         selectedYear = pickedYear;
-        selectedSeason = '$selectedYear-${(selectedYear + 1).toString().substring(2)}';
+        selectedSeason =
+            '${(selectedYear - 1).toString()}-${selectedYear.toString().substring(2)}';
 
         int tabIndex = _tabController.index;
         _initializeTabController(tabIndex);
@@ -273,7 +274,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                 tabs: [
                   const Tab(text: 'Conference'),
                   const Tab(text: 'Division'),
-                  const Tab(text: 'Playoffs'),
+                  if (int.parse(selectedSeason.substring(0, 4)) >= 1986)
+                    const Tab(text: 'Playoffs'),
                   if (int.parse(selectedSeason.substring(0, 4)) >= 2023)
                     const Tab(text: 'NBA Cup'),
                 ],
@@ -376,15 +378,16 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                     }).toList(),
                   ),
                 ),
-                ValueListenableBuilder<Map<String, dynamic>>(
-                  valueListenable: playoffDataNotifier,
-                  builder: (context, playoffData, _) {
-                    return PlayoffBracket(
-                      key: ValueKey(selectedYear),
-                      playoffData: playoffData,
-                    );
-                  },
-                ),
+                if (int.parse(selectedSeason.substring(0, 4)) >= 1986)
+                  ValueListenableBuilder<Map<String, dynamic>>(
+                    valueListenable: playoffDataNotifier,
+                    builder: (context, playoffData, _) {
+                      return PlayoffBracket(
+                        key: ValueKey(selectedYear),
+                        playoffData: playoffData,
+                      );
+                    },
+                  ),
                 if (int.parse(selectedSeason.substring(0, 4)) >= 2023)
                   ValueListenableBuilder<Map<String, dynamic>>(
                     valueListenable: cupDataNotifier,

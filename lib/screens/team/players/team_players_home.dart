@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:splash/screens/team/players/depth_chart.dart';
 import 'package:splash/screens/team/players/rotation.dart';
 import 'package:splash/screens/team/players/team_roster.dart';
 
@@ -52,7 +53,7 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
             controller: _tabController,
             children: [
               TeamRoster(team: widget.team),
-              TeamRoster(team: widget.team),
+              DepthChart(team: widget.team),
               TeamRotation(team: widget.team),
             ],
           ),

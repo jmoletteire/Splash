@@ -230,7 +230,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
               .replaceAll(RegExp(r'\bRunning\b'), '')
               .replaceAll(RegExp(r'\bShot\b'), '')
               .replaceAll(RegExp(r'\bshot\b'), '')
-              .replaceAll(RegExp(r'\Pullup\b'), 'Pull-Up')
+              .replaceAll(RegExp(r'\bPullup\b'), 'Pull-Up')
               .replaceAll(RegExp(r'\bJump\b'), 'Jumper')
               .replaceAll(RegExp(r'\s+'), ' ') // Replace multiple spaces with a single space
               .trim(); // Remove any leading or trailing whitespace

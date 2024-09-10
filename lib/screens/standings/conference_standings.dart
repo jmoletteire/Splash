@@ -388,11 +388,12 @@ class _ConferenceStandingsState extends State<ConferenceStandings> {
             child: Text(
               teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!,
               style: kBebasNormal.copyWith(
-                  fontSize: 18.0,
-                  color: teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!
-                          .contains('W')
-                      ? const Color(0xFF35C759)
-                      : const Color(0xFFFF3B31)),
+                fontSize: 18.0,
+                color: teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!
+                        .contains('W')
+                    ? const Color(0xFF55F86F)
+                    : const Color(0xFFFC3126),
+              ),
             ),
           );
         } catch (e) {

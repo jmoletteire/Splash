@@ -346,11 +346,12 @@ class _DivisionStandingsState extends State<DivisionStandings> {
             child: Text(
               teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!,
               style: kBebasNormal.copyWith(
-                  fontSize: 18.0,
-                  color: teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!
-                          .contains('W')
-                      ? Colors.green
-                      : Colors.red),
+                fontSize: 18.0,
+                color: teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!
+                        .contains('W')
+                    ? const Color(0xFF55F86F)
+                    : const Color(0xFFFC3126),
+              ),
             ),
           );
         } catch (e) {

@@ -387,7 +387,6 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                             );
                           } else if (gamesData[gameKey] is Map) {
                             Map<String, dynamic> game = gamesData[gameKey];
-                            // Skip if All-Star weekend
                             if (selectedDate.compareTo(DateTime.now()) > 0 &&
                                 game["SUMMARY"]["LineScore"].isNotEmpty) {
                               gameCards.add(
@@ -399,6 +398,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                                   userTZ: location,
                                 ),
                               );
+                              // Skip if All-Star weekend
                             } else if (!game["SEASON_ID"].toString().startsWith("3")) {
                               gameCards.add(
                                 GameCard(

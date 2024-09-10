@@ -18,13 +18,14 @@ class StatsQuery extends StatefulWidget {
   State<StatsQuery> createState() => _StatsQueryState();
 }
 
-class _StatsQueryState extends State<StatsQuery> {
+class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateMixin {
   List<dynamic>? queryData;
   String? selectedSeason;
   String? selectedSeasonType;
   String? selectedPosition;
   List<ColumnOption> selectedColumns = [];
   late ScrollController _scrollController;
+  late TabController _tabController;
   late ScrollControllerNotifier _notifier;
 
   void _handleFiltersDone(Map<String, dynamic> data) {
@@ -60,6 +61,7 @@ class _StatsQueryState extends State<StatsQuery> {
   void initState() {
     super.initState();
     selectedColumns = List.from(kAllColumns); // Initially select all columns
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -107,6 +109,16 @@ class _StatsQueryState extends State<StatsQuery> {
           ),
           FiltersBottomSheet(onDone: _handleFiltersDone)
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicatorColor: Colors.deepOrange,
+          indicatorWeight: 3.0,
+          unselectedLabelColor: Colors.grey,
+          labelColor: Colors.white,
+          labelStyle: kBebasNormal.copyWith(fontSize: 18.0),
+          tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
+        ),
       ),
       body: Center(
         child: queryData == null || queryData!.isEmpty
