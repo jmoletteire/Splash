@@ -1,0 +1,32 @@
+name: Deploy Flask App
+
+on:
+  push:
+    branches:
+      - main  # Change to the branch you want to trigger the workflow
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Set up SSH to connect to your remote server
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # The SSH key to authenticate with your remote server
+
+      # Deploy the application to your remote server
+      - name: Deploy to Remote Server
+        run: |
+          ssh ubuntu@54.159.103.129 << 'EOF'
+          cd ~/Splash/backend/splash_data
+          git pull origin main  # Pull the latest code
+          source venv/bin/activate
+          pip install -r requirements.txt  # Install any new dependencies
+          sudo systemctl restart flaskapp  # Restart the Flask app
+          EOF
