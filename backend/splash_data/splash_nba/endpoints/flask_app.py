@@ -715,4 +715,4 @@ if __name__ == '__main__':
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
 
-    app.run(host='0.0.0.0', port=8000)
+    # app.run(host='0.0.0.0', port=8000)
