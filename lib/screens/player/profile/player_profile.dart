@@ -39,7 +39,7 @@ class _PlayerProfileState extends State<PlayerProfile> {
         ? 'Last Played'
         : convertDate(widget.player['BIRTHDATE']);
     var value = widget.player['ROSTERSTATUS'] == "Inactive"
-        ? widget.player['TO_YEAR'].toString()
+        ? (widget.player['TO_YEAR'] + 1).toString()
         : '${calculateAge(widget.player['BIRTHDATE'])} yrs';
 
     var height = widget.player['HEIGHT'].toString().split('-');

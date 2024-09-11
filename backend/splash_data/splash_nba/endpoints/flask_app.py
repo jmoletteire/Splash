@@ -12,6 +12,8 @@ bytes_transferred = 0
 
 # MongoDB connection setup
 try:
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
     client = MongoClient('mongodb+srv://jmoletteire:J%40ckpa%24%245225@splash.p0xumnu.mongodb.net/')
     db = client.splash
 
