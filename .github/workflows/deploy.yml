@@ -30,7 +30,7 @@ jobs:
       # Deploy the application to your remote server
       - name: Deploy to Remote Server
         run: |
-          ssh -i ./backend/splash_data/Splash_Remote.pem ubuntu@54.159.103.129 << 'EOF'
+          ssh -i ../../backend/splash_data/Splash_Remote.pem ubuntu@54.159.103.129 << 'EOF'
           cd ~/Splash/backend/splash_data
           git pull origin main  # Pull the latest code
           source venv/bin/activate
