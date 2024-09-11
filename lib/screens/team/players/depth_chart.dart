@@ -238,7 +238,7 @@ class PositionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.black54,
+      color: Colors.black87,
       child: Padding(
         padding: const EdgeInsets.all(5.0),
         child: Column(

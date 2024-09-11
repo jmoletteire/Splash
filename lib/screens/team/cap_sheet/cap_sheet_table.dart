@@ -331,7 +331,7 @@ class _CapSheetState extends State<CapSheet> {
         (context, column) {
           return GestureDetector(
             onTap: () {
-              bool ascending = _sortedColumnIndex == column ? !_isAscending : true;
+              bool ascending = _sortedColumnIndex == column ? !_isAscending : false;
               _sortContracts(column, ascending);
             },
             child: Material(

@@ -87,7 +87,7 @@ class _CareerStatsState extends State<CareerStats> {
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),
 
         /// PPG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.115),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
 
         /// RPG
         TableColumn(width: MediaQuery.of(context).size.width * 0.1),

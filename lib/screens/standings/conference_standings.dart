@@ -21,9 +21,13 @@ class ConferenceStandings extends StatefulWidget {
   State<ConferenceStandings> createState() => _ConferenceStandingsState();
 }
 
-class _ConferenceStandingsState extends State<ConferenceStandings> {
+class _ConferenceStandingsState extends State<ConferenceStandings>
+    with AutomaticKeepAliveClientMixin {
   late ScrollController scrollController;
   List<Map<String, dynamic>> teams = [];
+
+  @override
+  bool get wantKeepAlive => true;
 
   String getClinched(Map<String, dynamic> standings) {
     if (int.parse(widget.season.substring(0, 4)) >= 2019) {

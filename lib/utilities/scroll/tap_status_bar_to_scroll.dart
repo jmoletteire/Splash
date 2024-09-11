@@ -6,7 +6,7 @@ import 'scroll_controller_provider.dart';
 class TapStatusBarToScroll extends StatelessWidget {
   final Widget child;
 
-  TapStatusBarToScroll({required this.child});
+  const TapStatusBarToScroll({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

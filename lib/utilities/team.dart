@@ -10,7 +10,7 @@ class Team {
       queryParams['fields'] = fields.join(',');
     }
 
-    var url = Uri.https(
+    var url = Uri.http(
       kFlaskUrl,
       '/get_team',
       queryParams,
@@ -22,14 +22,14 @@ class Team {
   }
 
   Future<Map<String, dynamic>> getTeamStats(String teamId, String season) async {
-    var url = Uri.https(
+    var url = Uri.http(
       kFlaskUrl,
       '/get_team_stats',
       {'team_id': teamId, 'season': season},
     );
 
     dynamic jsonData = await network.getData(url);
-    Map<String, dynamic> teamStats = jsonData['STATS'];
+    Map<String, dynamic> teamStats = jsonData;
     return teamStats;
   }
 }

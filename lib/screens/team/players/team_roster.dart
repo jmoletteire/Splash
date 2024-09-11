@@ -143,284 +143,301 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                         },
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF303030),
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.white30,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 8,
-                            child: GestureDetector(
-                              child: Container(
-                                color: Colors.transparent,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Player',
-                                      style: kBebasOffWhite,
-                                    ),
-                                    if (sortedBy == 'Name')
-                                      Icon(
-                                        sortOrder == 'ASC'
-                                            ? Icons.arrow_drop_down
-                                            : Icons.arrow_drop_up,
-                                        size: 16.0,
-                                        color: Colors.white,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  (sortedBy == 'Name' && sortOrder == 'ASC')
-                                      ? setPlayers('Name', 'DESC')
-                                      : setPlayers('Name', 'ASC');
-                                });
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: GestureDetector(
-                              child: Container(
-                                color: Colors.transparent,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Text(
-                                      '#',
-                                      textAlign: TextAlign.end,
-                                      style: kBebasOffWhite,
-                                    ),
-                                    if (sortedBy == 'Number')
-                                      Icon(
-                                        sortOrder == 'ASC'
-                                            ? Icons.arrow_drop_down
-                                            : Icons.arrow_drop_up,
-                                        size: 16.0,
-                                        color: Colors.white,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  (sortedBy == 'Number' && sortOrder == 'ASC')
-                                      ? setPlayers('Number', 'DESC')
-                                      : setPlayers('Number', 'ASC');
-                                });
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: GestureDetector(
-                              child: Container(
-                                color: Colors.transparent,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Pos',
-                                      textAlign: TextAlign.start,
-                                      style: kBebasOffWhite,
-                                    ),
-                                    if (sortedBy == 'Position')
-                                      Icon(
-                                        sortOrder == 'ASC'
-                                            ? Icons.arrow_drop_down
-                                            : Icons.arrow_drop_up,
-                                        size: 16.0,
-                                        color: Colors.white,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  (sortedBy == 'Position' && sortOrder == 'ASC')
-                                      ? setPlayers('Position', 'DESC')
-                                      : setPlayers('Position', 'ASC');
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PlayerHome(
-                              playerId: players[index],
+              MultiSliver(
+                pushPinnedChildren: true,
+                children: [
+                  SliverPinnedHeader(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF303030),
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.white30,
+                                width: 1,
+                              ),
                             ),
                           ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                        height: MediaQuery.of(context).size.height * 0.05,
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade900,
-                            border: const Border(
-                                bottom: BorderSide(color: Colors.white54, width: 0.125))),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              flex: 11,
-                              child: Row(
-                                children: [
-                                  PlayerAvatar(
-                                    radius: 16.0,
-                                    backgroundColor: Colors.white12,
-                                    playerImageUrl:
-                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png',
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 8,
+                                child: GestureDetector(
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Player',
+                                          style: kBebasOffWhite,
+                                        ),
+                                        if (sortedBy == 'Name')
+                                          Icon(
+                                            sortOrder == 'ASC'
+                                                ? Icons.arrow_drop_down
+                                                : Icons.arrow_drop_up,
+                                            size: 16.0,
+                                            color: Colors.white,
+                                          ),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(
-                                    width: 15.0,
+                                  onTap: () {
+                                    setState(() {
+                                      (sortedBy == 'Name' && sortOrder == 'ASC')
+                                          ? setPlayers('Name', 'DESC')
+                                          : setPlayers('Name', 'ASC');
+                                    });
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: GestureDetector(
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Text(
+                                          '#',
+                                          textAlign: TextAlign.end,
+                                          style: kBebasOffWhite,
+                                        ),
+                                        if (sortedBy == 'Number')
+                                          Icon(
+                                            sortOrder == 'ASC'
+                                                ? Icons.arrow_drop_down
+                                                : Icons.arrow_drop_up,
+                                            size: 16.0,
+                                            color: Colors.white,
+                                          ),
+                                      ],
+                                    ),
                                   ),
-                                  Text(
+                                  onTap: () {
+                                    setState(() {
+                                      (sortedBy == 'Number' && sortOrder == 'ASC')
+                                          ? setPlayers('Number', 'DESC')
+                                          : setPlayers('Number', 'ASC');
+                                    });
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: GestureDetector(
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Pos',
+                                          textAlign: TextAlign.start,
+                                          style: kBebasOffWhite,
+                                        ),
+                                        if (sortedBy == 'Position')
+                                          Icon(
+                                            sortOrder == 'ASC'
+                                                ? Icons.arrow_drop_down
+                                                : Icons.arrow_drop_up,
+                                            size: 16.0,
+                                            color: Colors.white,
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      (sortedBy == 'Position' && sortOrder == 'ASC')
+                                          ? setPlayers('Position', 'DESC')
+                                          : setPlayers('Position', 'ASC');
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlayerHome(
+                                  playerId: players[index],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            decoration: BoxDecoration(
+                                color: Colors.grey.shade900,
+                                border: const Border(
+                                    bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 11,
+                                  child: Row(
+                                    children: [
+                                      PlayerAvatar(
+                                        radius: 16.0,
+                                        backgroundColor: Colors.white12,
+                                        playerImageUrl:
+                                            'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png',
+                                      ),
+                                      const SizedBox(
+                                        width: 15.0,
+                                      ),
+                                      Text(
+                                        widget.team['seasons'][selectedSeason]['ROSTER']
+                                            [players[index]]['PLAYER'],
+                                        style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
                                     widget.team['seasons'][selectedSeason]['ROSTER']
-                                        [players[index]]['PLAYER'],
+                                                [players[index]]['NUM'] !=
+                                            null
+                                        ? '${widget.team['seasons'][selectedSeason]['ROSTER'][players[index]]['NUM']}'
+                                        : '',
+                                    textAlign: TextAlign.center,
                                     style: kBebasOffWhite.copyWith(fontSize: 18.0),
                                   ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                widget.team['seasons'][selectedSeason]['ROSTER']
-                                            [players[index]]['NUM'] !=
-                                        null
-                                    ? '${widget.team['seasons'][selectedSeason]['ROSTER'][players[index]]['NUM']}'
-                                    : '',
-                                textAlign: TextAlign.center,
-                                style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Text(
-                                widget.team['seasons'][selectedSeason]['ROSTER']
-                                    [players[index]]['POSITION'],
-                                textAlign: TextAlign.center,
-                                style: kBebasOffWhite.copyWith(fontSize: 18.0),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: players.length,
-                ),
-              ),
-              SliverPinnedHeader(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF303030),
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.white30,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 5,
-                            child: Container(
-                              color: Colors.transparent,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Coaches',
-                                    style: kBebasOffWhite,
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    widget.team['seasons'][selectedSeason]['ROSTER']
+                                        [players[index]]['POSITION'],
+                                    textAlign: TextAlign.center,
+                                    style: kBebasOffWhite.copyWith(fontSize: 18.0),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                      height: MediaQuery.of(context).size.height * 0.05,
-                      decoration: BoxDecoration(
-                          color: Colors.grey.shade900,
-                          border: const Border(
-                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 11,
-                            child: Row(
-                              children: [
-                                PlayerAvatar(
-                                  radius: 16.0,
-                                  backgroundColor: Colors.white12,
-                                  playerImageUrl:
-                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${coaches[index]['COACH_ID']}.png',
-                                ),
-                                const SizedBox(
-                                  width: 15.0,
-                                ),
-                                Text(
-                                  coaches[index]['COACH_NAME'],
-                                  style: kBebasOffWhite.copyWith(fontSize: 18.0),
                                 ),
                               ],
                             ),
                           ),
-                          Expanded(
-                            flex: 4,
-                            child: AutoSizeText(
-                              coaches[index]['COACH_TYPE'],
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              style: kBebasOffWhite.copyWith(fontSize: 16.0),
+                        );
+                      },
+                      childCount: players.length,
+                    ),
+                  ),
+                ],
+              ),
+              MultiSliver(
+                pushPinnedChildren: true,
+                children: [
+                  SliverPinnedHeader(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF303030),
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.white30,
+                                width: 1,
+                              ),
                             ),
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                  childCount: coaches.length,
-                ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 5,
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Coaches',
+                                        style: kBebasOffWhite,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                          height: MediaQuery.of(context).size.height * 0.05,
+                          decoration: BoxDecoration(
+                              color: Colors.grey.shade900,
+                              border: const Border(
+                                  bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 11,
+                                child: Row(
+                                  children: [
+                                    PlayerAvatar(
+                                      radius: 16.0,
+                                      backgroundColor: Colors.white12,
+                                      playerImageUrl:
+                                          'https://cdn.nba.com/headshots/nba/latest/1040x760/${coaches[index]['COACH_ID']}.png',
+                                    ),
+                                    const SizedBox(
+                                      width: 15.0,
+                                    ),
+                                    Text(
+                                      coaches[index]['COACH_NAME'],
+                                      style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 4,
+                                child: AutoSizeText(
+                                  coaches[index]['COACH_TYPE'],
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  style: kBebasOffWhite.copyWith(fontSize: 16.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      childCount: coaches.length,
+                    ),
+                  ),
+                ],
               ),
             ],
           );

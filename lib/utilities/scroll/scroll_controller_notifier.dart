@@ -17,6 +17,7 @@ class ScrollControllerNotifier extends ChangeNotifier {
 
   void setCurrentController(ScrollController controller) {
     _currentController = controller;
+    print('Current Controller: ${_currentController}');
   }
 
   void scrollToTop() {

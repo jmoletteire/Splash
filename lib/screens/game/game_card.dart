@@ -134,7 +134,6 @@ class _GameCardState extends State<GameCard> {
                             textAlign: TextAlign.start,
                           ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
-                          const SizedBox(width: 5),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
                             SvgPicture.asset(
                               'images/NBA_TV.svg',

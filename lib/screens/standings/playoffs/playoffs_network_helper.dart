@@ -9,7 +9,7 @@ class PlayoffsNetworkHelper {
     Map<String, String> queryParams = {'season': season};
 
     // Create the URL with query parameters
-    var url = Uri.https(
+    var url = Uri.http(
       kFlaskUrl,
       '/get_playoffs',
       queryParams,

@@ -9,7 +9,7 @@ class DraftNetworkHelper {
     Map<String, String> queryParams = {'draftYear': draftYear};
 
     // Create the URL with query parameters
-    var url = Uri.https(
+    var url = Uri.http(
       kFlaskUrl,
       '/get_draft',
       queryParams,

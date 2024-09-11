@@ -54,7 +54,8 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
       for (var entry in entries) {
         // Check if player meets the condition for being a starter
         if (startersEntries.length < 5) {
-          if ((entry.value['GS'] >= 41 || entry.value['MPG'] >= 20.0)) {
+          if (entry.value['GS'] >= 20 &&
+              (entry.value['GS'] >= 41 || entry.value['MPG'] >= 20.0)) {
             startersEntries.add(entry);
           } else {
             // If they don't meet the criteria, add them to the benchCandidates list
@@ -68,7 +69,8 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
       // If we haven't filled all 5 starter spots, take the next players from benchCandidates
       for (var candidate in benchCandidates) {
         if (startersEntries.length < 5) {
-          if (candidate.value['GS'] >= 41 || candidate.value['MPG'] >= 20.0) {
+          if (candidate.value['GS'] >= 20 &&
+              (candidate.value['GS'] >= 41 || candidate.value['MPG'] >= 20.0)) {
             startersEntries.add(candidate);
           }
         }

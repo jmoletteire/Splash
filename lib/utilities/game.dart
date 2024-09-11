@@ -9,7 +9,7 @@ class Game {
     Map<String, String> queryParams = {'gameId': gameId};
 
     // Create the URL with query parameters
-    var url = Uri.https(
+    var url = Uri.http(
       kFlaskUrl,
       '/get_game',
       queryParams,

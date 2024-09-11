@@ -9,7 +9,7 @@ const kSplashText = Text(
   style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 35.0),
 );
 
-const String kFlaskUrl = "api.splashapp.org";
+const String kFlaskUrl = "54.159.103.129:8000"; //"api.splashapp.org";
 
 /// ******************************************************
 ///                    TEXT STYLES

@@ -32,3 +32,6 @@ instance/
 
 # Heroku files
 *.log
+
+# EC2 key
+*.pem

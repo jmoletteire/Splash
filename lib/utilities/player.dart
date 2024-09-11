@@ -18,7 +18,7 @@ class Player {
     }
 
     // Create the URL with query parameters
-    var url = Uri.https(
+    var url = Uri.http(
       kFlaskUrl,
       '/get_player',
       queryParams,
@@ -40,7 +40,7 @@ class Player {
     };
 
     // Create the URL with query parameters
-    var url = Uri.https(
+    var url = Uri.http(
       kFlaskUrl,
       '/get_player_shot_chart',
       queryParams,

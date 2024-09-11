@@ -13,7 +13,7 @@ class DatesProvider with ChangeNotifier {
   Set<String> get dates => _dates;
 
   Future<Set<String>> fetchDates() async {
-    var url = Uri.https(
+    var url = Uri.http(
       kFlaskUrl,
       '/game_dates',
     );
