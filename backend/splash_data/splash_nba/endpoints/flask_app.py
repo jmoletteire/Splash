@@ -10,6 +10,25 @@ app = Flask(__name__)
 Compress(app)
 bytes_transferred = 0
 
+# MongoDB connection setup
+try:
+    client = MongoClient('mongodb+srv://jmoletteire:J%40ckpa%24%245225@splash.p0xumnu.mongodb.net/')
+    db = client.splash
+
+    # Define all collections at the top level so they're accessible across routes
+    games_collection = db.nba_games
+    teams_collection = db.nba_teams
+    players_collection = db.nba_players
+    player_shots_collection = db.nba_player_shot_data
+    playoff_collection = db.nba_playoff_history
+    cup_collection = db.nba_cup_history
+    draft_collection = db.nba_draft_history
+    transactions_collection = db.nba_transactions
+
+    logging.info("Connected to MongoDB")
+except Exception as e:
+    logging.error(f"Failed to connect to MongoDB: {e}")
+
 
 @app.route('/team_schedule_query', methods=['POST'])
 def query_schedules_database():
