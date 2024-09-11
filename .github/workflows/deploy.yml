@@ -21,11 +21,11 @@ jobs:
           echo "54.159.103.129 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCgSYcWLrcvKWYT3tdJe4C44mQEby4QgmlBNT43wdEN5tKmH5Ssa5W6ph1e1u4t+RChzF1njTXtywOMLNTkpycoJMEHB2JVObPfvZwRDJhmJezjJL5CFQXC5VBlWEqR3Ow+rGfLGev0iLof0bbQLXZ/UHXgj0tAa6O8xb2aenLE+irgkY91wUNglWTe526bcrYPWR8hvp7P4ymtwTiaVThRccDucRT9FnYu2nKZMEUViKRC3s8KmkVsfymSD+12F6fCEncZW1Up/sKPitOFNcOTMiz2OvpQj3zDN5dEg6iWdsDrEmMCklKf6tP+IomkK42RsmUWtvcnkgUJn3HgNLwNJw3t5HUXlDXP0+rvUA0z+/Dr7KdUDlqN6v7s2/ElagEkyLwk4Pofu7dRU1CRoJcE7azsNFPwsT5cG7opIee2s4BfnM2IcYR3UCQ2Wiaq6HY4KSuXP0+rjngtxXSD1MiQFPnf+cA1hKMJblOkIcFxaFqYM/8ZoO5fV5N0YuLLWvM=" >> ~/.ssh/known_hosts
           echo "54.159.103.129 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINUH+4kV7dv9WA68CAhj60C7ivtDTPHWVnbFPTi2cZAx" >> ~/.ssh/known_hosts
 
-      # Set up SSH to connect to your remote server
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # The SSH key to authenticate with your remote server
+      # Use the PEM key from the secret to SSH into the remote server
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.PEM_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa  # Set the proper permissions      
 
       # Deploy the application to your remote server
       - name: Deploy to Remote Server
