@@ -138,7 +138,8 @@ class _DraftSelectionsState extends State<DraftSelections> {
         type: MaterialType.transparency,
         child: InkWell(
           onTap: () {
-            if (widget.selections[row]['LAST_PLAYED'] > 1997) {
+            if (widget.selections[row]['LAST_PLAYED'] >= 1997 &&
+                widget.selections[row]['PLAYER_PROFILE_FLAG'] == 1) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -177,7 +178,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 0:
         return Center(
           child: AutoSizeText(
-            (row + 1).toString(),
+            (widget.selections[row]['OVERALL_PICK'] ?? (row + 1)).toString(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 16.0),

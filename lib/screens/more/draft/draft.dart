@@ -18,7 +18,7 @@ class Draft extends StatefulWidget {
   State<Draft> createState() => _DraftState();
 }
 
-class _DraftState extends State<Draft> {
+class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
   late List<dynamic> draft;
   List<dynamic> firstRound = [];
   List<dynamic> secondRound = [];
@@ -32,8 +32,10 @@ class _DraftState extends State<Draft> {
   List<dynamic> tenthRound = [];
   bool _isLoading = true;
   late String selectedSeason;
+  late int selectedPick;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+  late TabController _tabController;
 
   List<String> seasons = [
     '2024-25',
@@ -81,6 +83,17 @@ class _DraftState extends State<Draft> {
     '1982-83',
     '1981-82',
     '1980-81',
+    '1979-80',
+    '1978-79',
+    '1977-78',
+    '1976-77',
+    '1975-76',
+    '1974-75',
+    '1973-74',
+    '1972-73',
+    '1971-72',
+    '1970-71',
+    '1969-70',
   ];
 
   Future<void> getDraft(String draftYear) async {
@@ -128,7 +141,17 @@ class _DraftState extends State<Draft> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+
+    // Add a listener to update the AppBar actions when the tab changes
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        setState(() {}); // Rebuild the widget when tab index changes
+      }
+    });
+
     selectedSeason = seasons.first;
+    selectedPick = 1;
     getDraft(selectedSeason.substring(0, 4));
   }
 
@@ -147,6 +170,104 @@ class _DraftState extends State<Draft> {
     super.dispose();
   }
 
+  List<Widget> getActions(int index) {
+    if (index == 0) {
+      return [
+        Container(
+          decoration: BoxDecoration(
+              color: Colors.grey.shade900,
+              border: Border.all(color: Colors.deepOrange),
+              borderRadius: BorderRadius.circular(10.0)),
+          margin: const EdgeInsets.fromLTRB(0.0, 11.0, 0.0, 11.0),
+          child: DropdownButton<String>(
+            menuMaxHeight: 300.0,
+            isExpanded: false,
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            borderRadius: BorderRadius.circular(10.0),
+            underline: Container(),
+            dropdownColor: Colors.grey.shade900,
+            value: selectedSeason.substring(0, 4),
+            items: seasons.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value.substring(0, 4),
+                child: Text(
+                  value.substring(0, 4),
+                  style: kBebasNormal,
+                ),
+              );
+            }).toList(),
+            onChanged: (String? newValue) async {
+              setState(() {
+                selectedSeason = newValue!.substring(0, 4);
+                _scrollController.jumpTo(0);
+              });
+              getDraft(selectedSeason);
+            },
+          ),
+        ),
+        CustomIconButton(
+          icon: Icons.search,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SearchScreen(),
+              ),
+            );
+          },
+        ),
+      ];
+    } else {
+      return [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade900,
+            border: Border.all(color: Colors.deepOrange),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          margin: const EdgeInsets.fromLTRB(0.0, 11.0, 0.0, 11.0),
+          child: DropdownButton<int>(
+            menuMaxHeight: 300.0,
+            isExpanded: false,
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            borderRadius: BorderRadius.circular(10.0),
+            underline: Container(),
+            dropdownColor: Colors.grey.shade900,
+            value: selectedPick, // Ensure selectedValue is an integer
+            items: List.generate(60, (index) {
+              int value = index + 1; // Generate values from 1 to 60
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(
+                  value.toString(),
+                  style: kBebasNormal,
+                ),
+              );
+            }).toList(),
+            onChanged: (int? newValue) async {
+              setState(() {
+                selectedPick = newValue!;
+                _scrollController.jumpTo(0);
+              });
+              //getDraft(selectedPick.toString()); // Adjust if necessary
+            },
+          ),
+        ),
+        CustomIconButton(
+          icon: Icons.search,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SearchScreen(),
+              ),
+            );
+          },
+        ),
+      ];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return _isLoading
@@ -156,68 +277,77 @@ class _DraftState extends State<Draft> {
               backgroundColor: Colors.grey.shade900,
               surfaceTintColor: Colors.grey.shade900,
               title: Text(
-                'Draft History',
+                'Draft',
                 style: kBebasBold.copyWith(fontSize: 24.0),
               ),
-              actions: [
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade900,
-                      border: Border.all(color: Colors.deepOrange),
-                      borderRadius: BorderRadius.circular(10.0)),
-                  margin: const EdgeInsets.fromLTRB(0.0, 11.0, 0.0, 11.0),
-                  child: DropdownButton<String>(
-                    menuMaxHeight: 300.0,
-                    isExpanded: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    borderRadius: BorderRadius.circular(10.0),
-                    underline: Container(),
-                    dropdownColor: Colors.grey.shade900,
-                    value: selectedSeason.substring(0, 4),
-                    items: seasons.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value.substring(0, 4),
-                        child: Text(
-                          value.substring(0, 4),
-                          style: kBebasNormal,
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) async {
-                      setState(() {
-                        selectedSeason = newValue!.substring(0, 4);
-                        _scrollController.jumpTo(0);
-                      });
-                      getDraft(selectedSeason);
-                    },
-                  ),
-                ),
-                CustomIconButton(
-                  icon: Icons.search,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
+              actions: getActions(_tabController.index),
+              bottom: TabBar(
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorColor: Colors.deepOrange,
+                indicatorWeight: 3.0,
+                unselectedLabelColor: Colors.grey,
+                labelColor: Colors.white,
+                labelStyle: kBebasNormal.copyWith(fontSize: 18.0),
+                tabs: const [Tab(text: 'By Year'), Tab(text: 'By Pick')],
+              ),
             ),
-            body: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                DraftRound(round: firstRound, roundNum: '1'),
-                DraftRound(round: secondRound, roundNum: '2'),
-                if (thirdRound.isNotEmpty) DraftRound(round: thirdRound, roundNum: '3'),
-                if (fourthRound.isNotEmpty) DraftRound(round: fourthRound, roundNum: '4'),
-                if (fifthRound.isNotEmpty) DraftRound(round: fifthRound, roundNum: '5'),
-                if (sixthRound.isNotEmpty) DraftRound(round: sixthRound, roundNum: '6'),
-                if (seventhRound.isNotEmpty) DraftRound(round: seventhRound, roundNum: '7'),
-                if (eighthRound.isNotEmpty) DraftRound(round: eighthRound, roundNum: '8'),
-                if (ninthRound.isNotEmpty) DraftRound(round: ninthRound, roundNum: '9'),
-                if (tenthRound.isNotEmpty) DraftRound(round: tenthRound, roundNum: '10'),
+            body: TabBarView(
+              controller: _tabController,
+              children: [
+                CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    DraftRound(
+                        round: firstRound, roundNum: 1, isFinalRound: secondRound.isEmpty),
+                    DraftRound(
+                        round: secondRound, roundNum: 2, isFinalRound: thirdRound.isEmpty),
+                    if (thirdRound.isNotEmpty)
+                      DraftRound(
+                        round: thirdRound,
+                        roundNum: 3,
+                        isFinalRound: fourthRound.isEmpty,
+                      ),
+                    if (fourthRound.isNotEmpty)
+                      DraftRound(
+                        round: fourthRound,
+                        roundNum: 4,
+                        isFinalRound: fifthRound.isEmpty,
+                      ),
+                    if (fifthRound.isNotEmpty)
+                      DraftRound(
+                        round: fifthRound,
+                        roundNum: 5,
+                        isFinalRound: sixthRound.isEmpty,
+                      ),
+                    if (sixthRound.isNotEmpty)
+                      DraftRound(
+                        round: sixthRound,
+                        roundNum: 6,
+                        isFinalRound: seventhRound.isEmpty,
+                      ),
+                    if (seventhRound.isNotEmpty)
+                      DraftRound(
+                        round: seventhRound,
+                        roundNum: 7,
+                        isFinalRound: eighthRound.isEmpty,
+                      ),
+                    if (eighthRound.isNotEmpty)
+                      DraftRound(
+                        round: eighthRound,
+                        roundNum: 8,
+                        isFinalRound: ninthRound.isEmpty,
+                      ),
+                    if (ninthRound.isNotEmpty)
+                      DraftRound(
+                        round: ninthRound,
+                        roundNum: 9,
+                        isFinalRound: tenthRound.isEmpty,
+                      ),
+                    if (tenthRound.isNotEmpty)
+                      DraftRound(round: tenthRound, roundNum: 10, isFinalRound: true),
+                  ],
+                ),
               ],
             ),
           );

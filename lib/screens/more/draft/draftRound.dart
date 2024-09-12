@@ -6,9 +6,10 @@ import '../../../utilities/constants.dart';
 
 class DraftRound extends StatelessWidget {
   final List<dynamic> round;
-  final String roundNum;
+  final int roundNum;
+  final bool isFinalRound;
 
-  DraftRound({required this.round, required this.roundNum});
+  DraftRound({required this.round, required this.roundNum, required this.isFinalRound});
 
   Map<String, String> positionMap = {
     'Guard': 'G',
@@ -25,24 +26,25 @@ class DraftRound extends StatelessWidget {
     return MultiSliver(
       pushPinnedChildren: true,
       children: [
-        SliverPinnedHeader(
-          child: Container(
-            color: Colors.grey.shade800,
-            height: MediaQuery.sizeOf(context).height * 0.035,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 11.0),
-              child: Row(
-                children: [
-                  Text(
-                    'Round $roundNum',
-                    style: kBebasNormal.copyWith(fontSize: 18.0),
-                  ),
-                ],
+        DraftSelections(selections: round),
+        if (!isFinalRound)
+          SliverPinnedHeader(
+            child: Container(
+              color: Colors.grey.shade800,
+              height: MediaQuery.sizeOf(context).height * 0.035,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 11.0),
+                child: Row(
+                  children: [
+                    Text(
+                      'Round ${roundNum + 1}',
+                      style: kBebasNormal.copyWith(fontSize: 18.0),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        DraftSelections(selections: round)
       ],
     );
   }

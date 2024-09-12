@@ -107,6 +107,34 @@ def apply_team_schedule_filters(season, season_type, filters):
     return final_results
 
 
+@app.route('/get_draft/by_pick', methods=['GET'])
+def get_draft_by_pick():
+    try:
+        query_params = request.args.to_dict()
+        ovr_pick = int(query_params['overallPick'])  # Ensure overallPick is treated as an integer
+        results = []
+
+        # Query the database for all draft documents
+        drafts = draft_collection.find({}, {"_id": 0, "SELECTIONS": 1})  # Exclude _id and only return SELECTIONS
+
+        # Loop through each draft document and find the selection with the matching OVERALL_PICK
+        for draft in drafts:
+            selections = draft.get('SELECTIONS', [])
+            for selection in selections:
+                if selection.get('OVERALL_PICK') == ovr_pick:
+                    results.append(selection)
+                    break
+
+        if results:
+            return jsonify(results), 200
+        else:
+            return jsonify({"error": "No matching picks found"}), 404
+
+    except Exception as e:
+        logging.error(f"Error retrieving draft picks: {e}")
+        return jsonify({"error": "Failed to retrieve draft picks"}), 500
+
+
 @app.route('/get_draft', methods=['GET'])
 def get_draft():
     try:
