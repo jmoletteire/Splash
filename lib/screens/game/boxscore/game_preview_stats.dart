@@ -4,8 +4,6 @@ import 'package:splash/screens/game/boxscore/team_player_stats.dart';
 import 'package:splash/screens/game/matchup/components/team_season_stats.dart';
 
 import '../../../utilities/constants.dart';
-import '../../../utilities/scroll/scroll_controller_notifier.dart';
-import '../../../utilities/scroll/scroll_controller_provider.dart';
 import '../../../utilities/team.dart';
 import '../../team/team_cache.dart';
 
@@ -27,10 +25,8 @@ class GamePreviewStats extends StatefulWidget {
 class _GamePreviewStatsState extends State<GamePreviewStats>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late TabController _tabController;
-  late ScrollController _scrollController;
   late ScrollController _homeController;
   late ScrollController _awayController;
-  late ScrollControllerNotifier _notifier;
   final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
 
   bool _isLoading = false;
@@ -47,7 +43,6 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _scrollController = ScrollController();
     _homeController = ScrollController();
     _awayController = ScrollController();
 
@@ -75,22 +70,6 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
       }
     });
     _tabController.index = 1;
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _notifier = ScrollControllerProvider.of(context)!.notifier;
-    _scrollController = ScrollController();
-    _notifier.addController(_scrollController);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _notifier.removeController(_scrollController);
-    _scrollController.dispose();
-    super.dispose();
   }
 
   Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {

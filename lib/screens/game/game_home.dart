@@ -136,8 +136,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           _showImages = _isSliverAppBarExpanded ? true : false;
         });
       });
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('game', _scrollController);
   }
 
   /// ******************************************************
@@ -148,7 +147,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   @override
   void dispose() {
     _tabController.dispose();
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('game');
     _scrollController.dispose();
     super.dispose();
   }

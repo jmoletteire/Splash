@@ -143,13 +143,12 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     super.didChangeDependencies();
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController();
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('scoreboard', _scrollController);
   }
 
   @override
   void dispose() {
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('scoreboard');
     _scrollController.dispose();
     _tabController.dispose();
     super.dispose();

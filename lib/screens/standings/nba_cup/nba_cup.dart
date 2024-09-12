@@ -37,14 +37,13 @@ class _NbaCupState extends State<NbaCup>
     super.didChangeDependencies();
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController();
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('nba_cup', _scrollController);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('nba_cup');
     _scrollController.dispose();
     super.dispose();
   }

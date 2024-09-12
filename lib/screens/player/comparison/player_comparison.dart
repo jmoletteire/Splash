@@ -128,13 +128,12 @@ class _PlayerComparisonState extends State<PlayerComparison> {
     super.didChangeDependencies();
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController()..addListener(_scrollListener);
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('player_compare', _scrollController);
   }
 
   @override
   void dispose() {
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('player_compare');
     _scrollController.dispose();
     super.dispose();
   }

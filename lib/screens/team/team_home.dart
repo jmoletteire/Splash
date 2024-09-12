@@ -105,8 +105,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
           _title = _isSliverAppBarExpanded;
         });
       });
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('team', _scrollController);
   }
 
   /// ******************************************************
@@ -117,7 +116,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
   @override
   void dispose() {
     _tabController.dispose();
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('team');
     _scrollController.dispose();
     super.dispose();
   }
@@ -157,10 +156,9 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                         ? SvgPicture.asset(
                             'images/NBA_Logos/${team['TEAM_ID']}.svg',
                             fit: BoxFit.contain,
-                            width:
-                                team['ABBREVIATION'] == 'LAC' || team['ABBREVIATION'] == 'CHI'
-                                    ? MediaQuery.of(context).size.width * 0.165
-                                    : MediaQuery.of(context).size.width * 0.1,
+                            width: team['ABBREVIATION'] == 'CHI'
+                                ? MediaQuery.of(context).size.width * 0.165
+                                : MediaQuery.of(context).size.width * 0.1,
                           )
                         : null,
                     centerTitle: true,

@@ -48,6 +48,7 @@ dependencies:
   material_table_view: ^5.0.0
   percent_indicator: ^4.2.3
   provider: ^6.0.2
+  scrolls_to_top: ^2.1.1
   skeletonizer: ^1.4.1+1
   sliver_tools: ^0.2.12
   timezone: ^0.8.0

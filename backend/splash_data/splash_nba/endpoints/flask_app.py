@@ -5,7 +5,6 @@ from flask_compress import Compress
 from pymongo import MongoClient
 import logging
 
-
 app = Flask(__name__)
 Compress(app)
 bytes_transferred = 0
@@ -13,12 +12,11 @@ bytes_transferred = 0
 # MongoDB connection setup
 try:
     # Configure logging
-    #TEST
     logging.basicConfig(level=logging.INFO)
     client = MongoClient('mongodb+srv://jmoletteire:J%40ckpa%24%245225@splash.p0xumnu.mongodb.net/')
     db = client.splash
 
-    # Define all collections at the top level so they're accessible across routes
+    # Define all collections at the top level, so they're accessible across routes
     games_collection = db.nba_games
     teams_collection = db.nba_teams
     players_collection = db.nba_players
@@ -188,7 +186,14 @@ def query_database():
             query['POSITION'] = position
         results = list(players_collection.find(
             query,
-            {'PERSON_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{selected_season}.{selected_season_type}': 1, '_id': 0}
+            {
+                'PERSON_ID': 1,
+                'DISPLAY_FI_LAST': 1,
+                'TEAM_ID': 1,
+                'POSITION': 1,
+                f'STATS.{selected_season}.{selected_season_type}': 1,
+                '_id': 0
+            }
         ))
 
     return jsonify(results)

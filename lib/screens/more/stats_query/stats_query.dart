@@ -69,13 +69,12 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
     super.didChangeDependencies();
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController();
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('stats_query', _scrollController);
   }
 
   @override
   void dispose() {
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('stats_query');
     _scrollController.dispose();
     super.dispose();
   }

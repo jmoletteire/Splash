@@ -181,13 +181,12 @@ class _TeamComparisonState extends State<TeamComparison> {
     super.didChangeDependencies();
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController()..addListener(_scrollListener);
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('team_compare', _scrollController);
   }
 
   @override
   void dispose() {
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('team_compare');
     _scrollController.dispose();
     super.dispose();
   }

@@ -47,7 +47,7 @@ class Splash extends StatelessWidget {
           bodyMedium: const TextStyle(fontSize: 18.0),
         ),
       ),
-      home: TapStatusBarToScroll(child: const TabHomeScreen()),
+      home: const TapStatusBarToScroll(child: TabHomeScreen()),
     );
   }
 }

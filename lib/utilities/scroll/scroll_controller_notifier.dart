@@ -1,28 +1,19 @@
 import 'package:flutter/material.dart';
 
 class ScrollControllerNotifier extends ChangeNotifier {
-  final Set<ScrollController> _controllers = {};
-  ScrollController? _currentController;
+  final Map<String, ScrollController> _controllers = {};
 
-  void addController(ScrollController controller) {
-    _controllers.add(controller);
+  void addController(String key, ScrollController controller) {
+    _controllers[key] = controller;
   }
 
-  void removeController(ScrollController controller) {
-    _controllers.remove(controller);
-    if (_currentController == controller) {
-      _currentController = null;
-    }
-  }
-
-  void setCurrentController(ScrollController controller) {
-    _currentController = controller;
-    print('Current Controller: ${_currentController}');
+  void removeController(String key) {
+    _controllers.remove(key);
   }
 
   void scrollToTop() {
-    if (_currentController != null) {
-      _currentController!.animateTo(
+    for (var key in _controllers.keys) {
+      _controllers[key]?.animateTo(
         0.0,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,

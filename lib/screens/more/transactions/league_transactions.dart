@@ -57,13 +57,12 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
     super.didChangeDependencies();
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController();
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('lg_transactions', _scrollController);
   }
 
   @override
   void dispose() {
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('lg_transactions');
     _scrollController.dispose();
     super.dispose();
   }

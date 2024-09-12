@@ -145,8 +145,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
           _showImage = _isSliverAppBarExpanded ? true : false;
         });
       });
-    _notifier.addController(_scrollController);
-    _notifier.setCurrentController(_scrollController);
+    _notifier.addController('player', _scrollController);
   }
 
   /// ******************************************************
@@ -157,7 +156,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
   @override
   void dispose() {
     _tabController.dispose();
-    _notifier.removeController(_scrollController);
+    _notifier.removeController('player');
     _scrollController.dispose();
     super.dispose();
   }

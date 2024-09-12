@@ -1,7 +1,27 @@
-from nba_api.stats.endpoints import drafthistory
+from nba_api.stats.endpoints import drafthistory, commonplayerinfo
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
+
+
+def get_position():
+    for draft in draft_collection.find():
+        for player in draft['SELECTIONS']:
+            try:
+                player_data = commonplayerinfo.CommonPlayerInfo(player['PERSON_ID']).get_normalized_dict()['CommonPlayerInfo'][0]
+                player['POSITION'] = player_data['POSITION']
+                player['HEIGHT'] = player_data['HEIGHT']
+                player['WEIGHT'] = player_data['WEIGHT']
+                player['LAST_PLAYED'] = player_data['TO_YEAR']
+
+                logging.info(f" Added info for player {player}")
+            except Exception as e:
+                logging.error(f" Failed to add info for {player}: {e}")
+
+        draft_collection.update_one(
+            {"YEAR": draft['YEAR']},
+            {"$set": {"SELECTIONS": draft['SELECTIONS']}},
+        )
 
 
 def draft_history():
@@ -41,4 +61,5 @@ if __name__ == "__main__":
     draft_collection = db.nba_draft_history
     logging.info("Connected to MongoDB")
 
-    draft_history()
+    #draft_history()
+    get_position()

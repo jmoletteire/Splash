@@ -26,9 +26,38 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   bool _autoValidate = false;
   bool _loading = false;
   int? _editIndex;
-
-  List<String> seasonTypes = ['REGULAR SEASON', 'PLAYOFFS'];
   List<String> positions = ['ALL', 'G', 'F', 'C', 'G/F', 'F/C'];
+  List<String> seasonTypes = ['REGULAR SEASON', 'PLAYOFFS'];
+  List<String> seasons = [
+    '2023-24',
+    '2022-23',
+    '2021-22',
+    '2020-21',
+    '2019-20',
+    '2018-19',
+    '2017-18',
+    '2016-17',
+    '2015-16',
+    '2014-15',
+    '2013-14',
+    '2012-13',
+    '2011-12',
+    '2010-11',
+    '2009-10',
+    '2008-09',
+    '2007-08',
+    '2006-07',
+    '2005-06',
+    '2004-05',
+    '2003-04',
+    '2002-03',
+    '2001-02',
+    '2000-01',
+    '1999-00',
+    '1998-99',
+    '1997-98',
+    '1996-97'
+  ];
 
   String _operation = 'equals';
   final TextEditingController _valueController = TextEditingController();
@@ -38,7 +67,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   @override
   void initState() {
     super.initState();
-    selectedSeason = kSeasons.first;
+    selectedSeason = seasons.first;
     seasonType = seasonTypes.first;
     selectedPosition = positions.first;
   }
@@ -131,7 +160,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
     setState(() {
       _loading = true;
     });
-    final url = Uri.parse('https://$kFlaskUrl/stats_query');
+    final url = Uri.parse('http://$kFlaskUrl/stats_query');
 
     final response = await http.post(
       url,
@@ -296,7 +325,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                 children: [
                                   _buildDropdownButton(
                                     selectedValue: selectedSeason,
-                                    items: kSeasons,
+                                    items: seasons,
                                     onChanged: (value) {
                                       setModalState(() {
                                         selectedSeason = value!;

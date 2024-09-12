@@ -271,19 +271,23 @@ class _CareerStatsState extends State<CareerStats> {
       case 2:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                      .toStringAsFixed(0) ??
-                  '-');
+            text: (widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                    .toStringAsFixed(0) ??
+                '-',
+            color: const Color(0xFFD0D0D0),
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 3:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['MIN'] /
-                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                      .toStringAsFixed(1) ??
-                  '-');
+            text: (widget.seasons[season][widget.seasonType]['BASIC']['MIN'] /
+                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
+                    .toStringAsFixed(1) ??
+                '-',
+            color: const Color(0xFFD0D0D0),
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
@@ -436,9 +440,10 @@ class _CareerStatsState extends State<CareerStats> {
 }
 
 class StandingsDataText extends StatelessWidget {
-  const StandingsDataText({super.key, required this.text, this.alignment});
+  const StandingsDataText({super.key, required this.text, this.alignment, this.color});
 
   final Alignment? alignment;
+  final Color? color;
   final String text;
 
   @override
@@ -447,7 +452,7 @@ class StandingsDataText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasNormal.copyWith(fontSize: 18.0),
+        style: kBebasNormal.copyWith(fontSize: 18.0, color: color),
       ),
     );
   }

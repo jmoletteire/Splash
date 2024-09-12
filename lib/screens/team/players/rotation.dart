@@ -76,6 +76,12 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         }
       }
 
+      // If we still haven't filled all 5 spots, ignore the criteria and just take next players
+      while (startersEntries.length < 5) {
+        int index = 5 - startersEntries.length - 1;
+        startersEntries.add(benchCandidates[index]);
+      }
+
       // Sort the starters by Position and MPG
       startersEntries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
         String positionA = a.value['POSITION'] ?? '';
