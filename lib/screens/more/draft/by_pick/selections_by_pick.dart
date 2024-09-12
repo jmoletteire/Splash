@@ -112,6 +112,20 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
         },
       );
 
+  Color getRowColor(int row) {
+    if (widget.selections[row]['HOF'] == 1) {
+      return Colors.deepOrange.withOpacity(0.5);
+    } else if (widget.selections[row]['MVP'] == 1) {
+      return Colors.yellow.shade800.withOpacity(0.5);
+    } else if (widget.selections[row]['ALL_NBA'] == 1) {
+      return Colors.blueGrey.withOpacity(0.85);
+    } else if (widget.selections[row]['ALL_STAR'] == 1) {
+      return Colors.blueGrey.withOpacity(0.5);
+    } else {
+      return Colors.grey.shade900;
+    }
+  }
+
   /// This is used to wrap both regular and placeholder rows to achieve fade
   /// transition between them and to insert optional row divider.
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
@@ -119,7 +133,7 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
         child: DecoratedBox(
           position: DecorationPosition.foreground,
           decoration: BoxDecoration(
-            color: Colors.grey.shade900,
+            color: getRowColor(index),
             border: Border(
               bottom: BorderSide(
                 color: Colors.grey.shade200,
@@ -154,7 +168,7 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
           highlightColor: Colors.white,
           child: contentBuilder(context, (context, column) {
             return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: EdgeInsets.only(right: column == 2 ? 0.0 : 8.0),
               child: getContent(row, column, context),
             );
           }),

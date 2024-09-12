@@ -23,6 +23,7 @@ class Draft extends StatefulWidget {
 class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
   late List<dynamic> draft;
   late Map<String, int> draftStats;
+  late Map<String, int> pickStats;
   late List<dynamic> draftByPick;
   List<dynamic> firstRound = [];
   List<dynamic> secondRound = [];
@@ -128,6 +129,28 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
 
   Future<void> getDraftByPick(String pick) async {
     var fetchedPicks = await DraftNetworkHelper().getDraftByPick(pick);
+
+    num hof = 0;
+    num mvp = 0;
+    num allNba = 0;
+    num allStar = 0;
+    num roty = 0;
+
+    for (var player in fetchedPicks) {
+      hof += player['HOF'] ?? 0;
+      mvp += player['MVP'] ?? 0;
+      allNba += player['ALL_NBA'] ?? 0;
+      allStar += player['ALL_STAR'] ?? 0;
+      roty += player['ROTY'] ?? 0;
+    }
+    pickStats = {
+      'HOF': hof.toInt(),
+      'MVP': mvp.toInt(),
+      'ALL_NBA': allNba.toInt(),
+      'ALL_STAR': allStar.toInt(),
+      'ROTY': roty.toInt(),
+    };
+
     setState(() {
       draftByPick = fetchedPicks;
       draftByPick.sort((a, b) => int.parse(b['SEASON']).compareTo(int.parse(a['SEASON'])));
@@ -232,6 +255,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
           onPressed: () {
             showModalBottomSheet(
               context: context,
+              backgroundColor: const Color(0xFF111111),
               builder: (context) {
                 return DraftStats(
                   draftStats: draftStats,
@@ -287,6 +311,20 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
               getDraftByPick(selectedPick.toString());
             },
           ),
+        ),
+        CustomIconButton(
+          icon: Icons.bar_chart_sharp,
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: const Color(0xFF111111),
+              builder: (context) {
+                return DraftStats(
+                  draftStats: pickStats,
+                );
+              },
+            );
+          },
         ),
         CustomIconButton(
           icon: Icons.search,

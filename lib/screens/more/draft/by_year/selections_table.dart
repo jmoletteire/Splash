@@ -112,6 +112,20 @@ class _DraftSelectionsState extends State<DraftSelections> {
         },
       );
 
+  Color getRowColor(int row) {
+    if (widget.selections[row]['HOF'] == 1) {
+      return Colors.deepOrange.withOpacity(0.5);
+    } else if (widget.selections[row]['MVP'] == 1) {
+      return Colors.yellow.shade800.withOpacity(0.5);
+    } else if (widget.selections[row]['ALL_NBA'] == 1) {
+      return Colors.blueGrey.withOpacity(0.85);
+    } else if (widget.selections[row]['ALL_STAR'] == 1) {
+      return Colors.blueGrey.withOpacity(0.5);
+    } else {
+      return Colors.grey.shade900;
+    }
+  }
+
   /// This is used to wrap both regular and placeholder rows to achieve fade
   /// transition between them and to insert optional row divider.
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
@@ -119,7 +133,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
         child: DecoratedBox(
           position: DecorationPosition.foreground,
           decoration: BoxDecoration(
-            color: Colors.grey.shade900,
+            color: getRowColor(index),
             border: Border(
               bottom: BorderSide(
                 color: Colors.grey.shade200,
@@ -154,7 +168,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
           highlightColor: Colors.white,
           child: contentBuilder(context, (context, column) {
             return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: EdgeInsets.only(right: column == 2 ? 0.0 : 8.0),
               child: getContent(row, column, context),
             );
           }),
@@ -174,6 +188,11 @@ class _DraftSelectionsState extends State<DraftSelections> {
       'Center-Forward': 'C-F',
     };
 
+    String teamId = kEastConfTeamIds.contains(widget.selections[row]['TEAM_ID'].toString()) ||
+            kWestConfTeamIds.contains(widget.selections[row]['TEAM_ID'].toString())
+        ? widget.selections[row]['TEAM_ID'].toString()
+        : '0';
+
     switch (column) {
       case 0:
         return Center(
@@ -187,11 +206,12 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 1:
         return Row(
           children: [
+            if (teamId == '0') const Spacer(flex: 1),
             Expanded(
               flex: 4,
-              child: Image.asset('images/NBA_Logos/${widget.selections[row]['TEAM_ID']}.png'),
+              child: Image.asset('images/NBA_Logos/$teamId.png'),
             ),
-            const Spacer()
+            Spacer(flex: teamId == '0' ? 3 : 1)
           ],
         );
       case 2:

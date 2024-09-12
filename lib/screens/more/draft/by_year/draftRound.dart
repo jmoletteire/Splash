@@ -30,7 +30,13 @@ class DraftRound extends StatelessWidget {
         if (!isFinalRound)
           SliverPinnedHeader(
             child: Container(
-              color: Colors.grey.shade800,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade800,
+                border: const Border(
+                  top: BorderSide(color: Colors.white70, width: 0.5),
+                  bottom: BorderSide(color: Colors.white70, width: 0.25),
+                ),
+              ),
               height: MediaQuery.sizeOf(context).height * 0.035,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 11.0),

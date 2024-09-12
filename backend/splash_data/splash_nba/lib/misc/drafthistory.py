@@ -6,18 +6,22 @@ import logging
 
 
 def age_at_draft(year, birth_date):
-    # Step 1: Parse the Year and set the date to July 1st of that year
-    july_first = datetime(int(year), 7, 1)
+    try:
+        # Step 1: Parse the Year and set the date to July 1st of that year
+        july_first = datetime(int(year), 7, 1)
 
-    # Step 2: Parse the birthdate string
-    birth_date = datetime.strptime(birth_date, "%Y-%m-%dT%H:%M:%S")
+        # Step 2: Parse the birthdate string
+        birth_date = datetime.strptime(birth_date, "%Y-%m-%dT%H:%M:%S")
 
-    # Step 3: Calculate age
-    age = july_first.year - birth_date.year
+        # Step 3: Calculate age
+        age = july_first.year - birth_date.year
 
-    # Step 4: Check if the person has already had their birthday by July 1st of the given year
-    if (july_first.month, july_first.day) < (birth_date.month, birth_date.day):
-        age -= 1
+        # Step 4: Check if the person has already had their birthday by July 1st of the given year
+        if (july_first.month, july_first.day) < (birth_date.month, birth_date.day):
+            age -= 1
+    except Exception as e:
+        logging.error(e)
+        age = 0
 
     return age
 
@@ -36,26 +40,26 @@ def get_awards(player):
         awards = playerawards.PlayerAwards(player_id=player).get_normalized_dict()['PlayerAwards']
         for award in awards:
             if award['DESCRIPTION'] == 'Hall of Fame Inductee':
-                award_checks['hof'] += 1
+                award_checks['hof'] = 1
             elif award['DESCRIPTION'] == 'NBA Most Valuable Player':
-                award_checks['mvp'] += 1
+                award_checks['mvp'] = 1
             elif award['DESCRIPTION'] == 'All-NBA':
-                award_checks['all_nba'] += 1
+                award_checks['all_nba'] = 1
             elif award['DESCRIPTION'] == 'NBA All-Star':
-                award_checks['all_star'] += 1
+                award_checks['all_star'] = 1
             elif award['DESCRIPTION'] == 'NBA Rookie of the Year':
-                award_checks['roty'] += 1
+                award_checks['roty'] = 1
     else:
         if 'Hall of Fame Inductee' in result['AWARDS'].keys():
-            award_checks['hof'] += 1
+            award_checks['hof'] = 1
         if 'NBA Most Valuable Player' in result['AWARDS'].keys():
-            award_checks['mvp'] += 1
+            award_checks['mvp'] = 1
         if 'All-NBA' in result['AWARDS'].keys():
-            award_checks['all_nba'] += 1
+            award_checks['all_nba'] = 1
         if 'NBA All-Star' in result['AWARDS'].keys():
-            award_checks['all_star'] += 1
+            award_checks['all_star'] = 1
         if 'NBA Rookie of the Year' in result['AWARDS'].keys():
-            award_checks['roty'] += 1
+            award_checks['roty'] = 1
 
     return award_checks
 
