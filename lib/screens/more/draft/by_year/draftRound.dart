@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-import 'package:splash/screens/more/draft/selections_table.dart';
+import 'package:splash/screens/more/draft/by_year/selections_table.dart';
 
-import '../../../utilities/constants.dart';
+import '../../../../utilities/constants.dart';
 
 class DraftRound extends StatelessWidget {
   final List<dynamic> round;

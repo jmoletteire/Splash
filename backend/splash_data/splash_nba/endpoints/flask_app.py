@@ -147,7 +147,7 @@ def get_draft():
         # Query the database
         draft = draft_collection.find_one(
             {"YEAR": draft_year},
-            {"_id": 0, f"SELECTIONS": 1}
+            {"_id": 0}
         )
 
         if draft:

@@ -4,9 +4,9 @@ import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
 
-import '../../../components/player_avatar.dart';
-import '../../../utilities/constants.dart';
-import '../../player/player_home.dart';
+import '../../../../components/player_avatar.dart';
+import '../../../../utilities/constants.dart';
+import '../../../player/player_home.dart';
 
 class DraftSelections extends StatefulWidget {
   final List<dynamic> selections;

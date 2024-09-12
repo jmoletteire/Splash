@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
-import 'package:splash/screens/more/draft/draftRound.dart';
+import 'package:splash/screens/more/draft/by_pick/selections_by_pick.dart';
+import 'package:splash/screens/more/draft/by_year/draftRound.dart';
 import 'package:splash/screens/more/draft/draft_network_helper.dart';
+import 'package:splash/screens/more/draft/draft_stats.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/custom_icon_button.dart';
@@ -20,6 +22,8 @@ class Draft extends StatefulWidget {
 
 class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
   late List<dynamic> draft;
+  late Map<String, int> draftStats;
+  late List<dynamic> draftByPick;
   List<dynamic> firstRound = [];
   List<dynamic> secondRound = [];
   List<dynamic> thirdRound = [];
@@ -30,7 +34,8 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
   List<dynamic> eighthRound = [];
   List<dynamic> ninthRound = [];
   List<dynamic> tenthRound = [];
-  bool _isLoading = true;
+  bool _isLoadingByYear = true;
+  bool _isLoadingByPick = true;
   late String selectedSeason;
   late int selectedPick;
   late ScrollController _scrollController;
@@ -102,17 +107,33 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
       setState(() {
         draft = draftCache.getDraft(draftYear)!;
         setPicks();
-        _isLoading = false;
+        _isLoadingByYear = false;
       });
     } else {
       var fetchedDraft = await DraftNetworkHelper().getDraft(draftYear);
       setState(() {
-        draft = fetchedDraft;
+        draft = fetchedDraft['SELECTIONS'];
+        draftStats = {
+          'HOF': fetchedDraft['HOF'] ?? 0,
+          'MVP': fetchedDraft['MVP'] ?? 0,
+          'ALL_NBA': fetchedDraft['ALL_NBA'] ?? 0,
+          'ALL_STAR': fetchedDraft['ALL_STAR'] ?? 0,
+        };
         setPicks();
-        _isLoading = false;
+        _isLoadingByYear = false;
       });
       draftCache.addDraft(draftYear, draft);
     }
+  }
+
+  Future<void> getDraftByPick(String pick) async {
+    var fetchedPicks = await DraftNetworkHelper().getDraftByPick(pick);
+    setState(() {
+      draftByPick = fetchedPicks;
+      draftByPick.sort((a, b) => int.parse(b['SEASON']).compareTo(int.parse(a['SEASON'])));
+      setPicks();
+      _isLoadingByPick = false;
+    });
   }
 
   void setPicks() {
@@ -141,7 +162,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
 
     // Add a listener to update the AppBar actions when the tab changes
     _tabController.addListener(() {
@@ -153,6 +174,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
     selectedSeason = seasons.first;
     selectedPick = 1;
     getDraft(selectedSeason.substring(0, 4));
+    getDraftByPick(selectedPick.toString());
   }
 
   @override
@@ -206,6 +228,19 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
           ),
         ),
         CustomIconButton(
+          icon: Icons.bar_chart_sharp,
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (context) {
+                return DraftStats(
+                  draftStats: draftStats,
+                );
+              },
+            );
+          },
+        ),
+        CustomIconButton(
           icon: Icons.search,
           onPressed: () {
             Navigator.push(
@@ -249,7 +284,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
                 selectedPick = newValue!;
                 _scrollController.jumpTo(0);
               });
-              //getDraft(selectedPick.toString()); // Adjust if necessary
+              getDraftByPick(selectedPick.toString());
             },
           ),
         ),
@@ -270,7 +305,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
+    return _isLoadingByYear || _isLoadingByPick
         ? const SpinningIcon()
         : Scaffold(
             appBar: AppBar(
@@ -347,6 +382,10 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
                     if (tenthRound.isNotEmpty)
                       DraftRound(round: tenthRound, roundNum: 10, isFinalRound: true),
                   ],
+                ),
+                CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [DraftSelectionsByPick(selections: draftByPick)],
                 ),
               ],
             ),
