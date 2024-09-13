@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class DraftCache extends ChangeNotifier {
-  final Map<String, List<dynamic>> _cache = {};
+  final Map<String, Map<String, dynamic>> _cache = {};
 
-  List? getDraft(String draftYear) {
+  Map<String, dynamic>? getDraft(String draftYear) {
     return _cache[draftYear];
   }
 
-  void addDraft(String draftYear, List<dynamic> draftData) {
+  void addDraft(String draftYear, Map<String, dynamic> draftData) {
     _cache[draftYear] = draftData;
     notifyListeners();
   }

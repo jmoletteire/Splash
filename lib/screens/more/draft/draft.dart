@@ -22,9 +22,9 @@ class Draft extends StatefulWidget {
 
 class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
   late List<dynamic> draft;
+  late List<dynamic> draftByPick;
   late Map<String, int> draftStats;
   late Map<String, int> pickStats;
-  late List<dynamic> draftByPick;
   List<dynamic> firstRound = [];
   List<dynamic> secondRound = [];
   List<dynamic> thirdRound = [];
@@ -106,15 +106,10 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
     final draftCache = Provider.of<DraftCache>(context, listen: false);
     if (draftCache.containsDraft(draftYear)) {
       setState(() {
-        draft = draftCache.getDraft(draftYear)!;
-        setPicks();
-        _isLoadingByYear = false;
-      });
-    } else {
-      var fetchedDraft = await DraftNetworkHelper().getDraft(draftYear);
-      setState(() {
+        var fetchedDraft = draftCache.getDraft(draftYear)!;
         draft = fetchedDraft['SELECTIONS'];
         draftStats = {
+          'TOTAL': draft.length,
           'HOF': fetchedDraft['HOF'] ?? 0,
           'MVP': fetchedDraft['MVP'] ?? 0,
           'ALL_NBA': fetchedDraft['ALL_NBA'] ?? 0,
@@ -123,13 +118,28 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
         setPicks();
         _isLoadingByYear = false;
       });
-      draftCache.addDraft(draftYear, draft);
+    } else {
+      var fetchedDraft = await DraftNetworkHelper().getDraft(draftYear);
+      setState(() {
+        draft = fetchedDraft['SELECTIONS'];
+        draftStats = {
+          'TOTAL': draft.length,
+          'HOF': fetchedDraft['HOF'] ?? 0,
+          'MVP': fetchedDraft['MVP'] ?? 0,
+          'ALL_NBA': fetchedDraft['ALL_NBA'] ?? 0,
+          'ALL_STAR': fetchedDraft['ALL_STAR'] ?? 0,
+        };
+        setPicks();
+        _isLoadingByYear = false;
+      });
+      draftCache.addDraft(draftYear, fetchedDraft);
     }
   }
 
   Future<void> getDraftByPick(String pick) async {
     var fetchedPicks = await DraftNetworkHelper().getDraftByPick(pick);
 
+    num total = 0;
     num hof = 0;
     num mvp = 0;
     num allNba = 0;
@@ -137,6 +147,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
     num roty = 0;
 
     for (var player in fetchedPicks) {
+      total += 1;
       hof += player['HOF'] ?? 0;
       mvp += player['MVP'] ?? 0;
       allNba += player['ALL_NBA'] ?? 0;
@@ -144,6 +155,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
       roty += player['ROTY'] ?? 0;
     }
     pickStats = {
+      'TOTAL': total.toInt(),
       'HOF': hof.toInt(),
       'MVP': mvp.toInt(),
       'ALL_NBA': allNba.toInt(),
@@ -163,6 +175,14 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
     setState(() {
       firstRound = draft.where((d) => d['ROUND_NUMBER'] == 1).toList();
       secondRound = draft.where((d) => d['ROUND_NUMBER'] == 2).toList();
+      thirdRound = [];
+      fourthRound = [];
+      fifthRound = [];
+      sixthRound = [];
+      seventhRound = [];
+      eighthRound = [];
+      ninthRound = [];
+      tenthRound = [];
 
       // 7 rounds from 1985-86 to 1988-89
       if (int.parse(selectedSeason.substring(0, 4)) < 1989) {

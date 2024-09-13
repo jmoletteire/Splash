@@ -33,8 +33,8 @@ class DraftRound extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.grey.shade800,
                 border: const Border(
-                  top: BorderSide(color: Colors.white70, width: 0.5),
-                  bottom: BorderSide(color: Colors.white70, width: 0.25),
+                  top: BorderSide(color: Colors.white70, width: 0.25),
+                  bottom: BorderSide(color: Colors.grey, width: 0.25),
                 ),
               ),
               height: MediaQuery.sizeOf(context).height * 0.035,

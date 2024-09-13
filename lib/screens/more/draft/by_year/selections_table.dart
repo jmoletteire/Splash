@@ -26,6 +26,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
     'TEAM',
     'PLAYER',
     'POSITION',
+    'AGE',
     'HEIGHT',
     'WEIGHT',
     'ORGANIZATION',
@@ -66,10 +67,13 @@ class _DraftSelectionsState extends State<DraftSelections> {
         ),
 
         /// PLAYER
-        TableColumn(width: MediaQuery.of(context).size.width * 0.38),
+        TableColumn(width: MediaQuery.of(context).size.width * 0.4),
 
         /// POSITION
         TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+
+        /// AGE
+        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
 
         /// HEIGHT
         TableColumn(width: MediaQuery.of(context).size.width * 0.125),
@@ -152,7 +156,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
         type: MaterialType.transparency,
         child: InkWell(
           onTap: () {
-            if (widget.selections[row]['LAST_PLAYED'] >= 1997 &&
+            if (widget.selections[row]['LAST_PLAYED'] >= 1996 &&
                 widget.selections[row]['PLAYER_PROFILE_FLAG'] == 1) {
               Navigator.push(
                 context,
@@ -227,14 +231,24 @@ class _DraftSelectionsState extends State<DraftSelections> {
               ),
               const SizedBox(width: 8.0),
               Expanded(
-                flex: 5,
-                child: Text(
-                  widget.selections[row]['PLAYER_NAME'] ?? '-',
+                flex: 7,
+                child: AutoSizeText(
+                  widget.selections[row]['ROTY'] == 1
+                      ? '${widget.selections[row]['PLAYER_NAME'] ?? '-'}*'
+                      : widget.selections[row]['PLAYER_NAME'] ?? '-',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: kBebasNormal.copyWith(fontSize: 16.0),
                 ),
               ),
+              if (widget.selections[row]['HOF'] == 1)
+                Flexible(
+                  flex: 2,
+                  child: Image.asset(
+                    'images/hof.png',
+                    height: 25.0,
+                  ),
+                ),
             ],
           ),
         );
@@ -250,7 +264,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 4:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['HEIGHT'] ?? '-',
+            text: widget.selections[row]['AGE'].toString() ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -259,13 +273,22 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 5:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['WEIGHT'] ?? '-',
+            text: widget.selections[row]['HEIGHT'] ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 6:
+        try {
+          return StandingsDataText(
+            text: widget.selections[row]['WEIGHT'] ?? '-',
+            color: const Color(0xFFD0D0D0),
+          );
+        } catch (stack) {
+          return const StandingsDataText(text: '-');
+        }
+      case 7:
         try {
           return StandingsDataText(
             text: widget.selections[row]['ORGANIZATION'] ?? '-',
@@ -275,7 +298,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
-      case 7:
+      case 8:
         try {
           return StandingsDataText(
             text: widget.selections[row]['ORGANIZATION_TYPE'] ?? '-',

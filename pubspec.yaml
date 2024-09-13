@@ -89,6 +89,7 @@ flutter:
     - images/abc.svg
     - images/playoffs.svg
     - images/default_player_image.png
+    - images/hof.png
     - images/flags/
   #   - images/a_dot_ham.jpeg
 

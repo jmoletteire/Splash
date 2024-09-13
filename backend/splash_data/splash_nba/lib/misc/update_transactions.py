@@ -36,8 +36,10 @@ if __name__ == "__main__":
     if response.status_code == 200:
         data = response.json()
 
-        existing_data = transactions_collection.find({}, {'GroupSort': 1, '_id': 0})
-        new_data = find_new_data(existing_data, data)
+        # Fetch sorted existing data from the collection
+        existing_data = transactions_collection.find({}, {'GroupSort': 1, '_id': 0}).sort('TRANSACTION_DATE', -1)
+
+        new_data = find_new_data(existing_data, data['NBA_Player_Movement']['rows'])
 
         transactions_collection.insert_many(new_data)
     else:
