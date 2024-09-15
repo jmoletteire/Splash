@@ -32,14 +32,16 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
       homeTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
           ? widget.teams[0]
           : widget.teams[1];
-      awayTeam = widget.teams[0]['TEAM_ID'].toString() == widget.awayId
-          ? widget.teams[0]
-          : widget.teams[1];
+      awayTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
+          ? widget.teams[1]
+          : widget.teams[0];
 
       if (awayTeam.isNotEmpty) {
-        awayTeamColor = kDarkPrimaryColors.contains(awayTeam['TEAM_ABBREVIATION'])
-            ? (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
-            : (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['primaryColor']!);
+        awayTeamColor = kTeamColorOpacity.containsKey(awayTeam['TEAM_ABBREVIATION'])
+            ? kDarkPrimaryColors.contains(awayTeam['TEAM_ABBREVIATION'])
+                ? (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
+                : (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['primaryColor']!)
+            : kTeamColors['FA']!['primaryColor']!;
       }
 
       if (homeTeam.isNotEmpty) {

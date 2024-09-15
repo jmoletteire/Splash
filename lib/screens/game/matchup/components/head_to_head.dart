@@ -6,7 +6,17 @@ class H2H extends StatefulWidget {
   final Map<String, dynamic> game;
   final String homeId;
   final String awayId;
-  const H2H({super.key, required this.game, required this.homeId, required this.awayId});
+  final String homeAbbr;
+  final String awayAbbr;
+
+  const H2H({
+    super.key,
+    required this.game,
+    required this.homeId,
+    required this.awayId,
+    required this.homeAbbr,
+    required this.awayAbbr,
+  });
 
   @override
   State<H2H> createState() => _H2HState();
@@ -27,8 +37,8 @@ class _H2HState extends State<H2H> {
               homeTeamWins: widget.game['SUMMARY']['SeasonSeries'][0]['HOME_TEAM_WINS'],
               awayId: widget.awayId,
               homeId: widget.homeId,
-              awayTeam: kTeamNames[widget.awayId][1],
-              homeTeam: kTeamNames[widget.homeId][1],
+              awayTeam: widget.awayAbbr,
+              homeTeam: widget.homeAbbr,
               awayTeamColor: kTeamColors[kTeamNames[widget.awayId][1]]!['primaryColor']!,
               homeTeamColor: kTeamColors[kTeamNames[widget.homeId][1]]!['primaryColor']!,
             ),
@@ -76,7 +86,8 @@ class ComparisonBar extends StatelessWidget {
               children: [
                 Text(awayTeam, style: kBebasNormal),
                 const SizedBox(width: 5.0),
-                Image.asset('images/NBA_Logos/${awayId}.png', width: 18.0),
+                Image.asset('images/NBA_Logos/${awayId}.png',
+                    width: awayId == '0' ? 12.0 : 18.0),
               ],
             ),
             Text('SERIES', style: kBebasBold.copyWith(fontSize: 17.0)),

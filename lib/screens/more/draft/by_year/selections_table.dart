@@ -264,7 +264,10 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 4:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['AGE'].toString() ?? '-',
+            text: (widget.selections[row]['AGE'] == 0
+                    ? '-'
+                    : widget.selections[row]['AGE'] ?? '-')
+                .toString(),
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -273,7 +276,9 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 5:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['HEIGHT'] ?? '-',
+            text: widget.selections[row]['HEIGHT'] == ''
+                ? '-'
+                : widget.selections[row]['HEIGHT'] ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -282,7 +287,9 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 6:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['WEIGHT'] ?? '-',
+            text: widget.selections[row]['WEIGHT'] == ''
+                ? '-'
+                : widget.selections[row]['WEIGHT'] ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -291,7 +298,9 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 7:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['ORGANIZATION'] ?? '-',
+            text: widget.selections[row]['ORGANIZATION'] == ''
+                ? '-'
+                : widget.selections[row]['ORGANIZATION'] ?? '-',
             size: 14.0,
             color: const Color(0xFFD0D0D0),
           );
@@ -301,7 +310,9 @@ class _DraftSelectionsState extends State<DraftSelections> {
       case 8:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['ORGANIZATION_TYPE'] ?? '-',
+            text: widget.selections[row]['ORGANIZATION_TYPE'] == ''
+                ? '-'
+                : widget.selections[row]['ORGANIZATION_TYPE'] ?? '-',
             size: 14.0,
             color: const Color(0xFFD0D0D0),
           );

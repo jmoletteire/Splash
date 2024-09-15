@@ -1,3 +1,4 @@
+import inspect
 from itertools import groupby
 
 from nba_api.stats.endpoints import leaguestandings, leaguedashteamstats
@@ -352,6 +353,30 @@ def calculate_playoff_win_pct(team, standings, season, own_conference=True):
 
 
 def update_current_standings():
+    # Get the current call stack
+    stack = inspect.stack()
+
+    # Check the second item in the stack (the caller)
+    # The first item in the stack is the current function itself
+    caller_frame = stack[1]
+
+    # Extract the module (filename) and the function name of the caller
+    caller_filename = caller_frame.filename
+    caller_function = caller_frame.function
+
+    # Check if the caller is the main script
+    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
+        print("Called from main script.")
+    else:
+        # Connect to MongoDB
+        try:
+            client = MongoClient(uri)
+            db = client.splash
+            teams_collection = db.nba_teams
+        except Exception as e:
+            logging.error(f"Failed to connect to MongoDB: {e}")
+            exit(1)
+
     try:
         logging.info(f"Updating standings for Season: {k_current_season}")
         standings = leaguestandings.LeagueStandings(season=k_current_season).get_normalized_dict()['Standings']

@@ -255,6 +255,12 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     Map<String, dynamic> awayLinescore =
         linescore[0]['TEAM_ID'].toString() == widget.awayId ? linescore[0] : linescore[1];
 
+    String awayTeamId = '0';
+
+    if (kTeamNames.containsKey(widget.awayId.toString())) {
+      awayTeamId = widget.awayId;
+    }
+
     return Scaffold(
       body: ExtendedNestedScrollView(
         controller: _scrollController,
@@ -268,9 +274,13 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (_showImages) ...[
+                    if (awayTeamId == '0')
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.045),
                     Image.asset(
-                      'images/NBA_Logos/${widget.awayId}.png',
-                      width: MediaQuery.of(context).size.width * 0.09,
+                      'images/NBA_Logos/${awayTeamId}.png',
+                      width: awayTeamId == '0'
+                          ? MediaQuery.of(context).size.width * 0.045
+                          : MediaQuery.of(context).size.width * 0.09,
                     ),
                     const SizedBox(width: 15.0),
                     getTitle(summary['GAME_STATUS_TEXT'], homeLinescore, awayLinescore),
@@ -293,9 +303,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
-                          kTeamNames[widget.awayId] == null
+                          kTeamNames[awayTeamId] == null
                               ? Colors.grey
-                              : kTeamColors[kTeamNames[widget.awayId]![1]]![
+                              : kTeamColors[kTeamNames[awayTeamId]![1]]![
                                   'primaryColor']!, // Transparent at the top
                           kTeamColors[kTeamNames[widget.homeId]?[1]]![
                               'primaryColor']!, // Opaque at the bottom
@@ -307,9 +317,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     left: -MediaQuery.of(context).size.width * 0.5,
                     child: Opacity(
                       opacity:
-                          0.97 - kTeamColorOpacity[kTeamNames[widget.awayId][1]]!['opacity']!,
+                          0.97 - kTeamColorOpacity[kTeamNames[awayTeamId][1]]!['opacity']!,
                       child: SvgPicture.asset(
-                        'images/NBA_Logos/${widget.awayId}.svg',
+                        'images/NBA_Logos/${awayTeamId}.svg',
                         width: MediaQuery.of(context).size.width / 1.1,
                         fit: BoxFit.cover,
                       ),
@@ -335,7 +345,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         homeLinescore: homeLinescore,
                         awayLinescore: awayLinescore,
                         homeId: widget.homeId,
-                        awayId: widget.awayId,
+                        awayId: awayTeamId,
                         isUpcoming: _isUpcoming,
                         gameTime: widget.gameTime,
                       ),
@@ -384,7 +394,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
             return page(
               game: game,
               homeId: widget.homeId,
-              awayId: widget.awayId,
+              awayId: awayTeamId,
               isUpcoming: _isUpcoming,
             );
           }).toList(),
@@ -543,23 +553,28 @@ class GameInfo extends StatelessWidget {
           padding: const EdgeInsets.all(15.0),
           child: Row(
             children: [
+              if (awayId == '0') SizedBox(width: MediaQuery.of(context).size.width * 0.1),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TeamHome(
-                        teamId: awayId,
+                  if (awayId != '0') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TeamHome(
+                          teamId: awayId,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  }
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
                       'images/NBA_Logos/$awayId.png',
-                      width: MediaQuery.of(context).size.width * 0.2,
+                      width: awayId == '0'
+                          ? MediaQuery.of(context).size.width * 0.1
+                          : MediaQuery.of(context).size.width * 0.2,
                     ),
                     const SizedBox(height: 8.0),
                     Text(

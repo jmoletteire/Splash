@@ -38,7 +38,7 @@ class _GameMatchupState extends State<GameMatchup> {
     homeLinescore =
         linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
     awayLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.awayId ? linescore[0] : linescore[1];
+        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
   }
 
   @override
@@ -55,12 +55,21 @@ class _GameMatchupState extends State<GameMatchup> {
                   Lineups(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
                 if (!widget.isUpcoming)
                   Inactives(
-                      inactivePlayers: widget.game['SUMMARY']['InactivePlayers'],
-                      homeId: widget.homeId,
-                      awayId: widget.awayId),
+                    inactivePlayers: widget.game['SUMMARY']['InactivePlayers'],
+                    homeId: widget.homeId,
+                    awayId: widget.awayId,
+                    homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
+                    awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
+                  ),
                 if (widget.game['SUMMARY'].keys.toList().contains('SeasonSeries') &&
                     widget.game['SUMMARY']['SeasonSeries'].isNotEmpty)
-                  H2H(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
+                  H2H(
+                    game: widget.game,
+                    homeId: widget.homeId,
+                    awayId: widget.awayId,
+                    homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
+                    awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
+                  ),
                 if (widget.game['SUMMARY'].keys.toList().contains('LastMeeting') &&
                     widget.game['SUMMARY']['LastMeeting'].isNotEmpty)
                   LastMeeting(

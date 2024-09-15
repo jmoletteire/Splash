@@ -36,14 +36,19 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
       var entries = widget.team['seasons'][selectedSeason]['ROSTER'].entries.toList();
 
       // Filter out players with GP == 0
+      /*
       entries = entries.where((entry) {
         return entry.value['GP'] != 0;
       }).toList();
 
+       */
+
       // Sort the entries by % Start
       entries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
-        double startPercentA = (a.value['GS'] / a.value['GP'] ?? 0 as num).toDouble();
-        double startPercentB = (b.value['GS'] / b.value['GP'] ?? 0 as num).toDouble();
+        double startPercentA =
+            ((a.value['GS'] ?? 0) / (a.value['GP'] ?? 1) ?? 0 as num).toDouble();
+        double startPercentB =
+            ((b.value['GS'] ?? 0) / (b.value['GP'] ?? 1) ?? 0 as num).toDouble();
         return startPercentB.compareTo(startPercentA);
       });
 
@@ -66,6 +71,8 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         }
       }
 
+      print(benchCandidates.length);
+
       // If we haven't filled all 5 starter spots, take the next players from benchCandidates
       for (var candidate in benchCandidates) {
         if (startersEntries.length < 5) {
@@ -81,6 +88,8 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         int index = 5 - startersEntries.length - 1;
         startersEntries.add(benchCandidates[index]);
       }
+
+      print(startersEntries.length);
 
       // Sort the starters by Position and MPG
       startersEntries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
@@ -289,6 +298,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
+                        print(starters);
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(

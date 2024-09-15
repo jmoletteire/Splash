@@ -1,3 +1,4 @@
+import inspect
 import time
 from nba_api.stats.endpoints import teamyearbyyearstats
 from pymongo import MongoClient
@@ -9,28 +10,55 @@ import logging
 
 
 def update_current_season(team_id):
-    team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id).get_normalized_dict()['TeamStats']
+    # Get the current call stack
+    stack = inspect.stack()
 
-    # Only for current season
-    # EXAMPLE: season_stats_dict = {"2024-25": { data }}
-    season_stats_dict = {
-        season_dict['YEAR']: dict(list(season_dict.items())[:15])
-        for season_dict in team_seasons_list
-        if season_dict['YEAR'] == k_current_season
-    }
+    # Check the second item in the stack (the caller)
+    # The first item in the stack is the current function itself
+    caller_frame = stack[1]
 
-    # Fetch team stats for this team in given season
-    season_stats_dict[k_current_season]['STATS'] = fetch_team_stats(team_id=team_id, season=k_current_season)
+    # Extract the function name of the caller
+    caller_function = caller_frame.function
 
-    logging.info(f"Updated {k_current_season} stats for {team_id}")
+    # Check if the caller is the main script
+    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
+        print("Called from main script.")
+    else:
+        # Connect to MongoDB
+        try:
+            client = MongoClient(uri)
+            db = client.splash
+            teams_collection = db.nba_teams
+        except Exception as e:
+            logging.error(f"Failed to connect to MongoDB: {e}")
+            exit(1)
 
-    # Update SEASONS for this team
-    teams_collection.update_one(
-        {"TEAM_ID": team_id},
-        {"$set": {f"seasons.{k_current_season}": season_stats_dict[k_current_season]}},
-        upsert=True
-    )
-    logging.info(f"Fetched seasons for team {team_id}\n")
+    try:
+        team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id).get_normalized_dict()['TeamStats']
+
+        # Only for current season
+        # EXAMPLE: season_stats_dict = {"2024-25": { data }}
+        season_stats_dict = {
+            season_dict['YEAR']: dict(list(season_dict.items())[:15])
+            for season_dict in team_seasons_list
+            if season_dict['YEAR'] == k_current_season
+        }
+
+        # Fetch team stats for this team in given season
+        season_stats_dict[k_current_season]['STATS'] = fetch_team_stats(team_id=team_id, season=k_current_season)
+
+        logging.info(f"Updated {k_current_season} stats for {team_id}")
+
+        # Update SEASONS for this team
+        teams_collection.update_one(
+            {"TEAM_ID": team_id},
+            {"$set": {f"seasons.{k_current_season}": season_stats_dict[k_current_season]}},
+            upsert=True
+        )
+
+        logging.info(f"Updated current season for team {team_id}\n")
+    except Exception as e:
+        logging.error(f"Failed to update current season for team {team_id}: {e}")
 
 
 def fetch_all_seasons(team_id):

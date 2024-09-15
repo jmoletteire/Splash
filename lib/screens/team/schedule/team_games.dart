@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:timezone/timezone.dart';
 
 import '../../../utilities/constants.dart';
+import '../../../utilities/global_timezone.dart';
 import '../../game/game_home.dart';
 import '../team_cache.dart';
 
@@ -224,6 +226,38 @@ class _TeamGamesState extends State<TeamGames> {
     return gameIndex;
   }
 
+  String adjustTimezone(String dateString, String timeString) {
+    // Parse the base date
+    DateTime baseDate = DateTime.parse(dateString);
+
+    // Convert 12-hour format to 24-hour format
+    bool isPm = timeString.contains("pm");
+    List<String> timeParts = timeString.split(" ")[0].split(":");
+    int hour = int.parse(timeParts[0]);
+    int minute = int.parse(timeParts[1]);
+
+    if (isPm && hour != 12) {
+      hour += 12;
+    } else if (!isPm && hour == 12) {
+      hour = 0;
+    }
+
+    // Load the EST timezone location
+    final Location est = getLocation('America/New_York'); // NBA data uses EST
+
+    // Combine the base date and time in the EST timezone
+    final TZDateTime estDateTime =
+        TZDateTime(est, baseDate.year, baseDate.month, baseDate.day, hour, minute);
+
+    // Convert to the user's local timezone
+    final TZDateTime localDateTime = TZDateTime.from(estDateTime, GlobalTimeZone.location);
+
+    // Format the time in "h:mm a" format
+    String formattedTime = DateFormat.jm().format(localDateTime);
+
+    return formattedTime;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.opponent == null || widget.opponent == 0 && widget.selectedMonth != 'All') {
@@ -309,6 +343,10 @@ class _TeamGamesState extends State<TeamGames> {
                                 awayId: teamGames[gamesList[index]]['HOME_AWAY'] == '@'
                                     ? widget.team['TEAM_ID'].toString()
                                     : teamGames[gamesList[index]]['OPP'].toString(),
+                                gameTime: adjustTimezone(
+                                  teamGames[gamesList[index]]['GAME_DATE'],
+                                  teamGames[gamesList[index]]['RESULT'],
+                                ),
                               ),
                             ),
                           );
@@ -387,41 +425,64 @@ class _TeamGamesState extends State<TeamGames> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(
-                                      'Final',
-                                      textAlign: TextAlign.end,
-                                      style: kBebasNormal.copyWith(
-                                          fontSize: 12.0, color: Colors.grey),
-                                    ),
+                                    if (teamGames[gamesList[index]]['RESULT'] == 'W' ||
+                                        teamGames[gamesList[index]]['RESULT'] == 'L')
+                                      Text(
+                                        'Final',
+                                        textAlign: TextAlign.end,
+                                        style: kBebasNormal.copyWith(
+                                            fontSize: 12.0, color: Colors.grey),
+                                      ),
+                                    if (teamGames[gamesList[index]]['RESULT'] != 'W' &&
+                                        teamGames[gamesList[index]]['RESULT'] != 'L' &&
+                                        teamGames[gamesList[index]]['BROADCAST'] != null)
+                                      Text(
+                                        teamGames[gamesList[index]]['BROADCAST'],
+                                        textAlign: TextAlign.end,
+                                        style: kBebasNormal.copyWith(
+                                            fontSize: 12.0, color: Colors.grey),
+                                      ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         Text(
-                                          teamGames[gamesList[index]]['RESULT'],
+                                          adjustTimezone(
+                                              teamGames[gamesList[index]]['GAME_DATE'],
+                                              teamGames[gamesList[index]]['RESULT']),
                                           style: kBebasNormal.copyWith(
                                             fontSize: 14.0,
                                             color: teamGames[gamesList[index]]['RESULT'] == 'W'
                                                 ? Colors.green
-                                                : Colors.red,
+                                                : teamGames[gamesList[index]]['RESULT'] == 'L'
+                                                    ? Colors.red
+                                                    : Colors.white,
                                           ),
                                         ),
-                                        const SizedBox(width: 5.0),
-                                        Text(
-                                          teamGames[gamesList[index]]['TEAM_PTS'].toString(),
-                                          style: kBebasNormal.copyWith(fontSize: 14.0),
-                                        ),
-                                        SizedBox(
-                                          width: 10.0,
-                                          child: Text(
-                                            '-',
-                                            textAlign: TextAlign.center,
-                                            style: kBebasNormal.copyWith(fontSize: 14.0),
-                                          ),
-                                        ),
-                                        Text(
-                                          teamGames[gamesList[index]]['OPP_PTS'].toString(),
-                                          style: kBebasNormal.copyWith(fontSize: 14.0),
-                                        ),
+                                        if (teamGames[gamesList[index]]['RESULT'] == 'W' ||
+                                            teamGames[gamesList[index]]['RESULT'] == 'L')
+                                          Row(
+                                            children: [
+                                              const SizedBox(width: 5.0),
+                                              Text(
+                                                teamGames[gamesList[index]]['TEAM_PTS']
+                                                    .toString(),
+                                                style: kBebasNormal.copyWith(fontSize: 14.0),
+                                              ),
+                                              SizedBox(
+                                                width: 10.0,
+                                                child: Text(
+                                                  '-',
+                                                  textAlign: TextAlign.center,
+                                                  style: kBebasNormal.copyWith(fontSize: 14.0),
+                                                ),
+                                              ),
+                                              Text(
+                                                teamGames[gamesList[index]]['OPP_PTS']
+                                                    .toString(),
+                                                style: kBebasNormal.copyWith(fontSize: 14.0),
+                                              ),
+                                            ],
+                                          )
                                       ],
                                     ),
                                   ],

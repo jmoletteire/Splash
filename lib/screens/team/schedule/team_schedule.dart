@@ -82,10 +82,10 @@ class _TeamScheduleState extends State<TeamSchedule> {
   @override
   void initState() {
     super.initState();
-    schedule = widget.team['seasons'][kCurrentSeason]['GAMES'];
 
     seasons = widget.team['seasons'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
+    schedule = widget.team['seasons'][selectedSeason]['GAMES'];
 
     selectedSeasonType = 'All';
 

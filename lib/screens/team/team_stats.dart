@@ -26,6 +26,8 @@ class _TeamStatsState extends State<TeamStats> {
 
   String getStanding(int confRank) {
     switch (confRank) {
+      case 0:
+        return '-';
       case 1:
         return '${confRank}st';
       case 2:
@@ -44,7 +46,11 @@ class _TeamStatsState extends State<TeamStats> {
   }
 
   String getPlayoffs(dynamic teamSeason) {
-    if (kSeasons.indexOf(selectedSeason) < 21) {
+    if (!teamSeason.containsKey('CONF_RANK')) {
+      return '-';
+    }
+
+    if (int.parse(selectedSeason.substring(0, 4)) > 2019) {
       if (teamSeason['CONF_RANK'] > 10) {
         return 'Missed Playoffs';
       } else if (teamSeason['PO_WINS'] < 4) {
@@ -79,13 +85,22 @@ class _TeamStatsState extends State<TeamStats> {
   }
 
   double getPercentile(String location, String stat) {
-    return 1 -
-        ((widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType][location]
-                    ['${stat}_RANK'] -
-                1) /
-            (widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]['BASIC']
-                    ['LEAGUE_TEAMS'] -
-                1)) as double;
+    if (widget.team['seasons'][selectedSeason]['STATS'].containsKey(selectedSeasonType)) {
+      if (!widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]
+          .containsKey(location)) {
+        return 0.0;
+      } else {
+        return 1 -
+            ((widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType][location]
+                        ['${stat}_RANK'] -
+                    1) /
+                (widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]['BASIC']
+                        ['LEAGUE_TEAMS'] -
+                    1)) as double;
+      }
+    } else {
+      return 0.0;
+    }
   }
 
   double getFinalPercentile(String group) {
@@ -164,7 +179,7 @@ class _TeamStatsState extends State<TeamStats> {
                           Expanded(
                             flex: 1,
                             child: Text(
-                              '${widget.team['seasons'][selectedSeason]['WINS']!.toString()}-${widget.team['seasons'][selectedSeason]['LOSSES']!.toString()} (${widget.team['seasons'][selectedSeason]['WIN_PCT']!.toStringAsFixed(3)})',
+                              '${(widget.team['seasons'][selectedSeason]['WINS'] ?? 0).toString()}-${(widget.team['seasons'][selectedSeason]['LOSSES'] ?? 0).toString()} (${(widget.team['seasons'][selectedSeason]['WIN_PCT'] ?? 0).toStringAsFixed(3)})',
                               textAlign: TextAlign.center,
                               style: kBebasOffWhite.copyWith(fontSize: 18.0),
                             ),
@@ -172,7 +187,7 @@ class _TeamStatsState extends State<TeamStats> {
                           Expanded(
                             flex: 1,
                             child: Text(
-                              '${getStanding(widget.team['seasons'][selectedSeason]['CONF_RANK']!)} ${widget.team['CONF'].substring(0, 4)}',
+                              '${getStanding(widget.team['seasons'][selectedSeason]['CONF_RANK'] ?? 0)} ${widget.team['CONF'].substring(0, 4)}',
                               textAlign: TextAlign.center,
                               style: kBebasOffWhite.copyWith(fontSize: 18.0),
                             ),
@@ -350,48 +365,49 @@ class _TeamStatsState extends State<TeamStats> {
 
                 /// NOTE: Mistake in data. All teams have PLAYOFFS key, but
                 /// not PLAYOFFS.ADV, which is why it is used instead.
-                if (widget.team['seasons'][selectedSeason]['STATS']['PLAYOFFS']
-                    .containsKey('ADV'))
-                  Expanded(
-                    flex: 1,
-                    child: Stack(
-                      children: [
-                        Transform.scale(
-                          scale: 0.9,
-                          child: Transform.rotate(
-                            angle: -1.5708, // Rotate 90 degrees counterclockwise
-                            child: CupertinoSwitch(
-                              activeColor: teamColor,
-                              value: _playoffSwitch,
-                              onChanged: (value) {
-                                setState(() {
-                                  _playoffSwitch = value;
-                                  _playoffSwitch
-                                      ? selectedSeasonType = 'PLAYOFFS'
-                                      : selectedSeasonType = 'REGULAR SEASON';
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 2,
-                          left: 11, // Adjust based on your switch size
-                          child: IgnorePointer(
-                            ignoring: true,
-                            child: Visibility(
-                              visible: _playoffSwitch,
-                              child: SvgPicture.asset(
-                                'images/playoffs.svg',
-                                width: 16.0,
-                                height: 16.0,
+                if (widget.team['seasons'][selectedSeason]['STATS'].containsKey('PLAYOFFS'))
+                  if (widget.team['seasons'][selectedSeason]['STATS']['PLAYOFFS']
+                      .containsKey('ADV'))
+                    Expanded(
+                      flex: 1,
+                      child: Stack(
+                        children: [
+                          Transform.scale(
+                            scale: 0.9,
+                            child: Transform.rotate(
+                              angle: -1.5708, // Rotate 90 degrees counterclockwise
+                              child: CupertinoSwitch(
+                                activeColor: teamColor,
+                                value: _playoffSwitch,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _playoffSwitch = value;
+                                    _playoffSwitch
+                                        ? selectedSeasonType = 'PLAYOFFS'
+                                        : selectedSeasonType = 'REGULAR SEASON';
+                                  });
+                                },
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                          Positioned(
+                            top: 2,
+                            left: 11, // Adjust based on your switch size
+                            child: IgnorePointer(
+                              ignoring: true,
+                              child: Visibility(
+                                visible: _playoffSwitch,
+                                child: SvgPicture.asset(
+                                  'images/playoffs.svg',
+                                  width: 16.0,
+                                  height: 16.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                 const Spacer(),
                 Container(
                   decoration: BoxDecoration(

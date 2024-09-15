@@ -168,8 +168,9 @@ class _TeamStatCardState extends State<TeamStatCard> {
                               stats[stat]?['location'],
                               stats[stat]?[widget.perMode]['rank_nba_name'],
                             ),
-                            numTeams: widget.teamStats[widget.selectedSeasonType]['BASIC']
-                                ['LEAGUE_TEAMS'],
+                            numTeams: widget.teamStats[widget.selectedSeasonType]?['BASIC']
+                                    ?['LEAGUE_TEAMS'] ??
+                                30,
                           ),
                       ],
                     ],

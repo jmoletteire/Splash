@@ -5,8 +5,17 @@ class Inactives extends StatefulWidget {
   final List<dynamic> inactivePlayers;
   final String homeId;
   final String awayId;
-  const Inactives(
-      {super.key, required this.inactivePlayers, required this.homeId, required this.awayId});
+  final String homeAbbr;
+  final String awayAbbr;
+
+  const Inactives({
+    super.key,
+    required this.inactivePlayers,
+    required this.homeId,
+    required this.awayId,
+    required this.homeAbbr,
+    required this.awayAbbr,
+  });
 
   @override
   State<Inactives> createState() => _InactivesState();
@@ -48,8 +57,7 @@ class _InactivesState extends State<Inactives> {
             const SizedBox(height: 8.0),
             Wrap(
               children: [
-                Text('${kTeamNames[widget.awayId][1]}:',
-                    style: kBebasBold.copyWith(fontSize: 16.0)),
+                Text('${widget.awayAbbr}:', style: kBebasBold.copyWith(fontSize: 16.0)),
                 const SizedBox(width: 5.0),
                 ...List.generate(awayInactive.length, (index) {
                   return Text(
@@ -66,8 +74,7 @@ class _InactivesState extends State<Inactives> {
             const SizedBox(height: 8.0),
             Wrap(
               children: [
-                Text('${kTeamNames[widget.homeId][1]}:',
-                    style: kBebasBold.copyWith(fontSize: 16.0)),
+                Text('${widget.homeAbbr}:', style: kBebasBold.copyWith(fontSize: 16.0)),
                 const SizedBox(width: 5.0),
                 ...List.generate(homeInactive.length, (index) {
                   return Text(

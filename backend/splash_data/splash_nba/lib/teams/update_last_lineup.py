@@ -1,37 +1,72 @@
+import datetime
+import inspect
+
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
 
 
 def get_last_game(seasons):
+    # Get today's date for comparison
+    today = datetime.date.today()
+
     # Extract the keys from the MongoDB object
     keys = seasons.keys()
 
     # Convert the keys to a sortable format (tuples of integers)
     converted_keys = [(int(year.split("-")[0]), int(year.split("-")[1])) for year in keys]
 
-    # Find the maximum key
-    max_key_tuple = max(converted_keys)
+    # Sort the keys to iterate through them from latest to earliest
+    converted_keys.sort(reverse=True)
 
-    # Convert the maximum key back to the original format
-    max_key = f"{max_key_tuple[0]}-{max_key_tuple[1]}"
+    # Iterate through the sorted keys and check the games in each season
+    for key_tuple in converted_keys:
+        # Convert the tuple back to the original format
+        key = f"{key_tuple[0]}-{key_tuple[1]}"
 
-    # Convert the GAMES dictionary to a list of tuples (key, value)
-    entries = list(seasons[max_key]["GAMES"].items())
+        # Convert the GAMES dictionary to a list of tuples (key, value)
+        if 'GAMES' in seasons[key].keys():
+            entries = list(seasons[key]["GAMES"].items())
 
-    # Sort the entries by the GAME_DATE value
-    entries.sort(key=lambda x: x[1]["GAME_DATE"])
+            # Sort the entries by the GAME_DATE value
+            entries.sort(key=lambda x: x[1]["GAME_DATE"])
 
-    # Extract the sorted keys
-    game_index = [e[0] for e in entries]
+            # Find the latest game date that is less than today
+            for game_key, game_data in reversed(entries):
+                game_date = datetime.date(int(game_data["GAME_DATE"][0:4]), int(game_data["GAME_DATE"][5:7]), int(game_data["GAME_DATE"][8:]))  # Adjust the format as necessary
+                if game_date < today:
+                    return game_key, game_data["GAME_DATE"]
+        else:
+            continue
 
-    # Save the maximum key
-    max_game_key = game_index[-1]
-
-    return max_game_key, seasons[max_key]["GAMES"][max_game_key]["GAME_DATE"]
+    # If no game date is found that's less than today, return None or handle it as appropriate
+    return None, None
 
 
 def get_last_lineup(team_id, last_game_id, last_game_date):
+    # Get the current call stack
+    stack = inspect.stack()
+
+    # Check the second item in the stack (the caller)
+    # The first item in the stack is the current function itself
+    caller_frame = stack[1]
+
+    # Extract the function name of the caller
+    caller_function = caller_frame.function
+
+    # Check if the caller is the main script
+    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
+        print("Called from main script.")
+    else:
+        # Connect to MongoDB
+        try:
+            client = MongoClient(uri)
+            db = client.splash
+            games_collection = db.nba_games
+        except Exception as e:
+            logging.error(f"Failed to connect to MongoDB: {e}")
+            exit(1)
+
     try:
         games = games_collection.find({"GAME_DATE": last_game_date}, {"GAMES": 1, "_id": 0})
 

@@ -95,7 +95,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
     Color teamColor = kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
         ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
-    List coaches = widget.team['seasons'][selectedSeason]['COACHES'];
+    List coaches = widget.team['seasons'][selectedSeason]['COACHES'] ?? [];
     return _isLoading
         ? Center(
             child: SpinningIcon(

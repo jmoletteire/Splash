@@ -5,12 +5,16 @@ import 'package:splash/utilities/constants.dart';
 class LineScore extends StatelessWidget {
   final String homeTeam;
   final String awayTeam;
+  final String homeAbbr;
+  final String awayAbbr;
   final List<int> homeScores;
   final List<int> awayScores;
 
   LineScore({
     required this.homeTeam,
     required this.awayTeam,
+    required this.homeAbbr,
+    required this.awayAbbr,
     required this.homeScores,
     required this.awayScores,
   });
@@ -73,7 +77,7 @@ class LineScore extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: LineScoreRow(teamId: awayTeam, scores: awayScores),
+            child: LineScoreRow(teamId: awayTeam, abbr: awayAbbr, scores: awayScores),
           ),
           Container(
             height: 3.0,
@@ -85,7 +89,7 @@ class LineScore extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: LineScoreRow(teamId: homeTeam, scores: homeScores),
+            child: LineScoreRow(teamId: homeTeam, abbr: homeAbbr, scores: homeScores),
           ),
         ],
       ),
@@ -95,9 +99,10 @@ class LineScore extends StatelessWidget {
 
 class LineScoreRow extends StatelessWidget {
   final String teamId;
+  final String abbr;
   final List<int> scores;
 
-  LineScoreRow({required this.teamId, required this.scores});
+  LineScoreRow({required this.teamId, required this.abbr, required this.scores});
 
   @override
   Widget build(BuildContext context) {
@@ -105,12 +110,14 @@ class LineScoreRow extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TeamHome(teamId: teamId),
-          ),
-        );
+        if (teamId != '0') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TeamHome(teamId: teamId),
+            ),
+          );
+        }
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,12 +128,14 @@ class LineScoreRow extends StatelessWidget {
               padding: const EdgeInsets.only(left: 8.0),
               child: Row(
                 children: [
+                  if (teamId == '0') const SizedBox(width: 5.5),
                   Image.asset(
                     'images/NBA_Logos/$teamId.png',
-                    width: 22.0,
+                    width: teamId == '0' ? 11.0 : 22.0,
                   ),
+                  if (teamId == '0') const SizedBox(width: 5.5),
                   const SizedBox(width: 5.0),
-                  Text(kTeamNames[teamId][1],
+                  Text(abbr,
                       textAlign: TextAlign.start, style: kBebasBold.copyWith(fontSize: 20.0)),
                 ],
               ),

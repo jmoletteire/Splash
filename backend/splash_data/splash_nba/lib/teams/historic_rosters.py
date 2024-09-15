@@ -1,3 +1,4 @@
+import inspect
 import time
 
 from nba_api.stats.endpoints import commonteamroster, playercareerstats
@@ -7,6 +8,30 @@ import logging
 
 
 def fetch_roster(team_id, season):
+    # Get the current call stack
+    stack = inspect.stack()
+
+    # Check the second item in the stack (the caller)
+    # The first item in the stack is the current function itself
+    caller_frame = stack[1]
+
+    # Extract the function name of the caller
+    caller_function = caller_frame.function
+
+    # Check if the caller is the main script
+    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
+        print("Called from main script.")
+    else:
+        # Connect to MongoDB
+        try:
+            client = MongoClient(uri)
+            db = client.splash
+            teams_collection = db.nba_teams
+            players_collection = db.nba_players
+        except Exception as e:
+            logging.error(f"Failed to connect to MongoDB: {e}")
+            exit(1)
+
     try:
         team_data = commonteamroster.CommonTeamRoster(team_id, season=season).get_normalized_dict()
         team_roster = team_data['CommonTeamRoster']
@@ -21,12 +46,18 @@ def fetch_roster(team_id, season):
             player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID']).get_normalized_dict()['SeasonTotalsRegularSeason']
             player_season_stats = [season_stats for season_stats in player_stats if season_stats['SEASON_ID'] == season and season_stats['TEAM_ID'] == team_id]
             try:
-                player['GP'] = player_season_stats[0]['GP'] if player_season_stats[0]['GP'] is not None else 0
-                player['GS'] = player_season_stats[0]['GS'] if player_season_stats[0]['GS'] is not None else 0
-                player['MIN'] = player_season_stats[0]['MIN'] if player_season_stats[0]['MIN'] is not None else 0
-                if player['GP'] > 0:
-                    player['MPG'] = player['MIN'] / player['GP']
+                if len(player_season_stats) > 0:
+                    player['GP'] = player_season_stats[0]['GP'] if player_season_stats[0]['GP'] is not None else 0
+                    player['GS'] = player_season_stats[0]['GS'] if player_season_stats[0]['GS'] is not None else 0
+                    player['MIN'] = player_season_stats[0]['MIN'] if player_season_stats[0]['MIN'] is not None else 0
+                    if player['GP'] > 0:
+                        player['MPG'] = player['MIN'] / player['GP']
+                    else:
+                        player['MPG'] = 0
                 else:
+                    player['GP'] = 0
+                    player['GS'] = 0
+                    player['MIN'] = 0
                     player['MPG'] = 0
 
                 # Player dictionary {"player_id": {data}}

@@ -137,7 +137,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     Map<String, dynamic> homeLinescore =
         linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
     Map<String, dynamic> awayLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.awayId ? linescore[0] : linescore[1];
+        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
 
     String topScorer = '';
     String topRebounder = '';
@@ -183,6 +183,8 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         LineScore(
           homeTeam: widget.homeId,
           awayTeam: widget.awayId,
+          homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
+          awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
           homeScores: [
             homeLinescore['PTS_QTR1'],
             homeLinescore['PTS_QTR2'],
@@ -235,8 +237,12 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           controller: _boxscoreTabController,
           indicator: CustomTabIndicator(
               controller: _boxscoreTabController,
-              homeTeam: homePlayerStats[0]['TEAM_ABBREVIATION'],
-              awayTeam: awayPlayerStats[0]['TEAM_ABBREVIATION']),
+              homeTeam: kTeamColorOpacity.containsKey(homePlayerStats[0]['TEAM_ABBREVIATION'])
+                  ? homePlayerStats[0]['TEAM_ABBREVIATION']
+                  : 'FA',
+              awayTeam: kTeamColorOpacity.containsKey(awayPlayerStats[0]['TEAM_ABBREVIATION'])
+                  ? awayPlayerStats[0]['TEAM_ABBREVIATION']
+                  : 'FA'),
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
           labelStyle: kBebasNormal,
@@ -255,7 +261,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                     ),
                     margin: const EdgeInsets.only(bottom: 3.0),
                     child: Tab(
-                      text: kTeamNames[widget.awayId][0],
+                      text: awayLinescore['TEAM_NICKNAME'],
                     ),
                   ),
                 ),
@@ -287,7 +293,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                       ),
                     ),
                     child: Tab(
-                      text: kTeamNames[widget.homeId][0],
+                      text: homeLinescore['TEAM_NICKNAME'],
                     ),
                   ),
                 ),

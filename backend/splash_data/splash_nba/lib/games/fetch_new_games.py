@@ -118,9 +118,9 @@ def fetch_upcoming_games(game_date):
             game_id = games['GameHeader'][i]['GAME_ID']
             games_map[game_id] = {
                 'SUMMARY': {
-                    'GameSummary': [] if games['GameHeader'] == [] else [games['GameHeader'][i]],
+                    'GameSummary': [header for header in games['GameHeader'] if header['GAME_ID'] == game_id],
                     'LineScore': [linescore for linescore in games['LineScore'] if linescore['GAME_ID'] == game_id],
-                    'LastMeeting': [] if games['LastMeeting'] == [] else [games['LastMeeting'][i]]
+                    'LastMeeting': [last_meeting for last_meeting in games['LastMeeting'] if last_meeting['GAME_ID'] == game_id]
                 }
             }
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     try:
         # Define date range
         start_date = datetime(2024, 10, 4)
-        end_date = datetime(2025, 4, 13)
+        end_date = datetime(2024, 10, 22)
 
         # Fetch games for each date in the range
         fetch_games_for_date_range(start_date, end_date)

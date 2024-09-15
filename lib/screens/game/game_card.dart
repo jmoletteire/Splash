@@ -89,7 +89,7 @@ class _GameCardState extends State<GameCard> {
     Map<String, dynamic> homeLinescore =
         linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[0] : linescore[1];
     Map<String, dynamic> awayLinescore =
-        linescore[0]['TEAM_ID'] == widget.awayTeam ? linescore[0] : linescore[1];
+        linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[1] : linescore[0];
 
     return GestureDetector(
       onTap: () {
@@ -134,6 +134,8 @@ class _GameCardState extends State<GameCard> {
                             textAlign: TextAlign.start,
                           ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
+                            const SizedBox(width: 3.0),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
                             SvgPicture.asset(
                               'images/NBA_TV.svg',

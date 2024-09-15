@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
@@ -7,8 +6,6 @@ import 'package:splash/screens/game/game_card.dart';
 import 'package:splash/screens/search_screen.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/nba_api/library/network.dart';
-import 'package:timezone/data/latest.dart';
-import 'package:timezone/timezone.dart';
 
 import '../components/custom_icon_button.dart';
 import '../utilities/game_dates.dart';
@@ -32,7 +29,6 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   late DatesProvider _datesProvider;
   late DateTime maxDate;
   late DateTime selectedDate;
-  late Location location;
   bool _showFab = false;
   bool _isLoading = false;
   bool _pageInitLoad = false;
@@ -46,28 +42,12 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
   }
 
-  Future<void> setTimeZone() async {
-    // Initialize time zone data
-    initializeTimeZones();
-
-    // Get the device's time zone
-    String timeZoneName = await FlutterTimezone.getLocalTimezone();
-
-    // Set the local time zone to the actual device time zone
-    setState(() {
-      location = getLocation(timeZoneName);
-      _isLoading = false;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
     setState(() {
       _pageInitLoad = true;
     });
-
-    setTimeZone();
 
     _datesProvider = Provider.of<DatesProvider>(context, listen: false);
     _datesProvider.fetchDates().then((_) {
@@ -394,17 +374,18 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                                   homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
                                   awayTeam: game['SUMMARY']['GameSummary'][0]
                                       ['VISITOR_TEAM_ID'],
-                                  userTZ: location,
                                 ),
                               );
                               // Skip if All-Star weekend
-                            } else if (!game["SEASON_ID"].toString().startsWith("3")) {
+                            } else if (!game["SEASON_ID"].toString().startsWith("3") &&
+                                game['SUMMARY']['LineScore'].isNotEmpty) {
                               gameCards.add(
                                 GameCard(
                                   game: game,
                                   homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
                                   awayTeam: game['SUMMARY']['GameSummary'][0]
-                                      ['VISITOR_TEAM_ID'],
+                                          ['VISITOR_TEAM_ID'] ??
+                                      0,
                                 ),
                               );
                             }

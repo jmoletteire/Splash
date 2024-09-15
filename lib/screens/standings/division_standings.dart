@@ -36,7 +36,7 @@ class _DivisionStandingsState extends State<DivisionStandings> {
       } else if (standings['EliminatedConference'] == 1) {
         return ' -o';
       }
-      return ' -pi';
+      return '';
     } else {
       if (standings['PlayoffRank'] > 8) {
         return ' -o';
@@ -291,14 +291,26 @@ class _DivisionStandingsState extends State<DivisionStandings> {
           ),
         );
       case 1:
-        return StandingsDataText(
-            text: teams[row]['seasons'][widget.season]['WINS']!.toStringAsFixed(0));
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['WINS']!.toStringAsFixed(0));
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 2:
-        return StandingsDataText(
-            text: teams[row]['seasons'][widget.season]['LOSSES']!.toStringAsFixed(0));
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['LOSSES']!.toStringAsFixed(0));
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 3:
-        return StandingsDataText(
-            text: teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3));
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3));
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
       case 4:
         String gb =
             teams[row]['seasons'][widget.season]['STANDINGS']['DivisionGamesBack']!.toString();

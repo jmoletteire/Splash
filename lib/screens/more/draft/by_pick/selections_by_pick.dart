@@ -264,7 +264,10 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
       case 4:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['AGE'].toString() ?? '-',
+            text: (widget.selections[row]['AGE'] == 0
+                    ? '-'
+                    : widget.selections[row]['AGE'] ?? '-')
+                .toString(),
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -273,7 +276,9 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
       case 5:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['HEIGHT'] ?? '-',
+            text: widget.selections[row]['HEIGHT'] == ''
+                ? '-'
+                : widget.selections[row]['HEIGHT'] ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -282,7 +287,9 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
       case 6:
         try {
           return StandingsDataText(
-            text: widget.selections[row]['WEIGHT'] ?? '-',
+            text: widget.selections[row]['WEIGHT'] == ''
+                ? '-'
+                : widget.selections[row]['WEIGHT'] ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
