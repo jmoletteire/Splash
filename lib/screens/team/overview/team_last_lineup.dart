@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/utilities/constants.dart';
@@ -40,14 +41,14 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
     var lineup = widget.team['LAST_STARTING_LINEUP'];
     var lastGame = getLastGame();
     return Card(
-      margin: const EdgeInsets.all(11.0),
+      margin: EdgeInsets.all(11.0.r),
       color: Colors.grey.shade900,
       child: Column(
         children: [
           Row(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
+                padding: EdgeInsets.fromLTRB(15.0.r, 15.0.r, 15.0.r, 0.0),
                 child: Column(
                   children: [
                     Container(
@@ -58,28 +59,30 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                       ),
                       child: Text(
                         'Last Starting Lineup',
-                        style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
+                        style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
                       ),
                     ),
-                    const SizedBox(height: 5.0),
+                    SizedBox(height: 5.0.r),
                     RichText(
                       text: TextSpan(
                         children: [
                           TextSpan(
                             text:
                                 '${formatDate(lastGame['GAME_DATE'])} - ${lastGame['HOME_AWAY']} ${kTeamNames[lastGame['OPP'].toString()][1]} (${lastGame['TEAM_PTS']}-${lastGame['OPP_PTS']} ',
-                            style: kBebasBold.copyWith(fontSize: 15.0, color: Colors.grey),
+                            style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.grey),
                           ),
                           TextSpan(
                             text: '${lastGame['RESULT']}',
-                            style: kBebasBold.copyWith(
-                              fontSize: 15.0,
-                              color: lastGame['RESULT'] == 'W' ? Colors.green : Colors.red,
+                            style: kBebasNormal.copyWith(
+                              fontSize: 13.0.r,
+                              color: lastGame['RESULT'] == 'W'
+                                  ? const Color(0xFF55F86F)
+                                  : const Color(0xFFFC3126),
                             ),
                           ),
                           TextSpan(
                             text: ')',
-                            style: kBebasBold.copyWith(fontSize: 15.0, color: Colors.grey),
+                            style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -90,7 +93,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0.r),
             child: Card(
               color: Colors.white10,
               child: Stack(children: [
@@ -100,7 +103,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                 ),
                 Column(
                   children: [
-                    const SizedBox(height: 30.0),
+                    SizedBox(height: 30.0.r),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -122,7 +125,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 25.0),
+                    SizedBox(height: 25.0.r),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -193,19 +196,19 @@ class PlayerCard extends StatelessWidget {
       child: Column(
         children: [
           PlayerAvatar(
-            radius: 30,
+            radius: 30.r,
             backgroundColor: Colors.grey.shade800,
             playerImageUrl: 'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
           ),
-          const SizedBox(height: 5.0),
+          SizedBox(height: 5.0.r),
           AutoSizeText(
             name,
             maxLines: 1,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
           Text(
             position,
-            style: kBebasOffWhite,
+            style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
           ),
         ],
       ),

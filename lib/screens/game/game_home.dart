@@ -301,7 +301,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
               flexibleSpace: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Gradient mask to fade out the image towards the bottom
+                  // Gradient team colors
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(

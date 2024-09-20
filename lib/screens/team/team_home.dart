@@ -1,5 +1,6 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
@@ -140,6 +141,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return _isLoading
         ? const SpinningIcon(
             color: Colors.deepOrange,
@@ -147,30 +149,31 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
         : Scaffold(
             body: ExtendedNestedScrollView(
               controller: _scrollController,
-              floatHeaderSlivers: false,
               headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return [
                   SliverAppBar(
                     backgroundColor: kTeamColors[team['ABBREVIATION']]!['primaryColor']!,
+                    pinned: true,
+                    expandedHeight: MediaQuery.of(context).size.height * 0.28,
                     title: _title
-                        ? SvgPicture.asset(
-                            'images/NBA_Logos/${team['TEAM_ID']}.svg',
-                            fit: BoxFit.contain,
+                        ? Image.asset(
+                            'images/NBA_Logos/${team['TEAM_ID']}.png',
                             width: team['ABBREVIATION'] == 'CHI'
                                 ? MediaQuery.of(context).size.width * 0.165
-                                : MediaQuery.of(context).size.width * 0.1,
+                                : isLandscape
+                                    ? MediaQuery.of(context).size.width * 0.0375
+                                    : MediaQuery.of(context).size.width * 0.09,
                           )
                         : null,
                     centerTitle: true,
-                    pinned: true,
-                    floating: false,
-                    expandedHeight: MediaQuery.of(context).size.height * 0.28,
                     flexibleSpace: Stack(
                       fit: StackFit.expand,
                       children: [
-                        SvgPicture.asset(
-                          'images/NBA_Logos/${team['TEAM_ID']}.svg',
-                          fit: BoxFit.cover,
+                        Positioned(
+                          child: SvgPicture.asset(
+                            'images/NBA_Logos/${team['TEAM_ID']}.svg',
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         // Gradient mask to fade out the image towards the bottom
                         Container(
@@ -191,7 +194,6 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                         Padding(
                           padding: const EdgeInsets.only(top: 15.0),
                           child: FlexibleSpaceBar(
-                            centerTitle: true,
                             background: TeamInfo(team: team),
                             collapseMode: CollapseMode.pin,
                           ),
@@ -207,7 +209,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
-                      labelStyle: kBebasNormal,
+                      labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
                       tabs: const [
                         Tab(text: 'Overview'),
                         Tab(text: 'Schedule'),
@@ -220,6 +222,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                     actions: [
                       CustomIconButton(
                         icon: Icons.search,
+                        size: 30.0.r,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -231,6 +234,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                       ),
                       CustomIconButton(
                         icon: Icons.compare_arrows,
+                        size: 30.0.r,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -245,9 +249,9 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                 ];
               },
               pinnedHeaderSliverHeightBuilder: () {
-                return (208 - kToolbarHeight);
+                return MediaQuery.of(context).size.height * 0.001;
               },
-              onlyOneScrollInBody: false,
+              onlyOneScrollInBody: true,
               body: TabBarView(
                 controller: _tabController,
                 children: _teamPages.map((page) {
@@ -303,76 +307,82 @@ class TeamInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     var lastGame = getLastGame();
-    return Padding(
-      padding: const EdgeInsets.all(35.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 1,
-            child: SvgPicture.asset(
-              'images/NBA_Logos/${team['TEAM_ID']}.svg',
-              fit: BoxFit.contain,
-              width: MediaQuery.of(context).size.width * 0.15,
-              height: MediaQuery.of(context).size.height * 0.15,
-            ),
-          ),
-          const SizedBox(width: 20.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+
+    return Stack(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(35.0.r),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              RichText(
-                text: TextSpan(
-                  text:
-                      "${team['seasons'][kCurrentSeason]['WINS']!.toInt()}-${team['seasons'][kCurrentSeason]['LOSSES']!.toInt()}",
-                  style: kBebasNormal.copyWith(fontSize: 34.0),
-                  children: [
-                    TextSpan(
-                      text:
-                          '  (${getStanding(team['seasons'][kCurrentSeason]['CONF_RANK'])} ${team['CONF'].substring(0, 4)})',
-                      style: kBebasNormal.copyWith(fontSize: 24.0),
-                    ),
-                  ],
-                ),
+              Image.asset(
+                'images/NBA_Logos/${team['TEAM_ID']}.png',
+                width: isLandscape
+                    ? MediaQuery.of(context).size.width * 0.1
+                    : MediaQuery.of(context).size.width * 0.28,
+                height: isLandscape
+                    ? MediaQuery.of(context).size.width * 0.1
+                    : MediaQuery.of(context).size.height * 0.28,
               ),
-              Row(
+              SizedBox(width: 20.0.r),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Last Game: ",
-                    style: kBebasNormal.copyWith(color: Colors.white70),
+                  RichText(
+                    text: TextSpan(
+                      text:
+                          "${team['seasons'][kCurrentSeason]['WINS']!.toInt()}-${team['seasons'][kCurrentSeason]['LOSSES']!.toInt()}",
+                      style: kBebasNormal.copyWith(fontSize: 32.0.r),
+                      children: [
+                        TextSpan(
+                          text:
+                              '  (${getStanding(team['seasons'][kCurrentSeason]['CONF_RANK'])} ${team['CONF'].substring(0, 4)})',
+                          style: kBebasNormal.copyWith(fontSize: 22.0.r),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        "Last Game: ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "${lastGame['HOME_AWAY']} ",
+                        style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "${kTeamNames[lastGame['OPP'].toString()][1]} ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "(${lastGame['TEAM_PTS'].toString()}-${lastGame['OPP_PTS'].toString()} ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "${lastGame['RESULT']}",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        ")",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                    ],
                   ),
                   Text(
-                    "${lastGame['HOME_AWAY']} ",
-                    style: kBebasNormal.copyWith(color: Colors.white70, fontSize: 14.0),
-                  ),
-                  Text(
-                    "${kTeamNames[lastGame['OPP'].toString()][1]} ",
-                    style: kBebasNormal.copyWith(color: Colors.white70),
-                  ),
-                  Text(
-                    "(${lastGame['TEAM_PTS'].toString()}-${lastGame['OPP_PTS'].toString()} ",
-                    style: kBebasNormal.copyWith(color: Colors.white70),
-                  ),
-                  Text(
-                    "${lastGame['RESULT']}",
-                    style: kBebasNormal.copyWith(color: Colors.white70),
-                  ),
-                  Text(
-                    ")",
-                    style: kBebasNormal.copyWith(color: Colors.white70),
+                    "Next Game: TBD",
+                    style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
                   ),
                 ],
-              ),
-              Text(
-                "Next Game: TBD",
-                style: kBebasNormal.copyWith(color: Colors.white70),
-              ),
+              )
             ],
-          )
-        ],
-      ),
+          ),
+        ),
+      ],
     );
   }
 }

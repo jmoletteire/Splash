@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -205,20 +206,20 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                     pinned: true,
                     expandedHeight: MediaQuery.of(context).size.height * 0.28,
                     title: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (_showImage)
                           PlayerAvatar(
-                            radius: MediaQuery.of(context).size.width * 0.04,
+                            radius: 16.56.r,
                             backgroundColor: Colors.white70,
                             playerImageUrl:
                                 'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
                           ),
-                        const SizedBox(width: 15.0),
+                        SizedBox(width: 15.0.r),
                         Flexible(
                           child: AutoSizeText(
                             _title,
-                            style: kBebasBold.copyWith(fontSize: 24.0),
+                            style: kBebasBold.copyWith(fontSize: 22.0.r),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -266,7 +267,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
-                      labelStyle: kBebasNormal,
+                      labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
                       isScrollable: true,
                       tabAlignment: TabAlignment.start,
                       tabs: const [
@@ -280,6 +281,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                     actions: [
                       CustomIconButton(
                         icon: Icons.search,
+                        size: 30.0.r,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -291,6 +293,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       ),
                       CustomIconButton(
                         icon: Icons.compare_arrows,
+                        size: 30.0.r,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -305,7 +308,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                 ];
               },
               pinnedHeaderSliverHeightBuilder: () {
-                return (208 - kToolbarHeight);
+                return MediaQuery.of(context).size.height * 0.001;
               },
               onlyOneScrollInBody: true,
               body: TabBarView(
@@ -330,86 +333,89 @@ class PlayerInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(35.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          PlayerAvatar(
-            radius: MediaQuery.of(context).size.width * 0.125,
-            backgroundColor: Colors.white70,
-            playerImageUrl:
-                'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
-          ),
-          const SizedBox(
-            width: 20.0,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+    return Stack(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(35.0.r),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              player['GREATEST_75_FLAG'] == 'Y'
-                  ? Row(
-                      children: [
-                        Text(
+              PlayerAvatar(
+                radius: 50.0.r,
+                backgroundColor: Colors.white70,
+                playerImageUrl:
+                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
+              ),
+              SizedBox(width: 20.0.r),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  player['GREATEST_75_FLAG'] == 'Y'
+                      ? Row(
+                          children: [
+                            Text(
+                              player['FIRST_NAME'],
+                              style: kBebasBold.copyWith(fontSize: 28.0.r),
+                            ),
+                            SizedBox(width: 10.0.r),
+                            SvgPicture.asset(
+                              'images/NBA_75th_anniversary_logo.svg',
+                              width: 30.0.r,
+                              height: 30.0.r,
+                            ),
+                          ],
+                        )
+                      : Text(
                           player['FIRST_NAME'],
-                          style: kBebasBold.copyWith(fontSize: 30.0),
+                          style: kBebasBold.copyWith(fontSize: 28.0.r),
                         ),
-                        const SizedBox(width: 10.0),
-                        SvgPicture.asset(
-                          'images/NBA_75th_anniversary_logo.svg',
-                          width: 30.0,
-                          height: 30.0,
-                        ),
-                      ],
-                    )
-                  : Text(
-                      player['FIRST_NAME'],
-                      style: kBebasBold.copyWith(fontSize: 30.0),
-                    ),
-              Text(
-                player['LAST_NAME'],
-                style: kBebasBold.copyWith(fontSize: 30.0),
-              ),
-              Text(
-                '${player['POSITION']} • #${player['JERSEY']}',
-                style: kBebasNormal.copyWith(fontSize: 19.0, color: Colors.white60),
-              ),
-              if (team['CITY'] != 'Free Agent')
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TeamHome(
-                          teamId: team['TEAM_ID'].toString(),
-                        ),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    children: [
-                      Text(
-                        '${team['CITY']} ${team['NICKNAME']}',
-                        style: kBebasNormal.copyWith(fontSize: 19.0, color: Colors.white60),
-                      ),
-                      const SizedBox(width: 5.0),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 20.0),
-                        child: Image.asset(
-                          'images/NBA_Logos/${team['TEAM_ID']}.png',
-                          fit: BoxFit.contain,
-                          width: 20.0,
-                          height: 20.0,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    player['LAST_NAME'],
+                    style: kBebasBold.copyWith(fontSize: 28.0.r),
                   ),
-                ),
+                  Text(
+                    '${player['POSITION']} • #${player['JERSEY']}',
+                    style: kBebasNormal.copyWith(fontSize: 17.0.r, color: Colors.white60),
+                  ),
+                  if (team['CITY'] != 'Free Agent')
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TeamHome(
+                              teamId: team['TEAM_ID'].toString(),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            '${team['CITY']} ${team['NICKNAME']}',
+                            style:
+                                kBebasNormal.copyWith(fontSize: 17.0.r, color: Colors.white60),
+                          ),
+                          SizedBox(width: 5.0.r),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 20.0.r),
+                            child: Image.asset(
+                              'images/NBA_Logos/${team['TEAM_ID']}.png',
+                              fit: BoxFit.contain,
+                              width: 20.0.r,
+                              height: 20.0.r,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

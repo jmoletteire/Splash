@@ -171,45 +171,54 @@ class _TeamLatestNewsState extends State<TeamLatestNews> {
                     child: Column(
                       children: [
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Add spacing between date and transaction text
                             Expanded(
                               flex: 6,
-                              child: Text(item['headline']!,
-                                  style: kBebasNormal.copyWith(fontSize: 16.0.r)),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Wrap(
+                                    children: [
+                                      Text(item['headline']!,
+                                          style: kBebasNormal.copyWith(fontSize: 14.0.r)),
+                                    ],
+                                  ),
+                                  Row(
+                                    textBaseline: TextBaseline.alphabetic,
+                                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                                    children: [
+                                      Text(
+                                        timeAgo(item['date']!),
+                                        style: kBebasNormal.copyWith(
+                                            fontSize: 12.0.r, color: Colors.white60),
+                                      ),
+                                      const Text(
+                                          ' • '), // Add spacing between date and transaction text
+                                      Text(
+                                        item['provider']!,
+                                        style: kBebasNormal.copyWith(
+                                            fontSize: 12.0.r, color: Colors.white60),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                             if (item['image'] != 'null') SizedBox(width: 10.0.r),
                             if (item['image'] != 'null')
                               Expanded(
                                 flex: 3,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.network(
-                                    item['image']!,
-                                    fit: BoxFit.cover,
-                                    height: 70.0.h,
-                                    width: 70.0.w,
+                                child: ConstrainedBox(
+                                  constraints:
+                                      BoxConstraints(maxHeight: 70.0.r, maxWidth: 70.0.r),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(item['image']!),
                                   ),
                                 ),
                               ),
-                          ],
-                        ),
-                        Row(
-                          textBaseline: TextBaseline.alphabetic,
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          children: [
-                            Text(
-                              timeAgo(item['date']!),
-                              style: kBebasNormal.copyWith(
-                                  fontSize: 12.0.r, color: Colors.white60),
-                            ),
-                            const Text(' • '), // Add spacing between date and transaction text
-                            Text(
-                              item['provider']!,
-                              style: kBebasNormal.copyWith(
-                                  fontSize: 12.0.r, color: Colors.white60),
-                            ),
                           ],
                         ),
                       ],
