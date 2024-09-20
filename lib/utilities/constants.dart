@@ -11,6 +11,9 @@ const kSplashText = Text(
 
 const String kFlaskUrl = "54.159.103.129"; //"api.splashapp.org";
 
+const kStandardWidth = 414.0;
+const kStandardHeight = 896.0;
+
 /// ******************************************************
 ///                    TEXT STYLES
 /// ******************************************************

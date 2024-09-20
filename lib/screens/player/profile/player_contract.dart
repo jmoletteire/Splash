@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -117,7 +118,7 @@ class _PlayerContractState extends State<PlayerContract> {
                 child: Center(
                   child: Text(
                     'Contract (\'${currentContract['startYear'].toString().substring(2)}-${endYear.toString().substring(2)})',
-                    style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
+                    style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
                   ),
                 ),
               ),
@@ -139,11 +140,11 @@ class _PlayerContractState extends State<PlayerContract> {
                 children: [
                   Text(
                     '${currentContract['yearsTotal']} yr(s) / ${formatCurrency(currentContract['amountTotal'])}',
-                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
                   ),
                   Text(
                     'Terms',
-                    style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+                    style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
                   ),
                 ],
               ),
@@ -151,11 +152,11 @@ class _PlayerContractState extends State<PlayerContract> {
                 children: [
                   Text(
                     formatCurrency(currentContract['averageSalary']),
-                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
                   ),
                   Text(
                     'AAV',
-                    style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+                    style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
                   ),
                 ],
               ),
@@ -163,11 +164,11 @@ class _PlayerContractState extends State<PlayerContract> {
                 children: [
                   Text(
                     '$endYear / ${currentContract['freeAgentType'] == "" ? 'RFA' : currentContract['freeAgentType'] ?? 'UFA'}',
-                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
                   ),
                   Text(
                     'FA',
-                    style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+                    style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
                   ),
                 ],
               ),
@@ -185,7 +186,7 @@ class _PlayerContractState extends State<PlayerContract> {
                       border: Border(
                         bottom: BorderSide(
                           color: Colors.white54,
-                          width: 2,
+                          width: 2.0,
                         ),
                       ),
                     ),
@@ -222,8 +223,8 @@ class _PlayerContractState extends State<PlayerContract> {
                             ),
                             Image.asset(
                               'images/NBA_Logos/${kTeamIds[contractTeamIds[year['teamId']]] ?? 0}.png',
-                              width: 18.0,
-                              height: 18.0,
+                              width: 18.0.r,
+                              height: 18.0.r,
                             )
                           ],
                         ),
@@ -280,7 +281,7 @@ class _PlayerContractState extends State<PlayerContract> {
                   ),
                   child: Text(
                     'Notes',
-                    style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white),
+                    style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white),
                   ),
                 ),
               ],
@@ -291,7 +292,7 @@ class _PlayerContractState extends State<PlayerContract> {
               children: [
                 Text(
                   '- $note',
-                  style: kBebasNormal.copyWith(fontSize: 14.0),
+                  style: kBebasNormal.copyWith(fontSize: 12.0.r),
                 ),
                 const SizedBox(height: 30.0),
               ],
@@ -307,7 +308,7 @@ class _PlayerContractState extends State<PlayerContract> {
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: kBebasNormal.copyWith(fontSize: 18.0),
+        style: kBebasNormal.copyWith(fontSize: 16.0.r),
       ),
     );
   }
@@ -318,7 +319,7 @@ class _PlayerContractState extends State<PlayerContract> {
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: kBebasNormal.copyWith(fontSize: 17.0, color: color),
+        style: kBebasNormal.copyWith(fontSize: 14.0.r, color: color),
       ),
     );
   }

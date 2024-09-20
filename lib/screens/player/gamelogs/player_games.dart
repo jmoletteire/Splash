@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/player/gamelogs/game_by_game_stats.dart';
@@ -265,15 +266,15 @@ class _PlayerGamesState extends State<PlayerGames> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.sports_basketball,
                         color: Colors.white38,
-                        size: 40.0,
+                        size: 40.0.r,
                       ),
-                      const SizedBox(height: 15.0),
+                      SizedBox(height: 15.0.r),
                       Text(
                         'No Games Available',
-                        style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
                       ),
                     ],
                   ),
@@ -284,7 +285,7 @@ class _PlayerGamesState extends State<PlayerGames> {
         : CustomScrollView(
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.only(bottom: 100.0),
+                padding: EdgeInsets.only(bottom: 100.0.r),
                 sliver: GameByGameStats(
                   player: widget.player,
                   gameIds: gamesList,

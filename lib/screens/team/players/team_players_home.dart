@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/team/players/depth_chart.dart';
 import 'package:splash/screens/team/players/rotation.dart';
 import 'package:splash/screens/team/players/team_roster.dart';
@@ -42,7 +43,8 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
             indicatorWeight: 3.0,
             unselectedLabelColor: Colors.grey,
             labelColor: Colors.white,
-            labelStyle: kBebasNormal.copyWith(fontSize: 18.0),
+            labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
+            labelPadding: EdgeInsets.symmetric(horizontal: 16.0.r, vertical: 0.0.r),
             tabs: const [
               Tab(text: 'Roster'),
               Tab(text: 'Depth Chart'),

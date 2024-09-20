@@ -33,12 +33,14 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
     if (transactionsCache.containsTransactions()) {
       setState(() {
         transactions = transactionsCache.getTransactions()!;
+        transactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
         _isLoading = false;
       });
     } else {
       var fetchedTransactions = await TransactionsNetworkHelper().getTransactions();
       setState(() {
         transactions = fetchedTransactions;
+        transactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
         _isLoading = false;
       });
       transactionsCache.addTransactions(transactions);

@@ -1,6 +1,7 @@
 import os
+import time
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_compress import Compress
 from pymongo import MongoClient
 import logging
@@ -518,6 +519,26 @@ def get_playoff_bracket():
 def get_dates():
     dates = games_collection.distinct('GAME_DATE')
     return jsonify(dates)
+
+
+@app.route('/live_scores')
+def stream_scores():
+    def generate():
+        while True:
+            # Replace this with your NBA score-fetching logic
+            updated_scores = fetch_latest_nba_scores()  # Custom function to fetch scores
+            yield f"data: {jsonify(updated_scores)}\n\n"
+            time.sleep(5)  # Interval for sending updates (e.g., every 5 seconds)
+
+    return Response(generate(), content_type='text/event-stream')
+
+
+def fetch_latest_nba_scores():
+    # This is your logic to retrieve updated NBA scores from the backend.
+    return {
+        'game_1': {'home_team': 'Lakers', 'away_team': 'Warriors', 'score': '102-98'},
+        'game_2': {'home_team': 'Celtics', 'away_team': 'Heat', 'score': '110-105'}
+    }
 
 
 @app.route('/get_games', methods=['GET'])

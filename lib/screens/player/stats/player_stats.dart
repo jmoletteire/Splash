@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
@@ -136,15 +137,15 @@ class _PlayerStatsState extends State<PlayerStats> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.sports_basketball,
                   color: Colors.white38,
-                  size: 40.0,
+                  size: 38.0.r,
                 ),
                 const SizedBox(height: 15.0),
                 Text(
                   'No Stats Available',
-                  style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
                 ),
               ],
             ),
@@ -186,7 +187,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                           return Text(
                                             value.toStringAsFixed(1),
                                             textAlign: TextAlign.center,
-                                            style: kBebasNormal.copyWith(fontSize: 22.0),
+                                            style: kBebasNormal.copyWith(fontSize: 20.0.r),
                                           );
                                         },
                                       ),
@@ -210,7 +211,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                             return Text(
                                               value.toStringAsFixed(1),
                                               textAlign: TextAlign.center,
-                                              style: kBebasNormal.copyWith(fontSize: 22.0),
+                                              style: kBebasNormal.copyWith(fontSize: 20.0.r),
                                             );
                                           }),
                                     ),
@@ -238,7 +239,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                             return Text(
                                               value.toStringAsFixed(1),
                                               textAlign: TextAlign.center,
-                                              style: kBebasNormal.copyWith(fontSize: 22.0),
+                                              style: kBebasNormal.copyWith(fontSize: 20.0.r),
                                             );
                                           }),
                                     ),
@@ -252,7 +253,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                         'PPG',
                                         textAlign: TextAlign.center,
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 15.0, color: Colors.white70),
+                                            fontSize: 13.0.r, color: Colors.white70),
                                       ),
                                     ),
                                     Expanded(
@@ -261,7 +262,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                         'RPG',
                                         textAlign: TextAlign.center,
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 15.0, color: Colors.white70),
+                                            fontSize: 13.0.r, color: Colors.white70),
                                       ),
                                     ),
                                     Expanded(
@@ -270,7 +271,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                         'APG',
                                         textAlign: TextAlign.center,
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 15.0, color: Colors.white70),
+                                            fontSize: 13.0.r, color: Colors.white70),
                                       ),
                                     ),
                                   ],
@@ -313,6 +314,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                                   'Shooting',
                                 ],
                                 maxPossibleValue: 1.0,
+                                chartSize: 200.r,
                               ),
                             ),
                           ),
@@ -322,7 +324,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                           child: Row(
                             children: [
                               Text('Expand/Collapse All',
-                                  style: kBebasNormal.copyWith(fontSize: 18.0)),
+                                  style: kBebasNormal.copyWith(fontSize: 16.0.r)),
                               const SizedBox(width: 10.0),
                               Transform.scale(
                                 scale: 0.9,
@@ -465,21 +467,21 @@ class _PlayerStatsState extends State<PlayerStats> {
                                   children: [
                                     Text(
                                       value,
-                                      style: kBebasNormal.copyWith(fontSize: 19.0),
+                                      style: kBebasNormal.copyWith(fontSize: 17.0.r),
                                     ),
                                     const SizedBox(width: 10.0),
                                     if (teamId != null)
                                       Image.asset(
                                         'images/NBA_Logos/$teamId.png',
                                         fit: BoxFit.scaleDown,
-                                        width: 25.0,
-                                        height: 25.0,
+                                        width: 25.0.r,
+                                        height: 25.0.r,
                                         alignment: Alignment.center,
                                       )
                                     else
-                                      const SizedBox(
-                                        width: 25.0,
-                                        height: 25.0,
+                                      SizedBox(
+                                        width: 25.0.r,
+                                        height: 25.0.r,
                                       ),
                                   ],
                                 ),
@@ -516,17 +518,14 @@ class _PlayerStatsState extends State<PlayerStats> {
                                 ),
                               ),
                               Positioned(
-                                top: 2,
-                                left: 8, // Adjust based on your switch size
+                                left: 2.r,
+                                width: 16.r,
+                                height: 16.r, // Adjust based on your switch size
                                 child: IgnorePointer(
                                   ignoring: true,
                                   child: Visibility(
                                     visible: _playoffSwitch,
-                                    child: SvgPicture.asset(
-                                      'images/playoffs.svg',
-                                      width: 16.0,
-                                      height: 16.0,
-                                    ),
+                                    child: SvgPicture.asset('images/playoffs.svg'),
                                   ),
                                 ),
                               ),
@@ -548,8 +547,8 @@ class _PlayerStatsState extends State<PlayerStats> {
                             cornerRadius: 20.0,
                             curve: Curves.decelerate,
                             customTextStyles: [
-                              kBebasNormal.copyWith(fontSize: 16.0),
-                              kBebasNormal.copyWith(fontSize: 16.0),
+                              kBebasNormal.copyWith(fontSize: 14.0.r),
+                              kBebasNormal.copyWith(fontSize: 14.0.r),
                             ],
                             customWidths: [
                               (MediaQuery.sizeOf(context).width - 28) / 4.5,

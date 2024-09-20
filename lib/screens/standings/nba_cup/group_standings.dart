@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
@@ -40,6 +41,8 @@ class _GroupStandingsState extends State<GroupStandings> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return SliverTableView.builder(
       horizontalScrollController: scrollController,
       style: const TableViewStyle(
@@ -61,30 +64,42 @@ class _GroupStandingsState extends State<GroupStandings> {
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
       columns: [
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.35,
+          width: MediaQuery.of(context).size.width * (isLandscape ? 0.15 : 0.35),
           freezePriority: 1,
         ),
 
         /// W
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.05 : 0.08)),
 
         /// L
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.05 : 0.08)),
 
         /// PCT
-        TableColumn(width: MediaQuery.of(context).size.width * 0.165),
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.165)),
 
         /// GB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.125)),
 
         /// DIFF
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.125)),
 
         /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.125)),
 
         /// OPP PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.125)),
+
+        /// G1
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.175)),
+
+        /// G2
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.175)),
+
+        /// G3
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.175)),
+
+        /// G4
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.175)),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -98,15 +113,14 @@ class _GroupStandingsState extends State<GroupStandings> {
           return Material(
             color: Colors.grey.shade800,
             child: Padding(
-              padding: column == 0
-                  ? const EdgeInsets.only(left: 20.0)
-                  : const EdgeInsets.only(right: 8.0),
+              padding:
+                  column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
               child: Align(
                 alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
                 child: Text(
                   widget.columnNames[column],
                   style: kBebasNormal.copyWith(
-                    fontSize: 18.0,
+                    fontSize: 16.0.r,
                   ),
                 ),
               ),
@@ -161,7 +175,7 @@ class _GroupStandingsState extends State<GroupStandings> {
           splashColor: Colors.white,
           child: contentBuilder(context, (context, column) {
             return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: EdgeInsets.only(right: 8.0.r),
               child: getContent(teams, row, column, context),
             );
           }),
@@ -174,7 +188,7 @@ class _GroupStandingsState extends State<GroupStandings> {
     switch (column) {
       case 0:
         return Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 3.0, 8.0),
+          padding: EdgeInsets.fromLTRB(8.0.r, 8.0.r, 3.0.r, 8.0.r),
           child: Row(
             children: [
               Expanded(
@@ -184,19 +198,19 @@ class _GroupStandingsState extends State<GroupStandings> {
                   textAlign: TextAlign.center,
                   style: kBebasNormal.copyWith(
                     color: Colors.white70,
-                    fontSize: 19.0,
+                    fontSize: 17.0.r,
                   ),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 24.0),
+                  constraints: BoxConstraints(maxWidth: 24.0.r),
                   child: Image.asset(
                     'images/NBA_Logos/${teams[row]['teamId']}.png',
                     fit: BoxFit.contain,
-                    width: 24.0,
-                    height: 24.0,
+                    width: 24.0.r,
+                    height: 24.0.r,
                   ),
                 ),
               ),
@@ -208,11 +222,11 @@ class _GroupStandingsState extends State<GroupStandings> {
                     children: [
                       TextSpan(
                         text: teams[row]['teamAbbreviation'],
-                        style: kBebasBold.copyWith(fontSize: 20.0),
+                        style: kBebasBold.copyWith(fontSize: 18.0.r),
                       ),
                       TextSpan(
                         text: teams[row]['clinchIndicator'],
-                        style: kBebasNormal.copyWith(fontSize: 12.0, letterSpacing: 0.8),
+                        style: kBebasNormal.copyWith(fontSize: 10.0.r, letterSpacing: 0.8),
                       ),
                     ],
                   ),
@@ -240,7 +254,7 @@ class _GroupStandingsState extends State<GroupStandings> {
             child: Text(
               diff,
               style: kBebasNormal.copyWith(
-                fontSize: 18.0,
+                fontSize: 16.0.r,
                 color: teams[row]['diff'] >= 0
                     ? const Color(0xFF55F86F)
                     : const Color(0xFFFC3126),
@@ -262,6 +276,146 @@ class _GroupStandingsState extends State<GroupStandings> {
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
+      case 8:
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (teams[row]['games'][0]['outcome'] != null)
+              Text(
+                teams[row]['games'][0]['outcome'],
+                textAlign: TextAlign.center,
+                style: kBebasNormal.copyWith(
+                  fontSize: 17.0.r,
+                  color: teams[row]['games'][0]['outcome'] == 'W'
+                      ? const Color(0xFF55F86F)
+                      : const Color(0xFFFC3126),
+                ),
+              ),
+            if (teams[row]['games'][0]['outcome'] != null) SizedBox(width: 5.0.r),
+            Text(
+              teams[row]['games'][0]['location'] == 'H' ? 'vs' : '@',
+              textAlign: TextAlign.center,
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 13.0.r,
+              ),
+            ),
+            SizedBox(width: 5.0.r),
+            Text(
+              teams[row]['games'][0]['opponentTeamAbbreviation'],
+              textAlign: TextAlign.center,
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 17.0.r,
+              ),
+            ),
+          ],
+        );
+      case 9:
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (teams[row]['games'][1]['outcome'] != null)
+              Text(
+                teams[row]['games'][1]['outcome'],
+                textAlign: TextAlign.center,
+                style: kBebasNormal.copyWith(
+                  fontSize: 17.0.r,
+                  color: teams[row]['games'][1]['outcome'] == 'W'
+                      ? const Color(0xFF55F86F)
+                      : const Color(0xFFFC3126),
+                ),
+              ),
+            if (teams[row]['games'][1]['outcome'] != null) SizedBox(width: 5.0.r),
+            Text(
+              teams[row]['games'][1]['location'] == 'H' ? 'vs' : '@',
+              textAlign: TextAlign.center,
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 13.0.r,
+              ),
+            ),
+            SizedBox(width: 5.0.r),
+            Text(
+              teams[row]['games'][1]['opponentTeamAbbreviation'],
+              textAlign: TextAlign.center,
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 17.0.r,
+              ),
+            ),
+          ],
+        );
+      case 10:
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (teams[row]['games'][2]['outcome'] != null)
+              Text(
+                teams[row]['games'][2]['outcome'],
+                textAlign: TextAlign.center,
+                style: kBebasNormal.copyWith(
+                  fontSize: 17.0.r,
+                  color: teams[row]['games'][2]['outcome'] == 'W'
+                      ? const Color(0xFF55F86F)
+                      : const Color(0xFFFC3126),
+                ),
+              ),
+            if (teams[row]['games'][2]['outcome'] != null) SizedBox(width: 5.0.r),
+            Text(
+              teams[row]['games'][2]['location'] == 'H' ? 'vs' : '@',
+              textAlign: TextAlign.center,
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 13.0.r,
+              ),
+            ),
+            SizedBox(width: 5.0.r),
+            Text(
+              teams[row]['games'][2]['opponentTeamAbbreviation'],
+              textAlign: TextAlign.center,
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 17.0.r,
+              ),
+            ),
+          ],
+        );
+      case 11:
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            if (teams[row]['games'][3]['outcome'] != null)
+              Text(
+                teams[row]['games'][3]['outcome'],
+                textAlign: TextAlign.center,
+                style: kBebasNormal.copyWith(
+                  fontSize: 17.0.r,
+                  color: teams[row]['games'][3]['outcome'] == 'W'
+                      ? const Color(0xFF55F86F)
+                      : const Color(0xFFFC3126),
+                ),
+              ),
+            if (teams[row]['games'][3]['outcome'] != null) SizedBox(width: 5.0.r),
+            Text(
+              teams[row]['games'][3]['location'] == 'H' ? 'vs' : '@',
+              textAlign: TextAlign.center,
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 13.0.r,
+              ),
+            ),
+            SizedBox(width: 5.0.r),
+            Text(
+              teams[row]['games'][3]['opponentTeamAbbreviation'],
+              textAlign: TextAlign.center,
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 17.0.r,
+              ),
+            ),
+          ],
+        );
       default:
         return const Text('');
     }
@@ -280,7 +434,7 @@ class StandingsDataText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasNormal.copyWith(fontSize: 19.0),
+        style: kBebasNormal.copyWith(fontSize: 17.0.r),
       ),
     );
   }

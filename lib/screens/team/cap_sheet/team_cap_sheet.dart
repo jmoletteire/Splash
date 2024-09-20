@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
 import 'cap_sheet_table.dart';
@@ -21,15 +22,15 @@ class _TeamCapSheetState extends State<TeamCapSheet> {
         ),
         if (widget.team['CAP_SHEET']['isHardCapped'])
           SliverPadding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0.r),
             sliver: SliverToBoxAdapter(
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.grey.shade900,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                padding: const EdgeInsets.all(15.0),
-                margin: const EdgeInsets.symmetric(vertical: 11.0),
+                padding: EdgeInsets.all(15.0.r),
+                margin: EdgeInsets.symmetric(vertical: 11.0.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -41,18 +42,19 @@ class _TeamCapSheetState extends State<TeamCapSheet> {
                       ),
                       child: Text(
                         'Notes',
-                        style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
+                        style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
                       ),
                     ),
-                    const SizedBox(height: 8.0),
+                    SizedBox(height: 8.0.r),
                     Text(
                       '${widget.team['CITY']} is hard capped for $kCurrentSeason:',
-                      style: kBebasNormal.copyWith(fontSize: 18.0),
+                      style: kBebasNormal.copyWith(fontSize: 16.0.r),
                     ),
                     for (var note in widget.team['CAP_SHEET']['hardCapReasons'])
                       Text(
                         '• $note',
-                        style: kBebasNormal.copyWith(fontSize: 16.0, color: Color(0xCFFFFFFF)),
+                        style: kBebasNormal.copyWith(
+                            fontSize: 14.0.r, color: const Color(0xCFFFFFFF)),
                       ),
                   ],
                 ),

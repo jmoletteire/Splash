@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import '../../../utilities/constants.dart';
@@ -87,48 +88,48 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
           Container(
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
               ),
             ),
             child: Text(
               'Transactions',
-              style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
+              style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
             ),
           ),
           if (widget.playerTransactions.isEmpty)
-            const Row(
+            Row(
               children: [
                 Text(
                   'No Transactions',
-                  style: kBebasNormal,
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r),
                 ),
               ],
             ),
           for (var transaction in widget.playerTransactions)
             if (!['fined', 'suspended'].contains(transaction['transactionType'])) ...[
-              const SizedBox(height: 20.0),
+              SizedBox(height: 20.0.r),
               Wrap(
                 children: [
                   Row(
                     children: [
                       Image.asset(
                         'images/NBA_Logos/${kTeamIds[fanspoTeamIds[transaction['teamId']]] ?? 0}.png',
-                        width: 30.0,
-                        height: 30.0,
+                        width: 30.0.r,
+                        height: 30.0.r,
                       ),
-                      const SizedBox(width: 10.0),
+                      SizedBox(width: 10.0.r),
                       Flexible(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               transaction['description'],
-                              style: kBebasNormal.copyWith(fontSize: 16.0),
+                              style: kBebasNormal.copyWith(fontSize: 14.0.r),
                             ),
                             Text(
                               formatDate(transaction['date']),
-                              style:
-                                  kBebasNormal.copyWith(fontSize: 14.0, color: Colors.white70),
+                              style: kBebasNormal.copyWith(
+                                  fontSize: 12.0.r, color: Colors.white70),
                             ),
                           ],
                         ),

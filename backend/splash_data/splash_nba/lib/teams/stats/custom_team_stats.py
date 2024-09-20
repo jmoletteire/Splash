@@ -1,3 +1,5 @@
+import inspect
+
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
@@ -86,38 +88,62 @@ def avg_category_rankings():
                 logging.error(f"Error processing documents for season {season}: {e}")
 
 
-def three_and_ft_rate(season, season_type):
+def three_and_ft_rate(seasons, season_type):
+    # Get the current call stack
+    stack = inspect.stack()
+
+    # Check the second item in the stack (the caller)
+    # The first item in the stack is the current function itself
+    caller_frame = stack[1]
+
+    # Extract the function name of the caller
+    caller_function = caller_frame.function
+
+    # Check if the caller is the main script
+    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
+        print("Called from main script.")
+    else:
+        # Connect to MongoDB
+        try:
+            client = MongoClient(uri)
+            db = client.splash
+            teams_collection = db.nba_teams
+        except Exception as e:
+            logging.error(f"Failed to connect to MongoDB: {e}")
+            exit(1)
+
     # Update each document in the collection
     for document in teams_collection.find({}, {"TEAM_ID": 1, "seasons": 1, "_id": 0}):
         team_id = document['TEAM_ID']
-        logging.info(f'Processing team {team_id}...')
-        for season in document['seasons']:
-            if season in seasons:
-                try:
-                    # Extract the values needed for calculation
-                    fg3a = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FG3A', 0)
-                    fta = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FTA', 0)
-                    ftm = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FTM', 1)
-                    fga = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FGA', 1)  # Avoid division by zero
-                    # Calculate 3PAr
-                    three_pt_rate = fg3a / fga
-                    fta_rate = fta / fga
-                    ft_per_fga = ftm / fga
-                    logging.info(f'Calculated for {season}')
+        if team_id != 0:
+            logging.info(f'Processing team {team_id}...')
+            for season in document['seasons']:
+                if season in seasons:
+                    try:
+                        # Extract the values needed for calculation
+                        fg3a = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FG3A', 0)
+                        fta = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FTA', 0)
+                        ftm = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FTM', 1)
+                        fga = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FGA', 1)  # Avoid division by zero
+                        # Calculate 3PAr
+                        three_pt_rate = fg3a / fga
+                        fta_rate = fta / fga
+                        ft_per_fga = ftm / fga
+                        logging.info(f'Calculated for {season}')
 
-                    # Update the document with the new field
-                    teams_collection.update_one(
-                        {'TEAM_ID': document['TEAM_ID']},
-                        {'$set': {f'seasons.{season}.STATS.BASIC.3PAr': three_pt_rate,
-                                  f'seasons.{season}.STATS.BASIC.FTAr': fta_rate,
-                                  f'seasons.{season}.STATS.{season_type}.BASIC.FT_PER_FGA': ft_per_fga}
-                         }
-                    )
+                        # Update the document with the new field
+                        teams_collection.update_one(
+                            {'TEAM_ID': document['TEAM_ID']},
+                            {'$set': {f'seasons.{season}.STATS.BASIC.3PAr': three_pt_rate,
+                                      f'seasons.{season}.STATS.BASIC.FTAr': fta_rate,
+                                      f'seasons.{season}.STATS.{season_type}.BASIC.FT_PER_FGA': ft_per_fga}
+                             }
+                        )
 
-                    logging.info(f'Added stats for {season} for team {team_id}')
+                        logging.info(f'Added stats for {season} for team {team_id}')
 
-                except KeyError as e:
-                    print(f"Key error for document {document['TEAM_ID']}: {e}")
+                    except KeyError as e:
+                        print(f"Key error for document {document['TEAM_ID']}: {e}")
 
 
 if __name__ == "__main__":
@@ -160,8 +186,8 @@ if __name__ == "__main__":
         '1997-98',
         '1996-97'
     ]
-    for season in seasons:
-        three_and_ft_rate(season, 'PLAYOFFS')
-        # avg_category_rankings()
+
+    three_and_ft_rate(seasons, 'PLAYOFFS')
+    # avg_category_rankings()
 
     logging.info("Update complete.")

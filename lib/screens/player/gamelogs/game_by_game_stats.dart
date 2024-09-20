@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
@@ -25,8 +26,6 @@ class GameByGameStats extends StatefulWidget {
 }
 
 class _GameByGameStatsState extends State<GameByGameStats> {
-  bool _gameIdsPrepared = false;
-
   List columnNames = [
     'DATE',
     'OPP',
@@ -202,7 +201,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
                 child: Text(
                   columnNames[column],
                   style: kBebasNormal.copyWith(
-                    fontSize: 16.0,
+                    fontSize: 14.0.r,
                   ),
                 ),
               ),
@@ -240,7 +239,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         alignment: Alignment.centerLeft,
         child: Text(
           gameId,
-          style: kBebasNormal.copyWith(fontSize: 14.0),
+          style: kBebasNormal.copyWith(fontSize: 12.0.r),
         ),
       );
     }
@@ -306,18 +305,18 @@ class _GameByGameStatsState extends State<GameByGameStats> {
     switch (column) {
       case 0:
         return Padding(
-          padding: const EdgeInsets.only(left: 11.0),
+          padding: EdgeInsets.only(left: 9.0.r),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 gameDate[0],
-                style: kBebasNormal.copyWith(fontSize: 13.0, color: Colors.white70),
+                style: kBebasNormal.copyWith(fontSize: 11.0.r, color: Colors.white70),
               ),
               Text(
                 gameDate[1],
-                style: kBebasNormal.copyWith(fontSize: 13.0),
+                style: kBebasNormal.copyWith(fontSize: 11.0.r),
               ),
             ],
           ),
@@ -330,15 +329,15 @@ class _GameByGameStatsState extends State<GameByGameStats> {
               game['MATCHUP'][4] == '@'
                   ? game['MATCHUP'].substring(4)
                   : game['MATCHUP'].substring(8) ?? '-',
-              style: kBebasBold.copyWith(fontSize: 15.0),
+              style: kBebasBold.copyWith(fontSize: 13.0.r),
             ),
             ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 15.0),
+              constraints: BoxConstraints(maxWidth: 15.0.r),
               child: Image.asset(
                 'images/NBA_Logos/${game['OPP_ID']}.png',
                 fit: BoxFit.contain,
                 alignment: Alignment.center,
-                width: 15.0,
+                width: 15.0.r,
               ),
             ),
           ],
@@ -351,7 +350,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         }
         return StandingsDataText(
           text: game['MIN'].toStringAsFixed(0) == '0' ? '-' : convertMinutes(game['MIN']),
-          size: 15.0,
+          size: 13.0.r,
         );
       case 3:
         return StandingsDataText(text: game['PTS'].toStringAsFixed(0) ?? '-');
@@ -408,7 +407,7 @@ class StandingsDataText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: AutoSizeText(
         text,
-        style: kBebasNormal.copyWith(fontSize: size ?? 17.0),
+        style: kBebasNormal.copyWith(fontSize: size ?? 15.0.r),
         maxLines: 1,
       ),
     );

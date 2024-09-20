@@ -101,14 +101,12 @@ def update_games(game_day):
             teams_collection.update_one(
                 {"TEAM_ID": home_team_id},
                 {"$set": {f"seasons.{season}.GAMES.{game_id}": game_data_home}},
-                upsert=True
             )
 
             # Update the visitor team season data
             teams_collection.update_one(
                 {"TEAM_ID": visitor_team_id},
                 {"$set": {f"seasons.{season}.GAMES.{game_id}": game_data_visitor}},
-                upsert=True
             )
         except Exception as e:
             logging.error(f"Could not process games for {game_day['GAME_DATE']}: {e.with_traceback()}")

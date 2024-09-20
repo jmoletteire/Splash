@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -15,6 +16,8 @@ class _TeamHistoryState extends State<TeamHistory> {
 
   String getStanding(int confRank) {
     switch (confRank) {
+      case 0:
+        return '-';
       case 1:
         return '${confRank}st';
       case 2:
@@ -33,6 +36,10 @@ class _TeamHistoryState extends State<TeamHistory> {
   }
 
   String getPlayoffs(dynamic teamSeason) {
+    if (teamSeason['CONF_RANK'] == 0) {
+      return '-';
+    }
+
     // Best-of-7 every round (post-2003)
     if (int.parse(teamSeason['YEAR'].substring(0, 4)) >= 2003) {
       // Play-In (post-2019)
@@ -184,6 +191,8 @@ class _TeamHistoryState extends State<TeamHistory> {
     // Extract the sorted keys
     var seasonIndex = entries.map((e) => e.key).toList();
 
+    TextStyle teamHistoryStyle = kBebasOffWhite.copyWith(fontSize: 14.0.r);
+
     return CustomScrollView(
       slivers: [
         SliverPinnedHeader(
@@ -200,10 +209,10 @@ class _TeamHistoryState extends State<TeamHistory> {
                     ),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Season-by-Season', style: kBebasOffWhite),
+                    Text('Season-by-Season', style: teamHistoryStyle),
                   ],
                 ),
               ),
@@ -218,24 +227,24 @@ class _TeamHistoryState extends State<TeamHistory> {
                     ),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Expanded(
                         flex: 1,
                         child:
-                            Text('YEAR', textAlign: TextAlign.start, style: kBebasOffWhite)),
+                            Text('YEAR', textAlign: TextAlign.start, style: teamHistoryStyle)),
                     Expanded(
                         flex: 3,
                         child: Text('RECORD',
-                            textAlign: TextAlign.center, style: kBebasOffWhite)),
+                            textAlign: TextAlign.center, style: teamHistoryStyle)),
                     Expanded(
                         flex: 1,
-                        child:
-                            Text('CONF', textAlign: TextAlign.center, style: kBebasOffWhite)),
+                        child: Text('CONF',
+                            textAlign: TextAlign.center, style: teamHistoryStyle)),
                     Expanded(
                         flex: 3,
                         child: Text('PLAYOFFS',
-                            textAlign: TextAlign.center, style: kBebasOffWhite)),
+                            textAlign: TextAlign.center, style: teamHistoryStyle)),
                   ],
                 ),
               ),
@@ -257,10 +266,11 @@ class _TeamHistoryState extends State<TeamHistory> {
                     Expanded(
                       flex: 1,
                       child: FittedBox(
+                        fit: BoxFit.scaleDown,
                         child: Text(
                           seasons[seasonIndex[index]]['YEAR'],
                           textAlign: TextAlign.center,
-                          style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                          style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                         ),
                       ),
                     ),
@@ -269,7 +279,7 @@ class _TeamHistoryState extends State<TeamHistory> {
                       child: Text(
                         '${seasons[seasonIndex[index]]['WINS']!.toString()}-${seasons[seasonIndex[index]]['LOSSES']!.toString()} (${seasons[seasonIndex[index]]['WIN_PCT']!.toStringAsFixed(3)})',
                         textAlign: TextAlign.center,
-                        style: kBebasOffWhite.copyWith(fontSize: 17.0),
+                        style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
                       ),
                     ),
                     Expanded(
@@ -277,7 +287,7 @@ class _TeamHistoryState extends State<TeamHistory> {
                       child: Text(
                         getStanding(seasons[seasonIndex[index]]['CONF_RANK']!),
                         textAlign: TextAlign.center,
-                        style: kBebasOffWhite.copyWith(fontSize: 17.0),
+                        style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
                       ),
                     ),
                     Expanded(
@@ -285,7 +295,7 @@ class _TeamHistoryState extends State<TeamHistory> {
                       child: Text(
                         getPlayoffs(seasons[seasonIndex[index]]!),
                         textAlign: TextAlign.center,
-                        style: kBebasOffWhite.copyWith(fontSize: 17.0),
+                        style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
                       ),
                     ),
                   ],

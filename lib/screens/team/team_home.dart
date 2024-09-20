@@ -7,9 +7,9 @@ import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/team/overview/team_overview.dart';
 import 'package:splash/screens/team/players/team_players_home.dart';
 import 'package:splash/screens/team/schedule/team_schedule.dart';
+import 'package:splash/screens/team/stats/team_stats.dart';
 import 'package:splash/screens/team/team_cache.dart';
 import 'package:splash/screens/team/team_history.dart';
-import 'package:splash/screens/team/team_stats.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../utilities/scroll/scroll_controller_notifier.dart';

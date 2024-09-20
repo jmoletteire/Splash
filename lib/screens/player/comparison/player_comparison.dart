@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/player/player_cache.dart';
@@ -38,6 +39,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
 
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+  late double widthRatio;
+  late double heightRatio;
   double _opacity = 0.0;
 
   double roundToDecimalPlaces(num value, int decimalPlaces) {
@@ -86,6 +89,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
   @override
   void initState() {
     super.initState();
+
     playerOne = widget.player;
     playerTwo = {};
 
@@ -129,6 +133,15 @@ class _PlayerComparisonState extends State<PlayerComparison> {
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController()..addListener(_scrollListener);
     _notifier.addController('player_compare', _scrollController);
+    // Retrieve the updated dimensions from MediaQuery
+    final size = MediaQuery.of(context).size;
+    widthRatio = size.width / kStandardWidth;
+    heightRatio = size.height / kStandardHeight;
+
+    // Use the widthRatio and heightRatio in your UI build methods
+    setState(() {
+      // Set new dimensions or layout adjustments if necessary
+    });
   }
 
   @override
@@ -171,7 +184,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
         backgroundColor: Colors.grey.shade900,
         surfaceTintColor: Colors.grey.shade900,
         title: const Text('Comparison'),
-        titleTextStyle: kBebasBold.copyWith(fontSize: 24.0),
+        titleTextStyle: kBebasBold.copyWith(fontSize: 20.0.r),
         actions: [
           CustomIconButton(
             icon: Icons.search,
@@ -241,16 +254,16 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                   child: Column(
                                     children: [
                                       PlayerAvatar(
-                                        radius: MediaQuery.of(context).size.width * 0.06,
+                                        radius: 25.r,
                                         backgroundColor: Colors.white70,
                                         playerImageUrl:
                                             'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerOne['PERSON_ID']}.png',
                                       ),
-                                      const SizedBox(height: 5.0),
+                                      SizedBox(height: 5.0.r),
                                       AutoSizeText(
                                         playerOne['DISPLAY_FIRST_LAST'],
                                         style: kBebasOffWhite.copyWith(
-                                            color: Colors.white, fontSize: 18.0),
+                                            color: Colors.white, fontSize: 16.0.r),
                                         maxLines: 1,
                                       ),
                                       Row(
@@ -259,16 +272,16 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                           Text(
                                             '${playerOne['TEAM_CITY']} ${playerOne['TEAM_NAME']}',
                                             style: kBebasOffWhite.copyWith(
-                                                color: Colors.grey, fontSize: 14.0),
+                                                color: Colors.grey, fontSize: 12.0.r),
                                           ),
-                                          const SizedBox(width: 5.0),
+                                          SizedBox(width: 5.0.r),
                                           ConstrainedBox(
-                                            constraints: const BoxConstraints(maxWidth: 20.0),
+                                            constraints: BoxConstraints(maxWidth: 20.0.r),
                                             child: Image.asset(
                                               'images/NBA_Logos/${playerOne['TEAM_ID']}.png',
                                               fit: BoxFit.contain,
                                               alignment: Alignment.center,
-                                              width: 16.0,
+                                              width: 16.0.r,
                                             ),
                                           ),
                                         ],
@@ -276,13 +289,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                     ],
                                   ),
                                 ),
-                                const Positioned(
+                                Positioned(
                                   top: 5,
                                   right: 10,
                                   child: Icon(
                                     Icons.compare_arrows, // Replace with the desired icon
                                     color: Colors.white70,
-                                    size: 24.0,
+                                    size: 24.0.r,
                                   ),
                                 ),
                               ],
@@ -334,7 +347,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 children: [
                                   if (playerTwo.isNotEmpty)
                                     PlayerAvatar(
-                                      radius: MediaQuery.of(context).size.width * 0.06,
+                                      radius: 25.r,
                                       backgroundColor: Colors.white70,
                                       playerImageUrl:
                                           'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png',
@@ -342,16 +355,15 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                   if (playerTwo.isEmpty)
                                     SvgPicture.asset(
                                       'images/NBA_Logos/0.svg',
-                                      width: MediaQuery.of(context).size.width * 0.12,
-                                      height: MediaQuery.of(context).size.width * 0.12,
+                                      height: 50.r,
                                     ),
-                                  const SizedBox(height: 5.0),
+                                  SizedBox(height: 5.0.r),
                                   AutoSizeText(
                                     playerTwo.isNotEmpty
                                         ? playerTwo['DISPLAY_FIRST_LAST']
                                         : 'Select Player',
                                     style: kBebasOffWhite.copyWith(
-                                        color: Colors.white, fontSize: 18.0),
+                                        color: Colors.white, fontSize: 16.0.r),
                                     maxLines: 1,
                                   ),
                                   Row(
@@ -362,17 +374,17 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                             ? '${playerTwo['TEAM_CITY']} ${playerTwo['TEAM_NAME']}'
                                             : '',
                                         style: kBebasOffWhite.copyWith(
-                                            color: Colors.grey, fontSize: 14.0),
+                                            color: Colors.grey, fontSize: 12.0.r),
                                       ),
-                                      if (playerTwo.isNotEmpty) const SizedBox(width: 5.0),
+                                      if (playerTwo.isNotEmpty) SizedBox(width: 5.0.r),
                                       if (playerTwo.isNotEmpty)
                                         ConstrainedBox(
-                                          constraints: const BoxConstraints(maxWidth: 20.0),
+                                          constraints: BoxConstraints(maxWidth: 20.0.r),
                                           child: Image.asset(
                                             'images/NBA_Logos/${playerTwo['TEAM_ID']}.png',
                                             fit: BoxFit.contain,
                                             alignment: Alignment.center,
-                                            width: 16.0,
+                                            width: 16.0.r,
                                           ),
                                         ),
                                     ],
@@ -380,13 +392,13 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 ],
                               ),
                             ),
-                            const Positioned(
+                            Positioned(
                               top: 5,
                               right: 10,
                               child: Icon(
                                 Icons.compare_arrows, // Replace with the desired icon
                                 color: Colors.white70,
-                                size: 24.0,
+                                size: 24.0.r,
                               ),
                             ),
                           ]),
@@ -419,16 +431,16 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 children: [
                                   Text(
                                     value,
-                                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
                                   ),
-                                  const SizedBox(width: 10.0),
+                                  SizedBox(width: 8.0.r),
                                   ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 20.0),
+                                    constraints: BoxConstraints(maxWidth: 20.0.r),
                                     child: Image.asset(
                                       'images/NBA_Logos/${playerOne['STATS'][value]['REGULAR SEASON']['BASIC']['TEAM_ID']}.png',
                                       fit: BoxFit.contain,
                                       alignment: Alignment.center,
-                                      width: 20.0,
+                                      width: 20.0.r,
                                     ),
                                   ),
                                 ],
@@ -468,17 +480,20 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 children: [
                                   Text(
                                     value,
-                                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                                    style: kBebasNormal.copyWith(
+                                      fontSize: 16.0.r,
+                                      color: playerTwo.isNotEmpty ? Colors.white : Colors.grey,
+                                    ),
                                   ),
-                                  if (playerTwo.isNotEmpty) const SizedBox(width: 10.0),
+                                  if (playerTwo.isNotEmpty) SizedBox(width: 8.0.r),
                                   if (playerTwo.isNotEmpty)
                                     ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 20.0),
+                                      constraints: BoxConstraints(maxWidth: 20.0.r),
                                       child: Image.asset(
                                         'images/NBA_Logos/${playerTwo['STATS'][value]['REGULAR SEASON']['BASIC']['TEAM_ID']}.png',
                                         fit: BoxFit.contain,
                                         alignment: Alignment.center,
-                                        width: 20.0,
+                                        width: 20.0.r,
                                       ),
                                     ),
                                 ],
@@ -527,23 +542,26 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 children: [
                                   Text(
                                     value,
-                                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
                                   ),
-                                  const SizedBox(width: 10.0),
+                                  SizedBox(width: 8.0.r),
                                   ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 10.0),
+                                    constraints:
+                                        BoxConstraints(maxWidth: 10.0.r, maxHeight: 20.0.r),
                                     child: value == 'REGULAR SEASON'
                                         ? Image.asset(
                                             'images/NBA_Logos/0.png',
                                             fit: BoxFit.contain,
                                             alignment: Alignment.center,
-                                            width: 10.0,
+                                            width: 10.0.r,
+                                            height: 20.0.r,
                                           )
                                         : SvgPicture.asset(
                                             'images/playoffs.svg',
                                             fit: BoxFit.contain,
                                             alignment: Alignment.center,
-                                            width: 10.0,
+                                            width: 10.0.r,
+                                            height: 20.0.r,
                                           ),
                                   ),
                                 ],
@@ -580,24 +598,30 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                 children: [
                                   Text(
                                     value,
-                                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                                    style: kBebasNormal.copyWith(
+                                      fontSize: 16.0.r,
+                                      color: playerTwo.isNotEmpty ? Colors.white : Colors.grey,
+                                    ),
                                   ),
-                                  if (playerTwo.isNotEmpty) const SizedBox(width: 10.0),
+                                  if (playerTwo.isNotEmpty) SizedBox(width: 8.0.r),
                                   if (playerTwo.isNotEmpty)
                                     ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 20.0),
+                                      constraints:
+                                          BoxConstraints(maxWidth: 10.0.r, maxHeight: 20.0.r),
                                       child: value == 'REGULAR SEASON'
                                           ? Image.asset(
                                               'images/NBA_Logos/0.png',
                                               fit: BoxFit.contain,
                                               alignment: Alignment.center,
-                                              width: 10.0,
+                                              width: 10.0.r,
+                                              height: 20.0.r,
                                             )
                                           : SvgPicture.asset(
                                               'images/playoffs.svg',
                                               fit: BoxFit.contain,
                                               alignment: Alignment.center,
-                                              width: 10.0,
+                                              width: 10.0.r,
+                                              height: 20.0.r,
                                             ),
                                     ),
                                 ],
@@ -711,7 +735,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Top Stats', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Top Stats', style: kBebasBold.copyWith(fontSize: 18.0.r))
                               ],
                             ),
 
@@ -1025,7 +1049,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Shooting', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Shooting', style: kBebasBold.copyWith(fontSize: 18.0.r))
                               ],
                             ),
 
@@ -1207,7 +1231,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Rebounding', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Rebounding',
+                                    style: kBebasBold.copyWith(fontSize: 18.0.r))
                               ],
                             ),
 
@@ -1425,7 +1450,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Playmaking', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Playmaking',
+                                    style: kBebasBold.copyWith(fontSize: 18.0.r))
                               ],
                             ),
 
@@ -1567,7 +1593,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Defense', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Defense', style: kBebasBold.copyWith(fontSize: 18.0.r))
                               ],
                             ),
 
@@ -1739,7 +1765,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Hustle', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Hustle', style: kBebasBold.copyWith(fontSize: 18.0.r))
                               ],
                             ),
 
@@ -1859,7 +1885,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   color: Colors.grey.shade900,
-                  height: 65.0,
+                  height: 65.0.r,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -1882,25 +1908,25 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                             Row(
                               children: [
                                 PlayerAvatar(
-                                  radius: MediaQuery.of(context).size.width * 0.055,
+                                  radius: 25.0.r,
                                   backgroundColor: Colors.white70,
                                   playerImageUrl:
                                       'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerOne['PERSON_ID']}.png',
                                 ),
-                                const SizedBox(width: 10.0),
+                                SizedBox(width: 10.0.r),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     AutoSizeText(
                                       playerOne['FIRST_NAME'],
                                       textAlign: TextAlign.start,
-                                      style: kBebasOffWhite.copyWith(fontSize: 15.0),
+                                      style: kBebasOffWhite.copyWith(fontSize: 13.0.r),
                                       maxLines: 1,
                                     ),
                                     AutoSizeText(
                                       playerOne['LAST_NAME'],
                                       textAlign: TextAlign.start,
-                                      style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                      style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                                       maxLines: 1,
                                     ),
                                     Row(
@@ -1908,18 +1934,18 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                         AutoSizeText(
                                           playerOne['POSITION'],
                                           style: kBebasNormal.copyWith(
-                                              color: Colors.grey.shade400, fontSize: 12.0),
+                                              color: Colors.grey.shade400, fontSize: 12.0.r),
                                           maxLines: 1,
                                         ),
-                                        const SizedBox(width: 5.0),
+                                        SizedBox(width: 5.0.r),
                                         ConstrainedBox(
-                                          constraints: const BoxConstraints(
-                                              maxWidth: 18.0, maxHeight: 18.0),
+                                          constraints: BoxConstraints(
+                                              maxWidth: 18.0.r, maxHeight: 18.0.r),
                                           child: Image.asset(
                                             'images/NBA_Logos/${playerOne['TEAM_ID']}.png',
                                             fit: BoxFit.contain,
                                             alignment: Alignment.center,
-                                            width: 18.0,
+                                            width: 18.0.r,
                                           ),
                                         ),
                                       ],
@@ -1957,12 +1983,12 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                       children: [
                                         AutoSizeText(
                                           playerTwo['FIRST_NAME'],
-                                          style: kBebasOffWhite.copyWith(fontSize: 15.0),
+                                          style: kBebasOffWhite.copyWith(fontSize: 13.0.r),
                                           maxLines: 1,
                                         ),
                                         AutoSizeText(
                                           playerTwo['LAST_NAME'],
-                                          style: kBebasNormal.copyWith(fontSize: 18.0),
+                                          style: kBebasNormal.copyWith(fontSize: 16.0.r),
                                           maxLines: 1,
                                         ),
                                         Row(
@@ -1970,27 +1996,28 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                             AutoSizeText(
                                               playerTwo['POSITION'],
                                               style: kBebasNormal.copyWith(
-                                                  color: Colors.grey.shade400, fontSize: 12.0),
+                                                  color: Colors.grey.shade400,
+                                                  fontSize: 12.0.r),
                                               maxLines: 1,
                                             ),
-                                            const SizedBox(width: 5.0),
+                                            SizedBox(width: 5.0.r),
                                             ConstrainedBox(
-                                              constraints: const BoxConstraints(
-                                                  maxWidth: 18.0, maxHeight: 18.0),
+                                              constraints: BoxConstraints(
+                                                  maxWidth: 18.0.r, maxHeight: 18.0.r),
                                               child: Image.asset(
                                                 'images/NBA_Logos/${playerTwo['TEAM_ID']}.png',
                                                 fit: BoxFit.contain,
                                                 alignment: Alignment.center,
-                                                width: 18.0,
+                                                width: 18.0.r,
                                               ),
                                             ),
                                           ],
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(width: 10.0),
+                                    SizedBox(width: 10.0.r),
                                     PlayerAvatar(
-                                      radius: MediaQuery.of(context).size.width * 0.055,
+                                      radius: 25.0.r,
                                       backgroundColor: Colors.white70,
                                       playerImageUrl:
                                           'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png',
@@ -2034,7 +2061,7 @@ class NonComparisonRow extends StatelessWidget {
           child: AutoSizeText(
             playerOne,
             textAlign: TextAlign.start,
-            style: kBebasNormal.copyWith(fontSize: 18.0),
+            style: kBebasNormal.copyWith(fontSize: 16.0.r),
           ),
         ),
         Expanded(
@@ -2042,7 +2069,7 @@ class NonComparisonRow extends StatelessWidget {
           child: Text(
             statName,
             textAlign: TextAlign.center,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
         ),
         Expanded(
@@ -2050,7 +2077,7 @@ class NonComparisonRow extends StatelessWidget {
           child: AutoSizeText(
             playerTwo,
             textAlign: TextAlign.end,
-            style: kBebasNormal.copyWith(fontSize: 18.0),
+            style: kBebasNormal.copyWith(fontSize: 16.0.r),
           ),
         ),
       ],
@@ -2113,7 +2140,7 @@ class ComparisonRow extends StatelessWidget {
           child: Text(
             statName,
             textAlign: TextAlign.center,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
         ),
         Expanded(
@@ -2172,8 +2199,8 @@ class StatValue extends StatelessWidget {
       child: Text(
         isPercentage ? '$value%' : '$value',
         style: isHighlighted && lightColors.containsKey(color)
-            ? kBebasNormal.copyWith(color: lightColors[color])
-            : kBebasNormal,
+            ? kBebasNormal.copyWith(fontSize: 16.0.r, color: lightColors[color])
+            : kBebasNormal.copyWith(fontSize: 16.0.r),
       ),
     );
   }

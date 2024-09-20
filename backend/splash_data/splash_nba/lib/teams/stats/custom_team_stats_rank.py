@@ -1,138 +1,140 @@
 from pymongo import MongoClient
-from splash_nba.util.env import uri
+from splash_nba.util.env import uri, k_current_season_type
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 
-# Replace with your MongoDB connection string
-client = MongoClient(uri)
-db = client.splash
-teams_collection = db.nba_teams
-logging.info("Connected to MongoDB")
+def custom_team_stats_rank():
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
 
-# Stats to rank
-custom_stats = [
-    # BASIC
-    # ("FGM_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("FGA_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("FTM_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("FTA_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("FG3M_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("FG3A_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("STL_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("BLK_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("REB_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("OREB_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("DREB_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("TOV_PER_100", "PLAYOFFS.BASIC", 1),
-    # ("PF_PER_100", "PLAYOFFS.BASIC", 1),
-    # ("PFD_PER_100", "PLAYOFFS.BASIC", -1),
-    # ("PTS_PER_100", "PLAYOFFS.BASIC", -1),
-    ("FT_PER_FGA", "PLAYOFFS.BASIC", -1),
+    # Replace with your MongoDB connection string
+    client = MongoClient(uri)
+    db = client.splash
+    teams_collection = db.nba_teams
 
-    # HUSTLE
-    # ("CONTESTED_SHOTS_PER_100", "PLAYOFFS.HUSTLE", -1),
-    # ("SCREEN_ASSISTS_PER_100", "PLAYOFFS.HUSTLE", -1),
-    # ("SCREEN_AST_PTS_PER_100", "PLAYOFFS.HUSTLE", -1),
-    # ("BOX_OUTS_PER_100", "PLAYOFFS.HUSTLE", -1),
-    # ("OFF_BOXOUTS_PER_100", "PLAYOFFS.HUSTLE", -1),
-    # ("DEF_BOXOUTS_PER_100", "PLAYOFFS.HUSTLE", -1),
-    # ("DEFLECTIONS_PER_100", "PLAYOFFS.HUSTLE", -1),
-    # ("LOOSE_BALLS_RECOVERED_PER_100", "PLAYOFFS.HUSTLE", -1),
-    # ("CHARGES_DRAWN_PER_100", "PLAYOFFS.HUSTLE", -1),
+    # Stats to rank
+    custom_stats = [
+        # BASIC
+        ("FGM_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("FGA_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("FTM_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("FTA_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("FG3M_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("FG3A_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("STL_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("BLK_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("REB_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("OREB_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("DREB_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("TOV_PER_100", f"{k_current_season_type}.BASIC", 1),
+        ("PF_PER_100", f"{k_current_season_type}.BASIC", 1),
+        ("PFD_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("PTS_PER_100", f"{k_current_season_type}.BASIC", -1),
+        ("FT_PER_FGA", f"{k_current_season_type}.BASIC", -1),
 
-    # ("CONTESTED_SHOTS", "PLAYOFFS.HUSTLE", -1),
-    # ("SCREEN_ASSISTS", "PLAYOFFS.HUSTLE", -1),
-    # ("SCREEN_AST_PTS", "PLAYOFFS.HUSTLE", -1),
-    # ("BOX_OUTS", "PLAYOFFS.HUSTLE", -1),
-    # ("OFF_BOXOUTS", "PLAYOFFS.HUSTLE", -1),
-    # ("DEF_BOXOUTS", "PLAYOFFS.HUSTLE", -1),
-    # ("DEFLECTIONS", "PLAYOFFS.HUSTLE", -1),
-    # ("LOOSE_BALLS_RECOVERED", "PLAYOFFS.HUSTLE", -1),
-    # ("CHARGES_DRAWN", "PLAYOFFS.HUSTLE", -1),
-]
+        # HUSTLE
+        ("CONTESTED_SHOTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        ("SCREEN_ASSISTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        ("SCREEN_AST_PTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        ("BOX_OUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        ("OFF_BOXOUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        ("DEF_BOXOUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        ("DEFLECTIONS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        ("LOOSE_BALLS_RECOVERED_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        ("CHARGES_DRAWN_PER_100", f"{k_current_season_type}.HUSTLE", -1),
 
-# List of seasons
-seasons = [
-    '2023-24',
-    '2022-23',
-    '2021-22',
-    '2020-21',
-    '2019-20',
-    '2018-19',
-    '2017-18',
-    '2016-17',
-    '2015-16',
-    '2014-15',
-    '2013-14',
-    '2012-13',
-    '2011-12',
-    '2010-11',
-    '2009-10',
-    '2008-09',
-    '2007-08',
-    '2006-07',
-    '2005-06',
-    '2004-05',
-    '2003-04',
-    '2002-03',
-    '2001-02',
-    '2000-01',
-    '1999-00',
-    '1998-99',
-    '1997-98',
-    '1996-97'
-]
+        ("CONTESTED_SHOTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("SCREEN_ASSISTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("SCREEN_AST_PTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("BOX_OUTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("OFF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("DEF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("DEFLECTIONS", f"{k_current_season_type}.HUSTLE", -1),
+        ("LOOSE_BALLS_RECOVERED", f"{k_current_season_type}.HUSTLE", -1),
+        ("CHARGES_DRAWN", f"{k_current_season_type}.HUSTLE", -1),
+    ]
 
-# Initialize the pipeline list
-pipeline = []
+    # List of seasons
+    seasons = [
+        '2024-25'
+        # '2023-24',
+        # '2022-23',
+        # '2021-22',
+        # '2020-21',
+        # '2019-20',
+        # '2018-19',
+        # '2017-18',
+        # '2016-17',
+        # '2015-16',
+        # '2014-15',
+        # '2013-14',
+        # '2012-13',
+        # '2011-12',
+        # '2010-11',
+        # '2009-10',
+        # '2008-09',
+        # '2007-08',
+        # '2006-07',
+        # '2005-06',
+        # '2004-05',
+        # '2003-04',
+        # '2002-03',
+        # '2001-02',
+        # '2000-01',
+        # '1999-00',
+        # '1998-99',
+        # '1997-98',
+        # '1996-97'
+    ]
 
-# Loop over each season to build the pipeline
-for season in seasons:
-    logging.info(f"Season: {season}")
-    for stat in custom_stats:
-        logging.info(f"\nCalculating {stat[0]} rank...")
+    # Initialize the pipeline list
+    pipeline = []
 
-        loc = stat[1].split('.')
+    # Loop over each season to build the pipeline
+    for season in seasons:
+        logging.info(f"Season: {season}")
+        for stat in custom_stats:
+            logging.info(f"\nCalculating {stat[0]} rank...")
 
-        if loc[-1] == 'HUSTLE' and season < '2016-17':
-            continue
+            loc = stat[1].split('.')
 
-        pipeline = [
-            {
-                "$setWindowFields": {
-                    "sortBy": {
-                        f"seasons.{season}.STATS.{stat[1]}.{stat[0]}": stat[2]
-                    },
-                    "output": {
-                        f"seasons.{season}.STATS.{stat[1]}.{stat[0]}_RANK": {
-                            "$documentNumber": {}
+            if loc[-1] == 'HUSTLE' and season < '2016-17':
+                continue
+
+            pipeline = [
+                {
+                    "$setWindowFields": {
+                        "sortBy": {
+                            f"seasons.{season}.STATS.{stat[1]}.{stat[0]}": stat[2]
+                        },
+                        "output": {
+                            f"seasons.{season}.STATS.{stat[1]}.{stat[0]}_RANK": {
+                                "$documentNumber": {}
+                            }
                         }
                     }
                 }
-            }
-        ]
+            ]
 
-        # Execute the pipeline and get the results
-        results = list(teams_collection.aggregate(pipeline))
+            # Execute the pipeline and get the results
+            results = list(teams_collection.aggregate(pipeline))
 
-        logging.info(f"Adding {stat[0]}_RANK to database.")
+            logging.info(f"Adding {stat[0]}_RANK to database.")
 
-        # Update each document with the new rank field
-        for result in results:
-            if len(loc) == 2:
-                res = result['seasons'][season]['STATS'][loc[0]][loc[1]][f'{stat[0]}_RANK']
-            elif len(loc) == 3:
-                res = result['seasons'][season]['STATS'][loc[0]][loc[1]][loc[2]][f'{stat[0]}_RANK']
-            else:
-                res = result['seasons'][season]['STATS'][stat[1]][f'{stat[0]}_RANK']
+            # Update each document with the new rank field
+            for result in results:
+                if len(loc) == 2:
+                    res = result['seasons'][season]['STATS'][loc[0]][loc[1]][f'{stat[0]}_RANK']
+                elif len(loc) == 3:
+                    res = result['seasons'][season]['STATS'][loc[0]][loc[1]][loc[2]][f'{stat[0]}_RANK']
+                else:
+                    res = result['seasons'][season]['STATS'][stat[1]][f'{stat[0]}_RANK']
 
-            try:
-                teams_collection.update_one(
-                    {"_id": result["_id"]},
-                    {"$set": {f"seasons.{season}.STATS.{stat[1]}.{stat[0]}_RANK": res}}
-                )
-            except Exception as e:
-                logging.error(e)
-                continue
+                try:
+                    teams_collection.update_one(
+                        {"_id": result["_id"]},
+                        {"$set": {f"seasons.{season}.STATS.{stat[1]}.{stat[0]}_RANK": res}}
+                    )
+                except Exception as e:
+                    logging.error(e)
+                    continue

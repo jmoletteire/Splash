@@ -45,13 +45,13 @@ def fetch_roster(team_id):
         if caller_function == '<module>':
             main_teams_collection.update_one(
                 {"TEAM_ID": team_id},
-                {"$set": {f"seasons.{k_current_season}.ROSTER": team_roster_dict, f"seasons.{k_current_season}.coaches": coaches}},
+                {"$set": {f"seasons.{k_current_season}.ROSTER": team_roster_dict, f"seasons.{k_current_season}.COACHES": coaches}},
                 upsert=True
             )
         else:
             teams_collection.update_one(
                 {"TEAM_ID": team_id},
-                {"$set": {f"seasons.{k_current_season}.ROSTER": team_roster_dict, f"seasons.{k_current_season}.coaches": coaches}},
+                {"$set": {f"seasons.{k_current_season}.ROSTER": team_roster_dict, f"seasons.{k_current_season}.COACHES": coaches}},
                 upsert=True
             )
         logging.info(f"Updated roster for team {team_id}")

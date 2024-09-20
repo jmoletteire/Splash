@@ -126,7 +126,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
     } else if (widget.selections[row]['ALL_STAR'] == 1) {
       return Colors.blueGrey.withOpacity(0.5);
     } else {
-      return Colors.grey.shade900;
+      return Colors.grey.shade900.withOpacity(0.8);
     }
   }
 
@@ -197,6 +197,25 @@ class _DraftSelectionsState extends State<DraftSelections> {
         ? widget.selections[row]['TEAM_ID'].toString()
         : '0';
 
+    /*
+    String fullName = widget.selections[row]['PLAYER_NAME'];
+
+    // Split the name by spaces
+    List<String> nameParts = fullName.split(' ');
+
+    // Assign first and last name
+    String firstName = nameParts.isNotEmpty ? nameParts.first : '';
+    String lastName = nameParts.length > 1 ? nameParts.last : '';
+
+    String lastSub = '';
+    if (lastName.length > 5) {
+      lastSub = lastName.substring(0, 5).toLowerCase();
+    } else {
+      lastSub = lastName.toLowerCase();
+    }
+
+     */
+
     switch (column) {
       case 0:
         return Center(
@@ -228,6 +247,7 @@ class _DraftSelectionsState extends State<DraftSelections> {
                 backgroundColor: Colors.white70,
                 playerImageUrl:
                     'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.selections[row]['PERSON_ID']}.png',
+                //'https://www.basketball-reference.com/req/202106291/images/headshots/$lastSub${firstName.substring(0, 2).toLowerCase()}01.jpg'
               ),
               const SizedBox(width: 8.0),
               Expanded(

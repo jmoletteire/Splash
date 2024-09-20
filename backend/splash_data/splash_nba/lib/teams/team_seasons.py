@@ -5,7 +5,7 @@ from pymongo import MongoClient
 
 from splash_nba.lib.teams.stats.team_hustle_stats_rank import rank_hustle_stats_current_season
 from splash_nba.lib.teams.stats.team_stats import fetch_team_stats
-from splash_nba.util.env import uri, k_current_season
+from splash_nba.util.env import uri, k_current_season, k_current_season_type
 import logging
 
 
@@ -44,19 +44,51 @@ def update_current_season(team_id):
             if season_dict['YEAR'] == k_current_season
         }
 
-        # Fetch team stats for this team in given season
-        season_stats_dict[k_current_season]['STATS'] = fetch_team_stats(team_id=team_id, season=k_current_season)
+        try:
+            # Fetch team stats for this team in given season
+            season_stats_dict[k_current_season]['STATS'][k_current_season_type] = fetch_team_stats(team_id=team_id, season=k_current_season, season_type='Regular Season' if k_current_season_type == 'REGULAR SEASON' else 'PLAYOFFS')
 
-        logging.info(f"Updated {k_current_season} stats for {team_id}")
+            logging.info(f"Updated {k_current_season} stats for {team_id}")
 
-        # Update SEASONS for this team
-        teams_collection.update_one(
-            {"TEAM_ID": team_id},
-            {"$set": {f"seasons.{k_current_season}": season_stats_dict[k_current_season]}},
-            upsert=True
-        )
+            # Update SEASONS for this team
+            teams_collection.update_one(
+                {"TEAM_ID": team_id},
+                {"$set": {
+                    f"seasons.{k_current_season}.TEAM_ID": season_stats_dict[k_current_season]['TEAM_ID'],
+                    f"seasons.{k_current_season}.YEAR": season_stats_dict[k_current_season]['YEAR'],
+                    f"seasons.{k_current_season}.GP": season_stats_dict[k_current_season]['GP'],
+                    f"seasons.{k_current_season}.WINS": season_stats_dict[k_current_season]['WINS'],
+                    f"seasons.{k_current_season}.LOSSES": season_stats_dict[k_current_season]['LOSSES'],
+                    f"seasons.{k_current_season}.WIN_PCT": season_stats_dict[k_current_season]['WIN_PCT'],
+                    f"seasons.{k_current_season}.CONF_RANK": season_stats_dict[k_current_season]['CONF_RANK'],
+                    f"seasons.{k_current_season}.DIV_RANK": season_stats_dict[k_current_season]['DIV_RANK'],
+                    f"seasons.{k_current_season}.PO_WINS": season_stats_dict[k_current_season]['PO_WINS'],
+                    f"seasons.{k_current_season}.PO_LOSSES": season_stats_dict[k_current_season]['PO_LOSSES'],
+                    f"seasons.{k_current_season}.STATS.{k_current_season_type}": season_stats_dict[k_current_season]['STATS'][k_current_season_type]
+                }},
+                upsert=True
+            )
+        except Exception as e:
+            logging.error(f"{k_current_season} season stats unavailable for {team_id}: {e}")
+            teams_collection.update_one(
+                {"TEAM_ID": team_id},
+                {"$set": {
+                    f"seasons.{k_current_season}.TEAM_ID": team_id,
+                    f"seasons.{k_current_season}.YEAR": k_current_season,
+                    f"seasons.{k_current_season}.GP": 0,
+                    f"seasons.{k_current_season}.WINS": 0,
+                    f"seasons.{k_current_season}.LOSSES": 0,
+                    f"seasons.{k_current_season}.WIN_PCT": 0.000,
+                    f"seasons.{k_current_season}.CONF_RANK": 0,
+                    f"seasons.{k_current_season}.DIV_RANK": 0,
+                    f"seasons.{k_current_season}.PO_WINS": 0,
+                    f"seasons.{k_current_season}.PO_LOSSES": 0,
+                    f"seasons.{k_current_season}.STATS.{k_current_season_type}": {'BASIC': {}, 'ADV': {}, 'HUSTLE': {}}
+                }},
+                upsert=True
+            )
 
-        logging.info(f"Updated current season for team {team_id}\n")
+        logging.info(f"Updated current season for team {team_id}")
     except Exception as e:
         logging.error(f"Failed to update current season for team {team_id}: {e}")
 
@@ -75,7 +107,7 @@ def fetch_all_seasons(team_id):
         # Stats only available since 1996-97
         if season >= '1996-97':
             # Fetch team stats for this team in given season
-            season_stats_dict[season]['STATS'] = fetch_team_stats(team_id=team_id, season=season)
+            season_stats_dict[season]['STATS'] = fetch_team_stats(team_id=team_id, season=season, season_type='Regular Season')
             time.sleep(5)
 
         logging.info(f"Processed {season} for {team_id}")

@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
@@ -119,9 +120,9 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                         ),
                       ),
                       child: DropdownButton<String>(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 5.0.r),
                         borderRadius: BorderRadius.circular(10.0),
-                        menuMaxHeight: 300.0,
+                        menuMaxHeight: 300.0.r,
                         dropdownColor: Colors.grey.shade900,
                         isExpanded: true,
                         underline: Container(),
@@ -131,7 +132,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                             value: value,
                             child: Text(
                               value,
-                              style: kBebasOffWhite,
+                              style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                             ),
                           );
                         }).toList(),
@@ -153,7 +154,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                          padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 0.0, 6.0.r),
                           decoration: const BoxDecoration(
                             color: Color(0xFF303030),
                             border: Border(
@@ -174,16 +175,16 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Player',
-                                          style: kBebasOffWhite,
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                         ),
                                         if (sortedBy == 'Name')
                                           Icon(
                                             sortOrder == 'ASC'
                                                 ? Icons.arrow_drop_down
                                                 : Icons.arrow_drop_up,
-                                            size: 16.0,
+                                            size: 14.0.r,
                                             color: Colors.white,
                                           ),
                                       ],
@@ -199,24 +200,24 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                 ),
                               ),
                               Expanded(
-                                flex: 1,
+                                flex: 2,
                                 child: GestureDetector(
                                   child: Container(
                                     color: Colors.transparent,
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        const Text(
+                                        Text(
                                           '#',
                                           textAlign: TextAlign.end,
-                                          style: kBebasOffWhite,
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                         ),
                                         if (sortedBy == 'Number')
                                           Icon(
                                             sortOrder == 'ASC'
                                                 ? Icons.arrow_drop_down
                                                 : Icons.arrow_drop_up,
-                                            size: 16.0,
+                                            size: 14.0.r,
                                             color: Colors.white,
                                           ),
                                       ],
@@ -239,17 +240,17 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Pos',
                                           textAlign: TextAlign.start,
-                                          style: kBebasOffWhite,
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                         ),
                                         if (sortedBy == 'Position')
                                           Icon(
                                             sortOrder == 'ASC'
                                                 ? Icons.arrow_drop_down
                                                 : Icons.arrow_drop_up,
-                                            size: 16.0,
+                                            size: 14.0.r,
                                             color: Colors.white,
                                           ),
                                       ],
@@ -285,8 +286,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                             );
                           },
                           child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                            padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
                             height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
                                 color: Colors.grey.shade900,
@@ -300,18 +300,18 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                   child: Row(
                                     children: [
                                       PlayerAvatar(
-                                        radius: 16.0,
+                                        radius: 14.0.r,
                                         backgroundColor: Colors.white12,
                                         playerImageUrl:
                                             'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[index]}.png',
                                       ),
-                                      const SizedBox(
-                                        width: 15.0,
+                                      SizedBox(
+                                        width: 15.0.r,
                                       ),
                                       Text(
                                         widget.team['seasons'][selectedSeason]['ROSTER']
                                             [players[index]]['PLAYER'],
-                                        style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                        style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                                       ),
                                     ],
                                   ),
@@ -325,16 +325,19 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                         ? '${widget.team['seasons'][selectedSeason]['ROSTER'][players[index]]['NUM']}'
                                         : '',
                                     textAlign: TextAlign.center,
-                                    style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                    style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                                   ),
                                 ),
                                 Expanded(
                                   flex: 1,
                                   child: Text(
                                     widget.team['seasons'][selectedSeason]['ROSTER']
-                                        [players[index]]['POSITION'],
+                                                [players[index]]['POSITION'] !=
+                                            null
+                                        ? '${widget.team['seasons'][selectedSeason]['ROSTER'][players[index]]['POSITION']}'
+                                        : '',
                                     textAlign: TextAlign.center,
-                                    style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                    style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                                   ),
                                 ),
                               ],
@@ -354,7 +357,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                          padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 0.0, 6.0.r),
                           decoration: const BoxDecoration(
                             color: Color(0xFF303030),
                             border: Border(
@@ -371,12 +374,12 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                 flex: 5,
                                 child: Container(
                                   color: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Coaches',
-                                        style: kBebasOffWhite,
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                       ),
                                     ],
                                   ),
@@ -392,7 +395,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                          padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
                           height: MediaQuery.of(context).size.height * 0.05,
                           decoration: BoxDecoration(
                               color: Colors.grey.shade900,
@@ -406,17 +409,17 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                 child: Row(
                                   children: [
                                     PlayerAvatar(
-                                      radius: 16.0,
+                                      radius: 14.0.r,
                                       backgroundColor: Colors.white12,
                                       playerImageUrl:
                                           'https://cdn.nba.com/headshots/nba/latest/1040x760/${coaches[index]['COACH_ID']}.png',
                                     ),
-                                    const SizedBox(
-                                      width: 15.0,
+                                    SizedBox(
+                                      width: 15.0.r,
                                     ),
                                     Text(
                                       coaches[index]['COACH_NAME'],
-                                      style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                      style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                                     ),
                                   ],
                                 ),
@@ -427,7 +430,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                   coaches[index]['COACH_TYPE'],
                                   textAlign: TextAlign.center,
                                   maxLines: 1,
-                                  style: kBebasOffWhite.copyWith(fontSize: 16.0),
+                                  style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                 ),
                               ),
                             ],

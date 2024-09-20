@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/default_animated_switcher_transition_builder.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
@@ -146,19 +147,17 @@ class _CareerStatsState extends State<CareerStats> {
           return Material(
             color: Colors.grey.shade800,
             child: Padding(
-              padding: column == 0
-                  ? const EdgeInsets.only(left: 20.0)
-                  : const EdgeInsets.only(right: 8.0),
+              padding: const EdgeInsets.only(right: 8.0),
               child: Align(
                 alignment: column == 0
-                    ? Alignment.centerLeft
+                    ? Alignment.center
                     : column == 1
                         ? Alignment.center
                         : Alignment.centerRight,
                 child: Text(
                   columnNames[column],
                   style: kBebasNormal.copyWith(
-                    fontSize: 16.0,
+                    fontSize: 14.0.r,
                   ),
                 ),
               ),
@@ -231,10 +230,9 @@ class _CareerStatsState extends State<CareerStats> {
         return Center(
           child: Text(
             '\'${season.substring(2)}',
-            textAlign: TextAlign.center,
             style: kBebasNormal.copyWith(
               color: Colors.white70,
-              fontSize: 17.0,
+              fontSize: 15.0.r,
             ),
           ),
         );
@@ -245,22 +243,22 @@ class _CareerStatsState extends State<CareerStats> {
               Expanded(
                 flex: 3,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 20.0),
+                  constraints: BoxConstraints(maxWidth: 20.0.r),
                   child: Image.asset(
                     'images/NBA_Logos/${widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ID']}.png',
                     fit: BoxFit.contain,
                     alignment: Alignment.center,
-                    width: 20.0,
+                    width: 20.0.r,
                   ),
                 ),
               ),
-              const SizedBox(width: 8.0),
+              SizedBox(width: 8.0.r),
               Expanded(
                 flex: 4,
                 child: Text(
                   widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'] ??
                       '-',
-                  style: kBebasBold.copyWith(fontSize: 17.0),
+                  style: kBebasBold.copyWith(fontSize: 15.0.r),
                 ),
               ),
             ],
@@ -452,7 +450,7 @@ class StandingsDataText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasNormal.copyWith(fontSize: 18.0, color: color),
+        style: kBebasNormal.copyWith(fontSize: 16.0.r, color: color),
       ),
     );
   }

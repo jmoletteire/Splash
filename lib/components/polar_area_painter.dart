@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
 class PolarAreaChartPainter extends CustomPainter {
@@ -23,8 +24,7 @@ class PolarAreaChartPainter extends CustomPainter {
     final double centerX = size.width / 2;
     final double centerY = size.height / 2;
     final double maxRadius = min(centerX, centerY);
-    final double maxChartRadius =
-        (maxPossibleValue / maxPossibleValue) * maxRadius;
+    final double maxChartRadius = (maxPossibleValue / maxPossibleValue) * maxRadius;
 
     final Paint paint = Paint()..style = PaintingStyle.fill;
 
@@ -64,8 +64,7 @@ class PolarAreaChartPainter extends CustomPainter {
     }
 
     // Draw the outer circular border
-    canvas.drawCircle(
-        Offset(centerX, centerY), maxChartRadius, outerBorderPaint);
+    canvas.drawCircle(Offset(centerX, centerY), maxChartRadius, outerBorderPaint);
 
     // Draw the borders from center to circumference
     for (int i = 0; i < numberOfSegments; i++) {
@@ -110,7 +109,7 @@ class PolarAreaChartPainter extends CustomPainter {
       // Draw the label
       textPainter.text = TextSpan(
         text: labels[i],
-        style: kBebasBold.copyWith(fontSize: 17.0),
+        style: kBebasBold.copyWith(fontSize: 15.0.r),
       );
       textPainter.layout();
       textPainter.paint(
@@ -119,14 +118,14 @@ class PolarAreaChartPainter extends CustomPainter {
           labelOffset.dx - textPainter.width / 2,
           labelOffset.dy -
               textPainter.height / 2 -
-              10, // Adjust the vertical position for value
+              10.0.r, // Adjust the vertical position for value
         ),
       );
 
       // Draw the value below the label
       textPainter.text = TextSpan(
         text: '${(values[i] * 100).toStringAsFixed(0)}%',
-        style: kBebasBold.copyWith(fontSize: 16.0, color: Colors.grey),
+        style: kBebasBold.copyWith(fontSize: 14.0.r, color: Colors.grey),
       );
       textPainter.layout();
       textPainter.paint(
@@ -135,7 +134,7 @@ class PolarAreaChartPainter extends CustomPainter {
           labelOffset.dx - textPainter.width / 2,
           labelOffset.dy -
               textPainter.height / 2 +
-              10, // Adjust the vertical position for value
+              10.0.r, // Adjust the vertical position for value
         ),
       );
     }

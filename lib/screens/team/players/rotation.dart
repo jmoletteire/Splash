@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -71,8 +72,6 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         }
       }
 
-      print(benchCandidates.length);
-
       // If we haven't filled all 5 starter spots, take the next players from benchCandidates
       for (var candidate in benchCandidates) {
         if (startersEntries.length < 5) {
@@ -88,8 +87,6 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         int index = 5 - startersEntries.length - 1;
         startersEntries.add(benchCandidates[index]);
       }
-
-      print(startersEntries.length);
 
       // Sort the starters by Position and MPG
       startersEntries.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
@@ -197,9 +194,9 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                     ),
                   ),
                   child: DropdownButton<String>(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 5.0.r),
                     borderRadius: BorderRadius.circular(10.0),
-                    menuMaxHeight: 300.0,
+                    menuMaxHeight: 300.0.r,
                     dropdownColor: Colors.grey.shade900,
                     isExpanded: true,
                     underline: Container(),
@@ -209,7 +206,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                         value: value,
                         child: Text(
                           value,
-                          style: kBebasOffWhite,
+                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                         ),
                       );
                     }).toList(),
@@ -229,7 +226,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                          padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 0.0, 6.0.r),
                           decoration: const BoxDecoration(
                             color: Color(0xFF303030),
                             border: Border(
@@ -246,12 +243,12 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                 flex: 9,
                                 child: Container(
                                   color: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Starters',
-                                        style: kBebasOffWhite,
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                       ),
                                     ],
                                   ),
@@ -261,13 +258,13 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                 flex: 1,
                                 child: Container(
                                   color: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
                                         'MIN',
                                         textAlign: TextAlign.start,
-                                        style: kBebasOffWhite,
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                       ),
                                     ],
                                   ),
@@ -277,13 +274,13 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                 flex: 1,
                                 child: Container(
                                   color: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
                                         'GS',
                                         textAlign: TextAlign.start,
-                                        style: kBebasOffWhite,
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                       ),
                                     ],
                                   ),
@@ -298,7 +295,6 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
-                        print(starters);
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -311,8 +307,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                             );
                           },
                           child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                            padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
                             height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
                                 color: Colors.grey.shade900,
@@ -337,7 +332,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.fromLTRB(20.0, 6.0, 0.0, 6.0),
+                          padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 0.0, 6.0.r),
                           decoration: const BoxDecoration(
                             color: Color(0xFF303030),
                             border: Border(
@@ -354,12 +349,12 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                 flex: 9,
                                 child: Container(
                                   color: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Bench',
-                                        style: kBebasOffWhite,
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                       ),
                                     ],
                                   ),
@@ -369,13 +364,13 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                 flex: 1,
                                 child: Container(
                                   color: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
                                         'MIN',
                                         textAlign: TextAlign.start,
-                                        style: kBebasOffWhite,
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                       ),
                                     ],
                                   ),
@@ -385,13 +380,13 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                 flex: 1,
                                 child: Container(
                                   color: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
                                         'GS',
                                         textAlign: TextAlign.start,
-                                        style: kBebasOffWhite,
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                                       ),
                                     ],
                                   ),
@@ -418,8 +413,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                             );
                           },
                           child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                            padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
                             height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
                                 color: Colors.grey.shade900,
@@ -469,20 +463,20 @@ class RotationRow extends StatelessWidget {
           child: Row(
             children: [
               PlayerAvatar(
-                radius: 16.0,
+                radius: 14.0.r,
                 backgroundColor: Colors.white12,
                 playerImageUrl:
                     'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PLAYER_ID']}.png',
               ),
-              const SizedBox(
-                width: 15.0,
+              SizedBox(
+                width: 15.0.r,
               ),
               Flexible(
                 child: Text(
                   player['PLAYER'],
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: kBebasOffWhite.copyWith(fontSize: 16.0),
+                  style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                 ),
               ),
             ],
@@ -493,18 +487,18 @@ class RotationRow extends StatelessWidget {
         Expanded(
           flex: 1,
           child: Text(
-            player['POSITION'],
+            player['POSITION'] ?? '-',
             textAlign: TextAlign.right,
-            style: kBebasNormal.copyWith(fontSize: 17.0),
+            style: kBebasNormal.copyWith(fontSize: 15.0.r),
           ),
         ),
-        const SizedBox(width: 5.0),
+        SizedBox(width: 5.0.r),
 
         /// Horizontal bar percentile (full == 100th, empty == 0th)
         Expanded(
           flex: 4,
           child: LinearPercentIndicator(
-            lineHeight: 10.0,
+            lineHeight: 9.0.r,
             backgroundColor: const Color(0xFF444444),
             progressColor: getProgressColor(minutesPerGame / 48),
             percent: minutesPerGame / 48,
@@ -528,7 +522,7 @@ class RotationRow extends StatelessWidget {
               return Text(
                 value.toStringAsFixed(1),
                 textAlign: TextAlign.center,
-                style: kBebasNormal.copyWith(fontSize: 17.0),
+                style: kBebasNormal.copyWith(fontSize: 15.0.r),
               );
             },
           ),
@@ -546,7 +540,7 @@ class RotationRow extends StatelessWidget {
               return Text(
                 value.toStringAsFixed(0),
                 textAlign: TextAlign.center,
-                style: kBebasNormal.copyWith(fontSize: 17.0),
+                style: kBebasNormal.copyWith(fontSize: 15.0.r),
               );
             },
           ),

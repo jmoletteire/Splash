@@ -15,7 +15,7 @@ class AnimatedPolarAreaChart extends StatefulWidget {
     required this.colors,
     required this.labels,
     required this.maxPossibleValue,
-    this.chartSize = 200,
+    required this.chartSize,
     required this.selectedSeasonType,
   }) : super(key: key);
 

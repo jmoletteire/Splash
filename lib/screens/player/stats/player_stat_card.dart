@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import '../../../components/expandable_card_controller.dart';
@@ -96,9 +97,9 @@ class _PlayerStatCardState extends State<PlayerStatCard> {
                           flex: 10,
                           child: Text(
                             widget.statGroup,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Anton',
-                              fontSize: 18.0,
+                              fontSize: 16.0.r,
                               fontStyle: FontStyle.italic,
                             ),
                           ),
@@ -213,16 +214,16 @@ class StatisticRow extends StatelessWidget {
                 child: Text(
                   statName,
                   textAlign: TextAlign.start,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Anton',
-                    fontSize: 12.5,
+                    fontSize: 10.5.r,
                     letterSpacing: 0.0,
-                    color: Color(0xFFCFCFCF),
+                    color: const Color(0xFFCFCFCF),
                   ),
                 ),
               ),
-              const SizedBox(
-                width: 5.0,
+              SizedBox(
+                width: 5.0.r,
               ),
               DismissibleTooltip(
                 statFullName: statFullName,
@@ -257,18 +258,18 @@ class StatisticRow extends StatelessWidget {
                         ? '${value.toStringAsFixed(int.parse(round))}%'
                         : value.toStringAsFixed(int.parse(round)),
                 textAlign: TextAlign.right,
-                style: kBebasNormal.copyWith(fontSize: 16.0),
+                style: kBebasNormal.copyWith(fontSize: 14.0.r),
               );
             },
           ),
         ),
-        const SizedBox(width: 5.0),
+        SizedBox(width: 5.0.r),
 
         /// Horizontal bar percentile (full == 100th, empty == 0th)
         Expanded(
           flex: 4,
           child: LinearPercentIndicator(
-            lineHeight: 10.0,
+            lineHeight: 9.0.r,
             backgroundColor: const Color(0xFF444444),
             progressColor: getProgressColor(1 - ((rank - 1) / (numPlayers - 1))),
             percent: 1 - ((rank - 1) / (numPlayers - 1)) < 0
@@ -296,7 +297,7 @@ class StatisticRow extends StatelessWidget {
               return Text(
                 value.toString(),
                 textAlign: TextAlign.center,
-                style: kBebasNormal.copyWith(fontSize: 16.0),
+                style: kBebasNormal.copyWith(fontSize: 14.0.r),
               );
             },
           ),
@@ -356,45 +357,45 @@ class _DismissibleTooltipState extends State<DismissibleTooltip> {
           children: [
             TextSpan(
               text: '${widget.statFullName}\n\n',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 height: 0.9,
-                fontSize: 14.0,
+                fontSize: 12.0.r,
                 fontFamily: 'Anton',
               ),
             ),
             TextSpan(
               text: widget.definition,
-              style: const TextStyle(
-                color: Color(0xFFBCBCBC),
-                fontSize: 13.0,
+              style: TextStyle(
+                color: const Color(0xFFBCBCBC),
+                fontSize: 11.0.r,
                 fontFamily: 'Anton',
               ),
             ),
             if (widget.formula.isNotEmpty)
-              const TextSpan(
+              TextSpan(
                 text: '\n\nFormula: ',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 13.0,
+                  fontSize: 11.0.r,
                   fontFamily: 'Anton',
                 ),
               ),
             if (widget.formula.isNotEmpty)
               TextSpan(
                 text: widget.formula,
-                style: const TextStyle(
-                  color: Color(0xFFBCBCBC),
-                  fontSize: 13.0,
+                style: TextStyle(
+                  color: const Color(0xFFBCBCBC),
+                  fontSize: 11.0.r,
                   fontFamily: 'Anton',
                 ),
               ),
           ],
         ),
-        child: const Icon(
+        child: Icon(
           Icons.info_outline,
           color: Colors.white70,
-          size: 15.0,
+          size: 12.0.r,
         ),
       ),
     );

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/utilities/constants.dart';
-import 'package:splash/utilities/global_timezone.dart';
+import 'package:splash/utilities/global_variables.dart';
 import 'package:timezone/timezone.dart';
 
 import 'game_home.dart';

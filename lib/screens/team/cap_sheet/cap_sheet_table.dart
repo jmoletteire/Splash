@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:material_table_view/default_animated_switcher_transition_builder.dart';
 import 'package:material_table_view/material_table_view.dart';
@@ -515,21 +516,21 @@ class _CapSheetState extends State<CapSheet> {
         try {
           return Row(
             children: [
-              const SizedBox(width: 8.0),
+              SizedBox(width: 8.0.r),
               PlayerAvatar(
-                radius: 12.0,
+                radius: 10.0.r,
                 backgroundColor: Colors.white70,
                 playerImageUrl:
                     'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['player']['id']}.png',
               ),
-              const SizedBox(width: 8.0),
+              SizedBox(width: 8.0.r),
               Expanded(
                 flex: 5,
                 child: Text(
                   '${player['player']['firstName'].toString().substring(0, 1)}. ${player['player']['lastName']}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: kBebasNormal.copyWith(fontSize: 16.0),
+                  style: kBebasNormal.copyWith(fontSize: 14.0.r),
                 ),
               ),
             ],
@@ -576,9 +577,9 @@ class _CapSheetState extends State<CapSheet> {
             bool restrictedFreeAgent = player['signedUsing'] == 'rookie-scale-exception' ||
                 year - player['player']['fromYear'] < 3;
             return Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+              padding: EdgeInsets.fromLTRB(8.0.r, 8.0.r, 0.0, 8.0.r),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 8.0.r),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: restrictedFreeAgent ? Colors.red.shade900 : Colors.lightBlueAccent,
@@ -586,7 +587,7 @@ class _CapSheetState extends State<CapSheet> {
                 ),
                 child: Text(
                   restrictedFreeAgent ? 'RFA' : 'UFA',
-                  style: kBebasNormal.copyWith(fontSize: 18.0),
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
                 ),
               ),
             );
@@ -609,9 +610,9 @@ class _CapSheetState extends State<CapSheet> {
             bool restrictedFreeAgent = player['signedUsing'] == 'rookie-scale-exception' ||
                 year - player['player']['fromYear'] < 3;
             return Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+              padding: EdgeInsets.fromLTRB(8.0.r, 8.0.r, 0.0, 8.0.r),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 8.0.r),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: restrictedFreeAgent ? Colors.red.shade900 : Colors.lightBlueAccent,
@@ -619,7 +620,7 @@ class _CapSheetState extends State<CapSheet> {
                 ),
                 child: Text(
                   restrictedFreeAgent ? 'RFA' : 'UFA',
-                  style: kBebasNormal.copyWith(fontSize: 18.0),
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
                 ),
               ),
             );
@@ -642,7 +643,7 @@ class _CapSheetState extends State<CapSheet> {
             bool restrictedFreeAgent = player['signedUsing'] == 'rookie-scale-exception' ||
                 year - player['player']['fromYear'] < 3;
             return Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+              padding: EdgeInsets.fromLTRB(8.0.r, 8.0.r, 0.0, 8.0.r),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 alignment: Alignment.center,
@@ -652,7 +653,7 @@ class _CapSheetState extends State<CapSheet> {
                 ),
                 child: Text(
                   restrictedFreeAgent ? 'RFA' : 'UFA',
-                  style: kBebasNormal.copyWith(fontSize: 18.0),
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
                 ),
               ),
             );
@@ -675,9 +676,9 @@ class _CapSheetState extends State<CapSheet> {
             bool restrictedFreeAgent = player['signedUsing'] == 'rookie-scale-exception' ||
                 year - player['player']['fromYear'] < 3;
             return Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 0.0, 8.0),
+              padding: EdgeInsets.fromLTRB(8.0.r, 8.0.r, 0.0, 8.0.r),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 8.0.r),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: restrictedFreeAgent ? Colors.red.shade900 : Colors.lightBlueAccent,
@@ -685,7 +686,7 @@ class _CapSheetState extends State<CapSheet> {
                 ),
                 child: Text(
                   restrictedFreeAgent ? 'RFA' : 'UFA',
-                  style: kBebasNormal.copyWith(fontSize: 18.0),
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
                 ),
               ),
             );
@@ -708,9 +709,9 @@ class _CapSheetState extends State<CapSheet> {
             bool restrictedFreeAgent = player['signedUsing'] == 'rookie-scale-exception' ||
                 year - player['player']['fromYear'] <= 3;
             return Padding(
-              padding: const EdgeInsets.fromLTRB(11.0, 11.0, 0.0, 11.0),
+              padding: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 0.0, 11.0.r),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 11.0),
+                padding: EdgeInsets.symmetric(horizontal: 11.0.r),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: restrictedFreeAgent ? Colors.red.shade900 : Colors.lightBlueAccent,
@@ -718,7 +719,7 @@ class _CapSheetState extends State<CapSheet> {
                 ),
                 child: Text(
                   restrictedFreeAgent ? 'RFA' : 'UFA',
-                  style: kBebasNormal.copyWith(fontSize: 17.0),
+                  style: kBebasNormal.copyWith(fontSize: 15.0.r),
                 ),
               ),
             );
@@ -752,7 +753,7 @@ class CapSheetText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasNormal.copyWith(fontSize: 17.0, color: color ?? Colors.white),
+        style: kBebasNormal.copyWith(fontSize: 15.0.r, color: color ?? Colors.white),
       ),
     );
   }

@@ -131,12 +131,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 statName: 'DRTG',
                 awayTeam: roundToDecimalPlaces(
                     awayTeam['seasons']?[season]?['STATS']['REGULAR SEASON']?['ADV']
-                            ['DEF_RATING'] ??
+                            ?['DEF_RATING'] ??
                         0.0,
                     1),
                 homeTeam: roundToDecimalPlaces(
                     homeTeam['seasons']?[season]?['STATS']['REGULAR SEASON']?['ADV']
-                            ['DEF_RATING'] ??
+                            ?['DEF_RATING'] ??
                         0.0,
                     1),
                 awayTeamColor: awayTeamColor,
@@ -147,12 +147,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 statName: 'NRTG',
                 awayTeam: roundToDecimalPlaces(
                     awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ['NET_RATING'] ??
+                            ?['NET_RATING'] ??
                         0.0,
                     1),
                 homeTeam: roundToDecimalPlaces(
                     homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ['NET_RATING'] ??
+                            ?['NET_RATING'] ??
                         0.0,
                     1),
                 awayTeamColor: awayTeamColor,
@@ -163,12 +163,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 statName: 'PACE',
                 awayTeam: roundToDecimalPlaces(
                     awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ['PACE'] ??
+                            ?['PACE'] ??
                         0.0,
                     1),
                 homeTeam: roundToDecimalPlaces(
                     homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ['PACE'] ??
+                            ?['PACE'] ??
                         0.0,
                     1),
                 awayTeamColor: awayTeamColor,

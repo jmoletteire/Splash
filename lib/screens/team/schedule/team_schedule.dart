@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/team/schedule/team_games.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -158,7 +159,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                         children: [
                                           Text(
                                             'Filter',
-                                            style: kBebasBold.copyWith(fontSize: 22.0),
+                                            style: kBebasBold.copyWith(fontSize: 20.0.r),
                                           ),
                                           TextButton(
                                             onPressed: () {
@@ -166,12 +167,13 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                             },
                                             child: Text(
                                               'Done',
-                                              style: kBebasNormal.copyWith(color: teamColor),
+                                              style: kBebasNormal.copyWith(
+                                                  fontSize: 16.0.r, color: teamColor),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 10.0),
+                                      SizedBox(height: 10.0.r),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
@@ -184,7 +186,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                               padding:
                                                   const EdgeInsets.symmetric(horizontal: 15.0),
                                               borderRadius: BorderRadius.circular(10.0),
-                                              menuMaxHeight: 300.0,
+                                              menuMaxHeight: 300.0.r,
                                               dropdownColor: Colors.grey.shade900,
                                               isExpanded: false,
                                               underline: Container(),
@@ -195,8 +197,8 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                                   value: value,
                                                   child: Text(
                                                     value,
-                                                    style:
-                                                        kBebasNormal.copyWith(fontSize: 18.0),
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 16.0.r),
                                                   ),
                                                 );
                                               }).toList(),
@@ -232,7 +234,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                               padding:
                                                   const EdgeInsets.symmetric(horizontal: 15.0),
                                               borderRadius: BorderRadius.circular(10.0),
-                                              menuMaxHeight: 300.0,
+                                              menuMaxHeight: 300.0.r,
                                               dropdownColor: Colors.grey.shade900,
                                               isExpanded: false,
                                               underline: Container(),
@@ -244,8 +246,8 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                                   value: value,
                                                   child: Text(
                                                     value,
-                                                    style:
-                                                        kBebasNormal.copyWith(fontSize: 18.0),
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 16.0.r),
                                                   ),
                                                 );
                                               }).toList(),
@@ -287,9 +289,9 @@ class _TeamScheduleState extends State<TeamSchedule> {
                         children: [
                           Text(
                             selectedSeason,
-                            style: kBebasNormal.copyWith(fontSize: 18.0),
+                            style: kBebasNormal.copyWith(fontSize: 16.0.r),
                           ),
-                          const Icon(Icons.arrow_drop_down, color: Colors.white),
+                          Icon(Icons.arrow_drop_down, color: Colors.grey.shade400),
                         ],
                       ),
                     ),
@@ -304,7 +306,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                   child: DropdownButton<String>(
                     padding: const EdgeInsets.symmetric(horizontal: 15.0),
                     borderRadius: BorderRadius.circular(10.0),
-                    menuMaxHeight: 300.0,
+                    menuMaxHeight: 300.0.r,
                     dropdownColor: Colors.grey.shade900,
                     isExpanded: false,
                     underline: Container(),
@@ -314,7 +316,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                         value: value,
                         child: Text(
                           value,
-                          style: kBebasNormal.copyWith(fontSize: 18.0),
+                          style: kBebasNormal.copyWith(fontSize: 16.0.r),
                         ),
                       );
                     }).toList(),
@@ -342,7 +344,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                   child: DropdownButton<String>(
                     padding: const EdgeInsets.symmetric(horizontal: 15.0),
                     borderRadius: BorderRadius.circular(10.0),
-                    menuMaxHeight: 300.0,
+                    menuMaxHeight: 300.0.r,
                     dropdownColor: Colors.grey.shade900,
                     isExpanded: false,
                     underline: Container(),
@@ -356,7 +358,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 20.0),
+                              constraints: BoxConstraints(maxWidth: 20.0.r),
                               child: Image.asset(
                                 teamAbbr[value]! == '1' ||
                                         teamAbbr[value]! == '2' ||
@@ -364,14 +366,14 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                     ? 'images/NBA_Logos/0.png'
                                     : 'images/NBA_Logos/${teamAbbr[value]!}.png',
                                 fit: BoxFit.contain,
-                                width: 20.0,
-                                height: 20.0,
+                                width: 20.0.r,
+                                height: 20.0.r,
                               ),
                             ),
-                            const SizedBox(width: 8.0),
+                            SizedBox(width: 8.0.r),
                             Text(
                               value,
-                              style: kBebasNormal.copyWith(fontSize: 18.0),
+                              style: kBebasNormal.copyWith(fontSize: 16.0.r),
                             ),
                           ],
                         ),

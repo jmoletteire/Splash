@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
 
 import '../../../utilities/constants.dart';
-import '../../../utilities/global_timezone.dart';
+import '../../../utilities/global_variables.dart';
 import '../../game/game_home.dart';
 import '../team_cache.dart';
 
@@ -34,7 +35,6 @@ class _TeamGamesState extends State<TeamGames> {
   late List<String> gamesList;
   late Map<String, dynamic> teamGames;
   double topPadding = 0.0;
-  bool _showStickyHeader = false;
   late String seasonType;
 
   Map<String, String> seasonTypes = {
@@ -280,15 +280,15 @@ class _TeamGamesState extends State<TeamGames> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.sports_basketball,
                     color: Colors.white38,
-                    size: 40.0,
+                    size: 40.0.r,
                   ),
-                  const SizedBox(height: 15.0),
+                  SizedBox(height: 15.0.r),
                   Text(
                     'No Games Available',
-                    style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
+                    style: kBebasNormal.copyWith(fontSize: 20.0.r, color: Colors.white54),
                   ),
                 ],
               ),
@@ -316,14 +316,13 @@ class _TeamGamesState extends State<TeamGames> {
                               teamGames[gamesList[index - 1]]['SEASON_ID']) {
                         widgets.add(
                           Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+                            padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
                             alignment: Alignment.centerLeft,
                             child: Text(
                               seasonTypes[teamGames[gamesList[index]]['SEASON_ID']
                                   .toString()
                                   .substring(0, 1)]!,
-                              style: kBebasNormal.copyWith(fontSize: 14.0),
+                              style: kBebasNormal.copyWith(fontSize: 12.0.r),
                             ),
                           ),
                         );
@@ -343,17 +342,18 @@ class _TeamGamesState extends State<TeamGames> {
                                 awayId: teamGames[gamesList[index]]['HOME_AWAY'] == '@'
                                     ? widget.team['TEAM_ID'].toString()
                                     : teamGames[gamesList[index]]['OPP'].toString(),
-                                gameTime: adjustTimezone(
-                                  teamGames[gamesList[index]]['GAME_DATE'],
-                                  teamGames[gamesList[index]]['RESULT'],
-                                ),
+                                gameTime: teamGames[gamesList[index]]['RESULT'] == 'Upcoming'
+                                    ? adjustTimezone(
+                                        teamGames[gamesList[index]]['GAME_DATE'],
+                                        teamGames[gamesList[index]]['RESULT'],
+                                      )
+                                    : null,
                               ),
                             ),
                           );
                         },
                         child: Container(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                          padding: EdgeInsets.symmetric(horizontal: 12.0.r, vertical: 8.0.r),
                           height: MediaQuery.sizeOf(context).height * 0.065,
                           decoration: BoxDecoration(
                             color: Colors.grey.shade900,
@@ -371,11 +371,11 @@ class _TeamGamesState extends State<TeamGames> {
                                     Text(
                                       gameDate[0],
                                       style: kBebasNormal.copyWith(
-                                          fontSize: 13.0, color: Colors.white70),
+                                          fontSize: 11.0.r, color: Colors.white70),
                                     ),
                                     Text(
                                       gameDate[1],
-                                      style: kBebasNormal.copyWith(fontSize: 13.0),
+                                      style: kBebasNormal.copyWith(fontSize: 11.0.r),
                                     ),
                                   ],
                                 ),
@@ -386,15 +386,15 @@ class _TeamGamesState extends State<TeamGames> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     SizedBox(
-                                      width: 30.0,
+                                      width: 30.0.r,
                                       child: Text(
                                         teamGames[gamesList[index]]['HOME_AWAY'],
-                                        style: kBebasBold.copyWith(fontSize: 14.0),
+                                        style: kBebasBold.copyWith(fontSize: 12.0.r),
                                       ),
                                     ),
                                     SizedBox(
-                                      width: 24.0,
-                                      height: 24.0,
+                                      width: 24.0.r,
+                                      height: 24.0.r,
                                       child: kTeamNames[teamGames[gamesList[index]]['OPP']
                                                   .toString()] ==
                                               null
@@ -402,11 +402,11 @@ class _TeamGamesState extends State<TeamGames> {
                                           : Image.asset(
                                               'images/NBA_Logos/${teamGames[gamesList[index]]['OPP']}.png',
                                               fit: BoxFit.contain,
-                                              width: 16.0,
-                                              height: 16.0,
+                                              width: 16.0.r,
+                                              height: 16.0.r,
                                             ),
                                     ),
-                                    const SizedBox(width: 15.0),
+                                    SizedBox(width: 15.0.r),
                                     Text(
                                       kTeamNames[teamGames[gamesList[index]]['OPP']
                                                   .toString()] !=
@@ -414,7 +414,7 @@ class _TeamGamesState extends State<TeamGames> {
                                           ? kTeamNames[
                                               teamGames[gamesList[index]]['OPP'].toString()][0]
                                           : 'INT\'L',
-                                      style: kBebasBold.copyWith(fontSize: 18.0),
+                                      style: kBebasBold.copyWith(fontSize: 16.0.r),
                                     ),
                                   ],
                                 ),
@@ -431,7 +431,7 @@ class _TeamGamesState extends State<TeamGames> {
                                         'Final',
                                         textAlign: TextAlign.end,
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 12.0, color: Colors.grey),
+                                            fontSize: 10.0.r, color: Colors.grey),
                                       ),
                                     if (teamGames[gamesList[index]]['RESULT'] != 'W' &&
                                         teamGames[gamesList[index]]['RESULT'] != 'L' &&
@@ -440,17 +440,19 @@ class _TeamGamesState extends State<TeamGames> {
                                         teamGames[gamesList[index]]['BROADCAST'],
                                         textAlign: TextAlign.end,
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 12.0, color: Colors.grey),
+                                            fontSize: 10.0.r, color: Colors.grey),
                                       ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         Text(
-                                          adjustTimezone(
-                                              teamGames[gamesList[index]]['GAME_DATE'],
-                                              teamGames[gamesList[index]]['RESULT']),
+                                          teamGames[gamesList[index]]['RESULT'] == 'Upcoming'
+                                              ? adjustTimezone(
+                                                  teamGames[gamesList[index]]['GAME_DATE'],
+                                                  teamGames[gamesList[index]]['RESULT'])
+                                              : teamGames[gamesList[index]]['RESULT'],
                                           style: kBebasNormal.copyWith(
-                                            fontSize: 14.0,
+                                            fontSize: 12.0.r,
                                             color: teamGames[gamesList[index]]['RESULT'] == 'W'
                                                 ? Colors.green
                                                 : teamGames[gamesList[index]]['RESULT'] == 'L'
@@ -462,24 +464,25 @@ class _TeamGamesState extends State<TeamGames> {
                                             teamGames[gamesList[index]]['RESULT'] == 'L')
                                           Row(
                                             children: [
-                                              const SizedBox(width: 5.0),
+                                              SizedBox(width: 5.0.r),
                                               Text(
                                                 teamGames[gamesList[index]]['TEAM_PTS']
                                                     .toString(),
-                                                style: kBebasNormal.copyWith(fontSize: 14.0),
+                                                style: kBebasNormal.copyWith(fontSize: 12.0.r),
                                               ),
                                               SizedBox(
-                                                width: 10.0,
+                                                width: 10.0.r,
                                                 child: Text(
                                                   '-',
                                                   textAlign: TextAlign.center,
-                                                  style: kBebasNormal.copyWith(fontSize: 14.0),
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
                                                 ),
                                               ),
                                               Text(
                                                 teamGames[gamesList[index]]['OPP_PTS']
                                                     .toString(),
-                                                style: kBebasNormal.copyWith(fontSize: 14.0),
+                                                style: kBebasNormal.copyWith(fontSize: 12.0.r),
                                               ),
                                             ],
                                           )
@@ -516,11 +519,11 @@ class MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
       alignment: Alignment.centerLeft,
       child: Text(
         seasonType,
-        style: kBebasNormal.copyWith(fontSize: 14.0),
+        style: kBebasNormal.copyWith(fontSize: 12.0.r),
       ),
     );
   }

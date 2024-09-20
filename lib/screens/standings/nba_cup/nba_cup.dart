@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/standings/nba_cup/knockout_bracket.dart';
 import 'package:splash/screens/standings/nba_cup/wildcard_standings.dart';
 
@@ -82,7 +83,7 @@ class _NbaCupState extends State<NbaCup>
           indicatorWeight: 3.0,
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
-          labelStyle: kBebasNormal.copyWith(fontSize: 18.0),
+          labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
           tabs: const [
             Tab(text: 'Groups'),
             Tab(text: 'Wild Card'),
@@ -99,7 +100,20 @@ class _NbaCupState extends State<NbaCup>
               controller: _scrollController,
               slivers: groups.keys.map((groupName) {
                 return GroupStandings(
-                  columnNames: [groupName, 'W', 'L', 'PCT', 'GB', 'DIFF', 'PTS', 'OPP'],
+                  columnNames: [
+                    groupName,
+                    'W',
+                    'L',
+                    'PCT',
+                    'GB',
+                    'DIFF',
+                    'PTS',
+                    'OPP',
+                    'GAME 1',
+                    'GAME 2',
+                    'GAME 3',
+                    'GAME 4',
+                  ],
                   standings: groups[groupName]!,
                   season: widget.selectedSeason,
                 );
@@ -112,11 +126,37 @@ class _NbaCupState extends State<NbaCup>
               controller: _scrollController,
               slivers: [
                 WildcardStandings(
-                    columnNames: const ['EAST', 'W', 'L', 'PCT', 'GB', 'DIFF', 'PTS', 'OPP'],
+                    columnNames: const [
+                      'EAST',
+                      'W',
+                      'L',
+                      'PCT',
+                      'GB',
+                      'DIFF',
+                      'PTS',
+                      'OPP',
+                      'GAME 1',
+                      'GAME 2',
+                      'GAME 3',
+                      'GAME 4',
+                    ],
                     standings: widget.cupData['WILD CARD']['East']!,
                     season: widget.selectedSeason),
                 WildcardStandings(
-                    columnNames: const ['WEST', 'W', 'L', 'PCT', 'GB', 'DIFF', 'PTS', 'OPP'],
+                    columnNames: const [
+                      'WEST',
+                      'W',
+                      'L',
+                      'PCT',
+                      'GB',
+                      'DIFF',
+                      'PTS',
+                      'OPP',
+                      'GAME 1',
+                      'GAME 2',
+                      'GAME 3',
+                      'GAME 4',
+                    ],
                     standings: widget.cupData['WILD CARD']['West']!,
                     season: widget.selectedSeason),
               ],

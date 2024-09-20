@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/screens/player/profile/player_awards.dart';
 import 'package:splash/screens/player/profile/player_contract.dart';
@@ -99,7 +100,7 @@ class InfoCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade900,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.0),
       ),
       padding: const EdgeInsets.all(15.0),
       child: Center(
@@ -116,14 +117,14 @@ class InfoCard extends StatelessWidget {
                         Text(
                           entry.value,
                           textAlign: TextAlign.center,
-                          style: kBebasNormal.copyWith(fontSize: 18),
+                          style: kBebasNormal.copyWith(fontSize: 16.0.r),
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 5.0),
                         Text(
                           entry.key,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.grey,
-                            fontSize: 12,
+                            fontSize: 10.0.r,
                           ),
                         ),
                       ],
@@ -148,24 +149,24 @@ class InfoCard extends StatelessWidget {
                                 entry.value,
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
-                                style: kBebasNormal.copyWith(fontSize: 18),
+                                style: kBebasNormal.copyWith(fontSize: 16.0.r),
                               ),
                             ),
                             if (entry.key == 'Country') const SizedBox(width: 5.0),
                             if (entry.key == 'Country')
                               CircleAvatar(
-                                radius: 8.0,
+                                radius: 7.0.r,
                                 backgroundImage: AssetImage(
                                     'images/flags/${kCountryCodes[entry.value]?.toLowerCase()}.png'),
                               )
                           ],
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 5.0),
                         Text(
                           entry.key,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.grey,
-                            fontSize: 12,
+                            fontSize: 10.0.r,
                           ),
                         ),
                       ],

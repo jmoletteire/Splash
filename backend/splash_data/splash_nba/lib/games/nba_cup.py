@@ -1,12 +1,90 @@
+import inspect
 from collections import defaultdict
 
 import requests
 from nba_api.stats.endpoints import iststandings
 from pymongo import MongoClient
-from splash_nba.util.env import uri
+from splash_nba.util.env import uri, k_current_season
 import logging
 
 seasons = ['2023-24']
+
+
+def update_current_cup():
+    # Get the current call stack
+    stack = inspect.stack()
+
+    # Check the second item in the stack (the caller)
+    # The first item in the stack is the current function itself
+    caller_frame = stack[1]
+
+    # Extract the function name of the caller
+    caller_function = caller_frame.function
+
+    # Check if the caller is the main script
+    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
+        print("Called from main script.")
+    else:
+        # Connect to MongoDB
+        try:
+            client = MongoClient(uri)
+            db = client.splash
+            cup_collection = db.nba_cup_history
+        except Exception as e:
+            logging.error(f"Failed to connect to MongoDB: {e}")
+            exit(1)
+
+    try:
+        teams = iststandings.ISTStandings(season=k_current_season).get_dict()['teams']
+    except Exception as e:
+        logging.error(f"NBA Cup data unavailable: {e}")
+        return
+
+    # Initialize a dictionary to group teams by istGroup
+    grouped_teams = defaultdict(list)
+    conference_teams = defaultdict(list)
+
+    sorted_teams = sorted(teams, key=lambda x: (x['istGroup'], x['istGroupRank']))
+
+    # Group teams
+    for team in sorted_teams:
+        grouped_teams[team['istGroup']].append(team)
+        conference_teams[team['conference']].append(team)
+
+    # Sort the teams
+    for group in grouped_teams.keys():
+        # Sort the teams in this group by 'istGroupRank'
+        group_standings = sorted(grouped_teams[group], key=lambda x: x['istGroupRank'])
+
+        # Update the database with the sorted array of teams
+        cup_collection.update_one(
+            {'SEASON': k_current_season},
+            {'$set': {f'GROUP.{group_standings[0]["conference"]}.{group}': group_standings}},
+            upsert=True
+        )
+
+    for conf in conference_teams.keys():
+        wildcard_standings = sorted(conference_teams[conf], key=lambda x: x['istWildcardRank'])
+
+        # Update the database with the sorted array of teams
+        cup_collection.update_one(
+            {'SEASON': k_current_season},
+            {'$set': {f'WILD CARD.{wildcard_standings[0]["conference"]}': wildcard_standings}},
+            upsert=True
+        )
+
+    # Fetching the JSON data from the URL
+    url = f"https://cdn.nba.com/static/json/staticData/brackets/{k_current_season[0:4]}/ISTBracket.json"
+    response = requests.get(url)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        json_data = response.json()
+        cup_collection.update_one(
+            {'SEASON': k_current_season},
+            {'$set': {f'KNOCKOUT': json_data['bracket']['istBracketSeries']}},
+            upsert=True
+        )
 
 
 def fetch_all_cups():

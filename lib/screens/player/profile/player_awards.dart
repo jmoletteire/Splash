@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../utilities/constants.dart';
 
@@ -23,6 +24,7 @@ class _PlayerAwardsState extends State<PlayerAwards> {
     'NBA Finals Most Valuable Player',
     'NBA Most Valuable Player',
     'NBA Defensive Player of the Year',
+    'NBA Sixth Man of the Year',
     'NBA Most Improved Player',
     'NBA Rookie of the Year',
     'All-NBA',
@@ -44,7 +46,7 @@ class _PlayerAwardsState extends State<PlayerAwards> {
               widget.playerAwards[awardName].length > 1
                   ? '${widget.playerAwards[awardName].length}x  $awardName'
                   : awardName,
-              style: kBebasNormal.copyWith(fontSize: 18),
+              style: kBebasNormal.copyWith(fontSize: 16.0.r),
             ),
           ],
         ),
@@ -64,7 +66,7 @@ class _PlayerAwardsState extends State<PlayerAwards> {
             Text(
               '${seasons[i]}${i == seasons.length - 1 ? '' : ', '}',
               style: kBebasNormal.copyWith(
-                fontSize: 15,
+                fontSize: 13.0.r,
                 color: Colors.grey,
               ),
             ),
@@ -104,14 +106,14 @@ class _PlayerAwardsState extends State<PlayerAwards> {
                   TextSpan(
                     text: '${teamNum[teamNumber]} Team: ',
                     style: kBebasNormal.copyWith(
-                      fontSize: 15,
+                      fontSize: 13.0.r,
                       color: Colors.white70,
                     ),
                   ),
                   TextSpan(
                     text: teamAwards[teamNumber]!.join(', '),
                     style: kBebasNormal.copyWith(
-                      fontSize: 15,
+                      fontSize: 13.0.r,
                       color: Colors.grey,
                     ),
                   ),
@@ -151,27 +153,27 @@ class _PlayerAwardsState extends State<PlayerAwards> {
           Container(
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
               ),
             ),
             child: Text(
               'Awards',
-              style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
+              style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
             ),
           ),
-          if (widget.playerAwards.isEmpty || !hasAwards) const SizedBox(height: 10.0),
+          if (widget.playerAwards.isEmpty || !hasAwards) SizedBox(height: 10.0.r),
           if (widget.playerAwards.isEmpty || !hasAwards)
-            const Row(
+            Row(
               children: [
                 Text(
                   'No Awards',
-                  style: kBebasNormal,
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r),
                 ),
               ],
             ),
           for (String award in awards)
             if (widget.playerAwards.keys.contains(award)) ...[
-              const SizedBox(height: 10.0),
+              SizedBox(height: 10.0.r),
               awardCount(award),
               awardYears(award),
             ],

@@ -2,7 +2,7 @@ from nba_api.stats.endpoints import leaguedashteamstats, leaguehustlestatsteam
 import logging
 
 
-def fetch_team_stats(team_id, season):
+def fetch_team_stats(team_id, season, season_type):
     # Init return variables
     team_basic_stats = {}
     team_adv_stats = {}

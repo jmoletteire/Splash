@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
-import '../../components/animated_polar_chart.dart';
-import '../../components/team_stat_card.dart';
+import '../../../components/animated_polar_chart.dart';
+import 'team_stat_card.dart';
 
 class TeamStats extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -27,7 +28,7 @@ class _TeamStatsState extends State<TeamStats> {
   String getStanding(int confRank) {
     switch (confRank) {
       case 0:
-        return '-';
+        return '';
       case 1:
         return '${confRank}st';
       case 2:
@@ -46,7 +47,7 @@ class _TeamStatsState extends State<TeamStats> {
   }
 
   String getPlayoffs(dynamic teamSeason) {
-    if (!teamSeason.containsKey('CONF_RANK')) {
+    if (!teamSeason.containsKey('CONF_RANK') || teamSeason['CONF_RANK'] == 0) {
       return '-';
     }
 
@@ -86,17 +87,24 @@ class _TeamStatsState extends State<TeamStats> {
 
   double getPercentile(String location, String stat) {
     if (widget.team['seasons'][selectedSeason]['STATS'].containsKey(selectedSeasonType)) {
-      if (!widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]
+      if (widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]
           .containsKey(location)) {
-        return 0.0;
+        if (widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType][location]
+                .containsKey('${stat}_RANK') &&
+            widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]['BASIC']
+                .containsKey('LEAGUE_TEAMS')) {
+          return 1 -
+              ((widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType][location]
+                          ['${stat}_RANK'] -
+                      1) /
+                  (widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]['BASIC']
+                          ['LEAGUE_TEAMS'] -
+                      1)) as double;
+        } else {
+          return 0.0;
+        }
       } else {
-        return 1 -
-            ((widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType][location]
-                        ['${stat}_RANK'] -
-                    1) /
-                (widget.team['seasons'][selectedSeason]['STATS'][selectedSeasonType]['BASIC']
-                        ['LEAGUE_TEAMS'] -
-                    1)) as double;
+        return 0.0;
       }
     } else {
       return 0.0;
@@ -181,7 +189,7 @@ class _TeamStatsState extends State<TeamStats> {
                             child: Text(
                               '${(widget.team['seasons'][selectedSeason]['WINS'] ?? 0).toString()}-${(widget.team['seasons'][selectedSeason]['LOSSES'] ?? 0).toString()} (${(widget.team['seasons'][selectedSeason]['WIN_PCT'] ?? 0).toStringAsFixed(3)})',
                               textAlign: TextAlign.center,
-                              style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                              style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                             ),
                           ),
                           Expanded(
@@ -189,7 +197,7 @@ class _TeamStatsState extends State<TeamStats> {
                             child: Text(
                               '${getStanding(widget.team['seasons'][selectedSeason]['CONF_RANK'] ?? 0)} ${widget.team['CONF'].substring(0, 4)}',
                               textAlign: TextAlign.center,
-                              style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                              style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                             ),
                           ),
                           Expanded(
@@ -197,7 +205,7 @@ class _TeamStatsState extends State<TeamStats> {
                             child: Text(
                               getPlayoffs(widget.team['seasons'][selectedSeason]!),
                               textAlign: TextAlign.center,
-                              style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                              style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                             ),
                           ),
                         ],
@@ -209,8 +217,8 @@ class _TeamStatsState extends State<TeamStats> {
                             child: Text(
                               'RECORD',
                               textAlign: TextAlign.center,
-                              style:
-                                  kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
+                              style: kBebasNormal.copyWith(
+                                  fontSize: 14.0.r, color: Colors.white70),
                             ),
                           ),
                           Expanded(
@@ -218,8 +226,8 @@ class _TeamStatsState extends State<TeamStats> {
                             child: Text(
                               'CONF',
                               textAlign: TextAlign.center,
-                              style:
-                                  kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
+                              style: kBebasNormal.copyWith(
+                                  fontSize: 14.0.r, color: Colors.white70),
                             ),
                           ),
                           Expanded(
@@ -227,8 +235,8 @@ class _TeamStatsState extends State<TeamStats> {
                             child: Text(
                               'PLAYOFFS',
                               textAlign: TextAlign.center,
-                              style:
-                                  kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white70),
+                              style: kBebasNormal.copyWith(
+                                  fontSize: 14.0.r, color: Colors.white70),
                             ),
                           ),
                         ],
@@ -242,7 +250,7 @@ class _TeamStatsState extends State<TeamStats> {
                   margin: const EdgeInsets.fromLTRB(11.0, 0.0, 11.0, 11.0),
                   color: Colors.grey.shade900,
                   child: Padding(
-                    padding: const EdgeInsets.all(75.0),
+                    padding: EdgeInsets.all(60.0.r),
                     child: AnimatedPolarAreaChart(
                       key: ValueKey(selectedSeason),
                       selectedSeasonType: selectedSeasonType,
@@ -268,6 +276,7 @@ class _TeamStatsState extends State<TeamStats> {
                         'Shooting',
                       ],
                       maxPossibleValue: 1.0,
+                      chartSize: 200.r,
                     ),
                   ),
                 ),
@@ -311,8 +320,8 @@ class _TeamStatsState extends State<TeamStats> {
                   statGroup: 'HUSTLE',
                   perMode: perMode,
                 ),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 100),
+              Padding(
+                padding: EdgeInsets.only(bottom: 100.r),
               ),
             ],
           ),
@@ -336,11 +345,11 @@ class _TeamStatsState extends State<TeamStats> {
                       color: Colors.grey.shade900,
                       border: Border.all(color: teamColor),
                       borderRadius: BorderRadius.circular(10.0)),
-                  margin: const EdgeInsets.all(11.0),
+                  margin: EdgeInsets.all(11.0.r),
                   child: DropdownButton<String>(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.r),
                     borderRadius: BorderRadius.circular(10.0),
-                    menuMaxHeight: 300.0,
+                    menuMaxHeight: 300.0.r,
                     dropdownColor: Colors.grey.shade900,
                     isExpanded: false,
                     underline: Container(),
@@ -350,7 +359,7 @@ class _TeamStatsState extends State<TeamStats> {
                         value: value,
                         child: Text(
                           value,
-                          style: kBebasNormal.copyWith(fontSize: 19.0),
+                          style: kBebasNormal.copyWith(fontSize: 17.0.r),
                         ),
                       );
                     }).toList(),
@@ -393,15 +402,13 @@ class _TeamStatsState extends State<TeamStats> {
                           Positioned(
                             top: 2,
                             left: 11, // Adjust based on your switch size
+                            width: 16,
+                            height: 16,
                             child: IgnorePointer(
                               ignoring: true,
                               child: Visibility(
                                 visible: _playoffSwitch,
-                                child: SvgPicture.asset(
-                                  'images/playoffs.svg',
-                                  width: 16.0,
-                                  height: 16.0,
-                                ),
+                                child: SvgPicture.asset('images/playoffs.svg'),
                               ),
                             ),
                           ),
@@ -433,8 +440,8 @@ class _TeamStatsState extends State<TeamStats> {
                       activeFgColor: teamSecondaryColor,
                       inactiveBgColor: Colors.grey.shade900,
                       customTextStyles: [
-                        kBebasNormal.copyWith(fontSize: 16.0),
-                        kBebasNormal.copyWith(fontSize: 16.0)
+                        kBebasNormal.copyWith(fontSize: 14.0.r),
+                        kBebasNormal.copyWith(fontSize: 14.0.r)
                       ],
                       onToggle: (index) {
                         setState(() {

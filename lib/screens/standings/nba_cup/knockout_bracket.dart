@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../game/game_home.dart';
@@ -39,12 +40,12 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
               teamTwoWins
                   ? GrayscaleImage(
                       imagePath: 'images/NBA_Logos/$teamOne.png',
-                      size: 44.0,
+                      size: 42.0.r,
                     )
                   : Image.asset(
                       'images/NBA_Logos/$teamOne.png',
-                      width: 44.0,
-                      height: 44.0,
+                      width: 42.0.r,
+                      height: 42.0.r,
                     ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -55,14 +56,14 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                         TextSpan(
                           text: '${series['highSeedRank'].toString()} ',
                           style: kBebasBold.copyWith(
-                            fontSize: 16.0,
+                            fontSize: 12.0.r,
                             color: teamTwoWins ? Colors.grey : Colors.white,
                           ),
                         ),
                         TextSpan(
                           text: series['highSeedTricode'],
                           style: kBebasBold.copyWith(
-                            fontSize: 24.0,
+                            fontSize: 20.0.r,
                             color: teamTwoWins ? Colors.grey : Colors.white,
                           ),
                         ),
@@ -82,18 +83,18 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                   Text(
                     series['highSeedScore'].toString(),
                     style: kBebasBold.copyWith(
-                      fontSize: 28.0,
+                      fontSize: 24.0.r,
                       color: teamTwoWins ? Colors.grey : Colors.white,
                     ),
                   ),
                   Text(
                     '    -    ',
-                    style: kBebasNormal.copyWith(fontSize: 28.0),
+                    style: kBebasNormal.copyWith(fontSize: 24.0.r),
                   ),
                   Text(
                     series['lowSeedScore'].toString(),
                     style: kBebasBold.copyWith(
-                      fontSize: 28.0,
+                      fontSize: 24.0.r,
                       color: teamOneWins ? Colors.grey : Colors.white,
                     ),
                   ),
@@ -107,12 +108,12 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
               teamOneWins
                   ? GrayscaleImage(
                       imagePath: 'images/NBA_Logos/$teamTwo.png',
-                      size: 44.0,
+                      size: 42.0.r,
                     )
                   : Image.asset(
                       'images/NBA_Logos/$teamTwo.png',
-                      width: 44.0,
-                      height: 44.0,
+                      width: 42.0.r,
+                      height: 42.0.r,
                     ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -123,14 +124,14 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                         TextSpan(
                           text: '${series['lowSeedRank'].toString()} ',
                           style: kBebasBold.copyWith(
-                            fontSize: 16.0,
+                            fontSize: 12.0.r,
                             color: teamOneWins ? Colors.grey : Colors.white,
                           ),
                         ),
                         TextSpan(
                           text: series['lowSeedTricode'],
                           style: kBebasBold.copyWith(
-                            fontSize: 24.0,
+                            fontSize: 20.0.r,
                             color: teamOneWins ? Colors.grey : Colors.white,
                           ),
                         ),
@@ -153,7 +154,9 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
 
     List<String> useSecondary = ['SAS'];
 
-    Map<int, double> widthFactor = {1: 2.75, 2: 2, 3: 1.25};
+    Map<int, double> widthFactor = {1: 2.75.r, 2: 2.r, 3: 1.25.r};
+
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return GestureDetector(
       onTap: () {
@@ -169,8 +172,8 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        margin: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(horizontal: 8.0.r),
+        margin: EdgeInsets.all(8.0.r),
         height: MediaQuery.of(context).size.height / 10,
         width: MediaQuery.of(context).size.width / widthFactor[round]!,
         decoration: BoxDecoration(
@@ -203,20 +206,20 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                     children: [
                       teamTwoWinsSeries
                           ? GrayscaleImage(
-                              imagePath: 'images/NBA_Logos/$teamOne.png', size: 28.0)
+                              imagePath: 'images/NBA_Logos/$teamOne.png', size: 28.0.r)
                           : Image.asset(
                               'images/NBA_Logos/$teamOne.png',
-                              width: 28.0,
-                              height: 28.0,
+                              width: 28.0.r,
+                              height: 28.0.r,
                             ),
                       const Text(' '),
                       teamOneWinsSeries
                           ? GrayscaleImage(
-                              imagePath: 'images/NBA_Logos/$teamTwo.png', size: 28.0)
+                              imagePath: 'images/NBA_Logos/$teamTwo.png', size: 28.0.r)
                           : Image.asset(
                               'images/NBA_Logos/$teamTwo.png',
-                              width: 28.0,
-                              height: 28.0,
+                              width: 28.0.r,
+                              height: 28.0.r,
                             ),
                     ],
                   ),
@@ -229,14 +232,14 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                             TextSpan(
                               text: '${series['highSeedRank'].toString()} ',
                               style: kBebasBold.copyWith(
-                                fontSize: 12.0, // smaller font size for TEAM_TWO_SEED
+                                fontSize: 10.0.r, // smaller font size for TEAM_TWO_SEED
                                 color: teamTwoWinsSeries ? Colors.grey : Colors.white,
                               ),
                             ),
                             TextSpan(
                               text: series['highSeedTricode'],
                               style: kBebasBold.copyWith(
-                                fontSize: 18.0, // keep the current styling for TEAM_TWO_ABBR
+                                fontSize: 16.0.r, // keep the current styling for TEAM_TWO_ABBR
                                 color: teamTwoWinsSeries ? Colors.grey : Colors.white,
                               ),
                             ),
@@ -250,14 +253,14 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                             TextSpan(
                               text: '${series['lowSeedRank'].toString()} ',
                               style: kBebasBold.copyWith(
-                                fontSize: 12.0, // smaller font size for TEAM_TWO_SEED
+                                fontSize: 10.0.r, // smaller font size for TEAM_TWO_SEED
                                 color: teamOneWinsSeries ? Colors.grey : Colors.white,
                               ),
                             ),
                             TextSpan(
                               text: series['lowSeedTricode'],
                               style: kBebasBold.copyWith(
-                                fontSize: 18.0, // keep the current styling for TEAM_TWO_ABBR
+                                fontSize: 16.0.r, // keep the current styling for TEAM_TWO_ABBR
                                 color: teamOneWinsSeries ? Colors.grey : Colors.white,
                               ),
                             ),
@@ -272,18 +275,18 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                       Text(
                         series['highSeedScore'].toString(),
                         style: kBebasBold.copyWith(
-                          fontSize: 18.0,
+                          fontSize: 16.0.r,
                           color: teamTwoWinsSeries ? Colors.grey : Colors.white,
                         ),
                       ),
                       Text(
                         '-',
-                        style: kBebasNormal.copyWith(fontSize: 18.0),
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
                       ),
                       Text(
                         series['lowSeedScore'].toString(),
                         style: kBebasBold.copyWith(
-                          fontSize: 18.0,
+                          fontSize: 16.0.r,
                           color: teamOneWinsSeries ? Colors.grey : Colors.white,
                         ),
                       ),
@@ -297,54 +300,56 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // CustomPaint for drawing lines
-        CustomPaint(
-          size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
-          painter: BracketPainter(widget.knockoutData),
-        ),
-        Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                seriesCard(widget.knockoutData[0], widget.knockoutData[0]['roundNumber']),
-                seriesCard(widget.knockoutData[1], widget.knockoutData[1]['roundNumber']),
-              ],
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height / 60),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                seriesCard(widget.knockoutData[4], widget.knockoutData[4]['roundNumber']),
-              ],
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height / 60),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                seriesCard(widget.knockoutData[6], widget.knockoutData[6]['roundNumber']),
-              ],
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height / 60),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                seriesCard(widget.knockoutData[5], widget.knockoutData[5]['roundNumber']),
-              ],
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height / 60),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                seriesCard(widget.knockoutData[2], widget.knockoutData[2]['roundNumber']),
-                seriesCard(widget.knockoutData[3], widget.knockoutData[3]['roundNumber']),
-              ],
-            ),
-          ],
-        ),
-      ],
+    return SingleChildScrollView(
+      child: Stack(
+        children: [
+          // CustomPaint for drawing lines
+          CustomPaint(
+            size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+            painter: BracketPainter(widget.knockoutData),
+          ),
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  seriesCard(widget.knockoutData[0], widget.knockoutData[0]['roundNumber']),
+                  seriesCard(widget.knockoutData[1], widget.knockoutData[1]['roundNumber']),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height / 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  seriesCard(widget.knockoutData[4], widget.knockoutData[4]['roundNumber']),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height / 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  seriesCard(widget.knockoutData[6], widget.knockoutData[6]['roundNumber']),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height / 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  seriesCard(widget.knockoutData[5], widget.knockoutData[5]['roundNumber']),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height / 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  seriesCard(widget.knockoutData[2], widget.knockoutData[2]['roundNumber']),
+                  seriesCard(widget.knockoutData[3], widget.knockoutData[3]['roundNumber']),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -389,69 +394,69 @@ class BracketPainter extends CustomPainter {
     // Draw lines between rounds
     /// EAST SEMIS
     canvas.drawLine(
-      Offset(size.width * 0.7525, size.height * 0.165),
-      Offset(size.width * 0.7525, size.height * 0.19),
+      Offset(size.width * 0.7525, size.height * 0.05),
+      Offset(size.width * 0.7525, size.height * 0.1275),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[1], 2),
     );
     canvas.drawLine(
-      Offset(size.width * 0.2525, size.height * 0.165),
-      Offset(size.width * 0.2525, size.height * 0.19),
+      Offset(size.width * 0.2525, size.height * 0.05),
+      Offset(size.width * 0.2525, size.height * 0.1275),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[0], 2),
     );
     canvas.drawLine(
-      Offset(size.width * 0.2525, size.height * 0.19),
-      Offset(size.width * 0.5, size.height * 0.19),
+      Offset(size.width * 0.2525, size.height * 0.1275),
+      Offset(size.width * 0.5, size.height * 0.1275),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[0], 2),
     );
     canvas.drawLine(
-      Offset(size.width * 0.5, size.height * 0.19),
-      Offset(size.width * 0.7525, size.height * 0.19),
+      Offset(size.width * 0.5, size.height * 0.1275),
+      Offset(size.width * 0.7525, size.height * 0.1275),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[1], 2),
     );
     canvas.drawLine(
-      Offset(size.width * 0.5, size.height * 0.19),
-      Offset(size.width * 0.5, size.height * 0.215),
+      Offset(size.width * 0.5, size.height * 0.1275),
+      Offset(size.width * 0.5, size.height * 0.195),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[4], 3),
     );
 
     /// EAST FINALS
     canvas.drawLine(
-      Offset(size.width * 0.5, size.height * 0.35),
-      Offset(size.width * 0.5, size.height * 0.465),
+      Offset(size.width * 0.5, size.height * 0.195),
+      Offset(size.width * 0.5, size.height * 0.3325),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[4], 3),
     );
 
     /// WEST FINALS
     canvas.drawLine(
-      Offset(size.width * 0.5, size.height * 0.56),
-      Offset(size.width * 0.5, size.height * 0.65),
+      Offset(size.width * 0.5, size.height * 0.3325),
+      Offset(size.width * 0.5, size.height * 0.47),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[6], 3),
     );
 
     /// WEST SEMIS
     canvas.drawLine(
-      Offset(size.width * 0.7525, size.height * 0.7925),
-      Offset(size.width * 0.7525, size.height * 0.82),
+      Offset(size.width * 0.7525, size.height * 0.5375),
+      Offset(size.width * 0.7525, size.height * 0.615),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[3], 2),
     );
     canvas.drawLine(
-      Offset(size.width * 0.2525, size.height * 0.7925),
-      Offset(size.width * 0.2525, size.height * 0.82),
+      Offset(size.width * 0.2525, size.height * 0.5375),
+      Offset(size.width * 0.2525, size.height * 0.615),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[2], 2),
     );
     canvas.drawLine(
-      Offset(size.width * 0.2525, size.height * 0.7925),
-      Offset(size.width * 0.5, size.height * 0.7925),
+      Offset(size.width * 0.2525, size.height * 0.5375),
+      Offset(size.width * 0.5, size.height * 0.5375),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[2], 2),
     );
     canvas.drawLine(
-      Offset(size.width * 0.5, size.height * 0.7925),
-      Offset(size.width * 0.7525, size.height * 0.7925),
+      Offset(size.width * 0.5, size.height * 0.5375),
+      Offset(size.width * 0.7525, size.height * 0.5375),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[3], 2),
     );
     canvas.drawLine(
-      Offset(size.width * 0.5, size.height * 0.7925),
-      Offset(size.width * 0.5, size.height * 0.765),
+      Offset(size.width * 0.5, size.height * 0.47),
+      Offset(size.width * 0.5, size.height * 0.5375),
       knockoutData.isEmpty ? paint : choosePaint(knockoutData[5], 2),
     );
   }

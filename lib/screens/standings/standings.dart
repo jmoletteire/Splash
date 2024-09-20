@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/standings/playoffs/playoff_bracket.dart';
@@ -240,7 +241,11 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
             appBar: AppBar(
               backgroundColor: Colors.grey.shade900,
               surfaceTintColor: Colors.grey.shade900,
-              title: kSplashText,
+              title: Text(
+                'Splash',
+                style:
+                    TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 32.0.r),
+              ),
               actions: [
                 CustomIconButton(
                   icon: Icons.search,
@@ -269,13 +274,15 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                 indicatorWeight: 3.0,
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal,
+                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.sp.clamp(14.0, 25.0)),
                 tabs: [
                   const Tab(text: 'Conference'),
                   const Tab(text: 'Division'),
-                  if (int.parse(selectedSeason.substring(0, 4)) >= 1986)
+                  if (int.parse(selectedSeason.substring(0, 4)) >= 1986 &&
+                      !playoffDataNotifier.value.containsKey('error'))
                     const Tab(text: 'Playoffs'),
-                  if (int.parse(selectedSeason.substring(0, 4)) >= 2023)
+                  if (int.parse(selectedSeason.substring(0, 4)) >= 2023 &&
+                      !cupDataNotifier.value.containsKey('error'))
                     const Tab(text: 'NBA Cup'),
                 ],
               ),
@@ -312,6 +319,12 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                           'NW',
                           'PAC',
                           'SW',
+                          '100+ PTS',
+                          'LEAD HT',
+                          'LEAD 3Q',
+                          'W - FG%',
+                          'W - REB',
+                          'W - TOV'
                         ],
                         standings: eastTeams,
                         season: selectedSeason,
@@ -340,6 +353,12 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                           'NW',
                           'PAC',
                           'SW',
+                          '100+ PTS',
+                          'LEAD HT',
+                          'LEAD 3Q',
+                          'W - FG%',
+                          'W - REB',
+                          'W - TOV'
                         ],
                         standings: westTeams,
                         season: selectedSeason,
@@ -370,6 +389,18 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                           '> .500',
                           'EAST',
                           'WEST',
+                          'ATL',
+                          'CEN',
+                          'SE',
+                          'NW',
+                          'PAC',
+                          'SW',
+                          '100+ PTS',
+                          'LEAD HT',
+                          'LEAD 3Q',
+                          'W - FG%',
+                          'W - REB',
+                          'W - TOV'
                         ],
                         standings: divisions[divisionName]!,
                         season: selectedSeason,
@@ -377,7 +408,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                     }).toList(),
                   ),
                 ),
-                if (int.parse(selectedSeason.substring(0, 4)) >= 1986)
+                if (int.parse(selectedSeason.substring(0, 4)) >= 1986 &&
+                    !playoffDataNotifier.value.containsKey('error'))
                   ValueListenableBuilder<Map<String, dynamic>>(
                     valueListenable: playoffDataNotifier,
                     builder: (context, playoffData, _) {
@@ -387,7 +419,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                       );
                     },
                   ),
-                if (int.parse(selectedSeason.substring(0, 4)) >= 2023)
+                if (int.parse(selectedSeason.substring(0, 4)) >= 2023 &&
+                    !cupDataNotifier.value.containsKey('error'))
                   ValueListenableBuilder<Map<String, dynamic>>(
                     valueListenable: cupDataNotifier,
                     builder: (context, cupData, _) {

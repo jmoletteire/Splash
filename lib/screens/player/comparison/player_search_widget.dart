@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/utilities/constants.dart';
@@ -17,6 +18,7 @@ class PlayerSearchWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextField(
             autofocus: true,
@@ -47,7 +49,7 @@ class PlayerSearchWidget extends StatelessWidget {
                 },
               ),
             ),
-            style: kBebasNormal.copyWith(fontSize: 18.0),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
             cursorColor: Colors.white,
           ),
           const SizedBox(height: 8.0),
