@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
 class Inactives extends StatefulWidget {
@@ -36,56 +37,56 @@ class _InactivesState extends State<Inactives> {
     }
 
     return Card(
-      margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
+      margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
       color: Colors.grey.shade900,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                  bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
                 ),
               ),
               child: Text(
                 'INACTIVES',
-                style: kBebasBold.copyWith(fontSize: 18.0),
+                style: kBebasBold.copyWith(fontSize: 16.0.r),
               ),
             ),
-            const SizedBox(height: 8.0),
+            SizedBox(height: 8.0.r),
             Wrap(
               children: [
-                Text('${widget.awayAbbr}:', style: kBebasBold.copyWith(fontSize: 16.0)),
-                const SizedBox(width: 5.0),
+                Text('${widget.awayAbbr}:', style: kBebasBold.copyWith(fontSize: 14.0.r)),
+                SizedBox(width: 5.0.r),
                 ...List.generate(awayInactive.length, (index) {
                   return Text(
                     index != awayInactive.length - 1
                         ? '${awayInactive[index]}, '
                         : awayInactive[index],
-                    style: kBebasNormal.copyWith(fontSize: 16.0),
+                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
                   );
                 }),
                 if (awayInactive.isEmpty)
-                  Text('None', style: kBebasNormal.copyWith(fontSize: 16.0))
+                  Text('None', style: kBebasNormal.copyWith(fontSize: 14.0.r))
               ],
             ),
-            const SizedBox(height: 8.0),
+            SizedBox(height: 8.0.r),
             Wrap(
               children: [
-                Text('${widget.homeAbbr}:', style: kBebasBold.copyWith(fontSize: 16.0)),
-                const SizedBox(width: 5.0),
+                Text('${widget.homeAbbr}:', style: kBebasBold.copyWith(fontSize: 14.0.r)),
+                SizedBox(width: 5.0.r),
                 ...List.generate(homeInactive.length, (index) {
                   return Text(
                     index != homeInactive.length - 1
                         ? '${homeInactive[index]}, '
                         : homeInactive[index],
-                    style: kBebasNormal.copyWith(fontSize: 16.0),
+                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
                   );
                 }),
                 if (homeInactive.isEmpty)
-                  Text('None', style: kBebasNormal.copyWith(fontSize: 16.0))
+                  Text('None', style: kBebasNormal.copyWith(fontSize: 14.0.r))
               ],
             ),
           ],

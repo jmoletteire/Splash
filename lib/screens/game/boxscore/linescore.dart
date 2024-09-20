@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/team/team_home.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -36,20 +37,22 @@ class LineScore extends StatelessWidget {
                   flex: 2,
                   child: Container(
                       color: const Color(0xFF1B1B1B),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Text('', textAlign: TextAlign.start, style: kBebasBold),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0.r),
+                        child: Text('',
+                            textAlign: TextAlign.start,
+                            style: kBebasBold.copyWith(fontSize: 16.0.r)),
                       ))),
               for (int i = 1; i <= totalQuarters; i++)
                 Expanded(
                     child: Container(
                         color: const Color(0xFF1B1B1B),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: EdgeInsets.symmetric(horizontal: 8.0.r),
                           child: Text('Q$i',
                               textAlign: TextAlign.end,
                               style: kBebasBold.copyWith(
-                                  fontSize: 16.0, color: Colors.grey.shade400)),
+                                  fontSize: 14.0.r, color: Colors.grey.shade400)),
                         ))),
               if (overtimes > 0)
                 for (int i = 1; i <= overtimes; i++)
@@ -57,30 +60,30 @@ class LineScore extends StatelessWidget {
                       child: Container(
                           color: const Color(0xFF1B1B1B),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: EdgeInsets.symmetric(horizontal: 8.0.r),
                             child: Text(i == 1 ? 'OT' : '${i}OT',
                                 textAlign: TextAlign.end,
                                 style: kBebasBold.copyWith(
-                                    fontSize: 16.0, color: Colors.grey.shade400)),
+                                    fontSize: 14.0.r, color: Colors.grey.shade400)),
                           ))),
               Expanded(
                   child: Container(
                       color: const Color(0xFF2A2A2A),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        padding: EdgeInsets.symmetric(horizontal: 8.0.r),
                         child: Text('F',
                             textAlign: TextAlign.end,
                             style: kBebasBold.copyWith(
-                                fontSize: 16.0, color: Colors.grey.shade400)),
+                                fontSize: 14.0.r, color: Colors.grey.shade400)),
                       ))),
             ],
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            padding: EdgeInsets.symmetric(vertical: 4.0.r),
             child: LineScoreRow(teamId: awayTeam, abbr: awayAbbr, scores: awayScores),
           ),
           Container(
-            height: 3.0,
+            height: 3.0.r,
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(color: Colors.white12),
@@ -88,7 +91,7 @@ class LineScore extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            padding: EdgeInsets.symmetric(vertical: 4.0.r),
             child: LineScoreRow(teamId: homeTeam, abbr: homeAbbr, scores: homeScores),
           ),
         ],
@@ -125,18 +128,19 @@ class LineScoreRow extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
+              padding: EdgeInsets.only(left: 8.0.r),
               child: Row(
                 children: [
-                  if (teamId == '0') const SizedBox(width: 5.5),
+                  if (teamId == '0') SizedBox(width: 5.5.r),
                   Image.asset(
                     'images/NBA_Logos/$teamId.png',
-                    width: teamId == '0' ? 11.0 : 22.0,
+                    width: teamId == '0' ? 11.0.r : 22.0.r,
                   ),
-                  if (teamId == '0') const SizedBox(width: 5.5),
-                  const SizedBox(width: 5.0),
+                  if (teamId == '0') SizedBox(width: 5.5.r),
+                  SizedBox(width: 5.0.r),
                   Text(abbr,
-                      textAlign: TextAlign.start, style: kBebasBold.copyWith(fontSize: 20.0)),
+                      textAlign: TextAlign.start,
+                      style: kBebasBold.copyWith(fontSize: 18.0.r)),
                 ],
               ),
             ),
@@ -144,20 +148,20 @@ class LineScoreRow extends StatelessWidget {
           for (int i = 0; i < scores.length; i++)
             Expanded(
                 child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: EdgeInsets.symmetric(horizontal: 8.0.r),
               child: Text(
                 scores[i].toString(),
                 textAlign: TextAlign.end,
-                style: kBebasNormal.copyWith(color: Colors.grey.shade400),
+                style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.grey.shade400),
               ),
             )),
           Expanded(
               child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 8.0.r),
             child: Text(
               totalScore.toString(),
               textAlign: TextAlign.end,
-              style: kBebasNormal,
+              style: kBebasNormal.copyWith(fontSize: 18.0.r),
             ),
           )),
         ],

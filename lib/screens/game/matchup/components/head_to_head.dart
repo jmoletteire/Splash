@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../utilities/constants.dart';
 
@@ -26,10 +27,10 @@ class _H2HState extends State<H2H> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
+      margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
       color: Colors.grey.shade900,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
         child: Column(
           children: [
             ComparisonBar(
@@ -84,23 +85,23 @@ class ComparisonBar extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(awayTeam, style: kBebasNormal),
-                const SizedBox(width: 5.0),
+                Text(awayTeam, style: kBebasNormal.copyWith(fontSize: 18.0.r)),
+                SizedBox(width: 5.0.r),
                 Image.asset('images/NBA_Logos/${awayId}.png',
-                    width: awayId == '0' ? 12.0 : 18.0),
+                    width: awayId == '0' ? 12.0.r : 18.0.r),
               ],
             ),
-            Text('SERIES', style: kBebasBold.copyWith(fontSize: 17.0)),
+            Text('SERIES', style: kBebasBold.copyWith(fontSize: 15.0.r)),
             Row(
               children: [
-                Image.asset('images/NBA_Logos/${homeId}.png', width: 18.0),
-                const SizedBox(width: 5.0),
-                Text(homeTeam, style: kBebasNormal),
+                Image.asset('images/NBA_Logos/${homeId}.png', width: 18.0.r),
+                SizedBox(width: 5.0.r),
+                Text(homeTeam, style: kBebasNormal.copyWith(fontSize: 18.0.r)),
               ],
             ),
           ],
         ),
-        const SizedBox(height: 6.0),
+        SizedBox(height: 6.0.r),
         Stack(
           children: [
             Positioned(
@@ -109,7 +110,7 @@ class ComparisonBar extends StatelessWidget {
                   Expanded(
                     flex: (awayTeamPercentage * 100).toInt(),
                     child: Container(
-                      height: 20,
+                      height: 20.0.r,
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(20.0),
@@ -122,7 +123,7 @@ class ComparisonBar extends StatelessWidget {
                           awayTeamPercentage > 0
                               ? '${(awayTeamPercentage * 100).toStringAsFixed(1)}%'
                               : '    ',
-                          style: kBebasNormal.copyWith(fontSize: 15.0),
+                          style: kBebasNormal.copyWith(fontSize: 13.0.r),
                         ),
                       ),
                     ),
@@ -130,7 +131,7 @@ class ComparisonBar extends StatelessWidget {
                   Expanded(
                     flex: (homeTeamPercentage * 100).toInt(),
                     child: Container(
-                      height: 20,
+                      height: 20.0.r,
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.only(
                           topRight: Radius.circular(20.0),
@@ -143,7 +144,7 @@ class ComparisonBar extends StatelessWidget {
                           homeTeamPercentage > 0
                               ? '${(homeTeamPercentage * 100).toStringAsFixed(1)}%'
                               : '    ',
-                          style: kBebasNormal.copyWith(fontSize: 15.0),
+                          style: kBebasNormal.copyWith(fontSize: 13.0.r),
                         ),
                       ),
                     ),
@@ -153,7 +154,7 @@ class ComparisonBar extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 6.0),
+        SizedBox(height: 6.0.r),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -161,12 +162,12 @@ class ComparisonBar extends StatelessWidget {
                 awayTeamWins == 1
                     ? '${awayTeamWins.toStringAsFixed(0)} WIN'
                     : '${awayTeamWins.toStringAsFixed(0)} WINS',
-                style: kBebasNormal.copyWith(fontSize: 16.0)),
+                style: kBebasNormal.copyWith(fontSize: 14.0.r)),
             Text(
                 homeTeamWins == 1
                     ? '${homeTeamWins.toStringAsFixed(0)} WIN'
                     : '${homeTeamWins.toStringAsFixed(0)} WINS',
-                style: kBebasNormal.copyWith(fontSize: 16.0)),
+                style: kBebasNormal.copyWith(fontSize: 14.0.r)),
           ],
         ),
       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
@@ -198,10 +199,15 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
               preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
               child: AppBar(
                 backgroundColor: Colors.grey.shade900,
-                title: kSplashText,
+                title: Text(
+                  'Splash',
+                  style: TextStyle(
+                      color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 32.0.r),
+                ),
                 actions: [
                   CustomIconButton(
                     icon: Icons.search,
+                    size: 30.0.r,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -213,6 +219,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                   ),
                   CustomIconButton(
                     icon: Icons.calendar_month,
+                    size: 30.0.r,
                     onPressed: () {
                       showModalBottomSheet(
                         backgroundColor: Colors.grey.shade900,
@@ -301,8 +308,8 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                   indicatorColor: Colors.deepOrange,
                   unselectedLabelColor: Colors.white70,
                   labelColor: Colors.deepOrangeAccent,
-                  labelStyle: kBebasNormal,
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+                  labelPadding: EdgeInsets.symmetric(horizontal: 20.0.r),
                   onTap: (index) {
                     setState(() {
                       selectedDate = _dates[index];
@@ -315,7 +322,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                   },
                   tabs: _dates.map((date) {
                     return Tab(
-                      height: 55.0,
+                      height: 50.0.r,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -350,16 +357,16 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.sports_basketball,
                                     color: Colors.white38,
-                                    size: 40.0,
+                                    size: 40.0.r,
                                   ),
-                                  const SizedBox(height: 15.0),
+                                  SizedBox(height: 15.0.r),
                                   Text(
                                     'No Games Today',
                                     style: kBebasNormal.copyWith(
-                                        fontSize: 20.0, color: Colors.white54),
+                                        fontSize: 18.0.r, color: Colors.white54),
                                   ),
                                 ],
                               ),
@@ -396,10 +403,10 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                           Column(
                             children: [
                               SizedBox(height: MediaQuery.sizeOf(context).height / 10),
-                              const Icon(
+                              Icon(
                                 Icons.sports_basketball,
                                 color: Colors.white38,
-                                size: 40.0,
+                                size: 40.0.r,
                               ),
                               SizedBox(height: MediaQuery.sizeOf(context).height / 10),
                             ],
@@ -417,16 +424,16 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.sports_basketball,
                                 color: Colors.white38,
-                                size: 40.0,
+                                size: 40.0.r,
                               ),
-                              const SizedBox(height: 15.0),
+                              SizedBox(height: 15.0.r),
                               Text(
                                 'No Games Today',
                                 style: kBebasNormal.copyWith(
-                                    fontSize: 20.0, color: Colors.white54),
+                                    fontSize: 18.0.r, color: Colors.white54),
                               ),
                             ],
                           ),
@@ -440,9 +447,9 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                       goToMaxDate();
                     },
                     backgroundColor: Colors.deepOrange,
-                    child: const Icon(
+                    child: Icon(
                       Icons.home,
-                      size: 28.0,
+                      size: 28.0.r,
                     ),
                   )
                 : null,

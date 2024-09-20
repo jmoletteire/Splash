@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../../components/player_avatar.dart';
@@ -234,7 +235,7 @@ class PlayerCard extends StatelessWidget {
           AutoSizeText(
             name,
             maxLines: 1,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
           Text(
             position,

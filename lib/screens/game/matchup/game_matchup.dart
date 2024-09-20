@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'components/game_basic_info.dart';
 import 'components/head_to_head.dart';
@@ -46,7 +47,7 @@ class _GameMatchupState extends State<GameMatchup> {
     return CustomScrollView(
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.only(bottom: 50.0),
+          padding: EdgeInsets.only(bottom: 50.0.r),
           sliver: SliverList(
             delegate: SliverChildListDelegate(
               [

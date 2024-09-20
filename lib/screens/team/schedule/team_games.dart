@@ -342,7 +342,8 @@ class _TeamGamesState extends State<TeamGames> {
                                 awayId: teamGames[gamesList[index]]['HOME_AWAY'] == '@'
                                     ? widget.team['TEAM_ID'].toString()
                                     : teamGames[gamesList[index]]['OPP'].toString(),
-                                gameTime: teamGames[gamesList[index]]['RESULT'] == 'Upcoming'
+                                gameTime: teamGames[gamesList[index]]['RESULT'] != 'W' &&
+                                        teamGames[gamesList[index]]['RESULT'] != 'L'
                                     ? adjustTimezone(
                                         teamGames[gamesList[index]]['GAME_DATE'],
                                         teamGames[gamesList[index]]['RESULT'],
@@ -446,7 +447,8 @@ class _TeamGamesState extends State<TeamGames> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         Text(
-                                          teamGames[gamesList[index]]['RESULT'] == 'Upcoming'
+                                          teamGames[gamesList[index]]['RESULT'] != 'W' &&
+                                                  teamGames[gamesList[index]]['RESULT'] != 'L'
                                               ? adjustTimezone(
                                                   teamGames[gamesList[index]]['GAME_DATE'],
                                                   teamGames[gamesList[index]]['RESULT'])

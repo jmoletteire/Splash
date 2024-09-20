@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/default_animated_switcher_transition_builder.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
@@ -50,14 +51,15 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       'TS%',
       'USG%',
       '+/-',
+      'NRTG',
       'ORTG',
       'DRTG',
-      'NRTG',
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return SliverTableView.builder(
       horizontalScrollController: widget.controller,
       style: const TableViewStyle(
@@ -80,72 +82,158 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       columns: [
         /// PLAYER
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.3,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.15
+              : MediaQuery.of(context).size.width * 0.3,
           freezePriority: 1,
         ),
 
         /// POSS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// MIN
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.125,
+        ),
 
         /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// REB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// AST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// TOV
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// FGM - FGA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.11,
+        ),
 
         /// 3PM - 3PA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.11,
+        ),
 
         /// FTM - FTA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.11,
+        ),
 
         /// STL
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.04
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// BLK
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// OREB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// DREB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// PF
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// EFG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
 
         /// TS%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
 
         /// USG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
 
         /// +/-
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// ORTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
 
         /// DRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
 
         /// NRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -159,9 +247,8 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           return Material(
             color: Colors.grey.shade800,
             child: Padding(
-              padding: column == 0
-                  ? const EdgeInsets.only(left: 20.0)
-                  : const EdgeInsets.only(right: 8.0),
+              padding:
+                  column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
               child: Align(
                 alignment: column == 0
                     ? Alignment.centerLeft
@@ -171,7 +258,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                 child: Text(
                   columnNames[column],
                   style: kBebasNormal.copyWith(
-                    fontSize: 16.0,
+                    fontSize: 14.0.r,
                   ),
                 ),
               ),
@@ -225,7 +312,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           highlightColor: Colors.white,
           child: contentBuilder(context, (context, column) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              padding: EdgeInsets.symmetric(horizontal: 8.0.r),
               child: getContent(widget.players[row], row, column, context),
             );
           }),
@@ -244,12 +331,12 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           child: Row(
             children: [
               PlayerAvatar(
-                radius: 12.0,
+                radius: 12.0.r,
                 backgroundColor: Colors.white12,
                 playerImageUrl:
                     'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PLAYER_ID']}.png',
               ),
-              const SizedBox(width: 5.0),
+              SizedBox(width: 5.0.r),
               Flexible(
                 child: RichText(
                     maxLines: 1,
@@ -261,7 +348,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                               '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(firstSpaceIndex + 1)}',
                           style: kBebasNormal.copyWith(
                             color: Colors.white70,
-                            fontSize: 15.0,
+                            fontSize: 13.0.r,
                           ),
                         ),
                         if (widget.playerGroup == 'STARTERS')
@@ -269,7 +356,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                             text: ', ${widget.players[row]['START_POSITION']}',
                             style: kBebasNormal.copyWith(
                               color: Colors.white,
-                              fontSize: 15.0,
+                              fontSize: 13.0.r,
                             ),
                           ),
                       ],
@@ -284,7 +371,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
             alignment: Alignment.centerRight,
             child: Text(
               '${widget.players[row]['POSS']}',
-              style: kBebasNormal.copyWith(fontSize: 16.0),
+              style: kBebasNormal.copyWith(fontSize: 14.0.r),
             ),
           );
         } catch (e) {
@@ -296,7 +383,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
             alignment: Alignment.centerRight,
             child: Text(
               '${widget.players[row]['MIN'].replaceAll(RegExp(r'\..*?(?=:)'), '')}',
-              style: kBebasNormal.copyWith(fontSize: 16.0),
+              style: kBebasNormal.copyWith(fontSize: 14.0.r),
             ),
           );
         } catch (e) {
@@ -411,21 +498,21 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       case 19:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['OFF_RATING'].toStringAsFixed(1)}');
+              text: '${widget.players[row]['NET_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 20:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['DEF_RATING'].toStringAsFixed(1)}');
+              text: '${widget.players[row]['OFF_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 21:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['NET_RATING'].toStringAsFixed(1)}');
+              text: '${widget.players[row]['DEF_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -448,7 +535,7 @@ class BoxscoreDataText extends StatelessWidget {
       child: AutoSizeText(
         text,
         maxLines: 1,
-        style: kBebasNormal.copyWith(fontSize: 17.0),
+        style: kBebasNormal.copyWith(fontSize: 15.0.r),
       ),
     );
   }

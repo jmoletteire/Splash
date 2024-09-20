@@ -62,11 +62,11 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
           backgroundColor: Colors.grey.shade900,
           title: Text(
             'Season',
-            style: kBebasBold.copyWith(fontSize: 18.0),
+            style: kBebasBold.copyWith(fontSize: 16.0.r),
           ),
           content: SizedBox(
             width: double.minPositive,
-            height: 300,
+            height: 300.r,
             child: Theme(
               data: Theme.of(context).copyWith(
                   colorScheme: const ColorScheme.light(
@@ -74,10 +74,10 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                     onPrimary: Colors.white, // Selected item text color
                     onSurface: Colors.white, // Unselected item text color
                   ),
-                  textTheme: const TextTheme(bodyLarge: kBebasNormal)),
+                  textTheme: TextTheme(bodyLarge: kBebasNormal.copyWith(fontSize: 16.0.r))),
               child: YearPicker(
                 firstDate: DateTime(1981),
-                lastDate: DateTime.now().add(Duration(days: 365)),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
                 selectedDate: DateTime(selectedYear),
                 onChanged: (DateTime dateTime) {
                   Navigator.pop(context, dateTime.year);
@@ -249,6 +249,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
               actions: [
                 CustomIconButton(
                   icon: Icons.search,
+                  size: 30.0.r,
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -260,6 +261,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                 ),
                 CustomIconButton(
                   icon: Icons.calendar_month,
+                  size: 30.0.r,
                   onPressed: () {
                     _showYearPicker(context);
                   },

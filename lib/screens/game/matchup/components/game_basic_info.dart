@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../utilities/constants.dart';
@@ -31,10 +32,10 @@ class GameBasicInfo extends StatelessWidget {
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(parsedDate).toUpperCase();
 
     return Card(
-      margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
+      margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
       color: Colors.grey.shade900,
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: EdgeInsets.all(15.0.r),
         child: Column(
           children: [
             // Date
@@ -42,7 +43,7 @@ class GameBasicInfo extends StatelessWidget {
               icon: Icons.calendar_month,
               data: [formattedDate],
             ),
-            const SizedBox(height: 10.0),
+            SizedBox(height: 10.0.r),
             // Broadcast
             GameBasicInfoRow(
               icon: Icons.tv_sharp,
@@ -51,7 +52,7 @@ class GameBasicInfo extends StatelessWidget {
                     'LEAGUE PASS'
               ],
             ),
-            const SizedBox(height: 10.0),
+            SizedBox(height: 10.0.r),
             // Officials
             GameBasicInfoRow(
               icon: Icons.sports,
@@ -82,13 +83,13 @@ class GameBasicInfoRow extends StatelessWidget {
         children: [
           Icon(
             icon,
-            size: 22.0,
+            size: 20.0.r,
           ),
-          const SizedBox(width: 15.0),
+          SizedBox(width: 15.0.r),
           ...List.generate(data.length, (index) {
             return Text(
               index != data.length - 1 ? '${data[index]}, ' : data[index],
-              style: kBebasNormal.copyWith(fontSize: 16.0),
+              style: kBebasNormal.copyWith(fontSize: 14.0.r),
             );
           }),
         ],

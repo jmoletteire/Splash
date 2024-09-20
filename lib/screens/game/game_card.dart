@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -58,19 +59,19 @@ class _GameCardState extends State<GameCard> {
 
         return Text(
           'Game $gameNum - $conf ${poRounds[roundId]}',
-          style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       case 'Play-In':
         return Text(
           'Play-In Tourney',
-          style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       case 'In-Season Tournament':
         return Text(
           'Emirates NBA Cup Final',
-          style: kBebasNormal.copyWith(fontSize: 15.0, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       default:
@@ -90,6 +91,8 @@ class _GameCardState extends State<GameCard> {
         linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[0] : linescore[1];
     Map<String, dynamic> awayLinescore =
         linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[1] : linescore[0];
+
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return GestureDetector(
       onTap: () {
@@ -113,7 +116,7 @@ class _GameCardState extends State<GameCard> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: EdgeInsets.all(15.0.r),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -130,35 +133,35 @@ class _GameCardState extends State<GameCard> {
                           Text(
                             summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
                             style: kBebasBold.copyWith(
-                                fontSize: 14.0, color: Colors.grey.shade300),
+                                fontSize: 12.0.r, color: Colors.grey.shade300),
                             textAlign: TextAlign.start,
                           ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
-                            const SizedBox(width: 3.0),
+                            SizedBox(width: 3.0.r),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
                             SvgPicture.asset(
                               'images/NBA_TV.svg',
-                              width: 12.0,
-                              height: 12.0,
+                              width: 10.0.r,
+                              height: 10.0.r,
                             ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
                             SvgPicture.asset(
                               'images/TNT.svg',
-                              width: 18.0,
-                              height: 18.0,
+                              width: 16.0.r,
+                              height: 16.0.r,
                             ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
                             SvgPicture.asset(
                               'images/ESPN.svg',
-                              width: 7.0,
-                              height: 7.0,
+                              width: 5.0.r,
+                              height: 5.0.r,
                             ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
                             SvgPicture.asset(
                               'images/abc.svg',
-                              width: 18.0,
-                              height: 18.0,
+                              width: 16.0.r,
+                              height: 16.0.r,
                             ),
                         ],
                       ],
@@ -171,7 +174,7 @@ class _GameCardState extends State<GameCard> {
                           ? summary['GAME_STATUS_TEXT']
                           : '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ',
                       style: kBebasNormal.copyWith(
-                          fontSize: 15.0,
+                          fontSize: 13.0.r,
                           color: summary['GAME_STATUS_TEXT'] == 'Final'
                               ? Colors.grey.shade300
                               : Colors.white),
@@ -180,30 +183,32 @@ class _GameCardState extends State<GameCard> {
                   )
                 ],
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
 
               /// AWAY TEAM ROW
               Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
+                  /*
                   Expanded(
                     flex: 1,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 3.0, 10.0, 0.0),
+                      padding: EdgeInsets.fromLTRB(0.0, 3.0.r, 10.0.r, 0.0),
                       child: kTeamNames.containsKey(widget.awayTeam.toString())
                           ? ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 26.0),
+                              constraints: BoxConstraints(maxWidth: 24.0.r),
                               child: Image.asset(
                                 'images/NBA_Logos/${widget.awayTeam}.png',
                                 fit: BoxFit.contain,
-                                width: 26.0,
-                                height: 26.0,
+                                width: 24.0.r,
+                                height: 24.0.r,
                               ),
                             )
                           : const Text(''),
                     ),
                   ),
+                   */
                   Expanded(
                     flex: 8,
                     child: Row(
@@ -215,6 +220,26 @@ class _GameCardState extends State<GameCard> {
                             textBaseline: TextBaseline.alphabetic,
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             children: [
+                              kTeamNames.containsKey(widget.awayTeam.toString())
+                                  ? ConstrainedBox(
+                                      constraints: BoxConstraints(maxWidth: 24.0.r),
+                                      child: Image.asset(
+                                        'images/NBA_Logos/${widget.awayTeam}.png',
+                                        fit: BoxFit.contain,
+                                        width: 24.0.r,
+                                        height: 24.0.r,
+                                      ),
+                                    )
+                                  : ConstrainedBox(
+                                      constraints: BoxConstraints(maxWidth: 24.0.r),
+                                      child: Image.asset(
+                                        'images/NBA_Logos/0.png',
+                                        fit: BoxFit.contain,
+                                        width: 24.0.r,
+                                        height: 24.0.r,
+                                      ),
+                                    ),
+                              SizedBox(width: 10.0.r),
                               Text(
                                 kTeamNames[widget.awayTeam.toString()]?[0] ??
                                     awayLinescore['TEAM_NICKNAME'],
@@ -224,15 +249,13 @@ class _GameCardState extends State<GameCard> {
                                       : (summary['GAME_STATUS_TEXT'] == 'Final'
                                           ? Colors.grey
                                           : Colors.white), // Away team lost
-                                  fontSize: 22.0,
+                                  fontSize: 20.0.r,
                                 ),
                               ),
-                              const SizedBox(
-                                width: 4.0,
-                              ),
+                              SizedBox(width: 4.0.r),
                               Text(
                                 awayLinescore['TEAM_WINS_LOSSES'],
-                                style: kGameCardTextStyle,
+                                style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
                               ),
                             ],
                           ),
@@ -255,17 +278,17 @@ class _GameCardState extends State<GameCard> {
                                         : (summary['GAME_STATUS_TEXT'] == 'Final'
                                             ? Colors.grey
                                             : Colors.white), // Away team lost
-                                    fontSize: 22.0,
+                                    fontSize: 20.0.r,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 17.0),
+                              SizedBox(width: 15.0.r),
                               Expanded(
                                 flex: 1,
                                 child: Text(
                                   '206.5',
                                   textAlign: TextAlign.right,
-                                  style: kGameCardTextStyle,
+                                  style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
                                 ),
                               ),
                             ],
@@ -282,21 +305,23 @@ class _GameCardState extends State<GameCard> {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
+                  /*
                   Expanded(
                     flex: 1,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 3.0, 10.0, 0.0),
+                      padding: EdgeInsets.fromLTRB(0.0, 3.0.r, 10.0.r, 0.0),
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 26.0),
+                        constraints: BoxConstraints(maxWidth: 24.0.r),
                         child: Image.asset(
                           'images/NBA_Logos/${widget.homeTeam}.png',
                           fit: BoxFit.contain,
-                          width: 26.0,
-                          height: 26.0,
+                          width: 24.0.r,
+                          height: 24.0.r,
                         ),
                       ),
                     ),
                   ),
+                   */
                   Expanded(
                     flex: 8,
                     child: Row(
@@ -308,6 +333,26 @@ class _GameCardState extends State<GameCard> {
                             textBaseline: TextBaseline.alphabetic,
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             children: [
+                              kTeamNames.containsKey(widget.homeTeam.toString())
+                                  ? ConstrainedBox(
+                                      constraints: BoxConstraints(maxWidth: 24.0.r),
+                                      child: Image.asset(
+                                        'images/NBA_Logos/${widget.homeTeam}.png',
+                                        fit: BoxFit.contain,
+                                        width: 24.0.r,
+                                        height: 24.0.r,
+                                      ),
+                                    )
+                                  : ConstrainedBox(
+                                      constraints: BoxConstraints(maxWidth: 24.0.r),
+                                      child: Image.asset(
+                                        'images/NBA_Logos/0.png',
+                                        fit: BoxFit.contain,
+                                        width: 24.0.r,
+                                        height: 24.0.r,
+                                      ),
+                                    ),
+                              SizedBox(width: 10.0.r),
                               Text(
                                 kTeamNames[widget.homeTeam.toString()][0],
                                 style: kGameCardTextStyle.copyWith(
@@ -316,15 +361,13 @@ class _GameCardState extends State<GameCard> {
                                       : (summary['GAME_STATUS_TEXT'] == 'Final'
                                           ? Colors.grey
                                           : Colors.white), // Home team lost
-                                  fontSize: 22.0,
+                                  fontSize: 20.0.r,
                                 ),
                               ),
-                              const SizedBox(
-                                width: 4.0,
-                              ),
+                              SizedBox(width: 4.0.r),
                               Text(
                                 homeLinescore['TEAM_WINS_LOSSES'],
-                                style: kGameCardTextStyle,
+                                style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
                               ),
                             ],
                           ),
@@ -347,17 +390,17 @@ class _GameCardState extends State<GameCard> {
                                         : (summary['GAME_STATUS_TEXT'] == 'Final'
                                             ? Colors.grey
                                             : Colors.white), // Home team lost
-                                    fontSize: 22.0,
+                                    fontSize: 20.0.r,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 17.0),
+                              SizedBox(width: 15.0.r),
                               Expanded(
                                 flex: 1,
                                 child: Text(
                                   '-6.5',
                                   textAlign: TextAlign.right,
-                                  style: kGameCardTextStyle,
+                                  style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
                                 ),
                               ),
                             ],

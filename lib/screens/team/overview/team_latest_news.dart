@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -75,10 +76,10 @@ class _TeamLatestNewsState extends State<TeamLatestNews> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(11.0),
+      margin: EdgeInsets.all(11.0.r),
       color: Colors.grey.shade900,
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: EdgeInsets.all(15.0.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -87,27 +88,25 @@ class _TeamLatestNewsState extends State<TeamLatestNews> {
                 Container(
                   decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                      bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
                     ),
                   ),
                   child: Text(
                     //'Franchise',
                     'Latest',
-                    style: kBebasBold.copyWith(
-                        fontSize: 20.0, color: Colors.white),
+                    style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 5.0),
+            SizedBox(height: 5.0.r),
             if (news.isEmpty)
               Padding(
-                padding: EdgeInsets.all(15.0),
+                padding: EdgeInsets.all(15.0.r),
                 child: Center(
                   child: Text(
                     'No News',
-                    style: kBebasBold.copyWith(
-                        fontSize: 18.0, color: Colors.white70),
+                    style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.white70),
                   ),
                 ),
               ),
@@ -168,7 +167,7 @@ class _TeamLatestNewsState extends State<TeamLatestNews> {
                     );
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: EdgeInsets.symmetric(vertical: 8.0.r),
                     child: Column(
                       children: [
                         Row(
@@ -176,23 +175,21 @@ class _TeamLatestNewsState extends State<TeamLatestNews> {
                           children: [
                             // Add spacing between date and transaction text
                             Expanded(
-                              flex: 7,
+                              flex: 6,
                               child: Text(item['headline']!,
-                                  style: kBebasNormal.copyWith(fontSize: 16.0)),
+                                  style: kBebasNormal.copyWith(fontSize: 16.0.r)),
                             ),
-                            if (item['image'] != 'null')
-                              const SizedBox(width: 10.0),
+                            if (item['image'] != 'null') SizedBox(width: 10.0.r),
                             if (item['image'] != 'null')
                               Expanded(
                                 flex: 3,
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                      8.0), // Adjust the radius as needed
+                                  borderRadius: BorderRadius.circular(8.0),
                                   child: Image.network(
                                     item['image']!,
                                     fit: BoxFit.cover,
-                                    height: 70.0, // Adjust the height as needed
-                                    width: 70.0, // Adjust the width as needed
+                                    height: 70.0.h,
+                                    width: 70.0.w,
                                   ),
                                 ),
                               ),
@@ -205,14 +202,13 @@ class _TeamLatestNewsState extends State<TeamLatestNews> {
                             Text(
                               timeAgo(item['date']!),
                               style: kBebasNormal.copyWith(
-                                  fontSize: 14.0, color: Colors.white60),
+                                  fontSize: 12.0.r, color: Colors.white60),
                             ),
-                            const Text(
-                                ' • '), // Add spacing between date and transaction text
+                            const Text(' • '), // Add spacing between date and transaction text
                             Text(
                               item['provider']!,
                               style: kBebasNormal.copyWith(
-                                  fontSize: 14.0, color: Colors.white60),
+                                  fontSize: 12.0.r, color: Colors.white60),
                             ),
                           ],
                         ),

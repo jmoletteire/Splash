@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -99,10 +100,10 @@ class _LastMeetingState extends State<LastMeeting> {
           );
         },
         child: Card(
-          margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
+          margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
           color: Colors.grey.shade900,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
             child: Column(
               children: [
                 Row(
@@ -111,17 +112,17 @@ class _LastMeetingState extends State<LastMeeting> {
                     Container(
                       decoration: BoxDecoration(
                         border: Border(
-                          bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                          bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
                         ),
                       ),
                       child: Text(
                         'Previous Meeting',
-                        style: kBebasBold.copyWith(fontSize: 18.0),
+                        style: kBebasBold.copyWith(fontSize: 16.0.r),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8.0),
+                SizedBox(height: 8.0.r),
                 Row(
                   children: [
                     Expanded(
@@ -133,11 +134,11 @@ class _LastMeetingState extends State<LastMeeting> {
                           Text(
                             gameDate[0],
                             style:
-                                kBebasNormal.copyWith(fontSize: 13.0, color: Colors.white70),
+                                kBebasNormal.copyWith(fontSize: 11.0.r, color: Colors.white70),
                           ),
                           Text(
                             gameDate[1],
-                            style: kBebasNormal.copyWith(fontSize: 13.0),
+                            style: kBebasNormal.copyWith(fontSize: 11.0.r),
                           ),
                         ],
                       ),
@@ -147,17 +148,17 @@ class _LastMeetingState extends State<LastMeeting> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          const SizedBox(width: 15.0),
+                          SizedBox(width: 15.0.r),
                           SizedBox(
-                            width: 24.0,
-                            height: 24.0,
+                            width: 24.0.r,
+                            height: 24.0.r,
                             child: lastAwayId == ''
                                 ? const Text('')
                                 : Image.asset(
                                     'images/NBA_Logos/$lastAwayId.png',
                                     fit: BoxFit.contain,
-                                    width: 16.0,
-                                    height: 16.0,
+                                    width: 16.0.r,
+                                    height: 16.0.r,
                                   ),
                           ),
                           Text(
@@ -182,7 +183,7 @@ class _LastMeetingState extends State<LastMeeting> {
                           ),
                           Text(
                             '@',
-                            style: kBebasBold.copyWith(fontSize: 14.0),
+                            style: kBebasBold.copyWith(fontSize: 12.0.r),
                           ),
                           Text(
                             widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() ==
@@ -205,28 +206,28 @@ class _LastMeetingState extends State<LastMeeting> {
                             ),
                           ),
                           SizedBox(
-                            width: 24.0,
-                            height: 24.0,
+                            width: 24.0.r,
+                            height: 24.0.r,
                             child: lastHomeId == ''
                                 ? const Text('')
                                 : Image.asset(
                                     'images/NBA_Logos/$lastHomeId.png',
                                     fit: BoxFit.contain,
-                                    width: 16.0,
-                                    height: 16.0,
+                                    width: 16.0.r,
+                                    height: 16.0.r,
                                   ),
                           ),
                         ],
                       ),
                     ),
-                    const Expanded(
+                    Expanded(
                       flex: 2,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Icon(
                             Icons.arrow_forward_ios,
-                            size: 16.0,
+                            size: 16.0.r,
                           ),
                         ],
                       ),

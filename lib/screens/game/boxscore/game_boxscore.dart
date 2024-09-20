@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:splash/screens/game/boxscore/box_player_stats.dart';
 import 'package:splash/screens/game/boxscore/linescore.dart';
@@ -171,7 +172,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     return Column(
       children: [
         Container(
-          height: (kToolbarHeight - 15) / 4.5,
+          height: (kToolbarHeight - 15.0.r) / 4.5.r,
           decoration: const BoxDecoration(
             color: Color(0xFF1B1B1B),
             border: Border(
@@ -203,7 +204,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           ],
         ),
         Container(
-          height: (kToolbarHeight - 15),
+          height: (kToolbarHeight - 15.0.r),
           decoration: const BoxDecoration(
             color: Color(0xFF1B1B1B),
             border: Border(
@@ -216,17 +217,17 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
             children: [
               Text(
                 '$topScorer  - $highestPTS  PTS',
-                style: kBebasNormal.copyWith(fontSize: 14.0, color: Colors.grey.shade300),
+                style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
-              const SizedBox(width: 25.0),
+              SizedBox(width: 25.0.r),
               Text(
                 '$topRebounder  - $highestREB  REB',
-                style: kBebasNormal.copyWith(fontSize: 14.0, color: Colors.grey.shade300),
+                style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
-              const SizedBox(width: 25.0),
+              SizedBox(width: 25.0.r),
               Text(
                 '$topAssistant  - $highestAST  AST',
-                style: kBebasNormal.copyWith(fontSize: 14.0, color: Colors.grey.shade300),
+                style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
             ],
           ),
@@ -245,7 +246,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                   : 'FA'),
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
-          labelStyle: kBebasNormal,
+          labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
           tabs: <Widget>[
             Row(
               children: [
@@ -259,7 +260,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                         end: Alignment.centerLeft,
                       ),
                     ),
-                    margin: const EdgeInsets.only(bottom: 3.0),
+                    margin: EdgeInsets.only(bottom: 3.0.r),
                     child: Tab(
                       text: awayLinescore['TEAM_NICKNAME'],
                     ),
@@ -271,7 +272,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               children: [
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 3.0),
+                    margin: EdgeInsets.only(bottom: 3.0.r),
                     color: const Color(0xFF1B1B1B),
                     child: const Tab(
                       text: "TEAM",
@@ -284,7 +285,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               children: [
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 3.0),
+                    margin: EdgeInsets.only(bottom: 3.0.r),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [const Color(0xFF1B1B1B), homeContainerColor],
@@ -324,7 +325,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 CustomScrollView(
                   slivers: [
                     SliverPadding(
-                      padding: const EdgeInsets.only(top: 10.0),
+                      padding: EdgeInsets.only(top: 10.0.r),
                       sliver: BoxTeamStats(
                         teams: teamStats,
                         homeId: widget.homeId,

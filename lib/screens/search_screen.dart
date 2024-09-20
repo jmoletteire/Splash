@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/player/player_home.dart';
 import 'package:splash/screens/team/team_home.dart';
@@ -82,7 +83,7 @@ class SearchScreen extends StatelessWidget {
               },
             ),
           ),
-          style: kBebasNormal.copyWith(fontSize: 18.0),
+          style: kBebasNormal.copyWith(fontSize: 16.0.r),
           cursorColor: Colors.white,
         ),
       ),
@@ -104,17 +105,15 @@ class SearchScreen extends StatelessWidget {
                         title: Row(
                           children: [
                             PlayerAvatar(
-                              radius: 20.0,
+                              radius: 20.0.r,
                               backgroundColor: Colors.white12,
                               playerImageUrl:
                                   'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
                             ),
-                            const SizedBox(
-                              width: 15.0,
-                            ),
+                            SizedBox(width: 15.0.r),
                             Text(
                               player['DISPLAY_FIRST_LAST'],
-                              style: kBebasNormal.copyWith(fontSize: 18.0),
+                              style: kBebasNormal.copyWith(fontSize: 16.0.r),
                             ),
                           ],
                         ),
@@ -136,20 +135,18 @@ class SearchScreen extends StatelessWidget {
                         title: Row(
                           children: [
                             Container(
-                              margin: const EdgeInsets.only(left: 4.0),
+                              margin: EdgeInsets.only(left: 4.0.r),
                               child: Image.asset(
                                 'images/NBA_Logos/${team['TEAM_ID']}.png',
                                 fit: BoxFit.contain,
-                                width: 40,
-                                height: 40,
+                                width: 40.r,
+                                height: 40.r,
                               ),
                             ),
-                            const SizedBox(
-                              width: 15.0,
-                            ),
+                            SizedBox(width: 15.0.r),
                             Text(
                               '${team['CITY']} ${team['NICKNAME']}',
-                              style: kBebasNormal.copyWith(fontSize: 18.0),
+                              style: kBebasNormal.copyWith(fontSize: 16.0.r),
                             ),
                           ],
                         ),

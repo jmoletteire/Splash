@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -93,24 +94,24 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
     return Skeletonizer(
       enabled: _isLoading,
       child: Card(
-        margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
+        margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
         color: Colors.grey.shade900,
         child: Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: EdgeInsets.all(15.0.r),
           child: Column(
             children: [
               Container(
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                    bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Season Stats',
-                  style: kBebasBold,
+                  style: kBebasBold.copyWith(fontSize: 16.0.r),
                 ),
               ),
-              const SizedBox(height: 10.0),
+              SizedBox(height: 10.0.r),
               ComparisonRow(
                 statName: 'ORTG',
                 awayTeam: roundToDecimalPlaces(
@@ -126,7 +127,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'DRTG',
                 awayTeam: roundToDecimalPlaces(
@@ -142,7 +143,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'NRTG',
                 awayTeam: roundToDecimalPlaces(
@@ -158,7 +159,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'PACE',
                 awayTeam: roundToDecimalPlaces(
@@ -174,7 +175,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 15.0),
+              SizedBox(height: 15.0.r),
               ComparisonRow(
                 statName: 'FG%',
                 awayTeam: roundToDecimalPlaces(
@@ -192,7 +193,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: '3P%',
                 awayTeam: roundToDecimalPlaces(
@@ -210,7 +211,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'FT%',
                 awayTeam: roundToDecimalPlaces(
@@ -228,7 +229,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 15.0),
+              SizedBox(height: 15.0.r),
               ComparisonRow(
                 statName: 'EFG%',
                 awayTeam: roundToDecimalPlaces(
@@ -246,7 +247,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'TS%',
                 awayTeam: roundToDecimalPlaces(
@@ -264,7 +265,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'OREB%',
                 awayTeam: roundToDecimalPlaces(
@@ -282,7 +283,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
-              const SizedBox(height: 5.0),
+              SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'TOV%',
                 awayTeam: roundToDecimalPlaces(
@@ -355,7 +356,7 @@ class ComparisonRow extends StatelessWidget {
           child: Text(
             statName,
             textAlign: TextAlign.center,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
         ),
         Expanded(
@@ -406,7 +407,7 @@ class StatValue extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: 8.0.r),
       decoration: BoxDecoration(
         color: isHighlighted ? color : Colors.transparent,
         borderRadius: BorderRadius.circular(10.0),
@@ -414,8 +415,8 @@ class StatValue extends StatelessWidget {
       child: Text(
         isPercentage ? '$value%' : '$value',
         style: isHighlighted && lightColors.containsKey(color)
-            ? kBebasNormal.copyWith(color: lightColors[color])
-            : kBebasNormal,
+            ? kBebasNormal.copyWith(fontSize: 18.0.r, color: lightColors[color])
+            : kBebasNormal.copyWith(fontSize: 18.0.r),
       ),
     );
   }

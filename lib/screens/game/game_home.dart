@@ -1,5 +1,6 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -207,9 +208,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     if (_isUpcoming) {
       return Row(
         children: [
-          const SizedBox(width: 15.0),
-          Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 24.0)),
-          const SizedBox(width: 15.0),
+          SizedBox(width: 15.0.r),
+          Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r)),
+          SizedBox(width: 15.0.r),
         ],
       );
     } else {
@@ -220,18 +221,18 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           Text(
             awayScore.toString(),
             style: kBebasBold.copyWith(
-                fontSize: 24.0,
+                fontSize: 22.0.r,
                 color: awayScore > homeScore
                     ? Colors.white
                     : (status == 'Final' ? Colors.grey : Colors.white)),
           ),
-          const SizedBox(width: 15.0),
-          Text('-', style: kBebasBold.copyWith(fontSize: 24.0)),
-          const SizedBox(width: 15.0),
+          SizedBox(width: 15.0.r),
+          Text('-', style: kBebasBold.copyWith(fontSize: 22.0.r)),
+          SizedBox(width: 15.0.r),
           Text(
             homeScore.toString(),
             style: kBebasBold.copyWith(
-                fontSize: 24.0,
+                fontSize: 22.0.r,
                 color: homeScore > awayScore
                     ? Colors.white
                     : (status == 'Final' ? Colors.grey : Colors.white)),
@@ -278,8 +279,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                       SizedBox(width: MediaQuery.of(context).size.width * 0.045),
                     Image.asset(
                       'images/NBA_Logos/${awayTeamId}.png',
-                      width: awayTeamId == '0'
-                          ? MediaQuery.of(context).size.width * 0.045
+                      width: awayTeamId == '0' ||
+                              MediaQuery.of(context).orientation == Orientation.landscape
+                          ? MediaQuery.of(context).size.width * 0.0375
                           : MediaQuery.of(context).size.width * 0.09,
                     ),
                     const SizedBox(width: 15.0),
@@ -287,7 +289,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     const SizedBox(width: 15.0),
                     Image.asset(
                       'images/NBA_Logos/${widget.homeId}.png',
-                      width: MediaQuery.of(context).size.width * 0.09,
+                      width: widget.homeId == '0' ||
+                              MediaQuery.of(context).orientation == Orientation.landscape
+                          ? MediaQuery.of(context).size.width * 0.0375
+                          : MediaQuery.of(context).size.width * 0.09,
                     ),
                   ],
                 ],
@@ -361,7 +366,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 indicatorWeight: 3.0,
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal,
+                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
                 tabs: [
                   const Tab(text: 'Matchup'),
                   Tab(text: _isUpcoming ? 'Teams' : 'Box Score'),
@@ -370,6 +375,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
               actions: [
                 CustomIconButton(
                   icon: Icons.search,
+                  size: 30.0.r,
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -427,15 +433,15 @@ class GameInfo extends StatelessWidget {
   Widget getStatus(String status) {
     if (status == 'Final') {
       return Text('FINAL',
-          style: kBebasBold.copyWith(fontSize: 18.0, color: Colors.grey.shade300));
+          style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
     }
     if (status.contains('Q')) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(status.toString().trimRight(), style: kBebasBold.copyWith(fontSize: 18.0)),
+          Text(status.toString().trimRight(), style: kBebasBold.copyWith(fontSize: 16.0.r)),
           Text(gameSummary['LIVE_PC_TIME'].toString().trimRight(),
-              style: kBebasBold.copyWith(fontSize: 18.0)),
+              style: kBebasBold.copyWith(fontSize: 16.0.r)),
         ],
       );
     } else {
@@ -446,35 +452,35 @@ class GameInfo extends StatelessWidget {
               gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
               gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT')
             Text(gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS',
-                style: kBebasBold.copyWith(fontSize: 21.0)),
+                style: kBebasBold.copyWith(fontSize: 19.0.r)),
           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
             if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
               SvgPicture.asset(
                 'images/NBA_TV.svg',
-                width: 32.0,
-                height: 32.0,
+                width: 30.0.r,
+                height: 30.0.r,
               ),
             if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
               SvgPicture.asset(
                 'images/TNT.svg',
-                width: 34.0,
-                height: 34.0,
+                width: 32.0.r,
+                height: 32.0.r,
               ),
             if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
               SvgPicture.asset(
                 'images/ESPN.svg',
-                width: 14.0,
-                height: 14.0,
+                width: 12.0.r,
+                height: 12.0.r,
               ),
             if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
               SvgPicture.asset(
                 'images/abc.svg',
-                width: 34.0,
-                height: 34.0,
+                width: 32.0.r,
+                height: 32.0.r,
               ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.0.r),
           ],
-          Text(gameTime!, style: kBebasBold.copyWith(fontSize: 21.0)),
+          Text(gameTime!, style: kBebasBold.copyWith(fontSize: 19.0.r)),
         ],
       );
     }
@@ -516,13 +522,13 @@ class GameInfo extends StatelessWidget {
         };
 
         return Text('Game $gameNum - $conf ${poRounds[roundId]}',
-            style: kBebasBold.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+            style: kBebasBold.copyWith(fontSize: 14.0.r, color: Colors.grey.shade300));
       case 'Play-In':
         return Text('Play-In Tourney',
-            style: kBebasBold.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+            style: kBebasBold.copyWith(fontSize: 14.0.r, color: Colors.grey.shade300));
       case 'In-Season Tournament':
         return Text('Emirates NBA Cup Final',
-            style: kBebasBold.copyWith(fontSize: 16.0, color: Colors.grey.shade300));
+            style: kBebasBold.copyWith(fontSize: 14.0.r, color: Colors.grey.shade300));
       default:
         // Parse the input string into a DateTime object
         DateTime parsedDate = DateTime.parse(gameSummary['GAME_DATE_EST']);
@@ -532,7 +538,7 @@ class GameInfo extends StatelessWidget {
 
         return Text(
           formattedDate,
-          style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.grey.shade300),
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.grey.shade300),
         );
     }
   }
@@ -550,7 +556,7 @@ class GameInfo extends StatelessWidget {
           ],
         ),
         Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: EdgeInsets.all(15.0.r),
           child: Row(
             children: [
               if (awayId == '0') SizedBox(width: MediaQuery.of(context).size.width * 0.1),
@@ -572,15 +578,16 @@ class GameInfo extends StatelessWidget {
                   children: [
                     Image.asset(
                       'images/NBA_Logos/$awayId.png',
-                      width: awayId == '0'
+                      width: awayId == '0' ||
+                              MediaQuery.of(context).orientation == Orientation.landscape
                           ? MediaQuery.of(context).size.width * 0.1
                           : MediaQuery.of(context).size.width * 0.2,
                     ),
-                    const SizedBox(height: 8.0),
+                    SizedBox(height: 8.0.r),
                     Text(
                       awayLinescore['TEAM_WINS_LOSSES'],
                       style:
-                          kBebasNormal.copyWith(fontSize: 18.0, color: Colors.grey.shade300),
+                          kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
                     )
                   ],
                 ),
@@ -590,7 +597,7 @@ class GameInfo extends StatelessWidget {
                 Text(
                   awayLinescore['PTS'].toString(),
                   style: kBebasBold.copyWith(
-                      fontSize: 40.0,
+                      fontSize: 36.0.r,
                       color: awayLinescore['PTS'] > homeLinescore['PTS']
                           ? Colors.white
                           : (gameSummary['GAME_STATUS_TEXT'] == 'Final'
@@ -609,7 +616,7 @@ class GameInfo extends StatelessWidget {
                 Text(
                   homeLinescore['PTS'].toString(),
                   style: kBebasBold.copyWith(
-                      fontSize: 40.0,
+                      fontSize: 36.0.r,
                       color: homeLinescore['PTS'] > awayLinescore['PTS']
                           ? Colors.white
                           : (gameSummary['GAME_STATUS_TEXT'] == 'Final'
@@ -633,13 +640,16 @@ class GameInfo extends StatelessWidget {
                   children: [
                     Image.asset(
                       'images/NBA_Logos/$homeId.png',
-                      width: MediaQuery.of(context).size.width * 0.2,
+                      width: homeId == '0' ||
+                              MediaQuery.of(context).orientation == Orientation.landscape
+                          ? MediaQuery.of(context).size.width * 0.1
+                          : MediaQuery.of(context).size.width * 0.2,
                     ),
-                    const SizedBox(height: 8.0),
+                    SizedBox(height: 8.0.r),
                     Text(
                       homeLinescore['TEAM_WINS_LOSSES'],
                       style:
-                          kBebasNormal.copyWith(fontSize: 18.0, color: Colors.grey.shade300),
+                          kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
                     )
                   ],
                 ),

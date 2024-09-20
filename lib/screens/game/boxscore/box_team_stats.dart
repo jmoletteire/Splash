@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../utilities/constants.dart';
@@ -73,15 +74,15 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.sports_basketball,
                       color: Colors.white38,
-                      size: 40.0,
+                      size: 40.0.r,
                     ),
-                    const SizedBox(height: 15.0),
+                    SizedBox(height: 15.0.r),
                     Text(
                       'No Games Available',
-                      style: kBebasNormal.copyWith(fontSize: 20.0, color: Colors.white54),
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
                     ),
                   ],
                 ),
@@ -90,18 +91,18 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                 children: [
                   Card(
                     color: Colors.grey.shade900,
-                    margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                    margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                     child: Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: EdgeInsets.all(15.0.r),
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Efficiency', style: kBebasBold.copyWith(fontSize: 20.0))
+                              Text('Efficiency', style: kBebasBold.copyWith(fontSize: 18.0.r))
                             ],
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'PTS',
                             awayTeam: awayTeam['PTS'] ?? 0.0,
@@ -109,7 +110,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'PER 100',
                             awayTeam: awayTeam['OFF_RATING'] ?? 0.0,
@@ -117,7 +118,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'POSSESSIONS',
                             awayTeam: awayTeam['POSS'] ?? 0.0,
@@ -125,7 +126,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'PACE',
                             awayTeam: awayTeam['PACE'] ?? 0.0,
@@ -133,7 +134,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'TOV',
                             awayTeam: awayTeam['TO'] ?? 0,
@@ -141,7 +142,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'TOV%',
                             awayTeam: roundToDecimalPlaces(awayTeam['TM_TOV_PCT'] ?? 0.0, 1),
@@ -155,24 +156,24 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                   ),
                   Card(
                     color: Colors.grey.shade900,
-                    margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                    margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                     child: Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: EdgeInsets.all(15.0.r),
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Shooting', style: kBebasBold.copyWith(fontSize: 20.0))
+                              Text('Shooting', style: kBebasBold.copyWith(fontSize: 18.0.r))
                             ],
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           NonComparisonRow(
                             statName: 'FG',
                             awayTeam: '${awayTeam['FGM'] ?? 0}-${awayTeam['FGA'] ?? 0}',
                             homeTeam: '${homeTeam['FGM'] ?? 0}-${homeTeam['FGA'] ?? 0}',
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FG%',
                             awayTeam:
@@ -182,13 +183,13 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           NonComparisonRow(
                             statName: '3P',
                             awayTeam: '${awayTeam['FG3M'] ?? 0}-${awayTeam['FG3A'] ?? 0}',
                             homeTeam: '${homeTeam['FG3M'] ?? 0}-${homeTeam['FG3A'] ?? 0}',
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: '3P%',
                             awayTeam:
@@ -198,13 +199,13 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           NonComparisonRow(
                             statName: 'FT',
                             awayTeam: '${awayTeam['FTM'] ?? 0}-${awayTeam['FTA'] ?? 0}',
                             homeTeam: '${homeTeam['FTM'] ?? 0}-${homeTeam['FTA'] ?? 0}',
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FT%',
                             awayTeam:
@@ -214,7 +215,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FT/FGA',
                             awayTeam: roundToDecimalPlaces(
@@ -224,7 +225,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'EFG%',
                             awayTeam:
@@ -234,7 +235,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'TS%',
                             awayTeam:
@@ -244,7 +245,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'PTS IN PAINT',
                             awayTeam: awayTeam['PTS_PAINT'] ?? 0.0,
@@ -252,7 +253,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'PTS OUTSIDE',
                             awayTeam:
@@ -270,18 +271,18 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                   ),
                   Card(
                     color: Colors.grey.shade900,
-                    margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                    margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                     child: Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: EdgeInsets.all(15.0.r),
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Rebounding', style: kBebasBold.copyWith(fontSize: 20.0))
+                              Text('Rebounding', style: kBebasBold.copyWith(fontSize: 18.0.r))
                             ],
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'REB',
                             awayTeam: awayTeam['REB'] ?? 0,
@@ -289,7 +290,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'OREB',
                             awayTeam: awayTeam['OREB'] ?? 0,
@@ -297,7 +298,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'DREB',
                             awayTeam: awayTeam['DREB'] ?? 0,
@@ -305,7 +306,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'OREB%',
                             awayTeam:
@@ -315,7 +316,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'DREB%',
                             awayTeam:
@@ -325,7 +326,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: '2ND Chance PTS',
                             awayTeam: awayTeam['PTS_2ND_CHANCE'] ?? 0.0,
@@ -339,18 +340,18 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                   ),
                   Card(
                     color: Colors.grey.shade900,
-                    margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                    margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                     child: Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: EdgeInsets.all(15.0.r),
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Passing', style: kBebasBold.copyWith(fontSize: 20.0))
+                              Text('Passing', style: kBebasBold.copyWith(fontSize: 18.0.r))
                             ],
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'AST',
                             awayTeam: awayTeam['AST'] ?? 0,
@@ -358,7 +359,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'AST%',
                             awayTeam:
@@ -368,7 +369,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'AST / TOV',
                             awayTeam: awayTeam['AST_TOV'] ?? 0,
@@ -376,7 +377,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'AST Ratio',
                             awayTeam: awayTeam['AST_RATIO'] ?? 0,
@@ -390,18 +391,18 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                   ),
                   Card(
                     color: Colors.grey.shade900,
-                    margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                    margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                     child: Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: EdgeInsets.all(15.0.r),
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Defense', style: kBebasBold.copyWith(fontSize: 20.0))
+                              Text('Defense', style: kBebasBold.copyWith(fontSize: 18.0.r))
                             ],
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'STL',
                             awayTeam: awayTeam['STL'] ?? 0,
@@ -409,7 +410,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'BLK',
                             awayTeam: awayTeam['BLK'] ?? 0,
@@ -417,7 +418,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FOULS',
                             awayTeam: awayTeam['PF'] ?? 0,
@@ -425,7 +426,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 15.0),
+                          SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'PTS OFF TOV',
                             awayTeam: awayTeam['PTS_OFF_TO'] ?? 0,
@@ -433,7 +434,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FASTBREAK PTS',
                             awayTeam: awayTeam['PTS_FB'] ?? 0,
@@ -445,7 +446,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 5.0)
+                  SizedBox(height: 5.0.r),
                 ],
               ),
       ),
@@ -473,7 +474,7 @@ class NonComparisonRow extends StatelessWidget {
         Expanded(
           flex: 1,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 8.0.r),
             decoration: BoxDecoration(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(10.0),
@@ -481,7 +482,7 @@ class NonComparisonRow extends StatelessWidget {
             child: Text(
               awayTeam,
               textAlign: TextAlign.start,
-              style: kBebasNormal.copyWith(fontSize: 17.0, color: Colors.grey.shade300),
+              style: kBebasNormal.copyWith(fontSize: 15.0.r, color: Colors.grey.shade300),
             ),
           ),
         ),
@@ -490,13 +491,13 @@ class NonComparisonRow extends StatelessWidget {
           child: Text(
             statName,
             textAlign: TextAlign.center,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
         ),
         Expanded(
           flex: 1,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 8.0.r),
             decoration: BoxDecoration(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(10.0),
@@ -504,7 +505,7 @@ class NonComparisonRow extends StatelessWidget {
             child: Text(
               homeTeam,
               textAlign: TextAlign.end,
-              style: kBebasNormal.copyWith(fontSize: 17.0, color: Colors.grey.shade300),
+              style: kBebasNormal.copyWith(fontSize: 15.0.r, color: Colors.grey.shade300),
             ),
           ),
         ),
@@ -566,7 +567,7 @@ class ComparisonRow extends StatelessWidget {
           child: Text(
             statName,
             textAlign: TextAlign.center,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
         ),
         Expanded(
@@ -617,7 +618,7 @@ class StatValue extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: 8.0.r),
       decoration: BoxDecoration(
         color: isHighlighted ? color : Colors.transparent,
         borderRadius: BorderRadius.circular(10.0),
@@ -625,8 +626,8 @@ class StatValue extends StatelessWidget {
       child: Text(
         isPercentage ? '$value%' : '$value',
         style: isHighlighted && lightColors.containsKey(color)
-            ? kBebasNormal.copyWith(fontSize: 18.0, color: lightColors[color])
-            : kBebasNormal.copyWith(fontSize: 18.0),
+            ? kBebasNormal.copyWith(fontSize: 16.0.r, color: lightColors[color])
+            : kBebasNormal.copyWith(fontSize: 16.0.r),
       ),
     );
   }

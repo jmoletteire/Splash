@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/screens/team/overview/team_last_lineup.dart';
 import 'package:splash/screens/team/overview/team_latest_news.dart';
@@ -24,10 +25,10 @@ class _TeamOverviewState extends State<TeamOverview> {
           TeamLastLineup(team: widget.team),
           TeamRecentTransactions(team: widget.team),
           Card(
-            margin: const EdgeInsets.all(11.0),
+            margin: EdgeInsets.all(11.0.r),
             color: Colors.grey.shade900,
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.all(15.0.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -37,13 +38,13 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Container(
                         decoration: BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                            bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
                           ),
                         ),
                         child: Text(
                           //'Franchise',
                           '${widget.team['CITY']} ${widget.team['NICKNAME']}',
-                          style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
+                          style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
                         ),
                       ),
                     ],
@@ -54,14 +55,14 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Text(
                         'Founded',
                         style: kBebasNormal.copyWith(
-                          fontSize: 17.0,
+                          fontSize: 15.0.r,
                           fontStyle: FontStyle.italic,
                           color: Colors.white60,
                         ),
                       ),
                       Text(
                         '${widget.team['YEARFOUNDED']}',
-                        style: kBebasNormal.copyWith(fontSize: 18.0),
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
                       ),
                     ],
                   ),
@@ -71,14 +72,14 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Text(
                         'Owner',
                         style: kBebasNormal.copyWith(
-                          fontSize: 17.0,
+                          fontSize: 15.0.r,
                           fontStyle: FontStyle.italic,
                           color: Colors.white60,
                         ),
                       ),
                       Text(
                         '${widget.team['OWNER']}',
-                        style: kBebasNormal.copyWith(fontSize: 18.0),
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
                       ),
                     ],
                   ),
@@ -88,14 +89,14 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Text(
                         'General Manager',
                         style: kBebasNormal.copyWith(
-                          fontSize: 17.0,
+                          fontSize: 15.0.r,
                           fontStyle: FontStyle.italic,
                           color: Colors.white60,
                         ),
                       ),
                       Text(
                         '${widget.team['GENERALMANAGER']}',
-                        style: kBebasNormal.copyWith(fontSize: 18.0),
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
                       ),
                     ],
                   ),
@@ -105,7 +106,7 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Text(
                         'Head Coach',
                         style: kBebasNormal.copyWith(
-                          fontSize: 17.0,
+                          fontSize: 15.0.r,
                           fontStyle: FontStyle.italic,
                           color: Colors.white60,
                         ),
@@ -113,17 +114,15 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Row(
                         children: [
                           PlayerAvatar(
-                            radius: 10.0,
+                            radius: 10.0.r,
                             backgroundColor: Colors.white24,
                             playerImageUrl:
                                 'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.team['coaches'][0]['COACH_ID']}.png',
                           ),
-                          const SizedBox(
-                            width: 10.0,
-                          ),
+                          SizedBox(width: 10.0.r),
                           Text(
                             '${widget.team['HEADCOACH']}',
-                            style: kBebasNormal.copyWith(fontSize: 18.0),
+                            style: kBebasNormal.copyWith(fontSize: 16.0.r),
                           ),
                         ],
                       ),
@@ -135,7 +134,7 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Text(
                         'G-LEAGUE',
                         style: kBebasNormal.copyWith(
-                          fontSize: 17.0,
+                          fontSize: 15.0.r,
                           fontStyle: FontStyle.italic,
                           color: Colors.white60,
                         ),
@@ -145,17 +144,14 @@ class _TeamOverviewState extends State<TeamOverview> {
                           /*
                           SvgPicture.string(
                             widget.team['DLEAGUEAFFILIATION']['LOGO'][0],
-                            width: 18.0,
-                            height: 18.0,
+                            width: 18.0.r,
+                            height: 18.0.r,
                           ),
-                          const SizedBox(
-                            width: 10.0,
-                          ),
-
+                          const SizedBox(width: 10.0.r),
                            */
                           Text(
                             '${widget.team['DLEAGUEAFFILIATION']['TEAM']}',
-                            style: kBebasNormal.copyWith(fontSize: 18.0),
+                            style: kBebasNormal.copyWith(fontSize: 16.0.r),
                           ),
                         ],
                       ),
@@ -166,10 +162,10 @@ class _TeamOverviewState extends State<TeamOverview> {
             ),
           ),
           Card(
-            margin: const EdgeInsets.all(11.0),
+            margin: EdgeInsets.all(11.0.r),
             color: Colors.grey.shade900,
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.all(15.0.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -179,36 +175,36 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Container(
                         decoration: BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                            bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
                           ),
                         ),
                         child: Text(
                           'Venue',
-                          style: kBebasBold.copyWith(fontSize: 20.0, color: Colors.white),
+                          style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12.5),
+                  SizedBox(height: 12.5.r),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.asset('images/arenas/${widget.team['TEAM_ID']}.jpg'),
                   ),
-                  const SizedBox(height: 20.0),
+                  SizedBox(height: 20.0.r),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'City',
                         style: kBebasNormal.copyWith(
-                          fontSize: 18.0,
+                          fontSize: 16.0.r,
                           fontStyle: FontStyle.italic,
                           color: Colors.white60,
                         ),
                       ),
                       Text(
                         '${widget.team['ARENACITY']}',
-                        style: kBebasNormal.copyWith(fontSize: 20.0),
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r),
                       ),
                     ],
                   ),
@@ -218,14 +214,14 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Text(
                         'Arena',
                         style: kBebasNormal.copyWith(
-                          fontSize: 18.0,
+                          fontSize: 16.0.r,
                           fontStyle: FontStyle.italic,
                           color: Colors.white60,
                         ),
                       ),
                       Text(
                         '${widget.team['ARENA']}',
-                        style: kBebasNormal.copyWith(fontSize: 20.0),
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r),
                       ),
                     ],
                   ),
@@ -235,14 +231,14 @@ class _TeamOverviewState extends State<TeamOverview> {
                       Text(
                         'Capacity',
                         style: kBebasNormal.copyWith(
-                          fontSize: 18.0,
+                          fontSize: 16.0.r,
                           fontStyle: FontStyle.italic,
                           color: Colors.white60,
                         ),
                       ),
                       Text(
                         '${widget.team['ARENACAPACITY']}',
-                        style: kBebasNormal.copyWith(fontSize: 20.0),
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r),
                       ),
                     ],
                   ),

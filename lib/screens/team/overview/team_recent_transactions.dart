@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import '../../../utilities/constants.dart';
@@ -45,8 +46,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
         };
       }).toList();
 
-      trans = sortByDate(
-          Map.fromIterable(trans, key: (e) => e['date'], value: (e) => e));
+      trans = sortByDate(Map.fromIterable(trans, key: (e) => e['date'], value: (e) => e));
     }
     return trans;
   }
@@ -62,7 +62,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
         /// POSITION
         spans.add(TextSpan(
           text: '$part ',
-          style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white),
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white),
           /*
           recognizer: TapGestureRecognizer()
             ..onTap = () {
@@ -85,7 +85,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
           spans.add(
             TextSpan(
               text: '$firstName ',
-              style: kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white),
+              style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white),
             ),
           );
 
@@ -95,8 +95,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
             spans.add(
               TextSpan(
                 text: '$lastName ',
-                style:
-                    kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white),
+                style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white),
               ),
             );
             i += 2; // Skip the next two parts as they are processed
@@ -107,8 +106,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
       } else {
         spans.add(TextSpan(
             text: '$part ',
-            style:
-                kBebasNormal.copyWith(fontSize: 16.0, color: Colors.white60)));
+            style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white60)));
       }
     }
     return spans;
@@ -123,10 +121,10 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(11.0),
+      margin: EdgeInsets.all(11.0.r),
       color: Colors.grey.shade900,
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: EdgeInsets.all(15.0.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -135,27 +133,26 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
                 Container(
                   decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                      bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
                     ),
                   ),
                   child: Text(
                     //'Franchise',
                     'Recent Transactions',
-                    style: kBebasBold.copyWith(
-                        fontSize: 20.0, color: Colors.white),
+                    style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10.0),
+            SizedBox(height: 10.0.r),
             if (transactions.isEmpty)
               Padding(
-                padding: const EdgeInsets.all(15.0),
+                padding: EdgeInsets.all(15.0.r),
                 child: Center(
                   child: Text(
                     'No Transactions',
                     style: kBebasNormal.copyWith(
-                      fontSize: 18.0,
+                      fontSize: 16.0.r,
                       color: Colors.white70,
                     ),
                   ),
@@ -164,7 +161,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
             if (transactions.isNotEmpty)
               for (Map<String, String> trans in transactions)
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  padding: EdgeInsets.symmetric(vertical: 8.0.r),
                   child: Row(
                     textBaseline: TextBaseline.alphabetic,
                     crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -173,19 +170,15 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
                         flex: 1,
                         child: Text(
                           formatDate(trans['date']!),
-                          style: kBebasNormal.copyWith(
-                              fontSize: 16.0, color: Colors.white),
+                          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white),
                         ),
                       ),
-                      const SizedBox(
-                          width:
-                              10), // Add spacing between date and transaction text
+                      SizedBox(width: 10.r),
                       Expanded(
                         flex: 7,
                         child: RichText(
                           text: TextSpan(
-                            children:
-                                highlightPlayerNames(trans['transaction']!),
+                            children: highlightPlayerNames(trans['transaction']!),
                           ),
                         ),
                       ),
