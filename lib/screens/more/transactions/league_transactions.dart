@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
@@ -79,7 +80,7 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
               surfaceTintColor: Colors.grey.shade900,
               title: Text(
                 'Transactions',
-                style: kBebasBold.copyWith(fontSize: 24.0),
+                style: kBebasBold.copyWith(fontSize: 22.0.r),
               ),
               actions: [
                 Container(
@@ -87,11 +88,11 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                       color: Colors.grey.shade900,
                       border: Border.all(color: Colors.deepOrange),
                       borderRadius: BorderRadius.circular(10.0)),
-                  margin: const EdgeInsets.fromLTRB(0.0, 11.0, 0.0, 11.0),
+                  margin: EdgeInsets.symmetric(vertical: 6.0.r),
                   child: DropdownButton<String>(
-                    menuMaxHeight: 300.0,
+                    menuMaxHeight: 300.0.r,
                     isExpanded: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.r),
                     borderRadius: BorderRadius.circular(10.0),
                     underline: Container(),
                     dropdownColor: Colors.grey.shade900,
@@ -116,6 +117,7 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                 ),
                 CustomIconButton(
                   icon: Icons.search,
+                  size: 30.0.r,
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -133,33 +135,33 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _SliverAppBarDelegate(
-                    minHeight: 40.0,
-                    maxHeight: 40.0,
+                    minHeight: 38.0.r,
+                    maxHeight: 38.0.r,
                     child: Container(
                       color: Colors.grey.shade800,
                       child: Center(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 11.0),
+                          padding: EdgeInsets.symmetric(horizontal: 11.0.r),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
                                   'Date',
-                                  style: kBebasNormal.copyWith(fontSize: 16.0),
+                                  style: kBebasNormal.copyWith(fontSize: 14.0.r),
                                 ),
                               ),
                               Expanded(
                                 flex: 2,
                                 child: Text(
                                   'TEAM',
-                                  style: kBebasNormal.copyWith(fontSize: 16.0),
+                                  style: kBebasNormal.copyWith(fontSize: 14.0.r),
                                 ),
                               ),
                               Expanded(
                                 flex: 6,
                                 child: Text(
                                   'Details',
-                                  style: kBebasNormal.copyWith(fontSize: 16.0),
+                                  style: kBebasNormal.copyWith(fontSize: 14.0.r),
                                 ),
                               ),
                             ],
@@ -211,8 +213,7 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                             );
                           },
                           child: Container(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                            padding: EdgeInsets.symmetric(horizontal: 12.0.r, vertical: 8.0.r),
                             height: MediaQuery.sizeOf(context).height * 0.065,
                             decoration: const BoxDecoration(
                               color: Color(0xFF1B1B1B),
@@ -230,34 +231,34 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                                       Text(
                                         gameDate[0],
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 13.0, color: Colors.white70),
+                                            fontSize: 11.0.r, color: Colors.white70),
                                       ),
                                       Text(
                                         gameDate[1],
-                                        style: kBebasNormal.copyWith(fontSize: 13.5),
+                                        style: kBebasNormal.copyWith(fontSize: 11.5.r),
                                       ),
                                     ],
                                   ),
                                 ),
                                 Image.asset(
                                   'images/NBA_Logos/${transactions[index]['TEAM_ID'].toStringAsFixed(0)}.png',
-                                  width: 24.0,
+                                  width: 22.0.r,
                                 ),
-                                const SizedBox(width: 15.0),
+                                SizedBox(width: 15.0.r),
                                 PlayerAvatar(
-                                  radius: 15.0,
+                                  radius: 13.0.r,
                                   backgroundColor: Colors.white10,
                                   playerImageUrl:
                                       'https://cdn.nba.com/headshots/nba/latest/1040x760/${transactions[index]['PLAYER_ID'].toStringAsFixed(0)}.png',
                                 ),
-                                const SizedBox(width: 12.0),
+                                SizedBox(width: 12.0.r),
                                 Expanded(
                                   flex: 6,
                                   child: AutoSizeText(
                                     transactions[index]['TRANSACTION_DESCRIPTION'],
                                     maxLines: 3,
                                     textAlign: TextAlign.start,
-                                    style: kBebasNormal.copyWith(fontSize: 14.0),
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
                                   ),
                                 ),
                               ],

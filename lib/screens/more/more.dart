@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/more/draft/draft.dart';
 import 'package:splash/screens/more/league_history.dart';
 import 'package:splash/screens/more/stats_query/stats_query.dart';
@@ -32,13 +33,14 @@ class _MoreState extends State<More> {
       appBar: AppBar(
         backgroundColor: Colors.grey.shade900,
         surfaceTintColor: Colors.grey.shade900,
-        title: const Text(
+        title: Text(
           'More',
-          style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 35.0),
+          style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 32.0.r),
         ),
         actions: [
           CustomIconButton(
             icon: Icons.search,
+            size: 30.0.r,
             onPressed: () {
               Navigator.push(
                 context,
@@ -50,6 +52,7 @@ class _MoreState extends State<More> {
           ),
           CustomIconButton(
             icon: Icons.settings,
+            size: 30.0.r,
             onPressed: () {
               Navigator.push(
                 context,
@@ -76,21 +79,21 @@ class _MoreState extends State<More> {
                 children: [
                   Icon(
                     pages[pageName][0],
-                    size: 18.0,
+                    size: 18.0.r,
                     color: Colors.white,
                   ),
-                  const SizedBox(width: 10.0),
+                  SizedBox(width: 10.0.r),
                   Text(
                     pageName,
-                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Icon(
                           Icons.arrow_forward_ios,
-                          size: 18.0,
+                          size: 18.0.r,
                           color: Colors.white,
                         ),
                       ],

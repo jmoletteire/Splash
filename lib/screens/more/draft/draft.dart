@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/more/draft/by_pick/selections_by_pick.dart';
@@ -243,11 +244,11 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
               color: Colors.grey.shade900,
               border: Border.all(color: Colors.deepOrange),
               borderRadius: BorderRadius.circular(10.0)),
-          margin: const EdgeInsets.fromLTRB(0.0, 11.0, 0.0, 11.0),
+          margin: EdgeInsets.symmetric(vertical: 6.0.r),
           child: DropdownButton<String>(
-            menuMaxHeight: 300.0,
+            menuMaxHeight: 300.0.r,
             isExpanded: false,
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            padding: EdgeInsets.symmetric(horizontal: 15.0.r),
             borderRadius: BorderRadius.circular(10.0),
             underline: Container(),
             dropdownColor: Colors.grey.shade900,
@@ -257,7 +258,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
                 value: value.substring(0, 4),
                 child: Text(
                   value.substring(0, 4),
-                  style: kBebasNormal,
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r),
                 ),
               );
             }).toList(),
@@ -304,11 +305,11 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
             border: Border.all(color: Colors.deepOrange),
             borderRadius: BorderRadius.circular(10.0),
           ),
-          margin: const EdgeInsets.fromLTRB(0.0, 11.0, 0.0, 11.0),
+          margin: EdgeInsets.symmetric(vertical: 6.0.r),
           child: DropdownButton<int>(
-            menuMaxHeight: 300.0,
+            menuMaxHeight: 300.0.r,
             isExpanded: false,
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            padding: EdgeInsets.symmetric(horizontal: 15.0.r),
             borderRadius: BorderRadius.circular(10.0),
             underline: Container(),
             dropdownColor: Colors.grey.shade900,
@@ -319,7 +320,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
                 value: value,
                 child: Text(
                   value.toString(),
-                  style: kBebasNormal,
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r),
                 ),
               );
             }).toList(),
@@ -334,6 +335,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
         ),
         CustomIconButton(
           icon: Icons.bar_chart_sharp,
+          size: 30.0.r,
           onPressed: () {
             showModalBottomSheet(
               context: context,
@@ -348,6 +350,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
         ),
         CustomIconButton(
           icon: Icons.search,
+          size: 30.0.r,
           onPressed: () {
             Navigator.push(
               context,
@@ -371,7 +374,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
               surfaceTintColor: Colors.grey.shade900,
               title: Text(
                 'Draft',
-                style: kBebasBold.copyWith(fontSize: 24.0),
+                style: kBebasBold.copyWith(fontSize: 22.0.r),
               ),
               actions: getActions(_tabController.index),
               bottom: TabBar(
@@ -381,7 +384,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
                 indicatorWeight: 3.0,
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal.copyWith(fontSize: 18.0),
+                labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
                 tabs: const [Tab(text: 'By Year'), Tab(text: 'By Pick')],
               ),
             ),

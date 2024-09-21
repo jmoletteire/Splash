@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
 class MyDropdownSearch extends StatefulWidget {
@@ -72,6 +73,8 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return DropdownSearch<String>(
       items: categorizedFields.values.expand((list) => list).toList(),
       popupProps: PopupProps.dialog(
@@ -81,7 +84,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
           return Dialog(
             backgroundColor: const Color(0xFF121212),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(10.0),
+              padding: EdgeInsets.all(10.0.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: categorizedFields.entries.map((entry) {
@@ -93,20 +96,20 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                         entry.key,
                         style: kBebasNormal.copyWith(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 18.0.r,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
-                      const SizedBox(height: 8.0),
+                      SizedBox(height: 8.0.r),
                       GridView.count(
-                        padding: const EdgeInsets.only(bottom: 10.0),
+                        padding: EdgeInsets.only(bottom: 10.0.r),
                         shrinkWrap: true,
                         physics:
                             const NeverScrollableScrollPhysics(), // Disable GridView scrolling
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
+                        crossAxisCount: isLandscape ? 3.0.r.ceil() : 3.0.r.floor(),
+                        mainAxisSpacing: 10.0.r,
+                        crossAxisSpacing: 10.0.r,
                         children: entry.value.map((item) {
                           return InkWell(
                             onTap: () {
@@ -117,9 +120,9 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                             },
                             child: GridTile(
                               child: Container(
-                                margin: const EdgeInsets.all(5.0),
+                                margin: EdgeInsets.all(5.0.r),
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                                    EdgeInsets.symmetric(horizontal: 5.0.r, vertical: 0.0.r),
                                 decoration: BoxDecoration(
                                     color: Colors.grey.shade900,
                                     border: Border.all(color: Colors.deepOrange),
@@ -129,7 +132,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                                     item,
                                     textAlign: TextAlign.center,
                                     style: kBebasOffWhite.copyWith(
-                                      fontSize: 14.0,
+                                      fontSize: 12.0.r,
                                     ),
                                   ),
                                 ),
@@ -138,7 +141,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                           );
                         }).toList(),
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: 30.0.r),
                     ],
                   );
                 }).toList(),

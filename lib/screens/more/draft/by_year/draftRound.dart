@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/screens/more/draft/by_year/selections_table.dart';
 
@@ -39,12 +40,12 @@ class DraftRound extends StatelessWidget {
               ),
               height: MediaQuery.sizeOf(context).height * 0.035,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 11.0),
+                padding: EdgeInsets.symmetric(horizontal: 11.0.r),
                 child: Row(
                   children: [
                     Text(
                       'Round ${roundNum + 1}',
-                      style: kBebasNormal.copyWith(fontSize: 18.0),
+                      style: kBebasNormal.copyWith(fontSize: 16.0.r),
                     ),
                   ],
                 ),

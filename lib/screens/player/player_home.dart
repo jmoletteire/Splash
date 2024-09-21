@@ -119,33 +119,27 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
 
     _tabController.addListener(() {
       // If app bar expanded
-      if (_scrollController.offset < (201 - kToolbarHeight)) {
+      if (_scrollController.offset < ((MediaQuery.of(context).size.height * 0.28) - 105.0)) {
         // Remain at current offset
         _scrollController.jumpTo(_scrollController.offset);
       }
       // Else, app bar collapsed and no collapsed position saved
       else {
         // Go to top collapsed position
-        _scrollController.jumpTo(201 - kToolbarHeight);
+        _scrollController.jumpTo((MediaQuery.of(context).size.height * 0.28) - 105.0);
       }
     });
   }
 
   bool get _isSliverAppBarExpanded {
-    return _scrollController.hasClients && _scrollController.offset > (200 - kToolbarHeight);
+    return _scrollController.hasClients &&
+        _scrollController.offset >= ((MediaQuery.of(context).size.height * 0.28) - 105.0);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _notifier = ScrollControllerProvider.of(context)!.notifier;
-    _scrollController = ScrollController()
-      ..addListener(() {
-        setState(() {
-          _title = _isSliverAppBarExpanded ? player['DISPLAY_FIRST_LAST'] : '';
-          _showImage = _isSliverAppBarExpanded ? true : false;
-        });
-      });
     _notifier.addController('player', _scrollController);
   }
 
@@ -308,9 +302,9 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                 ];
               },
               pinnedHeaderSliverHeightBuilder: () {
-                return MediaQuery.of(context).size.height * 0.001;
+                return 105.0 + MediaQuery.of(context).padding.top; // 56 + 49 = 105
               },
-              onlyOneScrollInBody: true,
+              onlyOneScrollInBody: false,
               body: TabBarView(
                 controller: _tabController,
                 children: _playerPages.map((page) {

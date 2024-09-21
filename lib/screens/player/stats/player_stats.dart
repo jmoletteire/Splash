@@ -517,18 +517,34 @@ class _PlayerStatsState extends State<PlayerStats> {
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                left: 2.r,
-                                width: 16.r,
-                                height: 16.r, // Adjust based on your switch size
-                                child: IgnorePointer(
-                                  ignoring: true,
-                                  child: Visibility(
-                                    visible: _playoffSwitch,
-                                    child: SvgPicture.asset('images/playoffs.svg'),
+                              if (MediaQuery.of(context).orientation == Orientation.landscape)
+                                Positioned(
+                                  top: 1,
+                                  left: 22,
+                                  width: 16,
+                                  height: 16, // Adjust based on your switch size
+                                  child: IgnorePointer(
+                                    ignoring: true,
+                                    child: Visibility(
+                                      visible: _playoffSwitch,
+                                      child: SvgPicture.asset('images/playoffs.svg'),
+                                    ),
                                   ),
                                 ),
-                              ),
+                              if (MediaQuery.of(context).orientation == Orientation.portrait)
+                                Positioned(
+                                  top: 1,
+                                  left: 3,
+                                  width: 16,
+                                  height: 16, // Adjust based on your switch size
+                                  child: IgnorePointer(
+                                    ignoring: true,
+                                    child: Visibility(
+                                      visible: _playoffSwitch,
+                                      child: SvgPicture.asset('images/playoffs.svg'),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),

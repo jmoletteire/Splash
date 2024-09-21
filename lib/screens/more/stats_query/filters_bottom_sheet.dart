@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:splash/components/spinning_ball_loading.dart';
 
@@ -144,7 +145,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
         message,
         style: kBebasNormal.copyWith(
           color: Colors.white,
-          fontSize: 18.0,
+          fontSize: 16.0.r,
         ),
       ),
       backgroundColor: Colors.red,
@@ -196,6 +197,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   Widget build(BuildContext context) {
     return CustomIconButton(
       icon: Icons.filter_alt,
+      size: 30.0.r,
       onPressed: () {
         setState(() {
           _selectedFieldNotifier = ValueNotifier<String?>(null);
@@ -217,9 +219,9 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: DropdownButton<String>(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        padding: EdgeInsets.symmetric(horizontal: 15.0.r),
         borderRadius: BorderRadius.circular(10.0),
-        menuMaxHeight: 300.0,
+        menuMaxHeight: 300.0.r,
         dropdownColor: Colors.grey.shade900,
         isExpanded: false,
         underline: Container(),
@@ -229,7 +231,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
             value: value,
             child: Text(
               value,
-              style: kBebasNormal.copyWith(fontSize: 18.0),
+              style: kBebasNormal.copyWith(fontSize: 16.0.r),
             ),
           );
         }).toList(),
@@ -261,7 +263,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                   child: Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
+                        padding: EdgeInsets.symmetric(horizontal: 25.0.r, vertical: 10.0.r),
                         child: Form(
                           key: _formKey,
                           autovalidateMode: _autoValidate
@@ -275,7 +277,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                 children: [
                                   Text(
                                     'Filter',
-                                    style: kBebasBold.copyWith(fontSize: 22.0),
+                                    style: kBebasBold.copyWith(fontSize: 20.0.r),
                                   ),
                                   Row(
                                     children: [
@@ -291,6 +293,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                         child: Text(
                                           'CLEAR',
                                           style: kBebasNormal.copyWith(
+                                            fontSize: 18.0.r,
                                             color: filters.isEmpty
                                                 ? Colors.white24
                                                 : Colors.white,
@@ -311,15 +314,17 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                         },
                                         child: Text(
                                           'Done',
-                                          style:
-                                              kBebasNormal.copyWith(color: Colors.deepOrange),
+                                          style: kBebasNormal.copyWith(
+                                            fontSize: 18.0.r,
+                                            color: Colors.deepOrange,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10.0),
+                              SizedBox(height: 10.0.r),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
@@ -352,7 +357,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 30.0),
+                              SizedBox(height: 30.0.r),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
@@ -378,7 +383,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                     child: DropdownButtonFormField<String>(
                                       value: _operation,
                                       borderRadius: BorderRadius.circular(10.0),
-                                      menuMaxHeight: 300.0,
+                                      menuMaxHeight: 300.0.r,
                                       dropdownColor: Colors.grey.shade900,
                                       items: [
                                         'equals',
@@ -391,7 +396,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                           value: value,
                                           child: Text(
                                             value,
-                                            style: kBebasNormal.copyWith(fontSize: 16.5),
+                                            style: kBebasNormal.copyWith(fontSize: 14.5.r),
                                           ),
                                         );
                                       }).toList(),
@@ -409,11 +414,11 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                       controller: _valueController,
                                       keyboardType:
                                           const TextInputType.numberWithOptions(decimal: true),
-                                      style: kBebasNormal.copyWith(fontSize: 16.5),
+                                      style: kBebasNormal.copyWith(fontSize: 14.5.r),
                                       cursorColor: Colors.white70,
                                       decoration: InputDecoration(
                                           hintText: 'Value',
-                                          hintStyle: kBebasNormal.copyWith(fontSize: 16.5)),
+                                          hintStyle: kBebasNormal.copyWith(fontSize: 14.5.r)),
                                       onChanged: (value) {
                                         setModalState(() {
                                           _valueController.text = value;
@@ -426,13 +431,13 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 30.0),
+                              SizedBox(height: 30.0.r),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
-                                    height: 40.0,
-                                    width: 40.0,
+                                    height: 40.0.r,
+                                    width: 40.0.r,
                                     child: FloatingActionButton(
                                       onPressed: () {
                                         setModalState(() {
@@ -474,15 +479,15 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                         _editIndex != null ? '✓' : '+',
                                         style: _editIndex != null
                                             ? kBebasBold.copyWith(
-                                                color: Colors.black, fontSize: 14.0)
+                                                color: Colors.black, fontSize: 12.0.r)
                                             : kBebasBold.copyWith(
-                                                color: Colors.black, fontSize: 28.0),
+                                                color: Colors.black, fontSize: 26.0.r),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 25.0),
+                              SizedBox(height: 25.0.r),
                               Expanded(
                                 child: ClipRect(
                                   child: ListView.builder(
@@ -500,26 +505,26 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                           '${filter['field']} ${filter['operation']} ${filter['value']}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: kBebasNormal.copyWith(fontSize: 18.0),
+                                          style: kBebasNormal.copyWith(fontSize: 16.0.r),
                                         ),
                                         trailing: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             IconButton(
-                                              icon: const Icon(
+                                              icon: Icon(
                                                 Icons.edit,
                                                 color: Colors.white70,
-                                                size: 20.0,
+                                                size: 20.0.r,
                                               ),
                                               onPressed: () {
                                                 _editFilter(index, setModalState);
                                               },
                                             ),
                                             IconButton(
-                                              icon: const Icon(
+                                              icon: Icon(
                                                 Icons.remove_circle_outline_outlined,
                                                 color: Colors.red,
-                                                size: 20.0,
+                                                size: 20.0.r,
                                               ),
                                               onPressed: () {
                                                 _removeFilter(index, setModalState);

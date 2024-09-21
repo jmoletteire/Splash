@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
@@ -35,6 +36,7 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return SliverTableView.builder(
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
@@ -56,36 +58,68 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
       columns: [
         /// YEAR
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.12,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.04
+              : MediaQuery.of(context).size.width * 0.12,
           freezePriority: 1,
         ),
 
         /// TEAM
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.1,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.1,
           freezePriority: 1,
         ),
 
         /// PLAYER
-        TableColumn(width: MediaQuery.of(context).size.width * 0.4),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.2
+              : MediaQuery.of(context).size.width * 0.4,
+        ),
 
         /// POSITION
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// AGE
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.125,
+        ),
 
         /// HEIGHT
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.125,
+        ),
 
         /// WEIGHT
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.125,
+        ),
 
         /// ORGANIZATION
-        TableColumn(width: MediaQuery.of(context).size.width * 0.25),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.1
+              : MediaQuery.of(context).size.width * 0.25,
+        ),
 
         /// ORGANIZATION TYPE
-        TableColumn(width: MediaQuery.of(context).size.width * 0.28),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.1
+              : MediaQuery.of(context).size.width * 0.28,
+        ),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -99,15 +133,14 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
           return Material(
             color: Colors.grey.shade800,
             child: Padding(
-              padding: column == 0
-                  ? const EdgeInsets.only(left: 8.0)
-                  : const EdgeInsets.only(right: 8.0),
+              padding:
+                  column == 0 ? EdgeInsets.only(left: 8.0.r) : EdgeInsets.only(right: 8.0.r),
               child: Align(
                 alignment: column <= 2 ? Alignment.centerLeft : Alignment.centerRight,
                 child: Text(
                   columnNames[column],
                   style: kBebasNormal.copyWith(
-                    fontSize: 16.0,
+                    fontSize: 14.0.r,
                   ),
                 ),
               ),
@@ -126,7 +159,7 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
     } else if (widget.selections[row]['ALL_STAR'] == 1) {
       return Colors.blueGrey.withOpacity(0.5);
     } else {
-      return Colors.grey.shade900;
+      return Colors.grey.shade900.withOpacity(0.8);
     }
   }
 
@@ -172,7 +205,7 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
           highlightColor: Colors.white,
           child: contentBuilder(context, (context, column) {
             return Padding(
-              padding: EdgeInsets.only(right: column == 2 ? 0.0 : 8.0),
+              padding: EdgeInsets.only(right: column == 2 ? 0.0 : 8.0.r),
               child: getContent(row, column, context),
             );
           }),
@@ -204,7 +237,7 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
             widget.selections[row]['SEASON'],
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 16.0),
+            style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 14.0.r),
           ),
         );
       case 1:
@@ -220,16 +253,16 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
         );
       case 2:
         return Padding(
-          padding: const EdgeInsets.fromLTRB(6.0, 8.0, 0.0, 8.0),
+          padding: EdgeInsets.fromLTRB(6.0.r, 8.0.r, 0.0, 8.0.r),
           child: Row(
             children: [
               PlayerAvatar(
-                radius: 12.0,
+                radius: 12.0.r,
                 backgroundColor: Colors.white70,
                 playerImageUrl:
                     'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.selections[row]['PERSON_ID']}.png',
               ),
-              const SizedBox(width: 8.0),
+              SizedBox(width: 8.0.r),
               Expanded(
                 flex: 7,
                 child: AutoSizeText(
@@ -238,16 +271,13 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
                       : widget.selections[row]['PLAYER_NAME'] ?? '-',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: kBebasNormal.copyWith(fontSize: 16.0),
+                  style: kBebasNormal.copyWith(fontSize: 14.0.r),
                 ),
               ),
               if (widget.selections[row]['HOF'] == 1)
-                Flexible(
-                  flex: 2,
-                  child: Image.asset(
-                    'images/hof.png',
-                    height: 25.0,
-                  ),
+                Image.asset(
+                  'images/hof.png',
+                  height: 25.0.r,
                 ),
             ],
           ),
@@ -337,7 +367,7 @@ class StandingsDataText extends StatelessWidget {
       child: Text(
         text,
         textAlign: TextAlign.end,
-        style: kBebasNormal.copyWith(fontSize: size ?? 18.0, color: color),
+        style: kBebasNormal.copyWith(fontSize: size ?? 16.0.r, color: color),
       ),
     );
   }

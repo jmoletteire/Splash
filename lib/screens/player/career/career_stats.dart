@@ -50,6 +50,7 @@ class _CareerStatsState extends State<CareerStats> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return SliverTableView.builder(
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
@@ -71,69 +72,145 @@ class _CareerStatsState extends State<CareerStats> {
       columns: [
         /// YEAR
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.145,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.08
+              : MediaQuery.of(context).size.width * 0.145,
           freezePriority: 1,
         ),
 
         /// TEAM
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.15,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.15,
           freezePriority: 1,
         ),
 
         /// GP
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// MPG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// PPG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.125,
+        ),
 
         /// RPG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// APG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// SPG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// BPG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// TOV
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// FG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// 3P%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// FT%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// eFG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// TS%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// USG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// ORTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// DRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// NRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// DIE
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -149,11 +226,7 @@ class _CareerStatsState extends State<CareerStats> {
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Align(
-                alignment: column == 0
-                    ? Alignment.center
-                    : column == 1
-                        ? Alignment.center
-                        : Alignment.centerRight,
+                alignment: column <= 1 ? Alignment.center : Alignment.centerRight,
                 child: Text(
                   columnNames[column],
                   style: kBebasNormal.copyWith(
@@ -240,26 +313,19 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           return Row(
             children: [
-              Expanded(
-                flex: 3,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 20.0.r),
-                  child: Image.asset(
-                    'images/NBA_Logos/${widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ID']}.png',
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    width: 20.0.r,
-                  ),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 20.0.r),
+                child: Image.asset(
+                  'images/NBA_Logos/${widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ID']}.png',
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                  width: 20.0.r,
                 ),
               ),
               SizedBox(width: 8.0.r),
-              Expanded(
-                flex: 4,
-                child: Text(
-                  widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'] ??
-                      '-',
-                  style: kBebasBold.copyWith(fontSize: 15.0.r),
-                ),
+              Text(
+                widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'] ?? '-',
+                style: kBebasBold.copyWith(fontSize: 15.0.r),
               ),
             ],
           );

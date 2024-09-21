@@ -120,6 +120,7 @@ class _PlayersTableState extends State<PlayersTable> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return SliverTableView.builder(
       horizontalScrollController: scrollController,
       style: const TableViewStyle(
@@ -140,8 +141,9 @@ class _PlayersTableState extends State<PlayersTable> {
       rowHeight: MediaQuery.of(context).size.height * 0.055,
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
       columns: widget.selectedColumns.map((col) {
+        double colWidth = isLandscape ? col.landscapeWidth : col.portraitWidth;
         return TableColumn(
-          width: MediaQuery.of(context).size.width * col.width,
+          width: MediaQuery.of(context).size.width * colWidth,
           freezePriority: col.getIndex(kAllColumns) == 0 ? 1 : 0,
         );
       }).toList(),

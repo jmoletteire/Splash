@@ -399,19 +399,34 @@ class _TeamStatsState extends State<TeamStats> {
                               ),
                             ),
                           ),
-                          Positioned(
-                            top: 2,
-                            left: 11, // Adjust based on your switch size
-                            width: 16,
-                            height: 16,
-                            child: IgnorePointer(
-                              ignoring: true,
-                              child: Visibility(
-                                visible: _playoffSwitch,
-                                child: SvgPicture.asset('images/playoffs.svg'),
+                          if (MediaQuery.of(context).orientation == Orientation.landscape)
+                            Positioned(
+                              top: 1,
+                              left: 22,
+                              width: 16,
+                              height: 16, // Adjust based on your switch size
+                              child: IgnorePointer(
+                                ignoring: true,
+                                child: Visibility(
+                                  visible: _playoffSwitch,
+                                  child: SvgPicture.asset('images/playoffs.svg'),
+                                ),
                               ),
                             ),
-                          ),
+                          if (MediaQuery.of(context).orientation == Orientation.portrait)
+                            Positioned(
+                              top: 1,
+                              left: 3,
+                              width: 16,
+                              height: 16, // Adjust based on your switch size
+                              child: IgnorePointer(
+                                ignoring: true,
+                                child: Visibility(
+                                  visible: _playoffSwitch,
+                                  child: SvgPicture.asset('images/playoffs.svg'),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),

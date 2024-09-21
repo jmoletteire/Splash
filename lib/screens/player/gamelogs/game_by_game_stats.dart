@@ -98,6 +98,8 @@ class _GameByGameStatsState extends State<GameByGameStats> {
   Widget build(BuildContext context) {
     _prepareGameIds();
 
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return SliverTableView.builder(
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
@@ -119,63 +121,115 @@ class _GameByGameStatsState extends State<GameByGameStats> {
       columns: [
         /// DATE
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.12,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.12,
           freezePriority: 1,
         ),
 
         /// OPP
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.18,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.18,
           freezePriority: 1,
         ),
 
         /// MIN
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.12),
 
         /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.11),
 
         /// REB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.04
+                : MediaQuery.of(context).size.width * 0.08),
 
         /// AST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.04
+                : MediaQuery.of(context).size.width * 0.08),
 
         /// STL
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.04
+                : MediaQuery.of(context).size.width * 0.08),
 
         /// BLK
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.04
+                : MediaQuery.of(context).size.width * 0.08),
 
         /// TOV
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.04
+                : MediaQuery.of(context).size.width * 0.08),
 
         /// FG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.12),
 
         /// 3P%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.11),
 
         /// FT%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.11),
 
         /// eFG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.11),
 
         /// TS%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.11),
 
         /// USG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.11),
 
         /// ORTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.13),
 
         /// DRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.13),
 
         /// NRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.13),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.13),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -189,9 +243,8 @@ class _GameByGameStatsState extends State<GameByGameStats> {
           return Material(
             color: Colors.grey.shade800,
             child: Padding(
-              padding: column == 0
-                  ? const EdgeInsets.only(left: 11.0)
-                  : const EdgeInsets.only(right: 8.0),
+              padding:
+                  column == 0 ? EdgeInsets.only(left: 11.0.r) : EdgeInsets.only(right: 8.0.r),
               child: Align(
                 alignment: column == 0
                     ? Alignment.centerLeft
@@ -235,7 +288,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
     // Check if the row is a season type (not a regular game ID)
     if (seasonTypes.values.contains(gameId)) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
         alignment: Alignment.centerLeft,
         child: Text(
           gameId,
@@ -275,7 +328,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
           highlightColor: Colors.white,
           child: contentBuilder(context, (context, column) {
             return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: EdgeInsets.only(right: 8.0.r),
               child: getContent(game, row, column, context),
             );
           }),

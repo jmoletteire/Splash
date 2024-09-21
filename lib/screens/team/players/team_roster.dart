@@ -154,7 +154,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                     child: Column(
                       children: [
                         Container(
-                          padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 0.0, 6.0.r),
+                          padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 14.0.r, 6.0.r),
                           decoration: const BoxDecoration(
                             color: Color(0xFF303030),
                             border: Border(
@@ -168,27 +168,24 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
-                                flex: 8,
+                                flex: 11,
                                 child: GestureDetector(
-                                  child: Container(
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Player',
-                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Player',
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                      ),
+                                      if (sortedBy == 'Name')
+                                        Icon(
+                                          sortOrder == 'ASC'
+                                              ? Icons.arrow_drop_down
+                                              : Icons.arrow_drop_up,
+                                          size: 14.0.r,
+                                          color: Colors.white,
                                         ),
-                                        if (sortedBy == 'Name')
-                                          Icon(
-                                            sortOrder == 'ASC'
-                                                ? Icons.arrow_drop_down
-                                                : Icons.arrow_drop_up,
-                                            size: 14.0.r,
-                                            color: Colors.white,
-                                          ),
-                                      ],
-                                    ),
+                                    ],
                                   ),
                                   onTap: () {
                                     setState(() {
@@ -202,26 +199,22 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                               Expanded(
                                 flex: 2,
                                 child: GestureDetector(
-                                  child: Container(
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '#',
-                                          textAlign: TextAlign.end,
-                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '#',
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                      ),
+                                      if (sortedBy == 'Number')
+                                        Icon(
+                                          sortOrder == 'ASC'
+                                              ? Icons.arrow_drop_down
+                                              : Icons.arrow_drop_up,
+                                          size: 14.0.r,
+                                          color: Colors.white,
                                         ),
-                                        if (sortedBy == 'Number')
-                                          Icon(
-                                            sortOrder == 'ASC'
-                                                ? Icons.arrow_drop_down
-                                                : Icons.arrow_drop_up,
-                                            size: 14.0.r,
-                                            color: Colors.white,
-                                          ),
-                                      ],
-                                    ),
+                                    ],
                                   ),
                                   onTap: () {
                                     setState(() {
@@ -235,26 +228,22 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                               Expanded(
                                 flex: 1,
                                 child: GestureDetector(
-                                  child: Container(
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Pos',
-                                          textAlign: TextAlign.start,
-                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Pos',
+                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                      ),
+                                      if (sortedBy == 'Position')
+                                        Icon(
+                                          sortOrder == 'ASC'
+                                              ? Icons.arrow_drop_down
+                                              : Icons.arrow_drop_up,
+                                          size: 14.0.r,
+                                          color: Colors.white,
                                         ),
-                                        if (sortedBy == 'Position')
-                                          Icon(
-                                            sortOrder == 'ASC'
-                                                ? Icons.arrow_drop_down
-                                                : Icons.arrow_drop_up,
-                                            size: 14.0.r,
-                                            color: Colors.white,
-                                          ),
-                                      ],
-                                    ),
+                                    ],
                                   ),
                                   onTap: () {
                                     setState(() {

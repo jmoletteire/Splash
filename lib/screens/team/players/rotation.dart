@@ -236,57 +236,58 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                               ),
                             ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                flex: 9,
-                                child: Container(
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Starters',
-                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
-                                      ),
-                                    ],
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 14.0.r),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 10,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Starters',
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'MIN',
-                                        textAlign: TextAlign.start,
-                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
-                                      ),
-                                    ],
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'MIN',
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'GS',
-                                        textAlign: TextAlign.start,
-                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
-                                      ),
-                                    ],
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'GS',
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -342,57 +343,58 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                               ),
                             ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                flex: 9,
-                                child: Container(
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Bench',
-                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
-                                      ),
-                                    ],
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 14.0.r),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 10,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Bench',
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'MIN',
-                                        textAlign: TextAlign.start,
-                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
-                                      ),
-                                    ],
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'MIN',
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'GS',
-                                        textAlign: TextAlign.start,
-                                        style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
-                                      ),
-                                    ],
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'GS',
+                                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -521,7 +523,7 @@ class RotationRow extends StatelessWidget {
             builder: (BuildContext context, num value, Widget? child) {
               return Text(
                 value.toStringAsFixed(1),
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.end,
                 style: kBebasNormal.copyWith(fontSize: 15.0.r),
               );
             },
@@ -539,7 +541,7 @@ class RotationRow extends StatelessWidget {
             builder: (BuildContext context, num value, Widget? child) {
               return Text(
                 value.toStringAsFixed(0),
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.end,
                 style: kBebasNormal.copyWith(fontSize: 15.0.r),
               );
             },

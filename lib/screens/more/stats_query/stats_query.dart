@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/more/stats_query/filters_bottom_sheet.dart';
 import 'package:splash/screens/more/stats_query/players_table.dart';
 import 'package:splash/screens/more/stats_query/util/column_options.dart';
@@ -86,13 +87,14 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
       appBar: AppBar(
         backgroundColor: Colors.grey.shade900,
         surfaceTintColor: Colors.grey.shade900,
-        title: const Text(
+        title: Text(
           'STATS',
-          style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 28.0),
+          style: TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 26.0.r),
         ),
         actions: [
           CustomIconButton(
             icon: Icons.search,
+            size: 30.0.r,
             onPressed: () {
               Navigator.push(
                 context,
@@ -104,6 +106,7 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
           ),
           CustomIconButton(
             icon: Icons.table_rows,
+            size: 30.0.r,
             onPressed: _showColumnSelector,
           ),
           FiltersBottomSheet(onDone: _handleFiltersDone)
@@ -115,7 +118,7 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
           indicatorWeight: 3.0,
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
-          labelStyle: kBebasNormal.copyWith(fontSize: 18.0),
+          labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
           tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
         ),
       ),
@@ -125,20 +128,20 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (queryData == null)
-                    const Text(
+                    Text(
                       'Select Filters',
-                      style: kBebasNormal,
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r),
                     )
                   else
-                    const Text(
+                    Text(
                       'No Results',
-                      style: kBebasNormal,
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r),
                     ),
-                  const SizedBox(width: 5.0),
+                  SizedBox(width: 5.0.r),
                   if (queryData == null)
-                    const Icon(
+                    Icon(
                       Icons.filter_alt,
-                      size: 20.0,
+                      size: 20.0.r,
                     )
                 ],
               )
