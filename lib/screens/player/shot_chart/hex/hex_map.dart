@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
 import 'hex_aggregator.dart';
@@ -19,15 +20,16 @@ class _HexMapState extends State<HexMap> {
   HexagonData? _selectedHexagon; // Track the selected hexagon
 
   void _handleTap(BuildContext context, Offset tapPosition) {
-    const double canvasWidth = 368;
-    const double canvasHeight = 346;
-    const double tooltipWidth = 150; // Approximate width of the tooltip
-    const double tooltipHeight = 50; // Approximate height of the tooltip
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    double canvasWidth = isLandscape ? 368.r : 368;
+    double canvasHeight = isLandscape ? 346.r : 346;
+    double tooltipWidth = isLandscape ? 150.r : 150; // Approximate width of the tooltip
+    double tooltipHeight = isLandscape ? 50.r : 50; // Approximate height of the tooltip
 
     // Adjust for the court dimensions, similar to how you map the hexagons
-    const double hoopOffset = (4 / 47) * canvasHeight;
-    const double basketX = canvasWidth / 2;
-    const double basketY = canvasHeight - hoopOffset;
+    double hoopOffset = (4 / 47) * canvasHeight;
+    double basketX = canvasWidth / 2;
+    double basketY = canvasHeight - hoopOffset;
 
     // Map the tap position to the normalized court coordinate space
     double normalizedX = (basketX - tapPosition.dx) / basketX; // Normalize to range -1 to 1
@@ -38,7 +40,7 @@ class _HexMapState extends State<HexMap> {
 
     // Now check against the original hexagons before they were mapped
     for (var hex in widget.hexagons) {
-      if (hex.contains(normalizedTapPosition)) {
+      if (hex.contains(normalizedTapPosition, isLandscape)) {
         if (hex.FGA == 0 || hex == _selectedHexagon) {
           _dismissTooltip();
           break;
@@ -62,7 +64,7 @@ class _HexMapState extends State<HexMap> {
           // Set the final tooltip position
           _tooltipPosition = Offset(adjustedX, adjustedY);
           _tooltipMessage =
-              'Zone: ${hex.shotZoneRange['Zone']}\nAvg Dist: ${hex.avgDistance.toStringAsFixed(1) ?? 0}\nFG: ${hex.FGM}/${hex.FGA}  (${(100 * hex.FGM / hex.FGA).toStringAsFixed(1)}%)';
+              'Zone: ${hex.shotZoneRange['Zone']}\nAvg Dist: ${hex.avgDistance.toStringAsFixed(1) ?? 0} ft\nFG: ${hex.FGM}/${hex.FGA}  (${(100 * hex.FGM / hex.FGA).toStringAsFixed(1)}%)';
         });
         break;
       }
@@ -78,14 +80,15 @@ class _HexMapState extends State<HexMap> {
 
   @override
   Widget build(BuildContext context) {
-    const double canvasWidth = 368; // 368 pixels
-    const double canvasHeight = 346; // 346 pixels
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    double canvasWidth = isLandscape ? 368.r : 368; // 368 pixels
+    double canvasHeight = isLandscape ? 346.r : 346; // 346 pixels
 
     // Assume the hoop is 4 feet in front of the baseline
-    const double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units
+    double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units
 
-    const double basketX = canvasWidth / 2;
-    const double basketY = canvasHeight - hoopOffset;
+    double basketX = canvasWidth / 2;
+    double basketY = canvasHeight - hoopOffset;
 
     List<HexagonData> mappedHexagons = widget.hexagons.map((hex) {
       // Normalize Python data: (0,0) at the basket
@@ -132,7 +135,7 @@ class _HexMapState extends State<HexMap> {
               _handleTap(context, details.localPosition);
             },
             child: CustomPaint(
-              size: const Size(canvasWidth, canvasHeight),
+              size: Size(canvasWidth, canvasHeight),
               painter: HexMapPainter(hexagons: mappedHexagons),
             ),
           ),
@@ -143,14 +146,14 @@ class _HexMapState extends State<HexMap> {
               child: Material(
                 color: Colors.transparent,
                 child: Container(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0.r),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(4.0),
                   ),
                   child: Text(
                     _tooltipMessage,
-                    style: kBebasNormal.copyWith(fontSize: 15.0),
+                    style: kBebasNormal.copyWith(fontSize: 13.0.r),
                   ),
                 ),
               ),

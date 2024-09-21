@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/player/shot_chart/zone/zone_aggregator.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -20,13 +21,16 @@ class _ZoneMapState extends State<ZoneMap> {
   ZoneData? _selectedZone;
 
   void _handleTap(BuildContext context, Offset tapPosition) {
-    ZoneAggregator aggregator = ZoneAggregator(widget.courtSize);
-    Map<String, ZoneData> aggregatedZones = aggregator.aggregateShots(widget.shotData);
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    const double canvasWidth = 368;
-    const double canvasHeight = 346;
-    const double tooltipWidth = 150; // Approximate width of the tooltip
-    const double tooltipHeight = 50; // Approximate height of the tooltip
+    ZoneAggregator aggregator = ZoneAggregator(widget.courtSize);
+    Map<String, ZoneData> aggregatedZones =
+        aggregator.aggregateShots(widget.shotData, isLandscape);
+
+    double canvasWidth = isLandscape ? 368.r : 368;
+    double canvasHeight = isLandscape ? 346.r : 346;
+    double tooltipWidth = isLandscape ? 150.r : 150; // Approximate width of the tooltip
+    double tooltipHeight = isLandscape ? 50.r : 50; // Approximate height of the tooltip
 
     bool zoneTapped = false;
 
@@ -72,8 +76,9 @@ class _ZoneMapState extends State<ZoneMap> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     ZoneAggregator zones = ZoneAggregator(widget.courtSize);
-    Map<String, ZoneData> aggregatedZones = zones.aggregateShots(widget.shotData);
+    Map<String, ZoneData> aggregatedZones = zones.aggregateShots(widget.shotData, isLandscape);
     zones.adjustZones(aggregatedZones, widget.shotData.length, widget.lgAvg);
 
     return GestureDetector(
@@ -98,7 +103,7 @@ class _ZoneMapState extends State<ZoneMap> {
               child: Material(
                 color: Colors.transparent,
                 child: Container(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0.r),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(4.0),
@@ -108,7 +113,7 @@ class _ZoneMapState extends State<ZoneMap> {
                     'Avg Dist: ${_selectedZone!.avgDistance.toStringAsFixed(1)} ft.\n'
                     'LA: ${(100 * widget.lgAvg['Zone'][_selectedZone!.zoneName]['FG_PCT']).toStringAsFixed(1)}%\n'
                     'FG: ${_selectedZone!.FGM}/${_selectedZone!.FGA} (${(100 * _selectedZone!.FGM / _selectedZone!.FGA).toStringAsFixed(1)}%)',
-                    style: kBebasNormal.copyWith(fontSize: 16.0),
+                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
                   ),
                 ),
               ),

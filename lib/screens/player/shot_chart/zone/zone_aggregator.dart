@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ZoneAggregator {
   List<ZoneData> zones;
@@ -172,15 +173,15 @@ class ZoneAggregator {
     zones.add(ZoneData(zoneName: 'RESTRICTED AREA', zonePath: restrictedArea));
   }
 
-  Offset _normalizeShotCoordinate(double x, double y) {
-    const double canvasWidth = 368; // 368 pixels
-    const double canvasHeight = 346; // 346 pixels
+  Offset _normalizeShotCoordinate(double x, double y, bool isLandscape) {
+    double canvasWidth = isLandscape ? 368.r : 368; // 368 pixels
+    double canvasHeight = isLandscape ? 346.r : 346; // 346 pixels
 
     // Assume the hoop is 4 feet in front of the baseline
-    const double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units
+    double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units
 
-    const double basketX = canvasWidth / 2;
-    const double basketY = canvasHeight - hoopOffset;
+    double basketX = canvasWidth / 2;
+    double basketY = canvasHeight - hoopOffset;
 
     // Normalize Python data: (0,0) at the basket
     double normalizedX = x / 250; // Range -1 to 1
@@ -193,13 +194,13 @@ class ZoneAggregator {
     return Offset(mappedX, mappedY);
   }
 
-  Map<String, ZoneData> aggregateShots(List shotData) {
+  Map<String, ZoneData> aggregateShots(List shotData, bool isLandscape) {
     Map<String, ZoneData> zoneMap = {};
 
     for (var shot in shotData) {
       double x = shot['LOC_X'].toDouble();
       double y = shot['LOC_Y'].toDouble();
-      Offset normalizedShot = _normalizeShotCoordinate(x, y);
+      Offset normalizedShot = _normalizeShotCoordinate(x, y, isLandscape);
 
       for (ZoneData zone in zones) {
         if (zone.contains(normalizedShot)) {

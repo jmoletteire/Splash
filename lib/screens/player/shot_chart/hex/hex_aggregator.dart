@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HexagonAggregator {
   final double hexWidth;
@@ -8,23 +9,8 @@ class HexagonAggregator {
 
   HexagonAggregator(this.hexWidth, this.hexHeight);
 
-  bool isPointInHexagon(Offset point, List<Offset> vertices) {
-    int n = vertices.length;
-    bool inside = false;
-    for (int i = 0, j = n - 1; i < n; j = i++) {
-      if (((vertices[i].dy > point.dy) != (vertices[j].dy > point.dy)) &&
-          (point.dx <
-              (vertices[j].dx - vertices[i].dx) *
-                      (point.dy - vertices[i].dy) /
-                      (vertices[j].dy - vertices[i].dy) +
-                  vertices[i].dx)) {
-        inside = !inside;
-      }
-    }
-    return inside;
-  }
-
-  Map<String, HexagonData> aggregateShots(List shotData, List<HexagonData> hexagons) {
+  Map<String, HexagonData> aggregateShots(
+      List shotData, List<HexagonData> hexagons, bool isLandscape) {
     Map<String, HexagonData> hexagonMap = {};
 
     for (var shot in shotData) {
@@ -33,7 +19,7 @@ class HexagonAggregator {
       Offset shotPoint = Offset(x, y);
 
       for (var hexagon in hexagons) {
-        if (hexagon.contains(shotPoint)) {
+        if (hexagon.contains(shotPoint, isLandscape)) {
           String key = '${hexagon.x},${hexagon.y}';
           if (!hexagonMap.containsKey(key)) {
             hexagonMap[key] = hexagon;
@@ -139,11 +125,12 @@ class HexagonData {
     return points;
   }
 
-  bool contains(Offset point) {
+  bool contains(Offset point, bool isLandscape) {
+    double courtHeight = isLandscape ? 346.r : 346;
     double centerX = x;
     double centerY = y;
     double apothem =
-        346 / 47 * sqrt(3); // The distance from the center to the middle of any side
+        courtHeight / 47 * sqrt(3); // The distance from the center to the middle of any side
 
     // Calculate the distance from the point to the center of the hexagon
     double distance = sqrt(pow(point.dx - centerX, 2) + pow(point.dy - centerY, 2));

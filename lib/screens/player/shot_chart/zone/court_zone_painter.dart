@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/player/shot_chart/zone/zone_aggregator.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -33,7 +34,7 @@ class ZonePainter extends CustomPainter {
       final TextPainter textPainter = TextPainter(
         text: TextSpan(
           text: '${(100 * zone.FGM / zone.FGA).toStringAsFixed(1)}%', // FG% text
-          style: kBebasNormal.copyWith(fontSize: 18.0),
+          style: kBebasNormal.copyWith(fontSize: 16.0.r),
         ),
         textDirection: TextDirection.ltr,
       );

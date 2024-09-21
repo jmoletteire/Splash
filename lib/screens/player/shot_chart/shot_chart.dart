@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/player/shot_chart/shot_chart_cache.dart';
@@ -8,6 +9,7 @@ import 'package:splash/screens/player/shot_chart/zone/zone_aggregator.dart';
 import 'package:splash/screens/player/shot_chart/zone/zone_map.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../../../components/court_painter.dart';
 import '../../../utilities/player.dart';
 import 'hex/hex_aggregator.dart';
 import 'hex/hex_map.dart';
@@ -113,19 +115,21 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
   }
 
   void processShotChart(List shotChart) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     hexagons = generateHexagonGrid(
       hexSizeInFeet: 1.5,
       courtWidthInFeet: 50,
       courtHeightInFeet: 47,
-      canvasWidth: 368,
-      canvasHeight: 346,
+      canvasWidth: isLandscape ? 368.r : 368,
+      canvasHeight: isLandscape ? 346.r : 346,
     );
 
     // Create an instance of the aggregator
     HexagonAggregator aggregator = HexagonAggregator(hexagons[0].width, hexagons[0].height);
 
     // Aggregate shots by hexagon
-    hexagonMap = aggregator.aggregateShots(shotChart, hexagons);
+    hexagonMap = aggregator.aggregateShots(shotChart, hexagons, isLandscape);
 
     // Adjust hexagons based on aggregated data
     aggregator.adjustHexagons(hexagonMap, shotChart.length, lgAvg[0]);
@@ -140,8 +144,10 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
       }
     }
 
-    ZoneAggregator zoneAggregator = ZoneAggregator(const Size(368, 346));
-    Map<String, ZoneData> aggregatedZones = zoneAggregator.aggregateShots(filteredShotChart);
+    ZoneAggregator zoneAggregator =
+        ZoneAggregator(isLandscape ? Size(368.r, 346.r) : const Size(368, 346));
+    Map<String, ZoneData> aggregatedZones =
+        zoneAggregator.aggregateShots(filteredShotChart, isLandscape);
 
     // Adjust hexagons based on aggregated data
     zoneAggregator.adjustZones(aggregatedZones, filteredShotChart.length, lgAvg[0]);
@@ -304,186 +310,369 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
     // Calculate FGM, FGA, and FG%
     Map<String, dynamic> fgStats = calculateFGStats(filteredShotChart);
 
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Stack(
       children: [
         SingleChildScrollView(
           child: Card(
-            margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 100.0),
+            margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 100.0.r),
             color: Colors.grey.shade900,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0.r),
               child: Card(
-                color: Colors.white10,
-                child: Column(
-                  children: [
-                    Stack(
-                      children: [
-                        IgnorePointer(
-                          child: CustomPaint(
-                            size: const Size(368, 346),
-                            painter: HalfCourtPainter(),
-                          ),
-                        ),
-                        if (_displayMap == 'Hex')
-                          HexMap(
-                            hexagons: hexagons,
-                          ),
-                        if (_displayMap == 'Zone')
-                          ZoneMap(
-                              shotData: filteredShotChart,
-                              lgAvg: lgAvg[0],
-                              courtSize: const Size(368, 346))
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _displayMap = 'Hex';
-                            });
-                          },
-                          icon: _displayMap == 'Hex'
-                              ? const Icon(Icons.hexagon)
-                              : const Icon(Icons.hexagon_outlined),
-                          color: _displayMap == 'Hex' ? Colors.white : Colors.grey,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _displayMap = 'Zone';
-                            });
-                          },
-                          icon: const Icon(Icons.percent),
-                          color: _displayMap == 'Zone' ? Colors.white : Colors.grey,
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 6.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center, // Align center
-                      children: [
-                        Column(
-                          children: [
-                            TweenAnimationBuilder<int>(
-                              tween: IntTween(begin: 0, end: fgStats['FGM']),
-                              duration: const Duration(milliseconds: 200),
-                              builder: (context, value, child) {
-                                return Text(
-                                  "$value",
-                                  style: kBebasNormal.copyWith(
-                                      color: Colors.white, fontSize: 20.0),
-                                );
-                              },
-                            ),
-                            Text(
-                              "FGM",
-                              style:
-                                  kBebasNormal.copyWith(color: Colors.white70, fontSize: 14.0),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 50.0),
-                        Column(
-                          children: [
-                            TweenAnimationBuilder<int>(
-                              tween: IntTween(begin: 0, end: fgStats['FGA']),
-                              duration: const Duration(milliseconds: 200),
-                              builder: (context, value, child) {
-                                return Text(
-                                  "$value",
-                                  style: kBebasNormal.copyWith(
-                                      color: Colors.white, fontSize: 20.0),
-                                );
-                              },
-                            ),
-                            Text(
-                              "FGA",
-                              style:
-                                  kBebasNormal.copyWith(color: Colors.white70, fontSize: 14.0),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 50.0),
-                        Column(
-                          children: [
-                            TweenAnimationBuilder<double>(
-                              tween:
-                                  Tween<double>(begin: 0, end: double.parse(fgStats['FG%'])),
-                              duration: const Duration(milliseconds: 200),
-                              builder: (context, value, child) {
-                                return Text(
-                                  "${value.toStringAsFixed(1)}%",
-                                  style: kBebasNormal.copyWith(
-                                      color: Colors.white, fontSize: 20.0),
-                                );
-                              },
-                            ),
-                            Text(
-                              "FG%",
-                              style:
-                                  kBebasNormal.copyWith(color: Colors.white70, fontSize: 14.0),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10.0),
-                    Wrap(
-                      children: distinctShotTypes.map((shotType) {
-                        bool isSelected = selectedShotTypes.contains(shotType);
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4.0), // Add some spacing between buttons
-                          child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                if (isSelected) {
-                                  selectedShotTypes
-                                      .remove(shotType); // Deselect if already selected
-                                } else {
-                                  selectedShotTypes
-                                      .add(shotType); // Select if not already selected
-                                }
-                                filterShotChart(); // Apply filtering after selection
-                              });
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all(
-                                isSelected
-                                    ? kTeamColors[widget.team['ABBREVIATION']]![
-                                        'primaryColor']!
-                                    : Colors.grey.shade800,
-                              ),
-                              shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  side: BorderSide(
-                                    color: isSelected
-                                        ? kTeamColors[widget.team['ABBREVIATION']]![
-                                            'secondaryColor']!
-                                        : Colors.grey.shade600,
-                                    width: 2.0,
+                  color: Colors.white10,
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    if (isLandscape) {
+                      return Row(
+                        children: [
+                          SizedBox(width: 50.0.r),
+                          Column(
+                            children: [
+                              Stack(
+                                children: [
+                                  IgnorePointer(
+                                    child: CustomPaint(
+                                      size: Size(368.r, 346.r),
+                                      painter: HalfCourtPainter(),
+                                    ),
                                   ),
+                                  if (_displayMap == 'Hex')
+                                    HexMap(
+                                      hexagons: hexagons,
+                                    ),
+                                  if (_displayMap == 'Zone')
+                                    ZoneMap(
+                                        shotData: filteredShotChart,
+                                        lgAvg: lgAvg[0],
+                                        courtSize: Size(368.r, 346.r))
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _displayMap = 'Hex';
+                                      });
+                                    },
+                                    icon: _displayMap == 'Hex'
+                                        ? const Icon(Icons.hexagon)
+                                        : const Icon(Icons.hexagon_outlined),
+                                    color: _displayMap == 'Hex' ? Colors.white : Colors.grey,
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _displayMap = 'Zone';
+                                      });
+                                    },
+                                    icon: const Icon(Icons.percent),
+                                    color: _displayMap == 'Zone' ? Colors.white : Colors.grey,
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 6.0.r),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center, // Align center
+                                children: [
+                                  Column(
+                                    children: [
+                                      TweenAnimationBuilder<int>(
+                                        tween: IntTween(begin: 0, end: fgStats['FGM']),
+                                        duration: const Duration(milliseconds: 200),
+                                        builder: (context, value, child) {
+                                          return Text(
+                                            "$value",
+                                            style: kBebasNormal.copyWith(
+                                                color: Colors.white, fontSize: 18.0.r),
+                                          );
+                                        },
+                                      ),
+                                      Text(
+                                        "FGM",
+                                        style: kBebasNormal.copyWith(
+                                            color: Colors.white70, fontSize: 12.0.r),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 50.0.r),
+                                  Column(
+                                    children: [
+                                      TweenAnimationBuilder<int>(
+                                        tween: IntTween(begin: 0, end: fgStats['FGA']),
+                                        duration: const Duration(milliseconds: 200),
+                                        builder: (context, value, child) {
+                                          return Text(
+                                            "$value",
+                                            style: kBebasNormal.copyWith(
+                                                color: Colors.white, fontSize: 18.0.r),
+                                          );
+                                        },
+                                      ),
+                                      Text(
+                                        "FGA",
+                                        style: kBebasNormal.copyWith(
+                                            color: Colors.white70, fontSize: 12.0.r),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 50.0.r),
+                                  Column(
+                                    children: [
+                                      TweenAnimationBuilder<double>(
+                                        tween: Tween<double>(
+                                            begin: 0, end: double.parse(fgStats['FG%'])),
+                                        duration: const Duration(milliseconds: 200),
+                                        builder: (context, value, child) {
+                                          return Text(
+                                            "${value.toStringAsFixed(1)}%",
+                                            style: kBebasNormal.copyWith(
+                                                color: Colors.white, fontSize: 18.0.r),
+                                          );
+                                        },
+                                      ),
+                                      Text(
+                                        "FG%",
+                                        style: kBebasNormal.copyWith(
+                                            color: Colors.white70, fontSize: 12.0.r),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10.0.r),
+                            ],
+                          ),
+                          SizedBox(width: 50.0.r),
+                          Flexible(
+                            child: Wrap(
+                              children: distinctShotTypes.map((shotType) {
+                                bool isSelected = selectedShotTypes.contains(shotType);
+
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 4.0.r), // Add some spacing between buttons
+                                  child: TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (isSelected) {
+                                          selectedShotTypes.remove(
+                                              shotType); // Deselect if already selected
+                                        } else {
+                                          selectedShotTypes
+                                              .add(shotType); // Select if not already selected
+                                        }
+                                        filterShotChart(); // Apply filtering after selection
+                                      });
+                                    },
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(
+                                        isSelected
+                                            ? kTeamColors[widget.team['ABBREVIATION']]![
+                                                'primaryColor']!
+                                            : Colors.grey.shade800,
+                                      ),
+                                      shape: WidgetStateProperty.all(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(20.0),
+                                          side: BorderSide(
+                                            color: isSelected
+                                                ? kTeamColors[widget.team['ABBREVIATION']]![
+                                                    'secondaryColor']!
+                                                : Colors.grey.shade600,
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                      ),
+                                      foregroundColor: WidgetStateProperty.all(
+                                        isSelected ? Colors.white : Colors.grey.shade200,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      shotType,
+                                      style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          Stack(
+                            children: [
+                              IgnorePointer(
+                                child: CustomPaint(
+                                  size: const Size(368, 346),
+                                  painter: HalfCourtPainter(),
                                 ),
                               ),
-                              foregroundColor: WidgetStateProperty.all(
-                                isSelected ? Colors.white : Colors.grey.shade200,
-                              ),
-                            ),
-                            child: Text(
-                              shotType,
-                              style: kBebasNormal.copyWith(fontSize: 14.0),
-                            ),
+                              if (_displayMap == 'Hex')
+                                HexMap(
+                                  hexagons: hexagons,
+                                ),
+                              if (_displayMap == 'Zone')
+                                ZoneMap(
+                                    shotData: filteredShotChart,
+                                    lgAvg: lgAvg[0],
+                                    courtSize: const Size(368, 346))
+                            ],
                           ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _displayMap = 'Hex';
+                                  });
+                                },
+                                icon: _displayMap == 'Hex'
+                                    ? const Icon(Icons.hexagon)
+                                    : const Icon(Icons.hexagon_outlined),
+                                color: _displayMap == 'Hex' ? Colors.white : Colors.grey,
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _displayMap = 'Zone';
+                                  });
+                                },
+                                icon: const Icon(Icons.percent),
+                                color: _displayMap == 'Zone' ? Colors.white : Colors.grey,
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 6.0.r),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center, // Align center
+                            children: [
+                              Column(
+                                children: [
+                                  TweenAnimationBuilder<int>(
+                                    tween: IntTween(begin: 0, end: fgStats['FGM']),
+                                    duration: const Duration(milliseconds: 200),
+                                    builder: (context, value, child) {
+                                      return Text(
+                                        "$value",
+                                        style: kBebasNormal.copyWith(
+                                            color: Colors.white, fontSize: 20.0),
+                                      );
+                                    },
+                                  ),
+                                  Text(
+                                    "FGM",
+                                    style: kBebasNormal.copyWith(
+                                        color: Colors.white70, fontSize: 14.0),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 50.0),
+                              Column(
+                                children: [
+                                  TweenAnimationBuilder<int>(
+                                    tween: IntTween(begin: 0, end: fgStats['FGA']),
+                                    duration: const Duration(milliseconds: 200),
+                                    builder: (context, value, child) {
+                                      return Text(
+                                        "$value",
+                                        style: kBebasNormal.copyWith(
+                                            color: Colors.white, fontSize: 20.0),
+                                      );
+                                    },
+                                  ),
+                                  Text(
+                                    "FGA",
+                                    style: kBebasNormal.copyWith(
+                                        color: Colors.white70, fontSize: 14.0),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 50.0),
+                              Column(
+                                children: [
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                        begin: 0, end: double.parse(fgStats['FG%'])),
+                                    duration: const Duration(milliseconds: 200),
+                                    builder: (context, value, child) {
+                                      return Text(
+                                        "${value.toStringAsFixed(1)}%",
+                                        style: kBebasNormal.copyWith(
+                                            color: Colors.white, fontSize: 20.0),
+                                      );
+                                    },
+                                  ),
+                                  Text(
+                                    "FG%",
+                                    style: kBebasNormal.copyWith(
+                                        color: Colors.white70, fontSize: 14.0),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10.0.r),
+                          Wrap(
+                            children: distinctShotTypes.map((shotType) {
+                              bool isSelected = selectedShotTypes.contains(shotType);
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4.0), // Add some spacing between buttons
+                                child: TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isSelected) {
+                                        selectedShotTypes
+                                            .remove(shotType); // Deselect if already selected
+                                      } else {
+                                        selectedShotTypes
+                                            .add(shotType); // Select if not already selected
+                                      }
+                                      filterShotChart(); // Apply filtering after selection
+                                    });
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                      isSelected
+                                          ? kTeamColors[widget.team['ABBREVIATION']]![
+                                              'primaryColor']!
+                                          : Colors.grey.shade800,
+                                    ),
+                                    shape: WidgetStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20.0),
+                                        side: BorderSide(
+                                          color: isSelected
+                                              ? kTeamColors[widget.team['ABBREVIATION']]![
+                                                  'secondaryColor']!
+                                              : Colors.grey.shade600,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                    ),
+                                    foregroundColor: WidgetStateProperty.all(
+                                      isSelected ? Colors.white : Colors.grey.shade200,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    shotType,
+                                    style: kBebasNormal.copyWith(fontSize: 14.0),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      );
+                    }
+                  })),
             ),
           ),
         ),
@@ -506,11 +695,11 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                       color: Colors.grey.shade900,
                       border: Border.all(color: teamColor),
                       borderRadius: BorderRadius.circular(10.0)),
-                  margin: const EdgeInsets.all(11.0),
+                  margin: EdgeInsets.all(11.0.r),
                   child: DropdownButton<String>(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.r),
                     borderRadius: BorderRadius.circular(10.0),
-                    menuMaxHeight: 300.0,
+                    menuMaxHeight: 300.0.r,
                     dropdownColor: Colors.grey.shade900,
                     isExpanded: false,
                     underline: Container(),
@@ -524,21 +713,21 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                           children: [
                             Text(
                               value,
-                              style: kBebasNormal.copyWith(fontSize: 19.0),
+                              style: kBebasNormal.copyWith(fontSize: 17.0.r),
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0.r),
                             if (teamId != null)
                               Image.asset(
                                 'images/NBA_Logos/$teamId.png',
                                 fit: BoxFit.scaleDown,
-                                width: 25.0,
-                                height: 25.0,
+                                width: 22.0.r,
+                                height: 22.0.r,
                                 alignment: Alignment.center,
                               )
                             else
-                              const SizedBox(
-                                width: 25.0,
-                                height: 25.0,
+                              SizedBox(
+                                width: 25.0.r,
+                                height: 25.0.r,
                               ),
                           ],
                         ),
@@ -560,11 +749,11 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                       color: Colors.grey.shade900,
                       border: Border.all(color: teamColor),
                       borderRadius: BorderRadius.circular(10.0)),
-                  margin: const EdgeInsets.all(11.0),
+                  margin: EdgeInsets.all(11.0.r),
                   child: DropdownButton<String>(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.r),
                     borderRadius: BorderRadius.circular(10.0),
-                    menuMaxHeight: 300.0,
+                    menuMaxHeight: 300.0.r,
                     dropdownColor: Colors.grey.shade900,
                     isExpanded: false,
                     underline: Container(),
@@ -576,7 +765,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                           children: [
                             Text(
                               value,
-                              style: kBebasNormal.copyWith(fontSize: 19.0),
+                              style: kBebasNormal.copyWith(fontSize: 17.0.r),
                             ),
                           ],
                         ),
@@ -598,164 +787,5 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
         ),
       ],
     );
-  }
-}
-
-class HalfCourtPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey.shade700
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    /// 368 Pixels wide = 50 ft (1 pixel = 0.136 ft OR 1.63 inches)
-    /// 346 Pixels tall = 47 ft (1 pixel = 0.136 ft OR 1.63 inches)
-
-    final restrictedAreaRadius = size.width * (4 / 50);
-    final threePointLineRadius = size.height * (23.75 / 47);
-    final keyWidth = size.width * (12 / 50);
-    final outerKeyWidth = size.width * (16 / 50);
-    final freeThrowLine = size.height * (18.87 / 47);
-
-    // Draw center arc
-    canvas.drawArc(
-      Rect.fromCircle(center: Offset((size.width / 2), 0), radius: keyWidth / 2),
-      0,
-      3.14,
-      false,
-      paint,
-    );
-
-    // Draw inner center arc
-    canvas.drawArc(
-      Rect.fromCircle(center: Offset((size.width / 2), 0), radius: keyWidth / 6),
-      0,
-      3.14,
-      false,
-      paint,
-    );
-
-    // Left Hash
-    canvas.drawLine(
-      Offset(0, size.height - (size.height * 28 / 47)),
-      Offset(size.width * (3 / 50), size.height - (size.height * (28 / 47))),
-      paint,
-    );
-
-    // Right Hash
-    canvas.drawLine(
-      Offset(size.width - size.width * (3 / 50), size.height - (size.height * 28 / 47)),
-      Offset(size.width, size.height - (size.height * (28 / 47))),
-      paint,
-    );
-
-    // Draw baseline
-    canvas.drawLine(
-      Offset(0, size.height),
-      Offset(size.width, size.height),
-      paint,
-    );
-
-    // Draw key (free throw lane)
-    canvas.drawRect(
-      Rect.fromCenter(
-        center: Offset((size.width / 2), size.height - (freeThrowLine / 2)),
-        width: keyWidth,
-        height: freeThrowLine,
-      ),
-      paint,
-    );
-
-    // Draw outside key
-    canvas.drawRect(
-      Rect.fromCenter(
-        center: Offset((size.width / 2), size.height - (freeThrowLine / 2)),
-        width: outerKeyWidth,
-        height: freeThrowLine,
-      ),
-      paint,
-    );
-
-    // Draw free throw line arc
-    canvas.drawArc(
-      Rect.fromCircle(
-          center: Offset((size.width / 2), size.height - freeThrowLine), radius: keyWidth / 2),
-      3.14,
-      3.14,
-      false,
-      paint,
-    );
-
-    // Draw the inner part of the free throw line arc (dashed)
-    const dashWidth = 5.0;
-    const dashSpace = 5.0;
-    final arcRect = Rect.fromCircle(
-      center: Offset((size.width / 2), size.height - freeThrowLine),
-      radius: keyWidth / 2,
-    );
-
-    final path = Path();
-    const totalAngle = 3.14; // The arc's angle in radians (half-circle in this case)
-    const segments = 10; // Increase for smoother dash transitions
-    const segmentAngle = totalAngle / segments;
-    bool draw = true;
-
-    for (int i = 0; i < segments; i++) {
-      final startAngle = segmentAngle * i;
-      final endAngle = startAngle + segmentAngle;
-
-      if (draw) {
-        path.addArc(arcRect, startAngle, segmentAngle * (dashWidth / (dashWidth + dashSpace)));
-      }
-
-      draw = !draw;
-    }
-
-    canvas.drawPath(path, paint);
-
-    // Draw restricted area
-    canvas.drawArc(
-      Rect.fromCircle(
-          center: Offset((size.width / 2), size.height - (size.height * (4 / 47))),
-          radius: restrictedAreaRadius),
-      3.14,
-      3.14,
-      false,
-      paint,
-    );
-
-    // Draw three-point line with short corners
-    // Short Corner (Right)
-    canvas.drawLine(
-      Offset((size.width / 2) + size.width * (22 / 50), size.height),
-      Offset(
-          (size.width / 2) + size.width * (22 / 50), size.height - (size.height * (14 / 47))),
-      paint,
-    );
-
-// Short Corner (Left)
-    canvas.drawLine(
-      Offset((size.width / 2) - size.width * (22 / 50), size.height),
-      Offset(
-          (size.width / 2) - size.width * (22 / 50), size.height - (size.height * (14 / 47))),
-      paint,
-    );
-
-// Above the Break (Arc)
-    canvas.drawArc(
-      Rect.fromCircle(
-          center: Offset(size.width / 2, size.height - (size.height * (5 / 47))),
-          radius: threePointLineRadius),
-      -3.14 + (0.123 * 3.14), // Start angle in quadrant 2
-      (3.14 - (0.123 * 2 * 3.14)),
-      false,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }

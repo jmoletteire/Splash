@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../../../components/court_painter.dart';
 import '../../player/player_home.dart';
 
 class TeamLastLineup extends StatefulWidget {
@@ -40,6 +41,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
   Widget build(BuildContext context) {
     var lineup = widget.team['LAST_STARTING_LINEUP'];
     var lastGame = getLastGame();
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Card(
       margin: EdgeInsets.all(11.0.r),
       color: Colors.grey.shade900,
@@ -98,7 +100,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
               color: Colors.white10,
               child: Stack(children: [
                 CustomPaint(
-                  size: const Size(189, 289),
+                  size: isLandscape ? Size(368.r, 346.r) : const Size(368, 346),
                   painter: HalfCourtPainter(),
                 ),
                 Column(
@@ -216,6 +218,7 @@ class PlayerCard extends StatelessWidget {
   }
 }
 
+/*
 class HalfCourtPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -333,3 +336,5 @@ class HalfCourtPainter extends CustomPainter {
     return false;
   }
 }
+
+ */
