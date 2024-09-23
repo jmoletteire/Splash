@@ -187,7 +187,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
 
     setState(() {
       awardsByAward = fetchedAward;
-      awardsByAward.sort((a, b) => int.parse(b['YEAR']).compareTo(int.parse(a['YEAR'])));
+
       _isLoadingByAward = false;
     });
   }
@@ -205,9 +205,9 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
     });
 
     selectedSeason = seasons.first;
-    selectedAward = awards['Champion']!;
+    selectedAward = 'Champion';
     getAwards(selectedSeason);
-    getAwardsByAward(selectedAward);
+    getAwardsByAward(awards[selectedAward]!);
   }
 
   @override
@@ -291,7 +291,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
             borderRadius: BorderRadius.circular(10.0),
             underline: Container(),
             dropdownColor: Colors.grey.shade900,
-            value: selectedAward, // Ensure selectedValue is an integer
+            value: selectedAward,
             items: awards.keys.map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
@@ -328,6 +328,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    print(awardsByAward);
     return _isLoadingByYear || _isLoadingByAward
         ? const SpinningIcon()
         : Scaffold(

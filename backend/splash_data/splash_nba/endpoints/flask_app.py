@@ -116,10 +116,16 @@ def get_awards_by_award():
         query_params = request.args.to_dict()
         # logging.info(f"(get_awards_by_award) {query_params}")
 
-        award = query_params['award']
+        # Validate the award parameter
+        award = query_params.get('award')
+        if not award:
+            return jsonify({"error": "Award parameter is required"}), 400
 
-        # Query the database
-        years = list(lg_history_collection.find({}, {"YEAR": 1, award: 1, "_id": 0}))
+        # Query the database for both YEAR and the specific award
+        years = list(lg_history_collection.find(
+            {award: {"$exists": True}},  # Only return documents where the award exists
+            {"YEAR": 1, award: 1, "_id": 0}  # Return both YEAR and award field
+        ))
 
         if years:
             # logging.info(f"(get_awards_by_award) Retrieved awards from MongoDB")
