@@ -21,9 +21,9 @@ class AwardsNetworkHelper {
     return draft;
   }
 
-  Future<List> getAwardsByYear(String award) async {
+  Future<List> getAwardsByAward(String award) async {
     // Create the query parameters map
-    Map<String, String> queryParams = {'award': award};
+    Map<String, String> queryParams = {"award": award};
 
     // Create the URL with query parameters
     var url = Uri.http(

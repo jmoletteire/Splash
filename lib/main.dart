@@ -4,6 +4,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/game/game_cache.dart';
 import 'package:splash/screens/more/draft/draft_cache.dart';
+import 'package:splash/screens/more/league_history/award_cache.dart';
 import 'package:splash/screens/more/transactions/transactions_cache.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/shot_chart/shot_chart_cache.dart';
@@ -34,6 +35,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => PlayoffCache()),
         ChangeNotifierProvider(create: (_) => NbaCupCache()),
         ChangeNotifierProvider(create: (_) => TransactionsCache()),
+        ChangeNotifierProvider(create: (_) => AwardsCache()),
         ChangeNotifierProvider(create: (_) => DraftCache()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => DatesProvider()..fetchDates()),

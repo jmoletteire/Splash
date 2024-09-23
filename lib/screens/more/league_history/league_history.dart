@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -5,11 +6,15 @@ import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/custom_icon_button.dart';
+import '../../../components/expandable_card_controller.dart';
+import '../../../components/player_avatar.dart';
 import '../../../utilities/scroll/scroll_controller_notifier.dart';
 import '../../../utilities/scroll/scroll_controller_provider.dart';
+import '../../player/player_home.dart';
 import '../../search_screen.dart';
 import 'award_cache.dart';
 import 'awards_network_helper.dart';
+import 'by_year/awards.dart';
 
 class LeagueHistory extends StatefulWidget {
   const LeagueHistory({super.key});
@@ -19,109 +24,172 @@ class LeagueHistory extends StatefulWidget {
 }
 
 class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProviderStateMixin {
-  late Map<String, dynamic> year;
-  late List<dynamic> draftByPick;
+  Map<String, dynamic> year = {};
+  late List awardsByAward;
   bool _isLoadingByYear = true;
-  bool _isLoadingByPick = true;
+  bool _isLoadingByAward = false;
   late String selectedSeason;
   late String selectedAward;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
   late TabController _tabController;
+  List<bool> _isExpandedList = [];
+  List expandableAwards = [];
+  List nonExpandableAwards = [];
 
-  List<String> awards = ['Champion'];
+  List<String> awards = [
+    'Champion',
+    'Finals MVP',
+    'MVP',
+    'DPOY',
+    '6-MOTY',
+    'Most Improved',
+    'ROTY',
+    'All-Star',
+    'All-NBA',
+    'All-Defense',
+    'All-Rookie',
+    'NBA Cup MVP',
+    'All-NBA Cup',
+  ];
 
   List<String> seasons = [
-    '2024-25',
-    '2023-24',
-    '2022-23',
-    '2021-22',
-    '2020-21',
-    '2019-20',
-    '2018-19',
-    '2017-18',
-    '2016-17',
-    '2015-16',
-    '2014-15',
-    '2013-14',
-    '2012-13',
-    '2011-12',
-    '2010-11',
-    '2009-10',
-    '2008-09',
-    '2007-08',
-    '2006-07',
-    '2005-06',
-    '2004-05',
-    '2003-04',
-    '2002-03',
-    '2001-02',
-    '2000-01',
-    '1999-00',
-    '1998-99',
-    '1997-98',
-    '1996-97',
-    '1995-96',
-    '1994-95',
-    '1993-94',
-    '1992-93',
-    '1991-92',
-    '1990-91',
-    '1989-90',
-    '1988-89',
-    '1987-88',
-    '1986-87',
-    '1985-86',
-    '1984-85',
-    '1983-84',
-    '1982-83',
-    '1981-82',
-    '1980-81',
-    '1979-80',
-    '1978-79',
-    '1977-78',
-    '1976-77',
-    '1975-76',
-    '1974-75',
-    '1973-74',
-    '1972-73',
-    '1971-72',
-    '1970-71',
-    '1969-70',
+    '2024',
+    '2023',
+    '2022',
+    '2021',
+    '2020',
+    '2019',
+    '2018',
+    '2017',
+    '2016',
+    '2015',
+    '2014',
+    '2013',
+    '2012',
+    '2011',
+    '2010',
+    '2009',
+    '2008',
+    '2007',
+    '2006',
+    '2005',
+    '2004',
+    '2003',
+    '2002',
+    '2001',
+    '2000',
+    '1999',
+    '1998',
+    '1997',
+    '1996',
+    '1995',
+    '1994',
+    '1993',
+    '1992',
+    '1991',
+    '1990',
+    '1989',
+    '1988',
+    '1987',
+    '1986',
+    '1985',
+    '1984',
+    '1983',
+    '1982',
+    '1981',
+    '1980',
+    '1979',
+    '1978',
+    '1977',
+    '1976',
+    '1975',
+    '1974',
+    '1973',
+    '1972',
+    '1971',
+    '1970',
   ];
 
   Future<void> getAwards(String season) async {
+    Map<String, String> awardMap = {
+      'NBA Champion': 'Champion',
+      'NBA Finals Most Valuable Player': 'Finals MVP',
+      'All-NBA': 'All-NBA',
+      'All-Defensive Team': 'All-Defensive Team',
+      'All-Rookie Team': 'All-Rookie Team',
+      'NBA Most Valuable Player': 'Most Valuable Player',
+      'NBA Defensive Player of the Year': 'Defensive Player of the Year',
+      'NBA Sixth Man of the Year': 'Sixth Man of the Year',
+      'NBA Most Improved Player': 'Most Improved Player',
+      'NBA Rookie of the Year': 'Rookie of the Year',
+      'NBA Clutch Player of the Year': 'Clutch Player of the Year',
+      'NBA All-Star': 'All-Star',
+      'NBA All-Star Most Valuable Player': 'All-Star Game MVP',
+      'NBA In-Season Tournament Most Valuable Player': 'NBA Cup MVP',
+      'NBA In-Season Tournament All-Tournament': 'All-NBA Cup Team',
+      'NBA Player of the Month': 'Player of the Month',
+      'NBA Rookie of the Month': 'Rookie of the Month',
+      'NBA Player of the Week': 'Player of the Week',
+    };
+
     final awardCache = Provider.of<AwardsCache>(context, listen: false);
+
     if (awardCache.containsYear(season)) {
       setState(() {
         var fetchedAwards = awardCache.getYear(season)!;
-        year = fetchedAwards;
-        setPicks();
+        for (String award in awardMap.keys) {
+          if (fetchedAwards.containsKey(award)) {
+            year[awardMap[award]!] = fetchedAwards[award];
+          }
+        }
+        expandableAwards = year.entries
+            .toList()
+            .where((a) =>
+                a.value['PLAYERS'].length > 1 && a.value['DESCRIPTION'] != 'NBA Champion')
+            .toList();
+        nonExpandableAwards = year.entries
+            .toList()
+            .where((a) =>
+                a.value['PLAYERS'].length <= 1 || a.value['DESCRIPTION'] == 'NBA Champion')
+            .toList();
+        _isExpandedList = List<bool>.filled(expandableAwards.length, false);
         _isLoadingByYear = false;
       });
     } else {
       var fetchedAwards = await AwardsNetworkHelper().getAwards(season);
       setState(() {
-        year = fetchedAwards;
-        setPicks();
+        for (String award in awardMap.keys) {
+          if (fetchedAwards.containsKey(award)) {
+            year[awardMap[award]!] = fetchedAwards[award];
+          }
+        }
+        expandableAwards = year.entries
+            .toList()
+            .where((a) =>
+                a.value['PLAYERS'].length > 1 && a.value['DESCRIPTION'] != 'NBA Champion')
+            .toList();
+        nonExpandableAwards = year.entries
+            .toList()
+            .where((a) =>
+                a.value['PLAYERS'].length <= 1 || a.value['DESCRIPTION'] == 'NBA Champion')
+            .toList();
+        _isExpandedList = List<bool>.filled(expandableAwards.length, false);
         _isLoadingByYear = false;
       });
       awardCache.addYear(season, fetchedAwards);
     }
   }
 
-  Future<void> getDraftByPick(String season) async {
-    var fetchedPicks = await AwardsNetworkHelper().getAwardsByYear(season);
+  Future<void> getAwardsbyAward(String award) async {
+    var fetchedPicks = await AwardsNetworkHelper().getAwardsByAward(award);
 
     setState(() {
-      draftByPick = fetchedPicks;
-      draftByPick.sort((a, b) => int.parse(b['YEAR']).compareTo(int.parse(a['YEAR'])));
-      setPicks();
-      _isLoadingByPick = false;
+      awardsByAward = fetchedPicks;
+      awardsByAward.sort((a, b) => int.parse(b['YEAR']).compareTo(int.parse(a['YEAR'])));
+      _isLoadingByAward = false;
     });
   }
-
-  void setPicks() {}
 
   @override
   void initState() {
@@ -137,8 +205,8 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
 
     selectedSeason = seasons.first;
     selectedAward = 'Champion';
-    getAwards(selectedSeason.substring(0, 4));
-    getDraftByPick(selectedAward.toString());
+    getAwards(selectedSeason);
+    //getDraftByPick(selectedAward.toString());
   }
 
   @override
@@ -186,6 +254,9 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
               setState(() {
                 selectedSeason = newValue!.substring(0, 4);
                 _scrollController.jumpTo(0);
+                year = {};
+                expandableAwards = [];
+                nonExpandableAwards = [];
               });
               getAwards(selectedSeason);
             },
@@ -234,7 +305,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
                 selectedAward = newValue!;
                 _scrollController.jumpTo(0);
               });
-              getDraftByPick(selectedAward.toString());
+              //getDraftByPick(selectedAward.toString());
             },
           ),
         ),
@@ -256,7 +327,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    return _isLoadingByYear || _isLoadingByPick
+    return _isLoadingByYear || _isLoadingByAward
         ? const SpinningIcon()
         : Scaffold(
             appBar: AppBar(
@@ -283,16 +354,179 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
               children: [
                 CustomScrollView(
                   controller: _scrollController,
-                  slivers: [],
+                  slivers: [
+                    Awards(
+                      awards: nonExpandableAwards,
+                    ),
+                    SliverList(
+                        delegate: SliverChildListDelegate([
+                      for (int i = 0; i < expandableAwards.length; i++)
+                        ExpandableAwardCard(
+                          award: expandableAwards[i],
+                          isExpanded: _isExpandedList[i],
+                          onExpansionChanged: (isExpanded) {
+                            setState(() {
+                              _isExpandedList[i] = isExpanded;
+                            });
+                          },
+                        )
+                    ]))
+                  ],
                 ),
-                /*
                 CustomScrollView(
                   controller: _scrollController,
-                  slivers: [DraftSelectionsByPick(selections: draftByPick)],
+                  slivers: [
+                    Awards(
+                      awards: year.entries.toList(),
+                    )
+                  ],
                 ),
-                 */
               ],
             ),
           );
+  }
+}
+
+class ExpandableAwardCard extends StatefulWidget {
+  final MapEntry<String, dynamic> award;
+  final bool isExpanded;
+  final ValueChanged<bool> onExpansionChanged;
+
+  const ExpandableAwardCard({
+    super.key,
+    required this.award,
+    required this.isExpanded,
+    required this.onExpansionChanged,
+  });
+
+  @override
+  State<ExpandableAwardCard> createState() => _ExpandableAwardCardState();
+}
+
+class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
+  bool _isExpanded = false;
+  late final ExpandableCardController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ExpandableCardController(false);
+    _controller.isExpandedNotifier.addListener(_updateExpandedState);
+  }
+
+  @override
+  void dispose() {
+    _controller.isExpandedNotifier.removeListener(_updateExpandedState);
+    super.dispose();
+  }
+
+  void _updateExpandedState() {
+    setState(() {
+      _isExpanded = _controller.isExpandedNotifier.value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade900,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade200,
+            width: 0.125,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: ExpansionPanelList(
+              expandedHeaderPadding: EdgeInsets.zero,
+              elevation: 0,
+              materialGapSize: 0.0,
+              expansionCallback: (int index, bool isExpanded) {
+                setState(() {
+                  _isExpanded = isExpanded;
+                });
+              },
+              children: [
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  backgroundColor: Colors.transparent,
+                  headerBuilder: (BuildContext context, bool isExpanded) {
+                    return Container(
+                      padding: EdgeInsets.only(left: 8.0.r),
+                      alignment: Alignment.centerLeft,
+                      child: AutoSizeText(
+                        widget.award.key,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: kBebasNormal.copyWith(
+                            color: Colors.grey.shade400, fontSize: 15.0.r),
+                      ),
+                    );
+                  },
+                  body: Padding(
+                    padding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 15.0),
+                    child: Column(
+                      children: [
+                        for (var player in widget.award.value['PLAYERS'])
+                          InkWell(
+                            onTap: () {
+                              {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PlayerHome(
+                                      playerId: player['PLAYER_ID'].toString(),
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            highlightColor: Colors.white54,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade900,
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey.shade200,
+                                    width: 0.125,
+                                  ),
+                                ),
+                              ),
+                              padding: EdgeInsets.fromLTRB(6.0.r, 8.0.r, 0.0, 8.0.r),
+                              child: Row(
+                                children: [
+                                  PlayerAvatar(
+                                    radius: 12.0.r,
+                                    backgroundColor: Colors.white70,
+                                    playerImageUrl:
+                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PLAYER_ID']}.png',
+                                    //'https://www.basketball-reference.com/req/202106291/images/headshots/$lastSub${firstName.substring(0, 2).toLowerCase()}01.jpg'
+                                  ),
+                                  SizedBox(width: 8.0.r),
+                                  AutoSizeText(
+                                    '${player['FIRST_NAME'] ?? ''} ${player['LAST_NAME'] ?? ''}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  isExpanded: _isExpanded,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

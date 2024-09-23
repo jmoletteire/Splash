@@ -112,29 +112,25 @@ def apply_team_schedule_filters(season, season_type, filters):
 @app.route('/get_awards/by_award', methods=['GET'])
 def get_awards_by_award():
     try:
+        # logging.info(f"(get_awards_by_award) {request.args}")
         query_params = request.args.to_dict()
+        # logging.info(f"(get_awards_by_award) {query_params}")
+
         award = query_params['award']
-        results = []
 
-        # Query the database for all draft documents
-        drafts = draft_collection.find({}, {"_id": 0, "SELECTIONS": 1})  # Exclude _id and only return SELECTIONS
+        # Query the database
+        years = lg_history_collection.find({}, {"YEAR": 1, award: 1, "_id": 0})
 
-        # Loop through each draft document and find the selection with the matching OVERALL_PICK
-        for draft in drafts:
-            selections = draft.get('SELECTIONS', [])
-            for selection in selections:
-                if selection.get('OVERALL_PICK') == award:
-                    results.append(selection)
-                    break
-
-        if results:
-            return jsonify(results), 200
+        if years:
+            # logging.info(f"(get_awards_by_award) Retrieved awards from MongoDB")
+            return jsonify(years)
         else:
-            return jsonify({"error": "No matching picks found"}), 404
+            logging.warning("(get_awards_by_award) No award data found in MongoDB")
+            return jsonify({"error": "No award found"})
 
     except Exception as e:
-        logging.error(f"Error retrieving draft picks: {e}")
-        return jsonify({"error": "Failed to retrieve draft picks"}), 500
+        logging.error(f"(get_awards_by_award) Error retrieving award: {e}")
+        return jsonify({"error": "Failed to retrieve award"}), 500
 
 
 @app.route('/get_awards', methods=['GET'])
@@ -149,7 +145,7 @@ def get_awards():
         # Query the database
         year = lg_history_collection.find_one(
             {"YEAR": season},
-            {"_id": 0}
+            {"YEAR": 0, "_id": 0}
         )
 
         if year:

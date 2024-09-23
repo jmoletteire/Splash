@@ -7,6 +7,15 @@ from splash_nba.util.env import uri
 import logging
 
 
+def player_award_details():
+    for year in lg_history_collection.find({}, {"_id": 0}):
+        for player in year["All-NBA"]:
+            players_collection.find({'PERSON_ID': player['PLAYER_ID']}, {"AWARDS": 1, "_id": 0})
+
+
+
+
+
 def fetch_player_awards(players):
     awards = {}
     for j, player in enumerate(players):
@@ -16,7 +25,7 @@ def fetch_player_awards(players):
             for award in player_awards:
                 season = '19' + award['SEASON'][5:] if award['SEASON'][:4] < '2000' else '20' + award['SEASON'][5:]
                 award_name = award['DESCRIPTION']
-                award_keys = list(award.keys())[4:]
+                award_keys = list(award.keys())[4:10]
 
                 if season not in awards.keys():
                     awards[season] = {}
@@ -31,6 +40,10 @@ def fetch_player_awards(players):
                     'LAST_NAME': award['LAST_NAME'],
                     'TEAM': award['TEAM']
                 }
+
+                for key in award_keys:
+                    player_data[key] = award[key]
+
                 awards[season][award_name]['PLAYERS'].append(player_data)
 
             logging.info(f"Updated {j + 1} of {len(players)}")
@@ -79,6 +92,7 @@ if __name__ == "__main__":
         db = client.splash
         lg_history_collection = db.nba_league_history
         teams_collection = db.nba_teams
+        players_collection = db.nba_players
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
