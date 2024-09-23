@@ -432,7 +432,7 @@ class _TeamGamesState extends State<TeamGames> {
                                         'Final',
                                         textAlign: TextAlign.end,
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 10.0.r, color: Colors.grey),
+                                            fontSize: 11.0.r, color: Colors.grey),
                                       ),
                                     if (teamGames[gamesList[index]]['RESULT'] != 'W' &&
                                         teamGames[gamesList[index]]['RESULT'] != 'L' &&
@@ -441,7 +441,7 @@ class _TeamGamesState extends State<TeamGames> {
                                         teamGames[gamesList[index]]['BROADCAST'],
                                         textAlign: TextAlign.end,
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 10.0.r, color: Colors.grey),
+                                            fontSize: 11.0.r, color: Colors.grey),
                                       ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,

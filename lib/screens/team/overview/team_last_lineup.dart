@@ -43,7 +43,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
     var lastGame = getLastGame();
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Card(
-      margin: EdgeInsets.all(11.0.r),
+      margin: const EdgeInsets.all(11.0),
       color: Colors.grey.shade900,
       child: Column(
         children: [
@@ -95,7 +95,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
             ],
           ),
           Padding(
-            padding: EdgeInsets.all(8.0.r),
+            padding: const EdgeInsets.all(8.0),
             child: Card(
               color: Colors.white10,
               child: Stack(children: [
@@ -105,7 +105,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                 ),
                 Column(
                   children: [
-                    SizedBox(height: 30.0.r),
+                    SizedBox(height: 65.0.r),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

@@ -316,315 +316,143 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
       children: [
         SingleChildScrollView(
           child: Card(
-            margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 100.0.r),
+            margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 100.0),
             color: Colors.grey.shade900,
             child: Padding(
-              padding: EdgeInsets.all(8.0.r),
+              padding: const EdgeInsets.all(8.0),
               child: Card(
-                  color: Colors.white10,
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    if (isLandscape) {
-                      return Row(
-                        children: [
-                          SizedBox(width: 50.0.r),
-                          Column(
-                            children: [
-                              Stack(
-                                children: [
-                                  IgnorePointer(
-                                    child: CustomPaint(
-                                      size: Size(368.r, 346.r),
-                                      painter: HalfCourtPainter(),
-                                    ),
+                color: Colors.white10,
+                child: LayoutBuilder(builder: (context, constraints) {
+                  if (isLandscape) {
+                    return Row(
+                      children: [
+                        SizedBox(width: 50.0.r),
+                        Column(
+                          children: [
+                            Stack(
+                              children: [
+                                IgnorePointer(
+                                  child: CustomPaint(
+                                    size: Size(368.r, 346.r),
+                                    painter: HalfCourtPainter(),
                                   ),
-                                  if (_displayMap == 'Hex')
-                                    HexMap(
-                                      hexagons: hexagons,
-                                    ),
-                                  if (_displayMap == 'Zone')
-                                    ZoneMap(
-                                        shotData: filteredShotChart,
-                                        lgAvg: lgAvg[0],
-                                        courtSize: Size(368.r, 346.r))
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _displayMap = 'Hex';
-                                      });
-                                    },
-                                    icon: _displayMap == 'Hex'
-                                        ? const Icon(Icons.hexagon)
-                                        : const Icon(Icons.hexagon_outlined),
-                                    color: _displayMap == 'Hex' ? Colors.white : Colors.grey,
+                                ),
+                                if (_displayMap == 'Hex')
+                                  HexMap(
+                                    hexagons: hexagons,
                                   ),
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _displayMap = 'Zone';
-                                      });
-                                    },
-                                    icon: const Icon(Icons.percent),
-                                    color: _displayMap == 'Zone' ? Colors.white : Colors.grey,
-                                  )
-                                ],
-                              ),
-                              SizedBox(height: 6.0.r),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center, // Align center
-                                children: [
-                                  Column(
-                                    children: [
-                                      TweenAnimationBuilder<int>(
-                                        tween: IntTween(begin: 0, end: fgStats['FGM']),
-                                        duration: const Duration(milliseconds: 200),
-                                        builder: (context, value, child) {
-                                          return Text(
-                                            "$value",
-                                            style: kBebasNormal.copyWith(
-                                                color: Colors.white, fontSize: 18.0.r),
-                                          );
-                                        },
-                                      ),
-                                      Text(
-                                        "FGM",
-                                        style: kBebasNormal.copyWith(
-                                            color: Colors.white70, fontSize: 12.0.r),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 50.0.r),
-                                  Column(
-                                    children: [
-                                      TweenAnimationBuilder<int>(
-                                        tween: IntTween(begin: 0, end: fgStats['FGA']),
-                                        duration: const Duration(milliseconds: 200),
-                                        builder: (context, value, child) {
-                                          return Text(
-                                            "$value",
-                                            style: kBebasNormal.copyWith(
-                                                color: Colors.white, fontSize: 18.0.r),
-                                          );
-                                        },
-                                      ),
-                                      Text(
-                                        "FGA",
-                                        style: kBebasNormal.copyWith(
-                                            color: Colors.white70, fontSize: 12.0.r),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 50.0.r),
-                                  Column(
-                                    children: [
-                                      TweenAnimationBuilder<double>(
-                                        tween: Tween<double>(
-                                            begin: 0, end: double.parse(fgStats['FG%'])),
-                                        duration: const Duration(milliseconds: 200),
-                                        builder: (context, value, child) {
-                                          return Text(
-                                            "${value.toStringAsFixed(1)}%",
-                                            style: kBebasNormal.copyWith(
-                                                color: Colors.white, fontSize: 18.0.r),
-                                          );
-                                        },
-                                      ),
-                                      Text(
-                                        "FG%",
-                                        style: kBebasNormal.copyWith(
-                                            color: Colors.white70, fontSize: 12.0.r),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 10.0.r),
-                            ],
-                          ),
-                          SizedBox(width: 50.0.r),
-                          Flexible(
-                            child: Wrap(
-                              children: distinctShotTypes.map((shotType) {
-                                bool isSelected = selectedShotTypes.contains(shotType);
-
-                                return Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 4.0.r), // Add some spacing between buttons
-                                  child: TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        if (isSelected) {
-                                          selectedShotTypes.remove(
-                                              shotType); // Deselect if already selected
-                                        } else {
-                                          selectedShotTypes
-                                              .add(shotType); // Select if not already selected
-                                        }
-                                        filterShotChart(); // Apply filtering after selection
-                                      });
-                                    },
-                                    style: ButtonStyle(
-                                      backgroundColor: WidgetStateProperty.all(
-                                        isSelected
-                                            ? kTeamColors[widget.team['ABBREVIATION']]![
-                                                'primaryColor']!
-                                            : Colors.grey.shade800,
-                                      ),
-                                      shape: WidgetStateProperty.all(
-                                        RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(20.0),
-                                          side: BorderSide(
-                                            color: isSelected
-                                                ? kTeamColors[widget.team['ABBREVIATION']]![
-                                                    'secondaryColor']!
-                                                : Colors.grey.shade600,
-                                            width: 2.0,
-                                          ),
-                                        ),
-                                      ),
-                                      foregroundColor: WidgetStateProperty.all(
-                                        isSelected ? Colors.white : Colors.grey.shade200,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      shotType,
-                                      style: kBebasNormal.copyWith(fontSize: 12.0.r),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
+                                if (_displayMap == 'Zone')
+                                  ZoneMap(
+                                      shotData: filteredShotChart,
+                                      lgAvg: lgAvg[0],
+                                      courtSize: Size(368.r, 346.r))
+                              ],
                             ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Column(
-                        children: [
-                          Stack(
-                            children: [
-                              IgnorePointer(
-                                child: CustomPaint(
-                                  size: const Size(368, 346),
-                                  painter: HalfCourtPainter(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _displayMap = 'Hex';
+                                    });
+                                  },
+                                  icon: _displayMap == 'Hex'
+                                      ? const Icon(Icons.hexagon)
+                                      : const Icon(Icons.hexagon_outlined),
+                                  color: _displayMap == 'Hex' ? Colors.white : Colors.grey,
                                 ),
-                              ),
-                              if (_displayMap == 'Hex')
-                                HexMap(
-                                  hexagons: hexagons,
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _displayMap = 'Zone';
+                                    });
+                                  },
+                                  icon: const Icon(Icons.percent),
+                                  color: _displayMap == 'Zone' ? Colors.white : Colors.grey,
+                                )
+                              ],
+                            ),
+                            SizedBox(height: 6.0.r),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center, // Align center
+                              children: [
+                                Column(
+                                  children: [
+                                    TweenAnimationBuilder<int>(
+                                      tween: IntTween(begin: 0, end: fgStats['FGM']),
+                                      duration: const Duration(milliseconds: 200),
+                                      builder: (context, value, child) {
+                                        return Text(
+                                          "$value",
+                                          style: kBebasNormal.copyWith(
+                                              color: Colors.white, fontSize: 18.0.r),
+                                        );
+                                      },
+                                    ),
+                                    Text(
+                                      "FGM",
+                                      style: kBebasNormal.copyWith(
+                                          color: Colors.white70, fontSize: 12.0.r),
+                                    ),
+                                  ],
                                 ),
-                              if (_displayMap == 'Zone')
-                                ZoneMap(
-                                    shotData: filteredShotChart,
-                                    lgAvg: lgAvg[0],
-                                    courtSize: const Size(368, 346))
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _displayMap = 'Hex';
-                                  });
-                                },
-                                icon: _displayMap == 'Hex'
-                                    ? const Icon(Icons.hexagon)
-                                    : const Icon(Icons.hexagon_outlined),
-                                color: _displayMap == 'Hex' ? Colors.white : Colors.grey,
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _displayMap = 'Zone';
-                                  });
-                                },
-                                icon: const Icon(Icons.percent),
-                                color: _displayMap == 'Zone' ? Colors.white : Colors.grey,
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 6.0.r),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center, // Align center
-                            children: [
-                              Column(
-                                children: [
-                                  TweenAnimationBuilder<int>(
-                                    tween: IntTween(begin: 0, end: fgStats['FGM']),
-                                    duration: const Duration(milliseconds: 200),
-                                    builder: (context, value, child) {
-                                      return Text(
-                                        "$value",
-                                        style: kBebasNormal.copyWith(
-                                            color: Colors.white, fontSize: 20.0),
-                                      );
-                                    },
-                                  ),
-                                  Text(
-                                    "FGM",
-                                    style: kBebasNormal.copyWith(
-                                        color: Colors.white70, fontSize: 14.0),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 50.0),
-                              Column(
-                                children: [
-                                  TweenAnimationBuilder<int>(
-                                    tween: IntTween(begin: 0, end: fgStats['FGA']),
-                                    duration: const Duration(milliseconds: 200),
-                                    builder: (context, value, child) {
-                                      return Text(
-                                        "$value",
-                                        style: kBebasNormal.copyWith(
-                                            color: Colors.white, fontSize: 20.0),
-                                      );
-                                    },
-                                  ),
-                                  Text(
-                                    "FGA",
-                                    style: kBebasNormal.copyWith(
-                                        color: Colors.white70, fontSize: 14.0),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 50.0),
-                              Column(
-                                children: [
-                                  TweenAnimationBuilder<double>(
-                                    tween: Tween<double>(
-                                        begin: 0, end: double.parse(fgStats['FG%'])),
-                                    duration: const Duration(milliseconds: 200),
-                                    builder: (context, value, child) {
-                                      return Text(
-                                        "${value.toStringAsFixed(1)}%",
-                                        style: kBebasNormal.copyWith(
-                                            color: Colors.white, fontSize: 20.0),
-                                      );
-                                    },
-                                  ),
-                                  Text(
-                                    "FG%",
-                                    style: kBebasNormal.copyWith(
-                                        color: Colors.white70, fontSize: 14.0),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10.0.r),
-                          Wrap(
+                                SizedBox(width: 50.0.r),
+                                Column(
+                                  children: [
+                                    TweenAnimationBuilder<int>(
+                                      tween: IntTween(begin: 0, end: fgStats['FGA']),
+                                      duration: const Duration(milliseconds: 200),
+                                      builder: (context, value, child) {
+                                        return Text(
+                                          "$value",
+                                          style: kBebasNormal.copyWith(
+                                              color: Colors.white, fontSize: 18.0.r),
+                                        );
+                                      },
+                                    ),
+                                    Text(
+                                      "FGA",
+                                      style: kBebasNormal.copyWith(
+                                          color: Colors.white70, fontSize: 12.0.r),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(width: 50.0.r),
+                                Column(
+                                  children: [
+                                    TweenAnimationBuilder<double>(
+                                      tween: Tween<double>(
+                                          begin: 0, end: double.parse(fgStats['FG%'])),
+                                      duration: const Duration(milliseconds: 200),
+                                      builder: (context, value, child) {
+                                        return Text(
+                                          "${value.toStringAsFixed(1)}%",
+                                          style: kBebasNormal.copyWith(
+                                              color: Colors.white, fontSize: 18.0.r),
+                                        );
+                                      },
+                                    ),
+                                    Text(
+                                      "FG%",
+                                      style: kBebasNormal.copyWith(
+                                          color: Colors.white70, fontSize: 12.0.r),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10.0.r),
+                          ],
+                        ),
+                        SizedBox(width: 50.0.r),
+                        Flexible(
+                          child: Wrap(
                             children: distinctShotTypes.map((shotType) {
                               bool isSelected = selectedShotTypes.contains(shotType);
 
                               return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 4.0), // Add some spacing between buttons
+                                padding: EdgeInsets.symmetric(horizontal: 4.0.r),
                                 child: TextButton(
                                   onPressed: () {
                                     setState(() {
@@ -663,16 +491,188 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                   ),
                                   child: Text(
                                     shotType,
-                                    style: kBebasNormal.copyWith(fontSize: 14.0),
+                                    style: kBebasNormal.copyWith(fontSize: 12.0.r),
                                   ),
                                 ),
                               );
                             }).toList(),
                           ),
-                        ],
-                      );
-                    }
-                  })),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      children: [
+                        Stack(
+                          children: [
+                            IgnorePointer(
+                              child: CustomPaint(
+                                size: const Size(368, 346),
+                                painter: HalfCourtPainter(),
+                              ),
+                            ),
+                            if (_displayMap == 'Hex')
+                              HexMap(
+                                hexagons: hexagons,
+                              ),
+                            if (_displayMap == 'Zone')
+                              ZoneMap(
+                                  shotData: filteredShotChart,
+                                  lgAvg: lgAvg[0],
+                                  courtSize: const Size(368, 346))
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _displayMap = 'Hex';
+                                });
+                              },
+                              icon: _displayMap == 'Hex'
+                                  ? const Icon(Icons.hexagon)
+                                  : const Icon(Icons.hexagon_outlined),
+                              color: _displayMap == 'Hex' ? Colors.white : Colors.grey,
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _displayMap = 'Zone';
+                                });
+                              },
+                              icon: const Icon(Icons.percent),
+                              color: _displayMap == 'Zone' ? Colors.white : Colors.grey,
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 6.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center, // Align center
+                          children: [
+                            Column(
+                              children: [
+                                TweenAnimationBuilder<int>(
+                                  tween: IntTween(begin: 0, end: fgStats['FGM']),
+                                  duration: const Duration(milliseconds: 200),
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      "$value",
+                                      style: kBebasNormal.copyWith(
+                                          color: Colors.white, fontSize: 20.0),
+                                    );
+                                  },
+                                ),
+                                Text(
+                                  "FGM",
+                                  style: kBebasNormal.copyWith(
+                                      color: Colors.white70, fontSize: 14.0),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 50.0),
+                            Column(
+                              children: [
+                                TweenAnimationBuilder<int>(
+                                  tween: IntTween(begin: 0, end: fgStats['FGA']),
+                                  duration: const Duration(milliseconds: 200),
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      "$value",
+                                      style: kBebasNormal.copyWith(
+                                          color: Colors.white, fontSize: 20.0),
+                                    );
+                                  },
+                                ),
+                                Text(
+                                  "FGA",
+                                  style: kBebasNormal.copyWith(
+                                      color: Colors.white70, fontSize: 14.0),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 50.0),
+                            Column(
+                              children: [
+                                TweenAnimationBuilder<double>(
+                                  tween: Tween<double>(
+                                      begin: 0, end: double.parse(fgStats['FG%'])),
+                                  duration: const Duration(milliseconds: 200),
+                                  builder: (context, value, child) {
+                                    return Text(
+                                      "${value.toStringAsFixed(1)}%",
+                                      style: kBebasNormal.copyWith(
+                                          color: Colors.white, fontSize: 20.0),
+                                    );
+                                  },
+                                ),
+                                Text(
+                                  "FG%",
+                                  style: kBebasNormal.copyWith(
+                                      color: Colors.white70, fontSize: 14.0),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10.0),
+                        Wrap(
+                          children: distinctShotTypes.map((shotType) {
+                            bool isSelected = selectedShotTypes.contains(shotType);
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4.0), // Add some spacing between buttons
+                              child: TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (isSelected) {
+                                      selectedShotTypes
+                                          .remove(shotType); // Deselect if already selected
+                                    } else {
+                                      selectedShotTypes
+                                          .add(shotType); // Select if not already selected
+                                    }
+                                    filterShotChart(); // Apply filtering after selection
+                                  });
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                    isSelected
+                                        ? kTeamColors[widget.team['ABBREVIATION']]![
+                                            'primaryColor']!
+                                        : Colors.grey.shade800,
+                                  ),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      side: BorderSide(
+                                        color: isSelected
+                                            ? kTeamColors[widget.team['ABBREVIATION']]![
+                                                'secondaryColor']!
+                                            : Colors.grey.shade600,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                  ),
+                                  foregroundColor: WidgetStateProperty.all(
+                                    isSelected ? Colors.white : Colors.grey.shade200,
+                                  ),
+                                ),
+                                child: Text(
+                                  shotType,
+                                  style: kBebasNormal.copyWith(fontSize: 14.0),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    );
+                  }
+                }),
+              ),
             ),
           ),
         ),

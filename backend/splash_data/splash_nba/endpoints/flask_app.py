@@ -22,6 +22,7 @@ try:
     teams_collection = db.nba_teams
     players_collection = db.nba_players
     player_shots_collection = db.nba_player_shot_data
+    lg_history_collection = db.nba_league_history
     playoff_collection = db.nba_playoff_history
     cup_collection = db.nba_cup_history
     draft_collection = db.nba_draft_history
@@ -106,6 +107,61 @@ def apply_team_schedule_filters(season, season_type, filters):
         final_results = []
 
     return final_results
+
+
+@app.route('/get_awards/by_award', methods=['GET'])
+def get_awards_by_award():
+    try:
+        query_params = request.args.to_dict()
+        award = query_params['award']
+        results = []
+
+        # Query the database for all draft documents
+        drafts = draft_collection.find({}, {"_id": 0, "SELECTIONS": 1})  # Exclude _id and only return SELECTIONS
+
+        # Loop through each draft document and find the selection with the matching OVERALL_PICK
+        for draft in drafts:
+            selections = draft.get('SELECTIONS', [])
+            for selection in selections:
+                if selection.get('OVERALL_PICK') == award:
+                    results.append(selection)
+                    break
+
+        if results:
+            return jsonify(results), 200
+        else:
+            return jsonify({"error": "No matching picks found"}), 404
+
+    except Exception as e:
+        logging.error(f"Error retrieving draft picks: {e}")
+        return jsonify({"error": "Failed to retrieve draft picks"}), 500
+
+
+@app.route('/get_awards', methods=['GET'])
+def get_awards():
+    try:
+        # logging.info(f"(get_awards) {request.args}")
+        query_params = request.args.to_dict()
+        # logging.info(f"(get_awards) {query_params}")
+
+        season = query_params['season']
+
+        # Query the database
+        year = lg_history_collection.find_one(
+            {"YEAR": season},
+            {"_id": 0}
+        )
+
+        if year:
+            # logging.info(f"(get_awards) Retrieved {season} from MongoDB")
+            return jsonify(year)
+        else:
+            logging.warning("(get_awards) No award data found in MongoDB")
+            return jsonify({"error": "No award found"})
+
+    except Exception as e:
+        logging.error(f"(get_awards) Error retrieving season: {e}")
+        return jsonify({"error": "Failed to retrieve season"}), 500
 
 
 @app.route('/get_draft/by_pick', methods=['GET'])

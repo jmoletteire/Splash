@@ -1,7 +1,58 @@
-from nba_api.stats.endpoints import teamdetails
+import random
+import time
+
+from nba_api.stats.endpoints import teamdetails, commonallplayers, playerawards
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
+
+
+def fetch_player_awards(players):
+    awards = {}
+    for j, player in enumerate(players):
+        try:
+            player_awards = playerawards.PlayerAwards(player).get_normalized_dict()['PlayerAwards']
+
+            for award in player_awards:
+                season = '19' + award['SEASON'][5:] if award['SEASON'][:4] < '2000' else '20' + award['SEASON'][5:]
+                award_name = award['DESCRIPTION']
+                award_keys = list(award.keys())[4:]
+
+                if season not in awards.keys():
+                    awards[season] = {}
+
+                if award_name not in awards[season].keys():
+                    awards[season][award_name] = {key: award[key] for key in award_keys}
+                    awards[season][award_name]['PLAYERS'] = []
+
+                player_data = {
+                    'PLAYER_ID': player,
+                    'FIRST_NAME': award['FIRST_NAME'],
+                    'LAST_NAME': award['LAST_NAME'],
+                    'TEAM': award['TEAM']
+                }
+                awards[season][award_name]['PLAYERS'].append(player_data)
+
+            logging.info(f"Updated {j + 1} of {len(players)}")
+
+            # Pause for a random time between 0.5 and 2 seconds
+            time.sleep(random.uniform(0.5, 2.0))
+
+            # Pause 15 seconds for every 50 players
+            if j % 50 == 0:
+                time.sleep(15)
+
+        except Exception as e:
+            logging.error(f"Unable to process player {player}: {e}")
+            continue
+
+    for season in awards.keys():
+        for award in awards[season].keys():
+            lg_history_collection.update_one(
+                {"YEAR": season},
+                {"$set": {award: awards[season][award]}},
+                upsert=True
+            )
 
 
 def fetch_team_awards(team_id):
@@ -10,10 +61,12 @@ def fetch_team_awards(team_id):
     conf_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsConf']]
     div_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsDiv']]
 
-    teams_collection.update_one(
-        {"id": team_id},
-        {"$set": {"team_history": team_details}}
-    )
+    for year in league_title_years:
+        lg_history_collection.update_one(
+            {"YEAR": year},
+            {"$set": {"CHAMPION": team_id}},
+            upsert=True
+        )
 
 
 if __name__ == "__main__":
@@ -24,11 +77,16 @@ if __name__ == "__main__":
     try:
         client = MongoClient(uri)
         db = client.splash
+        lg_history_collection = db.nba_league_history
         teams_collection = db.nba_teams
         logging.info("Connected to MongoDB")
-
-        for team in teams_collection.find():
-            fetch_team_awards(team['id'])
-
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
+
+    for i, team in enumerate(teams_collection.find({}, {'TEAM_ID': 1, '_id': 0})):
+        logging.info(f"Processing {i + 1} of 30...")
+        #fetch_team_awards(team['TEAM_ID'])
+
+    all_players = commonallplayers.CommonAllPlayers().get_normalized_dict()['CommonAllPlayers']
+    player_ids = [player['PERSON_ID'] for player in all_players]
+    fetch_player_awards(player_ids)

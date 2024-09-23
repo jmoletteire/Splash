@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/more/draft/draft.dart';
-import 'package:splash/screens/more/league_history.dart';
+import 'package:splash/screens/more/league_history/league_history.dart';
 import 'package:splash/screens/more/stats_query/stats_query.dart';
 import 'package:splash/screens/more/transactions/league_transactions.dart';
 import 'package:splash/screens/search_screen.dart';

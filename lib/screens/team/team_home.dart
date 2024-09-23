@@ -2,6 +2,7 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
@@ -294,87 +295,142 @@ class TeamInfo extends StatelessWidget {
     entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
 
     // Extract the sorted keys
-    var gameIndex = entries.map((e) => e.key).toList();
+    var games = entries.map((e) => e.key).toList();
 
-    return schedule[gameIndex.last];
+    return schedule[games.last];
+  }
+
+  Map<String, dynamic> getNextGame() {
+    for (String season in kSeasons) {
+      Map<String, dynamic> schedule = team['seasons'][season]['GAMES'];
+
+      // Convert the map to a list of entries
+      var entries = schedule.entries.toList();
+
+      // Sort the entries by the GAME_DATE value
+      entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
+
+      // Extract the sorted keys
+      var games = entries.map((e) => e.key).toList();
+
+      // If season has not ended
+      if (DateTime.parse(schedule[games.last]['GAME_DATE']).compareTo(DateTime.now()) > 0) {
+        // Find next game
+        for (var game in games) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(DateTime.now()) > 0) {
+            return schedule[game];
+          }
+        }
+      }
+    }
+    return {};
   }
 
   @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     var lastGame = getLastGame();
+    var nextGame = getNextGame();
+
+    List<String> formatDate(String date) {
+      // Parse the string to a DateTime object
+      DateTime dateTime = DateTime.parse(date);
+
+      // Create a DateFormat for the abbreviated day of the week
+      DateFormat dayOfWeekFormat = DateFormat('E');
+      String dayOfWeek = dayOfWeekFormat.format(dateTime);
+
+      // Create a DateFormat for the month and date
+      DateFormat monthDateFormat = DateFormat('M/d');
+      String monthDate = monthDateFormat.format(dateTime);
+
+      return [dayOfWeek, monthDate];
+    }
 
     return Stack(
       children: [
-        Padding(
-          padding: EdgeInsets.all(35.0.r),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'images/NBA_Logos/${team['TEAM_ID']}.png',
-                width: isLandscape
-                    ? MediaQuery.of(context).size.width * 0.1
-                    : MediaQuery.of(context).size.width * 0.28,
-                height: isLandscape
-                    ? MediaQuery.of(context).size.width * 0.1
-                    : MediaQuery.of(context).size.height * 0.28,
-              ),
-              SizedBox(width: 20.0.r),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      text:
-                          "${team['seasons'][kCurrentSeason]['WINS']!.toInt()}-${team['seasons'][kCurrentSeason]['LOSSES']!.toInt()}",
-                      style: kBebasNormal.copyWith(fontSize: 32.0.r),
-                      children: [
-                        TextSpan(
-                          text:
-                              '  (${getStanding(team['seasons'][kCurrentSeason]['CONF_RANK'])} ${team['CONF'].substring(0, 4)})',
-                          style: kBebasNormal.copyWith(fontSize: 22.0.r),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Row(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'images/NBA_Logos/${team['TEAM_ID']}.png',
+              width: isLandscape
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : MediaQuery.of(context).size.width * 0.28,
+              height: isLandscape
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : MediaQuery.of(context).size.height * 0.28,
+            ),
+            SizedBox(width: 20.0.r),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    text:
+                        "${team['seasons'][kCurrentSeason]['WINS']!.toInt()}-${team['seasons'][kCurrentSeason]['LOSSES']!.toInt()}",
+                    style: kBebasNormal.copyWith(fontSize: 32.0.r),
                     children: [
-                      Text(
-                        "Last Game: ",
-                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                      ),
-                      Text(
-                        "${lastGame['HOME_AWAY']} ",
-                        style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
-                      ),
-                      Text(
-                        "${kTeamNames[lastGame['OPP'].toString()][1]} ",
-                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                      ),
-                      Text(
-                        "(${lastGame['TEAM_PTS'].toString()}-${lastGame['OPP_PTS'].toString()} ",
-                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                      ),
-                      Text(
-                        "${lastGame['RESULT']}",
-                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                      ),
-                      Text(
-                        ")",
-                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      TextSpan(
+                        text:
+                            '  (${getStanding(team['seasons'][kCurrentSeason]['CONF_RANK'])} ${team['CONF'].substring(0, 4)})',
+                        style: kBebasNormal.copyWith(fontSize: 22.0.r),
                       ),
                     ],
                   ),
-                  Text(
-                    "Next Game: TBD",
-                    style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                  ),
-                ],
-              )
-            ],
-          ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "Last Game: ",
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                    ),
+                    Text(
+                      "${lastGame['HOME_AWAY']} ",
+                      style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
+                    ),
+                    Text(
+                      "${kTeamNames[lastGame['OPP'].toString()][1]} ",
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                    ),
+                    Text(
+                      "(${lastGame['TEAM_PTS'].toString()}-${lastGame['OPP_PTS'].toString()} ",
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                    ),
+                    Text(
+                      "${lastGame['RESULT']}",
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                    ),
+                    Text(
+                      ")",
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "Next Game: ",
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                    ),
+                    Text(
+                      "${nextGame['HOME_AWAY']} ",
+                      style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
+                    ),
+                    Text(
+                      "${kTeamNames[nextGame['OPP'].toString()]?[1] ?? 'INT\'L'} ",
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                    ),
+                    Text(
+                      "| ${formatDate(nextGame['GAME_DATE'])[0]}, ${formatDate(nextGame['GAME_DATE'])[1]}",
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          ],
         ),
       ],
     );
