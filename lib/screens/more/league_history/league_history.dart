@@ -14,6 +14,7 @@ import '../../player/player_home.dart';
 import '../../search_screen.dart';
 import 'award_cache.dart';
 import 'awards_network_helper.dart';
+import 'by_award/awards_by_award.dart';
 import 'by_year/awards.dart';
 
 class LeagueHistory extends StatefulWidget {
@@ -27,7 +28,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
   Map<String, dynamic> year = {};
   late List awardsByAward;
   bool _isLoadingByYear = true;
-  bool _isLoadingByAward = false;
+  bool _isLoadingByAward = true;
   late String selectedSeason;
   late String selectedAward;
   late ScrollController _scrollController;
@@ -37,21 +38,21 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
   List expandableAwards = [];
   List nonExpandableAwards = [];
 
-  List<String> awards = [
-    'Champion',
-    'Finals MVP',
-    'MVP',
-    'DPOY',
-    '6-MOTY',
-    'Most Improved',
-    'ROTY',
-    'All-Star',
-    'All-NBA',
-    'All-Defense',
-    'All-Rookie',
-    'NBA Cup MVP',
-    'All-NBA Cup',
-  ];
+  Map<String, String> awards = {
+    'Champion': 'NBA Champion',
+    'Finals MVP': 'NBA Finals Most Valuable Player',
+    'MVP': 'NBA Most Valuable Player',
+    'DPOY': 'NBA Defensive Player of the Year',
+    '6-MOTY': 'NBA Sixth Man of the Year',
+    'Most Improved': 'NBA Most Improved Player',
+    'ROTY': 'NBA Rookie of the Year',
+    'All-Star': 'NBA All-Star',
+    'All-NBA': 'All-NBA',
+    'All-Defense': 'All-Defensive Team',
+    'All-Rookie': 'All-Rookie Team',
+    'NBA Cup MVP': 'NBA In-Season Tournament Most Valuable Player',
+    'All-NBA Cup': 'NBA In-Season Tournament All-Tournament',
+  };
 
   List<String> seasons = [
     '2024',
@@ -181,11 +182,11 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
     }
   }
 
-  Future<void> getAwardsbyAward(String award) async {
-    var fetchedPicks = await AwardsNetworkHelper().getAwardsByAward(award);
+  Future<void> getAwardsByAward(String award) async {
+    var fetchedAward = await AwardsNetworkHelper().getAwardsByAward(award);
 
     setState(() {
-      awardsByAward = fetchedPicks;
+      awardsByAward = fetchedAward;
       awardsByAward.sort((a, b) => int.parse(b['YEAR']).compareTo(int.parse(a['YEAR'])));
       _isLoadingByAward = false;
     });
@@ -204,9 +205,9 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
     });
 
     selectedSeason = seasons.first;
-    selectedAward = 'Champion';
+    selectedAward = awards['Champion']!;
     getAwards(selectedSeason);
-    //getDraftByPick(selectedAward.toString());
+    getAwardsByAward(selectedAward);
   }
 
   @override
@@ -291,7 +292,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
             underline: Container(),
             dropdownColor: Colors.grey.shade900,
             value: selectedAward, // Ensure selectedValue is an integer
-            items: awards.map((String value) {
+            items: awards.keys.map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(
@@ -302,10 +303,10 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
             }).toList(),
             onChanged: (String? newValue) async {
               setState(() {
-                selectedAward = newValue!;
+                selectedAward = awards[newValue]!;
                 _scrollController.jumpTo(0);
               });
-              //getDraftByPick(selectedAward.toString());
+              getAwardsByAward(selectedAward);
             },
           ),
         ),
@@ -376,8 +377,8 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
                 CustomScrollView(
                   controller: _scrollController,
                   slivers: [
-                    Awards(
-                      awards: year.entries.toList(),
+                    AwardsByAward(
+                      awards: awardsByAward,
                     )
                   ],
                 ),

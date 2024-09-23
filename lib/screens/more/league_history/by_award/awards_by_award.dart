@@ -9,19 +9,19 @@ import '../../../../components/player_avatar.dart';
 import '../../../../utilities/constants.dart';
 import '../../../player/player_home.dart';
 
-class Awards extends StatefulWidget {
+class AwardsByAward extends StatefulWidget {
   final List<dynamic> awards;
 
-  const Awards({
+  const AwardsByAward({
     super.key,
     required this.awards,
   });
 
   @override
-  State<Awards> createState() => _AwardsState();
+  State<AwardsByAward> createState() => _AwardsByAwardState();
 }
 
-class _AwardsState extends State<Awards> {
+class _AwardsByAwardState extends State<AwardsByAward> {
   List columnNames = [
     'AWARD',
     'TEAM',
@@ -206,17 +206,13 @@ class _AwardsState extends State<Awards> {
 
     String teamId = teamMap[widget.awards[row].value['PLAYERS'][0]['TEAM']] ?? '0';
 
-    String awardName = awardMap.containsKey(widget.awards[row].value['DESCRIPTION'] ?? '-')
-        ? awardMap[widget.awards[row].value['DESCRIPTION']]
-        : widget.awards[row].value['DESCRIPTION'] ?? '-';
-
     switch (column) {
       case 0:
         return Container(
           padding: EdgeInsets.only(left: 8.0.r),
           alignment: Alignment.centerLeft,
           child: AutoSizeText(
-            awardName,
+            widget.awards[row].value['SEASON'] ?? '-',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: kBebasNormal.copyWith(color: Colors.grey.shade400, fontSize: 15.0.r),

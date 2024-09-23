@@ -119,7 +119,7 @@ def get_awards_by_award():
         award = query_params['award']
 
         # Query the database
-        years = lg_history_collection.find({}, {"YEAR": 1, award: 1, "_id": 0})
+        years = list(lg_history_collection.find({}, {"YEAR": 1, award: 1, "_id": 0}))
 
         if years:
             # logging.info(f"(get_awards_by_award) Retrieved awards from MongoDB")
