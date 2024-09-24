@@ -186,7 +186,6 @@ class _AwardsByAwardState extends State<AwardsByAward> {
     };
 
     print(widget.awards[row]);
-
     String teamId = teamMap[widget.awards[row]['PLAYERS'][0]['TEAM']] ?? '0';
 
     switch (column) {

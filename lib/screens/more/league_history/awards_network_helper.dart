@@ -34,6 +34,7 @@ class AwardsNetworkHelper {
 
     // Fetch the data from the network
     dynamic jsonData = await network.getData(url);
-    return jsonData;
+    List awards = jsonData;
+    return awards;
   }
 }

@@ -306,7 +306,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
                 selectedAward = awards[newValue]!;
                 _scrollController.jumpTo(0);
               });
-              getAwardsByAward(selectedAward);
+              getAwardsByAward(awards[selectedAward]!);
             },
           ),
         ),
@@ -328,7 +328,6 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    print(awardsByAward);
     return _isLoadingByYear || _isLoadingByAward
         ? const SpinningIcon()
         : Scaffold(

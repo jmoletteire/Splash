@@ -124,7 +124,7 @@ def get_awards_by_award():
         # Query the database for both YEAR and the specific award
         years = list(lg_history_collection.find(
             {award: {"$exists": True}},  # Only return documents where the award exists
-            {"YEAR": 1, award: 1, "_id": 0}  # Return both YEAR and award field
+            {award: 1, "_id": 0}  # Return both YEAR and award field
         ))
 
         if years:
