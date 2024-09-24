@@ -187,7 +187,8 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
 
     setState(() {
       awardsByAward = fetchedAward;
-
+      awardsByAward.sort((a, b) =>
+          b[awards[selectedAward]!]['SEASON'].compareTo(a[awards[selectedAward]!]['SEASON']));
       _isLoadingByAward = false;
     });
   }
@@ -303,8 +304,9 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
             }).toList(),
             onChanged: (String? newValue) async {
               setState(() {
-                selectedAward = awards[newValue]!;
+                selectedAward = newValue!;
                 _scrollController.jumpTo(0);
+                _isLoadingByAward = true;
               });
               getAwardsByAward(awards[selectedAward]!);
             },
@@ -379,6 +381,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
                   slivers: [
                     AwardsByAward(
                       awards: awardsByAward,
+                      awardName: awards[selectedAward]!,
                     )
                   ],
                 ),
@@ -429,6 +432,45 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
 
   @override
   Widget build(BuildContext context) {
+    List players = widget.award.value['PLAYERS'];
+
+    if (widget.award.value['PLAYERS'][0]['ALL_NBA_TEAM_NUMBER'] != null) {
+      players.sort((a, b) => a['ALL_NBA_TEAM_NUMBER'].compareTo(b['ALL_NBA_TEAM_NUMBER']));
+    }
+
+    Map<String, String> teamMap = {
+      'Atlanta Hawks': '1610612737',
+      'Boston Celtics': '1610612738',
+      'Cleveland Cavaliers': '1610612739',
+      'New Orleans Pelicans': '1610612740',
+      'Chicago Bulls': '1610612741',
+      'Dallas Mavericks': '1610612742',
+      'Denver Nuggets': '1610612743',
+      'Golden State Warriors': '1610612744',
+      'Houston Rockets': '1610612745',
+      'Los Angeles Clippers': '1610612746',
+      'Los Angeles Lakers': '1610612747',
+      'Miami Heat': '1610612748',
+      'Milwaukee Bucks': '1610612749',
+      'Minnesota Timberwolves': '1610612750',
+      'Brooklyn Nets': '1610612751',
+      'New York Knicks': '1610612752',
+      'Orlando Magic': '1610612753',
+      'Indiana Pacers': '1610612754',
+      'Philadelphia 76ers': '1610612755',
+      'Phoenix Suns': '1610612756',
+      'Portland Trail Blazers': '1610612757',
+      'Sacramento Kings': '1610612758',
+      'San Antonio Spurs': '1610612759',
+      'Oklahoma City Thunder': '1610612760',
+      'Toronto Raptors': '1610612761',
+      'Utah Jazz': '1610612762',
+      'Memphis Grizzlies': '1610612763',
+      'Washington Wizards': '1610612764',
+      'Detroit Pistons': '1610612765',
+      'Charlotte Hornets': '1610612766',
+    };
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade900,
@@ -472,7 +514,42 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                     padding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 15.0),
                     child: Column(
                       children: [
-                        for (var player in widget.award.value['PLAYERS'])
+                        for (int i = 0; i < players.length; i++) ...{
+                          if (players[i]['ALL_NBA_TEAM_NUMBER'] != null &&
+                              (i == 0 ||
+                                  (i > 0 &&
+                                      players[i]['ALL_NBA_TEAM_NUMBER'] !=
+                                          players[i - 1]['ALL_NBA_TEAM_NUMBER'])))
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    padding: EdgeInsets.fromLTRB(8.0.r, 10.0.r, 0.0, 4.0.r),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade900,
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey.shade600,
+                                          width: 3,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          players[i]['ALL_NBA_TEAM_NUMBER'] == '1'
+                                              ? 'First Team'
+                                              : players[i]['ALL_NBA_TEAM_NUMBER'] == '2'
+                                                  ? 'Second Team'
+                                                  : 'Third Team',
+                                          style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           InkWell(
                             onTap: () {
                               {
@@ -480,7 +557,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => PlayerHome(
-                                      playerId: player['PLAYER_ID'].toString(),
+                                      playerId: players[i]['PLAYER_ID'].toString(),
                                     ),
                                   ),
                                 );
@@ -492,7 +569,9 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                                 color: Colors.grey.shade900,
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: Colors.grey.shade200,
+                                    color: i == players.length - 1
+                                        ? Colors.transparent
+                                        : Colors.grey.shade200,
                                     width: 0.125,
                                   ),
                                 ),
@@ -504,20 +583,28 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                                     radius: 12.0.r,
                                     backgroundColor: Colors.white70,
                                     playerImageUrl:
-                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PLAYER_ID']}.png',
+                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[i]['PLAYER_ID']}.png',
                                     //'https://www.basketball-reference.com/req/202106291/images/headshots/$lastSub${firstName.substring(0, 2).toLowerCase()}01.jpg'
                                   ),
                                   SizedBox(width: 8.0.r),
                                   AutoSizeText(
-                                    '${player['FIRST_NAME'] ?? ''} ${player['LAST_NAME'] ?? ''}',
+                                    '${players[i]['FIRST_NAME'] ?? ''} ${players[i]['LAST_NAME'] ?? ''}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: kBebasNormal.copyWith(fontSize: 14.0.r),
                                   ),
+                                  SizedBox(width: 8.0.r),
+                                  SizedBox(
+                                    height: 20.0.r,
+                                    width: 20.0.r,
+                                    child: Image.asset(
+                                        'images/NBA_Logos/${teamMap[players[i]['TEAM']]}.png'),
+                                  )
                                 ],
                               ),
                             ),
                           ),
+                        }
                       ],
                     ),
                   ),

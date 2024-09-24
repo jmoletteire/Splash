@@ -242,7 +242,7 @@ class _AwardsState extends State<Awards> {
               widget.awards[row].value['PLAYERS'][0]['TEAM'],
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: kBebasNormal.copyWith(fontSize: 14.0.r),
+              style: kBebasNormal.copyWith(fontSize: 17.5.r),
             ),
           );
         } else {
@@ -264,7 +264,7 @@ class _AwardsState extends State<Awards> {
                     '${widget.awards[row].value['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row].value['PLAYERS'][0]['LAST_NAME'] ?? ''}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                    style: kBebasNormal.copyWith(fontSize: 15.0.r),
                   ),
                 ),
               ],

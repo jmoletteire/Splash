@@ -11,10 +11,12 @@ import '../../../player/player_home.dart';
 
 class AwardsByAward extends StatefulWidget {
   final List<dynamic> awards;
+  final String awardName;
 
   const AwardsByAward({
     super.key,
     required this.awards,
+    required this.awardName,
   });
 
   @override
@@ -54,7 +56,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.04
-              : MediaQuery.of(context).size.width * 0.45,
+              : MediaQuery.of(context).size.width * 0.2,
           freezePriority: 1,
         ),
 
@@ -62,7 +64,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.03
-              : MediaQuery.of(context).size.width * 0.1,
+              : MediaQuery.of(context).size.width * 0.11,
           freezePriority: 1,
         ),
 
@@ -70,7 +72,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.4
-              : MediaQuery.of(context).size.width * 0.45,
+              : MediaQuery.of(context).size.width * 0.69,
         ),
       ],
       rowBuilder: _rowBuilder,
@@ -132,7 +134,8 @@ class _AwardsByAwardState extends State<AwardsByAward> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => PlayerHome(
-                    playerId: widget.awards[row]['PLAYERS'][0]['PLAYER_ID'].toString(),
+                    playerId: widget.awards[row][widget.awardName]['PLAYERS'][0]['PLAYER_ID']
+                        .toString(),
                   ),
                 ),
               );
@@ -185,8 +188,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
       'Charlotte Hornets': '1610612766',
     };
 
-    print(widget.awards[row]);
-    String teamId = teamMap[widget.awards[row]['PLAYERS'][0]['TEAM']] ?? '0';
+    String teamId = teamMap[widget.awards[row][widget.awardName]['PLAYERS'][0]['TEAM']] ?? '0';
 
     switch (column) {
       case 0:
@@ -194,7 +196,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
           padding: EdgeInsets.only(left: 8.0.r),
           alignment: Alignment.centerLeft,
           child: AutoSizeText(
-            widget.awards[row]['SEASON'] ?? '-',
+            widget.awards[row][widget.awardName]['SEASON'] ?? '-',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: kBebasNormal.copyWith(color: Colors.grey.shade400, fontSize: 15.0.r),
@@ -212,15 +214,15 @@ class _AwardsByAwardState extends State<AwardsByAward> {
           ],
         );
       case 2:
-        if (widget.awards[row]['DESCRIPTION'] == 'NBA Champion') {
+        if (widget.awards[row][widget.awardName]['DESCRIPTION'] == 'NBA Champion') {
           return Container(
             padding: EdgeInsets.only(left: 8.0.r),
             alignment: Alignment.centerLeft,
             child: AutoSizeText(
-              widget.awards[row]['PLAYERS'][0]['TEAM'],
+              widget.awards[row][widget.awardName]['PLAYERS'][0]['TEAM'],
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: kBebasNormal.copyWith(fontSize: 14.0.r),
+              style: kBebasNormal.copyWith(fontSize: 16.0.r),
             ),
           );
         } else {
@@ -229,20 +231,20 @@ class _AwardsByAwardState extends State<AwardsByAward> {
             child: Row(
               children: [
                 PlayerAvatar(
-                  radius: 12.0.r,
+                  radius: 14.0.r,
                   backgroundColor: Colors.white70,
                   playerImageUrl:
-                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.awards[row]['PLAYERS'][0]['PLAYER_ID']}.png',
+                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.awards[row][widget.awardName]['PLAYERS'][0]['PLAYER_ID']}.png',
                   //'https://www.basketball-reference.com/req/202106291/images/headshots/$lastSub${firstName.substring(0, 2).toLowerCase()}01.jpg'
                 ),
                 SizedBox(width: 8.0.r),
                 Expanded(
                   flex: 7,
                   child: AutoSizeText(
-                    '${widget.awards[row]['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row]['PLAYERS'][0]['LAST_NAME'] ?? ''}',
+                    '${widget.awards[row][widget.awardName]['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row][widget.awardName]['PLAYERS'][0]['LAST_NAME'] ?? ''}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
                   ),
                 ),
               ],
