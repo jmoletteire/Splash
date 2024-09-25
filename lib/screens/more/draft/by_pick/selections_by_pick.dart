@@ -189,8 +189,7 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
         type: MaterialType.transparency,
         child: InkWell(
           onTap: () {
-            if (widget.selections[row]['LAST_PLAYED'] >= 1997 &&
-                widget.selections[row]['PLAYER_PROFILE_FLAG'] == 1) {
+            if (widget.selections[row]['PLAYER_PROFILE_FLAG'] == 1) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -305,10 +304,12 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
         }
       case 5:
         try {
+          var height = widget.selections[row]['HEIGHT'].toString().split('-');
+          var heightFinal =
+              widget.selections[row]['HEIGHT'] == "" ? "" : '${height[0]}\'${height[1]}\"';
+
           return StandingsDataText(
-            text: widget.selections[row]['HEIGHT'] == ''
-                ? '-'
-                : widget.selections[row]['HEIGHT'] ?? '-',
+            text: widget.selections[row]['HEIGHT'] == '' ? '-' : heightFinal,
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {

@@ -30,7 +30,7 @@ class _TeamCapSheetState extends State<TeamCapSheet> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 padding: EdgeInsets.all(15.0.r),
-                margin: EdgeInsets.symmetric(vertical: 11.0.r),
+                margin: EdgeInsets.only(top: 11.0.r),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -61,6 +61,75 @@ class _TeamCapSheetState extends State<TeamCapSheet> {
               ),
             ),
           ),
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(8.0.r, 0.0, 8.0.r, 8.0.r),
+          sliver: SliverToBoxAdapter(
+            child: Container(
+              padding: EdgeInsets.all(15.0.r),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 10.0.r,
+                        height: 10.0.r,
+                        color: Colors.lightBlueAccent,
+                      ),
+                      SizedBox(width: 8.0.r),
+                      Text(
+                        'Player Option',
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 10.0.r,
+                        height: 10.0.r,
+                        color: Colors.lightGreenAccent,
+                      ),
+                      SizedBox(width: 8.0.r),
+                      Text(
+                        'Team Option',
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 10.0.r,
+                        height: 10.0.r,
+                        color: Colors.orangeAccent,
+                      ),
+                      SizedBox(width: 8.0.r),
+                      Text(
+                        'Qualifying Offer',
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 10.0.r,
+                        height: 10.0.r,
+                        color: Colors.blueGrey,
+                      ),
+                      SizedBox(width: 8.0.r),
+                      Text(
+                        'Non-Guaranteed',
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

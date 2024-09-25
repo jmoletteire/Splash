@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/screens/player/career/career_stats.dart';
 
 import '../../../utilities/constants.dart';
@@ -14,19 +15,48 @@ class PlayerCareer extends StatefulWidget {
 }
 
 class _PlayerCareerState extends State<PlayerCareer> {
-  late Map<String, dynamic> seasons;
-  late Map<String, dynamic> playoffSeasons;
+  late List seasons;
+  late List playoffSeasons;
+  late List collegeSeasons;
+  late String mode;
+  List<String> modes = ['TOTALS', 'PER GAME'];
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    widget.player.keys.contains('STATS') ? seasons = widget.player['STATS'] : seasons = {};
+    mode = 'PER GAME';
 
-    playoffSeasons = {};
-    for (var season in seasons.keys) {
-      if (seasons[season].containsKey('PLAYOFFS')) {
-        playoffSeasons[season] = seasons[season];
+    seasons = [];
+    if (widget.player.containsKey('CAREER')) {
+      if (widget.player['CAREER'].containsKey('REGULAR SEASON')) {
+        if (widget.player['CAREER']['REGULAR SEASON'].containsKey('SEASONS')) {
+          if (widget.player['CAREER']['REGULAR SEASON']['SEASONS'].isNotEmpty) {
+            seasons = widget.player['CAREER']['REGULAR SEASON']['SEASONS'];
+          }
+        }
+      }
+    }
+
+    playoffSeasons = [];
+    if (widget.player.containsKey('CAREER')) {
+      if (widget.player['CAREER'].containsKey('PLAYOFFS')) {
+        if (widget.player['CAREER']['PLAYOFFS'].containsKey('SEASONS')) {
+          if (widget.player['CAREER']['PLAYOFFS']['SEASONS'].isNotEmpty) {
+            playoffSeasons = widget.player['CAREER']['PLAYOFFS']['SEASONS'];
+          }
+        }
+      }
+    }
+
+    collegeSeasons = [];
+    if (widget.player.containsKey('CAREER')) {
+      if (widget.player['CAREER'].containsKey('COLLEGE')) {
+        if (widget.player['CAREER']['COLLEGE'].containsKey('SEASONS')) {
+          if (widget.player['CAREER']['COLLEGE']['SEASONS'].isNotEmpty) {
+            collegeSeasons = widget.player['CAREER']['COLLEGE']['SEASONS'];
+          }
+        }
       }
     }
 
@@ -44,7 +74,9 @@ class _PlayerCareerState extends State<PlayerCareer> {
 
   @override
   Widget build(BuildContext context) {
-    return !widget.player.keys.contains('STATS') || !widget.player['STATS'].isNotEmpty
+    return !widget.player.keys.contains('CAREER') ||
+            widget.player['CAREER'].isEmpty ||
+            (seasons.isEmpty && playoffSeasons.isEmpty && collegeSeasons.isEmpty)
         ? Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -52,48 +84,125 @@ class _PlayerCareerState extends State<PlayerCareer> {
                 Icon(
                   Icons.sports_basketball,
                   color: Colors.white38,
-                  size: 40.0.r,
+                  size: 38.0.r,
                 ),
                 SizedBox(height: 15.0.r),
                 Text(
                   'No Stats Available',
-                  style: kBebasNormal.copyWith(fontSize: 20.0.r, color: Colors.white54),
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
                 ),
               ],
             ),
           )
         : CustomScrollView(
             slivers: [
-              CareerStats(
-                player: widget.player,
-                seasons: seasons,
-                seasonType: 'REGULAR SEASON',
-              ),
-              if (playoffSeasons.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Playoffs',
-                      style: kBebasNormal.copyWith(fontSize: 12.0.r),
+              MultiSliver(
+                pushPinnedChildren: true,
+                children: [
+                  SliverPinnedHeader(
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade900,
+                        border: const Border(
+                          bottom: BorderSide(
+                            color: Colors.white30,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: DropdownButton<String>(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 5.0.r),
+                        borderRadius: BorderRadius.circular(10.0),
+                        menuMaxHeight: 300.0.r,
+                        dropdownColor: Colors.grey.shade900,
+                        isExpanded: true,
+                        underline: Container(),
+                        value: mode,
+                        items: modes.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          setState(() {
+                            mode = value!;
+                          });
+                        },
+                      ),
                     ),
                   ),
+                ],
+              ),
+              if (seasons.isNotEmpty)
+                MultiSliver(
+                  pushPinnedChildren: true,
+                  children: [
+                    SliverToBoxAdapter(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Regular Season',
+                          style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                        ),
+                      ),
+                    ),
+                    CareerStats(
+                      player: widget.player,
+                      seasons: seasons,
+                      seasonType: 'REGULAR SEASON',
+                      mode: mode,
+                    ),
+                  ],
                 ),
               if (playoffSeasons.isNotEmpty)
-                CareerStats(
-                  player: widget.player,
-                  seasons: playoffSeasons,
-                  seasonType: 'PLAYOFFS',
-                )
+                MultiSliver(
+                  children: [
+                    SliverToBoxAdapter(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Playoffs',
+                          style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                        ),
+                      ),
+                    ),
+                    CareerStats(
+                      player: widget.player,
+                      seasons: playoffSeasons,
+                      seasonType: 'PLAYOFFS',
+                      mode: mode,
+                    ),
+                  ],
+                ),
+              if (collegeSeasons.isNotEmpty)
+                MultiSliver(
+                  children: [
+                    SliverToBoxAdapter(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'College',
+                          style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                        ),
+                      ),
+                    ),
+                    CareerStats(
+                      player: widget.player,
+                      seasons: collegeSeasons,
+                      seasonType: 'COLLEGE',
+                      mode: mode,
+                    ),
+                  ],
+                ),
             ],
           );
-  }
-}
-
-class MyCustomScrollBehavior extends ScrollBehavior {
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const ClampingScrollPhysics();
   }
 }

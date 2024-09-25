@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/default_animated_switcher_transition_builder.dart';
@@ -10,14 +11,16 @@ import '../../team/team_home.dart';
 
 class CareerStats extends StatefulWidget {
   final Map<String, dynamic> player;
-  final Map<String, dynamic> seasons;
+  final List seasons;
   final String seasonType;
+  final String mode;
 
   const CareerStats({
     super.key,
     required this.player,
     required this.seasons,
     required this.seasonType,
+    required this.mode,
   });
 
   @override
@@ -30,13 +33,13 @@ class _CareerStatsState extends State<CareerStats> {
     'TEAM',
     'AGE',
     'GP',
-    'MPG',
-    'PPG',
-    'RPG',
-    'APG',
-    'SPG',
-    'BPG',
-    'TOPG',
+    'MIN',
+    'PTS',
+    'REB',
+    'AST',
+    'STL',
+    'BLK',
+    'TOV',
     'FG%',
     '3P%',
     'FT%',
@@ -98,14 +101,16 @@ class _CareerStatsState extends State<CareerStats> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.04
-              : MediaQuery.of(context).size.width * 0.07,
+              : MediaQuery.of(context).size.width * 0.075,
         ),
 
         /// MPG
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.1,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : MediaQuery.of(context).size.width * 0.11,
         ),
 
         /// PPG
@@ -154,42 +159,54 @@ class _CareerStatsState extends State<CareerStats> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.13
+                  : MediaQuery.of(context).size.width * 0.2,
         ),
 
         /// 3P%
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.13
+                  : MediaQuery.of(context).size.width * 0.18,
         ),
 
         /// FT%
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.13
+                  : MediaQuery.of(context).size.width * 0.18,
         ),
 
         /// eFG%
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.13
+                  : MediaQuery.of(context).size.width * 0.16,
         ),
 
         /// TS%
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.13
+                  : MediaQuery.of(context).size.width * 0.16,
         ),
 
         /// USG%
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.13
+                  : MediaQuery.of(context).size.width * 0.16,
         ),
 
         /// ORTG
@@ -271,7 +288,7 @@ class _CareerStatsState extends State<CareerStats> {
       );
 
   Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
-    String season = widget.seasons.keys.toList().reversed.toList()[row];
+    Map<String, dynamic> season = widget.seasons.reversed.toList()[row];
     return _wrapRow(
       row,
       Material(
@@ -283,8 +300,7 @@ class _CareerStatsState extends State<CareerStats> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => TeamHome(
-                    teamId: widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ID']
-                        .toString(),
+                    teamId: season['TEAM_ID'].toString(),
                   ),
                 ),
               );
@@ -305,12 +321,12 @@ class _CareerStatsState extends State<CareerStats> {
 
   Widget getContent(
       Map<String, dynamic> playerSeasons, int row, int column, BuildContext context) {
-    String season = widget.seasons.keys.toList().reversed.toList()[row];
+    Map<String, dynamic> season = widget.seasons.reversed.toList()[row];
     switch (column) {
       case 0:
         return Center(
           child: Text(
-            '\'${season.substring(2)}',
+            '\'${season['SEASON_ID'].substring(2)}',
             style: kBebasNormal.copyWith(
               color: Colors.white70,
               fontSize: 15.0.r,
@@ -319,33 +335,40 @@ class _CareerStatsState extends State<CareerStats> {
         );
       case 1:
         try {
-          return Row(
-            children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 20.0.r),
-                child: Image.asset(
-                  'images/NBA_Logos/${widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ID']}.png',
-                  fit: BoxFit.contain,
-                  alignment: Alignment.center,
-                  width: 20.0.r,
+          if (widget.seasonType == 'COLLEGE') {
+            return Center(
+              child: AutoSizeText(
+                season['SCHOOL_NAME'] ?? '-',
+                style: kBebasBold.copyWith(fontSize: 12.5.r),
+              ),
+            );
+          } else {
+            return Row(
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 20.0.r),
+                  child: Image.asset(
+                    'images/NBA_Logos/${season['TEAM_ID'].toString()}.png',
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    width: season['TEAM_ID'] == 0 ? 10.0.r : 20.0.r,
+                  ),
                 ),
-              ),
-              SizedBox(width: 8.0.r),
-              Text(
-                widget.seasons[season][widget.seasonType]['BASIC']['TEAM_ABBREVIATION'] ?? '-',
-                style: kBebasBold.copyWith(fontSize: 15.0.r),
-              ),
-            ],
-          );
+                SizedBox(width: 8.0.r),
+                Text(
+                  season['TEAM_ABBREVIATION'] ?? '-',
+                  style: kBebasBold.copyWith(fontSize: 15.0.r),
+                ),
+              ],
+            );
+          }
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 2:
         try {
           return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['AGE'])
-                    .toStringAsFixed(0) ??
-                '-',
+            text: (season['PLAYER_AGE']).toStringAsFixed(0) ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -354,9 +377,7 @@ class _CareerStatsState extends State<CareerStats> {
       case 3:
         try {
           return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                    .toStringAsFixed(0) ??
-                '-',
+            text: (season['GP']).toStringAsFixed(0) ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -365,10 +386,9 @@ class _CareerStatsState extends State<CareerStats> {
       case 4:
         try {
           return StandingsDataText(
-            text: (widget.seasons[season][widget.seasonType]['BASIC']['MIN'] /
-                        widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                    .toStringAsFixed(1) ??
-                '-',
+            text: widget.mode == 'PER GAME'
+                ? season['MPG'].toStringAsFixed(1) ?? '-'
+                : season['MIN'].toStringAsFixed(0) ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -377,111 +397,121 @@ class _CareerStatsState extends State<CareerStats> {
       case 5:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['PTS'] /
-                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                      .toStringAsFixed(1) ??
-                  '-');
+              text: widget.mode == 'PER GAME'
+                  ? season['PPG'].toStringAsFixed(1) ?? '-'
+                  : season['PTS'].toStringAsFixed(0) ?? '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 6:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['REB'] /
-                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                      .toStringAsFixed(1) ??
-                  '-');
+              text: widget.mode == 'PER GAME'
+                  ? season['RPG'].toStringAsFixed(1) ?? '-'
+                  : season['REB'].toStringAsFixed(0) ?? '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 7:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['AST'] /
-                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                      .toStringAsFixed(1) ??
-                  '-');
+              text: widget.mode == 'PER GAME'
+                  ? season['APG'].toStringAsFixed(1) ?? '-'
+                  : season['AST'].toStringAsFixed(0) ?? '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 8:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['STL'] /
-                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                      .toStringAsFixed(1) ??
-                  '-');
+              text: widget.mode == 'PER GAME'
+                  ? season['SPG'].toStringAsFixed(1) ?? '-'
+                  : season['STL'].toStringAsFixed(0) ?? '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 9:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['BLK'] /
-                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                      .toStringAsFixed(1) ??
-                  '-');
+              text: widget.mode == 'PER GAME'
+                  ? season['BPG'].toStringAsFixed(1) ?? '-'
+                  : season['BLK'].toStringAsFixed(0) ?? '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 10:
         try {
           return StandingsDataText(
-              text: (widget.seasons[season][widget.seasonType]['BASIC']['TOV'] /
-                          widget.seasons[season][widget.seasonType]['BASIC']['GP'])
-                      .toStringAsFixed(1) ??
-                  '-');
+              text: widget.mode == 'PER GAME'
+                  ? season['TOPG'].toStringAsFixed(1) ?? '-'
+                  : season['TOV'].toStringAsFixed(0) ?? '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 11:
         try {
-          double fgPct = widget.seasons[season][widget.seasonType]['BASIC']['FG_PCT'] * 100;
-          return StandingsDataText(text: '${fgPct.toStringAsFixed(1)}%');
+          double fgPct = season['FG_PCT'] * 100;
+          return StandingsDataText(
+              text: fgPct == 0.0
+                  ? '-'
+                  : widget.mode == 'PER GAME'
+                      ? '${fgPct.toStringAsFixed(1)}%'
+                      : '${season['FGM']}/${season['FGA']}');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 12:
         try {
-          double fg3Pct = widget.seasons[season][widget.seasonType]['BASIC']['FG3_PCT'] * 100;
-          return StandingsDataText(text: '${fg3Pct.toStringAsFixed(1)}%');
+          double fg3Pct = season['FG3_PCT'] * 100;
+          return StandingsDataText(
+              text: fg3Pct == 0.0
+                  ? '-'
+                  : widget.mode == 'PER GAME'
+                      ? '${fg3Pct.toStringAsFixed(1)}%'
+                      : '${season['FG3M']}/${season['FG3A']}');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 13:
         try {
-          double ftPct = widget.seasons[season][widget.seasonType]['BASIC']['FT_PCT'] * 100;
-          return StandingsDataText(text: '${ftPct.toStringAsFixed(1)}%');
+          double ftPct = season['FT_PCT'] * 100;
+          return StandingsDataText(
+              text: ftPct == 0.0
+                  ? '-'
+                  : widget.mode == 'PER GAME'
+                      ? '${ftPct.toStringAsFixed(1)}%'
+                      : '${season['FTM']}/${season['FTA']}');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 14:
         try {
-          double efgPct = widget.seasons[season][widget.seasonType]['ADV']['EFG_PCT'] * 100;
-          return StandingsDataText(text: '${efgPct.toStringAsFixed(1)}%');
+          double efgPct = season['EFG_PCT'] * 100;
+          return StandingsDataText(
+              text: efgPct == 0.0 ? '-' : '${efgPct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 15:
         try {
-          double tsPct = widget.seasons[season][widget.seasonType]['ADV']['TS_PCT'] * 100;
-          return StandingsDataText(text: '${tsPct.toStringAsFixed(1)}%');
+          double tsPct = season['TS_PCT'] * 100;
+          return StandingsDataText(text: tsPct == 0.0 ? '-' : '${tsPct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 16:
         try {
-          double usgPct = widget.seasons[season][widget.seasonType]['ADV']['USG_PCT'] * 100;
-          return StandingsDataText(text: '${usgPct.toStringAsFixed(1)}%');
+          double usgPct = season['USG_PCT'] * 100;
+          return StandingsDataText(
+              text: usgPct == 0.0 ? '-' : '${usgPct.toStringAsFixed(1)}%');
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 17:
         try {
           return StandingsDataText(
-              text: int.parse(season.substring(0, 4)) >= 2007
-                  ? widget.seasons[season][widget.seasonType]['ADV']['OFF_RATING_ON_OFF']
-                      .toStringAsFixed(1)
+              text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
+                  ? season['ORTG_ON_OFF'].toStringAsFixed(1)
                   : '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
@@ -489,9 +519,8 @@ class _CareerStatsState extends State<CareerStats> {
       case 18:
         try {
           return StandingsDataText(
-              text: int.parse(season.substring(0, 4)) >= 2007
-                  ? widget.seasons[season][widget.seasonType]['ADV']['DEF_RATING_ON_OFF']
-                      .toStringAsFixed(1)
+              text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
+                  ? season['DRTG_ON_OFF'].toStringAsFixed(1)
                   : '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
@@ -499,9 +528,8 @@ class _CareerStatsState extends State<CareerStats> {
       case 19:
         try {
           return StandingsDataText(
-              text: int.parse(season.substring(0, 4)) >= 2007
-                  ? widget.seasons[season][widget.seasonType]['ADV']['NET_RATING_ON_OFF']
-                      .toStringAsFixed(1)
+              text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
+                  ? season['NRTG_ON_OFF'].toStringAsFixed(1)
                   : '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');
@@ -509,9 +537,8 @@ class _CareerStatsState extends State<CareerStats> {
       case 20:
         try {
           return StandingsDataText(
-              text: int.parse(season.substring(0, 4)) >= 2017
-                  ? widget.seasons[season][widget.seasonType]['ADV']['DEF_IMPACT_EST']
-                      .toStringAsFixed(1)
+              text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2017
+                  ? season['DEF_IMPACT_EST'].toStringAsFixed(1)
                   : '-');
         } catch (stack) {
           return const StandingsDataText(text: '-');

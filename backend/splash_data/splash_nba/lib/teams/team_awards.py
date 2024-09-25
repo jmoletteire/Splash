@@ -9,11 +9,78 @@ import logging
 
 def player_award_details():
     for year in lg_history_collection.find({}, {"_id": 0}):
-        for player in year["All-NBA"]:
-            players_collection.find({'PERSON_ID': player['PLAYER_ID']}, {"AWARDS": 1, "_id": 0})
+        logging.info(year['YEAR'])
+        for award_name, award_data in year.items():
+            if award_name == 'YEAR' or award_name == 'J':
+                continue
 
+            logging.info(award_name)
+            for i, player in enumerate(award_data['PLAYERS']):
+                result = players_collection.find_one(
+                    {'PERSON_ID': player['PLAYER_ID']},
+                    {
+                        '_id': 0,
+                        'FIRST_NAME': 1,
+                        'LAST_NAME': 1,
+                        'POSITION': 1,
+                        f'STATS.{award_data["SEASON"]}.REGULAR SEASON.BASIC': 1
+                    }
+                )
+                if result is None:
+                    position = ''
+                    team_id = '0'
+                    team_abbreviation = ''
+                    conf = ''
+                    lg_history_collection.update_one(
+                        {'YEAR': year['YEAR']},
+                        {"$set": {
+                            f'{award_name}.PLAYERS.{i}.POSITION': position,
+                            f'{award_name}.PLAYERS.{i}.TEAM_ID': team_id,
+                            f'{award_name}.PLAYERS.{i}.TEAM_ABBR': team_abbreviation,
+                            f'{award_name}.PLAYERS.{i}.CONFERENCE': conf,
+                        }}
+                    )
+                else:
+                    try:
+                        first_name = result['FIRST_NAME']
+                    except KeyError:
+                        first_name = ''
 
+                    try:
+                        last_name = result['LAST_NAME']
+                    except KeyError:
+                        last_name = ''
 
+                    try:
+                        position = result['POSITION']
+                    except KeyError:
+                        position = ''
+
+                    try:
+                        team_id = result['STATS'][award_data['SEASON']]['REGULAR SEASON']['BASIC']['TEAM_ID']
+
+                        team_data = teams_collection.find_one({'TEAM_ID': team_id}, {'STANDINGS': 1, '_id': 0})
+                        conf = team_data['seasons'][award_data['SEASON']]['STANDINGS']['Conference']
+                    except KeyError:
+                        team_id = '0'
+                        conf = ''
+
+                    try:
+                        team_abbreviation = result['STATS'][award_data['SEASON']]['REGULAR SEASON']['BASIC']['TEAM_ABBREVIATION']
+                    except KeyError:
+                        team_abbreviation = ''
+
+                    lg_history_collection.update_one(
+                        {'YEAR': year['YEAR']},
+                        {"$set": {
+                            f'{award_name}.PLAYERS.{i}.FIRST_NAME': first_name,
+                            f'{award_name}.PLAYERS.{i}.LAST_NAME': last_name,
+                            f'{award_name}.PLAYERS.{i}.POSITION': position,
+                            f'{award_name}.PLAYERS.{i}.TEAM_ID': team_id,
+                            f'{award_name}.PLAYERS.{i}.TEAM_ABBR': team_abbreviation,
+                            f'{award_name}.PLAYERS.{i}.CONFERENCE': conf,
+                        }}
+                    )
 
 
 def fetch_player_awards(players):
@@ -97,10 +164,11 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
 
-    for i, team in enumerate(teams_collection.find({}, {'TEAM_ID': 1, '_id': 0})):
-        logging.info(f"Processing {i + 1} of 30...")
+    #for i, team in enumerate(teams_collection.find({}, {'TEAM_ID': 1, '_id': 0})):
+        #logging.info(f"Processing {i + 1} of 30...")
         #fetch_team_awards(team['TEAM_ID'])
 
-    all_players = commonallplayers.CommonAllPlayers().get_normalized_dict()['CommonAllPlayers']
-    player_ids = [player['PERSON_ID'] for player in all_players]
-    fetch_player_awards(player_ids)
+    #all_players = commonallplayers.CommonAllPlayers().get_normalized_dict()['CommonAllPlayers']
+    #player_ids = [player['PERSON_ID'] for player in all_players]
+    #fetch_player_awards(player_ids)
+    player_award_details()

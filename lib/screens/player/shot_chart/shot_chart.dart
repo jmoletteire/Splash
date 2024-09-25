@@ -41,6 +41,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
   late String selectedSeasonType;
 
   bool _isLoading = true;
+  bool _hasData = true;
   String _displayMap = 'Hex';
 
   @override
@@ -61,11 +62,19 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
         : seasons = [kCurrentSeason];
     selectedSeason = seasons.first;
 
-    setSeasonTypes();
-    selectedSeasonType = seasonTypes.first;
+    if (widget.player['STATS'].containsKey(selectedSeason)) {
+      setSeasonTypes();
+      selectedSeasonType = seasonTypes.first;
 
-    // Fetch the shot chart data and process it
-    fetchShotChart(widget.player['PERSON_ID'].toString(), selectedSeason, selectedSeasonType);
+      // Fetch the shot chart data and process it
+      fetchShotChart(
+          widget.player['PERSON_ID'].toString(), selectedSeason, selectedSeasonType);
+    } else {
+      setState(() {
+        _hasData = false;
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> fetchShotChart(String playerId, String season, String seasonType) async {
@@ -303,14 +312,37 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
         ? (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!);
 
+    Map<String, dynamic> fgStats = {};
+
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     if (_isLoading) {
       return SpinningIcon(color: teamColor);
     }
 
-    // Calculate FGM, FGA, and FG%
-    Map<String, dynamic> fgStats = calculateFGStats(filteredShotChart);
-
-    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    if (!_hasData) {
+      return Center(
+        heightFactor: 5,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.sports_basketball,
+              color: Colors.white38,
+              size: 38.0.r,
+            ),
+            SizedBox(height: 15.0.r),
+            Text(
+              'No Shot Data',
+              style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Calculate FGM, FGA, and FG%
+      fgStats = calculateFGStats(filteredShotChart);
+    }
 
     return Stack(
       children: [

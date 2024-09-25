@@ -101,11 +101,11 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
               child: Stack(children: [
                 CustomPaint(
                   size: isLandscape ? Size(368.r, 346.r) : const Size(368, 346),
-                  painter: HalfCourtPainter(),
+                  painter: HalfCourtPainter(courtColor: Colors.grey.shade800),
                 ),
                 Column(
                   children: [
-                    SizedBox(height: 65.0.r),
+                    SizedBox(height: 55.0.r),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

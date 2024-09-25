@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
 class HalfCourtPainter extends CustomPainter {
+  final Color? courtColor;
+
+  HalfCourtPainter({this.courtColor});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey.shade700
+      ..color = courtColor ?? Colors.grey.shade700
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 

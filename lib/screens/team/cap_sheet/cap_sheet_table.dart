@@ -376,9 +376,9 @@ class _CapSheetState extends State<CapSheet> {
           decoration: BoxDecoration(
             color: ['totals', 'salary_cap_diff'].contains(contracts[index]['player']['id'])
                 ? contracts[index]['player']['lastName'] == 'First Apron'
-                    ? const Color(0xFF7EB8EA)
+                    ? const Color(0xFF212121) //Color(0xFF7EB8EA)
                     : contracts[index]['player']['lastName'] == 'Second Apron'
-                        ? const Color(0xFF0F3665)
+                        ? const Color(0xFF111111) //Color(0xFF0F3665)
                         : const Color(0xFF303030)
                 : Colors.grey.shade900,
             border: contracts[index]['player']['id'] == 'totals' ||
@@ -386,11 +386,11 @@ class _CapSheetState extends State<CapSheet> {
                 ? Border(
                     top: BorderSide(
                       color: Colors.grey.shade200,
-                      width: contracts[index]['player']['id'] == 'salary_cap_diff' ? 1 : 2,
+                      width: contracts[index]['player']['id'] == 'salary_cap_diff' ? 0.5 : 1,
                     ),
                     bottom: BorderSide(
                       color: Colors.grey.shade200,
-                      width: 1,
+                      width: 0.5,
                     ))
                 : Border(
                     bottom: BorderSide(

@@ -54,8 +54,9 @@ class _TeamGamesState extends State<TeamGames> {
 
     // Iterate through the cache and extract NET_RATING
     teamCache.cache.forEach((teamId, values) {
-      int stat_rank =
-          values['seasons'][widget.selectedSeason]['STATS']['REGULAR SEASON']['ADV'][stat];
+      int stat_rank = values['seasons']?[widget.selectedSeason]?['STATS']?['REGULAR SEASON']
+              ?['ADV']?[stat] ??
+          30;
       if (stat_rank <= 10) top10Teams.add(teamId);
     });
 
@@ -274,24 +275,22 @@ class _TeamGamesState extends State<TeamGames> {
     gamesList = sortGames();
 
     return teamGames.isEmpty
-        ? SliverToBoxAdapter(
-            child: Center(
-              heightFactor: 5,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.sports_basketball,
-                    color: Colors.white38,
-                    size: 40.0.r,
-                  ),
-                  SizedBox(height: 15.0.r),
-                  Text(
-                    'No Games Available',
-                    style: kBebasNormal.copyWith(fontSize: 20.0.r, color: Colors.white54),
-                  ),
-                ],
-              ),
+        ? Center(
+            heightFactor: 5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.sports_basketball,
+                  color: Colors.white38,
+                  size: 38.0.r,
+                ),
+                SizedBox(height: 15.0.r),
+                Text(
+                  'No Games Available',
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+                ),
+              ],
             ),
           )
         : CustomScrollView(

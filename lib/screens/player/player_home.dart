@@ -40,11 +40,16 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
   late TabController _tabController;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
-  Map<String, dynamic> player = {};
-  Map<String, dynamic> team = {};
+  Map<String, dynamic> _player = {};
+  Map<String, dynamic> _team = {};
   String _title = '';
   bool _showImage = false;
   bool _isLoading = true;
+  bool _isHistoric = false;
+  late List<
+      Widget Function(
+          {required Map<String, dynamic> team,
+          required Map<String, dynamic> player})> _playerPages;
 
   Map<int, double> _scrollPositions = {};
 
@@ -52,14 +57,14 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
     final teamCache = Provider.of<TeamCache>(context, listen: false);
     if (teamCache.containsTeam(teamId)) {
       setState(() {
-        team = teamCache.getTeam(teamId)!;
+        _team = teamCache.getTeam(teamId)!;
       });
     } else {
       var fetchedTeam = await Team().getTeam(teamId);
       setState(() {
-        team = fetchedTeam;
+        _team = fetchedTeam;
       });
-      teamCache.addTeam(teamId, team);
+      teamCache.addTeam(teamId, _team);
     }
   }
 
@@ -67,14 +72,14 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
     final playerCache = Provider.of<PlayerCache>(context, listen: false);
     if (playerCache.containsPlayer(playerId)) {
       setState(() {
-        player = playerCache.getPlayer(playerId)!;
+        _player = playerCache.getPlayer(playerId)!;
       });
     } else {
       var fetchedPlayer = await Player().getPlayer(playerId);
       setState(() {
-        player = fetchedPlayer;
+        _player = fetchedPlayer;
       });
-      playerCache.addPlayer(playerId, player);
+      playerCache.addPlayer(playerId, _player);
     }
   }
 
@@ -86,10 +91,44 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
       ]);
     } else {
       await getPlayer(playerId);
-      await getTeam(player['TEAM_ID'].toString());
+      await getTeam(_player['TEAM_ID'].toString());
     }
+
     setState(() {
       _isLoading = false;
+      _isHistoric = _player['TO_YEAR'] <= 1996;
+      _playerPages = _isHistoric
+          ? [
+              ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
+                  PlayerProfile(team: team, player: player),
+              ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
+                  PlayerCareer(team: team, player: player),
+            ]
+          : [
+              ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
+                  PlayerProfile(team: team, player: player),
+              ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
+                  PlayerStats(team: team, player: player),
+              ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
+                  PlayerGamelogs(team: team, player: player),
+              ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
+                  PlayerShotChart(team: team, player: player),
+              ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
+                  PlayerCareer(team: team, player: player),
+            ];
+    });
+    _tabController = TabController(length: _playerPages.length, vsync: this);
+    _tabController.addListener(() {
+      // If app bar expanded
+      if (_scrollController.offset < ((MediaQuery.of(context).size.height * 0.28) - 105.0)) {
+        // Remain at current offset
+        _scrollController.jumpTo(_scrollController.offset);
+      }
+      // Else, app bar collapsed and no collapsed position saved
+      else {
+        // Go to top collapsed position
+        _scrollController.jumpTo((MediaQuery.of(context).size.height * 0.28) - 105.0);
+      }
     });
   }
 
@@ -104,31 +143,16 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
 
     setValues(widget.playerId, widget.teamId);
 
-    _tabController = TabController(length: _playerPages.length, vsync: this);
-
     _scrollController = ScrollController()
       ..addListener(() {
         setState(() {
-          _title = _isSliverAppBarExpanded ? player['DISPLAY_FIRST_LAST'] : '';
+          _title = _isSliverAppBarExpanded ? _player['DISPLAY_FIRST_LAST'] : '';
           _showImage = _isSliverAppBarExpanded ? true : false;
         });
 
         // Save the scroll position of the current tab
         _scrollPositions[_tabController.index] = _scrollController.offset;
       });
-
-    _tabController.addListener(() {
-      // If app bar expanded
-      if (_scrollController.offset < ((MediaQuery.of(context).size.height * 0.28) - 105.0)) {
-        // Remain at current offset
-        _scrollController.jumpTo(_scrollController.offset);
-      }
-      // Else, app bar collapsed and no collapsed position saved
-      else {
-        // Go to top collapsed position
-        _scrollController.jumpTo((MediaQuery.of(context).size.height * 0.28) - 105.0);
-      }
-    });
   }
 
   bool get _isSliverAppBarExpanded {
@@ -160,22 +184,6 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
   ///      Initialize each tab via anonymous function.
   /// ******************************************************
 
-  final List<
-      Widget Function(
-          {required Map<String, dynamic> team,
-          required Map<String, dynamic> player})> _playerPages = [
-    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
-        PlayerProfile(team: team, player: player),
-    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
-        PlayerStats(team: team, player: player),
-    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
-        PlayerGamelogs(team: team, player: player),
-    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
-        PlayerShotChart(team: team, player: player),
-    ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
-        PlayerCareer(team: team, player: player),
-  ];
-
   /// ******************************************************
   ///                   Build the page.
   /// ******************************************************
@@ -186,9 +194,9 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
       body: _isLoading
           ? Center(
               child: SpinningIcon(
-                color: kDarkPrimaryColors.contains(team['ABBREVIATION'])
-                    ? (kTeamColors[team['ABBREVIATION']]?['secondaryColor'])
-                    : (kTeamColors[team['ABBREVIATION']]?['primaryColor']),
+                color: kDarkPrimaryColors.contains(_team['ABBREVIATION'])
+                    ? (kTeamColors[_team['ABBREVIATION']]?['secondaryColor'])
+                    : (kTeamColors[_team['ABBREVIATION']]?['primaryColor']),
               ),
             )
           : ExtendedNestedScrollView(
@@ -196,7 +204,8 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
               headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                 return [
                   SliverAppBar(
-                    backgroundColor: kTeamColors[team['ABBREVIATION']]!['primaryColor']!,
+                    backgroundColor:
+                        kTeamColors[_team['ABBREVIATION'] ?? 'FA']!['primaryColor']!,
                     pinned: true,
                     expandedHeight: MediaQuery.of(context).size.height * 0.28,
                     title: Row(
@@ -207,7 +216,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                             radius: 16.56.r,
                             backgroundColor: Colors.white70,
                             playerImageUrl:
-                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
+                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${_player['PERSON_ID']}.png',
                           ),
                         SizedBox(width: 15.0.r),
                         Flexible(
@@ -225,7 +234,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       fit: StackFit.expand,
                       children: [
                         SvgPicture.asset(
-                          'images/NBA_Logos/${team['TEAM_ID']}.svg',
+                          'images/NBA_Logos/${_team['TEAM_ID']}.svg',
                           fit: BoxFit.cover,
                         ),
                         // Gradient mask to fade out the image towards the bottom
@@ -235,10 +244,10 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                kTeamColors[team['ABBREVIATION']]!['primaryColor']!
-                                    .withOpacity(kTeamColorOpacity[team['ABBREVIATION']]![
+                                kTeamColors[_team['ABBREVIATION'] ?? 'FA']!['primaryColor']!
+                                    .withOpacity(kTeamColorOpacity[_team['ABBREVIATION']]![
                                         'opacity']!), // Transparent at the top
-                                kTeamColors[team['ABBREVIATION']]!['primaryColor']!
+                                kTeamColors[_team['ABBREVIATION'] ?? 'FA']!['primaryColor']!
                                     .withOpacity(1.0), // Opaque at the bottom
                               ],
                             ),
@@ -248,7 +257,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                           padding: const EdgeInsets.only(top: 15.0),
                           child: FlexibleSpaceBar(
                             centerTitle: true,
-                            background: PlayerInfo(team: team, player: player),
+                            background: PlayerInfo(team: _team, player: _player),
                             collapseMode: CollapseMode.pin,
                           ),
                         ),
@@ -257,20 +266,25 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                     bottom: TabBar(
                       controller: _tabController,
                       indicatorSize: TabBarIndicatorSize.tab,
-                      indicatorColor: kTeamColors[team['ABBREVIATION']]!['secondaryColor']!,
+                      indicatorColor: kTeamColors[_team['ABBREVIATION']]!['secondaryColor']!,
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
                       labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
-                      isScrollable: true,
-                      tabAlignment: TabAlignment.start,
-                      tabs: const [
-                        Tab(text: 'Profile'),
-                        Tab(text: 'Stats'),
-                        Tab(text: 'Game Logs'),
-                        Tab(text: 'Shot Chart'),
-                        Tab(text: 'Career'),
-                      ],
+                      isScrollable: !_isHistoric,
+                      tabAlignment: !_isHistoric ? TabAlignment.start : null,
+                      tabs: _isHistoric
+                          ? [
+                              const Tab(text: 'Profile'),
+                              const Tab(text: 'Career'),
+                            ]
+                          : [
+                              const Tab(text: 'Profile'),
+                              const Tab(text: 'Stats'),
+                              const Tab(text: 'Game Logs'),
+                              const Tab(text: 'Shot Chart'),
+                              const Tab(text: 'Career'),
+                            ],
                     ),
                     actions: [
                       CustomIconButton(
@@ -285,18 +299,19 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                           );
                         },
                       ),
-                      CustomIconButton(
-                        icon: Icons.compare_arrows,
-                        size: 30.0.r,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PlayerComparison(player: player),
-                            ),
-                          );
-                        },
-                      ),
+                      if (!_isHistoric)
+                        CustomIconButton(
+                          icon: Icons.compare_arrows,
+                          size: 30.0.r,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlayerComparison(player: _player),
+                              ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 ];
@@ -304,13 +319,13 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
               pinnedHeaderSliverHeightBuilder: () {
                 return 105.0 + MediaQuery.of(context).padding.top; // 56 + 49 = 105
               },
-              onlyOneScrollInBody: false,
+              onlyOneScrollInBody: true,
               body: TabBarView(
                 controller: _tabController,
                 children: _playerPages.map((page) {
                   return page(
-                    team: team,
-                    player: player,
+                    team: _team,
+                    player: _player,
                   ); // Pass team object to each page
                 }).toList(),
               ),

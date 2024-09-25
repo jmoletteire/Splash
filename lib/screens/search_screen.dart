@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -56,8 +57,19 @@ class SearchProvider with ChangeNotifier {
   }
 }
 
-class SearchScreen extends StatelessWidget {
+class SearchScreen extends StatefulWidget {
+  @override
+  _SearchScreenState createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _textEditingController = TextEditingController();
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +87,7 @@ class SearchScreen extends StatelessWidget {
             hintText: 'Search',
             border: InputBorder.none,
             suffixIcon: IconButton(
-              icon: const Icon(Icons.clear),
+              icon: Icon(CupertinoIcons.clear_circled_solid, size: 20.0.r),
               onPressed: () {
                 // Clear the text field
                 _textEditingController.clear();

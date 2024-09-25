@@ -269,7 +269,7 @@ class _PlayerGamesState extends State<PlayerGames> {
                       Icon(
                         Icons.sports_basketball,
                         color: Colors.white38,
-                        size: 40.0.r,
+                        size: 38.0.r,
                       ),
                       SizedBox(height: 15.0.r),
                       Text(

@@ -17,7 +17,7 @@ class TapStatusBarToScroll extends StatelessWidget {
         GestureDetector(
           behavior: HitTestBehavior.translucent,
           onTapUp: (details) {
-            if (details.globalPosition.dy <= MediaQuery.of(context).padding.top + 10) {
+            if (details.globalPosition.dy <= MediaQuery.of(context).padding.top + 20) {
               notifier.scrollToTop();
             }
           },

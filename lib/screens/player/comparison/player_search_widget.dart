@@ -13,6 +13,24 @@ class PlayerSearchWidget extends StatelessWidget {
 
   final TextEditingController _textEditingController = TextEditingController();
 
+  void _showErrorSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: kBebasNormal.copyWith(
+          color: Colors.white,
+          fontSize: 16.0.r,
+        ),
+      ),
+      backgroundColor: Colors.red,
+      duration: const Duration(seconds: 3),
+      showCloseIcon: true,
+      closeIconColor: Colors.white,
+      dismissDirection: DismissDirection.vertical,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -84,8 +102,12 @@ class PlayerSearchWidget extends StatelessWidget {
                           ],
                         ),
                         onTap: () {
-                          onPlayerSelected(player);
-                          Navigator.pop(context);
+                          if (player['TO_YEAR'] <= 1997) {
+                            _showErrorSnackBar(context, 'Cannot compare players pre-1997');
+                          } else {
+                            onPlayerSelected(player);
+                            Navigator.pop(context);
+                          }
                         },
                       ),
                     ),

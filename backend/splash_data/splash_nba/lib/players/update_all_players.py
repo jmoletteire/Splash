@@ -2,12 +2,29 @@ import time
 
 from nba_api.stats.endpoints import commonallplayers, commonplayerinfo
 from pymongo import MongoClient
-from splash_nba.util.env import uri
+from splash_nba.util.env import uri, k_current_season
 import logging
 
 
+def add_historic_players():
+    all_players = commonallplayers.CommonAllPlayers().get_normalized_dict()['CommonAllPlayers']
+
+    # Filter players to only add those that don't exist in the collection
+    new_players = [player for player in all_players if not players_collection.find_one({"PERSON_ID": player["PERSON_ID"]})]
+
+    if new_players:
+        players_collection.insert_many(new_players)
+
+        for player in new_players:
+            new_player_info(player["PERSON_ID"])
+
+        logging.info(f"Added {len(new_players)} new players.")
+    else:
+        logging.info("No new players to add.")
+
+
 def add_players():
-    all_players = commonallplayers.CommonAllPlayers(season='2024-25').get_normalized_dict()['CommonAllPlayers']
+    all_players = commonallplayers.CommonAllPlayers(season=k_current_season).get_normalized_dict()['CommonAllPlayers']
 
     # Filter players to only add those that don't exist in the collection
     new_players = [player for player in all_players if not players_collection.find_one({"PERSON_ID": player["PERSON_ID"]}) and player["ROSTERSTATUS"] == 1]
@@ -117,6 +134,7 @@ if __name__ == "__main__":
         logging.info("Connected to MongoDB")
 
         try:
+            # add_historic_players()
             add_players()
             restructure_new_docs()
             update_player_info()

@@ -1,3 +1,6 @@
+import random
+import time
+
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 from nba_api.stats.endpoints import playerawards
@@ -42,3 +45,10 @@ for i, player in enumerate(players_collection.find({}, {"PERSON_ID": 1, "_id": 0
 
     except Exception as e:
         logging.error(f"Unable to process player {player['PERSON_ID']}: {e}")
+
+    # Pause for a random time between 0.5 and 2 seconds
+    time.sleep(random.uniform(0.5, 2.0))
+
+    # Pause 15 seconds for every 50 players
+    if i % 50 == 0:
+        time.sleep(15)

@@ -9,7 +9,6 @@ import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
 import '../../../components/custom_icon_button.dart';
 import '../../../utilities/scroll/scroll_controller_provider.dart';
-import '../../player/career/player_career.dart';
 import '../../search_screen.dart';
 
 class StatsQuery extends StatefulWidget {
@@ -162,5 +161,12 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
               ),
       ),
     );
+  }
+}
+
+class MyCustomScrollBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const ClampingScrollPhysics();
   }
 }

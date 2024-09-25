@@ -101,6 +101,28 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
     '1971-72',
     '1970-71',
     '1969-70',
+    '1968-69',
+    '1967-68',
+    '1966-67',
+    '1965-66',
+    '1964-65',
+    '1963-64',
+    '1962-63',
+    '1961-62',
+    '1960-61',
+    '1959-60',
+    '1958-59',
+    '1957-58',
+    '1956-57',
+    '1955-56',
+    '1954-55',
+    '1953-54',
+    '1952-53',
+    '1951-52',
+    '1950-51',
+    '1949-50',
+    '1948-49',
+    '1947-48',
   ];
 
   Future<void> getDraft(String draftYear) async {
@@ -396,8 +418,9 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
                   slivers: [
                     DraftRound(
                         round: firstRound, roundNum: 1, isFinalRound: secondRound.isEmpty),
-                    DraftRound(
-                        round: secondRound, roundNum: 2, isFinalRound: thirdRound.isEmpty),
+                    if (secondRound.isNotEmpty)
+                      DraftRound(
+                          round: secondRound, roundNum: 2, isFinalRound: thirdRound.isEmpty),
                     if (thirdRound.isNotEmpty)
                       DraftRound(
                         round: thirdRound,

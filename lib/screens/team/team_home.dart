@@ -151,14 +151,22 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                     pinned: true,
                     expandedHeight: MediaQuery.of(context).size.height * 0.28,
                     title: _title
-                        ? Image.asset(
-                            'images/NBA_Logos/${team['TEAM_ID']}.png',
-                            width: team['ABBREVIATION'] == 'CHI'
-                                ? MediaQuery.of(context).size.width * 0.165
-                                : isLandscape
+                        ? team['TEAM_ID'] == 1610612761
+                            ? SvgPicture.asset(
+                                'images/NBA_Logos/${team['TEAM_ID']}.svg',
+                                width: isLandscape
+                                    ? MediaQuery.of(context).size.width * 0.09
+                                    : MediaQuery.of(context).size.width * 0.06,
+                                height: isLandscape
+                                    ? MediaQuery.of(context).size.width * 0.09
+                                    : MediaQuery.of(context).size.height * 0.06,
+                              )
+                            : Image.asset(
+                                'images/NBA_Logos/${team['TEAM_ID']}.png',
+                                width: isLandscape
                                     ? MediaQuery.of(context).size.width * 0.0375
                                     : MediaQuery.of(context).size.width * 0.09,
-                          )
+                              )
                         : null,
                     centerTitle: true,
                     flexibleSpace: Stack(
@@ -352,15 +360,26 @@ class TeamInfo extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'images/NBA_Logos/${team['TEAM_ID']}.png',
-              width: isLandscape
-                  ? MediaQuery.of(context).size.width * 0.1
-                  : MediaQuery.of(context).size.width * 0.28,
-              height: isLandscape
-                  ? MediaQuery.of(context).size.width * 0.1
-                  : MediaQuery.of(context).size.height * 0.28,
-            ),
+            if (team['TEAM_ID'] == 1610612761)
+              SvgPicture.asset(
+                'images/NBA_Logos/${team['TEAM_ID']}.svg',
+                width: isLandscape
+                    ? MediaQuery.of(context).size.width * 0.1
+                    : MediaQuery.of(context).size.width * 0.15,
+                height: isLandscape
+                    ? MediaQuery.of(context).size.width * 0.1
+                    : MediaQuery.of(context).size.height * 0.15,
+              ),
+            if (team['TEAM_ID'] != 1610612761)
+              Image.asset(
+                'images/NBA_Logos/${team['TEAM_ID']}.png',
+                width: isLandscape
+                    ? MediaQuery.of(context).size.width * 0.1
+                    : MediaQuery.of(context).size.width * 0.28,
+                height: isLandscape
+                    ? MediaQuery.of(context).size.width * 0.1
+                    : MediaQuery.of(context).size.height * 0.28,
+              ),
             SizedBox(width: 20.0.r),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

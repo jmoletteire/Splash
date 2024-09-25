@@ -54,7 +54,7 @@ if __name__ == "__main__":
     logging.info("Connected to MongoDB")
 
     season_types = ['REGULAR SEASON', 'PLAYOFFS']
-    measure = 'Advanced'
+    measure = 'Base'
 
     # Set batch size to process documents
     batch_size = 25

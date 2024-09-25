@@ -472,7 +472,9 @@ def search():
                     "_id": 0,
                     "DISPLAY_FIRST_LAST": 1,
                     "PERSON_ID": 1,
-                    "TEAM_ID": 1
+                    "TEAM_ID": 1,
+                    'FROM_YEAR': 1,
+                    'TO_YEAR': 1
                 }
             }
         ])

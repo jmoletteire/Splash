@@ -311,7 +311,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         type: MaterialType.transparency,
         child: InkWell(
           onTap: () {
-            setState(() {
+            if (int.parse(widget.schedule[gameId]['GAME_DATE'].substring(0, 4)) >= 2018) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -322,7 +322,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
                   ),
                 ),
               );
-            });
+            }
           },
           splashColor: Colors.white,
           highlightColor: Colors.white,

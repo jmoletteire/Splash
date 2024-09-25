@@ -219,7 +219,7 @@ class _AwardsState extends State<Awards> {
             awardName,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: kBebasNormal.copyWith(color: Colors.grey.shade400, fontSize: 15.0.r),
+            style: kBebasNormal.copyWith(color: Colors.grey.shade300, fontSize: 15.0.r),
           ),
         );
       case 1:

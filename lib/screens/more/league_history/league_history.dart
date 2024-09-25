@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/utilities/constants.dart';
@@ -110,6 +111,29 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
     '1972',
     '1971',
     '1970',
+    '1969',
+    '1968',
+    '1967',
+    '1966',
+    '1965',
+    '1964',
+    '1963',
+    '1962',
+    '1961',
+    '1960',
+    '1959',
+    '1958',
+    '1957',
+    '1956',
+    '1955',
+    '1954',
+    '1953',
+    '1952',
+    '1951',
+    '1950',
+    '1949',
+    '1948',
+    '1947',
   ];
 
   Future<void> getAwards(String season) async {
@@ -436,6 +460,12 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
 
     if (widget.award.value['PLAYERS'][0]['ALL_NBA_TEAM_NUMBER'] != null) {
       players.sort((a, b) => a['ALL_NBA_TEAM_NUMBER'].compareTo(b['ALL_NBA_TEAM_NUMBER']));
+    } else if (widget.award.value['PLAYERS'][0]['MONTH'] != null) {
+      players.sort((a, b) => DateFormat('M/d/yyyy')
+          .parse(a['MONTH'])
+          .compareTo(DateFormat('M/d/yyyy').parse(b['MONTH'])));
+    } else if (widget.award.value['PLAYERS'][0]['WEEK'] != null) {
+      players.sort((a, b) => a['WEEK'].compareTo(b['WEEK']));
     }
 
     Map<String, String> teamMap = {
@@ -470,6 +500,19 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
       'Detroit Pistons': '1610612765',
       'Charlotte Hornets': '1610612766',
     };
+
+    String formatDate(String dateString, String format) {
+      if (format == 'WEEK') {
+        // Format the date to "Nov 21"
+        // Parse the date string
+        DateTime dateTime = DateTime.parse(dateString);
+        return DateFormat('MMM d').format(dateTime);
+      } else {
+        // Parse the date string
+        DateTime dateTime = DateFormat('M/d/yyyy').parse(dateString);
+        return DateFormat('MMM').format(dateTime);
+      }
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -506,7 +549,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: kBebasNormal.copyWith(
-                            color: Colors.grey.shade400, fontSize: 15.0.r),
+                            color: Colors.grey.shade300, fontSize: 15.0.r),
                       ),
                     );
                   },
@@ -524,7 +567,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                               children: [
                                 Expanded(
                                   child: Container(
-                                    padding: EdgeInsets.fromLTRB(8.0.r, 10.0.r, 0.0, 4.0.r),
+                                    padding: EdgeInsets.fromLTRB(8.0.r, 15.0.r, 0.0, 8.0.r),
                                     decoration: BoxDecoration(
                                       color: Colors.grey.shade900,
                                       border: Border(
@@ -569,7 +612,11 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                                 color: Colors.grey.shade900,
                                 border: Border(
                                   bottom: BorderSide(
-                                    color: i == players.length - 1
+                                    color: i == players.length - 1 ||
+                                            (players[i]['ALL_NBA_TEAM_NUMBER'] != null &&
+                                                (i > 0 &&
+                                                    players[i]['ALL_NBA_TEAM_NUMBER'] !=
+                                                        players[i + 1]['ALL_NBA_TEAM_NUMBER']))
                                         ? Colors.transparent
                                         : Colors.grey.shade200,
                                     width: 0.125,
@@ -579,27 +626,48 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                               padding: EdgeInsets.fromLTRB(6.0.r, 8.0.r, 0.0, 8.0.r),
                               child: Row(
                                 children: [
-                                  PlayerAvatar(
-                                    radius: 12.0.r,
-                                    backgroundColor: Colors.white70,
-                                    playerImageUrl:
-                                        'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[i]['PLAYER_ID']}.png',
-                                    //'https://www.basketball-reference.com/req/202106291/images/headshots/$lastSub${firstName.substring(0, 2).toLowerCase()}01.jpg'
+                                  if (players[i]['MONTH'] != null)
+                                    Expanded(
+                                      child: Text(
+                                        formatDate(players[i]['MONTH'], 'MONTH'),
+                                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                      ),
+                                    ),
+                                  if (players[i]['WEEK'] != null)
+                                    Expanded(
+                                      child: Text(
+                                        formatDate(players[i]['WEEK'], 'WEEK'),
+                                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                      ),
+                                    ),
+                                  Expanded(
+                                    flex: 6,
+                                    child: Row(
+                                      children: [
+                                        PlayerAvatar(
+                                          radius: 12.0.r,
+                                          backgroundColor: Colors.white70,
+                                          playerImageUrl:
+                                              'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[i]['PLAYER_ID']}.png',
+                                          //'https://www.basketball-reference.com/req/202106291/images/headshots/$lastSub${firstName.substring(0, 2).toLowerCase()}01.jpg'
+                                        ),
+                                        SizedBox(width: 8.0.r),
+                                        AutoSizeText(
+                                          '${players[i]['FIRST_NAME'] ?? ''} ${players[i]['LAST_NAME'] ?? ''}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                        ),
+                                        SizedBox(width: 8.0.r),
+                                        SizedBox(
+                                          height: 20.0.r,
+                                          width: 20.0.r,
+                                          child: Image.asset(
+                                              'images/NBA_Logos/${teamMap[players[i]['TEAM']]}.png'),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(width: 8.0.r),
-                                  AutoSizeText(
-                                    '${players[i]['FIRST_NAME'] ?? ''} ${players[i]['LAST_NAME'] ?? ''}',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                                  ),
-                                  SizedBox(width: 8.0.r),
-                                  SizedBox(
-                                    height: 20.0.r,
-                                    width: 20.0.r,
-                                    child: Image.asset(
-                                        'images/NBA_Logos/${teamMap[players[i]['TEAM']]}.png'),
-                                  )
                                 ],
                               ),
                             ),
