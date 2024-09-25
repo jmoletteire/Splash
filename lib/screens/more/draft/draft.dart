@@ -15,7 +15,8 @@ import '../../search_screen.dart';
 import 'draft_cache.dart';
 
 class Draft extends StatefulWidget {
-  const Draft({super.key});
+  final String? season;
+  const Draft({super.key, this.season});
 
   @override
   State<Draft> createState() => _DraftState();
@@ -237,7 +238,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
       }
     });
 
-    selectedSeason = seasons.first;
+    selectedSeason = widget.season ?? seasons.first;
     selectedPick = 1;
     getDraft(selectedSeason.substring(0, 4));
     getDraftByPick(selectedPick.toString());

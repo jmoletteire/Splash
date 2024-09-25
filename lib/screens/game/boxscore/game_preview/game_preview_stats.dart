@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:splash/screens/game/boxscore/game_preview/team_leaders.dart';
 import 'package:splash/screens/game/boxscore/team_player_stats.dart';
-import 'package:splash/screens/game/matchup/components/team_season_stats.dart';
 
-import '../../../utilities/constants.dart';
-import '../../../utilities/team.dart';
-import '../../team/team_cache.dart';
+import '../../../../utilities/constants.dart';
+import '../../../../utilities/team.dart';
+import '../../../team/team_cache.dart';
 
 class GamePreviewStats extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -196,7 +196,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                   slivers: [
                     SliverPadding(
                       padding: const EdgeInsets.only(top: 10.0),
-                      sliver: TeamSeasonStats(
+                      sliver: TeamLeaders(
                         season:
                             '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
                         homeId: widget.homeId,

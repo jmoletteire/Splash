@@ -70,10 +70,15 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
       _isLoading = false;
     });
 
-    if (!awayTeam['seasons'].keys.toList().contains(widget.season) ||
-        !homeTeam['seasons'].keys.toList().contains(widget.season)) {
-      season =
-          '${(int.parse(widget.season.substring(0, 4)) - 1).toString()}-${(int.parse(widget.season.substring(5)) - 1).toString()}';
+    // If season has not started for either team, use previous season
+    if ((!awayTeam['seasons'].keys.toList().contains(widget.season) ||
+            !homeTeam['seasons'].keys.toList().contains(widget.season)) ||
+        (awayTeam['seasons'][widget.season]['GP'] == 0 ||
+            homeTeam['seasons'][widget.season]['GP'] == 0)) {
+      setState(() {
+        season =
+            '${(int.parse(widget.season.substring(0, 4)) - 1).toString()}-${(int.parse(widget.season.substring(5)) - 1).toString()}';
+      });
     }
   }
 

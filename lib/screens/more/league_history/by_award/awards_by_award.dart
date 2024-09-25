@@ -25,11 +25,19 @@ class AwardsByAward extends StatefulWidget {
 }
 
 class _AwardsByAwardState extends State<AwardsByAward> {
-  List columnNames = [
-    'SEASON',
-    'TEAM',
-    'NAME',
-  ];
+  List columnNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    columnNames = [
+      'SEASON',
+      'TEAM',
+      'NAME',
+      if (widget.awardName != 'NBA Champion') 'POS',
+      '',
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +58,14 @@ class _AwardsByAwardState extends State<AwardsByAward> {
       ),
       headerHeight: MediaQuery.of(context).size.height * 0.045,
       rowCount: widget.awards.length,
-      rowHeight: MediaQuery.of(context).size.height * 0.06,
+      rowHeight: MediaQuery.of(context).size.height * 0.05,
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
       columns: [
         /// AWARD
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.04
-              : MediaQuery.of(context).size.width * 0.2,
+              : MediaQuery.of(context).size.width * 0.20,
           freezePriority: 1,
         ),
 
@@ -65,7 +73,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.03
-              : MediaQuery.of(context).size.width * 0.11,
+              : MediaQuery.of(context).size.width * 0.109,
           freezePriority: 1,
         ),
 
@@ -73,7 +81,25 @@ class _AwardsByAwardState extends State<AwardsByAward> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.4
-              : MediaQuery.of(context).size.width * 0.69,
+              : MediaQuery.of(context).size.width * 0.50,
+        ),
+
+        if (widget.awardName != 'NBA Champion')
+
+          /// POSITION
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.03
+                : MediaQuery.of(context).size.width * 0.14,
+          ),
+
+        /// Fill
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : widget.awardName == 'NBA Champion'
+                  ? MediaQuery.of(context).size.width * 0.19
+                  : MediaQuery.of(context).size.width * 0.05,
         ),
       ],
       rowBuilder: _rowBuilder,
@@ -234,7 +260,19 @@ class _AwardsByAwardState extends State<AwardsByAward> {
       'Charlotte Hornets': '1610612766',
     };
 
+    Map<String, String> positionMap = {
+      'Guard': 'G',
+      'Guard-Forward': 'G-F',
+      'Forward': 'F',
+      'Forward-Guard': 'F-G',
+      'Forward-Center': 'F-C',
+      'Center': 'C',
+      'Center-Forward': 'C-F',
+    };
+
     String teamId = teamMap[widget.awards[row][widget.awardName]['PLAYERS'][0]['TEAM']] ?? '0';
+    String position =
+        positionMap[widget.awards[row][widget.awardName]['PLAYERS'][0]['POSITION']] ?? '0';
 
     switch (column) {
       case 0:
@@ -253,7 +291,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
           children: [
             if (teamId == '0') const Spacer(flex: 1),
             Expanded(
-              flex: 4,
+              flex: 3,
               child: Image.asset('images/NBA_Logos/$teamId.png'),
             ),
             Spacer(flex: teamId == '0' ? 3 : 1)
@@ -268,7 +306,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
               widget.awards[row][widget.awardName]['PLAYERS'][0]['TEAM'],
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: kBebasNormal.copyWith(fontSize: 16.0.r),
+              style: kBebasNormal.copyWith(fontSize: 15.0.r),
             ),
           );
         } else {
@@ -290,13 +328,24 @@ class _AwardsByAwardState extends State<AwardsByAward> {
                     '${widget.awards[row][widget.awardName]['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row][widget.awardName]['PLAYERS'][0]['LAST_NAME'] ?? ''}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                    style: kBebasNormal.copyWith(fontSize: 15.0.r),
                   ),
                 ),
               ],
             ),
           );
         }
+      case 3:
+        try {
+          if (widget.awards[row][widget.awardName]['DESCRIPTION'] == 'NBA Champion') {
+            return StandingsDataText(text: '');
+          }
+          return StandingsDataText(text: position);
+        } catch (e) {
+          return StandingsDataText(text: '-');
+        }
+      case 4:
+        return const Text('');
       default:
         return const Text('-');
     }

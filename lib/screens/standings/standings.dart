@@ -42,7 +42,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   late ValueNotifier<Map<String, dynamic>> playoffDataNotifier;
   late ValueNotifier<Map<String, dynamic>> cupDataNotifier;
 
-  int selectedYear = 2024;
+  int selectedYear = 2025;
 
   void _initializeTabController(int index) {
     final int tabLength = selectedYear >= 2023 ? 4 : 3;
@@ -76,6 +76,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                   ),
                   textTheme: TextTheme(bodyLarge: kBebasNormal.copyWith(fontSize: 16.0.r))),
               child: YearPicker(
+                currentDate: DateTime(2025),
                 firstDate: DateTime(1981),
                 lastDate: DateTime.now().add(const Duration(days: 365)),
                 selectedDate: DateTime(selectedYear),

@@ -294,18 +294,29 @@ class TeamInfo extends StatelessWidget {
   }
 
   Map<String, dynamic> getLastGame() {
-    Map<String, dynamic> schedule = team['seasons'][kCurrentSeason]['GAMES'];
+    for (String season in kSeasons) {
+      Map<String, dynamic> schedule = team['seasons']?[season]?['GAMES'] ?? {};
 
-    // Convert the map to a list of entries
-    var entries = schedule.entries.toList();
+      // Convert the map to a list of entries
+      var entries = schedule.entries.toList();
 
-    // Sort the entries by the GAME_DATE value
-    entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
+      // Sort the entries by the GAME_DATE value
+      entries.sort((a, b) => b.value['GAME_DATE'].compareTo(a.value['GAME_DATE']));
 
-    // Extract the sorted keys
-    var games = entries.map((e) => e.key).toList();
+      // Extract the sorted keys
+      var games = entries.map((e) => e.key).toList();
 
-    return schedule[games.last];
+      // If season has started
+      if (DateTime.parse(schedule[games.last]['GAME_DATE']).compareTo(DateTime.now()) < 0) {
+        // Find last game
+        for (var game in games) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(DateTime.now()) < 0) {
+            return schedule[game];
+          }
+        }
+      }
+    }
+    return {};
   }
 
   Map<String, dynamic> getNextGame() {
@@ -322,10 +333,10 @@ class TeamInfo extends StatelessWidget {
       var games = entries.map((e) => e.key).toList();
 
       // If season has not ended
-      if (DateTime.parse(schedule[games.last]['GAME_DATE']).compareTo(DateTime.now()) > 0) {
+      if (DateTime.parse(schedule[games.last]['GAME_DATE']).compareTo(DateTime.now()) >= 0) {
         // Find next game
         for (var game in games) {
-          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(DateTime.now()) > 0) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(DateTime.now()) >= 0) {
             return schedule[game];
           }
         }

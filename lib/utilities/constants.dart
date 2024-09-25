@@ -140,7 +140,7 @@ List<String> kSeasons = [
 ///               STRINGS/INTEGERS/DOUBLES
 /// ******************************************************
 
-const kCurrentSeason = '2023-24';
+const kCurrentSeason = '2024-25';
 const kLeagueSalaryCap = {
   '1996': 24693000,
   '1997': 26900000,

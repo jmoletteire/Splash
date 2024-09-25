@@ -65,16 +65,34 @@ class _TeamComparisonState extends State<TeamComparison> {
           onTeamSelected: (team) async {
             teamTwo = await getTeam(team["TEAM_ID"].toString());
             setState(() {
-              teamTwo.keys.contains('seasons')
-                  ? seasonsTwo = teamTwo['seasons'].keys.toList().reversed.toList()
-                  : seasonsTwo = [kCurrentSeason];
+              if (teamTwo.keys.contains('seasons')) {
+                seasonsTwo = teamTwo['seasons'].keys.toList().reversed.toList();
+                seasonsTwo = seasonsTwo
+                    .where((season) => int.parse(season.substring(0, 4)) >= 1996)
+                    .toList();
 
-              selectedSeasonTwo = seasonsTwo.first;
+                // If season has not started, use previous season
+                if (teamTwo['seasons'].containsKey(seasonsTwo.first)) {
+                  if (teamTwo['seasons'][seasonsTwo.first]['GP'] > 0) {
+                    selectedSeasonTwo = seasonsTwo.first;
+                  } else {
+                    selectedSeasonTwo = seasonsTwo[1];
+                    seasonsTwo.removeAt(0);
+                  }
+                } else {
+                  selectedSeasonTwo = seasonsTwo[1];
+                  seasonsTwo.removeAt(0);
+                }
 
-              teamTwo['seasons'][selectedSeasonTwo]['STATS']['PLAYOFFS'].keys.contains('ADV')
-                  ? seasonTypesTwo = ['REGULAR SEASON', 'PLAYOFFS']
-                  : seasonTypesTwo = ['REGULAR SEASON'];
-              selectedSeasonTypeTwo = seasonTypesTwo.first;
+                teamTwo['seasons'][selectedSeasonTwo]['STATS']['PLAYOFFS'].keys.contains('ADV')
+                    ? seasonTypesTwo = ['REGULAR SEASON', 'PLAYOFFS']
+                    : seasonTypesTwo = ['REGULAR SEASON'];
+                selectedSeasonTypeTwo = seasonTypesTwo.first;
+              } else {
+                seasonsTwo = [kCurrentSeason];
+                seasonTypesTwo = ['REGULAR SEASON'];
+                selectedSeasonTypeTwo = seasonTypesTwo.first;
+              }
             });
           },
         ),
@@ -144,18 +162,32 @@ class _TeamComparisonState extends State<TeamComparison> {
 
     if (teamOne.keys.contains('seasons')) {
       seasonsOne = teamOne['seasons'].keys.toList().reversed.toList();
-      selectedSeasonOne = seasonsOne.first;
+      seasonsOne =
+          seasonsOne.where((season) => int.parse(season.substring(0, 4)) >= 1996).toList();
+
+      // If season has not started, use previous season
+      if (teamOne['seasons'].containsKey(seasonsOne.first)) {
+        if (teamOne['seasons'][seasonsOne.first]['GP'] > 0) {
+          selectedSeasonOne = seasonsOne.first;
+        } else {
+          selectedSeasonOne = seasonsOne[1];
+          seasonsOne.removeAt(0);
+        }
+      } else {
+        selectedSeasonOne = seasonsOne[1];
+        seasonsOne.removeAt(0);
+      }
 
       teamOne['seasons'][selectedSeasonOne]['STATS']['PLAYOFFS'].keys.contains('ADV')
           ? seasonTypesOne = ['REGULAR SEASON', 'PLAYOFFS']
           : seasonTypesOne = ['REGULAR SEASON'];
+
+      selectedSeasonTypeOne = seasonTypesOne.first;
     } else {
       seasonsOne = [kCurrentSeason];
       seasonTypesOne = ['REGULAR SEASON'];
+      selectedSeasonTypeOne = seasonTypesOne.first;
     }
-
-    selectedSeasonOne = seasonsOne.first;
-    selectedSeasonTypeOne = seasonTypesOne.first;
 
     seasonsTwo = [kCurrentSeason];
     seasonTypesTwo = ['REGULAR SEASON'];
@@ -248,7 +280,23 @@ class _TeamComparisonState extends State<TeamComparison> {
                                     if (teamOne.keys.contains('seasons')) {
                                       seasonsOne =
                                           teamOne['seasons'].keys.toList().reversed.toList();
-                                      selectedSeasonOne = seasonsOne.first;
+                                      seasonsOne = seasonsOne
+                                          .where((season) =>
+                                              int.parse(season.substring(0, 4)) >= 1996)
+                                          .toList();
+
+                                      // If season has not started, use previous season
+                                      if (teamOne['seasons'].containsKey(seasonsOne.first)) {
+                                        if (teamOne['seasons'][seasonsOne.first]['GP'] > 0) {
+                                          selectedSeasonOne = seasonsOne.first;
+                                        } else {
+                                          selectedSeasonOne = seasonsOne[1];
+                                          seasonsOne.removeAt(0);
+                                        }
+                                      } else {
+                                        selectedSeasonOne = seasonsOne[1];
+                                        seasonsOne.removeAt(0);
+                                      }
 
                                       teamOne['seasons'][selectedSeasonOne]['STATS']
                                                   ['PLAYOFFS']
@@ -256,13 +304,13 @@ class _TeamComparisonState extends State<TeamComparison> {
                                               .contains('ADV')
                                           ? seasonTypesOne = ['REGULAR SEASON', 'PLAYOFFS']
                                           : seasonTypesOne = ['REGULAR SEASON'];
+
+                                      selectedSeasonTypeOne = seasonTypesOne.first;
                                     } else {
                                       seasonsOne = [kCurrentSeason];
                                       seasonTypesOne = ['REGULAR SEASON'];
+                                      selectedSeasonTypeOne = seasonTypesOne.first;
                                     }
-
-                                    selectedSeasonOne = seasonsOne.first;
-                                    selectedSeasonTypeOne = seasonTypesOne.first;
                                   });
                                 },
                               ),
@@ -324,7 +372,23 @@ class _TeamComparisonState extends State<TeamComparison> {
                                     if (teamTwo.keys.contains('seasons')) {
                                       seasonsTwo =
                                           teamTwo['seasons'].keys.toList().reversed.toList();
-                                      selectedSeasonTwo = seasonsTwo.first;
+                                      seasonsTwo = seasonsTwo
+                                          .where((season) =>
+                                              int.parse(season.substring(0, 4)) >= 1996)
+                                          .toList();
+
+                                      // If season has not started, use previous season
+                                      if (teamTwo['seasons'].containsKey(seasonsTwo.first)) {
+                                        if (teamTwo['seasons'][seasonsTwo.first]['GP'] > 0) {
+                                          selectedSeasonTwo = seasonsTwo.first;
+                                        } else {
+                                          selectedSeasonTwo = seasonsTwo[1];
+                                          seasonsTwo.removeAt(0);
+                                        }
+                                      } else {
+                                        selectedSeasonTwo = seasonsTwo[1];
+                                        seasonsTwo.removeAt(0);
+                                      }
 
                                       teamTwo['seasons'][selectedSeasonTwo]['STATS']
                                                   ['PLAYOFFS']
@@ -332,13 +396,12 @@ class _TeamComparisonState extends State<TeamComparison> {
                                               .contains('ADV')
                                           ? seasonTypesTwo = ['REGULAR SEASON', 'PLAYOFFS']
                                           : seasonTypesTwo = ['REGULAR SEASON'];
+                                      selectedSeasonTypeTwo = seasonTypesTwo.first;
                                     } else {
                                       seasonsTwo = [kCurrentSeason];
                                       seasonTypesTwo = ['REGULAR SEASON'];
+                                      selectedSeasonTypeTwo = seasonTypesTwo.first;
                                     }
-
-                                    selectedSeasonTwo = seasonsTwo.first;
-                                    selectedSeasonTypeTwo = seasonTypesTwo.first;
                                   });
                                 },
                               ),
@@ -733,10 +796,14 @@ class _TeamComparisonState extends State<TeamComparison> {
                             const SizedBox(height: 15.0),
                             ComparisonRow(
                               statName: 'PACE',
-                              teamOne: teamOne['seasons'][selectedSeasonOne]['STATS']
-                                  [selectedSeasonTypeOne]['ADV']['PACE'],
-                              teamTwo: teamTwo['seasons'][selectedSeasonTwo]['STATS']
-                                  [selectedSeasonTypeTwo]['ADV']['PACE'],
+                              teamOne: roundToDecimalPlaces(
+                                  teamOne['seasons'][selectedSeasonOne]['STATS']
+                                      [selectedSeasonTypeOne]['ADV']['PACE'],
+                                  1),
+                              teamTwo: roundToDecimalPlaces(
+                                  teamTwo['seasons'][selectedSeasonTwo]['STATS']
+                                      [selectedSeasonTypeTwo]['ADV']['PACE'],
+                                  1),
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),

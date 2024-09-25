@@ -51,6 +51,41 @@ class _CareerStatsState extends State<CareerStats> {
     'NRTG',
     'DIE',
   ];
+  List<String> tradedYears = [];
+
+  void getTradedYears() {
+    for (var season in widget.seasons) {
+      if (season['TEAM_ABBREVIATION'] == 'TOT') {
+        tradedYears.add(season['SEASON_ID']);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.seasonType == 'REGULAR SEASON') getTradedYears();
+    if (widget.seasonType == 'COLLEGE') {
+      columnNames = [
+        'YEAR',
+        'TEAM',
+        'AGE',
+        'GP',
+        'MIN',
+        'PTS',
+        'REB',
+        'AST',
+        'STL',
+        'BLK',
+        'TOV',
+        'FG%',
+        '3P%',
+        'FT%',
+        'eFG%',
+        'TS%',
+      ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,42 +235,52 @@ class _CareerStatsState extends State<CareerStats> {
                   : MediaQuery.of(context).size.width * 0.16,
         ),
 
-        /// USG%
-        TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
-              : widget.mode == 'PER GAME'
-                  ? MediaQuery.of(context).size.width * 0.13
-                  : MediaQuery.of(context).size.width * 0.16,
-        ),
+        if (widget.seasonType != 'COLLEGE')
 
-        /// ORTG
-        TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
-        ),
+          /// USG%
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.06
+                : widget.mode == 'PER GAME'
+                    ? MediaQuery.of(context).size.width * 0.13
+                    : MediaQuery.of(context).size.width * 0.16,
+          ),
 
-        /// DRTG
-        TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
-        ),
+        if (widget.seasonType != 'COLLEGE')
 
-        /// NRTG
-        TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
-        ),
+          /// ORTG
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.06
+                : MediaQuery.of(context).size.width * 0.13,
+          ),
 
-        /// DIE
-        TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.13,
-        ),
+        if (widget.seasonType != 'COLLEGE')
+
+          /// DRTG
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.06
+                : MediaQuery.of(context).size.width * 0.13,
+          ),
+
+        if (widget.seasonType != 'COLLEGE')
+
+          /// NRTG
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.06
+                : MediaQuery.of(context).size.width * 0.13,
+          ),
+
+        if (widget.seasonType != 'COLLEGE')
+
+          /// DIE
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.06
+                : MediaQuery.of(context).size.width * 0.13,
+          ),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -266,12 +311,15 @@ class _CareerStatsState extends State<CareerStats> {
 
   /// This is used to wrap both regular and placeholder rows to achieve fade
   /// transition between them and to insert optional row divider.
-  Widget _wrapRow(int index, Widget child) => KeyedSubtree(
+  Widget _wrapRow(Map<String, dynamic> season, int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
         child: DecoratedBox(
           position: DecorationPosition.foreground,
           decoration: BoxDecoration(
-            color: Colors.grey.shade900,
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? const Color(0xFF171717)
+                : Colors.grey.shade900,
             border: Border(
               bottom: BorderSide(
                 color: Colors.grey.shade200,
@@ -290,6 +338,7 @@ class _CareerStatsState extends State<CareerStats> {
   Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
     Map<String, dynamic> season = widget.seasons.reversed.toList()[row];
     return _wrapRow(
+      season,
       row,
       Material(
         type: MaterialType.transparency,
@@ -324,15 +373,20 @@ class _CareerStatsState extends State<CareerStats> {
     Map<String, dynamic> season = widget.seasons.reversed.toList()[row];
     switch (column) {
       case 0:
-        return Center(
-          child: Text(
-            '\'${season['SEASON_ID'].substring(2)}',
-            style: kBebasNormal.copyWith(
-              color: Colors.white70,
-              fontSize: 15.0.r,
+        if (tradedYears.contains(season['SEASON_ID']) &&
+            season['TEAM_ABBREVIATION'] != 'TOT') {
+          return const Text('');
+        } else {
+          return Center(
+            child: Text(
+              '\'${season['SEASON_ID'].substring(2)}',
+              style: kBebasNormal.copyWith(
+                color: Colors.white70,
+                fontSize: 15.0.r,
+              ),
             ),
-          ),
-        );
+          );
+        }
       case 1:
         try {
           if (widget.seasonType == 'COLLEGE') {
@@ -397,54 +451,84 @@ class _CareerStatsState extends State<CareerStats> {
       case 5:
         try {
           return StandingsDataText(
-              text: widget.mode == 'PER GAME'
-                  ? season['PPG'].toStringAsFixed(1) ?? '-'
-                  : season['PTS'].toStringAsFixed(0) ?? '-');
+            text: widget.mode == 'PER GAME'
+                ? season['PPG'].toStringAsFixed(1) ?? '-'
+                : season['PTS'].toStringAsFixed(0) ?? '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 6:
         try {
           return StandingsDataText(
-              text: widget.mode == 'PER GAME'
-                  ? season['RPG'].toStringAsFixed(1) ?? '-'
-                  : season['REB'].toStringAsFixed(0) ?? '-');
+            text: widget.mode == 'PER GAME'
+                ? season['RPG'].toStringAsFixed(1) ?? '-'
+                : season['REB'].toStringAsFixed(0) ?? '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 7:
         try {
           return StandingsDataText(
-              text: widget.mode == 'PER GAME'
-                  ? season['APG'].toStringAsFixed(1) ?? '-'
-                  : season['AST'].toStringAsFixed(0) ?? '-');
+            text: widget.mode == 'PER GAME'
+                ? season['APG'].toStringAsFixed(1) ?? '-'
+                : season['AST'].toStringAsFixed(0) ?? '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 8:
         try {
           return StandingsDataText(
-              text: widget.mode == 'PER GAME'
-                  ? season['SPG'].toStringAsFixed(1) ?? '-'
-                  : season['STL'].toStringAsFixed(0) ?? '-');
+            text: widget.mode == 'PER GAME'
+                ? season['SPG'].toStringAsFixed(1) ?? '-'
+                : season['STL'].toStringAsFixed(0) ?? '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 9:
         try {
           return StandingsDataText(
-              text: widget.mode == 'PER GAME'
-                  ? season['BPG'].toStringAsFixed(1) ?? '-'
-                  : season['BLK'].toStringAsFixed(0) ?? '-');
+            text: widget.mode == 'PER GAME'
+                ? season['BPG'].toStringAsFixed(1) ?? '-'
+                : season['BLK'].toStringAsFixed(0) ?? '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 10:
         try {
           return StandingsDataText(
-              text: widget.mode == 'PER GAME'
-                  ? season['TOPG'].toStringAsFixed(1) ?? '-'
-                  : season['TOV'].toStringAsFixed(0) ?? '-');
+            text: widget.mode == 'PER GAME'
+                ? season['TOPG'].toStringAsFixed(1) ?? '-'
+                : season['TOV'].toStringAsFixed(0) ?? '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
@@ -452,11 +536,16 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           double fgPct = season['FG_PCT'] * 100;
           return StandingsDataText(
-              text: fgPct == 0.0
-                  ? '-'
-                  : widget.mode == 'PER GAME'
-                      ? '${fgPct.toStringAsFixed(1)}%'
-                      : '${season['FGM']}/${season['FGA']}');
+            text: fgPct == 0.0
+                ? '-'
+                : widget.mode == 'PER GAME'
+                    ? '${fgPct.toStringAsFixed(1)}%'
+                    : '${season['FGM']}/${season['FGA']}',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
@@ -464,11 +553,16 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           double fg3Pct = season['FG3_PCT'] * 100;
           return StandingsDataText(
-              text: fg3Pct == 0.0
-                  ? '-'
-                  : widget.mode == 'PER GAME'
-                      ? '${fg3Pct.toStringAsFixed(1)}%'
-                      : '${season['FG3M']}/${season['FG3A']}');
+            text: fg3Pct == 0.0
+                ? '-'
+                : widget.mode == 'PER GAME'
+                    ? '${fg3Pct.toStringAsFixed(1)}%'
+                    : '${season['FG3M']}/${season['FG3A']}',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
@@ -476,11 +570,16 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           double ftPct = season['FT_PCT'] * 100;
           return StandingsDataText(
-              text: ftPct == 0.0
-                  ? '-'
-                  : widget.mode == 'PER GAME'
-                      ? '${ftPct.toStringAsFixed(1)}%'
-                      : '${season['FTM']}/${season['FTA']}');
+            text: ftPct == 0.0
+                ? '-'
+                : widget.mode == 'PER GAME'
+                    ? '${ftPct.toStringAsFixed(1)}%'
+                    : '${season['FTM']}/${season['FTA']}',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
@@ -488,14 +587,25 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           double efgPct = season['EFG_PCT'] * 100;
           return StandingsDataText(
-              text: efgPct == 0.0 ? '-' : '${efgPct.toStringAsFixed(1)}%');
+            text: efgPct == 0.0 ? '-' : '${efgPct.toStringAsFixed(1)}%',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 15:
         try {
           double tsPct = season['TS_PCT'] * 100;
-          return StandingsDataText(text: tsPct == 0.0 ? '-' : '${tsPct.toStringAsFixed(1)}%');
+          return StandingsDataText(
+            text: tsPct == 0.0 ? '-' : '${tsPct.toStringAsFixed(1)}%',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
@@ -503,43 +613,68 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           double usgPct = season['USG_PCT'] * 100;
           return StandingsDataText(
-              text: usgPct == 0.0 ? '-' : '${usgPct.toStringAsFixed(1)}%');
+            text: usgPct == 0.0 ? '-' : '${usgPct.toStringAsFixed(1)}%',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 17:
         try {
           return StandingsDataText(
-              text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
-                  ? season['ORTG_ON_OFF'].toStringAsFixed(1)
-                  : '-');
+            text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
+                ? season['ORTG_ON_OFF'].toStringAsFixed(1)
+                : '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 18:
         try {
           return StandingsDataText(
-              text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
-                  ? season['DRTG_ON_OFF'].toStringAsFixed(1)
-                  : '-');
+            text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
+                ? season['DRTG_ON_OFF'].toStringAsFixed(1)
+                : '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 19:
         try {
           return StandingsDataText(
-              text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
-                  ? season['NRTG_ON_OFF'].toStringAsFixed(1)
-                  : '-');
+            text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
+                ? season['NRTG_ON_OFF'].toStringAsFixed(1)
+                : '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }
       case 20:
         try {
           return StandingsDataText(
-              text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2017
-                  ? season['DEF_IMPACT_EST'].toStringAsFixed(1)
-                  : '-');
+            text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2017
+                ? season['DEF_IMPACT_EST'].toStringAsFixed(1)
+                : '-',
+            color: tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT'
+                ? Colors.grey.shade300
+                : null,
+          );
         } catch (stack) {
           return const StandingsDataText(text: '-');
         }

@@ -204,7 +204,18 @@ class _AwardsState extends State<Awards> {
       'Charlotte Hornets': '1610612766',
     };
 
+    Map<String, String> positionMap = {
+      'Guard': 'G',
+      'Guard-Forward': 'G-F',
+      'Forward': 'F',
+      'Forward-Guard': 'F-G',
+      'Forward-Center': 'F-C',
+      'Center': 'C',
+      'Center-Forward': 'C-F',
+    };
+
     String teamId = teamMap[widget.awards[row].value['PLAYERS'][0]['TEAM']] ?? '0';
+    String position = positionMap[widget.awards[row].value['PLAYERS'][0]['POSITION']] ?? '0';
 
     String awardName = awardMap.containsKey(widget.awards[row].value['DESCRIPTION'] ?? '-')
         ? awardMap[widget.awards[row].value['DESCRIPTION']]
@@ -261,7 +272,7 @@ class _AwardsState extends State<Awards> {
                 Expanded(
                   flex: 7,
                   child: AutoSizeText(
-                    '${widget.awards[row].value['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row].value['PLAYERS'][0]['LAST_NAME'] ?? ''}',
+                    '${widget.awards[row].value['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row].value['PLAYERS'][0]['LAST_NAME'] ?? ''}, $position',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: kBebasNormal.copyWith(fontSize: 15.0.r),

@@ -115,17 +115,31 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                         ),
                         title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            PlayerAvatar(
-                              radius: 20.0.r,
-                              backgroundColor: Colors.white12,
-                              playerImageUrl:
-                                  'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
+                            Row(
+                              children: [
+                                PlayerAvatar(
+                                  radius: 20.0.r,
+                                  backgroundColor: Colors.white12,
+                                  playerImageUrl:
+                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
+                                ),
+                                SizedBox(
+                                  width: 15.0.r,
+                                ),
+                                Text(
+                                  player['DISPLAY_FIRST_LAST'],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 15.0.r),
                             Text(
-                              player['DISPLAY_FIRST_LAST'],
-                              style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                              '${player['FROM_YEAR']} - ${player['TO_YEAR']}',
+                              style: kBebasNormal.copyWith(
+                                  color: Colors.white70, fontSize: 14.0.r),
                             ),
                           ],
                         ),

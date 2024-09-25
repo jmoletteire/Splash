@@ -85,24 +85,34 @@ class PlayerSearchWidget extends StatelessWidget {
                           ),
                         ),
                         title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            PlayerAvatar(
-                              radius: 20.0,
-                              backgroundColor: Colors.white12,
-                              playerImageUrl:
-                                  'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
-                            ),
-                            const SizedBox(
-                              width: 15.0,
+                            Row(
+                              children: [
+                                PlayerAvatar(
+                                  radius: 20.0.r,
+                                  backgroundColor: Colors.white12,
+                                  playerImageUrl:
+                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PERSON_ID']}.png',
+                                ),
+                                SizedBox(width: 15.0.r),
+                                Text(
+                                  player['DISPLAY_FIRST_LAST'],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                                ),
+                              ],
                             ),
                             Text(
-                              player['DISPLAY_FIRST_LAST'],
-                              style: kBebasNormal.copyWith(fontSize: 18.0),
+                              '${player['FROM_YEAR']} - ${player['TO_YEAR']}',
+                              style: kBebasNormal.copyWith(
+                                  color: Colors.white70, fontSize: 14.0.r),
                             ),
                           ],
                         ),
                         onTap: () {
-                          if (player['TO_YEAR'] <= 1997) {
+                          if (player['TO_YEAR'] < 1997) {
                             _showErrorSnackBar(context, 'Cannot compare players pre-1997');
                           } else {
                             onPlayerSelected(player);

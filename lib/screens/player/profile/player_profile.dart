@@ -7,6 +7,8 @@ import 'package:splash/screens/player/profile/player_contract.dart';
 import 'package:splash/screens/player/profile/player_transactions.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../../more/draft/draft.dart';
+
 class PlayerProfile extends StatefulWidget {
   final Map<String, dynamic> team;
   final Map<String, dynamic> player;
@@ -88,14 +90,19 @@ class _PlayerProfileState extends State<PlayerProfile> {
   }
 }
 
-class InfoCard extends StatelessWidget {
+class InfoCard extends StatefulWidget {
   final Map<String, String> info;
 
   const InfoCard({required this.info});
 
   @override
+  State<InfoCard> createState() => _InfoCardState();
+}
+
+class _InfoCardState extends State<InfoCard> {
+  @override
   Widget build(BuildContext context) {
-    List<MapEntry<String, String>> entries = info.entries.toList();
+    List<MapEntry<String, String>> entries = widget.info.entries.toList();
 
     return Container(
       decoration: BoxDecoration(
@@ -136,40 +143,56 @@ class InfoCard extends StatelessWidget {
             Row(
               children: entries.sublist(3).map((entry) {
                 return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: AutoSizeText(
-                                entry.value,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                style: kBebasNormal.copyWith(fontSize: 16.0.r),
-                              ),
+                  child: GestureDetector(
+                    onTap: () {
+                      if (entry.key == 'Draft') {
+                        String value = entry.value.split('(')[1].split(')')[0];
+                        String year = '$value-${int.parse(value.substring(2)) + 1}';
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Draft(
+                              season: year,
                             ),
-                            if (entry.key == 'Country') const SizedBox(width: 5.0),
-                            if (entry.key == 'Country')
-                              CircleAvatar(
-                                radius: 7.0.r,
-                                backgroundImage: AssetImage(
-                                    'images/flags/${kCountryCodes[entry.value]?.toLowerCase()}.png'),
-                              )
-                          ],
-                        ),
-                        const SizedBox(height: 5.0),
-                        Text(
-                          entry.key,
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 10.0.r,
                           ),
-                        ),
-                      ],
+                        );
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: AutoSizeText(
+                                  entry.value,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                                ),
+                              ),
+                              if (entry.key == 'Country') const SizedBox(width: 5.0),
+                              if (entry.key == 'Country')
+                                CircleAvatar(
+                                  radius: 7.0.r,
+                                  backgroundImage: AssetImage(
+                                      'images/flags/${kCountryCodes[entry.value]?.toLowerCase()}.png'),
+                                )
+                            ],
+                          ),
+                          const SizedBox(height: 5.0),
+                          Text(
+                            entry.key,
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10.0.r,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
