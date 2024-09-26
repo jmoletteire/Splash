@@ -231,11 +231,11 @@ if __name__ == "__main__":
     # Set batch size to process documents
     batch_size = 25
     total_documents = players_collection.count_documents({})
-    processed_count = 2763
-    i = 2763
+    processed_count = 0
+    i = 0
 
     while processed_count < total_documents:
-        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, 'CAREER': 1, '_id': 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -246,14 +246,15 @@ if __name__ == "__main__":
                 i += 1
                 logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
 
-                try:
-                    player_career_stats(player['PERSON_ID'])
-                except Exception as e:
-                    logging.error(f'Could not add career stats for player {player["PERSON_ID"]}: {e}')
-                    continue
+                if 'CAREER' not in player or not player['CAREER']:
+                    try:
+                        player_career_stats(player['PERSON_ID'])
+                    except Exception as e:
+                        logging.error(f'Could not add career stats for player {player["PERSON_ID"]}: {e}')
+                        continue
 
-                # Pause for a random time between 0.5 and 1 second
-                time.sleep(random.uniform(0.5, 1.0))
+                    # Pause for a random time between 0.5 and 1 second
+                    time.sleep(random.uniform(0.5, 1.0))
 
             # Pause 15 seconds every 25 players
-            time.sleep(15)
+            #time.sleep(15)

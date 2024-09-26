@@ -24,9 +24,9 @@ class HexagonAggregator {
           if (!hexagonMap.containsKey(key)) {
             hexagonMap[key] = hexagon;
           }
-          hexagonMap[key]!.FGA += shot['SHOT_ATTEMPTED_FLAG'];
-          hexagonMap[key]!.FGM += shot['SHOT_MADE_FLAG'];
-          hexagonMap[key]!.totalDistance += shot['DISTANCE'];
+          hexagonMap[key]!.FGA += shot['SHOT_ATTEMPTED_FLAG'] ?? 1;
+          hexagonMap[key]!.FGM += shot['SHOT_MADE_FLAG'] ?? 0;
+          hexagonMap[key]!.totalDistance += shot['DISTANCE'] ?? 0;
           hexagonMap[key]!.avgDistance = hexagonMap[key]!.totalDistance / hexagonMap[key]!.FGA;
           break; // Stop checking after finding the first hexagon that contains the shot
         }

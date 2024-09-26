@@ -90,7 +90,7 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.125,
+              : MediaQuery.of(context).size.width * 0.1,
         ),
 
         /// HEIGHT

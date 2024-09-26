@@ -28,7 +28,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
   late List shotChart;
   List filteredShotChart = [];
   List lgAvg = [];
-  List<String> distinctShotTypes = [];
+  Map<String, int> distinctShotTypes = {};
   Set<String> selectedShotTypes = {};
   Map<String, String> shotTypeMapping = {};
 
@@ -206,8 +206,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
     return hexagons;
   }
 
-  List<String> collectDistinctShotTypes(List shotChart) {
-    Set<String> shotTypes = {};
+  Map<String, int> collectDistinctShotTypes(List shotChart) {
+    Map<String, int> shotTypes = {};
 
     for (var shot in shotChart) {
       if (shot.containsKey('SHOT_TYPE')) {
@@ -252,13 +252,16 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
         }
 
         if (modifiedShotType.isNotEmpty) {
-          shotTypes.add(modifiedShotType);
+          // Add or increment the count for this shot type
+          shotTypes.update(modifiedShotType, (count) => count + 1, ifAbsent: () => 1);
           shotTypeMapping[originalShotType] = modifiedShotType;
         }
       }
     }
 
-    return shotTypes.toList()..sort();
+    // Sort the map by shot type keys
+    return Map.fromEntries(
+        shotTypes.entries.toList()..sort((a, b) => b.value.compareTo(a.value)));
   }
 
   void filterShotChart() {
@@ -480,8 +483,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                         SizedBox(width: 50.0.r),
                         Flexible(
                           child: Wrap(
-                            children: distinctShotTypes.map((shotType) {
-                              bool isSelected = selectedShotTypes.contains(shotType);
+                            children: distinctShotTypes.entries.map((shotType) {
+                              bool isSelected = selectedShotTypes.contains(shotType.key);
 
                               return Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 4.0.r),
@@ -489,11 +492,11 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                   onPressed: () {
                                     setState(() {
                                       if (isSelected) {
-                                        selectedShotTypes
-                                            .remove(shotType); // Deselect if already selected
+                                        selectedShotTypes.remove(
+                                            shotType.key); // Deselect if already selected
                                       } else {
-                                        selectedShotTypes
-                                            .add(shotType); // Select if not already selected
+                                        selectedShotTypes.add(
+                                            shotType.key); // Select if not already selected
                                       }
                                       filterShotChart(); // Apply filtering after selection
                                     });
@@ -521,9 +524,20 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                       isSelected ? Colors.white : Colors.grey.shade200,
                                     ),
                                   ),
-                                  child: Text(
-                                    shotType,
-                                    style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                                  child: RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: shotType.key,
+                                          style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                                        ),
+                                        TextSpan(
+                                          text: '  ${shotType.value}',
+                                          style: kBebasNormal.copyWith(
+                                              color: Colors.grey.shade300, fontSize: 12.0.r),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
@@ -650,8 +664,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                         ),
                         const SizedBox(height: 10.0),
                         Wrap(
-                          children: distinctShotTypes.map((shotType) {
-                            bool isSelected = selectedShotTypes.contains(shotType);
+                          children: distinctShotTypes.entries.map((shotType) {
+                            bool isSelected = selectedShotTypes.contains(shotType.key);
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
@@ -660,16 +674,17 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                 onPressed: () {
                                   setState(() {
                                     if (isSelected) {
-                                      selectedShotTypes
-                                          .remove(shotType); // Deselect if already selected
+                                      selectedShotTypes.remove(
+                                          shotType.key); // Deselect if already selected
                                     } else {
                                       selectedShotTypes
-                                          .add(shotType); // Select if not already selected
+                                          .add(shotType.key); // Select if not already selected
                                     }
                                     filterShotChart(); // Apply filtering after selection
                                   });
                                 },
                                 style: ButtonStyle(
+                                  enableFeedback: true,
                                   backgroundColor: WidgetStateProperty.all(
                                     isSelected
                                         ? kTeamColors[widget.team['ABBREVIATION']]![
@@ -692,14 +707,26 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                     isSelected ? Colors.white : Colors.grey.shade200,
                                   ),
                                 ),
-                                child: Text(
-                                  shotType,
-                                  style: kBebasNormal.copyWith(fontSize: 14.0),
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: shotType.key,
+                                        style: kBebasNormal.copyWith(fontSize: 14.0),
+                                      ),
+                                      TextSpan(
+                                        text: '  ${shotType.value}',
+                                        style: kBebasNormal.copyWith(
+                                            color: Colors.grey.shade300, fontSize: 14.0),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
                           }).toList(),
                         ),
+                        const SizedBox(height: 10.0),
                       ],
                     );
                   }

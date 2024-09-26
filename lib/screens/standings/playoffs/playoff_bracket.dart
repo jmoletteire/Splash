@@ -170,7 +170,7 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
 
                   List<String> gameDate = formatDate(game['GAME_DATE']);
 
-                  return GestureDetector(
+                  return InkWell(
                     onTap: () {
                       if (int.parse(widget.playoffData['SEASON'].substring(0, 4)) >= 2017) {
                         Navigator.push(

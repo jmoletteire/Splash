@@ -81,8 +81,6 @@ class _CareerStatsState extends State<CareerStats> {
         'FG%',
         '3P%',
         'FT%',
-        'eFG%',
-        'TS%',
       ];
     }
   }
@@ -121,7 +119,9 @@ class _CareerStatsState extends State<CareerStats> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.155,
+              : widget.seasonType == 'COLLEGE'
+                  ? MediaQuery.of(context).size.width * 0.2
+                  : MediaQuery.of(context).size.width * 0.155,
           freezePriority: 1,
         ),
 
@@ -152,7 +152,7 @@ class _CareerStatsState extends State<CareerStats> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.125,
+              : MediaQuery.of(context).size.width * 0.1225,
         ),
 
         /// RPG
@@ -196,7 +196,7 @@ class _CareerStatsState extends State<CareerStats> {
               ? MediaQuery.of(context).size.width * 0.06
               : widget.mode == 'PER GAME'
                   ? MediaQuery.of(context).size.width * 0.13
-                  : MediaQuery.of(context).size.width * 0.2,
+                  : MediaQuery.of(context).size.width * 0.18,
         ),
 
         /// 3P%
@@ -205,28 +205,10 @@ class _CareerStatsState extends State<CareerStats> {
               ? MediaQuery.of(context).size.width * 0.06
               : widget.mode == 'PER GAME'
                   ? MediaQuery.of(context).size.width * 0.13
-                  : MediaQuery.of(context).size.width * 0.18,
-        ),
-
-        /// FT%
-        TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
-              : widget.mode == 'PER GAME'
-                  ? MediaQuery.of(context).size.width * 0.13
-                  : MediaQuery.of(context).size.width * 0.18,
-        ),
-
-        /// eFG%
-        TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
-              : widget.mode == 'PER GAME'
-                  ? MediaQuery.of(context).size.width * 0.13
                   : MediaQuery.of(context).size.width * 0.16,
         ),
 
-        /// TS%
+        /// FT%
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
@@ -237,13 +219,29 @@ class _CareerStatsState extends State<CareerStats> {
 
         if (widget.seasonType != 'COLLEGE')
 
+          /// eFG%
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.06
+                : MediaQuery.of(context).size.width * 0.14,
+          ),
+
+        if (widget.seasonType != 'COLLEGE')
+
+          /// TS%
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.06
+                : MediaQuery.of(context).size.width * 0.13,
+          ),
+
+        if (widget.seasonType != 'COLLEGE')
+
           /// USG%
           TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.06
-                : widget.mode == 'PER GAME'
-                    ? MediaQuery.of(context).size.width * 0.13
-                    : MediaQuery.of(context).size.width * 0.16,
+                : MediaQuery.of(context).size.width * 0.13,
           ),
 
         if (widget.seasonType != 'COLLEGE')
@@ -344,7 +342,7 @@ class _CareerStatsState extends State<CareerStats> {
         type: MaterialType.transparency,
         child: InkWell(
           onTap: () {
-            setState(() {
+            if (season['TEAM_ABBREVIATION'] != 'TOT') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -353,7 +351,7 @@ class _CareerStatsState extends State<CareerStats> {
                   ),
                 ),
               );
-            });
+            }
           },
           splashColor: Colors.white,
           highlightColor: Colors.white,
@@ -393,7 +391,7 @@ class _CareerStatsState extends State<CareerStats> {
             return Center(
               child: AutoSizeText(
                 season['SCHOOL_NAME'] ?? '-',
-                style: kBebasBold.copyWith(fontSize: 12.5.r),
+                style: kBebasNormal.copyWith(fontSize: 13.0.r),
               ),
             );
           } else {
@@ -695,8 +693,9 @@ class StandingsDataText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: alignment ?? Alignment.centerRight,
-      child: Text(
+      child: AutoSizeText(
         text,
+        maxLines: 1,
         style: kBebasNormal.copyWith(fontSize: 16.0.r, color: color),
       ),
     );

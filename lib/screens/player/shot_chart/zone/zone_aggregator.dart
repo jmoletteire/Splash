@@ -263,9 +263,9 @@ class ZoneData {
   }
 
   void aggregateShotData(Map<String, dynamic> shot) {
-    FGA += shot['SHOT_ATTEMPTED_FLAG'];
-    FGM += shot['SHOT_MADE_FLAG'];
-    totalDistance += shot['DISTANCE'];
+    FGA += shot['SHOT_ATTEMPTED_FLAG'] ?? 1;
+    FGM += shot['SHOT_MADE_FLAG'] ?? 0;
+    totalDistance += shot['DISTANCE'] ?? 0;
     avgDistance = totalDistance / FGA;
   }
 }

@@ -116,7 +116,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                 ),
                 Column(
                   children: [
-                    SizedBox(height: 55.0.r),
+                    SizedBox(height: 60.0.r),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
