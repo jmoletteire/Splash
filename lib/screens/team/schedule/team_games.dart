@@ -395,7 +395,7 @@ class _TeamGamesState extends State<TeamGames> {
                                     SizedBox(
                                       width: 24.0.r,
                                       height: 24.0.r,
-                                      child: kTeamNames[teamGames[gamesList[index]]['OPP']
+                                      child: kTeamIdToName[teamGames[gamesList[index]]['OPP']
                                                   .toString()] ==
                                               null
                                           ? const Text('')
@@ -408,10 +408,10 @@ class _TeamGamesState extends State<TeamGames> {
                                     ),
                                     SizedBox(width: 15.0.r),
                                     Text(
-                                      kTeamNames[teamGames[gamesList[index]]['OPP']
+                                      kTeamIdToName[teamGames[gamesList[index]]['OPP']
                                                   .toString()] !=
                                               null
-                                          ? kTeamNames[
+                                          ? kTeamIdToName[
                                               teamGames[gamesList[index]]['OPP'].toString()][0]
                                           : 'INT\'L',
                                       style: kBebasBold.copyWith(fontSize: 16.0.r),

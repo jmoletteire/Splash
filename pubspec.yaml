@@ -115,9 +115,13 @@ flutter:
     - family: Anton
       fonts:
         - asset: fonts/Anton/Anton-Regular.ttf
+    - family: Antonio
+      fonts:
+        - asset: fonts/Antonio/Antonio-VariableFont_wght.ttf
     - family: Montserrat
       fonts:
         - asset: fonts/Montserrat-VariableFont_wght.ttf
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

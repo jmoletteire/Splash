@@ -252,7 +252,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                 ];
               },
               pinnedHeaderSliverHeightBuilder: () {
-                return 105.0 + MediaQuery.of(context).padding.top; // 56 + 49 = 105
+                return 104.0 + MediaQuery.of(context).padding.top; // 56 + 49 = 105
               },
               onlyOneScrollInBody: false,
               body: TabBarView(
@@ -410,54 +410,78 @@ class TeamInfo extends StatelessWidget {
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Last Game: ",
-                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                    ),
-                    Text(
-                      "${lastGame['HOME_AWAY']} ",
-                      style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
-                    ),
-                    Text(
-                      "${kTeamNames[lastGame['OPP'].toString()][1]} ",
-                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                    ),
-                    Text(
-                      "(${lastGame['TEAM_PTS'].toString()}-${lastGame['OPP_PTS'].toString()} ",
-                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                    ),
-                    Text(
-                      "${lastGame['RESULT']}",
-                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                    ),
-                    Text(
-                      ")",
-                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text(
-                      "Next Game: ",
-                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                    ),
-                    Text(
-                      "${nextGame['HOME_AWAY']} ",
-                      style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
-                    ),
-                    Text(
-                      "${kTeamNames[nextGame['OPP'].toString()]?[1] ?? 'INT\'L'} ",
-                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                    ),
-                    Text(
-                      "| ${formatDate(nextGame['GAME_DATE'])[0]}, ${formatDate(nextGame['GAME_DATE'])[1]}",
-                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
-                    ),
-                  ],
-                ),
+                if (lastGame.isNotEmpty)
+                  Row(
+                    children: [
+                      Text(
+                        "Last Game: ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "${lastGame['HOME_AWAY']} ",
+                        style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "${kTeamIdToName[lastGame['OPP'].toString()][1]} ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "(${lastGame['TEAM_PTS'].toString()}-${lastGame['OPP_PTS'].toString()} ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "${lastGame['RESULT']}",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        ")",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                if (lastGame.isEmpty)
+                  Row(
+                    children: [
+                      Text(
+                        "Last Game: ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                if (nextGame.isNotEmpty)
+                  Row(
+                    children: [
+                      Text(
+                        "Next Game: ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "${nextGame['HOME_AWAY']} ",
+                        style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "${kTeamIdToName[nextGame['OPP'].toString()]?[1] ?? 'INT\'L'} ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "| ${formatDate(nextGame['GAME_DATE'])[0]}, ${formatDate(nextGame['GAME_DATE'])[1]}",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                if (nextGame.isEmpty)
+                  Row(
+                    children: [
+                      Text(
+                        "Next Game: ",
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
+                      ),
+                      Text(
+                        "TBA",
+                        style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
+                      ),
+                    ],
+                  ),
               ],
             )
           ],

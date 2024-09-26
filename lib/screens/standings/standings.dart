@@ -45,7 +45,17 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   int selectedYear = 2025;
 
   void _initializeTabController(int index) {
-    final int tabLength = selectedYear >= 2023 ? 4 : 3;
+    int tabLength = 2;
+    if (playoffDataNotifier.value.isNotEmpty &&
+        !playoffDataNotifier.value.containsKey('error')) {
+      tabLength += 1;
+    }
+
+    if (selectedYear >= 2024 &&
+        cupDataNotifier.value.isNotEmpty &&
+        !cupDataNotifier.value.containsKey('error')) {
+      tabLength += 1;
+    }
 
     // Dispose the old TabController if it exists
     _tabController.dispose();
@@ -95,15 +105,14 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
         selectedYear = pickedYear;
         selectedSeason =
             '${(selectedYear - 1).toString()}-${selectedYear.toString().substring(2)}';
-
-        int tabIndex = _tabController.index;
-        _initializeTabController(tabIndex);
-
-        setTeams();
-        setDivisions();
-        getPlayoffs(selectedSeason);
-        getNbaCup(selectedSeason);
       });
+      await setTeams();
+      setDivisions();
+      await getPlayoffs(selectedSeason);
+      await getNbaCup(selectedSeason);
+
+      int tabIndex = _tabController.index;
+      _initializeTabController(tabIndex);
     }
   }
 
@@ -130,7 +139,6 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
           divisions[div]!.add(team);
         }
       }
-
       _isLoading = false;
     });
   }
@@ -180,7 +188,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
     return await Future.wait(teamFutures);
   }
 
-  void setTeams() async {
+  Future<void> setTeams() async {
     setState(() {
       _isLoading = true;
     });
@@ -207,15 +215,29 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
     playoffDataNotifier = ValueNotifier<Map<String, dynamic>>({});
     cupDataNotifier = ValueNotifier<Map<String, dynamic>>({});
     selectedSeason = kCurrentSeason;
+
+    int tabLength = 2;
+    if (playoffDataNotifier.value.isNotEmpty &&
+        !playoffDataNotifier.value.containsKey('error')) {
+      tabLength += 1;
+    }
+
+    if (selectedYear >= 2024 &&
+        cupDataNotifier.value.isNotEmpty &&
+        !cupDataNotifier.value.containsKey('error')) {
+      tabLength += 1;
+    }
+    _tabController = TabController(length: tabLength, vsync: this);
+
     setTeams();
     getPlayoffs(selectedSeason);
     getNbaCup(selectedSeason);
-    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController();
     _notifier.addController('standings', _scrollController);

@@ -254,11 +254,11 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     Map<String, dynamic> homeLinescore =
         linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
     Map<String, dynamic> awayLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.awayId ? linescore[0] : linescore[1];
+        linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
 
     String awayTeamId = '0';
 
-    if (kTeamNames.containsKey(widget.awayId.toString())) {
+    if (kTeamIdToName.containsKey(widget.awayId.toString())) {
       awayTeamId = widget.awayId;
     }
 
@@ -308,11 +308,11 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
-                          kTeamNames[awayTeamId] == null
+                          kTeamIdToName[awayTeamId] == null
                               ? Colors.grey
-                              : kTeamColors[kTeamNames[awayTeamId]![1]]![
+                              : kTeamColors[kTeamIdToName[awayTeamId]![1]]![
                                   'primaryColor']!, // Transparent at the top
-                          kTeamColors[kTeamNames[widget.homeId]?[1]]![
+                          kTeamColors[kTeamIdToName[widget.homeId]?[1]]![
                               'primaryColor']!, // Opaque at the bottom
                         ],
                       ),
@@ -322,7 +322,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     left: -MediaQuery.of(context).size.width * 0.5,
                     child: Opacity(
                       opacity:
-                          0.97 - kTeamColorOpacity[kTeamNames[awayTeamId][1]]!['opacity']!,
+                          0.97 - kTeamColorOpacity[kTeamIdToName[awayTeamId][1]]!['opacity']!,
                       child: SvgPicture.asset(
                         'images/NBA_Logos/${awayTeamId}.svg',
                         width: MediaQuery.of(context).size.width / 1.1,
@@ -333,8 +333,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                   Positioned(
                     right: -MediaQuery.of(context).size.width * 0.5,
                     child: Opacity(
-                      opacity:
-                          0.97 - kTeamColorOpacity[kTeamNames[widget.homeId][1]]!['opacity']!,
+                      opacity: 0.97 -
+                          kTeamColorOpacity[kTeamIdToName[widget.homeId][1]]!['opacity']!,
                       child: SvgPicture.asset(
                         'images/NBA_Logos/${widget.homeId}.svg',
                         width: MediaQuery.of(context).size.width / 1.1,

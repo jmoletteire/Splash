@@ -81,7 +81,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                         children: [
                           TextSpan(
                             text:
-                                '${formatDate(lastGame['GAME_DATE'])} - ${lastGame['HOME_AWAY']} ${kTeamNames[lastGame['OPP'].toString()][1]} (${lastGame['TEAM_PTS']}-${lastGame['OPP_PTS']} ',
+                                '${formatDate(lastGame['GAME_DATE'])} - ${lastGame['HOME_AWAY']} ${kTeamIdToName[lastGame['OPP'].toString()][1]} (${lastGame['TEAM_PTS']}-${lastGame['OPP_PTS']} ',
                             style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.grey),
                           ),
                           TextSpan(

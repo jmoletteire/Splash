@@ -222,7 +222,7 @@ class _PlayerContractState extends State<PlayerContract> {
                                       : Colors.white70,
                             ),
                             Image.asset(
-                              'images/NBA_Logos/${kTeamIds[contractTeamIds[year['teamId']]] ?? 0}.png',
+                              'images/NBA_Logos/${kTeamAbbrToId[contractTeamIds[year['teamId']]] ?? 0}.png',
                               width: 18.0.r,
                               height: 18.0.r,
                             )

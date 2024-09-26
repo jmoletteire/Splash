@@ -390,7 +390,7 @@ class _CareerStatsState extends State<CareerStats> {
           if (widget.seasonType == 'COLLEGE') {
             return Center(
               child: AutoSizeText(
-                season['SCHOOL_NAME'] ?? '-',
+                kSchoolNames[season['SCHOOL_NAME']] ?? season['SCHOOL_NAME'] ?? '-',
                 style: kBebasNormal.copyWith(fontSize: 13.0.r),
               ),
             );

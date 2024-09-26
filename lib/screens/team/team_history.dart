@@ -36,12 +36,13 @@ class _TeamHistoryState extends State<TeamHistory> {
   }
 
   String getPlayoffs(dynamic teamSeason) {
-    if (teamSeason['CONF_RANK'] == 0) {
+    if (teamSeason['CONF_RANK'] == 0 &&
+        int.parse(teamSeason['YEAR'].substring(0, 4)) >= 1970) {
       return '-';
     }
 
     // Best-of-7 every round (post-2003)
-    if (int.parse(teamSeason['YEAR'].substring(0, 4)) >= 2003) {
+    if (int.parse(teamSeason['YEAR'].substring(0, 4)) >= 2002) {
       // Play-In (post-2019)
       if (teamSeason['CONF_RANK'] > 10 &&
           int.parse(teamSeason['YEAR'].substring(0, 4)) >= 2019) {
@@ -79,7 +80,7 @@ class _TeamHistoryState extends State<TeamHistory> {
       }
     }
     // Top 2 seeds first round byes (pre-1983)
-    else {
+    else if (int.parse(teamSeason['YEAR'].substring(0, 4)) >= 1970) {
       if (teamSeason['CONF_RANK'] > 8) {
         return '-';
       } else if (teamSeason['CONF_RANK'] <= 2) {
@@ -105,13 +106,19 @@ class _TeamHistoryState extends State<TeamHistory> {
           return 'Won NBA Finals';
         }
       }
+    } else {
+      if (teamSeason['NBA_FINALS_APPEARANCE'] == 'LEAGUE CHAMPION') {
+        return 'Won NBA Finals';
+      } else if (teamSeason['NBA_FINALS_APPEARANCE'] == 'FINALS APPEARANCE') {
+        return 'Lost NBA Finals';
+      }
     }
     return '-';
   }
 
   Color getColor(dynamic teamSeason) {
     // Best-of-7 every round (post-2003)
-    if (int.parse(teamSeason['YEAR'].substring(0, 4)) >= 2003) {
+    if (int.parse(teamSeason['YEAR'].substring(0, 4)) >= 2002) {
       // Play-In (post-2019)
       if (teamSeason['CONF_RANK'] > 10 &&
           int.parse(teamSeason['YEAR'].substring(0, 4)) >= 2019) {
@@ -147,7 +154,7 @@ class _TeamHistoryState extends State<TeamHistory> {
       }
     }
     // Top 2 seeds first round byes (pre-1983)
-    else {
+    else if (int.parse(teamSeason['YEAR'].substring(0, 4)) >= 1970) {
       if (teamSeason['CONF_RANK'] > 8) {
         return Colors.grey.shade900;
       } else if (teamSeason['CONF_RANK'] <= 2) {
@@ -172,6 +179,12 @@ class _TeamHistoryState extends State<TeamHistory> {
         } else if (teamSeason['PO_WINS'] == 15) {
           return Colors.yellow.shade900.withOpacity(0.4);
         }
+      }
+    } else {
+      if (teamSeason['NBA_FINALS_APPEARANCE'] == 'LEAGUE CHAMPION') {
+        return Colors.yellow.shade900.withOpacity(0.4);
+      } else if (teamSeason['NBA_FINALS_APPEARANCE'] == 'FINALS APPEARANCE') {
+        return Colors.blueGrey.withOpacity(0.5);
       }
     }
     return Colors.grey.shade900;
@@ -254,7 +267,56 @@ class _TeamHistoryState extends State<TeamHistory> {
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
-              return Container(
+              String city = seasons[seasonIndex[index]]?['TEAM_CITY'] ?? widget.team['CITY'];
+              String name =
+                  seasons[seasonIndex[index]]?['TEAM_NAME'] ?? widget.team['NICKNAME'];
+
+              // List to hold the widgets to be returned
+              List<Widget> widgets = [];
+
+              // Check if we need to add the season separator
+              if (index == 0 ||
+                  city !=
+                      (seasons[seasonIndex[index - 1]]?['TEAM_CITY'] ?? widget.team['CITY']) ||
+                  name !=
+                      (seasons[seasonIndex[index - 1]]?['TEAM_NAME'] ??
+                          widget.team['NICKNAME'])) {
+                var startYearList = widget.team['team_history']
+                    .where((e) =>
+                        e['TEAM_CITY'] ==
+                            (seasons[seasonIndex[index]]?['TEAM_CITY'] ??
+                                widget.team['CITY']) &&
+                        e['TEAM_NAME'] ==
+                            (seasons[seasonIndex[index]]?['TEAM_NAME'] ??
+                                widget.team['NICKNAME']))
+                    .toList();
+
+                var startYear = startYearList.length > 1
+                    ? startYearList[1]['START_YEAR']
+                    : startYearList.isNotEmpty
+                        ? startYearList[0]['START_YEAR']
+                        : null;
+                var endYear = index == 0
+                    ? kCurrentSeason.substring(0, 4)
+                    : startYearList.length > 1
+                        ? startYearList[1]['END_YEAR']
+                        : startYearList.isNotEmpty
+                            ? startYearList[0]['END_YEAR']
+                            : null;
+
+                widgets.add(
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 8.0.r),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '$city $name   ($startYear - $endYear)',
+                      style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                    ),
+                  ),
+                );
+              }
+
+              Widget seasonContainer = Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
                 height: MediaQuery.sizeOf(context).height * 0.06,
                 decoration: BoxDecoration(
@@ -285,7 +347,9 @@ class _TeamHistoryState extends State<TeamHistory> {
                     Expanded(
                       flex: 1,
                       child: Text(
-                        getStanding(seasons[seasonIndex[index]]['CONF_RANK']!),
+                        getStanding(int.parse(seasonIndex[index].substring(0, 4)) <= 1969
+                            ? seasons[seasonIndex[index]]['DIV_RANK']!
+                            : seasons[seasonIndex[index]]['CONF_RANK']!),
                         textAlign: TextAlign.center,
                         style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
                       ),
@@ -300,6 +364,12 @@ class _TeamHistoryState extends State<TeamHistory> {
                     ),
                   ],
                 ),
+              );
+
+              widgets.add(seasonContainer);
+
+              return Column(
+                children: widgets,
               );
             },
             childCount: seasonIndex.length,

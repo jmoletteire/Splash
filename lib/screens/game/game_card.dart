@@ -220,7 +220,7 @@ class _GameCardState extends State<GameCard> {
                             textBaseline: TextBaseline.alphabetic,
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             children: [
-                              kTeamNames.containsKey(widget.awayTeam.toString())
+                              kTeamIdToName.containsKey(widget.awayTeam.toString())
                                   ? ConstrainedBox(
                                       constraints: BoxConstraints(maxWidth: 24.0.r),
                                       child: Image.asset(
@@ -241,7 +241,7 @@ class _GameCardState extends State<GameCard> {
                                     ),
                               SizedBox(width: 10.0.r),
                               Text(
-                                kTeamNames[widget.awayTeam.toString()]?[0] ??
+                                kTeamIdToName[widget.awayTeam.toString()]?[0] ??
                                     awayLinescore['TEAM_NICKNAME'],
                                 style: kGameCardTextStyle.copyWith(
                                   color: awayLinescore['PTS'] > homeLinescore['PTS']
@@ -333,7 +333,7 @@ class _GameCardState extends State<GameCard> {
                             textBaseline: TextBaseline.alphabetic,
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             children: [
-                              kTeamNames.containsKey(widget.homeTeam.toString())
+                              kTeamIdToName.containsKey(widget.homeTeam.toString())
                                   ? ConstrainedBox(
                                       constraints: BoxConstraints(maxWidth: 24.0.r),
                                       child: Image.asset(
@@ -354,7 +354,7 @@ class _GameCardState extends State<GameCard> {
                                     ),
                               SizedBox(width: 10.0.r),
                               Text(
-                                kTeamNames[widget.homeTeam.toString()][0],
+                                kTeamIdToName[widget.homeTeam.toString()][0],
                                 style: kGameCardTextStyle.copyWith(
                                   color: homeLinescore['PTS'] > awayLinescore['PTS']
                                       ? Colors.white // Home team won

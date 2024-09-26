@@ -36,8 +36,10 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
   late ScrollControllerNotifier _notifier;
   late TabController _tabController;
   List<bool> _isExpandedList = [];
+  List<bool> _isExpandedByAwardList = [];
   List expandableAwards = [];
   List nonExpandableAwards = [];
+  List expandableAwardsByAward = [];
 
   Map<String, String> awards = {
     'Champion': 'NBA Champion',
@@ -213,6 +215,12 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
       awardsByAward = fetchedAward;
       awardsByAward.sort((a, b) =>
           b[awards[selectedAward]!]['SEASON'].compareTo(a[awards[selectedAward]!]['SEASON']));
+      expandableAwardsByAward = awardsByAward
+          .where((a) =>
+              a[awards[selectedAward]]['PLAYERS'].length > 1 &&
+              a[awards[selectedAward]]['DESCRIPTION'] != 'NBA Champion')
+          .toList();
+      _isExpandedByAwardList = List<bool>.filled(expandableAwardsByAward.length, false);
       _isLoadingByAward = false;
     });
   }
@@ -330,6 +338,8 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
               setState(() {
                 selectedAward = newValue!;
                 _scrollController.jumpTo(0);
+                awardsByAward = [];
+                expandableAwardsByAward = [];
                 _isLoadingByAward = true;
               });
               getAwardsByAward(awards[selectedAward]!);
@@ -389,7 +399,8 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
                         delegate: SliverChildListDelegate([
                       for (int i = 0; i < expandableAwards.length; i++)
                         ExpandableAwardCard(
-                          award: expandableAwards[i],
+                          award: expandableAwards[i].value,
+                          isByAward: false,
                           isExpanded: _isExpandedList[i],
                           onExpansionChanged: (isExpanded) {
                             setState(() {
@@ -403,10 +414,26 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
                 CustomScrollView(
                   controller: _scrollController,
                   slivers: [
-                    AwardsByAward(
-                      awards: awardsByAward,
-                      awardName: awards[selectedAward]!,
-                    )
+                    if (expandableAwardsByAward.isEmpty || selectedAward == 'ROTY')
+                      AwardsByAward(
+                        awards: awardsByAward,
+                        awardName: awards[selectedAward]!,
+                      ),
+                    if (expandableAwardsByAward.isNotEmpty && selectedAward != 'ROTY')
+                      SliverList(
+                          delegate: SliverChildListDelegate([
+                        for (int i = 0; i < expandableAwardsByAward.length; i++)
+                          ExpandableAwardCard(
+                            award: expandableAwardsByAward[i][awards[selectedAward]],
+                            isByAward: true,
+                            isExpanded: _isExpandedByAwardList[i],
+                            onExpansionChanged: (isExpanded) {
+                              setState(() {
+                                _isExpandedByAwardList[i] = isExpanded;
+                              });
+                            },
+                          )
+                      ]))
                   ],
                 ),
               ],
@@ -416,13 +443,15 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
 }
 
 class ExpandableAwardCard extends StatefulWidget {
-  final MapEntry<String, dynamic> award;
+  final Map<String, dynamic> award;
+  final bool isByAward;
   final bool isExpanded;
   final ValueChanged<bool> onExpansionChanged;
 
   const ExpandableAwardCard({
     super.key,
     required this.award,
+    required this.isByAward,
     required this.isExpanded,
     required this.onExpansionChanged,
   });
@@ -431,9 +460,13 @@ class ExpandableAwardCard extends StatefulWidget {
   State<ExpandableAwardCard> createState() => _ExpandableAwardCardState();
 }
 
-class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
+class _ExpandableAwardCardState extends State<ExpandableAwardCard>
+    with AutomaticKeepAliveClientMixin {
   bool _isExpanded = false;
   late final ExpandableCardController _controller;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -456,50 +489,81 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
 
   @override
   Widget build(BuildContext context) {
-    List players = widget.award.value['PLAYERS'];
+    List players = widget.award['PLAYERS'];
 
-    if (widget.award.value['PLAYERS'][0]['ALL_NBA_TEAM_NUMBER'] != null) {
-      players.sort((a, b) => a['ALL_NBA_TEAM_NUMBER'].compareTo(b['ALL_NBA_TEAM_NUMBER']));
-    } else if (widget.award.value['PLAYERS'][0]['MONTH'] != null) {
+    Map<String, String> awardMap = {
+      'NBA Champion': 'Champion',
+      'NBA Finals Most Valuable Player': 'Finals MVP',
+      'All-NBA': 'All-NBA',
+      'All-Defensive Team': 'All-Defensive Team',
+      'All-Rookie Team': 'All-Rookie Team',
+      'NBA Most Valuable Player': 'Most Valuable Player',
+      'NBA Defensive Player of the Year': 'Defensive Player of the Year',
+      'NBA Sixth Man of the Year': 'Sixth Man of the Year',
+      'NBA Most Improved Player': 'Most Improved Player',
+      'NBA Rookie of the Year': 'Rookie of the Year',
+      'NBA Clutch Player of the Year': 'Clutch Player of the Year',
+      'NBA All-Star': 'All-Star',
+      'NBA All-Star Most Valuable Player': 'All-Star Game MVP',
+      'NBA In-Season Tournament Most Valuable Player': 'NBA Cup MVP',
+      'NBA In-Season Tournament All-Tournament': 'All-NBA Cup Team',
+      'NBA Player of the Month': 'Player of the Month',
+      'NBA Rookie of the Month': 'Rookie of the Month',
+      'NBA Player of the Week': 'Player of the Week',
+    };
+
+    Map<String, String> positionMap = {
+      'Guard': 'G',
+      'Guard-Forward': 'G-F',
+      'Forward': 'F',
+      'Forward-Guard': 'F-G',
+      'Forward-Center': 'F-C',
+      'Center': 'C',
+      'Center-Forward': 'C-F',
+    };
+
+    // Define the custom order for positions
+    Map<String, int> positionRank = {
+      'G': 1,
+      'G-F': 2,
+      'F-G': 3,
+      'F': 4,
+      'F-C': 5,
+      'C-F': 6,
+      'C': 7
+    };
+
+    if (widget.award['PLAYERS'][0]['ALL_NBA_TEAM_NUMBER'] != null) {
+      players.sort((a, b) {
+        // Compare by conference first
+        int allTeamCompare = a['ALL_NBA_TEAM_NUMBER'].compareTo(b['ALL_NBA_TEAM_NUMBER']);
+        if (allTeamCompare != 0) {
+          return allTeamCompare;
+        } else {
+          // Use the positionRank map to compare by position
+          return (positionRank[positionMap[a['POSITION']]] ?? 0)
+              .compareTo(positionRank[positionMap[b['POSITION']]] ?? 0);
+        }
+      });
+    } else if (widget.award['PLAYERS'][0]['MONTH'] != null) {
       players.sort((a, b) => DateFormat('M/d/yyyy')
           .parse(a['MONTH'])
           .compareTo(DateFormat('M/d/yyyy').parse(b['MONTH'])));
-    } else if (widget.award.value['PLAYERS'][0]['WEEK'] != null) {
+    } else if (widget.award['PLAYERS'][0]['WEEK'] != null) {
       players.sort((a, b) => a['WEEK'].compareTo(b['WEEK']));
+    } else if (widget.award['DESCRIPTION'] == 'NBA All-Star') {
+      players.sort((a, b) {
+        // Compare by conference first
+        int conferenceCompare = a['CONFERENCE'].compareTo(b['CONFERENCE']);
+        if (conferenceCompare != 0) {
+          return conferenceCompare;
+        } else {
+          // Use the positionRank map to compare by position
+          return (positionRank[positionMap[a['POSITION']]] ?? 0)
+              .compareTo(positionRank[positionMap[b['POSITION']]] ?? 0);
+        }
+      });
     }
-
-    Map<String, String> teamMap = {
-      'Atlanta Hawks': '1610612737',
-      'Boston Celtics': '1610612738',
-      'Cleveland Cavaliers': '1610612739',
-      'New Orleans Pelicans': '1610612740',
-      'Chicago Bulls': '1610612741',
-      'Dallas Mavericks': '1610612742',
-      'Denver Nuggets': '1610612743',
-      'Golden State Warriors': '1610612744',
-      'Houston Rockets': '1610612745',
-      'Los Angeles Clippers': '1610612746',
-      'Los Angeles Lakers': '1610612747',
-      'Miami Heat': '1610612748',
-      'Milwaukee Bucks': '1610612749',
-      'Minnesota Timberwolves': '1610612750',
-      'Brooklyn Nets': '1610612751',
-      'New York Knicks': '1610612752',
-      'Orlando Magic': '1610612753',
-      'Indiana Pacers': '1610612754',
-      'Philadelphia 76ers': '1610612755',
-      'Phoenix Suns': '1610612756',
-      'Portland Trail Blazers': '1610612757',
-      'Sacramento Kings': '1610612758',
-      'San Antonio Spurs': '1610612759',
-      'Oklahoma City Thunder': '1610612760',
-      'Toronto Raptors': '1610612761',
-      'Utah Jazz': '1610612762',
-      'Memphis Grizzlies': '1610612763',
-      'Washington Wizards': '1610612764',
-      'Detroit Pistons': '1610612765',
-      'Charlotte Hornets': '1610612766',
-    };
 
     String formatDate(String dateString, String format) {
       if (format == 'WEEK') {
@@ -545,7 +609,9 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                       padding: EdgeInsets.only(left: 8.0.r),
                       alignment: Alignment.centerLeft,
                       child: AutoSizeText(
-                        widget.award.key,
+                        widget.isByAward
+                            ? widget.award['SEASON'] ?? ''
+                            : awardMap[widget.award['DESCRIPTION']] ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: kBebasNormal.copyWith(
@@ -585,6 +651,37 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                                               : players[i]['ALL_NBA_TEAM_NUMBER'] == '2'
                                                   ? 'Second Team'
                                                   : 'Third Team',
+                                          style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (players[i]['DESCRIPTION'] == 'NBA All-Star' &&
+                              (i == 0 ||
+                                  (i > 0 &&
+                                      players[i]['CONFERENCE'] !=
+                                          players[i - 1]['CONFERENCE'])))
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    padding: EdgeInsets.fromLTRB(8.0.r, 15.0.r, 0.0, 8.0.r),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade900,
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey.shade600,
+                                          width: 3,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          players[i]['CONFERENCE'],
                                           style: kBebasNormal.copyWith(fontSize: 15.0.r),
                                         ),
                                       ],
@@ -658,12 +755,21 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard> {
                                           overflow: TextOverflow.ellipsis,
                                           style: kBebasNormal.copyWith(fontSize: 14.0.r),
                                         ),
+                                        AutoSizeText(
+                                          ', ${positionMap[players[i]['POSITION']] ?? ''}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: kBebasNormal.copyWith(
+                                            color: Colors.grey.shade300,
+                                            fontSize: 14.0.r,
+                                          ),
+                                        ),
                                         SizedBox(width: 8.0.r),
                                         SizedBox(
                                           height: 20.0.r,
                                           width: 20.0.r,
                                           child: Image.asset(
-                                              'images/NBA_Logos/${teamMap[players[i]['TEAM']]}.png'),
+                                              'images/NBA_Logos/${kTeamFullNameToId[players[i]['TEAM']] ?? players[i]['TEAM_ID']}.png'),
                                         )
                                       ],
                                     ),

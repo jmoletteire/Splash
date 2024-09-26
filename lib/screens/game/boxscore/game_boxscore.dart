@@ -53,14 +53,16 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
       switch (_boxscoreTabController.index) {
         case 0:
           setState(() {
-            awayContainerColor = kTeamColors[kTeamNames[widget.awayId][1]]!['primaryColor']!;
+            awayContainerColor =
+                kTeamColors[kTeamIdToName[widget.awayId][1]]!['primaryColor']!;
             homeContainerColor = const Color(0xFF1B1B1B);
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         case 2:
           setState(() {
             awayContainerColor = const Color(0xFF1B1B1B);
-            homeContainerColor = kTeamColors[kTeamNames[widget.homeId][1]]!['primaryColor']!;
+            homeContainerColor =
+                kTeamColors[kTeamIdToName[widget.homeId][1]]!['primaryColor']!;
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         default:

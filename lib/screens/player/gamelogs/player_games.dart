@@ -125,7 +125,7 @@ class _PlayerGamesState extends State<PlayerGames> {
         schedule.forEach((key, game) {
           // Parse the GAME_DATE field
           String matchup = game['MATCHUP'].toString();
-          int oppId = int.parse(kTeamIds[matchup.substring(matchup.length - 3)] ?? '0');
+          int oppId = int.parse(kTeamAbbrToId[matchup.substring(matchup.length - 3)] ?? '0');
 
           // Check if the opponent matches
           if (teamIds.contains(oppId.toString())) {
@@ -139,7 +139,7 @@ class _PlayerGamesState extends State<PlayerGames> {
       schedule.forEach((key, game) {
         // Parse the GAME_DATE field
         String matchup = game['MATCHUP'].toString();
-        int oppId = int.parse(kTeamIds[matchup.substring(matchup.length - 3)]!);
+        int oppId = int.parse(kTeamAbbrToId[matchup.substring(matchup.length - 3)]!);
 
         // Check if the opponent matches
         if (oppId == opponentId) {

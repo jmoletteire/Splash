@@ -79,7 +79,7 @@ class _LastMeetingState extends State<LastMeeting> {
     if (!_isLoading) {
       lastHomeId = game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'].toString();
       lastAwayId = game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'].toString();
-      if (!kTeamNames.containsKey(lastAwayId)) {
+      if (!kTeamIdToName.containsKey(lastAwayId)) {
         lastAwayId = '0';
       }
     }

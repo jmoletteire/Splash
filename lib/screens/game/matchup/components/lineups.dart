@@ -328,23 +328,25 @@ class PlayerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlayerHome(
-              playerId: playerId,
+        if (team != '0') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayerHome(
+                playerId: playerId,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Column(
         children: [
           PlayerAvatar(
-            radius: 30,
+            radius: 29.0.r,
             backgroundColor: Colors.grey.shade800,
             playerImageUrl: 'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
           ),
-          const SizedBox(height: 5.0),
+          SizedBox(height: 5.0.r),
           AutoSizeText(
             name,
             maxLines: 1,

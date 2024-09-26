@@ -360,16 +360,20 @@ class _DismissibleTooltipState extends State<DismissibleTooltip> {
               style: TextStyle(
                 color: Colors.white,
                 height: 0.9,
+                letterSpacing: -1,
                 fontSize: 12.0.r,
-                fontFamily: 'Anton',
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w900,
               ),
             ),
             TextSpan(
               text: widget.definition,
               style: TextStyle(
-                color: const Color(0xFFBCBCBC),
-                fontSize: 11.0.r,
-                fontFamily: 'Anton',
+                color: const Color(0xFFCCCCCC),
+                letterSpacing: -0.8,
+                fontSize: 12.0.r,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w600,
               ),
             ),
             if (widget.formula.isNotEmpty)
@@ -377,17 +381,21 @@ class _DismissibleTooltipState extends State<DismissibleTooltip> {
                 text: '\n\nFormula: ',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 11.0.r,
-                  fontFamily: 'Anton',
+                  letterSpacing: -0.8,
+                  fontSize: 12.0.r,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             if (widget.formula.isNotEmpty)
               TextSpan(
                 text: widget.formula,
                 style: TextStyle(
-                  color: const Color(0xFFBCBCBC),
-                  fontSize: 11.0.r,
-                  fontFamily: 'Anton',
+                  color: const Color(0xFFCCCCCC),
+                  letterSpacing: -0.8,
+                  fontSize: 12.0.r,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w600,
                 ),
               ),
           ],
@@ -395,7 +403,7 @@ class _DismissibleTooltipState extends State<DismissibleTooltip> {
         child: Icon(
           Icons.info_outline,
           color: Colors.white70,
-          size: 12.0.r,
+          size: 13.0.r,
         ),
       ),
     );

@@ -159,7 +159,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
                 ),
               ),
             if (transactions.isNotEmpty)
-              for (Map<String, String> trans in transactions)
+              for (int i = 0; i < 5 && i < transactions.length; i++)
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 8.0.r),
                   child: Row(
@@ -169,7 +169,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
                       Expanded(
                         flex: 1,
                         child: Text(
-                          formatDate(trans['date']!),
+                          formatDate(transactions[i]['date']!),
                           style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white),
                         ),
                       ),
@@ -178,7 +178,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
                         flex: 7,
                         child: RichText(
                           text: TextSpan(
-                            children: highlightPlayerNames(trans['transaction']!),
+                            children: highlightPlayerNames(transactions[i]['transaction']!),
                           ),
                         ),
                       ),

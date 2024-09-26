@@ -113,7 +113,7 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
                   Row(
                     children: [
                       Image.asset(
-                        'images/NBA_Logos/${kTeamIds[fanspoTeamIds[transaction['teamId']]] ?? 0}.png',
+                        'images/NBA_Logos/${kTeamAbbrToId[fanspoTeamIds[transaction['teamId']]] ?? 0}.png',
                         width: 30.0.r,
                         height: 30.0.r,
                       ),

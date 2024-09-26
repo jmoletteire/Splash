@@ -36,10 +36,10 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             indicatorSize: TabBarIndicatorSize.tab,
-            indicatorColor:
-                kDarkSecondaryColors.contains(kTeamNames[widget.team['TEAM_ID'].toString()][1])
-                    ? kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!
-                    : kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!,
+            indicatorColor: kDarkSecondaryColors
+                    .contains(kTeamIdToName[widget.team['TEAM_ID'].toString()][1])
+                ? kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!
+                : kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!,
             indicatorWeight: 3.0,
             unselectedLabelColor: Colors.grey,
             labelColor: Colors.white,

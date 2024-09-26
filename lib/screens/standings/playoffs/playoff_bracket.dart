@@ -503,21 +503,21 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             colors: [
-              kTeamNames[series['TEAM_TWO'].toString()] == null
+              kTeamIdToName[series['TEAM_TWO'].toString()] == null
                   ? Colors.grey
                   : teamTwoWinsSeries
                       ? Colors.grey.shade700
-                      : useSecondary.contains(kTeamNames[series['TEAM_ONE'].toString()][1])
-                          ? kTeamColors[kTeamNames[series['TEAM_ONE'].toString()]?[1]]![
+                      : useSecondary.contains(kTeamIdToName[series['TEAM_ONE'].toString()][1])
+                          ? kTeamColors[kTeamIdToName[series['TEAM_ONE'].toString()]?[1]]![
                               'secondaryColor']!
-                          : kTeamColors[kTeamNames[series['TEAM_ONE'].toString()]?[1]]![
+                          : kTeamColors[kTeamIdToName[series['TEAM_ONE'].toString()]?[1]]![
                               'primaryColor']!,
               teamOneWinsSeries
                   ? Colors.grey.shade700
-                  : useSecondary.contains(kTeamNames[series['TEAM_TWO'].toString()][1])
-                      ? kTeamColors[kTeamNames[series['TEAM_TWO'].toString()]?[1]]![
+                  : useSecondary.contains(kTeamIdToName[series['TEAM_TWO'].toString()][1])
+                      ? kTeamColors[kTeamIdToName[series['TEAM_TWO'].toString()]?[1]]![
                           'secondaryColor']!
-                      : kTeamColors[kTeamNames[series['TEAM_TWO'].toString()]?[1]]![
+                      : kTeamColors[kTeamIdToName[series['TEAM_TWO'].toString()]?[1]]![
                           'primaryColor']!,
             ],
           ),
@@ -918,9 +918,9 @@ class BracketPainter extends CustomPainter {
 
     Paint getPaint(String teamId) {
       List<String> useSecondary = ['BKN', 'SAS'];
-      Color teamColor = useSecondary.contains(kTeamNames[teamId][1])
-          ? kTeamColors[kTeamNames[teamId]?[1]]!['secondaryColor']!
-          : kTeamColors[kTeamNames[teamId]?[1]]!['primaryColor']!;
+      Color teamColor = useSecondary.contains(kTeamIdToName[teamId][1])
+          ? kTeamColors[kTeamIdToName[teamId]?[1]]!['secondaryColor']!
+          : kTeamColors[kTeamIdToName[teamId]?[1]]!['primaryColor']!;
       return Paint()
         ..color = teamColor
         ..strokeWidth = 3;

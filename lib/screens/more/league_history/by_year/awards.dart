@@ -171,39 +171,6 @@ class _AwardsState extends State<Awards> {
       'NBA Player of the Week': 'Player of the Week',
     };
 
-    Map<String, String> teamMap = {
-      'Atlanta Hawks': '1610612737',
-      'Boston Celtics': '1610612738',
-      'Cleveland Cavaliers': '1610612739',
-      'New Orleans Pelicans': '1610612740',
-      'Chicago Bulls': '1610612741',
-      'Dallas Mavericks': '1610612742',
-      'Denver Nuggets': '1610612743',
-      'Golden State Warriors': '1610612744',
-      'Houston Rockets': '1610612745',
-      'Los Angeles Clippers': '1610612746',
-      'Los Angeles Lakers': '1610612747',
-      'Miami Heat': '1610612748',
-      'Milwaukee Bucks': '1610612749',
-      'Minnesota Timberwolves': '1610612750',
-      'Brooklyn Nets': '1610612751',
-      'New York Knicks': '1610612752',
-      'Orlando Magic': '1610612753',
-      'Indiana Pacers': '1610612754',
-      'Philadelphia 76ers': '1610612755',
-      'Phoenix Suns': '1610612756',
-      'Portland Trail Blazers': '1610612757',
-      'Sacramento Kings': '1610612758',
-      'San Antonio Spurs': '1610612759',
-      'Oklahoma City Thunder': '1610612760',
-      'Toronto Raptors': '1610612761',
-      'Utah Jazz': '1610612762',
-      'Memphis Grizzlies': '1610612763',
-      'Washington Wizards': '1610612764',
-      'Detroit Pistons': '1610612765',
-      'Charlotte Hornets': '1610612766',
-    };
-
     Map<String, String> positionMap = {
       'Guard': 'G',
       'Guard-Forward': 'G-F',
@@ -214,7 +181,7 @@ class _AwardsState extends State<Awards> {
       'Center-Forward': 'C-F',
     };
 
-    String teamId = teamMap[widget.awards[row].value['PLAYERS'][0]['TEAM']] ?? '0';
+    String teamId = kTeamFullNameToId[widget.awards[row].value['PLAYERS'][0]['TEAM']] ?? '0';
     String position = positionMap[widget.awards[row].value['PLAYERS'][0]['POSITION']] ?? '0';
 
     String awardName = awardMap.containsKey(widget.awards[row].value['DESCRIPTION'] ?? '-')
@@ -253,7 +220,7 @@ class _AwardsState extends State<Awards> {
               widget.awards[row].value['PLAYERS'][0]['TEAM'],
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: kBebasNormal.copyWith(fontSize: 17.5.r),
+              style: kBebasNormal.copyWith(fontSize: 16.0.r),
             ),
           );
         } else {
@@ -271,11 +238,24 @@ class _AwardsState extends State<Awards> {
                 SizedBox(width: 8.0.r),
                 Expanded(
                   flex: 7,
-                  child: AutoSizeText(
-                    '${widget.awards[row].value['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row].value['PLAYERS'][0]['LAST_NAME'] ?? ''}, $position',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                  child: Row(
+                    children: [
+                      AutoSizeText(
+                        '${widget.awards[row].value['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row].value['PLAYERS'][0]['LAST_NAME'] ?? ''}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                      ),
+                      AutoSizeText(
+                        ', ${positionMap[widget.awards[row].value['PLAYERS'][0]['POSITION']] ?? ''}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: kBebasNormal.copyWith(
+                          color: Colors.grey.shade300,
+                          fontSize: 14.0.r,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

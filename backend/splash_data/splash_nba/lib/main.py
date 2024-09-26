@@ -17,7 +17,7 @@ from splash_nba.lib.teams.standings import update_current_standings
 from splash_nba.lib.teams.update_news_and_transactions import fetch_team_transactions, fetch_team_news
 from splash_nba.lib.teams.team_seasons import update_current_season
 from splash_nba.lib.teams.stats.team_hustle_stats_rank import rank_hustle_stats_current_season
-from splash_nba.lib.teams.historic_rosters import update_current_roster
+from splash_nba.lib.teams.team_rosters import update_current_roster
 from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_lineup
 from splash_nba.util.env import uri, k_current_season, k_current_season_type
 

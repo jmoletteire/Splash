@@ -198,7 +198,70 @@ const kLeagueSecondApron = {
 ///                        MAPS
 /// ******************************************************
 
-Map<String, dynamic> kTeamNames = {
+Map<String, String> kTeamFullNameToId = {
+  'Atlanta Hawks': '1610612737',
+  'Boston Celtics': '1610612738',
+  'Cleveland Cavaliers': '1610612739',
+  'New Orleans Pelicans': '1610612740',
+  'Chicago Bulls': '1610612741',
+  'Dallas Mavericks': '1610612742',
+  'Denver Nuggets': '1610612743',
+  'Golden State Warriors': '1610612744',
+  'Houston Rockets': '1610612745',
+  'Los Angeles Clippers': '1610612746',
+  'Los Angeles Lakers': '1610612747',
+  'Miami Heat': '1610612748',
+  'Milwaukee Bucks': '1610612749',
+  'Minnesota Timberwolves': '1610612750',
+  'Brooklyn Nets': '1610612751',
+  'New York Knicks': '1610612752',
+  'Orlando Magic': '1610612753',
+  'Indiana Pacers': '1610612754',
+  'Philadelphia 76ers': '1610612755',
+  'Phoenix Suns': '1610612756',
+  'Portland Trail Blazers': '1610612757',
+  'Sacramento Kings': '1610612758',
+  'San Antonio Spurs': '1610612759',
+  'Oklahoma City Thunder': '1610612760',
+  'Toronto Raptors': '1610612761',
+  'Utah Jazz': '1610612762',
+  'Memphis Grizzlies': '1610612763',
+  'Washington Wizards': '1610612764',
+  'Detroit Pistons': '1610612765',
+  'Charlotte Hornets': '1610612766',
+  // HISTORIC
+  'Tri-Cities Blackhawks': '1610612737',
+  'Milwaukee Hawks': '1610612737',
+  'St. Louis Hawks': '1610612737',
+  'New Orleans Hornets': '1610612740',
+  'New Orleans/Oklahoma City Hornets': '1610612740',
+  'San Francisco Warriors': '1610612744',
+  'Philadelphia Warriors': '1610612744',
+  'San Diego Rockets': '1610612745',
+  'LA Clippers': '1610612746',
+  'San Diego Clippers': '1610612746',
+  'Buffalo Braves': '1610612746',
+  'Minneapolis Lakers': '1610612747',
+  'New Jersey Nets': '1610612751',
+  'New York Nets': '1610612751',
+  'Syracuse Nationals': '1610612755',
+  'Rochester Royals': '1610612758',
+  'Cincinnati Royals': '1610612758',
+  'Kansas City-Omaha Kings': '1610612758',
+  'Kansas City Kings': '1610612758',
+  'Seattle SuperSonics': '1610612760',
+  'New Orleans Jazz': '1610612762',
+  'Vancouver Grizzlies': '1610612763',
+  'Chicago Packers': '1610612764',
+  'Chicago Zephyrs': '1610612764',
+  'Baltimore Bullets': '1610612764',
+  'Capital Bullets': '1610612764',
+  'Washington Bullets': '1610612764',
+  'Ft. Wayne Zollner': '1610612765',
+  'Charlotte Bobcats': '1610612766',
+};
+
+Map<String, dynamic> kTeamIdToName = {
   '0': ['Free Agent', 'FA'],
   '1610612737': ['Hawks', 'ATL'],
   '1610612738': ['Celtics', 'BOS'],
@@ -232,7 +295,7 @@ Map<String, dynamic> kTeamNames = {
   '1610612763': ['Grizzlies', 'MEM']
 };
 
-Map<String, String> kTeamIds = {
+Map<String, String> kTeamAbbrToId = {
   'FA': '0',
   'ATL': '1610612737',
   'BOS': '1610612738',
@@ -1286,7 +1349,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'round': '1',
       'definition':
           'Turnover percentage based on possessions the player was involved rather than possessions the player ended.',
-      'formula': 'TOV / (LOAD% * 100)'
+      'formula': 'TOV per 100 / (LOAD% * 100)'
     },
     'fill3': {'first_available': '2013'},
     'TOUCHES': {
@@ -2663,7 +2726,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'round': '1',
       'definition':
           'Percentage of rebounds gathered when given a rebound chance on offense; excludes all deferred rebounds.',
-      'formula': '(OREB)/(OREB Chances - Deferred OREB Chances)'
+      'formula': 'OREB / (OREB Chances - Deferred OREB Chances)'
     },
     'ADJ DREB CHANCE %': {
       'location': ['ADV', 'REBOUNDING'],
@@ -2682,7 +2745,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'round': '1',
       'definition':
           'Percentage of rebounds gathered when given a rebound chance on defense; excludes all deferred rebounds.',
-      'formula': '(DREB)/(DREB Chances - Deferred DREB Chances)'
+      'formula': 'DREB / (DREB Chances - Deferred DREB Chances)'
     },
     'fill4': {'first_available': '2016'},
     'BOX OUTS': {
@@ -2945,13 +3008,13 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
         'rank_nba_name': 'AST_TO_PASS_PCT_ADJ_RANK',
       },
       'splash_name': 'Adj AST - Pass %',
-      'full_name': 'Adj Assist to Pass Ratio',
+      'full_name': 'Adjusted Assist to Pass Ratio',
       'first_available': '2013',
       'convert': 'true',
       'round': '1',
       'definition':
           'The percentage of passes by a player that are assists, free throw assists, or secondary assists.',
-      'formula': 'ADJ AST / Passes'
+      'formula': 'Adj AST / Passes'
     },
   },
   'DEFENSE': {
@@ -3028,7 +3091,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'convert': 'false',
       'round': '1',
       'definition':
-          'Difference in opponent ORTG vs. expected, based on whom this player guarded. For example, if player A\'s team normally has a 110.0 ORTG when he is on the court, but it drops to 108.0 when player B is guarding him, then player B\'s DIE is 2.0.\n\nOver a full season, this tells us how many points a player may have "saved" per 100 possessions on defense.',
+          'Difference in opponent ORTG vs. expected, based on whom this player guarded. For example, if player A\'s team ORTG is 110.0 when he is on the court, but drops to 108.0 when player B is guarding him, then player B\'s DIE is 2.0.\n\nOver a full season, it estimates the number of points a player "saved" per 100 possessions on defense.',
       'formula': ''
     },
     'fill': {'first_available': '2016'},
@@ -3395,6 +3458,11 @@ const List<String> kDarkPrimaryColors = [
 ];
 
 const List<String> kDarkSecondaryColors = ['CHA', 'CHI', 'DET', 'POR', 'TOR'];
+
+const Map<String, String> kSchoolNames = {
+  'Central Florida': 'UCF',
+  'California-Los Angeles': 'UCLA',
+};
 
 const Map<String, String> kCountryCodes = {
   "Andorra": "AD",

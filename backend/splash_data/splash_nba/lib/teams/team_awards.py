@@ -59,7 +59,7 @@ def player_award_details():
                     try:
                         team_id = result['STATS'][award_data['SEASON']]['REGULAR SEASON']['BASIC']['TEAM_ID']
 
-                        team_data = teams_collection.find_one({'TEAM_ID': team_id}, {'STANDINGS': 1, '_id': 0})
+                        team_data = teams_collection.find_one({'TEAM_ID': team_id}, {'seasons': 1, '_id': 0})
                         conf = team_data['seasons'][award_data['SEASON']]['STANDINGS']['Conference']
                     except KeyError:
                         team_id = '0'

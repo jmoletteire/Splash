@@ -190,7 +190,7 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                       : kTeamColors[series['highSeedTricode']]!['primaryColor']!,
               teamOneWinsSeries
                   ? Colors.grey.shade700
-                  : useSecondary.contains(kTeamNames[series['lowSeedTricode']])
+                  : useSecondary.contains(kTeamIdToName[series['lowSeedTricode']])
                       ? kTeamColors[series['lowSeedTricode']]!['secondaryColor']!
                       : kTeamColors[series['lowSeedTricode']]!['primaryColor']!,
             ],

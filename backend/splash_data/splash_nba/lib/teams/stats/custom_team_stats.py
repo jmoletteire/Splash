@@ -104,7 +104,7 @@ def three_and_ft_rate(seasons, season_type):
         if team_id != 0:
             logging.info(f'Processing team {team_id}...')
             for season in document['seasons']:
-                if season >= '1996-97':
+                if season in seasons:
                     try:
                         # Extract the values needed for calculation
                         fg3a = document['seasons'][season]['STATS'][season_type]['BASIC'].get('FG3A', 0)

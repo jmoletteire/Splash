@@ -51,14 +51,16 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
       switch (_tabController.index) {
         case 0:
           setState(() {
-            awayContainerColor = kTeamColors[kTeamNames[widget.awayId][1]]!['primaryColor']!;
+            awayContainerColor =
+                kTeamColors[kTeamIdToName[widget.awayId][1]]!['primaryColor']!;
             homeContainerColor = const Color(0xFF1B1B1B);
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         case 2:
           setState(() {
             awayContainerColor = const Color(0xFF1B1B1B);
-            homeContainerColor = kTeamColors[kTeamNames[widget.homeId][1]]!['primaryColor']!;
+            homeContainerColor =
+                kTeamColors[kTeamIdToName[widget.homeId][1]]!['primaryColor']!;
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         default:
@@ -120,8 +122,8 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
           controller: _tabController,
           indicator: CustomTabIndicator(
             controller: _tabController,
-            homeTeam: kTeamNames[widget.homeId][1],
-            awayTeam: kTeamNames[widget.awayId][1],
+            homeTeam: kTeamIdToName[widget.homeId][1],
+            awayTeam: kTeamIdToName[widget.awayId][1],
           ),
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
@@ -141,7 +143,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                     ),
                     margin: const EdgeInsets.only(bottom: 3.0),
                     child: Tab(
-                      text: kTeamNames[widget.awayId][0],
+                      text: kTeamIdToName[widget.awayId][0],
                     ),
                   ),
                 ),
@@ -173,7 +175,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                       ),
                     ),
                     child: Tab(
-                      text: kTeamNames[widget.homeId][0],
+                      text: kTeamIdToName[widget.homeId][0],
                     ),
                   ),
                 ),

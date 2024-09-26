@@ -55,6 +55,8 @@ def update_current_season(team_id):
                 {"TEAM_ID": team_id},
                 {"$set": {
                     f"seasons.{k_current_season}.TEAM_ID": season_stats_dict[k_current_season]['TEAM_ID'],
+                    f"seasons.{k_current_season}.TEAM_CITY": season_stats_dict[k_current_season]['TEAM_CITY'],
+                    f"seasons.{k_current_season}.TEAM_NAME": season_stats_dict[k_current_season]['TEAM_NAME'],
                     f"seasons.{k_current_season}.YEAR": season_stats_dict[k_current_season]['YEAR'],
                     f"seasons.{k_current_season}.GP": season_stats_dict[k_current_season]['GP'],
                     f"seasons.{k_current_season}.WINS": season_stats_dict[k_current_season]['WINS'],
@@ -100,7 +102,7 @@ def fetch_all_seasons(team_id):
     season_stats_dict = {
         season_dict['YEAR']: dict(list(season_dict.items())[:15])
         for season_dict in team_seasons_list
-        if int(season_dict['YEAR'][:4]) >= 1980
+        if int(season_dict['YEAR'][:4]) < 1980
     }
 
     for season in season_stats_dict.keys():
@@ -112,12 +114,12 @@ def fetch_all_seasons(team_id):
 
         logging.info(f"Processed {season} for {team_id}")
 
-    # Update SEASONS for this team
-    teams_collection.update_one(
-        {"TEAM_ID": team_id},
-        {"$set": {"seasons": season_stats_dict}},
-        upsert=True
-    )
+        # Update SEASONS for this team
+        teams_collection.update_one(
+            {"TEAM_ID": team_id},
+            {"$set": {f"seasons.{season}": season_stats_dict[season]}},
+            upsert=True
+        )
     logging.info(f"Fetched seasons for team {team_id}\n")
 
 
@@ -139,9 +141,9 @@ if __name__ == "__main__":
         # Loop through all documents in the collection
         for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, "_id": 0})):
             team = doc['TEAM_ID']
-            update_current_season(team)
-            # fetch_all_seasons(team)
+            #update_current_season(team)
+            fetch_all_seasons(team)
             # time.sleep(30)
-        rank_hustle_stats_current_season()
+        #rank_hustle_stats_current_season()
     except Exception as e:
         logging.error(f"Error updating team seasons: {e}")

@@ -422,7 +422,8 @@ class _CapSheetState extends State<CapSheet> {
                   MaterialPageRoute(
                     builder: (context) => PlayerHome(
                       playerId: contracts[row]['playerId'],
-                      teamId: kTeamIds[contractTeamIds[contracts[row]['player']['teamId']]],
+                      teamId:
+                          kTeamAbbrToId[contractTeamIds[contracts[row]['player']['teamId']]],
                     ),
                   ),
                 );
