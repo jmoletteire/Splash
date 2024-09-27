@@ -57,6 +57,10 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
       tabLength += 1;
     }
 
+    if (index > tabLength - 1) {
+      index = 0;
+    }
+
     // Dispose the old TabController if it exists
     _tabController.dispose();
 
@@ -72,7 +76,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
           backgroundColor: Colors.grey.shade900,
           title: Text(
             'Season',
-            style: kBebasBold.copyWith(fontSize: 16.0.r),
+            style: kBebasBold.copyWith(fontSize: 18.0.r),
           ),
           content: SizedBox(
             width: double.minPositive,
@@ -84,7 +88,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                     onPrimary: Colors.white, // Selected item text color
                     onSurface: Colors.white, // Unselected item text color
                   ),
-                  textTheme: TextTheme(bodyLarge: kBebasNormal.copyWith(fontSize: 16.0.r))),
+                  textTheme: TextTheme(bodyLarge: kBebasNormal.copyWith(fontSize: 18.0.r))),
               child: YearPicker(
                 currentDate: DateTime(2025),
                 firstDate: DateTime(1981),

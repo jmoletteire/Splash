@@ -85,7 +85,7 @@ class _MoreState extends State<More> {
                   SizedBox(width: 10.0.r),
                   Text(
                     pageName,
-                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                    style: kBebasNormal.copyWith(fontSize: 17.0.r),
                   ),
                   Expanded(
                     child: Row(

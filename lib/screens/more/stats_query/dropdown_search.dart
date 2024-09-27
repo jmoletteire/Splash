@@ -107,7 +107,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
                         shrinkWrap: true,
                         physics:
                             const NeverScrollableScrollPhysics(), // Disable GridView scrolling
-                        crossAxisCount: isLandscape ? 3.0.r.ceil() : 3.0.r.floor(),
+                        crossAxisCount: 3.0.r.ceil(),
                         mainAxisSpacing: 10.0.r,
                         crossAxisSpacing: 10.0.r,
                         children: entry.value.map((item) {

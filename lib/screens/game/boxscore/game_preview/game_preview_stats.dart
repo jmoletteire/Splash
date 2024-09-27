@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_leaders.dart';
 import 'package:splash/screens/game/boxscore/team_player_stats.dart';
@@ -114,6 +115,13 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
 
   @override
   Widget build(BuildContext context) {
+    var linescore = widget.game['SUMMARY']['LineScore'];
+
+    Map<String, dynamic> homeLinescore =
+        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+    Map<String, dynamic> awayLinescore =
+        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
+
     return Column(
       children: [
         TabBar(
@@ -127,7 +135,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
           ),
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
-          labelStyle: kBebasNormal,
+          labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
           tabs: <Widget>[
             Row(
               children: [
@@ -143,7 +151,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                     ),
                     margin: const EdgeInsets.only(bottom: 3.0),
                     child: Tab(
-                      text: kTeamIdToName[widget.awayId][0],
+                      text: awayLinescore['TEAM_NAME'],
                     ),
                   ),
                 ),
@@ -175,7 +183,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                       ),
                     ),
                     child: Tab(
-                      text: kTeamIdToName[widget.homeId][0],
+                      text: homeLinescore['TEAM_NAME'],
                     ),
                   ),
                 ),
