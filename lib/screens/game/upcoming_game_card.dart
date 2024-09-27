@@ -62,19 +62,19 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
 
         return Text(
           'Game $gameNum - $conf ${poRounds[roundId]}',
-          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       case 'Play-In':
         return Text(
           'Play-In Tourney',
-          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       case 'In-Season Tournament':
         return Text(
           'Emirates NBA Cup Final',
-          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       default:
@@ -169,7 +169,7 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                           Text(
                             summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
                             style: kBebasBold.copyWith(
-                                fontSize: 12.0.r, color: Colors.grey.shade300),
+                                fontSize: 14.0.r, color: Colors.grey.shade300),
                             textAlign: TextAlign.start,
                           ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
@@ -212,7 +212,7 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                                   summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT'])
                               : '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ',
                       style: kBebasNormal.copyWith(
-                          fontSize: 13.0.r,
+                          fontSize: 14.0.r,
                           color: summary['GAME_STATUS_TEXT'] == 'Final' ||
                                   summary['LIVE_PERIOD'] == 0
                               ? Colors.grey.shade300
@@ -229,26 +229,6 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  /*
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0.0, 3.0.r, 10.0.r, 0.0),
-                      child: kTeamNames.containsKey(widget.awayTeam.toString())
-                          ? ConstrainedBox(
-                              constraints: BoxConstraints(maxWidth: 26.0.r),
-                              child: Image.asset(
-                                'images/NBA_Logos/${widget.awayTeam}.png',
-                                fit: BoxFit.contain,
-                                width: 24.0.r,
-                                height: 24.0.r,
-                              ),
-                            )
-                          : const Text(''),
-                    ),
-                  ),
-
-                   */
                   Expanded(
                     flex: 8,
                     child: Row(
@@ -262,21 +242,21 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                             children: [
                               kTeamIdToName.containsKey(widget.awayTeam.toString())
                                   ? ConstrainedBox(
-                                      constraints: BoxConstraints(maxWidth: 24.0.r),
+                                      constraints: BoxConstraints(maxWidth: 26.0.r),
                                       child: Image.asset(
                                         'images/NBA_Logos/${widget.awayTeam}.png',
                                         fit: BoxFit.contain,
-                                        width: 24.0.r,
-                                        height: 24.0.r,
+                                        width: 26.0.r,
+                                        height: 26.0.r,
                                       ),
                                     )
                                   : ConstrainedBox(
-                                      constraints: BoxConstraints(maxWidth: 24.0.r),
+                                      constraints: BoxConstraints(maxWidth: 26.0.r),
                                       child: Image.asset(
                                         'images/NBA_Logos/0.png',
                                         fit: BoxFit.contain,
-                                        width: 24.0.r,
-                                        height: 24.0.r,
+                                        width: 26.0.r,
+                                        height: 26.0.r,
                                       ),
                                     ),
                               SizedBox(width: 10.0.r),
@@ -291,7 +271,7 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                               SizedBox(width: 4.0.r),
                               Text(
                                 awayLinescore['TEAM_WINS_LOSSES'],
-                                style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
+                                style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                               ),
                             ],
                           ),
@@ -317,7 +297,7 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                                 child: Text(
                                   '206.5',
                                   textAlign: TextAlign.right,
-                                  style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
+                                  style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                                 ),
                               ),
                             ],
@@ -334,24 +314,6 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  /*
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0.0, 3.0.r, 10.0.r, 0.0),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: 24.0.r),
-                        child: Image.asset(
-                          'images/NBA_Logos/${widget.homeTeam}.png',
-                          fit: BoxFit.contain,
-                          width: 24.0.r,
-                          height: 24.0.r,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                   */
                   Expanded(
                     flex: 8,
                     child: Row(
@@ -369,8 +331,8 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                                       child: Image.asset(
                                         'images/NBA_Logos/${widget.homeTeam}.png',
                                         fit: BoxFit.contain,
-                                        width: 24.0.r,
-                                        height: 24.0.r,
+                                        width: 26.0.r,
+                                        height: 26.0.r,
                                       ),
                                     )
                                   : ConstrainedBox(
@@ -378,8 +340,8 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                                       child: Image.asset(
                                         'images/NBA_Logos/0.png',
                                         fit: BoxFit.contain,
-                                        width: 24.0.r,
-                                        height: 24.0.r,
+                                        width: 26.0.r,
+                                        height: 26.0.r,
                                       ),
                                     ),
                               SizedBox(width: 10.0.r),
@@ -393,7 +355,7 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                               SizedBox(width: 4.0.r),
                               Text(
                                 homeLinescore['TEAM_WINS_LOSSES'],
-                                style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
+                                style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                               ),
                             ],
                           ),
@@ -419,7 +381,7 @@ class _UpcomingGameCardState extends State<UpcomingGameCard> {
                                 child: Text(
                                   '-6.5',
                                   textAlign: TextAlign.right,
-                                  style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
+                                  style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                                 ),
                               ),
                             ],

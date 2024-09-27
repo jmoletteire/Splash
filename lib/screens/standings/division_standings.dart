@@ -214,7 +214,7 @@ class _DivisionStandingsState extends State<DivisionStandings> {
                 alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
                 child: Text('${widget.columnNames[column]}',
                     style: kBebasNormal.copyWith(
-                      fontSize: 18.0,
+                      fontSize: 16.0.r,
                     )),
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../components/player_avatar.dart';
 import '../../../utilities/constants.dart';
@@ -105,9 +106,9 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
             ),
           ),
           child: DropdownButton<String>(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            padding: EdgeInsets.symmetric(horizontal: 15.0.r),
             borderRadius: BorderRadius.circular(10.0),
-            menuMaxHeight: 300.0,
+            menuMaxHeight: 300.0.r,
             dropdownColor: Colors.grey.shade900,
             isExpanded: true,
             underline: Container(),
@@ -117,7 +118,7 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
                 value: value,
                 child: Text(
                   value,
-                  style: kBebasOffWhite,
+                  style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
                 ),
               );
             }).toList(),

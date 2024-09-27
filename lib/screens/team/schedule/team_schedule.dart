@@ -168,7 +168,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                             child: Text(
                                               'Done',
                                               style: kBebasNormal.copyWith(
-                                                  fontSize: 16.0.r, color: teamColor),
+                                                  fontSize: 18.0.r, color: teamColor),
                                             ),
                                           ),
                                         ],

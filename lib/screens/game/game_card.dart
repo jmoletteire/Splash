@@ -59,19 +59,19 @@ class _GameCardState extends State<GameCard> {
 
         return Text(
           'Game $gameNum - $conf ${poRounds[roundId]}',
-          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       case 'Play-In':
         return Text(
           'Play-In Tourney',
-          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       case 'In-Season Tournament':
         return Text(
           'Emirates NBA Cup Final',
-          style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.white70),
           textAlign: TextAlign.center,
         );
       default:
@@ -133,7 +133,7 @@ class _GameCardState extends State<GameCard> {
                           Text(
                             summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
                             style: kBebasBold.copyWith(
-                                fontSize: 12.0.r, color: Colors.grey.shade300),
+                                fontSize: 14.0.r, color: Colors.grey.shade300),
                             textAlign: TextAlign.start,
                           ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
@@ -174,7 +174,7 @@ class _GameCardState extends State<GameCard> {
                           ? summary['GAME_STATUS_TEXT']
                           : '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ',
                       style: kBebasNormal.copyWith(
-                          fontSize: 13.0.r,
+                          fontSize: 14.0.r,
                           color: summary['GAME_STATUS_TEXT'] == 'Final'
                               ? Colors.grey.shade300
                               : Colors.white),
@@ -255,7 +255,7 @@ class _GameCardState extends State<GameCard> {
                               SizedBox(width: 4.0.r),
                               Text(
                                 awayLinescore['TEAM_WINS_LOSSES'],
-                                style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
+                                style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                               ),
                             ],
                           ),
@@ -288,7 +288,7 @@ class _GameCardState extends State<GameCard> {
                                 child: Text(
                                   '206.5',
                                   textAlign: TextAlign.right,
-                                  style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
+                                  style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                                 ),
                               ),
                             ],
@@ -367,7 +367,7 @@ class _GameCardState extends State<GameCard> {
                               SizedBox(width: 4.0.r),
                               Text(
                                 homeLinescore['TEAM_WINS_LOSSES'],
-                                style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
+                                style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                               ),
                             ],
                           ),
@@ -400,7 +400,7 @@ class _GameCardState extends State<GameCard> {
                                 child: Text(
                                   '-6.5',
                                   textAlign: TextAlign.right,
-                                  style: kGameCardTextStyle.copyWith(fontSize: 13.0.r),
+                                  style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                                 ),
                               ),
                             ],

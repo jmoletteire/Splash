@@ -102,7 +102,7 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                         value: value,
                         child: Text(
                           value,
-                          style: kBebasNormal,
+                          style: kBebasNormal.copyWith(fontSize: 18.0.r),
                         ),
                       );
                     }).toList(),

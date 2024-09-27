@@ -437,6 +437,7 @@ class FullCourtPainter extends CustomPainter {
         paint,
       );
 
+      /*
       // Left Hash
       canvas.drawLine(
         Offset(0, courtHeight - (courtHeight * 28 / 47)),
@@ -450,6 +451,8 @@ class FullCourtPainter extends CustomPainter {
         Offset(courtWidth, courtHeight - (courtHeight * (28 / 47))),
         paint,
       );
+
+       */
 
       // Draw baseline
       canvas.drawLine(

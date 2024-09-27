@@ -321,7 +321,7 @@ class _TeamGamesState extends State<TeamGames> {
                               seasonTypes[teamGames[gamesList[index]]['SEASON_ID']
                                   .toString()
                                   .substring(0, 1)]!,
-                              style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                              style: kBebasNormal.copyWith(fontSize: 13.0.r),
                             ),
                           ),
                         );
@@ -371,11 +371,11 @@ class _TeamGamesState extends State<TeamGames> {
                                     Text(
                                       gameDate[0],
                                       style: kBebasNormal.copyWith(
-                                          fontSize: 11.0.r, color: Colors.white70),
+                                          fontSize: 12.0.r, color: Colors.white70),
                                     ),
                                     Text(
                                       gameDate[1],
-                                      style: kBebasNormal.copyWith(fontSize: 11.0.r),
+                                      style: kBebasNormal.copyWith(fontSize: 12.0.r),
                                     ),
                                   ],
                                 ),
@@ -389,7 +389,7 @@ class _TeamGamesState extends State<TeamGames> {
                                       width: 30.0.r,
                                       child: Text(
                                         teamGames[gamesList[index]]['HOME_AWAY'],
-                                        style: kBebasBold.copyWith(fontSize: 12.0.r),
+                                        style: kBebasBold.copyWith(fontSize: 14.0.r),
                                       ),
                                     ),
                                     SizedBox(
@@ -402,8 +402,8 @@ class _TeamGamesState extends State<TeamGames> {
                                           : Image.asset(
                                               'images/NBA_Logos/${teamGames[gamesList[index]]['OPP']}.png',
                                               fit: BoxFit.contain,
-                                              width: 16.0.r,
-                                              height: 16.0.r,
+                                              width: 18.0.r,
+                                              height: 18.0.r,
                                             ),
                                     ),
                                     SizedBox(width: 15.0.r),
@@ -440,7 +440,7 @@ class _TeamGamesState extends State<TeamGames> {
                                         teamGames[gamesList[index]]['BROADCAST'],
                                         textAlign: TextAlign.end,
                                         style: kBebasNormal.copyWith(
-                                            fontSize: 11.0.r, color: Colors.grey),
+                                            fontSize: 12.0.r, color: Colors.grey),
                                       ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
@@ -453,7 +453,7 @@ class _TeamGamesState extends State<TeamGames> {
                                                   teamGames[gamesList[index]]['RESULT'])
                                               : teamGames[gamesList[index]]['RESULT'],
                                           style: kBebasNormal.copyWith(
-                                            fontSize: 12.0.r,
+                                            fontSize: 13.0.r,
                                             color: teamGames[gamesList[index]]['RESULT'] == 'W'
                                                 ? Colors.green
                                                 : teamGames[gamesList[index]]['RESULT'] == 'L'
@@ -469,7 +469,7 @@ class _TeamGamesState extends State<TeamGames> {
                                               Text(
                                                 teamGames[gamesList[index]]['TEAM_PTS']
                                                     .toString(),
-                                                style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                style: kBebasNormal.copyWith(fontSize: 13.0.r),
                                               ),
                                               SizedBox(
                                                 width: 10.0.r,
@@ -477,13 +477,13 @@ class _TeamGamesState extends State<TeamGames> {
                                                   '-',
                                                   textAlign: TextAlign.center,
                                                   style:
-                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                      kBebasNormal.copyWith(fontSize: 13.0.r),
                                                 ),
                                               ),
                                               Text(
                                                 teamGames[gamesList[index]]['OPP_PTS']
                                                     .toString(),
-                                                style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                style: kBebasNormal.copyWith(fontSize: 13.0.r),
                                               ),
                                             ],
                                           )

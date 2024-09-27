@@ -49,7 +49,7 @@ class _TeamStatCardState extends State<TeamStatCard> {
 
     return Card(
       clipBehavior: Clip.hardEdge,
-      margin: const EdgeInsets.fromLTRB(11.0, 0.0, 11.0, 11.0),
+      margin: EdgeInsets.fromLTRB(11.0.r, 0.0, 11.0.r, 11.0.r),
       color: Colors.grey.shade900,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -69,7 +69,7 @@ class _TeamStatCardState extends State<TeamStatCard> {
                 backgroundColor: Colors.transparent,
                 headerBuilder: (BuildContext context, bool isExpanded) {
                   return Padding(
-                    padding: const EdgeInsets.only(left: 15.0),
+                    padding: EdgeInsets.only(left: 15.0.r),
                     child: Row(
                       children: [
                         Expanded(
@@ -88,7 +88,7 @@ class _TeamStatCardState extends State<TeamStatCard> {
                   );
                 },
                 body: Padding(
-                  padding: const EdgeInsets.fromLTRB(15.0, 0.0, 5.0, 15.0),
+                  padding: EdgeInsets.fromLTRB(15.0.r, 0.0, 5.0.r, 15.0.r),
                   child: Column(
                     children: [
                       /*
@@ -243,7 +243,7 @@ class StatisticRow extends StatelessWidget {
                   textAlign: TextAlign.start,
                   style: TextStyle(
                     fontFamily: 'Anton',
-                    fontSize: 10.5.r,
+                    fontSize: 11.5.r,
                     letterSpacing: 0.0,
                     color: Color(0xFFCFCFCF),
                   ),
@@ -284,7 +284,7 @@ class StatisticRow extends StatelessWidget {
                         ? '${value.toStringAsFixed(int.parse(round))}%'
                         : value.toStringAsFixed(int.parse(round)),
                 textAlign: TextAlign.right,
-                style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                style: kBebasNormal.copyWith(fontSize: 15.0.r),
               );
             },
           ),
@@ -323,7 +323,7 @@ class StatisticRow extends StatelessWidget {
               return Text(
                 value.toString(),
                 textAlign: TextAlign.center,
-                style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                style: kBebasNormal.copyWith(fontSize: 15.0.r),
               );
             },
           ),
@@ -386,15 +386,15 @@ class _DismissibleTooltipState extends State<DismissibleTooltip> {
               style: TextStyle(
                 color: Colors.white,
                 height: 0.9,
-                fontSize: 12.0.r,
+                fontSize: 13.0.r,
                 fontFamily: 'Anton',
               ),
             ),
             TextSpan(
               text: widget.definition,
               style: TextStyle(
-                color: Color(0xFFBCBCBC),
-                fontSize: 11.0.r,
+                color: const Color(0xFFBCBCBC),
+                fontSize: 12.0.r,
                 fontFamily: 'Anton',
               ),
             ),
@@ -403,7 +403,7 @@ class _DismissibleTooltipState extends State<DismissibleTooltip> {
                 text: '\n\nFormula: ',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 11.0.r,
+                  fontSize: 12.0.r,
                   fontFamily: 'Anton',
                 ),
               ),
@@ -412,7 +412,7 @@ class _DismissibleTooltipState extends State<DismissibleTooltip> {
                 text: widget.formula,
                 style: TextStyle(
                   color: Color(0xFFBCBCBC),
-                  fontSize: 11.0.r,
+                  fontSize: 12.0.r,
                   fontFamily: 'Anton',
                 ),
               ),
@@ -421,7 +421,7 @@ class _DismissibleTooltipState extends State<DismissibleTooltip> {
         child: Icon(
           Icons.info_outline,
           color: Colors.white70,
-          size: 12.0.r,
+          size: 13.0.r,
         ),
       ),
     );

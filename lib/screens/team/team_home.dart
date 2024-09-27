@@ -215,7 +215,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
-                      labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+                      labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
                       tabs: const [
                         Tab(text: 'Overview'),
                         Tab(text: 'Schedule'),
@@ -376,7 +376,7 @@ class TeamInfo extends StatelessWidget {
           children: [
             //if (team['TEAM_ID'] == 1610612761)
             ConstrainedBox(
-              constraints: BoxConstraints(minWidth: 110.0, maxWidth: 120.0),
+              constraints: BoxConstraints(minWidth: 110.0.r, maxWidth: 120.0.r),
               child: SvgPicture.asset(
                 'images/NBA_Logos/${team['TEAM_ID']}.svg',
                 width: isLandscape

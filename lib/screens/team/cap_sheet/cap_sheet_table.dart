@@ -349,7 +349,7 @@ class _CapSheetState extends State<CapSheet> {
                       Text(
                         columnNames[column],
                         style: kBebasNormal.copyWith(
-                          fontSize: 16.0,
+                          fontSize: 14.0,
                         ),
                       ),
                       if (_sortedColumnIndex == column)
@@ -519,7 +519,7 @@ class _CapSheetState extends State<CapSheet> {
             children: [
               SizedBox(width: 8.0.r),
               PlayerAvatar(
-                radius: 10.0.r,
+                radius: 12.0.r,
                 backgroundColor: Colors.white70,
                 playerImageUrl:
                     'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['player']['id']}.png',
@@ -531,7 +531,7 @@ class _CapSheetState extends State<CapSheet> {
                   '${player['player']['firstName'].toString().substring(0, 1)}. ${player['player']['lastName']}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
                 ),
               ),
             ],
@@ -720,7 +720,7 @@ class _CapSheetState extends State<CapSheet> {
                 ),
                 child: Text(
                   restrictedFreeAgent ? 'RFA' : 'UFA',
-                  style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
                 ),
               ),
             );
@@ -754,7 +754,7 @@ class CapSheetText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasNormal.copyWith(fontSize: 15.0.r, color: color ?? Colors.white),
+        style: kBebasNormal.copyWith(fontSize: 17.0.r, color: color ?? Colors.white),
       ),
     );
   }

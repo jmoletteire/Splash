@@ -276,23 +276,29 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 children: [
                   if (_showImages) ...[
                     if (awayTeamId == '0')
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.045),
-                    Image.asset(
-                      'images/NBA_Logos/$awayTeamId.png',
-                      width: awayTeamId == '0' ||
-                              MediaQuery.of(context).orientation == Orientation.landscape
-                          ? MediaQuery.of(context).size.width * 0.0375
-                          : MediaQuery.of(context).size.width * 0.09,
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.05),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
+                      child: Image.asset(
+                        'images/NBA_Logos/$awayTeamId.png',
+                        width: awayTeamId == '0' ||
+                                MediaQuery.of(context).orientation == Orientation.landscape
+                            ? MediaQuery.of(context).size.width * 0.0375
+                            : MediaQuery.of(context).size.width * 0.09,
+                      ),
                     ),
                     const SizedBox(width: 15.0),
                     getTitle(summary['GAME_STATUS_TEXT'], homeLinescore, awayLinescore),
                     const SizedBox(width: 15.0),
-                    Image.asset(
-                      'images/NBA_Logos/${widget.homeId}.png',
-                      width: widget.homeId == '0' ||
-                              MediaQuery.of(context).orientation == Orientation.landscape
-                          ? MediaQuery.of(context).size.width * 0.0375
-                          : MediaQuery.of(context).size.width * 0.09,
+                    ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
+                      child: Image.asset(
+                        'images/NBA_Logos/${widget.homeId}.png',
+                        width: widget.homeId == '0' ||
+                                MediaQuery.of(context).orientation == Orientation.landscape
+                            ? MediaQuery.of(context).size.width * 0.0375
+                            : MediaQuery.of(context).size.width * 0.09,
+                      ),
                     ),
                   ],
                 ],
@@ -562,8 +568,8 @@ class GameInfo extends StatelessWidget {
           padding: EdgeInsets.all(15.0.r),
           child: Row(
             children: [
-              if (awayId == '0') SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-              if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1),
+              if (awayId == '0') SizedBox(width: MediaQuery.of(context).size.width * 0.1),
+              if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.06),
               GestureDetector(
                 onTap: () {
                   if (awayId != '0') {
@@ -580,14 +586,23 @@ class GameInfo extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'images/NBA_Logos/$awayId.png',
-                      width: awayId == '0'
-                          ? MediaQuery.of(context).size.width * 0.05
-                          : MediaQuery.of(context).orientation == Orientation.landscape
+                    if (awayId == '0')
+                      Image.asset(
+                        'images/NBA_Logos/$awayId.png',
+                        width: isLandscape
+                            ? MediaQuery.of(context).size.width * 0.04
+                            : MediaQuery.of(context).size.width * 0.1,
+                      ),
+                    if (awayId != '0')
+                      ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: 80.0.r, maxHeight: 80.0.r),
+                        child: Image.asset(
+                          'images/NBA_Logos/$awayId.png',
+                          width: isLandscape
                               ? MediaQuery.of(context).size.width * 0.1
                               : MediaQuery.of(context).size.width * 0.2,
-                    ),
+                        ),
+                      ),
                     SizedBox(height: 8.0.r),
                     Text(
                       awayLinescore['TEAM_WINS_LOSSES'],
@@ -643,13 +658,16 @@ class GameInfo extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'images/NBA_Logos/$homeId.png',
-                      width: homeId == '0'
-                          ? MediaQuery.of(context).size.width * 0.05
-                          : isLandscape
-                              ? MediaQuery.of(context).size.width * 0.1
-                              : MediaQuery.of(context).size.width * 0.2,
+                    ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: 80.0.r, maxHeight: 80.0.r),
+                      child: Image.asset(
+                        'images/NBA_Logos/$homeId.png',
+                        width: homeId == '0'
+                            ? MediaQuery.of(context).size.width * 0.05
+                            : isLandscape
+                                ? MediaQuery.of(context).size.width * 0.1
+                                : MediaQuery.of(context).size.width * 0.2,
+                      ),
                     ),
                     SizedBox(height: 8.0.r),
                     Text(

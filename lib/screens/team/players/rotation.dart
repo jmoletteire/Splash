@@ -478,7 +478,7 @@ class RotationRow extends StatelessWidget {
                   player['PLAYER'],
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                  style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
                 ),
               ),
             ],
