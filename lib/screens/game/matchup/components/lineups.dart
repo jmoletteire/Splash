@@ -50,19 +50,19 @@ class _LineupsState extends State<Lineups> {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return Card(
-      margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 0.0),
+      margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
       color: Colors.grey.shade900,
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 3.0),
+            padding: EdgeInsets.fromLTRB(15.0.r, 15.0.r, 15.0.r, 3.0.r),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
                   decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                      bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
                     ),
                   ),
                   child: Text(
@@ -74,7 +74,7 @@ class _LineupsState extends State<Lineups> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0.r),
             child: Card(
                 color: Colors.white10,
                 child: LayoutBuilder(builder: (context, constraints) {
@@ -82,104 +82,120 @@ class _LineupsState extends State<Lineups> {
                     return Stack(
                       children: [
                         CustomPaint(
-                          size: const Size(189, 578),
-                          painter: FullCourtPainter(),
+                          size: Size(368.r, 346.r),
+                          painter: FullCourtPainter(isLandscape: isLandscape),
                         ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            //SizedBox(width: 30.0.r),
-                            Flexible(
+                            Expanded(
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  PlayerCard(
-                                    playerId: awayPlayerStats[0]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[0]['PLAYER_NAME'],
-                                    position: awayPlayerStats[0]['START_POSITION'],
-                                    team: widget.awayId,
-                                  ),
-                                  PlayerCard(
-                                    playerId: awayPlayerStats[2]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[2]['PLAYER_NAME'],
-                                    position: awayPlayerStats[2]['START_POSITION'],
-                                    team: widget.awayId,
-                                  ),
-                                  PlayerCard(
-                                    playerId: awayPlayerStats[1]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[1]['PLAYER_NAME'],
-                                    position: awayPlayerStats[1]['START_POSITION'],
-                                    team: widget.awayId,
+                                  Row(
+                                    children: [
+                                      SizedBox(width: 30.0.r),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          PlayerCard(
+                                            playerId:
+                                                awayPlayerStats[0]['PLAYER_ID'].toString(),
+                                            name: awayPlayerStats[0]['PLAYER_NAME'],
+                                            position: awayPlayerStats[0]['START_POSITION'],
+                                            team: widget.awayId,
+                                          ),
+                                          PlayerCard(
+                                            playerId:
+                                                awayPlayerStats[2]['PLAYER_ID'].toString(),
+                                            name: awayPlayerStats[2]['PLAYER_NAME'],
+                                            position: awayPlayerStats[2]['START_POSITION'],
+                                            team: widget.awayId,
+                                          ),
+                                          PlayerCard(
+                                            playerId:
+                                                awayPlayerStats[1]['PLAYER_ID'].toString(),
+                                            name: awayPlayerStats[1]['PLAYER_NAME'],
+                                            position: awayPlayerStats[1]['START_POSITION'],
+                                            team: widget.awayId,
+                                          ),
+                                        ],
+                                      ),
+                                      //SizedBox(width: 25.0.r),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          PlayerCard(
+                                            playerId:
+                                                awayPlayerStats[4]['PLAYER_ID'].toString(),
+                                            name: awayPlayerStats[4]['PLAYER_NAME'],
+                                            position: awayPlayerStats[4]['START_POSITION'],
+                                            team: widget.awayId,
+                                          ),
+                                          PlayerCard(
+                                            playerId:
+                                                awayPlayerStats[3]['PLAYER_ID'].toString(),
+                                            name: awayPlayerStats[3]['PLAYER_NAME'],
+                                            position: awayPlayerStats[3]['START_POSITION'],
+                                            team: widget.awayId,
+                                          ),
+                                        ],
+                                      ),
+                                      //SizedBox(width: 30.0.r),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          PlayerCard(
+                                            playerId:
+                                                homePlayerStats[4]['PLAYER_ID'].toString(),
+                                            name: homePlayerStats[4]['PLAYER_NAME'],
+                                            position: homePlayerStats[4]['START_POSITION'],
+                                            team: widget.homeId,
+                                          ),
+                                          PlayerCard(
+                                            playerId:
+                                                homePlayerStats[3]['PLAYER_ID'].toString(),
+                                            name: homePlayerStats[3]['PLAYER_NAME'],
+                                            position: homePlayerStats[3]['START_POSITION'],
+                                            team: widget.homeId,
+                                          ),
+                                        ],
+                                      ),
+                                      //SizedBox(width: 25.0.r),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          PlayerCard(
+                                            playerId:
+                                                homePlayerStats[0]['PLAYER_ID'].toString(),
+                                            name: homePlayerStats[0]['PLAYER_NAME'],
+                                            position: homePlayerStats[0]['START_POSITION'],
+                                            team: widget.homeId,
+                                          ),
+                                          PlayerCard(
+                                            playerId:
+                                                homePlayerStats[2]['PLAYER_ID'].toString(),
+                                            name: homePlayerStats[2]['PLAYER_NAME'],
+                                            position: homePlayerStats[2]['START_POSITION'],
+                                            team: widget.homeId,
+                                          ),
+                                          PlayerCard(
+                                            playerId:
+                                                homePlayerStats[1]['PLAYER_ID'].toString(),
+                                            name: homePlayerStats[1]['PLAYER_NAME'],
+                                            position: homePlayerStats[1]['START_POSITION'],
+                                            team: widget.homeId,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
-                            //SizedBox(width: 25.0.r),
-                            Flexible(
+                            Expanded(
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  PlayerCard(
-                                    playerId: awayPlayerStats[4]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[4]['PLAYER_NAME'],
-                                    position: awayPlayerStats[4]['START_POSITION'],
-                                    team: widget.awayId,
-                                  ),
-                                  PlayerCard(
-                                    playerId: awayPlayerStats[3]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[3]['PLAYER_NAME'],
-                                    position: awayPlayerStats[3]['START_POSITION'],
-                                    team: widget.awayId,
-                                  ),
-                                ],
+                                children: [],
                               ),
-                            ),
-                            //SizedBox(width: 30.0.r),
-                            Flexible(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  PlayerCard(
-                                    playerId: homePlayerStats[4]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[4]['PLAYER_NAME'],
-                                    position: homePlayerStats[4]['START_POSITION'],
-                                    team: widget.homeId,
-                                  ),
-                                  PlayerCard(
-                                    playerId: homePlayerStats[3]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[3]['PLAYER_NAME'],
-                                    position: homePlayerStats[3]['START_POSITION'],
-                                    team: widget.homeId,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            //SizedBox(width: 25.0.r),
-                            Flexible(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  PlayerCard(
-                                    playerId: homePlayerStats[0]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[0]['PLAYER_NAME'],
-                                    position: homePlayerStats[0]['START_POSITION'],
-                                    team: widget.homeId,
-                                  ),
-                                  PlayerCard(
-                                    playerId: homePlayerStats[2]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[2]['PLAYER_NAME'],
-                                    position: homePlayerStats[2]['START_POSITION'],
-                                    team: widget.homeId,
-                                  ),
-                                  PlayerCard(
-                                    playerId: homePlayerStats[1]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[1]['PLAYER_NAME'],
-                                    position: homePlayerStats[1]['START_POSITION'],
-                                    team: widget.homeId,
-                                  ),
-                                ],
-                              ),
-                            ),
+                            )
                           ],
                         ),
                       ],
@@ -188,12 +204,12 @@ class _LineupsState extends State<Lineups> {
                     return Stack(
                       children: [
                         CustomPaint(
-                          size: const Size(189, 578),
-                          painter: FullCourtPainter(),
+                          size: Size(368.r, 346.r),
+                          painter: FullCourtPainter(isLandscape: isLandscape),
                         ),
                         Column(
                           children: [
-                            const SizedBox(height: 30.0),
+                            SizedBox(height: 30.0.r),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -223,7 +239,7 @@ class _LineupsState extends State<Lineups> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 25.0),
+                            SizedBox(height: 25.0.r),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -245,7 +261,7 @@ class _LineupsState extends State<Lineups> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 30.0),
+                            SizedBox(height: 30.0.r),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -267,7 +283,7 @@ class _LineupsState extends State<Lineups> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 25.0),
+                            SizedBox(height: 25.0.r),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -363,142 +379,48 @@ class PlayerCard extends StatelessWidget {
 }
 
 class FullCourtPainter extends CustomPainter {
+  final bool isLandscape;
+
+  FullCourtPainter({required this.isLandscape});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.grey.shade800
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
+      ..strokeWidth = 2;
 
-    final centerCircleRadius = size.width * 0.1;
-    final threePointLineRadius = size.width * 0.8;
-    final keyWidth = size.width * 0.4;
-    final keyHeight = size.height * 0.2;
-    final halfCourtWidth = size.width;
+    // Swap width and height if landscape mode
+    final courtWidth = isLandscape ? size.height : size.width;
+    final courtHeight = isLandscape ? size.width : size.height;
 
     // Draw the half court line
-    canvas.drawLine(
-      Offset(0, size.height / 2),
-      Offset(size.width * 1.95, size.height / 2),
-      paint,
-    );
+    isLandscape
+        ? canvas.drawLine(
+            Offset(courtHeight / (4 / 3), 0),
+            Offset(courtHeight / (4 / 3), courtWidth),
+            paint,
+          )
+        : canvas.drawLine(
+            Offset(0, courtHeight / (4 / 3)),
+            Offset(courtWidth, courtHeight / (4 / 3)),
+            paint,
+          );
 
-    void drawHalfCourt(double offsetX) {
-      // Draw center arc
-      canvas.drawArc(
-        Rect.fromCircle(
-            center: Offset(halfCourtWidth + offsetX, size.height / 2), radius: keyWidth / 2),
-        0,
-        3.14,
-        false,
-        paint,
-      );
-
-      // Draw baseline
-      canvas.drawLine(
-        Offset(offsetX + 4, size.height * 0.98),
-        Offset(halfCourtWidth * 1.95 + offsetX + 4, size.height * 0.98),
-        paint,
-      );
-
-      // Draw key (free throw lane)
-      canvas.drawRect(
-        Rect.fromCenter(
-          center: Offset(halfCourtWidth + offsetX, (size.height * 0.98) - (keyHeight / 2)),
-          width: keyWidth,
-          height: keyHeight,
-        ),
-        paint,
-      );
-
-      // Draw free throw line arc
-      canvas.drawArc(
-        Rect.fromCircle(
-            center: Offset(halfCourtWidth + offsetX, (size.height * 0.98) - keyHeight),
-            radius: keyWidth / 2),
-        3.14,
-        3.14,
-        false,
-        paint,
-      );
-
-      // Draw the inner part of the free throw line arc (dashed)
-      const dashWidth = 5.0;
-      const dashSpace = 5.0;
-      final arcRect = Rect.fromCircle(
-        center: Offset(halfCourtWidth + offsetX, (size.height * 0.98) - keyHeight),
-        radius: keyWidth / 2,
-      );
-
-      final path = Path();
-      const totalAngle = 3.14; // The arc's angle in radians (half-circle in this case)
-      const segments = 10; // Increase for smoother dash transitions
-      const segmentAngle = totalAngle / segments;
-      bool draw = true;
-
-      for (int i = 0; i < segments; i++) {
-        final startAngle = segmentAngle * i;
-        final endAngle = startAngle + segmentAngle;
-
-        if (draw) {
-          path.addArc(
-              arcRect, startAngle, segmentAngle * (dashWidth / (dashWidth + dashSpace)));
-        }
-
-        draw = !draw;
-      }
-
-      canvas.drawPath(path, paint);
-
-      // Draw restricted area
-      canvas.drawArc(
-        Rect.fromCircle(
-            center: Offset(halfCourtWidth + offsetX, (size.height * 0.98) - (keyHeight / 4)),
-            radius: centerCircleRadius),
-        3.14,
-        3.14,
-        false,
-        paint,
-      );
-
-      // Draw three-point line with flattened ends
-      canvas.drawLine(
-        Offset((halfCourtWidth + offsetX) + threePointLineRadius, size.height * 0.98),
-        Offset((halfCourtWidth + offsetX) + threePointLineRadius,
-            (size.height * 0.98) - (keyHeight / 2)),
-        paint,
-      );
-      canvas.drawLine(
-        Offset((halfCourtWidth + offsetX) - threePointLineRadius, size.height * 0.98),
-        Offset((halfCourtWidth + offsetX) - threePointLineRadius,
-            (size.height * 0.98) - (keyHeight / 2)),
-        paint,
-      );
-      canvas.drawArc(
-        Rect.fromCircle(
-            center: Offset(halfCourtWidth + offsetX, (size.height * 0.98) - (keyHeight / 2)),
-            radius: threePointLineRadius),
-        3.14,
-        3.14,
-        false,
-        paint,
-      );
-    }
-
-    /*
     void drawHalfCourt() {
       /// 368 Pixels wide = 50 ft (1 pixel = 0.136 ft OR 1.63 inches)
       /// 346 Pixels tall = 47 ft (1 pixel = 0.136 ft OR 1.63 inches)
 
-      final restrictedAreaRadius = size.width * (4 / 50);
-      final threePointLineRadius = size.height * (23.75 / 47);
-      final keyWidth = size.width * (12 / 50);
-      final outerKeyWidth = size.width * (16 / 50);
-      final freeThrowLine = size.height * (18.87 / 47);
+      final restrictedAreaRadius = courtWidth * (4 / 50);
+      final threePointLineRadius = courtHeight * (23.75 / 47);
+      final keyWidth = courtWidth * (12 / 50);
+      final outerKeyWidth = courtWidth * (16 / 50);
+      final freeThrowLine = courtHeight * (18.87 / 47);
 
       // Draw center arc
       canvas.drawArc(
-        Rect.fromCircle(center: Offset((size.width / 2), 0), radius: keyWidth / 2),
+        Rect.fromCircle(
+            center: Offset((courtWidth / 2), courtHeight / 4), radius: keyWidth / 3),
         0,
         3.14,
         false,
@@ -507,7 +429,8 @@ class FullCourtPainter extends CustomPainter {
 
       // Draw inner center arc
       canvas.drawArc(
-        Rect.fromCircle(center: Offset((size.width / 2), 0), radius: keyWidth / 6),
+        Rect.fromCircle(
+            center: Offset((courtWidth / 2), courtHeight / 4), radius: keyWidth / 9),
         0,
         3.14,
         false,
@@ -516,29 +439,29 @@ class FullCourtPainter extends CustomPainter {
 
       // Left Hash
       canvas.drawLine(
-        Offset(0, size.height - (size.height * 28 / 47)),
-        Offset(size.width * (3 / 50), size.height - (size.height * (28 / 47))),
+        Offset(0, courtHeight - (courtHeight * 28 / 47)),
+        Offset(courtWidth * (3 / 50), courtHeight - (courtHeight * (28 / 47))),
         paint,
       );
 
       // Right Hash
       canvas.drawLine(
-        Offset(size.width - size.width * (3 / 50), size.height - (size.height * 28 / 47)),
-        Offset(size.width, size.height - (size.height * (28 / 47))),
+        Offset(courtWidth - courtWidth * (3 / 50), courtHeight - (courtHeight * 28 / 47)),
+        Offset(courtWidth, courtHeight - (courtHeight * (28 / 47))),
         paint,
       );
 
       // Draw baseline
       canvas.drawLine(
-        Offset(0, size.height),
-        Offset(size.width, size.height),
+        Offset(5.r, courtHeight),
+        Offset(courtWidth - 5.r, courtHeight),
         paint,
       );
 
       // Draw key (free throw lane)
       canvas.drawRect(
         Rect.fromCenter(
-          center: Offset((size.width / 2), size.height - (freeThrowLine / 2)),
+          center: Offset((courtWidth / 2), courtHeight - (freeThrowLine / 2)),
           width: keyWidth,
           height: freeThrowLine,
         ),
@@ -548,7 +471,7 @@ class FullCourtPainter extends CustomPainter {
       // Draw outside key
       canvas.drawRect(
         Rect.fromCenter(
-          center: Offset((size.width / 2), size.height - (freeThrowLine / 2)),
+          center: Offset((courtWidth / 2), courtHeight - (freeThrowLine / 2)),
           width: outerKeyWidth,
           height: freeThrowLine,
         ),
@@ -558,7 +481,7 @@ class FullCourtPainter extends CustomPainter {
       // Draw free throw line arc
       canvas.drawArc(
         Rect.fromCircle(
-            center: Offset((size.width / 2), size.height - freeThrowLine),
+            center: Offset((courtWidth / 2), courtHeight - freeThrowLine),
             radius: keyWidth / 2),
         3.14,
         3.14,
@@ -570,7 +493,7 @@ class FullCourtPainter extends CustomPainter {
       const dashWidth = 5.0;
       const dashSpace = 5.0;
       final arcRect = Rect.fromCircle(
-        center: Offset((size.width / 2), size.height - freeThrowLine),
+        center: Offset((courtWidth / 2), courtHeight - freeThrowLine),
         radius: keyWidth / 2,
       );
 
@@ -597,7 +520,7 @@ class FullCourtPainter extends CustomPainter {
       // Draw restricted area
       canvas.drawArc(
         Rect.fromCircle(
-            center: Offset((size.width / 2), size.height - (size.height * (4 / 47))),
+            center: Offset((courtWidth / 2), courtHeight - (courtHeight * (4 / 47))),
             radius: restrictedAreaRadius),
         3.14,
         3.14,
@@ -608,24 +531,24 @@ class FullCourtPainter extends CustomPainter {
       // Draw three-point line with short corners
       // Short Corner (Right)
       canvas.drawLine(
-        Offset((size.width / 2) + size.width * (22 / 50), size.height),
-        Offset((size.width / 2) + size.width * (22 / 50),
-            size.height - (size.height * (14 / 47))),
+        Offset((courtWidth / 2) + courtWidth * (22 / 50), courtHeight),
+        Offset((courtWidth / 2) + courtWidth * (22 / 50),
+            courtHeight - (courtHeight * (14 / 47))),
         paint,
       );
 
-// Short Corner (Left)
+      // Short Corner (Left)
       canvas.drawLine(
-        Offset((size.width / 2) - size.width * (22 / 50), size.height),
-        Offset((size.width / 2) - size.width * (22 / 50),
-            size.height - (size.height * (14 / 47))),
+        Offset((courtWidth / 2) - courtWidth * (22 / 50), courtHeight),
+        Offset((courtWidth / 2) - courtWidth * (22 / 50),
+            courtHeight - (courtHeight * (14 / 47))),
         paint,
       );
 
-// Above the Break (Arc)
+      // Above the Break (Arc)
       canvas.drawArc(
         Rect.fromCircle(
-            center: Offset(size.width / 2, size.height - (size.height * (5 / 47))),
+            center: Offset(courtWidth / 2, courtHeight - (courtHeight * (5 / 47))),
             radius: threePointLineRadius),
         -3.14 + (0.123 * 3.14), // Start angle in quadrant 2
         (3.14 - (0.123 * 2 * 3.14)),
@@ -634,16 +557,21 @@ class FullCourtPainter extends CustomPainter {
       );
     }
 
-     */
+    // Adjust for landscape orientation
+    if (isLandscape) {
+      canvas.rotate(-3.14 / 2); // Rotate canvas for landscape drawing
+      canvas.translate(-size.height, 0); // Translate canvas back to fit in landscape mode
+    }
 
     // Draw the first half court
-    drawHalfCourt(-4);
+    canvas.translate(0, courtHeight / 2);
+    drawHalfCourt();
 
     // Draw the second half court, mirrored
     canvas.save();
-    canvas.translate(size.width, size.height);
+    canvas.translate(courtWidth, courtHeight / 2);
     canvas.rotate(3.14);
-    drawHalfCourt(-size.width + 4); //-size.width + 4
+    drawHalfCourt();
     canvas.restore();
   }
 

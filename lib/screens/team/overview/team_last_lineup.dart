@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/utilities/constants.dart';
 
-import '../../../components/court_painter.dart';
+import '../../../components/half_court_painter.dart';
 import '../../player/player_home.dart';
 
 class TeamLastLineup extends StatefulWidget {
@@ -109,68 +109,70 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
             padding: EdgeInsets.all(8.0.r),
             child: Card(
               color: Colors.white10,
-              child: Stack(children: [
-                CustomPaint(
-                  size: Size(368.r, 346.r),
-                  painter: HalfCourtPainter(courtColor: Colors.grey.shade800),
-                ),
-                Column(
-                  children: [
-                    SizedBox(height: 60.0.r),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: PlayerCard(
-                            playerId: lineup[4]['PLAYER_ID'].toString(),
-                            name: lineup[4]['NAME'],
-                            position: lineup[4]['POSITION'],
-                            team: widget.team,
+              child: Stack(
+                children: [
+                  CustomPaint(
+                    size: Size(368.r, 346.r),
+                    painter: HalfCourtPainter(courtColor: Colors.grey.shade800),
+                  ),
+                  Column(
+                    children: [
+                      SizedBox(height: 60.0.r),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: PlayerCard(
+                              playerId: lineup[4]['PLAYER_ID'].toString(),
+                              name: lineup[4]['NAME'],
+                              position: lineup[4]['POSITION'],
+                              team: widget.team,
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: PlayerCard(
-                            playerId: lineup[3]['PLAYER_ID'].toString(),
-                            name: lineup[3]['NAME'],
-                            position: lineup[3]['POSITION'],
-                            team: widget.team,
+                          Expanded(
+                            child: PlayerCard(
+                              playerId: lineup[3]['PLAYER_ID'].toString(),
+                              name: lineup[3]['NAME'],
+                              position: lineup[3]['POSITION'],
+                              team: widget.team,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 35.0.r),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: PlayerCard(
-                            playerId: lineup[0]['PLAYER_ID'].toString(),
-                            name: lineup[0]['NAME'],
-                            position: lineup[0]['POSITION'],
-                            team: widget.team,
+                        ],
+                      ),
+                      SizedBox(height: 35.0.r),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: PlayerCard(
+                              playerId: lineup[0]['PLAYER_ID'].toString(),
+                              name: lineup[0]['NAME'],
+                              position: lineup[0]['POSITION'],
+                              team: widget.team,
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: PlayerCard(
-                            playerId: lineup[2]['PLAYER_ID'].toString(),
-                            name: lineup[2]['NAME'],
-                            position: lineup[2]['POSITION'],
-                            team: widget.team,
+                          Expanded(
+                            child: PlayerCard(
+                              playerId: lineup[2]['PLAYER_ID'].toString(),
+                              name: lineup[2]['NAME'],
+                              position: lineup[2]['POSITION'],
+                              team: widget.team,
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: PlayerCard(
-                            playerId: lineup[1]['PLAYER_ID'].toString(),
-                            name: lineup[1]['NAME'],
-                            position: lineup[1]['POSITION'],
-                            team: widget.team,
+                          Expanded(
+                            child: PlayerCard(
+                              playerId: lineup[1]['PLAYER_ID'].toString(),
+                              name: lineup[1]['NAME'],
+                              position: lineup[1]['POSITION'],
+                              team: widget.team,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ]),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],

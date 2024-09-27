@@ -278,7 +278,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     if (awayTeamId == '0')
                       SizedBox(width: MediaQuery.of(context).size.width * 0.045),
                     Image.asset(
-                      'images/NBA_Logos/${awayTeamId}.png',
+                      'images/NBA_Logos/$awayTeamId.png',
                       width: awayTeamId == '0' ||
                               MediaQuery.of(context).orientation == Orientation.landscape
                           ? MediaQuery.of(context).size.width * 0.0375
@@ -324,7 +324,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                       opacity:
                           0.97 - kTeamColorOpacity[kTeamIdToName[awayTeamId][1]]!['opacity']!,
                       child: SvgPicture.asset(
-                        'images/NBA_Logos/${awayTeamId}.svg',
+                        'images/NBA_Logos/$awayTeamId.svg',
                         width: MediaQuery.of(context).size.width / 1.1,
                         fit: BoxFit.cover,
                       ),
@@ -390,7 +390,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           ];
         },
         pinnedHeaderSliverHeightBuilder: () {
-          return MediaQuery.of(context).size.height * 0.001;
+          return 104.0 +
+              MediaQuery.of(context).padding.top -
+              ((kToolbarHeight - 15.0.r) + ((kToolbarHeight - 15.0.r) / 4.5.r) + 93.0.r);
         },
         onlyOneScrollInBody: true,
         body: TabBarView(
@@ -545,6 +547,7 @@ class GameInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -559,7 +562,8 @@ class GameInfo extends StatelessWidget {
           padding: EdgeInsets.all(15.0.r),
           child: Row(
             children: [
-              if (awayId == '0') SizedBox(width: MediaQuery.of(context).size.width * 0.1),
+              if (awayId == '0') SizedBox(width: MediaQuery.of(context).size.width * 0.05),
+              if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1),
               GestureDetector(
                 onTap: () {
                   if (awayId != '0') {
@@ -578,10 +582,11 @@ class GameInfo extends StatelessWidget {
                   children: [
                     Image.asset(
                       'images/NBA_Logos/$awayId.png',
-                      width: awayId == '0' ||
-                              MediaQuery.of(context).orientation == Orientation.landscape
-                          ? MediaQuery.of(context).size.width * 0.1
-                          : MediaQuery.of(context).size.width * 0.2,
+                      width: awayId == '0'
+                          ? MediaQuery.of(context).size.width * 0.05
+                          : MediaQuery.of(context).orientation == Orientation.landscape
+                              ? MediaQuery.of(context).size.width * 0.1
+                              : MediaQuery.of(context).size.width * 0.2,
                     ),
                     SizedBox(height: 8.0.r),
                     Text(
@@ -640,10 +645,11 @@ class GameInfo extends StatelessWidget {
                   children: [
                     Image.asset(
                       'images/NBA_Logos/$homeId.png',
-                      width: homeId == '0' ||
-                              MediaQuery.of(context).orientation == Orientation.landscape
-                          ? MediaQuery.of(context).size.width * 0.1
-                          : MediaQuery.of(context).size.width * 0.2,
+                      width: homeId == '0'
+                          ? MediaQuery.of(context).size.width * 0.05
+                          : isLandscape
+                              ? MediaQuery.of(context).size.width * 0.1
+                              : MediaQuery.of(context).size.width * 0.2,
                     ),
                     SizedBox(height: 8.0.r),
                     Text(
@@ -654,6 +660,7 @@ class GameInfo extends StatelessWidget {
                   ],
                 ),
               ),
+              if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1)
             ],
           ),
         ),

@@ -9,7 +9,7 @@ import 'package:splash/screens/player/shot_chart/zone/zone_aggregator.dart';
 import 'package:splash/screens/player/shot_chart/zone/zone_map.dart';
 import 'package:splash/utilities/constants.dart';
 
-import '../../../components/court_painter.dart';
+import '../../../components/half_court_painter.dart';
 import '../../../utilities/player.dart';
 import 'hex/hex_aggregator.dart';
 import 'hex/hex_map.dart';

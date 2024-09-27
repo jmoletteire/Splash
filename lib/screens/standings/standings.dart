@@ -299,7 +299,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                 indicatorWeight: 3.0,
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.sp.clamp(14.0, 25.0)),
+                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r.clamp(14.0, 25.0)),
                 tabs: [
                   const Tab(text: 'Conference'),
                   const Tab(text: 'Division'),

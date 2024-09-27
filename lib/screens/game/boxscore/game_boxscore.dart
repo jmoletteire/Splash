@@ -206,7 +206,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           ],
         ),
         Container(
-          height: (kToolbarHeight - 15.0.r),
+          height: kToolbarHeight - 15.0.r,
           decoration: const BoxDecoration(
             color: Color(0xFF1B1B1B),
             border: Border(
@@ -217,18 +217,42 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Flexible(
+                child: Text(
+                  topScorer,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
+                ),
+              ),
               Text(
-                '$topScorer  - $highestPTS  PTS',
+                '  - $highestPTS  PTS',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
               SizedBox(width: 25.0.r),
+              Flexible(
+                child: Text(
+                  topRebounder,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
+                ),
+              ),
               Text(
-                '$topRebounder  - $highestREB  REB',
+                '  - $highestREB  REB',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
               SizedBox(width: 25.0.r),
+              Flexible(
+                child: Text(
+                  topAssistant,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
+                ),
+              ),
               Text(
-                '$topAssistant  - $highestAST  AST',
+                '  - $highestAST  AST',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
             ],
@@ -305,53 +329,50 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           ],
         ),
         Expanded(
-          child: ScrollConfiguration(
-            behavior: MyCustomScrollBehavior(),
-            child: TabBarView(
-              controller: _boxscoreTabController,
-              children: [
-                CustomScrollView(
-                  slivers: [
-                    BoxPlayerStats(
-                      players: awayPlayerStats.sublist(0, 5),
-                      playerGroup: 'STARTERS',
-                      controller: _awayStartersController,
+          child: TabBarView(
+            controller: _boxscoreTabController,
+            children: [
+              CustomScrollView(
+                slivers: [
+                  BoxPlayerStats(
+                    players: awayPlayerStats.sublist(0, 5),
+                    playerGroup: 'STARTERS',
+                    controller: _awayStartersController,
+                  ),
+                  BoxPlayerStats(
+                    players: awayPlayerStats.sublist(5),
+                    playerGroup: 'BENCH',
+                    controller: _awayBenchController,
+                  ),
+                ],
+              ),
+              CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.only(top: 10.0.r),
+                    sliver: BoxTeamStats(
+                      teams: teamStats,
+                      homeId: widget.homeId,
+                      awayId: widget.awayId,
                     ),
-                    BoxPlayerStats(
-                      players: awayPlayerStats.sublist(5),
-                      playerGroup: 'BENCH',
-                      controller: _awayBenchController,
-                    ),
-                  ],
-                ),
-                CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: EdgeInsets.only(top: 10.0.r),
-                      sliver: BoxTeamStats(
-                        teams: teamStats,
-                        homeId: widget.homeId,
-                        awayId: widget.awayId,
-                      ),
-                    )
-                  ],
-                ),
-                CustomScrollView(
-                  slivers: [
-                    BoxPlayerStats(
-                      players: homePlayerStats.sublist(0, 5),
-                      playerGroup: 'STARTERS',
-                      controller: _homeStartersController,
-                    ),
-                    BoxPlayerStats(
-                      players: homePlayerStats.sublist(5),
-                      playerGroup: 'BENCH',
-                      controller: _homeBenchController,
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  )
+                ],
+              ),
+              CustomScrollView(
+                slivers: [
+                  BoxPlayerStats(
+                    players: homePlayerStats.sublist(0, 5),
+                    playerGroup: 'STARTERS',
+                    controller: _homeStartersController,
+                  ),
+                  BoxPlayerStats(
+                    players: homePlayerStats.sublist(5),
+                    playerGroup: 'BENCH',
+                    controller: _homeBenchController,
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ],
