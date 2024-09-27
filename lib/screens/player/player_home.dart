@@ -317,7 +317,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                 ];
               },
               pinnedHeaderSliverHeightBuilder: () {
-                return 105.0 + MediaQuery.of(context).padding.top; // 56 + 49 = 105
+                return 104.0 + MediaQuery.of(context).padding.top; // 56 + 49 = 105
               },
               onlyOneScrollInBody: true,
               body: TabBarView(

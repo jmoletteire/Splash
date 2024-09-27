@@ -298,6 +298,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
         ),
         CustomIconButton(
           icon: Icons.search,
+          size: 30.0.r,
           onPressed: () {
             Navigator.push(
               context,
@@ -372,7 +373,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
               surfaceTintColor: Colors.grey.shade900,
               title: Text(
                 'History',
-                style: kBebasBold.copyWith(fontSize: 22.0.r),
+                style: kBebasBold.copyWith(fontSize: 24.0.r),
               ),
               actions: getActions(_tabController.index),
               bottom: TabBar(
@@ -382,7 +383,7 @@ class _LeagueHistoryState extends State<LeagueHistory> with SingleTickerProvider
                 indicatorWeight: 3.0,
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
+                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
                 tabs: const [Tab(text: 'By Year'), Tab(text: 'By Award')],
               ),
             ),
@@ -584,7 +585,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
         border: Border(
           bottom: BorderSide(
             color: Colors.grey.shade200,
-            width: 0.125,
+            width: 0.125.r,
           ),
         ),
       ),
@@ -615,12 +616,12 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: kBebasNormal.copyWith(
-                            color: Colors.grey.shade300, fontSize: 15.0.r),
+                            color: Colors.grey.shade300, fontSize: 16.0.r),
                       ),
                     );
                   },
                   body: Padding(
-                    padding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 15.0),
+                    padding: EdgeInsets.fromLTRB(15.0.r, 0.0, 15.0.r, 15.0.r),
                     child: Column(
                       children: [
                         for (int i = 0; i < players.length; i++) ...{
@@ -639,7 +640,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
                                       border: Border(
                                         bottom: BorderSide(
                                           color: Colors.grey.shade600,
-                                          width: 3,
+                                          width: 3.0.r,
                                         ),
                                       ),
                                     ),
@@ -651,7 +652,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
                                               : players[i]['ALL_NBA_TEAM_NUMBER'] == '2'
                                                   ? 'Second Team'
                                                   : 'Third Team',
-                                          style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                                          style: kBebasNormal.copyWith(fontSize: 16.0.r),
                                         ),
                                       ],
                                     ),
@@ -674,7 +675,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
                                       border: Border(
                                         bottom: BorderSide(
                                           color: Colors.grey.shade600,
-                                          width: 3,
+                                          width: 3.0.r,
                                         ),
                                       ),
                                     ),
@@ -682,7 +683,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
                                       children: [
                                         Text(
                                           players[i]['CONFERENCE'],
-                                          style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                                          style: kBebasNormal.copyWith(fontSize: 16.0.r),
                                         ),
                                       ],
                                     ),
@@ -716,7 +717,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
                                                         players[i + 1]['ALL_NBA_TEAM_NUMBER']))
                                         ? Colors.transparent
                                         : Colors.grey.shade200,
-                                    width: 0.125,
+                                    width: 0.125.r,
                                   ),
                                 ),
                               ),
@@ -742,7 +743,7 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
                                     child: Row(
                                       children: [
                                         PlayerAvatar(
-                                          radius: 12.0.r,
+                                          radius: 13.0.r,
                                           backgroundColor: Colors.white70,
                                           playerImageUrl:
                                               'https://cdn.nba.com/headshots/nba/latest/1040x760/${players[i]['PLAYER_ID']}.png',

@@ -174,8 +174,8 @@ class ZoneAggregator {
   }
 
   Offset _normalizeShotCoordinate(double x, double y, bool isLandscape) {
-    double canvasWidth = isLandscape ? 368.r : 368; // 368 pixels
-    double canvasHeight = isLandscape ? 346.r : 346; // 346 pixels
+    double canvasWidth = isLandscape ? 368.r : courtSize.width;
+    double canvasHeight = isLandscape ? 346.r : courtSize.height;
 
     // Assume the hoop is 4 feet in front of the baseline
     double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units

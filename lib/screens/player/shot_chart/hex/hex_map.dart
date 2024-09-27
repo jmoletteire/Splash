@@ -21,10 +21,10 @@ class _HexMapState extends State<HexMap> {
 
   void _handleTap(BuildContext context, Offset tapPosition) {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-    double canvasWidth = isLandscape ? 368.r : 368;
-    double canvasHeight = isLandscape ? 346.r : 346;
-    double tooltipWidth = isLandscape ? 150.r : 150; // Approximate width of the tooltip
-    double tooltipHeight = isLandscape ? 50.r : 50; // Approximate height of the tooltip
+    double canvasWidth = isLandscape ? 368.r : 368.w;
+    double canvasHeight = isLandscape ? 346.r : 346.h;
+    double tooltipWidth = isLandscape ? 150.r : 150.w; // Approximate width of the tooltip
+    double tooltipHeight = isLandscape ? 50.r : 50.h; // Approximate height of the tooltip
 
     // Adjust for the court dimensions, similar to how you map the hexagons
     double hoopOffset = (4 / 47) * canvasHeight;
@@ -40,7 +40,7 @@ class _HexMapState extends State<HexMap> {
 
     // Now check against the original hexagons before they were mapped
     for (var hex in widget.hexagons) {
-      if (hex.contains(normalizedTapPosition, isLandscape)) {
+      if (hex.contains(normalizedTapPosition, isLandscape, 346.h)) {
         if (hex.FGA == 0 || hex == _selectedHexagon) {
           _dismissTooltip();
           break;
@@ -64,7 +64,7 @@ class _HexMapState extends State<HexMap> {
           // Set the final tooltip position
           _tooltipPosition = Offset(adjustedX, adjustedY);
           _tooltipMessage =
-              'Zone: ${hex.shotZoneRange['Zone']}\nAvg Dist: ${hex.avgDistance.toStringAsFixed(1) ?? 0} ft\nFG: ${hex.FGM}/${hex.FGA}  (${(100 * hex.FGM / hex.FGA).toStringAsFixed(1)}%)';
+              'Zone: ${hex.shotZoneRange['Zone']}\nAvg Dist: ${hex.avgDistance.toStringAsFixed(1)} ft\nFG: ${hex.FGM}/${hex.FGA}  (${(100 * hex.FGM / hex.FGA).toStringAsFixed(1)}%)';
         });
         break;
       }
@@ -81,8 +81,8 @@ class _HexMapState extends State<HexMap> {
   @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-    double canvasWidth = isLandscape ? 368.r : 368; // 368 pixels
-    double canvasHeight = isLandscape ? 346.r : 346; // 346 pixels
+    double canvasWidth = isLandscape ? 368.r : 368.w; // 368 pixels
+    double canvasHeight = isLandscape ? 346.r : 346.h; // 346 pixels
 
     // Assume the hoop is 4 feet in front of the baseline
     double hoopOffset = (4 / 47) * canvasHeight; // Offset in Flutter canvas units
@@ -153,7 +153,7 @@ class _HexMapState extends State<HexMap> {
                   ),
                   child: Text(
                     _tooltipMessage,
-                    style: kBebasNormal.copyWith(fontSize: 13.0.r),
+                    style: kBebasNormal.copyWith(fontSize: 13.0.sp),
                   ),
                 ),
               ),

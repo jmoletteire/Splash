@@ -321,7 +321,7 @@ class _CareerStatsState extends State<CareerStats> {
             border: Border(
               bottom: BorderSide(
                 color: Colors.grey.shade200,
-                width: 0.125,
+                width: 0.15.r,
               ),
             ),
           ),
@@ -342,7 +342,7 @@ class _CareerStatsState extends State<CareerStats> {
         type: MaterialType.transparency,
         child: InkWell(
           onTap: () {
-            if (season['TEAM_ABBREVIATION'] != 'TOT') {
+            if (season['TEAM_ABBREVIATION'] != 'TOT' && widget.seasonType != 'COLLEGE') {
               Navigator.push(
                 context,
                 MaterialPageRoute(

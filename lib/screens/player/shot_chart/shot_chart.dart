@@ -130,15 +130,15 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
       hexSizeInFeet: 1.5,
       courtWidthInFeet: 50,
       courtHeightInFeet: 47,
-      canvasWidth: isLandscape ? 368.r : 368,
-      canvasHeight: isLandscape ? 346.r : 346,
+      canvasWidth: 368,
+      canvasHeight: 346,
     );
 
     // Create an instance of the aggregator
     HexagonAggregator aggregator = HexagonAggregator(hexagons[0].width, hexagons[0].height);
 
     // Aggregate shots by hexagon
-    hexagonMap = aggregator.aggregateShots(shotChart, hexagons, isLandscape);
+    hexagonMap = aggregator.aggregateShots(shotChart, hexagons, isLandscape, 346.h);
 
     // Adjust hexagons based on aggregated data
     aggregator.adjustHexagons(hexagonMap, shotChart.length, lgAvg[0]);
@@ -154,7 +154,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
     }
 
     ZoneAggregator zoneAggregator =
-        ZoneAggregator(isLandscape ? Size(368.r, 346.r) : const Size(368, 346));
+        ZoneAggregator(isLandscape ? Size(368.r, 346.r) : Size(368.w, 346.h));
     Map<String, ZoneData> aggregatedZones =
         zoneAggregator.aggregateShots(filteredShotChart, isLandscape);
 
@@ -351,10 +351,10 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
       children: [
         SingleChildScrollView(
           child: Card(
-            margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 100.0),
+            margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 100.0.r),
             color: Colors.grey.shade900,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.0.r),
               child: Card(
                 color: Colors.white10,
                 child: LayoutBuilder(builder: (context, constraints) {
@@ -553,7 +553,10 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                           children: [
                             IgnorePointer(
                               child: CustomPaint(
-                                size: const Size(368, 346),
+                                size: Size(
+                                  368.w,
+                                  346.h,
+                                ),
                                 painter: HalfCourtPainter(),
                               ),
                             ),
@@ -563,9 +566,13 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                               ),
                             if (_displayMap == 'Zone')
                               ZoneMap(
-                                  shotData: filteredShotChart,
-                                  lgAvg: lgAvg[0],
-                                  courtSize: const Size(368, 346))
+                                shotData: filteredShotChart,
+                                lgAvg: lgAvg[0],
+                                courtSize: Size(
+                                  368.w,
+                                  346.h,
+                                ),
+                              )
                           ],
                         ),
                         Row(
@@ -593,7 +600,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                             )
                           ],
                         ),
-                        const SizedBox(height: 6.0),
+                        SizedBox(height: 6.0.h),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center, // Align center
                           children: [
@@ -606,18 +613,18 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                     return Text(
                                       "$value",
                                       style: kBebasNormal.copyWith(
-                                          color: Colors.white, fontSize: 20.0),
+                                          color: Colors.white, fontSize: 20.0.sp),
                                     );
                                   },
                                 ),
                                 Text(
                                   "FGM",
                                   style: kBebasNormal.copyWith(
-                                      color: Colors.white70, fontSize: 14.0),
+                                      color: Colors.white70, fontSize: 14.0.sp),
                                 ),
                               ],
                             ),
-                            const SizedBox(width: 50.0),
+                            SizedBox(width: 50.0.w),
                             Column(
                               children: [
                                 TweenAnimationBuilder<int>(
@@ -627,18 +634,18 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                     return Text(
                                       "$value",
                                       style: kBebasNormal.copyWith(
-                                          color: Colors.white, fontSize: 20.0),
+                                          color: Colors.white, fontSize: 20.0.sp),
                                     );
                                   },
                                 ),
                                 Text(
                                   "FGA",
                                   style: kBebasNormal.copyWith(
-                                      color: Colors.white70, fontSize: 14.0),
+                                      color: Colors.white70, fontSize: 14.0.sp),
                                 ),
                               ],
                             ),
-                            const SizedBox(width: 50.0),
+                            SizedBox(width: 50.0.w),
                             Column(
                               children: [
                                 TweenAnimationBuilder<double>(
@@ -649,27 +656,27 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                     return Text(
                                       "${value.toStringAsFixed(1)}%",
                                       style: kBebasNormal.copyWith(
-                                          color: Colors.white, fontSize: 20.0),
+                                          color: Colors.white, fontSize: 20.0.sp),
                                     );
                                   },
                                 ),
                                 Text(
                                   "FG%",
                                   style: kBebasNormal.copyWith(
-                                      color: Colors.white70, fontSize: 14.0),
+                                      color: Colors.white70, fontSize: 14.0.sp),
                                 ),
                               ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10.0),
+                        SizedBox(height: 10.0.h),
                         Wrap(
                           children: distinctShotTypes.entries.map((shotType) {
                             bool isSelected = selectedShotTypes.contains(shotType.key);
 
                             return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 4.0), // Add some spacing between buttons
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 4.0.w), // Add some spacing between buttons
                               child: TextButton(
                                 onPressed: () {
                                   setState(() {
@@ -699,7 +706,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                             ? kTeamColors[widget.team['ABBREVIATION']]![
                                                 'secondaryColor']!
                                             : Colors.grey.shade600,
-                                        width: 2.0,
+                                        width: 2.0.w,
                                       ),
                                     ),
                                   ),
@@ -712,12 +719,12 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                                     children: [
                                       TextSpan(
                                         text: shotType.key,
-                                        style: kBebasNormal.copyWith(fontSize: 14.0),
+                                        style: kBebasNormal.copyWith(fontSize: 14.0.sp),
                                       ),
                                       TextSpan(
                                         text: '  ${shotType.value}',
                                         style: kBebasNormal.copyWith(
-                                            color: Colors.grey.shade300, fontSize: 14.0),
+                                            color: Colors.grey.shade300, fontSize: 14.0.sp),
                                       ),
                                     ],
                                   ),
@@ -726,7 +733,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                             );
                           }).toList(),
                         ),
-                        const SizedBox(height: 10.0),
+                        SizedBox(height: 10.0.r),
                       ],
                     );
                   }

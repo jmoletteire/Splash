@@ -54,7 +54,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
     var lastGame = getLastGame();
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Card(
-      margin: const EdgeInsets.all(11.0),
+      margin: EdgeInsets.all(11.0.r),
       color: Colors.grey.shade900,
       child: Column(
         children: [
@@ -106,12 +106,12 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(8.0.r),
             child: Card(
               color: Colors.white10,
               child: Stack(children: [
                 CustomPaint(
-                  size: isLandscape ? Size(368.r, 346.r) : const Size(368, 346),
+                  size: Size(368.r, 346.r),
                   painter: HalfCourtPainter(courtColor: Colors.grey.shade800),
                 ),
                 Column(
@@ -138,7 +138,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 25.0.r),
+                    SizedBox(height: 35.0.r),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -209,7 +209,7 @@ class PlayerCard extends StatelessWidget {
       child: Column(
         children: [
           PlayerAvatar(
-            radius: 30.r,
+            radius: 32.r,
             backgroundColor: Colors.grey.shade800,
             playerImageUrl: 'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
           ),

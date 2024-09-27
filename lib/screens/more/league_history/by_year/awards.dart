@@ -53,7 +53,7 @@ class _AwardsState extends State<Awards> {
         /// AWARD
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.04
+              ? MediaQuery.of(context).size.width * 0.2
               : MediaQuery.of(context).size.width * 0.45,
           freezePriority: 1,
         ),
@@ -112,7 +112,7 @@ class _AwardsState extends State<Awards> {
             border: Border(
               bottom: BorderSide(
                 color: Colors.grey.shade200,
-                width: 0.125,
+                width: 0.125.r,
               ),
             ),
           ),
@@ -145,7 +145,7 @@ class _AwardsState extends State<Awards> {
           highlightColor: Colors.white,
           child: contentBuilder(context, (context, column) {
             return Padding(
-              padding: EdgeInsets.only(right: column == 2 ? 0.0 : 8.0),
+              padding: EdgeInsets.only(right: column == 2 ? 0.0 : 8.0.r),
               child: getContent(row, column, context),
             );
           }),
@@ -172,6 +172,7 @@ class _AwardsState extends State<Awards> {
     };
 
     Map<String, String> positionMap = {
+      '0': '',
       'Guard': 'G',
       'Guard-Forward': 'G-F',
       'Forward': 'F',
@@ -197,7 +198,7 @@ class _AwardsState extends State<Awards> {
             awardName,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: kBebasNormal.copyWith(color: Colors.grey.shade300, fontSize: 15.0.r),
+            style: kBebasNormal.copyWith(color: Colors.grey.shade300, fontSize: 16.0.r),
           ),
         );
       case 1:
@@ -229,7 +230,7 @@ class _AwardsState extends State<Awards> {
             child: Row(
               children: [
                 PlayerAvatar(
-                  radius: 12.0.r,
+                  radius: 13.0.r,
                   backgroundColor: Colors.white70,
                   playerImageUrl:
                       'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.awards[row].value['PLAYERS'][0]['PLAYER_ID']}.png',
@@ -244,10 +245,10 @@ class _AwardsState extends State<Awards> {
                         '${widget.awards[row].value['PLAYERS'][0]['FIRST_NAME'] ?? ''} ${widget.awards[row].value['PLAYERS'][0]['LAST_NAME'] ?? ''}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                        style: kBebasNormal.copyWith(fontSize: 15.0.r),
                       ),
                       AutoSizeText(
-                        ', ${positionMap[widget.awards[row].value['PLAYERS'][0]['POSITION']] ?? ''}',
+                        ', $position',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: kBebasNormal.copyWith(

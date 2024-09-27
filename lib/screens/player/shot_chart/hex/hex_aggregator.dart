@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HexagonAggregator {
   final double hexWidth;
@@ -10,7 +9,7 @@ class HexagonAggregator {
   HexagonAggregator(this.hexWidth, this.hexHeight);
 
   Map<String, HexagonData> aggregateShots(
-      List shotData, List<HexagonData> hexagons, bool isLandscape) {
+      List shotData, List<HexagonData> hexagons, bool isLandscape, double courtHeight) {
     Map<String, HexagonData> hexagonMap = {};
 
     for (var shot in shotData) {
@@ -19,7 +18,7 @@ class HexagonAggregator {
       Offset shotPoint = Offset(x, y);
 
       for (var hexagon in hexagons) {
-        if (hexagon.contains(shotPoint, isLandscape)) {
+        if (hexagon.contains(shotPoint, isLandscape, courtHeight)) {
           String key = '${hexagon.x},${hexagon.y}';
           if (!hexagonMap.containsKey(key)) {
             hexagonMap[key] = hexagon;
@@ -125,8 +124,8 @@ class HexagonData {
     return points;
   }
 
-  bool contains(Offset point, bool isLandscape) {
-    double courtHeight = isLandscape ? 346.r : 346;
+  bool contains(Offset point, bool isLandscape, double height) {
+    double courtHeight = 346;
     double centerX = x;
     double centerY = y;
     double apothem =

@@ -64,7 +64,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
         /// AWARD
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.04
+              ? MediaQuery.of(context).size.width * 0.07
               : MediaQuery.of(context).size.width * 0.20,
           freezePriority: 1,
         ),
@@ -96,7 +96,9 @@ class _AwardsByAwardState extends State<AwardsByAward> {
         /// Fill
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.03
+              ? widget.awardName == 'NBA Champion'
+                  ? MediaQuery.of(context).size.width * 0.5
+                  : MediaQuery.of(context).size.width * 0.03
               : widget.awardName == 'NBA Champion'
                   ? MediaQuery.of(context).size.width * 0.19
                   : MediaQuery.of(context).size.width * 0.05,
@@ -141,7 +143,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
             border: Border(
               bottom: BorderSide(
                 color: Colors.grey.shade200,
-                width: 0.125,
+                width: 0.125.h,
               ),
             ),
           ),
@@ -186,7 +188,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
           highlightColor: Colors.white,
           child: contentBuilder(context, (context, column) {
             return Padding(
-              padding: EdgeInsets.only(right: column == 2 ? 0.0 : 8.0),
+              padding: EdgeInsets.only(right: column == 2 ? 0.0 : 8.0.r),
               child: getContent(row, column, context),
             );
           }),
@@ -252,7 +254,7 @@ class _AwardsByAwardState extends State<AwardsByAward> {
             child: Row(
               children: [
                 PlayerAvatar(
-                  radius: 14.0.r,
+                  radius: 13.0.r,
                   backgroundColor: Colors.white70,
                   playerImageUrl:
                       'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.awards[row][widget.awardName]['PLAYERS'][0]['PLAYER_ID']}.png',

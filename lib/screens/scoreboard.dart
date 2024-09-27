@@ -308,7 +308,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                   indicatorColor: Colors.deepOrange,
                   unselectedLabelColor: Colors.white70,
                   labelColor: Colors.deepOrangeAccent,
-                  labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+                  labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
                   labelPadding: EdgeInsets.symmetric(horizontal: 20.0.r),
                   onTap: (index) {
                     setState(() {

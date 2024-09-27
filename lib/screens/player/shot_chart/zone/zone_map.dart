@@ -27,10 +27,10 @@ class _ZoneMapState extends State<ZoneMap> {
     Map<String, ZoneData> aggregatedZones =
         aggregator.aggregateShots(widget.shotData, isLandscape);
 
-    double canvasWidth = isLandscape ? 368.r : 368;
-    double canvasHeight = isLandscape ? 346.r : 346;
-    double tooltipWidth = isLandscape ? 150.r : 150; // Approximate width of the tooltip
-    double tooltipHeight = isLandscape ? 50.r : 50; // Approximate height of the tooltip
+    double canvasWidth = isLandscape ? 368.r : 368.w;
+    double canvasHeight = isLandscape ? 346.r : 346.h;
+    double tooltipWidth = isLandscape ? 150.r : 150.w; // Approximate width of the tooltip
+    double tooltipHeight = isLandscape ? 50.r : 50.h; // Approximate height of the tooltip
 
     bool zoneTapped = false;
 
@@ -43,17 +43,17 @@ class _ZoneMapState extends State<ZoneMap> {
         setState(() {
           _selectedZone = zone;
           // Determine the tooltip position, adjusting for edges
-          double adjustedX = tapPosition.dx + 10; // Default offset to the right
-          double adjustedY = tapPosition.dy + 10; // Default offset to the bottom
+          double adjustedX = tapPosition.dx + 10.w; // Default offset to the right
+          double adjustedY = tapPosition.dy + 10.h; // Default offset to the bottom
 
           // Check if the tooltip would overflow the right edge
           if (adjustedX + tooltipWidth > canvasWidth) {
-            adjustedX = tapPosition.dx - tooltipWidth + 30; // Place it to the left
+            adjustedX = tapPosition.dx - tooltipWidth + 30.w; // Place it to the left
           }
 
           // Check if the tooltip would overflow the bottom edge
-          if (adjustedY + tooltipHeight > canvasHeight - 50) {
-            adjustedY = tapPosition.dy - tooltipHeight - 50; // Place it above
+          if (adjustedY + tooltipHeight > canvasHeight - 50.h) {
+            adjustedY = tapPosition.dy - tooltipHeight - 50.h; // Place it above
           }
           _tooltipPosition = Offset(adjustedX, adjustedY);
         });
@@ -113,7 +113,7 @@ class _ZoneMapState extends State<ZoneMap> {
                     'Avg Dist: ${_selectedZone!.avgDistance.toStringAsFixed(1)} ft.\n'
                     'LA: ${(100 * widget.lgAvg['Zone'][_selectedZone!.zoneName]['FG_PCT']).toStringAsFixed(1)}%\n'
                     'FG: ${_selectedZone!.FGM}/${_selectedZone!.FGA} (${(100 * _selectedZone!.FGM / _selectedZone!.FGA).toStringAsFixed(1)}%)',
-                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                    style: kBebasNormal.copyWith(fontSize: 14.0.sp),
                   ),
                 ),
               ),

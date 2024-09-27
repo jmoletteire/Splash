@@ -112,7 +112,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
       columns: [
         TableColumn(
-          width: MediaQuery.of(context).size.width * (isLandscape ? 0.15 : 0.35),
+          width: MediaQuery.of(context).size.width * (isLandscape ? 0.15 : 0.3),
           freezePriority: 1,
         ),
 

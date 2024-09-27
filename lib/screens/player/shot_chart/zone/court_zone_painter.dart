@@ -34,7 +34,7 @@ class ZonePainter extends CustomPainter {
       final TextPainter textPainter = TextPainter(
         text: TextSpan(
           text: '${(100 * zone.FGM / zone.FGA).toStringAsFixed(1)}%', // FG% text
-          style: kBebasNormal.copyWith(fontSize: 16.0.r),
+          style: kBebasNormal.copyWith(fontSize: 16.0.sp),
         ),
         textDirection: TextDirection.ltr,
       );

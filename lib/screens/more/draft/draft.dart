@@ -296,6 +296,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
         ),
         CustomIconButton(
           icon: Icons.bar_chart_sharp,
+          size: 30.0.r,
           onPressed: () {
             showModalBottomSheet(
               context: context,
@@ -310,6 +311,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
         ),
         CustomIconButton(
           icon: Icons.search,
+          size: 30.0.r,
           onPressed: () {
             Navigator.push(
               context,
@@ -397,7 +399,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
               surfaceTintColor: Colors.grey.shade900,
               title: Text(
                 'Draft',
-                style: kBebasBold.copyWith(fontSize: 22.0.r),
+                style: kBebasBold.copyWith(fontSize: 24.0.r),
               ),
               actions: getActions(_tabController.index),
               bottom: TabBar(
@@ -407,7 +409,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
                 indicatorWeight: 3.0,
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
+                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
                 tabs: const [Tab(text: 'By Year'), Tab(text: 'By Pick')],
               ),
             ),
