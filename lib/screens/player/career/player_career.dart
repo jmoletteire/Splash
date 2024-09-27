@@ -96,51 +96,46 @@ class _PlayerCareerState extends State<PlayerCareer> {
           )
         : CustomScrollView(
             slivers: [
-              MultiSliver(
-                pushPinnedChildren: true,
-                children: [
-                  SliverPinnedHeader(
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade900,
-                        border: const Border(
-                          bottom: BorderSide(
-                            color: Colors.white30,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: DropdownButton<String>(
-                        padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 5.0.r),
-                        borderRadius: BorderRadius.circular(10.0),
-                        menuMaxHeight: 300.0.r,
-                        dropdownColor: Colors.grey.shade900,
-                        isExpanded: true,
-                        underline: Container(),
-                        value: mode,
-                        items: modes.map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? value) {
-                          setState(() {
-                            mode = value!;
-                          });
-                        },
+              SliverToBoxAdapter(
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.04,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade900,
+                    border: const Border(
+                      bottom: BorderSide(
+                        color: Colors.white30,
+                        width: 1,
                       ),
                     ),
                   ),
-                ],
+                  child: DropdownButton<String>(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.r, vertical: 5.0.r),
+                    borderRadius: BorderRadius.circular(10.0),
+                    menuMaxHeight: 300.0.r,
+                    dropdownColor: Colors.grey.shade900,
+                    isExpanded: true,
+                    underline: Container(),
+                    value: mode,
+                    items: modes.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        mode = value!;
+                      });
+                    },
+                  ),
+                ),
               ),
               if (seasons.isNotEmpty)
                 MultiSliver(
-                  pushPinnedChildren: true,
+                  pushPinnedChildren: false,
                   children: [
                     SliverToBoxAdapter(
                       child: Container(

@@ -270,7 +270,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
-                      labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+                      labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
                       isScrollable: !_isHistoric,
                       tabAlignment: !_isHistoric ? TabAlignment.start : null,
                       tabs: _isHistoric
