@@ -90,9 +90,10 @@ class _LineupsState extends State<Lineups> {
                             Expanded(
                               child: Column(
                                 children: [
+                                  SizedBox(height: 30.0.r),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      SizedBox(width: 30.0.r),
                                       Column(
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
@@ -119,7 +120,6 @@ class _LineupsState extends State<Lineups> {
                                           ),
                                         ],
                                       ),
-                                      //SizedBox(width: 25.0.r),
                                       Column(
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
@@ -139,7 +139,6 @@ class _LineupsState extends State<Lineups> {
                                           ),
                                         ],
                                       ),
-                                      //SizedBox(width: 30.0.r),
                                       Column(
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
@@ -159,7 +158,6 @@ class _LineupsState extends State<Lineups> {
                                           ),
                                         ],
                                       ),
-                                      //SizedBox(width: 25.0.r),
                                       Column(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -394,6 +392,9 @@ class FullCourtPainter extends CustomPainter {
     final courtWidth = isLandscape ? size.height : size.width;
     final courtHeight = isLandscape ? size.width : size.height;
 
+    // Add a scaling factor for the three-point arc radius in landscape mode
+    final threePointArcScalingFactor = isLandscape ? 0.893 : 1.0;
+
     // Draw the half court line
     isLandscape
         ? canvas.drawLine(
@@ -412,7 +413,7 @@ class FullCourtPainter extends CustomPainter {
       /// 346 Pixels tall = 47 ft (1 pixel = 0.136 ft OR 1.63 inches)
 
       final restrictedAreaRadius = courtWidth * (4 / 50);
-      final threePointLineRadius = courtHeight * (23.75 / 47);
+      final threePointLineRadius = courtHeight * (23.75 / 47) * threePointArcScalingFactor;
       final keyWidth = courtWidth * (12 / 50);
       final outerKeyWidth = courtWidth * (16 / 50);
       final freeThrowLine = courtHeight * (18.87 / 47);

@@ -270,6 +270,7 @@ class _CapSheetState extends State<CapSheet> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return SliverTableView.builder(
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
@@ -291,35 +292,60 @@ class _CapSheetState extends State<CapSheet> {
       columns: [
         /// PLAYER
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.35,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.15
+              : MediaQuery.of(context).size.width * 0.35,
           freezePriority: 1,
         ),
 
         /// AGE
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.1,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
         ),
 
         /// POS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.1),
 
         /// '24-25
-        TableColumn(width: MediaQuery.of(context).size.width * 0.16),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.125
+                : MediaQuery.of(context).size.width * 0.16),
 
         /// '25-26
-        TableColumn(width: MediaQuery.of(context).size.width * 0.16),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.125
+                : MediaQuery.of(context).size.width * 0.16),
 
         /// '26-27
-        TableColumn(width: MediaQuery.of(context).size.width * 0.16),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.125
+                : MediaQuery.of(context).size.width * 0.16),
 
         /// '27-28
-        TableColumn(width: MediaQuery.of(context).size.width * 0.16),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.125
+                : MediaQuery.of(context).size.width * 0.16),
 
         /// '28-29
-        TableColumn(width: MediaQuery.of(context).size.width * 0.16),
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.125
+                : MediaQuery.of(context).size.width * 0.16),
 
         /// '29-30
-        TableColumn(width: MediaQuery.of(context).size.width * 0.16)
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.125
+                : MediaQuery.of(context).size.width * 0.16)
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -450,7 +476,7 @@ class _CapSheetState extends State<CapSheet> {
     List<String> contractYears = player['years'].keys.toList();
     contractYears.sort(); // Sort the years to get the last one
     int yearsRemaining =
-        int.parse(contractYears.last) - int.parse(kCurrentSeason.substring(0, 4));
+        (int.parse(contractYears.last) + 1) - int.parse(kCurrentSeason.substring(0, 4));
 
     String freeAgentYear = contractYears.isNotEmpty
         ? '\'${(int.parse(contractYears.last) + 1).toString().substring(2)}-${(int.parse(contractYears.last) + 2).toString().substring(2)}'

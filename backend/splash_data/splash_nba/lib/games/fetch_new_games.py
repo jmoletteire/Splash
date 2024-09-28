@@ -11,6 +11,15 @@ import logging
 
 
 def update_game_data():
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        games_collection = db.nba_games
+    except Exception as e:
+        logging.error(f"Failed to connect to MongoDB: {e}")
+        exit(1)
+
     try:
         today = datetime.today().strftime('%Y-%m-%d')
         query = {

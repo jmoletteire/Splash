@@ -190,6 +190,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Scaffold(
       body: _isLoading
           ? Center(
@@ -271,8 +272,8 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
                       labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
-                      isScrollable: !_isHistoric,
-                      tabAlignment: !_isHistoric ? TabAlignment.start : null,
+                      isScrollable: !_isHistoric && !isLandscape,
+                      tabAlignment: !_isHistoric && !isLandscape ? TabAlignment.start : null,
                       tabs: _isHistoric
                           ? [
                               const Tab(text: 'Profile'),

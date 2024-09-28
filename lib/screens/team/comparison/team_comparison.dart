@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/team/comparison/team_search_widget.dart';
@@ -57,6 +58,7 @@ class _TeamComparisonState extends State<TeamComparison> {
 
   void _showBottomSheet() {
     showModalBottomSheet(
+      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
       backgroundColor: const Color(0xFF111111),
       context: context,
       builder: (context) => ChangeNotifierProvider(
@@ -241,7 +243,7 @@ class _TeamComparisonState extends State<TeamComparison> {
         backgroundColor: Colors.grey.shade900,
         surfaceTintColor: Colors.grey.shade900,
         title: const Text('Comparison'),
-        titleTextStyle: kBebasBold.copyWith(fontSize: 24.0),
+        titleTextStyle: kBebasBold.copyWith(fontSize: 24.0.r),
         actions: [
           CustomIconButton(
             icon: Icons.search,
@@ -269,6 +271,8 @@ class _TeamComparisonState extends State<TeamComparison> {
                       child: GestureDetector(
                         onTap: () {
                           showModalBottomSheet(
+                            constraints:
+                                BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                             backgroundColor: const Color(0xFF111111),
                             context: context,
                             builder: (context) => ChangeNotifierProvider(
@@ -318,38 +322,38 @@ class _TeamComparisonState extends State<TeamComparison> {
                           );
                         },
                         child: Card(
-                          margin: const EdgeInsets.fromLTRB(11.0, 11.0, 5.0, 5.0),
+                          margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 5.0.r, 5.0.r),
                           color: Colors.grey.shade900,
                           child: Stack(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(15.0),
+                                padding: EdgeInsets.all(15.0.r),
                                 child: Center(
                                   child: Column(
                                     children: [
                                       Image.asset(
                                         'images/NBA_Logos/${teamOne['TEAM_ID']}.png',
-                                        width: MediaQuery.of(context).size.width * 0.125,
-                                        height: MediaQuery.of(context).size.width * 0.125,
+                                        width: 100.0.r,
+                                        height: 100.0.r,
                                       ),
-                                      const SizedBox(height: 5.0),
+                                      SizedBox(height: 10.0.r),
                                       AutoSizeText(
                                         '${teamOne['CITY']} ${teamOne['NICKNAME']}',
                                         style: kBebasOffWhite.copyWith(
-                                            color: Colors.white, fontSize: 18.0),
+                                            color: Colors.white, fontSize: 18.0.r),
                                         maxLines: 1,
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
-                              const Positioned(
+                              Positioned(
                                 top: 5,
                                 right: 10,
                                 child: Icon(
                                   Icons.compare_arrows, // Replace with the desired icon
                                   color: Colors.white70,
-                                  size: 24.0,
+                                  size: 24.0.r,
                                 ),
                               ),
                             ],
@@ -361,6 +365,8 @@ class _TeamComparisonState extends State<TeamComparison> {
                       child: GestureDetector(
                         onTap: () {
                           showModalBottomSheet(
+                            constraints:
+                                BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                             backgroundColor: const Color(0xFF111111),
                             context: context,
                             builder: (context) => ChangeNotifierProvider(
@@ -409,54 +415,54 @@ class _TeamComparisonState extends State<TeamComparison> {
                           );
                         },
                         child: Card(
-                          margin: const EdgeInsets.fromLTRB(5.0, 11.0, 11.0, 5.0),
+                          margin: EdgeInsets.fromLTRB(5.0.r, 11.0.r, 11.0.r, 5.0.r),
                           color: Colors.grey.shade900,
                           child: Stack(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(15.0),
+                                padding: EdgeInsets.all(15.0.r),
                                 child: Center(
                                   child: Column(
                                     children: [
                                       if (teamTwo.isEmpty)
                                         Image.asset(
                                           'images/NBA_Logos/0.png',
-                                          width: MediaQuery.of(context).size.width * 0.125,
-                                          height: MediaQuery.of(context).size.width * 0.125,
+                                          width: 100.0.r,
+                                          height: 100.0.r,
                                         ),
-                                      if (teamTwo.isEmpty) const SizedBox(height: 5.0),
+                                      if (teamTwo.isEmpty) SizedBox(height: 5.0.r),
                                       if (teamTwo.isEmpty)
                                         AutoSizeText(
                                           'SELECT TEAM',
                                           style: kBebasOffWhite.copyWith(
-                                              color: Colors.white, fontSize: 18.0),
+                                              color: Colors.white, fontSize: 18.0.r),
                                           maxLines: 1,
                                         ),
                                       if (teamTwo.isNotEmpty)
                                         Image.asset(
                                           'images/NBA_Logos/${teamTwo['TEAM_ID']}.png',
-                                          width: MediaQuery.of(context).size.width * 0.125,
-                                          height: MediaQuery.of(context).size.width * 0.125,
+                                          width: 100.0.r,
+                                          height: 100.0.r,
                                         ),
-                                      if (teamTwo.isNotEmpty) const SizedBox(height: 5.0),
+                                      if (teamTwo.isNotEmpty) SizedBox(height: 10.0.r),
                                       if (teamTwo.isNotEmpty)
                                         AutoSizeText(
                                           '${teamTwo['CITY']} ${teamTwo['NICKNAME']}',
                                           style: kBebasOffWhite.copyWith(
-                                              color: Colors.white, fontSize: 18.0),
+                                              color: Colors.white, fontSize: 18.0.r),
                                           maxLines: 1,
                                         ),
                                     ],
                                   ),
                                 ),
                               ),
-                              const Positioned(
+                              Positioned(
                                 top: 5,
                                 right: 10,
                                 child: Icon(
                                   Icons.compare_arrows, // Replace with the desired icon
                                   color: Colors.white70,
-                                  size: 24.0,
+                                  size: 24.0.r,
                                 ),
                               ),
                             ],
@@ -474,11 +480,11 @@ class _TeamComparisonState extends State<TeamComparison> {
                         decoration: BoxDecoration(
                             color: Colors.grey.shade900,
                             borderRadius: BorderRadius.circular(10.0)),
-                        margin: const EdgeInsets.fromLTRB(11.0, 5.0, 5.0, 5.0),
+                        margin: EdgeInsets.fromLTRB(11.0.r, 5.0.r, 5.0.r, 5.0.r),
                         child: DropdownButton<String>(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          padding: EdgeInsets.symmetric(horizontal: 15.0.r),
                           borderRadius: BorderRadius.circular(10.0),
-                          menuMaxHeight: 300.0,
+                          menuMaxHeight: 300.0.r,
                           dropdownColor: Colors.grey.shade900,
                           isExpanded: true,
                           underline: Container(),
@@ -490,16 +496,16 @@ class _TeamComparisonState extends State<TeamComparison> {
                                 children: [
                                   Text(
                                     value,
-                                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                                    style: kBebasNormal.copyWith(fontSize: 18.0.r),
                                   ),
-                                  const SizedBox(width: 10.0),
+                                  SizedBox(width: 10.0.r),
                                   ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 20.0),
+                                    constraints: BoxConstraints(maxWidth: 20.0.r),
                                     child: Image.asset(
                                       'images/NBA_Logos/${teamOne['TEAM_ID']}.png',
                                       fit: BoxFit.contain,
                                       alignment: Alignment.center,
-                                      width: 20.0,
+                                      width: 20.0.r,
                                     ),
                                   ),
                                 ],
@@ -525,11 +531,11 @@ class _TeamComparisonState extends State<TeamComparison> {
                         decoration: BoxDecoration(
                             color: Colors.grey.shade900,
                             borderRadius: BorderRadius.circular(10.0)),
-                        margin: const EdgeInsets.fromLTRB(5.0, 5.0, 11.0, 5.0),
+                        margin: EdgeInsets.fromLTRB(5.0.r, 5.0.r, 11.0.r, 5.0.r),
                         child: DropdownButton<String>(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          padding: EdgeInsets.symmetric(horizontal: 15.0.r),
                           borderRadius: BorderRadius.circular(10.0),
-                          menuMaxHeight: 300.0,
+                          menuMaxHeight: 300.0.r,
                           dropdownColor: Colors.grey.shade900,
                           isExpanded: true,
                           underline: Container(),
@@ -542,19 +548,19 @@ class _TeamComparisonState extends State<TeamComparison> {
                                   Text(
                                     value,
                                     style: kBebasNormal.copyWith(
-                                      fontSize: 18.0,
+                                      fontSize: 18.0.r,
                                       color: teamTwo.isNotEmpty ? Colors.white : Colors.grey,
                                     ),
                                   ),
-                                  if (teamTwo.isNotEmpty) const SizedBox(width: 10.0),
+                                  if (teamTwo.isNotEmpty) SizedBox(width: 10.0.r),
                                   if (teamTwo.isNotEmpty)
                                     ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 20.0),
+                                      constraints: BoxConstraints(maxWidth: 20.0.r),
                                       child: Image.asset(
                                         'images/NBA_Logos/${teamTwo['TEAM_ID']}.png',
                                         fit: BoxFit.contain,
                                         alignment: Alignment.center,
-                                        width: 20.0,
+                                        width: 20.0.r,
                                       ),
                                     ),
                                 ],
@@ -587,11 +593,11 @@ class _TeamComparisonState extends State<TeamComparison> {
                         decoration: BoxDecoration(
                             color: Colors.grey.shade900,
                             borderRadius: BorderRadius.circular(10.0)),
-                        margin: const EdgeInsets.fromLTRB(11.0, 5.0, 5.0, 5.0),
+                        margin: EdgeInsets.fromLTRB(11.0.r, 5.0.r, 5.0.r, 5.0.r),
                         child: DropdownButton<String>(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          padding: EdgeInsets.symmetric(horizontal: 15.0.r),
                           borderRadius: BorderRadius.circular(10.0),
-                          menuMaxHeight: 300.0,
+                          menuMaxHeight: 300.0.r,
                           dropdownColor: Colors.grey.shade900,
                           isExpanded: true,
                           underline: Container(),
@@ -603,23 +609,23 @@ class _TeamComparisonState extends State<TeamComparison> {
                                 children: [
                                   Text(
                                     value,
-                                    style: kBebasNormal.copyWith(fontSize: 18.0),
+                                    style: kBebasNormal.copyWith(fontSize: 18.0.r),
                                   ),
-                                  const SizedBox(width: 10.0),
+                                  SizedBox(width: 10.0.r),
                                   ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 10.0),
+                                    constraints: BoxConstraints(maxWidth: 10.0.r),
                                     child: value == 'REGULAR SEASON'
                                         ? Image.asset(
                                             'images/NBA_Logos/0.png',
                                             fit: BoxFit.contain,
                                             alignment: Alignment.center,
-                                            width: 10.0,
+                                            width: 10.0.r,
                                           )
                                         : SvgPicture.asset(
                                             'images/playoffs.svg',
                                             fit: BoxFit.contain,
                                             alignment: Alignment.center,
-                                            width: 10.0,
+                                            width: 10.0.r,
                                           ),
                                   ),
                                 ],
@@ -639,11 +645,11 @@ class _TeamComparisonState extends State<TeamComparison> {
                         decoration: BoxDecoration(
                             color: Colors.grey.shade900,
                             borderRadius: BorderRadius.circular(10.0)),
-                        margin: const EdgeInsets.fromLTRB(5.0, 5.0, 11.0, 5.0),
+                        margin: EdgeInsets.fromLTRB(5.0.r, 5.0.r, 11.0.r, 5.0.r),
                         child: DropdownButton<String>(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          padding: EdgeInsets.symmetric(horizontal: 15.0.r),
                           borderRadius: BorderRadius.circular(10.0),
-                          menuMaxHeight: 300.0,
+                          menuMaxHeight: 300.0.r,
                           dropdownColor: Colors.grey.shade900,
                           isExpanded: true,
                           underline: Container(),
@@ -656,26 +662,26 @@ class _TeamComparisonState extends State<TeamComparison> {
                                   Text(
                                     value,
                                     style: kBebasNormal.copyWith(
-                                      fontSize: 18.0,
+                                      fontSize: 18.0.r,
                                       color: teamTwo.isNotEmpty ? Colors.white : Colors.grey,
                                     ),
                                   ),
-                                  if (teamTwo.isNotEmpty) const SizedBox(width: 10.0),
+                                  if (teamTwo.isNotEmpty) SizedBox(width: 10.0.r),
                                   if (teamTwo.isNotEmpty)
                                     ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 20.0),
+                                      constraints: BoxConstraints(maxWidth: 20.0.r),
                                       child: value == 'REGULAR SEASON'
                                           ? Image.asset(
                                               'images/NBA_Logos/0.png',
                                               fit: BoxFit.contain,
                                               alignment: Alignment.center,
-                                              width: 10.0,
+                                              width: 10.0.r,
                                             )
                                           : SvgPicture.asset(
                                               'images/playoffs.svg',
                                               fit: BoxFit.contain,
                                               alignment: Alignment.center,
-                                              width: 10.0,
+                                              width: 10.0.r,
                                             ),
                                     ),
                                 ],
@@ -697,9 +703,9 @@ class _TeamComparisonState extends State<TeamComparison> {
                 if (teamTwo.isNotEmpty)
                   Card(
                     color: Colors.grey.shade900,
-                    margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                    margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                     child: Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: EdgeInsets.all(15.0.r),
                       child: Column(
                         children: [
                           NonComparisonRow(
@@ -709,7 +715,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                             teamTwo:
                                 '${teamTwo['seasons'][selectedSeasonTwo]['WINS']} - ${teamTwo['seasons'][selectedSeasonTwo]['LOSSES']}',
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           NonComparisonRow(
                             statName: 'WIN %',
                             teamOne: teamOne['seasons'][selectedSeasonOne]['WIN_PCT']
@@ -717,7 +723,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                             teamTwo: teamTwo['seasons'][selectedSeasonTwo]['WIN_PCT']
                                 .toStringAsFixed(3),
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           NonComparisonRow(
                             statName: 'STANDINGS',
                             teamOne: getStanding(
@@ -725,13 +731,13 @@ class _TeamComparisonState extends State<TeamComparison> {
                             teamTwo: getStanding(
                                 teamTwo['seasons'][selectedSeasonTwo]['CONF_RANK']),
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           NonComparisonRow(
                             statName: 'CONF',
                             teamOne: teamOne['CONF'].toString().substring(0, 4),
                             teamTwo: teamTwo['CONF'].toString().substring(0, 4),
                           ),
-                          const SizedBox(height: 5.0),
+                          SizedBox(height: 5.0.r),
                           NonComparisonRow(
                             statName: 'PLAYOFFS',
                             teamOne: getPlayoffs(
@@ -752,18 +758,18 @@ class _TeamComparisonState extends State<TeamComparison> {
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
                     Card(
                       color: Colors.grey.shade900,
-                      margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                      margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                       child: Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: EdgeInsets.all(15.0.r),
                         child: Column(
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Top Stats', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Top Stats', style: kBebasBold.copyWith(fontSize: 20.0.r))
                               ],
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'OFF RATING',
                               teamOne: teamOne['seasons'][selectedSeasonOne]['STATS']
@@ -773,7 +779,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'DEF RATING',
                               teamOne: teamOne['seasons'][selectedSeasonOne]['STATS']
@@ -783,7 +789,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'NET RATING',
                               teamOne: teamOne['seasons'][selectedSeasonOne]['STATS']
@@ -793,7 +799,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'PACE',
                               teamOne: roundToDecimalPlaces(
@@ -807,7 +813,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'TOV%',
                               teamOne: roundToDecimalPlaces(
@@ -832,18 +838,18 @@ class _TeamComparisonState extends State<TeamComparison> {
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
                     Card(
                       color: Colors.grey.shade900,
-                      margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                      margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                       child: Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: EdgeInsets.all(15.0.r),
                         child: Column(
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Shooting', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Shooting', style: kBebasBold.copyWith(fontSize: 20.0.r))
                               ],
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'FG%',
                               teamOne: roundToDecimalPlaces(
@@ -859,7 +865,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: '3P%',
                               teamOne: roundToDecimalPlaces(
@@ -875,7 +881,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'FT%',
                               teamOne: roundToDecimalPlaces(
@@ -891,7 +897,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: '3PA Rate%',
                               teamOne: roundToDecimalPlaces(
@@ -907,7 +913,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'FT/FGA',
                               teamOne: roundToDecimalPlaces(
@@ -921,7 +927,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'EFG%',
                               teamOne: roundToDecimalPlaces(
@@ -937,7 +943,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'TS%',
                               teamOne: roundToDecimalPlaces(
@@ -962,18 +968,19 @@ class _TeamComparisonState extends State<TeamComparison> {
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
                     Card(
                       color: Colors.grey.shade900,
-                      margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                      margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                       child: Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: EdgeInsets.all(15.0.r),
                         child: Column(
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Rebounding', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Rebounding',
+                                    style: kBebasBold.copyWith(fontSize: 20.0.r))
                               ],
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'REB PER 100',
                               teamOne: roundToDecimalPlaces(
@@ -987,7 +994,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'OREB PER 100',
                               teamOne: roundToDecimalPlaces(
@@ -1001,7 +1008,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'DREB PER 100',
                               teamOne: roundToDecimalPlaces(
@@ -1015,7 +1022,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'OREB%',
                               teamOne: roundToDecimalPlaces(
@@ -1031,7 +1038,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'DREB%',
                               teamOne: roundToDecimalPlaces(
@@ -1049,7 +1056,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                             ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
-                              const SizedBox(height: 15.0),
+                              SizedBox(height: 15.0.r),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               ComparisonRow(
@@ -1067,7 +1074,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
-                              const SizedBox(height: 5.0),
+                              SizedBox(height: 5.0.r),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               ComparisonRow(
@@ -1087,7 +1094,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
-                              const SizedBox(height: 5.0),
+                              SizedBox(height: 5.0.r),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               ComparisonRow(
@@ -1114,18 +1121,18 @@ class _TeamComparisonState extends State<TeamComparison> {
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
                     Card(
                       color: Colors.grey.shade900,
-                      margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                      margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                       child: Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: EdgeInsets.all(15.0.r),
                         child: Column(
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Defense', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Defense', style: kBebasBold.copyWith(fontSize: 20.0.r))
                               ],
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'STL PER 100',
                               teamOne: roundToDecimalPlaces(
@@ -1139,7 +1146,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               ComparisonRow(
@@ -1159,7 +1166,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
-                              const SizedBox(height: 15.0),
+                              SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'BLK PER 100',
                               teamOne: roundToDecimalPlaces(
@@ -1175,7 +1182,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                             ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
-                              const SizedBox(height: 5.0),
+                              SizedBox(height: 5.0.r),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               ComparisonRow(
@@ -1202,18 +1209,18 @@ class _TeamComparisonState extends State<TeamComparison> {
                       int.parse(selectedSeasonTwo.substring(0, 4)) >= 1996)
                     Card(
                       color: Colors.grey.shade900,
-                      margin: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 5.0),
+                      margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
                       child: Padding(
-                        padding: const EdgeInsets.all(15.0),
+                        padding: EdgeInsets.all(15.0.r),
                         child: Column(
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Hustle', style: kBebasBold.copyWith(fontSize: 20.0))
+                                Text('Hustle', style: kBebasBold.copyWith(fontSize: 20.0.r))
                               ],
                             ),
-                            const SizedBox(height: 15.0),
+                            SizedBox(height: 15.0.r),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               ComparisonRow(
@@ -1233,7 +1240,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
-                              const SizedBox(height: 5.0),
+                              SizedBox(height: 5.0.r),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               ComparisonRow(
@@ -1253,7 +1260,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
-                              const SizedBox(height: 15.0),
+                              SizedBox(height: 15.0.r),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
                               ComparisonRow(
@@ -1273,7 +1280,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               ),
                             if (int.parse(selectedSeasonOne.substring(0, 4)) >= 2016 &&
                                 int.parse(selectedSeasonTwo.substring(0, 4)) >= 2016)
-                              const SizedBox(height: 15.0),
+                              SizedBox(height: 15.0.r),
                             ComparisonRow(
                               statName: 'FOULS PER 100',
                               teamOne: roundToDecimalPlaces(
@@ -1287,7 +1294,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                               teamOneColor: teamOneColor,
                               teamTwoColor: teamTwoColor,
                             ),
-                            const SizedBox(height: 5.0),
+                            SizedBox(height: 5.0.r),
                             ComparisonRow(
                               statName: 'FOULS DRAWN PER 100',
                               teamOne: roundToDecimalPlaces(
@@ -1305,7 +1312,7 @@ class _TeamComparisonState extends State<TeamComparison> {
                         ),
                       ),
                     ),
-                const SizedBox(height: 5.0)
+                SizedBox(height: 5.0.r),
               ],
             ),
           ),
@@ -1318,9 +1325,9 @@ class _TeamComparisonState extends State<TeamComparison> {
               child: IgnorePointer(
                 ignoring: _opacity != 1,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  padding: EdgeInsets.symmetric(horizontal: 20.0.r),
                   color: Colors.grey.shade900,
-                  height: 60.0,
+                  height: 60.0.r,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -1342,23 +1349,23 @@ class _TeamComparisonState extends State<TeamComparison> {
                             Row(
                               children: [
                                 Image.asset(
-                                  width: MediaQuery.of(context).size.width * 0.125,
                                   'images/NBA_Logos/${teamOne['TEAM_ID']}.png',
+                                  width: 50.0.r,
                                 ),
-                                const SizedBox(width: 10.0),
+                                SizedBox(width: 10.0.r),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     AutoSizeText(
                                       teamOne['CITY'],
                                       textAlign: TextAlign.start,
-                                      style: kBebasOffWhite.copyWith(fontSize: 15.0),
+                                      style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
                                       maxLines: 1,
                                     ),
                                     AutoSizeText(
                                       teamOne['NICKNAME'],
                                       textAlign: TextAlign.start,
-                                      style: kBebasOffWhite.copyWith(fontSize: 18.0),
+                                      style: kBebasOffWhite.copyWith(fontSize: 18.0.r),
                                       maxLines: 1,
                                     ),
                                   ],
@@ -1393,20 +1400,20 @@ class _TeamComparisonState extends State<TeamComparison> {
                                       children: [
                                         AutoSizeText(
                                           teamTwo['CITY'],
-                                          style: kBebasOffWhite.copyWith(fontSize: 15.0),
+                                          style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
                                           maxLines: 1,
                                         ),
                                         AutoSizeText(
                                           teamTwo['NICKNAME'],
-                                          style: kBebasNormal.copyWith(fontSize: 18.0),
+                                          style: kBebasNormal.copyWith(fontSize: 18.0.r),
                                           maxLines: 1,
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(width: 10.0),
+                                    SizedBox(width: 10.0.r),
                                     Image.asset(
-                                      width: MediaQuery.of(context).size.width * 0.125,
                                       'images/NBA_Logos/${teamTwo['TEAM_ID']}.png',
+                                      width: 50.0.r,
                                     ),
                                   ],
                                 ),
@@ -1447,7 +1454,7 @@ class NonComparisonRow extends StatelessWidget {
           child: AutoSizeText(
             teamOne,
             textAlign: TextAlign.start,
-            style: kBebasNormal.copyWith(fontSize: 18.0),
+            style: kBebasNormal.copyWith(fontSize: 18.0.r),
           ),
         ),
         Expanded(
@@ -1455,7 +1462,7 @@ class NonComparisonRow extends StatelessWidget {
           child: Text(
             statName,
             textAlign: TextAlign.center,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 16.0.r),
           ),
         ),
         Expanded(
@@ -1463,7 +1470,7 @@ class NonComparisonRow extends StatelessWidget {
           child: AutoSizeText(
             teamTwo,
             textAlign: TextAlign.end,
-            style: kBebasNormal.copyWith(fontSize: 18.0),
+            style: kBebasNormal.copyWith(fontSize: 18.0.r),
           ),
         ),
       ],
@@ -1520,7 +1527,7 @@ class ComparisonRow extends StatelessWidget {
           child: Text(
             statName,
             textAlign: TextAlign.center,
-            style: kBebasNormal.copyWith(fontSize: 16.0),
+            style: kBebasNormal.copyWith(fontSize: 16.0.r),
           ),
         ),
         Expanded(
@@ -1571,7 +1578,7 @@ class StatValue extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: 8.0.r),
       decoration: BoxDecoration(
         color: isHighlighted ? color : Colors.transparent,
         borderRadius: BorderRadius.circular(10.0),
@@ -1579,8 +1586,8 @@ class StatValue extends StatelessWidget {
       child: Text(
         isPercentage ? '$value%' : '$value',
         style: isHighlighted && lightColors.containsKey(color)
-            ? kBebasNormal.copyWith(color: lightColors[color])
-            : kBebasNormal,
+            ? kBebasNormal.copyWith(fontSize: 20.0.r, color: lightColors[color])
+            : kBebasNormal.copyWith(fontSize: 20.0.r),
       ),
     );
   }

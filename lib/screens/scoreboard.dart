@@ -222,6 +222,8 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                     size: 30.0.r,
                     onPressed: () {
                       showModalBottomSheet(
+                        constraints:
+                            BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                         backgroundColor: Colors.grey.shade900,
                         context: context,
                         builder: (BuildContext context) {

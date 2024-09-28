@@ -474,6 +474,7 @@ class StandingsGlossary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return SliverPadding(
       padding: EdgeInsets.fromLTRB(8.0.r, 0.0, 8.0.r, 8.0.r),
       sliver: SliverToBoxAdapter(
@@ -598,318 +599,659 @@ class StandingsGlossary extends StatelessWidget {
                   ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Stats',
-                    style: kBebasNormal.copyWith(fontSize: 18.0.r),
-                  ),
-                  SizedBox(height: 5.0.r),
-                  Row(
+              LayoutBuilder(builder: (context, constraints) {
+                if (isLandscape) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'NRTG',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                        'Stats',
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r),
                       ),
-                      Text(
-                        ' - Net Rating',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
+                      SizedBox(height: 5.0.r),
+                      Wrap(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'NRTG',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Net Rating',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'ORTG',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Offensive Rating',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'DRTG',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Defensive Rating',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'PACE',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Possessions per 48 Min',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 20.0.r),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'Streak',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Current Streak',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Last 10',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Last 10 Games',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Home',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Home Record',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Road',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Road Record',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    '> .500',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Teams Over .500',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 20.0.r),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'East',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Eastern Conference',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'West',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Western Conference',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'ATL',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Atlantic Division',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'CEN',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Central Division',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'SE',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Southeast Division',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'NW',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Northwest Division',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'PAC',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Pacific Division',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'SW',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Southwest Division',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 20.0.r),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '100+ PTS',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Scored 100+ Points',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'LEAD HT',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Lead at Halftime',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'LEAD 3Q',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Lead Thru 3 Quarters',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'W - FG%',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Better Field Goal Percentage',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'W - REB',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - More Rebounds',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'W - TOV',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Fewer Turnovers',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                     ],
-                  ),
-                  Row(
+                  );
+                } else {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ORTG',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                        'Stats',
+                        style: kBebasNormal.copyWith(fontSize: 18.0.r),
                       ),
-                      Text(
-                        ' - Offensive Rating',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
+                      SizedBox(height: 5.0.r),
+                      Row(
+                        children: [
+                          Text(
+                            'NRTG',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Net Rating',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'ORTG',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Offensive Rating',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'DRTG',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Defensive Rating',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'PACE',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Possessions per 48 Minutes',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5.0.r),
+                      Row(
+                        children: [
+                          Text(
+                            'Streak',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Current Streak',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Last 10',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Last 10 Games',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Home',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Home Record',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Road',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Road Record',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            '> .500',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Teams Over .500',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5.0.r),
+                      Row(
+                        children: [
+                          Text(
+                            'East',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Eastern Conference',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'West',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Western Conference',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'ATL',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Atlantic Division',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'CEN',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Central Division',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'SE',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Southeast Division',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'NW',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Northwest Division',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'PAC',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Pacific Division',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'SW',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Southwest Division',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5.0.r),
+                      Row(
+                        children: [
+                          Text(
+                            '100+ PTS',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Scored 100+ Points',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'LEAD HT',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Lead at Halftime',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'LEAD 3Q',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Lead Thru 3 Quarters',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'W - FG%',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Better Field Goal Percentage',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'W - REB',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - More Rebounds',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'W - TOV',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Fewer Turnovers',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'DRTG',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Defensive Rating',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'PACE',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Possessions per 48 Minutes',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5.0.r),
-                  Row(
-                    children: [
-                      Text(
-                        'Streak',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Current Streak',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'Last 10',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Last 10 Games',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'Home',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Home Record',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'Road',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Road Record',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        '> .500',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Teams Over .500',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5.0.r),
-                  Row(
-                    children: [
-                      Text(
-                        'East',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Eastern Conference',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'West',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Western Conference',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'ATL',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Atlantic Division',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'CEN',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Central Division',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'SE',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Southeast Division',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'NW',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Northwest Division',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'PAC',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Pacific Division',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'SW',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Southwest Division',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 5.0.r),
-                  Row(
-                    children: [
-                      Text(
-                        '100+ PTS',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Scored 100+ Points',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'LEAD HT',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Lead at Halftime',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'LEAD 3Q',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Lead Thru 3 Quarters',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'W - FG%',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Better Field Goal Percentage',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'W - REB',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - More Rebounds',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        'W - TOV',
-                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                      ),
-                      Text(
-                        ' - Fewer Turnovers',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                  );
+                }
+              })
             ],
           ),
         ),

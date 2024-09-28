@@ -61,6 +61,7 @@ class _PlayerComparisonState extends State<PlayerComparison> {
 
   void _showBottomSheet() {
     showModalBottomSheet(
+      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
       backgroundColor: const Color(0xFF111111),
       context: context,
       builder: (context) => ChangeNotifierProvider(
@@ -212,6 +213,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                       child: GestureDetector(
                           onTap: () {
                             showModalBottomSheet(
+                              constraints:
+                                  BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                               backgroundColor: const Color(0xFF111111),
                               context: context,
                               builder: (context) => ChangeNotifierProvider(
@@ -306,6 +309,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                       child: GestureDetector(
                         onTap: () {
                           showModalBottomSheet(
+                            constraints:
+                                BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                             backgroundColor: const Color(0xFF111111),
                             context: context,
                             builder: (context) => ChangeNotifierProvider(

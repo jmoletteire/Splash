@@ -244,8 +244,8 @@ class _TeamHistoryState extends State<TeamHistory> {
                   children: [
                     Expanded(
                         flex: 1,
-                        child:
-                            Text('YEAR', textAlign: TextAlign.start, style: teamHistoryStyle)),
+                        child: Text('YEAR',
+                            textAlign: TextAlign.center, style: teamHistoryStyle)),
                     Expanded(
                         flex: 3,
                         child: Text('RECORD',
@@ -310,7 +310,7 @@ class _TeamHistoryState extends State<TeamHistory> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       '$city $name   ($startYear - $endYear)',
-                      style: kBebasNormal.copyWith(fontSize: 12.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 13.0.r),
                     ),
                   ),
                 );

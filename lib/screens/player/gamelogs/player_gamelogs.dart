@@ -136,6 +136,8 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
         ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
 
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Stack(
       children: [
         games,
@@ -152,7 +154,8 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
               ),
               width: MediaQuery.sizeOf(context).width,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment:
+                    isLandscape ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
                     decoration: BoxDecoration(
@@ -164,6 +167,8 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
                     child: InkWell(
                       onTap: () {
                         showModalBottomSheet(
+                          constraints:
+                              BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                           backgroundColor: Colors.grey.shade900,
                           scrollControlDisabledMaxHeightRatio: 0.25,
                           context: context,
@@ -327,6 +332,7 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
                       ),
                     ),
                   ),
+                  if (isLandscape) SizedBox(width: 100.0.r),
                   Container(
                     decoration: BoxDecoration(
                         color: Colors.grey.shade900,
@@ -365,6 +371,7 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
                       },
                     ),
                   ),
+                  if (isLandscape) SizedBox(width: 100.0.r),
                   Container(
                     decoration: BoxDecoration(
                         color: Colors.grey.shade900,

@@ -141,13 +141,6 @@ def fetch_team_awards(team_id):
     conf_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsConf']]
     div_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsDiv']]
 
-    for year in league_title_years:
-        lg_history_collection.update_one(
-            {"YEAR": year},
-            {"$set": {"CHAMPION": team_id}},
-            upsert=True
-        )
-
 
 if __name__ == "__main__":
     # Configure logging
@@ -164,11 +157,7 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
 
-    #for i, team in enumerate(teams_collection.find({}, {'TEAM_ID': 1, '_id': 0})):
-        #logging.info(f"Processing {i + 1} of 30...")
-        #fetch_team_awards(team['TEAM_ID'])
-
-    #all_players = commonallplayers.CommonAllPlayers().get_normalized_dict()['CommonAllPlayers']
-    #player_ids = [player['PERSON_ID'] for player in all_players]
-    #fetch_player_awards(player_ids)
+    all_players = commonallplayers.CommonAllPlayers().get_normalized_dict()['CommonAllPlayers']
+    player_ids = [player['PERSON_ID'] for player in all_players]
+    fetch_player_awards(player_ids)
     player_award_details()

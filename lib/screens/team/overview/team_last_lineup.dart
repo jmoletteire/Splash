@@ -115,62 +115,134 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                     size: Size(368.r, 346.r),
                     painter: HalfCourtPainter(courtColor: Colors.grey.shade800),
                   ),
-                  Column(
-                    children: [
-                      SizedBox(height: 60.0.r),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  LayoutBuilder(builder: (context, constraints) {
+                    if (isLandscape) {
+                      return Row(
                         children: [
-                          Expanded(
-                            child: PlayerCard(
-                              playerId: lineup[4]['PLAYER_ID'].toString(),
-                              name: lineup[4]['NAME'],
-                              position: lineup[4]['POSITION'],
-                              team: widget.team,
+                          SizedBox(
+                            width: 368.0.r,
+                            height: 346.0.r,
+                            child: Column(
+                              children: [
+                                SizedBox(height: 60.0.r),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Expanded(
+                                      child: PlayerCard(
+                                        playerId: lineup[4]['PLAYER_ID'].toString(),
+                                        name: lineup[4]['NAME'],
+                                        position: lineup[4]['POSITION'],
+                                        team: widget.team,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: PlayerCard(
+                                        playerId: lineup[3]['PLAYER_ID'].toString(),
+                                        name: lineup[3]['NAME'],
+                                        position: lineup[3]['POSITION'],
+                                        team: widget.team,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 35.0.r),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Expanded(
+                                      child: PlayerCard(
+                                        playerId: lineup[0]['PLAYER_ID'].toString(),
+                                        name: lineup[0]['NAME'],
+                                        position: lineup[0]['POSITION'],
+                                        team: widget.team,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: PlayerCard(
+                                        playerId: lineup[2]['PLAYER_ID'].toString(),
+                                        name: lineup[2]['NAME'],
+                                        position: lineup[2]['POSITION'],
+                                        team: widget.team,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: PlayerCard(
+                                        playerId: lineup[1]['PLAYER_ID'].toString(),
+                                        name: lineup[1]['NAME'],
+                                        position: lineup[1]['POSITION'],
+                                        team: widget.team,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                          Expanded(
-                            child: PlayerCard(
-                              playerId: lineup[3]['PLAYER_ID'].toString(),
-                              name: lineup[3]['NAME'],
-                              position: lineup[3]['POSITION'],
-                              team: widget.team,
-                            ),
+                          Column(
+                            children: [],
+                          )
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          SizedBox(height: 60.0.r),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                child: PlayerCard(
+                                  playerId: lineup[4]['PLAYER_ID'].toString(),
+                                  name: lineup[4]['NAME'],
+                                  position: lineup[4]['POSITION'],
+                                  team: widget.team,
+                                ),
+                              ),
+                              Expanded(
+                                child: PlayerCard(
+                                  playerId: lineup[3]['PLAYER_ID'].toString(),
+                                  name: lineup[3]['NAME'],
+                                  position: lineup[3]['POSITION'],
+                                  team: widget.team,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 35.0.r),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                child: PlayerCard(
+                                  playerId: lineup[0]['PLAYER_ID'].toString(),
+                                  name: lineup[0]['NAME'],
+                                  position: lineup[0]['POSITION'],
+                                  team: widget.team,
+                                ),
+                              ),
+                              Expanded(
+                                child: PlayerCard(
+                                  playerId: lineup[2]['PLAYER_ID'].toString(),
+                                  name: lineup[2]['NAME'],
+                                  position: lineup[2]['POSITION'],
+                                  team: widget.team,
+                                ),
+                              ),
+                              Expanded(
+                                child: PlayerCard(
+                                  playerId: lineup[1]['PLAYER_ID'].toString(),
+                                  name: lineup[1]['NAME'],
+                                  position: lineup[1]['POSITION'],
+                                  team: widget.team,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
-                      ),
-                      SizedBox(height: 35.0.r),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: PlayerCard(
-                              playerId: lineup[0]['PLAYER_ID'].toString(),
-                              name: lineup[0]['NAME'],
-                              position: lineup[0]['POSITION'],
-                              team: widget.team,
-                            ),
-                          ),
-                          Expanded(
-                            child: PlayerCard(
-                              playerId: lineup[2]['PLAYER_ID'].toString(),
-                              name: lineup[2]['NAME'],
-                              position: lineup[2]['POSITION'],
-                              team: widget.team,
-                            ),
-                          ),
-                          Expanded(
-                            child: PlayerCard(
-                              playerId: lineup[1]['PLAYER_ID'].toString(),
-                              name: lineup[1]['NAME'],
-                              position: lineup[1]['POSITION'],
-                              team: widget.team,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                      );
+                    }
+                  })
                 ],
               ),
             ),

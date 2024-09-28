@@ -115,6 +115,7 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
 
   void _showBottomSheet(Map<String, dynamic> selectedSeries, String round) {
     showModalBottomSheet(
+      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
       backgroundColor: Colors.grey.shade900,
       context: context,
       builder: (context) => SingleChildScrollView(

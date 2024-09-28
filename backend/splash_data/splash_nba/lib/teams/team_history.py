@@ -5,6 +5,16 @@ import logging
 
 
 def update_team_history(team_id):
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f"Failed to connect to MongoDB: {e}")
+        exit(1)
+
     try:
         # Fetch the franchise history data
         history_list = franchisehistory.FranchiseHistory().get_normalized_dict()['FranchiseHistory']

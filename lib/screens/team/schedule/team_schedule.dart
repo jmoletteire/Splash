@@ -108,6 +108,8 @@ class _TeamScheduleState extends State<TeamSchedule> {
         ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
 
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Stack(
       children: [
         games,
@@ -123,7 +125,8 @@ class _TeamScheduleState extends State<TeamSchedule> {
             ),
             width: MediaQuery.sizeOf(context).width,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment:
+                  isLandscape ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
               children: [
                 Container(
                   decoration: BoxDecoration(
@@ -135,6 +138,8 @@ class _TeamScheduleState extends State<TeamSchedule> {
                   child: InkWell(
                     onTap: () {
                       showModalBottomSheet(
+                        constraints:
+                            BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                         backgroundColor: Colors.grey.shade900,
                         scrollControlDisabledMaxHeightRatio: 0.25,
                         context: context,
@@ -297,6 +302,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                     ),
                   ),
                 ),
+                if (isLandscape) SizedBox(width: 100.0.r),
                 Container(
                   decoration: BoxDecoration(
                       color: Colors.grey.shade900,
@@ -335,6 +341,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                     },
                   ),
                 ),
+                if (isLandscape) SizedBox(width: 100.0.r),
                 Container(
                   decoration: BoxDecoration(
                       color: Colors.grey.shade900,

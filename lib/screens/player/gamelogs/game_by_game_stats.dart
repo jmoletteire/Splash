@@ -403,7 +403,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         }
         return StandingsDataText(
           text: game['MIN'].toStringAsFixed(0) == '0' ? '-' : convertMinutes(game['MIN']),
-          size: 13.0.r,
+          size: 14.0.r,
         );
       case 3:
         return StandingsDataText(text: game['PTS'].toStringAsFixed(0) ?? '-');

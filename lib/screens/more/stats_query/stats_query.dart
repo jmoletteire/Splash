@@ -39,6 +39,7 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
 
   void _showColumnSelector() {
     showModalBottomSheet(
+      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
       scrollControlDisabledMaxHeightRatio: 0.75,
       backgroundColor: const Color(0xFF111111),
       context: context,

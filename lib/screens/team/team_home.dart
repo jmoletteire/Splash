@@ -208,8 +208,8 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                     ),
                     bottom: TabBar(
                       controller: _tabController,
-                      isScrollable: true,
-                      tabAlignment: TabAlignment.start,
+                      isScrollable: !isLandscape,
+                      tabAlignment: !isLandscape ? TabAlignment.start : null,
                       indicatorSize: TabBarIndicatorSize.tab,
                       indicatorColor: kTeamColors[team['ABBREVIATION']]!['secondaryColor']!,
                       indicatorWeight: 3.0,

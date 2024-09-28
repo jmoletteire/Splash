@@ -242,6 +242,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
 
   void _openBottomSheet() {
     showModalBottomSheet(
+        constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
         scrollControlDisabledMaxHeightRatio: 0.65,
         backgroundColor: const Color(0xFF111111),
         context: context,
@@ -326,7 +327,10 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                               ),
                               SizedBox(height: 10.0.r),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MediaQuery.of(context).orientation == Orientation.landscape
+                                        ? MainAxisAlignment.center
+                                        : MainAxisAlignment.spaceEvenly,
                                 children: [
                                   _buildDropdownButton(
                                     selectedValue: selectedSeason,
@@ -337,6 +341,9 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                       });
                                     },
                                   ),
+                                  if (MediaQuery.of(context).orientation ==
+                                      Orientation.landscape)
+                                    SizedBox(width: 50.0.r),
                                   _buildDropdownButton(
                                     selectedValue: seasonType,
                                     items: seasonTypes,
@@ -346,6 +353,9 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
                                       });
                                     },
                                   ),
+                                  if (MediaQuery.of(context).orientation ==
+                                      Orientation.landscape)
+                                    SizedBox(width: 50.0.r),
                                   _buildDropdownButton(
                                     selectedValue: selectedPosition,
                                     items: positions,

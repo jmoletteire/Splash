@@ -1,4 +1,6 @@
 import logging
+import random
+
 import schedule
 import time
 
@@ -8,10 +10,13 @@ from pymongo import MongoClient
 from splash_nba.lib.games.fetch_new_games import update_game_data
 from splash_nba.lib.games.nba_cup import update_current_cup
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
+from splash_nba.lib.players.player_gamelogs import gamelogs
+from splash_nba.lib.players.update_all_players import add_players, restructure_new_docs, update_player_info
 from splash_nba.lib.teams.stats.custom_team_stats import three_and_ft_rate
 from splash_nba.lib.teams.stats.custom_team_stats_rank import custom_team_stats_rank
 from splash_nba.lib.teams.stats.per100 import calculate_and_update_per_100_possessions
 from splash_nba.lib.teams.team_cap_sheet import update_team_contract_data
+from splash_nba.lib.teams.team_history import update_team_history
 from splash_nba.lib.teams.update_team_games import update_games
 from splash_nba.lib.teams.standings import update_current_standings
 from splash_nba.lib.teams.update_news_and_transactions import fetch_team_transactions, fetch_team_news
@@ -24,7 +29,7 @@ from splash_nba.util.env import uri, k_current_season, k_current_season_type
 
 def games_daily_update():
     """
-    Runs every day at 3AM.\n
+    Runs every day at 2:30AM.\n
     Updates games, NBA Cup, and playoff data for each team.
     """
     # Games
@@ -38,7 +43,8 @@ def games_daily_update():
     # Playoffs
     logging.info("Playoffs...")
     playoff_games = commonplayoffseries.CommonPlayoffSeries(season=k_current_season).get_normalized_dict()['PlayoffSeries']
-    if playoff_games == 0:
+    if not playoff_games:
+        logging.info("No playoff games found.")
         return
     else:
         series_data = reformat_series_data(playoff_games)
@@ -88,6 +94,122 @@ def teams_daily_update():
                 continue
 
             logging.info(f"Processing team {team} ({i + 1} of 30)...")
+            # Team History
+            logging.info("History...")
+            update_team_history(team_id=team)
+
+            # Season Stats
+            logging.info("Stats...")
+            update_current_season(team_id=team)
+
+            # Filter seasons to only include the current season key
+            filtered_doc = doc.copy()
+            filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if key == k_current_season}
+            calculate_and_update_per_100_possessions(team_doc=filtered_doc, playoffs=True if k_current_season_type == 'PLAYOFFS' else False)
+
+            # Current Roster & Coaches
+            logging.info("Roster & Coaches...")
+            season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
+            update_current_roster(team_id=team, season_not_started=season_not_started)
+
+            # Last Starting Lineup
+            # Get most recent game by date
+            game_id, game_date = get_last_game(doc['seasons'])
+
+            # Get starting lineup for most recent game
+            last_starting_lineup = get_last_lineup(team, game_id, game_date)
+
+            # Update document
+            teams_collection.update_one(
+                {"TEAM_ID": team},
+                {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
+            )
+
+        rank_hustle_stats_current_season()
+        three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
+        custom_team_stats_rank()
+    except Exception as e:
+        logging.error(f"Error updating team season: {e}")
+
+
+def players_daily_update():
+    """
+    Runs every day at 3AM.\n
+    Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
+    for each team.
+    """
+
+    logging.info("Updating players (daily)...")
+    try:
+        try:
+            # add_historic_players()
+            add_players()
+            restructure_new_docs()
+            update_player_info()
+        except Exception as e:
+            logging.error(f"Error adding players: {e}")
+
+        # Game Logs
+        logging.info("Game Logs...")
+
+        # Set batch size to process documents
+        batch_size = 25
+        total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+        processed_count = 0
+        i = 0
+
+        while processed_count < total_documents:
+            with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+                    batch_size).batch_size(batch_size) as cursor:
+                documents = list(cursor)
+                if not documents:
+                    break
+                processed_count += len(documents)
+
+                for player in documents:
+                    i += 1
+                    logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
+
+                    stats = player.get('STATS', None)
+                    if not stats:
+                        continue
+
+                    else:
+                        try:
+                            gamelogs(player['PERSON_ID'], k_current_season, k_current_season_type, 'Base')
+                        except Exception as e:
+                            logging.error(f'Could not add gamelogs for player {player["PERSON_ID"]}: {e}')
+                            continue
+                        # Pause for a random time between 0.5 and 1 second
+                        time.sleep(random.uniform(0.5, 1.0))
+
+                time.sleep(10)
+
+        # Standings
+        logging.info("Standings...")
+        update_current_standings()
+
+        # News & Transactions
+        logging.info("News & Transactions...")
+        fetch_team_transactions()
+        fetch_team_news()
+
+        # Cap Sheet
+        logging.info("Cap Sheet...")
+        update_team_contract_data()
+
+        # Loop through all documents in the collection
+        for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0})):
+            team = doc['TEAM_ID']
+
+            if team == 0:
+                continue
+
+            logging.info(f"Processing team {team} ({i + 1} of 30)...")
+            # Team History
+            logging.info("History...")
+            update_team_history(team_id=team)
+
             # Season Stats
             logging.info("Stats...")
             update_current_season(team_id=team)
@@ -126,7 +248,7 @@ def teams_daily_update():
 # schedule.every(1).hour.do(teams_hourly_update)  # Run every 1 hour
 # schedule.every().day.at("02:30").do(games_daily_update())  # Run every day at 2:30 AM
 # schedule.every().day.at("03:00").do(teams_daily_update())  # Run every day at 3:00 AM
-
+# schedule.every().day.at("03:30").do(players_daily_update())  # Run every day at 3:30 AM
 
 if __name__ == '__main__':
     # Configure logging
@@ -156,8 +278,8 @@ if __name__ == '__main__':
         logging.error(f"Failed to connect to MongoDB: {e}")
         exit(1)
 
-    teams_daily_update()
-    #games_daily_update()
+    #teams_daily_update()
+    games_daily_update()
 
     #while True:
         #schedule.run_pending()

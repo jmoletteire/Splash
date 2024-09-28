@@ -116,6 +116,7 @@ class _TeamLatestNewsState extends State<TeamLatestNews> {
                   onTap: () {
                     showModalBottomSheet(
                       context: context,
+                      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                       isScrollControlled: true,
                       builder: (context) {
                         final WebViewController controller = WebViewController()

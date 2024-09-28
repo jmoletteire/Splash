@@ -6,35 +6,40 @@ from splash_nba.util.env import uri
 import logging
 
 
-def gamelogs(player_id, season, season_type, measure_type):
+def gamelogs(player_id, season, season_type):
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+    except Exception as e:
+        logging.error(e)
+        exit(1)
+
     if season_type == 'PLAYOFFS':
-        gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs', measure_type_player_game_logs_nullable=measure_type).get_normalized_dict()['PlayerGameLogs']
+        gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs').get_normalized_dict()['PlayerGameLogs']
+        if season >= '1996-97':
+            adv_gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs', measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
     else:
-        gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable=measure_type).get_normalized_dict()['PlayerGameLogs']
+        gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season).get_normalized_dict()['PlayerGameLogs']
+        if season >= '1996-97':
+            adv_gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
 
-    if measure_type == 'Base':
-        keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:32]
-    else:
-        keys = list(gamelog[0].keys())[7:39]
+    base_keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:32]
+    if season >= '1996-97':
+        adv_keys = ['OFF_RATING', 'DEF_RATING', 'NET_RATING', 'EFG_PCT', 'TS_PCT', 'USG_PCT', 'PACE', 'POSS', 'MIN_SEC']
 
-    # Retrieve existing gamelog data
-    existing_data = players_collection.find_one(
-        {'PERSON_ID': player_id},
-        {f'STATS.{season}.GAMELOGS.{season_type}': 1, '_id': 0}
-    )
-
-    # Initialize dictionaries for each data type
-    if existing_data:
-        gamelog_data = existing_data
-        logging.debug(f'Existing gamelog data: {gamelog_data}')
-    else:
-        gamelog_data = {}
+    gamelog_data = {}
 
     # Fill in the player data from each list
     for game in gamelog:
-        game_id = int(game['GAME_ID'])
-        for key in keys:
-            gamelog_data[game_id][key] = game[key]
+        gamelog_data[game['GAME_ID']] = {}
+        for key in base_keys:
+            gamelog_data[game['GAME_ID']][key] = game[key]
+
+    if season >= '1996-97':
+        for game in adv_gamelog:
+            for key in adv_keys:
+                gamelog_data[game['GAME_ID']][key] = game[key]
 
     players_collection.update_one(
         {'PERSON_ID': player_id},
@@ -54,13 +59,12 @@ if __name__ == "__main__":
     logging.info("Connected to MongoDB")
 
     season_types = ['REGULAR SEASON', 'PLAYOFFS']
-    measure = 'Base'
 
     # Set batch size to process documents
     batch_size = 25
     total_documents = players_collection.count_documents({})
-    processed_count = 0
-    i = 0
+    processed_count = 140
+    i = 140
 
     while processed_count < total_documents:
         with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
@@ -84,7 +88,7 @@ if __name__ == "__main__":
                             continue
                         else:
                             try:
-                                gamelogs(player['PERSON_ID'], season, season_type, measure)
+                                gamelogs(player['PERSON_ID'], season, season_type)
                             except Exception as e:
                                 logging.error(f'Could not add gamelogs for player {player["PERSON_ID"]}: {e}')
                                 continue

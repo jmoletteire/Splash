@@ -300,6 +300,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
           onPressed: () {
             showModalBottomSheet(
               context: context,
+              constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
               backgroundColor: const Color(0xFF111111),
               builder: (context) {
                 return DraftStats(
@@ -364,6 +365,7 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
           onPressed: () {
             showModalBottomSheet(
               context: context,
+              constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
               backgroundColor: const Color(0xFF111111),
               builder: (context) {
                 return DraftStats(

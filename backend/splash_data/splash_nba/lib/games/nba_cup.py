@@ -7,32 +7,16 @@ from pymongo import MongoClient
 from splash_nba.util.env import uri, k_current_season
 import logging
 
-seasons = ['2023-24']
-
 
 def update_current_cup():
-    # Get the current call stack
-    stack = inspect.stack()
-
-    # Check the second item in the stack (the caller)
-    # The first item in the stack is the current function itself
-    caller_frame = stack[1]
-
-    # Extract the function name of the caller
-    caller_function = caller_frame.function
-
-    # Check if the caller is the main script
-    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
-        print("Called from main script.")
-    else:
-        # Connect to MongoDB
-        try:
-            client = MongoClient(uri)
-            db = client.splash
-            cup_collection = db.nba_cup_history
-        except Exception as e:
-            logging.error(f"Failed to connect to MongoDB: {e}")
-            exit(1)
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        cup_collection = db.nba_cup_history
+    except Exception as e:
+        logging.error(f"Failed to connect to MongoDB: {e}")
+        exit(1)
 
     try:
         teams = iststandings.ISTStandings(season=k_current_season).get_dict()['teams']
@@ -88,6 +72,8 @@ def update_current_cup():
 
 
 def fetch_all_cups():
+    seasons = ['2023-24']
+
     for season in seasons:
         teams = iststandings.ISTStandings(season=season).get_dict()['teams']
 
