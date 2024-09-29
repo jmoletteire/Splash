@@ -342,8 +342,8 @@ class _CareerStatsState extends State<CareerStats> {
                 : Colors.grey.shade900,
             border: Border(
               bottom: BorderSide(
-                color: Colors.grey.shade200,
-                width: index == widget.seasons.length - 1 ? 1.r : 0.15.r,
+                color: Colors.grey.shade500,
+                width: index == widget.seasons.length - 1 ? 1.r : 0.25.r,
               ),
             ),
           ),
@@ -462,7 +462,7 @@ class _CareerStatsState extends State<CareerStats> {
             return const StandingsDataText(text: '');
           }
           return StandingsDataText(
-            text: (season['PLAYER_AGE']).toStringAsFixed(0) ?? '-',
+            text: season['PLAYER_AGE'].toStringAsFixed(0) ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -478,7 +478,7 @@ class _CareerStatsState extends State<CareerStats> {
             );
           }
           return StandingsDataText(
-            text: (season['GP']).toStringAsFixed(0) ?? '-',
+            text: season['GP'].toStringAsFixed(0) ?? '-',
             color: const Color(0xFFD0D0D0),
           );
         } catch (stack) {
@@ -489,7 +489,7 @@ class _CareerStatsState extends State<CareerStats> {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
               return StandingsDataText(
-                text: careerTotals['MPG'].toString(),
+                text: (careerTotals['MPG'] ?? '-').toString(),
                 color: const Color(0xFFD0D0D0),
               );
             } else {
@@ -516,7 +516,7 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
-              return StandingsDataText(text: careerTotals['PPG'].toString());
+              return StandingsDataText(text: (careerTotals['PPG'] ?? '-').toString());
             } else {
               String pts = NumberFormat.decimalPattern().format(careerTotals['PTS'] ?? 0);
               return StandingsDataText(text: pts == '0' ? '-' : pts);
@@ -541,7 +541,7 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
-              return StandingsDataText(text: careerTotals['RPG'].toString());
+              return StandingsDataText(text: (careerTotals['RPG'] ?? '-').toString());
             } else {
               String reb = NumberFormat.decimalPattern().format(careerTotals['REB'] ?? 0);
               return StandingsDataText(text: reb == '0' ? '-' : reb);
@@ -566,7 +566,7 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
-              return StandingsDataText(text: careerTotals['APG'].toString());
+              return StandingsDataText(text: (careerTotals['APG'] ?? '-').toString());
             } else {
               String ast = NumberFormat.decimalPattern().format(careerTotals['AST'] ?? 0);
               return StandingsDataText(text: ast == '0' ? '-' : ast);
@@ -591,7 +591,7 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
-              return StandingsDataText(text: careerTotals['SPG'].toString());
+              return StandingsDataText(text: (careerTotals['SPG'] ?? '-').toString());
             } else {
               String stl = NumberFormat.decimalPattern().format(careerTotals['STL'] ?? 0);
               return StandingsDataText(text: stl == '0' ? '-' : stl);
@@ -616,7 +616,7 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
-              return StandingsDataText(text: careerTotals['BPG'].toString());
+              return StandingsDataText(text: (careerTotals['BPG'] ?? '-').toString());
             } else {
               String blk = NumberFormat.decimalPattern().format(careerTotals['BLK'] ?? 0);
               return StandingsDataText(text: blk == '0' ? '-' : blk);
@@ -641,7 +641,7 @@ class _CareerStatsState extends State<CareerStats> {
         try {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
-              return StandingsDataText(text: careerTotals['TOPG'].toString());
+              return StandingsDataText(text: (careerTotals['TOPG'] ?? '-').toString());
             } else {
               String tov = NumberFormat.decimalPattern().format(careerTotals['TOV'] ?? 0);
               return StandingsDataText(text: tov == '0' ? '-' : tov);
@@ -667,7 +667,7 @@ class _CareerStatsState extends State<CareerStats> {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
               return StandingsDataText(
-                  text: '${(careerTotals['FG_PCT'] * 100).toStringAsFixed(1)}%');
+                  text: '${(careerTotals['FG_PCT'] * 100 ?? '-').toStringAsFixed(1)}%');
             } else {
               String fgm = NumberFormat.decimalPattern().format(careerTotals['FGM']);
               String fga = NumberFormat.decimalPattern().format(careerTotals['FGA']);
@@ -696,7 +696,7 @@ class _CareerStatsState extends State<CareerStats> {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
               return StandingsDataText(
-                  text: '${(careerTotals['FG3_PCT'] * 100).toStringAsFixed(1)}%');
+                  text: '${(careerTotals['FG3_PCT'] * 100 ?? '-').toStringAsFixed(1)}%');
             } else {
               String fg3m = NumberFormat.decimalPattern().format(careerTotals['FG3M']);
               String fg3a = NumberFormat.decimalPattern().format(careerTotals['FG3A']);
@@ -725,7 +725,7 @@ class _CareerStatsState extends State<CareerStats> {
           if (row == widget.seasons.length) {
             if (widget.mode == 'PER GAME') {
               return StandingsDataText(
-                  text: '${(careerTotals['FT_PCT'] * 100).toStringAsFixed(1)}%');
+                  text: '${(careerTotals['FT_PCT'] * 100 ?? '-').toStringAsFixed(1)}%');
             } else {
               String ftm = NumberFormat.decimalPattern().format(careerTotals['FTM']);
               String fta = NumberFormat.decimalPattern().format(careerTotals['FTA']);
@@ -762,6 +762,13 @@ class _CareerStatsState extends State<CareerStats> {
             }
           } else {
             efgPct = season['EFG_PCT'] * 100;
+            if (efgPct == 0.0) {
+              try {
+                efgPct = 100 * (season['FGM'] + (0.5 * (season['FG3M'] ?? 0))) / season['FGA'];
+              } catch (e) {
+                efgPct = 0.0;
+              }
+            }
           }
           return StandingsDataText(
             text: efgPct == 0.0 ? '-' : '${efgPct.toStringAsFixed(1)}%',
@@ -786,6 +793,13 @@ class _CareerStatsState extends State<CareerStats> {
             }
           } else {
             tsPct = season['TS_PCT'] * 100;
+            if (tsPct == 0.0) {
+              try {
+                tsPct = 100 * season['PTS'] / (2 * (season['FGA'] + (0.44 * season['FTA'])));
+              } catch (e) {
+                tsPct = 0.0;
+              }
+            }
           }
           return StandingsDataText(
             text: tsPct == 0.0 ? '-' : '${tsPct.toStringAsFixed(1)}%',

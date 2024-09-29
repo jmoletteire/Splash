@@ -104,7 +104,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
           )
         : CustomScrollView(
             slivers: [
-              SliverToBoxAdapter(
+              SliverPinnedHeader(
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.04,
                   decoration: BoxDecoration(
