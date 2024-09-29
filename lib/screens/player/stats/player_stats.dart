@@ -58,7 +58,15 @@ class _PlayerStatsState extends State<PlayerStats> {
                 : result;
         return result;
       case 'Shooting':
-        return getPercentile(['ADV'], 'TS_PCT');
+        double result = (getPercentile(['ADV'], 'TS_PCT') +
+                getPercentile(['ADV', 'SCORING_BREAKDOWN'], 'PCT_UAST_FGM')) /
+            2;
+        result = result > 1
+            ? 1
+            : result < 0
+                ? 0
+                : result;
+        return result;
       case 'Defense':
         double result = (getPercentile(['ADV'], 'DEF_IMPACT_EST') +
                 getPercentile(['ADV'], 'MATCHUP_DIFFICULTY') +
@@ -97,7 +105,6 @@ class _PlayerStatsState extends State<PlayerStats> {
       case 'Hustle':
         double result = (getPercentile(['ADV'], 'PACE') +
                 getPercentile(['HUSTLE'], 'CHARGES_DRAWN') +
-                getPercentile(['HUSTLE'], 'SCREEN_ASSISTS_PER_75') +
                 getPercentile(['HUSTLE'], 'SCREEN_AST_PTS_PER_75') +
                 getPercentile(['HUSTLE'], 'LOOSE_BALLS_RECOVERED_PER_75')) /
             5;
@@ -282,40 +289,167 @@ class _PlayerStatsState extends State<PlayerStats> {
                         ),
                         if (int.parse(selectedSeason.substring(0, 4)) > 2015)
                           Card(
-                            margin: const EdgeInsets.fromLTRB(11.0, 0.0, 11.0, 11.0),
+                            margin: EdgeInsets.fromLTRB(11.0.r, 0.0, 11.0.r, 11.0.r),
                             color: Colors.grey.shade900,
-                            child: Padding(
-                              padding: const EdgeInsets.all(75.0),
-                              child: AnimatedPolarAreaChart(
-                                key: ValueKey(selectedSeason),
-                                selectedSeasonType: selectedSeasonType,
-                                values: [
-                                  getFinalPercentile('Defense'),
-                                  getFinalPercentile('Rebounding'),
-                                  getFinalPercentile('Playmaking'),
-                                  getFinalPercentile('Hustle'),
-                                  getFinalPercentile('Efficiency'),
-                                  getFinalPercentile('Shooting'),
-                                ],
-                                colors: [
-                                  teamColor.withOpacity(getFinalPercentile('Defense')),
-                                  teamColor.withOpacity(getFinalPercentile('Rebounding')),
-                                  teamColor.withOpacity(getFinalPercentile('Playmaking')),
-                                  teamColor.withOpacity(getFinalPercentile('Hustle')),
-                                  teamColor.withOpacity(getFinalPercentile('Efficiency')),
-                                  teamColor.withOpacity(getFinalPercentile('Shooting')),
-                                ],
-                                labels: const [
-                                  'Defense',
-                                  'Rebounding',
-                                  'Playmaking',
-                                  'Hustle',
-                                  'Efficiency',
-                                  'Shooting',
-                                ],
-                                maxPossibleValue: 1.0,
-                                chartSize: 200.r,
-                              ),
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  right: 1,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                        constraints: BoxConstraints(
+                                            minWidth: MediaQuery.of(context).size.width),
+                                        backgroundColor: Colors.grey.shade900,
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: Column(children: [
+                                              RichText(
+                                                text: const TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text:
+                                                          'Percentages are based on aggregate rank in each category. The following stats are used for each category:',
+                                                      style: TextStyle(fontFamily: 'Roboto'),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '\n\nEfficiency',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          ' - Net Rating On/Off, +/- per 75, Offensive Load, Creation-Based (Adjusted) Turnover%',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '\n\nScoring',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: ' - True Shooting %, Unassisted %',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '\n\nDefense',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          ' - Defensive Impact Estimate, Matchup Difficulty, Versatility Score',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '\n\nRebounding',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          ' - Offensive Rebound %, Defensive Rebound %, Box Outs per 75, Adjust Rebound Chance %',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '\n\nPlaymaking',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          ' - Adjusted Assists per 75, Potential Assists per 75, Adjusted Assist-to-Pass %, Box Creation',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '\n\nHustle',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          ' - Pace, Loose Balls Recovered per 75, Screen Assist Points per 75, Charges Drawn',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Roboto',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ]),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    icon: Icon(
+                                      CupertinoIcons.question_circle,
+                                      size: 20.0.r,
+                                    ),
+                                  ),
+                                ),
+                                Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(75.0.r),
+                                    child: AnimatedPolarAreaChart(
+                                      key: ValueKey(selectedSeason),
+                                      selectedSeasonType: selectedSeasonType,
+                                      values: [
+                                        getFinalPercentile('Defense'),
+                                        getFinalPercentile('Rebounding'),
+                                        getFinalPercentile('Playmaking'),
+                                        getFinalPercentile('Hustle'),
+                                        getFinalPercentile('Efficiency'),
+                                        getFinalPercentile('Shooting'),
+                                      ],
+                                      colors: [
+                                        teamColor.withOpacity(getFinalPercentile('Defense')),
+                                        teamColor
+                                            .withOpacity(getFinalPercentile('Rebounding')),
+                                        teamColor
+                                            .withOpacity(getFinalPercentile('Playmaking')),
+                                        teamColor.withOpacity(getFinalPercentile('Hustle')),
+                                        teamColor
+                                            .withOpacity(getFinalPercentile('Efficiency')),
+                                        teamColor.withOpacity(getFinalPercentile('Shooting')),
+                                      ],
+                                      labels: const [
+                                        'Defense',
+                                        'Rebounding',
+                                        'Playmaking',
+                                        'Hustle',
+                                        'Efficiency',
+                                        'Scoring',
+                                      ],
+                                      maxPossibleValue: 1.0,
+                                      chartSize: 200.r,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         Padding(

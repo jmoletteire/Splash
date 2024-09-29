@@ -568,7 +568,10 @@ class GameInfo extends StatelessWidget {
           padding: EdgeInsets.all(15.0.r),
           child: Row(
             children: [
-              if (awayId == '0') SizedBox(width: MediaQuery.of(context).size.width * 0.06),
+              if (awayId == '0')
+                if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.06),
+              if (awayId == '0')
+                if (!isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1),
               if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1),
               GestureDetector(
                 onTap: () {

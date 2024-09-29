@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/screens/player/career/career_stats.dart';
 
@@ -21,11 +22,18 @@ class _PlayerCareerState extends State<PlayerCareer> {
   late String mode;
   List<String> modes = ['TOTALS', 'PER GAME'];
   final ScrollController _scrollController = ScrollController();
+  late LinkedScrollControllerGroup _careerStatsControllers;
+  late ScrollController _regSeasonController;
+  late ScrollController _playoffController;
+  final ScrollController _collegeController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     mode = 'PER GAME';
+    _careerStatsControllers = LinkedScrollControllerGroup();
+    _regSeasonController = _careerStatsControllers.addAndGet();
+    _playoffController = _careerStatsControllers.addAndGet();
 
     seasons = [];
     if (widget.player.containsKey('CAREER')) {
@@ -152,6 +160,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
                       seasons: seasons,
                       seasonType: 'REGULAR SEASON',
                       mode: mode,
+                      controller: _regSeasonController,
                     ),
                   ],
                 ),
@@ -173,6 +182,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
                       seasons: playoffSeasons,
                       seasonType: 'PLAYOFFS',
                       mode: mode,
+                      controller: _playoffController,
                     ),
                   ],
                 ),
@@ -194,6 +204,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
                       seasons: collegeSeasons,
                       seasonType: 'COLLEGE',
                       mode: mode,
+                      controller: _collegeController,
                     ),
                   ],
                 ),

@@ -1497,11 +1497,11 @@ class ComparisonRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool oneIsBetter =
-        (statName.contains('DRTG') || statName.contains('TOV') || statName == 'FOULS PER 75')
+        (statName == 'DEF RATING' || statName.contains('TOV') || statName == 'FOULS PER 75')
             ? teamOne < teamTwo
             : teamOne > teamTwo;
     bool twoIsBetter =
-        (statName.contains('DRTG') || statName.contains('TOV') || statName == 'FOULS PER 75')
+        (statName == 'DEF RATING' || statName.contains('TOV') || statName == 'FOULS PER 75')
             ? teamTwo < teamOne
             : teamTwo > teamOne;
     return Row(

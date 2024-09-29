@@ -245,7 +245,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         context,
         (context, column) {
           return Material(
-            color: Colors.grey.shade800,
+            color: const Color(0xFF303030),
             child: Padding(
               padding:
                   column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
@@ -348,7 +348,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                               '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(firstSpaceIndex + 1)}',
                           style: kBebasNormal.copyWith(
                             color: Colors.white70,
-                            fontSize: 13.0.r,
+                            fontSize: 14.0.r,
                           ),
                         ),
                         if (widget.playerGroup == 'STARTERS')

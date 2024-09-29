@@ -241,7 +241,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         context,
         (context, column) {
           return Material(
-            color: Colors.grey.shade800,
+            color: const Color(0xFF303030),
             child: Padding(
               padding:
                   column == 0 ? EdgeInsets.only(left: 11.0.r) : EdgeInsets.only(right: 8.0.r),

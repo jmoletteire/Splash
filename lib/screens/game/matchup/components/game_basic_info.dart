@@ -31,6 +31,15 @@ class GameBasicInfo extends StatelessWidget {
     // Format the DateTime object into the desired string format
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(parsedDate).toUpperCase();
 
+    Map<String, String> seasonTypes = {
+      '1': 'Pre-Season',
+      '2': 'Regular Season',
+      '3': 'All-Star Game',
+      '4': 'Playoffs',
+      '5': 'Play-In',
+      '6': 'NBA Cup Final'
+    };
+
     return Card(
       margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
       color: Colors.grey.shade900,
@@ -42,6 +51,14 @@ class GameBasicInfo extends StatelessWidget {
             GameBasicInfoRow(
               icon: Icons.calendar_month,
               data: [formattedDate],
+            ),
+            SizedBox(height: 10.0.r),
+            GameBasicInfoRow(
+              icon: Icons.sports_basketball,
+              data: [
+                seasonTypes[game['SUMMARY']['GameSummary'][0]['GAME_ID'].substring(2, 3)] ??
+                    '-'
+              ],
             ),
             SizedBox(height: 10.0.r),
             // Broadcast

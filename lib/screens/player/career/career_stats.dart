@@ -15,6 +15,7 @@ class CareerStats extends StatefulWidget {
   final List seasons;
   final String seasonType;
   final String mode;
+  final ScrollController controller;
 
   const CareerStats({
     super.key,
@@ -22,6 +23,7 @@ class CareerStats extends StatefulWidget {
     required this.seasons,
     required this.seasonType,
     required this.mode,
+    required this.controller,
   });
 
   @override
@@ -103,6 +105,7 @@ class _CareerStatsState extends State<CareerStats> {
           ),
         ),
       ),
+      horizontalScrollController: widget.controller,
       headerHeight: MediaQuery.of(context).size.height * 0.045,
       rowCount: widget.seasons.length + 1,
       rowHeight: MediaQuery.of(context).size.height * 0.06,
@@ -146,49 +149,61 @@ class _CareerStatsState extends State<CareerStats> {
               ? MediaQuery.of(context).size.width * 0.05
               : widget.mode == 'PER GAME'
                   ? MediaQuery.of(context).size.width * 0.1
-                  : MediaQuery.of(context).size.width * 0.11,
+                  : MediaQuery.of(context).size.width * 0.115,
         ),
 
         /// PPG
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.06
-              : MediaQuery.of(context).size.width * 0.1225,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.1225
+                  : MediaQuery.of(context).size.width * 0.13,
         ),
 
         /// RPG
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.1,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : MediaQuery.of(context).size.width * 0.12,
         ),
 
         /// APG
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.1,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : MediaQuery.of(context).size.width * 0.12,
         ),
 
         /// SPG
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.1,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : MediaQuery.of(context).size.width * 0.12,
         ),
 
         /// BPG
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.1,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : MediaQuery.of(context).size.width * 0.12,
         ),
 
         /// TOV
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.1,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.1
+                  : MediaQuery.of(context).size.width * 0.12,
         ),
 
         /// FG%
@@ -199,7 +214,7 @@ class _CareerStatsState extends State<CareerStats> {
                   : MediaQuery.of(context).size.width * 0.09
               : widget.mode == 'PER GAME'
                   ? MediaQuery.of(context).size.width * 0.15
-                  : MediaQuery.of(context).size.width * 0.18,
+                  : MediaQuery.of(context).size.width * 0.2,
         ),
 
         /// 3P%
@@ -210,7 +225,7 @@ class _CareerStatsState extends State<CareerStats> {
                   : MediaQuery.of(context).size.width * 0.075
               : widget.mode == 'PER GAME'
                   ? MediaQuery.of(context).size.width * 0.13
-                  : MediaQuery.of(context).size.width * 0.16,
+                  : MediaQuery.of(context).size.width * 0.18,
         ),
 
         /// FT%
@@ -221,7 +236,7 @@ class _CareerStatsState extends State<CareerStats> {
                   : MediaQuery.of(context).size.width * 0.08
               : widget.mode == 'PER GAME'
                   ? MediaQuery.of(context).size.width * 0.13
-                  : MediaQuery.of(context).size.width * 0.16,
+                  : MediaQuery.of(context).size.width * 0.18,
         ),
 
         if (widget.seasonType != 'COLLEGE')
@@ -297,7 +312,7 @@ class _CareerStatsState extends State<CareerStats> {
         context,
         (context, column) {
           return Material(
-            color: Colors.grey.shade800,
+            color: const Color(0xFF303030),
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Align(
