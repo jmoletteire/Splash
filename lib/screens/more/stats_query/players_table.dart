@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/default_animated_switcher_transition_builder.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
@@ -171,9 +172,9 @@ class _PlayersTableState extends State<PlayersTable> {
               },
               child: Padding(
                 padding: column == 0
-                    ? const EdgeInsets.only(left: 20.0)
+                    ? EdgeInsets.only(left: 20.0.r)
                     : _sortColumnIndex != column
-                        ? const EdgeInsets.only(right: 8.0)
+                        ? EdgeInsets.only(right: 8.0.r)
                         : EdgeInsets.zero,
                 child: Row(
                   mainAxisAlignment:
@@ -182,13 +183,13 @@ class _PlayersTableState extends State<PlayersTable> {
                     Text(
                       col.headerName,
                       style: kBebasNormal.copyWith(
-                        fontSize: 18.0,
+                        fontSize: 14.0.r,
                       ),
                     ),
                     if (_sortColumnIndex == column)
                       Icon(
                         _sortAscending ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                        size: 15.0,
+                        size: 15.0.r,
                       ),
                   ],
                 ),
@@ -242,7 +243,7 @@ class _PlayersTableState extends State<PlayersTable> {
           child: contentBuilder(context, (context, column) {
             final col = widget.selectedColumns[column];
             return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+              padding: EdgeInsets.only(right: 8.0.r),
               child: getContent(row, col.getIndex(kAllColumns), col.mapName, context),
             );
           }),
@@ -260,7 +261,7 @@ class _PlayersTableState extends State<PlayersTable> {
     switch (column) {
       case 0:
         return Padding(
-          padding: const EdgeInsets.fromLTRB(6.0, 8.0, 0.0, 8.0),
+          padding: EdgeInsets.fromLTRB(6.0.r, 8.0.r, 0.0, 8.0.r),
           child: Row(
             children: [
               Expanded(
@@ -269,24 +270,24 @@ class _PlayersTableState extends State<PlayersTable> {
                   (row + 1).toString(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 16.0),
+                  style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 16.0.r),
                 ),
               ),
-              const SizedBox(width: 8.0),
+              SizedBox(width: 8.0.r),
               PlayerAvatar(
-                radius: 12.0,
+                radius: 12.0.r,
                 backgroundColor: Colors.white70,
                 playerImageUrl:
                     'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PERSON_ID']}.png',
               ),
-              const SizedBox(width: 8.0),
+              SizedBox(width: 8.0.r),
               Expanded(
                 flex: 5,
                 child: Text(
                   widget.players[row]['DISPLAY_FI_LAST'],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: kBebasNormal.copyWith(fontSize: 16.0),
+                  style: kBebasNormal.copyWith(fontSize: 14.0.r),
                 ),
               ),
             ],
@@ -301,8 +302,8 @@ class _PlayersTableState extends State<PlayersTable> {
               child: Image.asset(
                 'images/NBA_Logos/${widget.players[row]['TEAM_ID']}.png',
                 fit: BoxFit.scaleDown,
-                width: 30.0,
-                height: 30.0,
+                width: 30.0.r,
+                height: 30.0.r,
               ),
             ),
           ],
@@ -454,7 +455,7 @@ class PlayerStatsTableText extends StatelessWidget {
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasNormal.copyWith(fontSize: 18.0),
+        style: kBebasNormal.copyWith(fontSize: 16.0.r),
       ),
     );
   }

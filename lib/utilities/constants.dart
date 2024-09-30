@@ -326,7 +326,13 @@ Map<String, String> kTeamAbbrToId = {
   'SAS': '1610612759',
   'OKC': '1610612760',
   'UTA': '1610612762',
-  'MEM': '1610612763'
+  'MEM': '1610612763',
+  'SEA': '1610612760',
+  'NOH': '1610612740',
+  'NOK': '1610612740',
+  'NJN': '1610612751',
+  'CHO': '1610612766',
+  'CHH': '1610612766',
 };
 
 const Map<String, dynamic> kTeamStatLabelMap = {
@@ -3054,7 +3060,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition':
           'A measure of the time spent guarding different positions (G, F, C) on a 0-100 scale. A player who guarded all 3 positions equally ( ⅓ of the time each) will have a score of 100, while a player who only guarded one position will have a score of 0.',
       'formula':
-          '1 - ( | Gₜ - ⅓ | + | Fₜ - ⅓ | + | Cₜ - ⅓ | )\n\n*Where Gₜ, Fₜ, Cₜ represent % of time spent guarding each position.'
+          '1 - ( | Gₜ - ⅓ | + | Fₜ - ⅓ | + | Cₜ - ⅓ | ) * 3/4\n\n*Where Gₜ, Fₜ, Cₜ represent % of time spent guarding each position.'
     },
     'MATCHUP DIFFICULTY': {
       'location': ['ADV'],
@@ -3174,6 +3180,43 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
     },
   },
   'HUSTLE': {
+    'DIST (MILES)': {
+      'location': ['HUSTLE', 'SPEED'],
+      'TOTAL': {
+        'nba_name': 'DIST_MILES',
+        'rank_nba_name': 'DIST_MILES_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'DIST_MILES_PER_75',
+        'rank_nba_name': 'DIST_MILES_PER_75_RANK',
+      },
+      'splash_name': 'DISTANCE',
+      'full_name': 'Distance Covered (Miles)',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '2',
+      'definition': 'The distance a player covered on the court (in miles).',
+      'formula': ''
+    },
+    'AVG SPEED': {
+      'location': ['HUSTLE', 'SPEED'],
+      'TOTAL': {
+        'nba_name': 'AVG_SPEED',
+        'rank_nba_name': 'AVG_SPEED_RANK',
+      },
+      'PER_75': {
+        'nba_name': 'AVG_SPEED',
+        'rank_nba_name': 'AVG_SPEED_RANK',
+      },
+      'splash_name': 'AVG SPEED',
+      'full_name': 'Average Speed',
+      'first_available': '2013',
+      'convert': 'false',
+      'round': '2',
+      'definition': 'Player\'s average running speed (miles per hour) while on the court.',
+      'formula': ''
+    },
+    'fill': {'first_available': '2013'},
     'SCREEN AST': {
       'location': ['HUSTLE'],
       'TOTAL': {
@@ -3211,7 +3254,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition': 'Points created by a player through their screen assists.',
       'formula': ''
     },
-    'fill': {'first_available': '2016'},
+    'fill2': {'first_available': '2016'},
     'LOOSE BALLS': {
       'location': ['HUSTLE'],
       'TOTAL': {
@@ -3231,7 +3274,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
           'The number of times a player gains sole possession of a live ball that is not in the control of either team.',
       'formula': ''
     },
-    'fill2': {'first_available': '2016'},
+    'fill3': {'first_available': '2016'},
     'FOULS': {
       'location': ['BASIC'],
       'TOTAL': {

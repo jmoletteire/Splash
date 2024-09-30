@@ -11,7 +11,7 @@ class TeamSchedule extends StatefulWidget {
   State<TeamSchedule> createState() => _TeamScheduleState();
 }
 
-class _TeamScheduleState extends State<TeamSchedule> {
+class _TeamScheduleState extends State<TeamSchedule> with AutomaticKeepAliveClientMixin {
   late Map<String, dynamic> schedule;
   late List<String> seasons;
   late String selectedSeason;
@@ -71,23 +71,50 @@ class _TeamScheduleState extends State<TeamSchedule> {
     'WAS': '1610612764',
   };
 
-  Map<String, String> seasonTypes = {
-    'All': '*',
-    'Pre-Season': '1',
-    'Regular Season': '2',
-    'Playoffs': '4',
-    'Play-In': '5',
-    'NBA Cup': '6',
-  };
+  late Map<String, String> seasonTypes;
+
+  void filterSeasonTypes(List<String> scheduleKeys) {
+    seasonTypes = {
+      'All': '*',
+      'Pre-Season': '1',
+      'Regular Season': '2',
+      'Playoffs': '4',
+      'Play-In': '5',
+      'NBA Cup': '6',
+    };
+
+    // Iterate over a copy of the map to avoid modification during iteration
+    seasonTypes.keys.toList().forEach((seasonType) {
+      String value = seasonTypes[seasonType]!;
+
+      // Skip the 'All' entry and continue
+      if (seasonType == 'All') {
+        return;
+      }
+
+      // Check if any key from scheduleKeys has a matching substring
+      bool matchFound = scheduleKeys.any((key) => key.substring(2, 3) == value);
+
+      // If no match is found, remove the seasonType entry
+      if (!matchFound) {
+        seasonTypes.remove(seasonType);
+      }
+    });
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
 
     seasons = widget.team['seasons'].keys.toList().reversed.toList();
+    seasons = seasons.where((e) => int.parse(e.substring(0, 4)) >= 2017).toList();
     selectedSeason = seasons.first;
     schedule = widget.team['seasons'][selectedSeason]['GAMES'];
 
+    filterSeasonTypes(schedule.keys.toList());
     selectedSeasonType = 'All';
 
     selectedMonth = months.first;
@@ -218,6 +245,7 @@ class _TeamScheduleState extends State<TeamSchedule> {
                                                   selectedSeason = value!;
                                                   schedule =
                                                       widget.team['seasons'][value]['GAMES'];
+                                                  filterSeasonTypes(schedule.keys.toList());
                                                   games = TeamGames(
                                                     team: widget.team,
                                                     schedule: schedule,

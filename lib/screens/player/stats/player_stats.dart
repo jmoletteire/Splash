@@ -103,7 +103,8 @@ class _PlayerStatsState extends State<PlayerStats> {
                 : result;
         return result;
       case 'Hustle':
-        double result = (getPercentile(['ADV'], 'PACE') +
+        double result = (getPercentile(['HUSTLE', 'SPEED'], 'DIST_MILES_PER_75') +
+                getPercentile(['HUSTLE', 'SPEED'], 'AVG_SPEED') +
                 getPercentile(['HUSTLE'], 'CHARGES_DRAWN') +
                 getPercentile(['HUSTLE'], 'SCREEN_AST_PTS_PER_75') +
                 getPercentile(['HUSTLE'], 'LOOSE_BALLS_RECOVERED_PER_75')) /
@@ -299,108 +300,108 @@ class _PlayerStatsState extends State<PlayerStats> {
                                     onPressed: () {
                                       showModalBottomSheet(
                                         constraints: BoxConstraints(
-                                            minWidth: MediaQuery.of(context).size.width),
+                                            minWidth: MediaQuery.of(context).size.width,
+                                            maxHeight:
+                                                MediaQuery.of(context).size.height * 0.5),
                                         backgroundColor: Colors.grey.shade900,
                                         context: context,
                                         builder: (BuildContext context) {
                                           return Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: Column(children: [
-                                              RichText(
-                                                text: const TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text:
-                                                          'Percentages are based on aggregate rank in each category. The following stats are used for each category:',
-                                                      style: TextStyle(fontFamily: 'Roboto'),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '\n\nEfficiency',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
-                                                        fontWeight: FontWeight.bold,
+                                            padding: const EdgeInsets.all(30.0),
+                                            child: SingleChildScrollView(
+                                              child: Column(children: [
+                                                RichText(
+                                                  text: const TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text: 'What is this?\n\n',
+                                                        style: TextStyle(
+                                                            fontFamily: 'Roboto',
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 18.0),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text:
-                                                          ' - Net Rating On/Off, +/- per 75, Offensive Load, Creation-Based (Adjusted) Turnover%',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
+                                                      TextSpan(
+                                                        text:
+                                                            'Percentages are based on aggregate rank in each category. Players are then assigned a percentile based on their aggregate rank.\n\nFor example, a player at 75% in Defense was better than 75% of players (on average) across that category\'s select stats.\n\nThe following stats are used for each category:',
+                                                        style: TextStyle(fontFamily: 'Roboto'),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '\n\nScoring',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
-                                                        fontWeight: FontWeight.bold,
+                                                      TextSpan(
+                                                        text: '\n\n  Efficiency',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Roboto',
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: ' - True Shooting %, Unassisted %',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
+                                                      TextSpan(
+                                                        text:
+                                                            '\n   • Net Rating On/Off\n   • +/- per 75\n   • Offensive Load\n   • Creation-Based (Adjusted) Turnover%',
+                                                        style: TextStyle(fontFamily: 'Roboto'),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '\n\nDefense',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
-                                                        fontWeight: FontWeight.bold,
+                                                      TextSpan(
+                                                        text: '\n\n  Scoring',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Roboto',
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text:
-                                                          ' - Defensive Impact Estimate, Matchup Difficulty, Versatility Score',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
+                                                      TextSpan(
+                                                        text:
+                                                            '\n   • True Shooting %\n   • Unassisted %',
+                                                        style: TextStyle(fontFamily: 'Roboto'),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '\n\nRebounding',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
-                                                        fontWeight: FontWeight.bold,
+                                                      TextSpan(
+                                                        text: '\n\n  Defense',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Roboto',
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text:
-                                                          ' - Offensive Rebound %, Defensive Rebound %, Box Outs per 75, Adjust Rebound Chance %',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
+                                                      TextSpan(
+                                                        text:
+                                                            '\n   • Defensive Impact Estimate\n   • Matchup Difficulty\n   • Versatility Score',
+                                                        style: TextStyle(fontFamily: 'Roboto'),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '\n\nPlaymaking',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
-                                                        fontWeight: FontWeight.bold,
+                                                      TextSpan(
+                                                        text: '\n\n  Rebounding',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Roboto',
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text:
-                                                          ' - Adjusted Assists per 75, Potential Assists per 75, Adjusted Assist-to-Pass %, Box Creation',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
+                                                      TextSpan(
+                                                        text:
+                                                            '\n   • Offensive Rebound %\n   • Defensive Rebound %\n   • Box Outs per 75\n   • Adjusted Rebound Chance %',
+                                                        style: TextStyle(fontFamily: 'Roboto'),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '\n\nHustle',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
-                                                        fontWeight: FontWeight.bold,
+                                                      TextSpan(
+                                                        text: '\n\n  Playmaking',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Roboto',
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    TextSpan(
-                                                      text:
-                                                          ' - Pace, Loose Balls Recovered per 75, Screen Assist Points per 75, Charges Drawn',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Roboto',
+                                                      TextSpan(
+                                                        text:
+                                                            '\n   • Adjusted Assists per 75\n   • Potential Assists per 75\n   • Adjusted Assist-to-Pass %\n   • Box Creation',
+                                                        style: TextStyle(fontFamily: 'Roboto'),
                                                       ),
-                                                    ),
-                                                  ],
+                                                      TextSpan(
+                                                        text: '\n\n  Hustle',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Roboto',
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            '\n   • Distance Covered per 75\n   • Average Speed\n   • Loose Balls Recovered per 75\n   • Screen Assist Points per 75\n   • Charges Drawn',
+                                                        style: TextStyle(fontFamily: 'Roboto'),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ]),
+                                              ]),
+                                            ),
                                           );
                                         },
                                       );
@@ -547,7 +548,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeasonType: selectedSeasonType,
                             expandableController: _controller,
                           ),
-                        if (int.parse(selectedSeason.substring(0, 4)) > 2015)
+                        if (int.parse(selectedSeason.substring(0, 4)) >= 2013)
                           PlayerStatCard(
                             playerStats: widget.player['STATS'][selectedSeason],
                             selectedSeason: selectedSeason,
@@ -556,9 +557,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                             selectedSeasonType: selectedSeasonType,
                             expandableController: _controller,
                           ),
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 100),
-                        )
+                        Padding(padding: EdgeInsets.only(bottom: 100.0.r))
                       ],
                     ),
                   ),

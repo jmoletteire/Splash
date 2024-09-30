@@ -215,7 +215,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
-                      labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
+                      labelStyle: kBebasNormal.copyWith(fontSize: 19.0.r),
                       tabs: const [
                         Tab(text: 'Overview'),
                         Tab(text: 'Schedule'),
@@ -239,7 +239,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                         },
                       ),
                       CustomIconButton(
-                        icon: Icons.compare_arrows,
+                        icon: Icons.people_alt_outlined,
                         size: 30.0.r,
                         onPressed: () {
                           Navigator.push(

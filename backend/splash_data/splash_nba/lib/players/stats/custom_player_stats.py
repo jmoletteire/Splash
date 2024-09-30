@@ -739,6 +739,10 @@ def player_tracking_stats(season_type):
                                                     season=season,
                                                     season_type_all_star='Playoffs').get_normalized_dict()[
                     'LeagueDashPtStats']
+            player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='SpeedDistance',
+                                                                season=season,
+                                                                season_type_all_star='Playoffs').get_normalized_dict()[
+                'LeagueDashPtStats']
         else:
             player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
                                                                  season=season).get_normalized_dict()[
@@ -753,8 +757,11 @@ def player_tracking_stats(season_type):
                 leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Rebounding',
                                                     season=season).get_normalized_dict()[
                     'LeagueDashPtStats']
+            player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='SpeedDistance',
+                                                                    season=season).get_normalized_dict()[
+                'LeagueDashPtStats']
 
-        num_players = len(player_drives)
+        num_players = len(player_speed_dist)
 
         logging.info(f'Processing {num_players} for season {season} {season_type}...')
 
@@ -762,9 +769,10 @@ def player_tracking_stats(season_type):
         passing_keys = list(player_passing[0].keys())[8:]
         drives_keys = list(player_drives[0].keys())[8:]
         rebounding_keys = list(player_rebounding[0].keys())[8:]
+        speed_dist_keys = list(player_speed_dist[0].keys())[8:]
 
         # Initialize dictionaries for each data type
-        player_data = defaultdict(lambda: {'touches': {}, 'passing': {}, 'drives': {}, 'rebounding': {}})
+        player_data = defaultdict(lambda: {'touches': {}, 'passing': {}, 'drives': {}, 'rebounding': {}, 'speed_dist': {}})
 
         # Fill in the player data from each list
         for player in player_touches:
@@ -783,6 +791,10 @@ def player_tracking_stats(season_type):
             player_id = player['PLAYER_ID']
             player_data[player_id]['rebounding'] = {key: player[key] for key in rebounding_keys}
 
+        for player in player_speed_dist:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['speed_dist'] = {key: player[key] for key in speed_dist_keys}
+
         # Update the MongoDB collection
         for player_id, data in player_data.items():
             try:
@@ -793,6 +805,7 @@ def player_tracking_stats(season_type):
                         f'STATS.{season}.{season_type}.ADV.PASSING': data['passing'],
                         f'STATS.{season}.{season_type}.ADV.DRIVES': data['drives'],
                         f'STATS.{season}.{season_type}.ADV.REBOUNDING': data['rebounding'],
+                        f'STATS.{season}.{season_type}.HUSTLE.SPEED': data['speed_dist'],
                     }},
                 )
             except Exception as e:
@@ -982,55 +995,55 @@ if __name__ == "__main__":
     # player_on_off(season_types[0])
     # player_on_off(season_types[1])
 
-    # logging.info("\nAdding Poss Per Game data...\n")
+    # logging.info("\nAdding Poss Per Game...\n")
     # poss_per_game(season_types[0])
     # poss_per_game(season_types[1])
 
-    logging.info("\nAdding 3PAr and FTAr data...\n")
+    # logging.info("\nAdding 3PAr and FTAr...\n")
     # three_and_ft_rate(season_types[0])
-    three_and_ft_rate(season_types[1])
+    # three_and_ft_rate(season_types[1])
 
-    # logging.info("\nAdding Passes and Touches data...\n")
-    # player_tracking_stats(season_types[0])
-    # player_tracking_stats(season_types[1])
+    logging.info("\nAdding Player Tracking data...\n")
+    player_tracking_stats(season_types[0])
+    player_tracking_stats(season_types[1])
 
-    # logging.info("\nAdding Touches Breakdown data...\n")
+    # logging.info("\nAdding Touches Breakdown...\n")
     # touches_breakdown(season_types[0])
     # touches_breakdown(season_types[1])
 
-    # logging.info("\nAdding Shot Distribution data...\n")
+    # logging.info("\nAdding Shot Distribution...\n")
     # shot_distribution(season_types[0])
     # shot_distribution(season_types[1])
 
-    # logging.info("\nAdding DRIVE STATS data...\n")
+    # logging.info("\nAdding Drives...\n")
     # drive_stats(season_types[0])
     # drive_stats(season_types[1])
 
-    # logging.info("\nAdding SCORING BREAKDOWN data...\n")
+    # logging.info("\nAdding Scoring Breakdown...\n")
     # scoring_breakdown_and_pct_unassisted(season_types[0])
     # scoring_breakdown_and_pct_unassisted(season_types[1])
 
-    # logging.info("\nAdding BOX CREATION data...\n")
+    # logging.info("\nAdding Box Creation...\n")
     # box_creation(season_types[0])
     # box_creation(season_types[1])
 
-    # logging.info("\nAdding OFFENSIVE LOAD data...\n")
+    # logging.info("\nAdding Offensive Load...\n")
     # offensive_load(season_types[0])
     # offensive_load(season_types[1])
 
-    # logging.info("\nAdding cTOV data...\n")
+    # logging.info("\nAdding cTOV...\n")
     # adj_turnover_pct(season_types[0])
     # adj_turnover_pct(season_types[1])
 
-    # logging.info("\nAdding DPS data...\n")
+    # logging.info("\nAdding DPS...\n")
     # defensive_points_saved(season_types[0])
     # defensive_points_saved(season_types[1])
 
-    # logging.info("\nAdding Versatility Score data...\n")
+    # logging.info("\nAdding Versatility Score...\n")
     # versatility_score(season_types[0])
     # versatility_score(season_types[1])
 
-    # logging.info("\nAdding Matchup Difficulty data...\n")
+    # logging.info("\nAdding Matchup Difficulty...\n")
     # matchup_difficulty_and_dps(season_types[0])
     # matchup_difficulty_and_dps(season_types[1])
 

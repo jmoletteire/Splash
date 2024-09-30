@@ -11,7 +11,16 @@ from splash_nba.lib.games.fetch_new_games import update_game_data
 from splash_nba.lib.games.nba_cup import update_current_cup
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
 from splash_nba.lib.players.player_gamelogs import gamelogs
+from splash_nba.lib.players.stats.player_hustle_stats import update_player_hustle_stats, \
+    update_player_playoff_hustle_stats
+from splash_nba.lib.players.stats.player_stats import update_player_stats, update_player_playoff_stats
+from splash_nba.lib.players.stats.shot_chart_data import get_shot_chart_data
+from splash_nba.lib.players.stats.update_custom_player_stats import update_player_on_off, update_poss_per_game, \
+    update_three_and_ft_rate, update_player_tracking_stats, update_shot_distribution, update_touches_breakdown, \
+    update_drive_stats, update_scoring_breakdown_and_pct_unassisted, update_box_creation, update_offensive_load, \
+    update_adj_turnover_pct, update_versatility_score
 from splash_nba.lib.players.update_all_players import add_players, restructure_new_docs, update_player_info
+from splash_nba.lib.players.update_player_contracts import fetch_player_contract_data, keep_most_informative
 from splash_nba.lib.teams.stats.custom_team_stats import three_and_ft_rate
 from splash_nba.lib.teams.stats.custom_team_stats_rank import custom_team_stats_rank
 from splash_nba.lib.teams.stats.per100 import calculate_and_update_per_100_possessions
@@ -134,21 +143,48 @@ def teams_daily_update():
 
 def players_daily_update():
     """
-    Runs every day at 3AM.\n
+    Runs every day at 3:30AM.\n
     Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
     for each team.
     """
 
-    logging.info("Updating players (daily)...")
-    try:
+    def player_info():
+        # Player Info
+        logging.info("Player Info...")
         try:
-            # add_historic_players()
             add_players()
             restructure_new_docs()
             update_player_info()
         except Exception as e:
             logging.error(f"Error adding players: {e}")
 
+    def player_stats():
+        # Stats
+        logging.info("Player Stats...")
+
+        # BASIC, ADV, HUSTLE
+        if k_current_season_type == 'REGULAR SEASON':
+            update_player_stats()
+            update_player_hustle_stats()
+        else:
+            update_player_playoff_stats()
+            update_player_playoff_hustle_stats()
+
+        # CUSTOM STATS (Calculated)
+        update_player_on_off(k_current_season_type)  # ON/OFF
+        update_poss_per_game(k_current_season_type)  # POSS PER G
+        update_three_and_ft_rate(k_current_season_type)  # 3PAr, FTAr, FT/FGA
+        update_player_tracking_stats(k_current_season_type)  # TOUCHES, PASSING, DRIVES, REBOUNDING, SPEED/DISTANCE
+        update_touches_breakdown(k_current_season_type)
+        update_shot_distribution(k_current_season_type)  # SHOT TYPE, CLOSEST DEFENDER
+        update_drive_stats(k_current_season_type)  # DRIVE %, DRIVE TS%, DRIVE FT/FGA
+        update_scoring_breakdown_and_pct_unassisted(k_current_season_type)  # % UAST
+        update_box_creation(k_current_season_type)  # BOX CREATION
+        update_offensive_load(k_current_season_type)  # OFF LOAD
+        update_adj_turnover_pct(k_current_season_type)  # cTOV
+        update_versatility_score(k_current_season_type)  # VERSATILITY
+
+    def player_game_logs():
         # Game Logs
         logging.info("Game Logs...")
 
@@ -158,6 +194,7 @@ def players_daily_update():
         processed_count = 0
         i = 0
 
+        # Loop through all ACTIVE players
         while processed_count < total_documents:
             with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
                     batch_size).batch_size(batch_size) as cursor:
@@ -168,80 +205,117 @@ def players_daily_update():
 
                 for player in documents:
                     i += 1
-                    logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
+                    logging.info(f'\n(Player Game Logs) Processing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
 
-                    stats = player.get('STATS', None)
-                    if not stats:
+                    try:
+                        # Pass player, current season, and current season type
+                        gamelogs(player['PERSON_ID'], k_current_season, k_current_season_type)
+                    except Exception as e:
+                        logging.error(f'(Player Game Logs) Could not add game logs for player {player["PERSON_ID"]}: {e}')
                         continue
+                    # Pause for a random time between 0.5 and 1 second between each player
+                    time.sleep(random.uniform(0.5, 1.0))
 
-                    else:
-                        try:
-                            gamelogs(player['PERSON_ID'], k_current_season, k_current_season_type, 'Base')
-                        except Exception as e:
-                            logging.error(f'Could not add gamelogs for player {player["PERSON_ID"]}: {e}')
-                            continue
-                        # Pause for a random time between 0.5 and 1 second
-                        time.sleep(random.uniform(0.5, 1.0))
-
+                # Pause 10 seconds every 25 players
                 time.sleep(10)
 
-        # Standings
-        logging.info("Standings...")
-        update_current_standings()
+    def player_shot_charts():
+        # Shot Charts
+        logging.info("Shot Charts...")
 
-        # News & Transactions
-        logging.info("News & Transactions...")
-        fetch_team_transactions()
-        fetch_team_news()
+        # Set batch size to process documents
+        batch_size = 25
+        total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+        processed_count = 0
+        i = 0
+        keep_league_avg = True
 
-        # Cap Sheet
-        logging.info("Cap Sheet...")
-        update_team_contract_data()
+        # Loop through all ACTIVE players
+        while processed_count < total_documents:
+            with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'TEAM_ID': 1, '_id': 0}).skip(processed_count).limit(
+                    batch_size).batch_size(batch_size) as cursor:
+                documents = list(cursor)
+                if not documents:
+                    break
+                processed_count += len(documents)
 
-        # Loop through all documents in the collection
-        for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0})):
-            team = doc['TEAM_ID']
+                for player in documents:
+                    i += 1
+                    logging.info(f'\n(Player Shot Charts) Processing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
 
-            if team == 0:
+                    try:
+                        get_shot_chart_data(
+                            player['PERSON_ID'],
+                            player['TEAM_ID'],
+                            k_current_season,
+                            'Regular Season' if k_current_season_type == 'REGULAR SEASON' else 'Playoffs',
+                            keep_league_avg
+                        )
+                        keep_league_avg = False
+                    except Exception as e:
+                        logging.error(f'(Player Shot Charts) Could not process shot chart for Player {player["PERSON_ID"]}: {e}')
+                        continue
+
+                    # Pause for a random time between 0.5 and 1 second between players
+                    time.sleep(random.uniform(0.5, 1.0))
+
+                # Pause 30 seconds every 25 players
+                time.sleep(30)
+
+    def player_contracts_and_trans():
+        # Contracts & Transactions
+        logging.info("Contracts & Transactions...")
+
+        # Update all ACTIVE players
+        for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, '_id': 0})):
+            logging.info(f'Processing {i + 1} of {players_collection.count_documents({"ROSTERSTATUS": "Active"})}...')
+
+            try:
+                player_id = str(player['PERSON_ID'])
+
+                # Define the GraphQL endpoint
+                url = "https://fanspo.com/api/graphql"
+
+                # Define the headers
+                headers = {
+                    "Content-Type": "application/json"
+                }
+
+                # Define the initial query variables
+                variables = {
+                    "playerId": player_id
+                }
+
+                # Fetch all paginated data
+                contracts, transactions = fetch_player_contract_data(url, variables, headers)
+                transactions = keep_most_informative(transactions)
+
+                players_collection.update_one(
+                    {"PERSON_ID": int(player_id)},
+                    {"$set": {'CONTRACTS': contracts, 'TRANSACTIONS': transactions}},
+                )
+            except Exception as e:
+                logging.error(f'(Contracts) Could not process contract data for Player {player["PERSON_ID"]}: {e}')
                 continue
 
-            logging.info(f"Processing team {team} ({i + 1} of 30)...")
-            # Team History
-            logging.info("History...")
-            update_team_history(team_id=team)
+    logging.info("Updating players (daily)...")
 
-            # Season Stats
-            logging.info("Stats...")
-            update_current_season(team_id=team)
-
-            # Filter seasons to only include the current season key
-            filtered_doc = doc.copy()
-            filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if key == k_current_season}
-            calculate_and_update_per_100_possessions(team_doc=filtered_doc, playoffs=True if k_current_season_type == 'PLAYOFFS' else False)
-
-            # Current Roster & Coaches
-            logging.info("Roster & Coaches...")
-            season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
-            update_current_roster(team_id=team, season_not_started=season_not_started)
-
-            # Last Starting Lineup
-            # Get most recent game by date
-            game_id, game_date = get_last_game(doc['seasons'])
-
-            # Get starting lineup for most recent game
-            last_starting_lineup = get_last_lineup(team, game_id, game_date)
-
-            # Update document
-            teams_collection.update_one(
-                {"TEAM_ID": team},
-                {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
-            )
-
-        rank_hustle_stats_current_season()
-        three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
-        custom_team_stats_rank()
+    try:
+        player_info()
     except Exception as e:
-        logging.error(f"Error updating team season: {e}")
+        logging.error(f"Error updating player info: {e}")
+    try:
+        player_game_logs()
+    except Exception as e:
+        logging.error(f"Error updating player game logs: {e}")
+    try:
+        player_shot_charts()
+    except Exception as e:
+        logging.error(f"Error updating player shot charts: {e}")
+    try:
+        player_contracts_and_trans()
+    except Exception as e:
+        logging.error(f"Error updating player contracts & transactions: {e}")
 
 
 # Schedule the tasks
@@ -278,8 +352,9 @@ if __name__ == '__main__':
         logging.error(f"Failed to connect to MongoDB: {e}")
         exit(1)
 
-    #teams_daily_update()
-    games_daily_update()
+    # games_daily_update()
+    # teams_daily_update()
+    players_daily_update()
 
     #while True:
         #schedule.run_pending()

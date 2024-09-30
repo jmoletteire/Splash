@@ -108,4 +108,4 @@ if __name__ == "__main__":
                     # Pause for a random time between 0.5 and 1 second
                     time.sleep(random.uniform(0.5, 1.0))
 
-        time.sleep(30)
+            time.sleep(30)

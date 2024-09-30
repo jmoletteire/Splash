@@ -1,7 +1,42 @@
 from nba_api.stats.endpoints import leaguehustlestatsplayer
 from pymongo import MongoClient
-from splash_nba.util.env import uri
+from splash_nba.util.env import uri, k_current_season
 import logging
+
+
+def update_player_playoff_hustle_stats():
+    logging.info(f'Processing HUSTLE stats for {k_current_season}...')
+    player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=k_current_season,
+                                                                          season_type_all_star='Playoffs').get_normalized_dict()[
+        'HustleStatsPlayer']
+
+    logging.info(f'Adding data for {len(player_hustle_stats)} players.')
+    for player in player_hustle_stats:
+        try:
+            players_collection.update_one(
+                {'PERSON_ID': player['PLAYER_ID']},
+                {'$set': {f'STATS.{k_current_season}.PLAYOFFS.HUSTLE': player}}
+            )
+        except Exception as e:
+            logging.error(f'Unable to add stats for {player}: {e}')
+            continue
+
+
+def update_player_hustle_stats():
+        logging.info(f'Processing HUSTLE stats for {k_current_season}...')
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=k_current_season).get_normalized_dict()[
+            'HustleStatsPlayer']
+
+        logging.info(f'Adding data for {len(player_hustle_stats)} players.')
+        for player in player_hustle_stats:
+            try:
+                players_collection.update_one(
+                    {'PERSON_ID': player['PLAYER_ID']},
+                    {'$set': {f'STATS.{k_current_season}.REGULAR SEASON.HUSTLE': player}}
+                )
+            except Exception as e:
+                logging.error(f'Unable to add stats for {player}: {e}')
+                continue
 
 
 def fetch_player_playoff_hustle_stats(seasons):

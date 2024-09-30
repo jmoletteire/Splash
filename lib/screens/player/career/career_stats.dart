@@ -140,7 +140,9 @@ class _CareerStatsState extends State<CareerStats> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.04
-              : MediaQuery.of(context).size.width * 0.075,
+              : widget.mode == 'PER GAME'
+                  ? MediaQuery.of(context).size.width * 0.075
+                  : MediaQuery.of(context).size.width * 0.1,
         ),
 
         /// MPG
@@ -149,7 +151,7 @@ class _CareerStatsState extends State<CareerStats> {
               ? MediaQuery.of(context).size.width * 0.05
               : widget.mode == 'PER GAME'
                   ? MediaQuery.of(context).size.width * 0.1
-                  : MediaQuery.of(context).size.width * 0.115,
+                  : MediaQuery.of(context).size.width * 0.12,
         ),
 
         /// PPG

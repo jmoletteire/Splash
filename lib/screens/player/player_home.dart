@@ -271,7 +271,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       indicatorWeight: 3.0,
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.white,
-                      labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
+                      labelStyle: kBebasNormal.copyWith(fontSize: 19.0.r),
                       isScrollable: !_isHistoric && !isLandscape,
                       tabAlignment: !_isHistoric && !isLandscape ? TabAlignment.start : null,
                       tabs: _isHistoric
@@ -302,7 +302,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                       ),
                       if (!_isHistoric)
                         CustomIconButton(
-                          icon: Icons.compare_arrows,
+                          icon: Icons.people_alt_outlined,
                           size: 30.0.r,
                           onPressed: () {
                             Navigator.push(

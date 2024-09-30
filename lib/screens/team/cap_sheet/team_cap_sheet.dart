@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:splash/utilities/constants.dart';
 
 import 'cap_sheet_table.dart';
@@ -31,33 +33,156 @@ class _TeamCapSheetState extends State<TeamCapSheet> {
                 ),
                 padding: EdgeInsets.all(15.0.r),
                 margin: EdgeInsets.only(top: 11.0.r),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                child: Stack(children: [
+                  Positioned(
+                    top: -10,
+                    right: 1,
+                    child: IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          constraints:
+                              BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+                          backgroundColor: Colors.grey.shade900,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Column(children: [
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Hard Cap',
+                                        style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontSize: 17.0.r,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const TextSpan(
+                                        text: '\n\nFirst Apron\n',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            'A team becomes hard-capped at the first tax apron (\$${NumberFormat.decimalPattern().format(kLeagueFirstApron[kCurrentSeason.substring(0, 4)])}) by making any of the following moves:',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: '\n\n\t\tBi-Annual Exception',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: ' - True Shooting %, Unassisted %',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: '\n\n\t\tSign-and-Trade',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text:
+                                            ' - Acquires player via sign-and-trade with another team.',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: '\n\n\t\tMid-Level Exception',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text:
+                                            ' - Offensive Rebound %, Defensive Rebound %, Box Outs per 75, Adjust Rebound Chance %',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: '\n\n\t\tPlaymaking',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text:
+                                            ' - Adjusted Assists per 75, Potential Assists per 75, Adjusted Assist-to-Pass %, Box Creation',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: '\n\n\t\tHustle',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text:
+                                            ' - Pace, Loose Balls Recovered per 75, Screen Assist Points per 75, Charges Drawn',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]),
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        CupertinoIcons.question_circle,
+                        size: 18.0.r,
+                      ),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(color: Colors.grey.shade700, width: 2),
+                          ),
+                        ),
+                        child: Text(
+                          'Notes',
+                          style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
                         ),
                       ),
-                      child: Text(
-                        'Notes',
-                        style: kBebasBold.copyWith(fontSize: 18.0.r, color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(height: 8.0.r),
-                    Text(
-                      '${widget.team['CITY']} is hard capped for $kCurrentSeason:',
-                      style: kBebasNormal.copyWith(fontSize: 16.0.r),
-                    ),
-                    for (var note in widget.team['CAP_SHEET']['hardCapReasons'])
+                      SizedBox(height: 8.0.r),
                       Text(
-                        '• $note',
-                        style: kBebasNormal.copyWith(
-                            fontSize: 14.0.r, color: const Color(0xCFFFFFFF)),
+                        '${widget.team['CITY']} is hard capped for $kCurrentSeason:',
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
                       ),
-                  ],
-                ),
+                      for (var note in widget.team['CAP_SHEET']['hardCapReasons'])
+                        Text(
+                          '• $note',
+                          style: kBebasNormal.copyWith(
+                              fontSize: 14.0.r, color: const Color(0xCFFFFFFF)),
+                        ),
+                    ],
+                  ),
+                ]),
               ),
             ),
           ),
@@ -123,6 +248,21 @@ class _TeamCapSheetState extends State<TeamCapSheet> {
                         'Non-Guaranteed',
                         style: kBebasNormal.copyWith(fontSize: 16.0.r),
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 20.0.r),
+                  Wrap(
+                    runSpacing: 2.5,
+                    children: [
+                      Text(
+                        'Two-Way (TW) Contract',
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                      ),
+                      Text(
+                        'Players on Two-Way contracts do not count toward the cap. They can only appear in 50 regular season games, and are ineligible for postseason rosters.',
+                        style: kBebasNormal.copyWith(
+                            color: Colors.grey.shade300, fontSize: 15.0.r),
+                      )
                     ],
                   ),
                 ],

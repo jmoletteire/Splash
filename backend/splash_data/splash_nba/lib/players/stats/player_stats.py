@@ -1,7 +1,68 @@
 from nba_api.stats.endpoints import leaguedashplayerstats
 from pymongo import MongoClient
-from splash_nba.util.env import uri
+from splash_nba.util.env import uri, k_current_season
 import logging
+
+
+def update_player_playoff_stats():
+    basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=k_current_season, season_type_all_star='Playoffs').get_normalized_dict()['LeagueDashPlayerStats']
+    adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=k_current_season, season_type_all_star='Playoffs').get_normalized_dict()['LeagueDashPlayerStats']
+
+    player_stats = [(d1, d2) for d1 in basic_stats for d2 in adv_stats if d1['PLAYER_ID'] == d2['PLAYER_ID']]
+
+    logging.info(f'Processing BASIC & ADV stats for {k_current_season}...')
+    num_players = len(player_stats)
+
+    logging.info(f'Adding data for {len(player_stats)} players.')
+    for player in player_stats:
+        try:
+            player[0]['NUM_PLAYERS'] = num_players
+
+            players_collection.update_one(
+                {'PERSON_ID': player[0]['PLAYER_ID']},
+                {
+                    '$set': {
+                        f'STATS.{k_current_season}.PLAYOFFS.BASIC': player[0],
+                        f'STATS.{k_current_season}.PLAYOFFS.ADV': player[1]
+                     }
+                }
+
+            )
+        except Exception as e:
+            logging.error(f'Unable to add stats for {player[0]["PLAYER_NAME"]}: {e}')
+            continue
+
+
+def update_player_stats():
+    # Fetch basic and advanced stats for the given season
+    basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=k_current_season).get_normalized_dict()['LeagueDashPlayerStats']
+    adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=k_current_season).get_normalized_dict()['LeagueDashPlayerStats']
+
+    # Combine basic and advanced stats based on PLAYER_ID
+    combined_list = [(d1, d2) for d1 in basic_stats for d2 in adv_stats if d1['PLAYER_ID'] == d2['PLAYER_ID']]
+
+    logging.info(f'Processing BASIC & ADV stats for {k_current_season}...')
+    player_stats = combined_list
+    num_players = len(player_stats)
+
+    logging.info(f'Adding data for {len(player_stats)} players.')
+    for i, player in enumerate(player_stats):
+        try:
+            player[0]['NUM_PLAYERS'] = num_players
+
+            # Update BASIC & ADV stats for player
+            players_collection.update_one(
+                {'PERSON_ID': player[0]['PLAYER_ID']},
+                {
+                    '$set': {
+                        f'STATS.{k_current_season}.REGULAR SEASON.BASIC': player[0],
+                        f'STATS.{k_current_season}.REGULAR SEASON.ADV': player[1]
+                    }
+                }
+            )
+        except Exception as e:
+            logging.error(f"Unable to add stats for {player[0]['PLAYER_NAME']}: {e}")
+            continue
 
 
 def fetch_playoff_stats(seasons):

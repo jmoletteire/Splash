@@ -299,7 +299,8 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                       ),
                                       Text(
                                         widget.team['seasons'][selectedSeason]['ROSTER']
-                                            [players[index]]['PLAYER'],
+                                                ?[players[index]]?['PLAYER'] ??
+                                            '-',
                                         style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                                       ),
                                     ],
@@ -309,10 +310,8 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                   flex: 2,
                                   child: Text(
                                     widget.team['seasons'][selectedSeason]['ROSTER']
-                                                [players[index]]['NUM'] !=
-                                            null
-                                        ? '${widget.team['seasons'][selectedSeason]['ROSTER'][players[index]]['NUM']}'
-                                        : '',
+                                            ?[players[index]]?['NUM'] ??
+                                        '',
                                     textAlign: TextAlign.center,
                                     style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                                   ),
@@ -321,10 +320,8 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                   flex: 1,
                                   child: Text(
                                     widget.team['seasons'][selectedSeason]['ROSTER']
-                                                [players[index]]['POSITION'] !=
-                                            null
-                                        ? '${widget.team['seasons'][selectedSeason]['ROSTER'][players[index]]['POSITION']}'
-                                        : '',
+                                            ?[players[index]]?['POSITION'] ??
+                                        '',
                                     textAlign: TextAlign.center,
                                     style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                                   ),

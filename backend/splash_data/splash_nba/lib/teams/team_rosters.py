@@ -90,29 +90,15 @@ def update_current_roster(team_id, season_not_started):
 
 
 def fetch_roster(team_id, season):
-    # Get the current call stack
-    stack = inspect.stack()
-
-    # Check the second item in the stack (the caller)
-    # The first item in the stack is the current function itself
-    caller_frame = stack[1]
-
-    # Extract the function name of the caller
-    caller_function = caller_frame.function
-
-    # Check if the caller is the main script
-    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
-        print("Called from main script.")
-    else:
-        # Connect to MongoDB
-        try:
-            client = MongoClient(uri)
-            db = client.splash
-            teams_collection = db.nba_teams
-            players_collection = db.nba_players
-        except Exception as e:
-            logging.error(f"Failed to connect to MongoDB: {e}")
-            exit(1)
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+        players_collection = db.nba_players
+    except Exception as e:
+        logging.error(f"Failed to connect to MongoDB: {e}")
+        exit(1)
 
     try:
         team_data = commonteamroster.CommonTeamRoster(team_id, season=season).get_normalized_dict()
@@ -185,9 +171,11 @@ if __name__ == "__main__":
             team = doc['TEAM_ID']
             seasons = doc['seasons']
             for season in seasons.keys():
-                fetch_roster(team, season)
-                time.sleep(2)
+                if season < '1980-81':
+                    fetch_roster(team, season)
+                    time.sleep(2)
             logging.info(f"Processed {i + 1} of 30")
+            time.sleep(30)
         logging.info("Done")
     except Exception as e:
         logging.error(f"Error updating team rosters: {e}")

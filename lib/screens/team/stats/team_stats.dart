@@ -154,6 +154,7 @@ class _TeamStatsState extends State<TeamStats> {
   void initState() {
     super.initState();
     seasons = widget.team['seasons'].keys.toList().reversed.toList();
+    seasons = seasons.where((e) => int.parse(e.substring(0, 4)) >= 1996).toList();
     selectedSeason = seasons.first;
     selectedSeasonType = 'REGULAR SEASON';
     perMode = 'TOTAL';

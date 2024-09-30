@@ -63,8 +63,8 @@ if __name__ == "__main__":
     # Set batch size to process documents
     batch_size = 25
     total_documents = players_collection.count_documents({})
-    processed_count = 140
-    i = 140
+    processed_count = 0
+    i = 0
 
     while processed_count < total_documents:
         with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(

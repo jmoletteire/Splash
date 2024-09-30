@@ -33,6 +33,9 @@ def calculate_and_update_per_75_possessions(player_doc, playoffs):
 
                 loc = location.split('.')
 
+                if loc[1] == 'HUSTLE' and season_key < '2013-14':
+                    continue
+
                 if len(loc) == 2:
                     stat_value = season_stats[loc[0]].get(loc[1], {}).get(stat_key, None)
                 elif len(loc) == 3:
@@ -100,6 +103,9 @@ if __name__ == '__main__':
         # ("DEFLECTIONS", "HUSTLE"),
         # ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
         # ("CHARGES_DRAWN", "HUSTLE"),
+        ("DIST_MILES", "HUSTLE.SPEED"),
+        ("DIST_MILES_OFF", "HUSTLE.SPEED"),
+        ("DIST_MILES_DEF", "HUSTLE.SPEED"),
 
         # ADV -> PASSING
         # ("PASSES_MADE", "ADV.PASSING"),
@@ -114,7 +120,7 @@ if __name__ == '__main__':
         # ADV -> TOUCHES
         # ("TOUCHES", "ADV.TOUCHES"),
         # ("FRONT_CT_TOUCHES", "ADV.TOUCHES"),
-        ("TIME_OF_POSS", "ADV.TOUCHES"),
+        # ("TIME_OF_POSS", "ADV.TOUCHES"),
 
         # ADV -> DRIVES
         # ("DRIVES", "ADV.DRIVES"),
@@ -142,7 +148,7 @@ if __name__ == '__main__':
         # ("REB_CHANCE_DEFER", "ADV.REBOUNDING")
     ]
 
-    playoffs = False
+    playoffs = True
 
     # Set the batch size
     batch_size = 25  # Adjust this value based on your needs and system performance

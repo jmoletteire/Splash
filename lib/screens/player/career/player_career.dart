@@ -106,7 +106,7 @@ class _PlayerCareerState extends State<PlayerCareer> {
             slivers: [
               SliverPinnedHeader(
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.04,
+                  height: MediaQuery.of(context).size.height * 0.045,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade900,
                     border: const Border(

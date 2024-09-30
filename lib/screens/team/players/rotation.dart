@@ -82,10 +82,17 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         }
       }
 
-      // If we still haven't filled all 5 spots, ignore the criteria and just take next players
+      benchCandidates.sort((MapEntry<String, dynamic> a, MapEntry<String, dynamic> b) {
+        double mpgA = (a.value['MPG'] ?? 0 as num).toDouble();
+        double mpgB = (b.value['MPG'] ?? 0 as num).toDouble();
+        return mpgB.compareTo(mpgA); // Higher MPG comes first
+      });
+
+      // If we still haven't filled all 5 spots, just take next players by MPG
       while (startersEntries.length < 5) {
         int index = 5 - startersEntries.length - 1;
         startersEntries.add(benchCandidates[index]);
+        benchCandidates.removeAt(index);
       }
 
       // Sort the starters by Position and MPG

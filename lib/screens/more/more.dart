@@ -8,6 +8,7 @@ import 'package:splash/screens/search_screen.dart';
 
 import '../../components/custom_icon_button.dart';
 import '../../utilities/constants.dart';
+import 'contracts/contracts.dart';
 import 'glossary/glossary.dart';
 
 class More extends StatefulWidget {
@@ -19,11 +20,12 @@ class More extends StatefulWidget {
 
 class _MoreState extends State<More> {
   Map<String, dynamic> pages = {
-    'Stats': [Icons.leaderboard, StatsQuery()],
-    'Transactions': [Icons.compare_arrows, LeagueTransactions()],
-    'Draft': [Icons.format_list_numbered, Draft()],
-    'League History': [Icons.history, LeagueHistory()],
-    'Glossary': [Icons.menu_book, Glossary()],
+    'Stats': [Icons.leaderboard, const StatsQuery()],
+    'Transactions': [Icons.compare_arrows, const LeagueTransactions()],
+    'Draft': [Icons.format_list_numbered, const Draft()],
+    'Contracts': [Icons.attach_money, const Contracts()],
+    'League History': [Icons.history, const LeagueHistory()],
+    'Glossary': [Icons.menu_book, const Glossary()],
   };
 
   @override

@@ -6,9 +6,9 @@ import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
 
-import '../../../components/player_avatar.dart';
-import '../../../utilities/constants.dart';
-import '../../player/player_home.dart';
+import '../../../../components/player_avatar.dart';
+import '../../../../utilities/constants.dart';
+import '../../../player/player_home.dart';
 
 class CapSheet extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -61,63 +61,15 @@ class _CapSheetState extends State<CapSheet> {
   };
 
   List columnNames = [
-    'PLAYER',
+    'TEAM',
     'AGE',
-    'YRS',
-    '\'24-25',
-    '\'25-26',
-    '\'26-27',
-    '\'27-28',
-    '\'28-29',
-    '\'29-30',
+    'ALLOCATIONS',
+    'CAP SPACE',
   ];
-
-  List _mergeContracts(List contracts) {
-    Map<String, Map<String, dynamic>> mergedContracts = {};
-
-    for (var contract in contracts) {
-      String playerId = contract['player']['id'];
-      String contractType = contract['contractType'];
-
-      if (mergedContracts.containsKey(playerId)) {
-        // Merge the contracts by year
-        for (var year in contract['years']) {
-          String startYear = year['fromYear'].toString();
-
-          // Check if the year already exists
-          if (mergedContracts[playerId]!['years'].containsKey(startYear)) {
-            // If the year already exists, keep the upcoming contract's year data
-            if (contractType == 'upcoming') {
-              mergedContracts[playerId]!['years'][startYear] = year;
-            }
-          } else {
-            // If the year doesn't exist, add it to the map
-            mergedContracts[playerId]!['years'][startYear] = year;
-          }
-        }
-
-        // Update the contractType if it's an upcoming contract
-        if (contractType == 'upcoming') {
-          mergedContracts[playerId]!['contractType'] = 'upcoming';
-        }
-      } else {
-        // First time adding this player's contract
-        mergedContracts[playerId] = Map.from(contract);
-        // Convert years to a map
-        mergedContracts[playerId]!['years'] = {
-          for (var year in contract['years']) year['fromYear'].toString(): year
-        };
-      }
-    }
-
-    // Convert the merged contracts map back to a list
-    return mergedContracts.values.toList();
-  }
 
   @override
   void initState() {
     super.initState();
-    contracts = _mergeContracts(widget.team['contracts']);
     _addTotalsRow();
     _sortContracts(_sortedColumnIndex, _isAscending);
   }

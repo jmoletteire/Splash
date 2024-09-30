@@ -51,10 +51,11 @@ class _PlayerGamesState extends State<PlayerGames> {
     // Create a list to store the team IDs and their corresponding NET_RATING
     List<String> top10Teams = [];
 
-    // Iterate through the cache and extract NET_RATING
+    // Iterate through the cache and extract RATING
     teamCache.cache.forEach((teamId, values) {
-      int stat_rank =
-          values['seasons'][widget.selectedSeason]['STATS']['REGULAR SEASON']['ADV'][stat];
+      int stat_rank = values['seasons']?[widget.selectedSeason]?['STATS']?['REGULAR SEASON']
+              ?['ADV']?[stat] ??
+          30;
       if (stat_rank <= 10) top10Teams.add(teamId);
     });
 
@@ -139,7 +140,7 @@ class _PlayerGamesState extends State<PlayerGames> {
       schedule.forEach((key, game) {
         // Parse the GAME_DATE field
         String matchup = game['MATCHUP'].toString();
-        int oppId = int.parse(kTeamAbbrToId[matchup.substring(matchup.length - 3)]!);
+        int oppId = int.parse(kTeamAbbrToId[matchup.substring(matchup.length - 3)] ?? '0');
 
         // Check if the opponent matches
         if (oppId == opponentId) {

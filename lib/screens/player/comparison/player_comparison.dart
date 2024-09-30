@@ -279,13 +279,14 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                           ),
                                           SizedBox(width: 5.0.r),
                                           ConstrainedBox(
-                                            constraints: BoxConstraints(maxWidth: 20.0.r),
+                                            constraints: BoxConstraints(
+                                                maxWidth: 20.0.r, maxHeight: 20.0.r),
                                             child: Image.asset(
-                                              'images/NBA_Logos/${playerOne['TEAM_ID']}.png',
-                                              fit: BoxFit.contain,
-                                              alignment: Alignment.center,
-                                              width: 16.0.r,
-                                            ),
+                                                'images/NBA_Logos/${playerOne['TEAM_ID']}.png',
+                                                fit: BoxFit.contain,
+                                                alignment: Alignment.center,
+                                                width: 16.0.r,
+                                                height: 20.0.r),
                                           ),
                                         ],
                                       ),

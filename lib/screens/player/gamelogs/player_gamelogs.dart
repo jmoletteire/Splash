@@ -81,6 +81,35 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
     'NBA CUP': '6',
   };
 
+  void filterSeasonTypes(List<String> scheduleKeys) {
+    seasonTypes = {
+      'ALL': '*',
+      'PRE-SEASON': '1',
+      'REGULAR SEASON': '2',
+      'PLAYOFFS': '4',
+      'PLAY-IN': '5',
+      'NBA CUP': '6',
+    };
+
+    // Iterate over a copy of the map to avoid modification during iteration
+    seasonTypes.keys.toList().forEach((seasonType) {
+      String value = seasonTypes[seasonType]!;
+
+      // Skip the 'All' entry and continue
+      if (seasonType == 'ALL') {
+        return;
+      }
+
+      // Check if any key from scheduleKeys has a matching substring
+      bool matchFound = scheduleKeys.any((key) => key.substring(2, 3) == value);
+
+      // If no match is found, remove the seasonType entry
+      if (!matchFound) {
+        seasonTypes.remove(seasonType);
+      }
+    });
+  }
+
   @override
   bool get wantKeepAlive => true;
 
@@ -247,6 +276,7 @@ class _PlayerGamelogsState extends State<PlayerGamelogs> with AutomaticKeepAlive
                                                     selectedSeason = value!;
                                                     schedule = updateSchedule(
                                                         selectedSeason, selectedSeasonType);
+                                                    filterSeasonTypes(schedule.keys.toList());
                                                     games = PlayerGames(
                                                       player: widget.player,
                                                       schedule: schedule,

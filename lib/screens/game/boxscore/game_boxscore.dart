@@ -135,6 +135,11 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           .add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[otherStatsIndex]});
     }
 
+    dynamic homeTeam =
+        teamStats[0]['TEAM_ID'].toString() == widget.homeId ? teamStats[0] : teamStats[1];
+    dynamic awayTeam =
+        teamStats[0]['TEAM_ID'].toString() == widget.homeId ? teamStats[1] : teamStats[0];
+
     var linescore = widget.game['SUMMARY']['LineScore'];
 
     Map<String, dynamic> homeLinescore =
@@ -336,11 +341,13 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 slivers: [
                   BoxPlayerStats(
                     players: awayPlayerStats.sublist(0, 5),
+                    teamPoss: awayTeam['POSS'],
                     playerGroup: 'STARTERS',
                     controller: _awayStartersController,
                   ),
                   BoxPlayerStats(
                     players: awayPlayerStats.sublist(5),
+                    teamPoss: awayTeam['POSS'],
                     playerGroup: 'BENCH',
                     controller: _awayBenchController,
                   ),
@@ -362,11 +369,13 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 slivers: [
                   BoxPlayerStats(
                     players: homePlayerStats.sublist(0, 5),
+                    teamPoss: homeTeam['POSS'],
                     playerGroup: 'STARTERS',
                     controller: _homeStartersController,
                   ),
                   BoxPlayerStats(
                     players: homePlayerStats.sublist(5),
+                    teamPoss: homeTeam['POSS'],
                     playerGroup: 'BENCH',
                     controller: _homeBenchController,
                   ),

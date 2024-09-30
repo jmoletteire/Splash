@@ -42,9 +42,10 @@ class _GameByGameStatsState extends State<GameByGameStats> {
     'eFG%',
     'TS%',
     'USG%',
+    'NRTG',
     'ORTG',
     'DRTG',
-    'NRTG',
+    'PACE',
   ];
 
   Map<String, String> seasonTypes = {
@@ -199,19 +200,19 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.11),
+                : MediaQuery.of(context).size.width * 0.13),
 
         /// TS%
         TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.11),
+                : MediaQuery.of(context).size.width * 0.13),
 
         /// USG%
         TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.11),
+                : MediaQuery.of(context).size.width * 0.13),
 
         /// ORTG
         TableColumn(
@@ -226,6 +227,12 @@ class _GameByGameStatsState extends State<GameByGameStats> {
                 : MediaQuery.of(context).size.width * 0.13),
 
         /// NRTG
+        TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.05
+                : MediaQuery.of(context).size.width * 0.13),
+
+        /// PACE
         TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.05
@@ -430,17 +437,21 @@ class _GameByGameStatsState extends State<GameByGameStats> {
         String fta = game['FTA'].toStringAsFixed(0);
         return StandingsDataText(text: fta == '0' ? '-' : '$ftm-$fta');
       case 12:
-        return StandingsDataText(text: game['MIN'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(
+            text: '${(game['EFG_PCT'] * 100).toStringAsFixed(1)}%' ?? '-');
       case 13:
-        return StandingsDataText(text: game['MIN'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(text: '${(game['TS_PCT'] * 100).toStringAsFixed(1)}%' ?? '-');
       case 14:
-        return StandingsDataText(text: game['MIN'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(
+            text: '${(game['USG_PCT'] * 100).toStringAsFixed(1)}%' ?? '-');
       case 15:
-        return StandingsDataText(text: game['MIN'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(text: game['NET_RATING'].toStringAsFixed(1) ?? '-');
       case 16:
-        return StandingsDataText(text: game['MIN'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(text: game['OFF_RATING'].toStringAsFixed(1) ?? '-');
       case 17:
-        return StandingsDataText(text: game['MIN'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(text: game['DEF_RATING'].toStringAsFixed(1) ?? '-');
+      case 18:
+        return StandingsDataText(text: game['PACE'].toStringAsFixed(1) ?? '-');
       default:
         return const Text('-');
     }

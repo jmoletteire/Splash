@@ -12,11 +12,14 @@ import '../../player/player_home.dart';
 
 class BoxPlayerStats extends StatefulWidget {
   final List<dynamic> players;
+  final int teamPoss;
   final String playerGroup;
   final ScrollController controller;
+
   const BoxPlayerStats({
     super.key,
     required this.players,
+    required this.teamPoss,
     required this.playerGroup,
     required this.controller,
   });
@@ -34,6 +37,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
     columnNames = [
       widget.playerGroup,
       'POSS',
+      'P%',
       'MIN',
       'PTS',
       'REB',
@@ -89,6 +93,13 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         ),
 
         /// POSS
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
+
+        /// %
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.03
@@ -382,7 +393,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
-              '${widget.players[row]['MIN'].replaceAll(RegExp(r'\..*?(?=:)'), '')}',
+              '${(100 * widget.players[row]['POSS'] / widget.teamPoss).toStringAsFixed(0)}%',
               style: kBebasNormal.copyWith(fontSize: 14.0.r),
             ),
           );
@@ -391,33 +402,37 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         }
       case 3:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['PTS'].toStringAsFixed(0)}');
+          return Container(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '${widget.players[row]['MIN'].replaceAll(RegExp(r'\..*?(?=:)'), '')}',
+              style: kBebasNormal.copyWith(fontSize: 14.0.r),
+            ),
+          );
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 4:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['REB'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['PTS'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 5:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['AST'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['REB'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 6:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['TO'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['AST'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 7:
         try {
-          return BoxscoreDataText(
-              text:
-                  '${widget.players[row]['FGM'].toStringAsFixed(0)}-${widget.players[row]['FGA'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['TO'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -425,7 +440,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${widget.players[row]['FG3M'].toStringAsFixed(0)}-${widget.players[row]['FG3A'].toStringAsFixed(0)}');
+                  '${widget.players[row]['FGM'].toStringAsFixed(0)}-${widget.players[row]['FGA'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -433,83 +448,91 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${widget.players[row]['FTM'].toStringAsFixed(0)}-${widget.players[row]['FTA'].toStringAsFixed(0)}');
+                  '${widget.players[row]['FG3M'].toStringAsFixed(0)}-${widget.players[row]['FG3A'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 10:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['STL'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${widget.players[row]['FTM'].toStringAsFixed(0)}-${widget.players[row]['FTA'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 11:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['BLK'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['STL'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 12:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['OREB'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['BLK'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 13:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['DREB'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['OREB'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 14:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['PF'].toStringAsFixed(0)}');
+          return BoxscoreDataText(text: '${widget.players[row]['DREB'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 15:
         try {
-          return BoxscoreDataText(
-              text: '${(widget.players[row]['EFG_PCT'] * 100).toStringAsFixed(1)}%');
+          return BoxscoreDataText(text: '${widget.players[row]['PF'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 16:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['TS_PCT'] * 100).toStringAsFixed(1)}%');
+              text: '${(widget.players[row]['EFG_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 17:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['USG_PCT'] * 100).toStringAsFixed(1)}%');
+              text: '${(widget.players[row]['TS_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 18:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['PLUS_MINUS'].toStringAsFixed(0)}');
+              text: '${(widget.players[row]['USG_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 19:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['NET_RATING'].toStringAsFixed(1)}');
+              text: '${widget.players[row]['PLUS_MINUS'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 20:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['OFF_RATING'].toStringAsFixed(1)}');
+              text: '${widget.players[row]['NET_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 21:
+        try {
+          return BoxscoreDataText(
+              text: '${widget.players[row]['OFF_RATING'].toStringAsFixed(1)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 22:
         try {
           return BoxscoreDataText(
               text: '${widget.players[row]['DEF_RATING'].toStringAsFixed(1)}');
