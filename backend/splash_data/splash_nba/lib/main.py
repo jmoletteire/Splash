@@ -18,7 +18,7 @@ from splash_nba.lib.players.stats.shot_chart_data import get_shot_chart_data
 from splash_nba.lib.players.stats.update_custom_player_stats import update_player_on_off, update_poss_per_game, \
     update_three_and_ft_rate, update_player_tracking_stats, update_shot_distribution, update_touches_breakdown, \
     update_drive_stats, update_scoring_breakdown_and_pct_unassisted, update_box_creation, update_offensive_load, \
-    update_adj_turnover_pct, update_versatility_score
+    update_adj_turnover_pct, update_versatility_score, update_matchup_difficulty_and_dps
 from splash_nba.lib.players.update_all_players import add_players, restructure_new_docs, update_player_info
 from splash_nba.lib.players.update_player_contracts import fetch_player_contract_data, keep_most_informative
 from splash_nba.lib.teams.stats.custom_team_stats import three_and_ft_rate
@@ -183,6 +183,7 @@ def players_daily_update():
         update_offensive_load(k_current_season_type)  # OFF LOAD
         update_adj_turnover_pct(k_current_season_type)  # cTOV
         update_versatility_score(k_current_season_type)  # VERSATILITY
+        update_matchup_difficulty_and_dps(k_current_season_type)  # MATCHUP DIFF & DIE
 
     def player_game_logs():
         # Game Logs

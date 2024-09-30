@@ -44,6 +44,20 @@ season_types = ['REGULAR SEASON', 'PLAYOFFS']
 
 # CHECKED
 def update_scoring_breakdown_and_pct_unassisted(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Scoring Breakdown) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     if season_type == 'PLAYOFFS':
         player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
                                                                   season=k_current_season,
@@ -82,15 +96,31 @@ def update_scoring_breakdown_and_pct_unassisted(season_type):
             continue
 
 
+# CHECKED
 def update_matchup_difficulty_and_dps(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Matchup Diff & DIE) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Set batch size to process documents
     batch_size = 25
-    total_documents = players_collection.count_documents({})
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
     processed_count = 0
     i = 0
 
+    # Update all ACTIVE players
     while processed_count < total_documents:
-        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+        with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -99,75 +129,105 @@ def update_matchup_difficulty_and_dps(season_type):
 
             for player in documents:
                 i += 1
-                logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
+                logging.info(f'(Matchup Diff & DIE) Processing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
 
-                stats = player.get('STATS', None)
-                if not stats:
-                    continue
+                try:
+                    if season_type == 'REGULAR SEASON':
+                        data = leagueseasonmatchups.LeagueSeasonMatchups(season=k_current_season,
+                                                                         def_player_id_nullable=player['PERSON_ID'])
+                    else:
+                        data = leagueseasonmatchups.LeagueSeasonMatchups(season=k_current_season,
+                                                                         season_type_playoffs='Playoffs',
+                                                                         def_player_id_nullable=player['PERSON_ID'])
 
-                for season in stats.keys():
-                    if season < '2017-18':
-                        continue
-
-                    logging.info(f'Processing {season}...')
                     try:
-                        if season_type == 'REGULAR SEASON':
-                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
-                                                                             def_player_id_nullable=player['PERSON_ID'])
-                        else:
-                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
-                                                                             season_type_playoffs='Playoffs',
-                                                                             def_player_id_nullable=player['PERSON_ID'])
-
                         raw_data = data.get_normalized_dict()['SeasonMatchups']
-
-                        if len(raw_data) == 0:
-                            continue
-
-                        load = 0  # Matchup Difficulty
-                        x_team_pts = 0  # DPS
-                        partial_poss = 0
-
-                        for matchup in raw_data:
-                            off_player = players_collection.find_one(
-                                {'PERSON_ID': matchup['OFF_PLAYER_ID']},
-                                {
-                                    f'STATS.{season}.{season_type}.ADV.OFFENSIVE_LOAD': 1,
-                                    f'STATS.{season}.{season_type}.ADV.OFF_RATING': 1,
-                                    '_id': 0
-                                }
-                            )
-
-                            partial_poss += matchup['PARTIAL_POSS']
-
-                            # Matchup Difficulty
-                            player_off_load = off_player['STATS'][season][season_type]['ADV']['OFFENSIVE_LOAD']
-                            load += player_off_load * matchup['PARTIAL_POSS']
-
-                            avg_load = load / partial_poss
-
-                            # DPS
-                            x_team_ppp = off_player['STATS'][season][season_type]['ADV']['OFF_RATING'] / 100
-                            x_team_pts += x_team_ppp * matchup['PARTIAL_POSS']
-
-                            total_x_ortg = x_team_pts / partial_poss * 100
-                            net_saved = total_x_ortg - player['STATS'][season][season_type]['ADV']['DEF_RATING']
-
-                        players_collection.update_one(
-                            {'PERSON_ID': player['PERSON_ID']},
-                            {'$set': {
-                                f'STATS.{season}.{season_type}.ADV.MATCHUP_DIFFICULTY': avg_load,
-                                f'STATS.{season}.{season_type}.ADV.DEF_IMPACT_EST': net_saved,
-                            }
-                            },
-                        )
-                    except Exception as e:
-                        logging.error(f'Could not process {season} for player {player["PERSON_ID"]}: {e}')
+                    except KeyError:
                         continue
+
+                    if len(raw_data) == 0:
+                        continue
+
+                    load = 0  # Matchup Difficulty
+                    x_team_pts = 0  # DPS
+                    partial_poss = 0
+
+                    for matchup in raw_data:
+                        off_player = players_collection.find_one(
+                            {'PERSON_ID': matchup['OFF_PLAYER_ID']},
+                            {
+                                f'STATS.{k_current_season}.{season_type}.ADV.OFFENSIVE_LOAD': 1,
+                                f'STATS.{k_current_season}.{season_type}.ADV.OFF_RATING': 1,
+                                '_id': 0
+                            }
+                        )
+
+                        try:
+                            partial_poss += matchup['PARTIAL_POSS']
+                        except KeyError:
+                            partial_poss = 0
+
+                        # Matchup Difficulty
+                        try:
+                            player_off_load = off_player['STATS'][k_current_season][season_type]['ADV']['OFFENSIVE_LOAD']
+                        except KeyError:
+                            player_off_load = 0
+
+                        load += player_off_load * matchup['PARTIAL_POSS']
+
+                        try:
+                            avg_load = load / partial_poss
+                        except ZeroDivisionError:
+                            avg_load = 0
+
+                        # DPS
+                        try:
+                            x_team_ppp = off_player['STATS'][k_current_season][season_type]['ADV']['OFF_RATING'] / 100
+                        except KeyError:
+                            x_team_ppp = 0
+
+                        x_team_pts += x_team_ppp * matchup['PARTIAL_POSS']
+
+                        try:
+                            total_x_ortg = x_team_pts / partial_poss * 100
+                        except ZeroDivisionError:
+                            total_x_ortg = 0
+
+                        try:
+                            net_saved = total_x_ortg - player['STATS'][k_current_season][season_type]['ADV']['DEF_RATING']
+                        except KeyError:
+                            net_saved = 0
+
+                    players_collection.update_one(
+                        {'PERSON_ID': player['PERSON_ID']},
+                        {'$set': {
+                            f'STATS.{k_current_season}.{season_type}.ADV.MATCHUP_DIFFICULTY': avg_load,
+                            f'STATS.{k_current_season}.{season_type}.ADV.DEF_IMPACT_EST': net_saved,
+                            f'STATS.{k_current_season}.{season_type}.ADV.PARTIAL_POSS': partial_poss,
+                        }
+                        },
+                    )
+                except Exception as e:
+                    logging.error(f'(Matchup Diff & DIE) Could not process {k_current_season} for player {player["PERSON_ID"]}: {e}')
+                    continue
 
 
 # CHECKED
 def update_versatility_score(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Versatility) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Set batch size to process documents
     batch_size = 25
     total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
@@ -222,146 +282,22 @@ def update_versatility_score(season_type):
                 time.sleep(random.uniform(0.5, 1.0))
 
 
-def update_defensive_points_saved(season_type):
-    def expected_pts(player_data, matchup_data):
-        try:
-            xFTM = (player_data.get('FTA_PER_75', 0) / 75) * matchup_data['PARTIAL_POSS'] * player_data.get('FT_PCT', 0)
-        except ZeroDivisionError:
-            xFTM = 0
-
-        try:
-            xFG2M = ((player_data.get('FGA_PER_75', 0) - player_data.get('FG3A_PER_75', 0)) / 75) * matchup_data[
-                'PARTIAL_POSS'] * (
-                            (player_data.get('FGM', 0) - player_data.get('FG3M', 0)) / (
-                            player_data.get('FGA', 0) - player_data.get('FG3A', 0)))
-        except ZeroDivisionError:
-            xFG2M = 0
-
-        try:
-            xFG3M = (player_data.get('FG3A_PER_75', 0) / 75) * matchup_data['PARTIAL_POSS'] * player_data.get('FG3_PCT',
-                                                                                                              0)
-        except ZeroDivisionError:
-            xFG3M = 0
-
-        try:
-            xTOV = (player_data.get('TOV_PER_75', 0) / 75) * matchup_data['PARTIAL_POSS']
-        except ZeroDivisionError:
-            xTOV = 0
-
-        try:
-            xBLKA = (player_data.get('BLKA_PER_75', 0) / 75) * matchup_data['PARTIAL_POSS']
-        except ZeroDivisionError:
-            xBLKA = 0
-
-        xPTS = ((xFG2M * 2) + (xFG3M * 3) + xFTM) - (xBLKA * player_data['PPS']) - (xTOV * player_data['PPP'])
-
-        return xPTS
-
-    # Set batch size to process documents
-    batch_size = 25
-    total_documents = players_collection.count_documents({})
-    processed_count = 0
-    i = 0
-
-    while processed_count < total_documents:
-        with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
-                batch_size).batch_size(batch_size) as cursor:
-            documents = list(cursor)
-            if not documents:
-                break
-            processed_count += len(documents)
-
-            for player in documents:
-                i += 1
-                logging.info(f'\nProcessing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
-
-                stats = player.get('STATS', None)
-                if not stats:
-                    continue
-
-                for season in stats.keys():
-                    if season < '2017-18':
-                        continue
-
-                    logging.info(f'Processing {season}...')
-                    try:
-                        if season_type == 'REGULAR SEASON':
-                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
-                                                                             def_player_id_nullable=player['PERSON_ID'])
-                        else:
-                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
-                                                                             season_type_playoffs='Playoffs',
-                                                                             def_player_id_nullable=player['PERSON_ID'])
-
-                        raw_data = data.get_normalized_dict()['SeasonMatchups']
-                        dps = 0
-                        partial_poss = 0
-
-                        for matchup in raw_data:
-                            off_player = players_collection.find_one(
-                                {'PERSON_ID': matchup['OFF_PLAYER_ID']},
-                                {
-                                    f'STATS.{season}.{season_type}.BASIC.FGM': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.FGA': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.FG3M': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.FG3A': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.FT_PCT': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.FG3_PCT': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.FGA_PER_75': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.FG3A_PER_75': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.FTA_PER_75': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.TOV_PER_75': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.BLKA_PER_75': 1,
-                                    f'STATS.{season}.{season_type}.BASIC.PTS': 1,
-                                    f'STATS.2023-24.{season_type}.ADV.OFF_RATING': 1,
-                                    '_id': 0
-                                }
-                            )
-
-                            player_stats = off_player['STATS'][season][season_type]['BASIC']
-
-                            try:
-                                player_stats['PPS'] = off_player['STATS'][season][season_type]['BASIC']['PTS'] / \
-                                                      off_player['STATS'][season][season_type]['BASIC']['FGA']
-                            except ZeroDivisionError:
-                                player_stats['PPS'] = 1
-
-                            try:
-                                player_stats['PPP'] = off_player['STATS']['2023-24'][season_type]['ADV'][
-                                                          'OFF_RATING'] / 100
-                            except ZeroDivisionError:
-                                player_stats['PPP'] = 1
-
-                            x_pts = expected_pts(player_stats, matchup)
-
-                            player_pts = matchup['PLAYER_PTS']
-                            blk_pts = matchup['MATCHUP_BLK'] * player_stats['PPS']
-                            tov_pts = matchup['MATCHUP_TOV'] * player_stats['PPP']
-
-                            dps += (x_pts - (player_pts - blk_pts - tov_pts))
-                            partial_poss += matchup['PARTIAL_POSS']
-
-                        try:
-                            dps_per_75 = (dps / partial_poss) * 75
-                        except ZeroDivisionError:
-                            dps_per_75 = 0
-
-                        players_collection.update_one(
-                            {'PERSON_ID': player['PERSON_ID']},
-                            {'$set': {
-                                f'STATS.{season}.{season_type}.ADV.DEF_PTS_SAVED': dps,
-                                f'STATS.{season}.{season_type}.ADV.PARTIAL_POSS': partial_poss,
-                                f'STATS.{season}.{season_type}.ADV.DPS_PER_75': dps_per_75,
-                            }
-                            },
-                        )
-                    except Exception as e:
-                        logging.error(f'Could not process {season} for player {player["PERSON_ID"]}: {e}')
-                        continue
-
-
 # CHECKED
 def update_adj_turnover_pct(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(cTOV) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Set batch size to process documents
     batch_size = 25
     total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
@@ -410,6 +346,20 @@ def update_adj_turnover_pct(season_type):
 
 # CHECKED
 def update_offensive_load(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Offensive Load) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Set batch size to process documents
     batch_size = 25
     total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
@@ -467,6 +417,20 @@ def update_offensive_load(season_type):
 
 # CHECKED
 def update_box_creation(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Box Creation) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     def calculate_3pt_proficiency(three_pa, three_p_percent):
         # Calculate the sigmoid part of the formula
         sigmoid_value = 2 / (1 + math.exp(-three_pa)) - 1
@@ -536,6 +500,20 @@ def update_box_creation(season_type):
 
 # CHECKED
 def update_drive_stats(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Drives) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Set batch size to process documents
     batch_size = 25
     total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
@@ -615,6 +593,20 @@ def update_drive_stats(season_type):
 
 # CHECKED
 def update_touches_breakdown(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Touches Breakdown) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Update each document in the collection
     for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'})):
         logging.info(f'(Touches Breakdown) Processing {i} of {players_collection.count_documents({"ROSTERSTATUS": "Active"})}...')
@@ -670,6 +662,20 @@ def update_touches_breakdown(season_type):
 
 # CHECKED
 def update_shot_distribution(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Shot Distribution) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Set the batch size
     batch_size = 25
 
@@ -735,6 +741,20 @@ def update_shot_distribution(season_type):
 
 # CHECKED
 def update_player_tracking_stats(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Player Tracking) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     if season_type == 'PLAYOFFS':
         player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
                                                              season=k_current_season,
@@ -829,6 +849,20 @@ def update_player_tracking_stats(season_type):
 
 # CHECKED
 def update_three_and_ft_rate(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(3PAr & FTAr) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Update each document in the collection
     for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active"})):
         logging.info(f'(3PAr & FTAr) Processing {i + 1} of {players_collection.count_documents({{"ROSTERSTATUS": "Active"}})}...')
@@ -877,6 +911,20 @@ def update_three_and_ft_rate(season_type):
 
 # CHECKED
 def update_poss_per_game(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Poss Per Game) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     # Update all ACTIVE players
     for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active"})):
         logging.info(f'(Poss Per Game) Processing {i} of {players_collection.count_documents({"ROSTERSTATUS": "Active"})}...')
@@ -911,6 +959,20 @@ def update_poss_per_game(season_type):
 
 # CHECKED
 def update_player_on_off(season_type):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
+        teams_collection = db.nba_teams
+        logging.info("Connected to MongoDB")
+    except Exception as e:
+        logging.error(f'(Player On/Off) Unable to connect to MongoDB: {e}')
+        exit(1)
+
     logging.info(f'(Player On/Off) Processing season {k_current_season}...')
     for team in teams_collection.find({}, {'TEAM_ID': 1, '_id': 0}):
         if team['TEAM_ID'] == 0:
