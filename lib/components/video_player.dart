@@ -55,12 +55,17 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
           itemCount: widget.shotChart.length,
           itemBuilder: (context, index) {
             return ListTile(
-              leading: Image.network(
-                widget.shotChart[index]['THUMBNAIL']!,
-                width: 50.r,
-                height: 50.r,
-                fit: BoxFit.cover,
-              ),
+              leading: widget.shotChart[index]['THUMBNAIL'] == null
+                  ? SizedBox(
+                      width: 50.r,
+                      height: 50.r,
+                    )
+                  : Image.network(
+                      widget.shotChart[index]['THUMBNAIL']!,
+                      width: 50.r,
+                      height: 50.r,
+                      fit: BoxFit.cover,
+                    ),
               title: Row(
                 children: [
                   ConstrainedBox(
@@ -364,12 +369,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               showValueIndicator: ShowValueIndicator.never, // No value indicator
             ),
             child: Slider(
-              value: currentPosition.inSeconds.toDouble(),
+              value: currentPosition.inMicroseconds.toDouble(),
               min: 0,
-              max: _videoPlayerController.value.duration.inSeconds.toDouble(),
+              max: _videoPlayerController.value.duration.inMicroseconds.toDouble(),
               onChanged: (value) {
                 setState(() {
-                  _videoPlayerController.seekTo(Duration(seconds: value.toInt()));
+                  _videoPlayerController.seekTo(Duration(microseconds: value.toInt()));
                 });
               },
             ),

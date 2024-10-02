@@ -23,6 +23,7 @@ class HexagonAggregator {
           if (!hexagonMap.containsKey(key)) {
             hexagonMap[key] = hexagon;
           }
+          hexagonMap[key]!.shots.add(shot);
           hexagonMap[key]!.FGA += shot['SHOT_ATTEMPTED_FLAG'] ?? 1;
           hexagonMap[key]!.FGM += shot['SHOT_MADE_FLAG'] ?? 0;
           hexagonMap[key]!.totalDistance += shot['DISTANCE'] ?? 0;
@@ -93,6 +94,7 @@ class HexagonData {
   num FGM;
   num totalDistance;
   num avgDistance;
+  late List shots;
   late Map<String, String> shotZoneRange;
   late List<Offset> vertices;
 
@@ -108,6 +110,7 @@ class HexagonData {
     this.totalDistance = 0,
     this.avgDistance = 0,
   }) {
+    shots = [];
     shotZoneRange = _shotZoneRange();
     vertices = _calculateVertices(x, y, width, height);
   }

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/player/shot_chart/zone/zone_aggregator.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../../../../components/video_player.dart';
 import 'court_zone_painter.dart';
 
 class ZoneMap extends StatefulWidget {
@@ -108,12 +109,34 @@ class _ZoneMapState extends State<ZoneMap> {
                     color: Colors.black.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  child: Text(
-                    'Zone: ${_selectedZone!.zoneName}\n'
-                    'Avg Dist: ${_selectedZone!.avgDistance.toStringAsFixed(1)} ft.\n'
-                    'LA: ${(100 * widget.lgAvg['Zone'][_selectedZone!.zoneName]['FG_PCT']).toStringAsFixed(1)}%\n'
-                    'FG: ${_selectedZone!.FGM}/${_selectedZone!.FGA} (${(100 * _selectedZone!.FGM / _selectedZone!.FGA).toStringAsFixed(1)}%)',
-                    style: kBebasNormal.copyWith(fontSize: 14.0.sp),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Zone: ${_selectedZone!.zoneName}\n'
+                        'Avg Dist: ${_selectedZone!.avgDistance.toStringAsFixed(1)} ft.\n'
+                        'LA: ${(100 * widget.lgAvg['Zone'][_selectedZone!.zoneName]['FG_PCT']).toStringAsFixed(1)}%\n'
+                        'FG: ${_selectedZone!.FGM}/${_selectedZone!.FGA} (${(100 * _selectedZone!.FGM / _selectedZone!.FGA).toStringAsFixed(1)}%)',
+                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            clipBehavior: Clip.hardEdge,
+                            constraints:
+                                BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+                            backgroundColor: Colors.grey.shade900,
+                            builder: (BuildContext context) {
+                              return TikTokVideoPlayer(shotChart: _selectedZone!.shots);
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.video_collection),
+                        color: Colors.white,
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -848,21 +848,23 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                     },
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      clipBehavior: Clip.hardEdge,
-                      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-                      backgroundColor: Colors.grey.shade900,
-                      builder: (BuildContext context) {
-                        return TikTokVideoPlayer(shotChart: filteredShotChart);
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.video_collection),
-                  color: Colors.white,
-                ),
+                if (int.parse(selectedSeason.substring(0, 4)) >= 2014)
+                  IconButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        clipBehavior: Clip.hardEdge,
+                        constraints:
+                            BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+                        backgroundColor: Colors.grey.shade900,
+                        builder: (BuildContext context) {
+                          return TikTokVideoPlayer(shotChart: filteredShotChart);
+                        },
+                      );
+                    },
+                    icon: const Icon(Icons.video_collection),
+                    color: Colors.white,
+                  ),
               ],
             ),
           ),

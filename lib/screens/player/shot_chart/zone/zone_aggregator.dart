@@ -195,6 +195,8 @@ class ZoneAggregator {
   }
 
   Map<String, ZoneData> aggregateShots(List shotData, bool isLandscape) {
+    // This will store information about each zone if the zone contains a shot
+    // String = Zone Name, ZoneData = Zone Path
     Map<String, ZoneData> zoneMap = {};
 
     for (var shot in shotData) {
@@ -247,6 +249,7 @@ class ZoneAggregator {
 class ZoneData {
   final String zoneName;
   final Path zonePath;
+  List shots = [];
   num FGA = 0;
   num FGM = 0;
   double totalDistance = 0;
@@ -263,6 +266,7 @@ class ZoneData {
   }
 
   void aggregateShotData(Map<String, dynamic> shot) {
+    shots.add(shot);
     FGA += shot['SHOT_ATTEMPTED_FLAG'] ?? 1;
     FGM += shot['SHOT_MADE_FLAG'] ?? 0;
     totalDistance += shot['DISTANCE'] ?? 0;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../../../../components/video_player.dart';
 import 'hex_aggregator.dart';
 import 'hex_map_painter.dart';
 
@@ -151,9 +152,31 @@ class _HexMapState extends State<HexMap> {
                     color: Colors.black.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  child: Text(
-                    _tooltipMessage,
-                    style: kBebasNormal.copyWith(fontSize: 13.0.sp),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        _tooltipMessage,
+                        style: kBebasNormal.copyWith(fontSize: 13.0.sp),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            clipBehavior: Clip.hardEdge,
+                            constraints:
+                                BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+                            backgroundColor: Colors.grey.shade900,
+                            builder: (BuildContext context) {
+                              return TikTokVideoPlayer(shotChart: _selectedHexagon!.shots);
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.video_collection),
+                        color: Colors.white,
+                      ),
+                    ],
                   ),
                 ),
               ),
