@@ -1,7 +1,7 @@
 import random
 import time
 
-from nba_api.stats.endpoints import shotchartdetail
+from nba_api.stats.endpoints import shotchartdetail, videodetailsasset
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
@@ -11,6 +11,9 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
     shot_data = shotchartdetail.ShotChartDetail(player_id=player, team_id=team, season_nullable=season,
                                                 season_type_all_star=season_type,
                                                 context_measure_simple='FGA').get_normalized_dict()
+    video_data = videodetailsasset.VideoDetailsAsset(player_id=player, team_id=team, season=season,
+                                                season_type_all_star=season_type,
+                                                context_measure_detailed='FGA').get_normalized_dict()
 
     filtered_data = [
         {
@@ -19,9 +22,14 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
             "SHOT_ATTEMPTED_FLAG": shot['SHOT_ATTEMPTED_FLAG'],
             "SHOT_MADE_FLAG": shot['SHOT_MADE_FLAG'],
             "SHOT_TYPE": shot['ACTION_TYPE'],
-            "DISTANCE": shot['SHOT_DISTANCE']
+            "DISTANCE": shot['SHOT_DISTANCE'],
+            "GAME_DATE": shot['GAME_DATE'],
+            "HTM": shot['HTM'],
+            "VTM": shot['VTM'],
+            "VIDEO": video_data['Meta']['videoUrls'][i]['murl'],
+            'THUMBNAIL': video_data['Meta']['videoUrls'][i]['mth'],
         }
-        for shot in shot_data['Shot_Chart_Detail']
+        for i, shot in enumerate(shot_data['Shot_Chart_Detail'])
     ]
 
     player_shots_collection.update_one(
@@ -74,8 +82,8 @@ if __name__ == "__main__":
     # Set batch size to process documents
     batch_size = 10
     total_documents = players_collection.count_documents({})
-    processed_count = 0
-    i = 0
+    processed_count = 31
+    i = 31
 
     while processed_count < total_documents:
         with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
@@ -106,6 +114,6 @@ if __name__ == "__main__":
                         logging.error(f'Could not process shot chart for Player {player["PERSON_ID"]}: {e}')
                         continue
                     # Pause for a random time between 0.5 and 1 second
-                    time.sleep(random.uniform(0.5, 1.0))
+                    time.sleep(3)
 
             time.sleep(30)

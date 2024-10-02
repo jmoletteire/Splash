@@ -1,34 +1,161 @@
 import inspect
 
 from pymongo import MongoClient
-from splash_nba.util.env import uri
+from splash_nba.util.env import uri, k_current_season
 import logging
+
+
+def current_season_per_100_possessions(team_doc, playoffs):
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"(Team Per-100) Failed to connect to MongoDB: {e}")
+        exit(1)
+
+    # List of tuples specifying the stats to calculate per-75 possession values for
+    # Each tuple should be in the format ("stat_key", "location")
+    # Example: [("PTS", "BASIC"), ("AST", "BASIC")]
+    stats_to_calculate = [
+        # BASIC
+        ("FGM", "BASIC"),
+        ("FGA", "BASIC"),
+        ("FTM", "BASIC"),
+        ("FTA", "BASIC"),
+        ("FG3M", "BASIC"),
+        ("FG3A", "BASIC"),
+        ("STL", "BASIC"),
+        ("BLK", "BASIC"),
+        ("REB", "BASIC"),
+        ("OREB", "BASIC"),
+        ("DREB", "BASIC"),
+        ("TOV", "BASIC"),
+        ("PF", "BASIC"),
+        ("PFD", "BASIC"),
+        ("PTS", "BASIC"),
+
+        # HUSTLE
+        ("CONTESTED_SHOTS", "HUSTLE"),
+        ("SCREEN_ASSISTS", "HUSTLE"),
+        ("SCREEN_AST_PTS", "HUSTLE"),
+        ("BOX_OUTS", "HUSTLE"),
+        ("OFF_BOXOUTS", "HUSTLE"),
+        ("DEF_BOXOUTS", "HUSTLE"),
+        ("DEFLECTIONS", "HUSTLE"),
+        ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
+    ]
+
+    seasons = team_doc.get("seasons", None)
+
+    for season_key, season in seasons.items():
+        if season_key != k_current_season:
+            continue
+
+        season_stats = season.get("STATS", None)
+        if season_stats is None:
+            continue
+
+        if playoffs:
+            playoff_stats = season_stats.get("PLAYOFFS", None)
+
+            if playoff_stats is None:
+                continue
+
+            adv_stats = playoff_stats.get("ADV", {})
+        else:
+            reg_season_stats = season_stats.get("REGULAR SEASON", None)
+
+            if reg_season_stats is None:
+                continue
+
+            adv_stats = season_stats.get("ADV", {})
+
+        possessions = adv_stats.get("POSS", None)
+
+        if possessions:
+            for stat_key, location in stats_to_calculate:
+                if playoffs:
+                    location = 'PLAYOFFS.' + location
+                else:
+                    location = 'REGULAR SEASON.' + location
+
+                loc = location.split('.')
+
+                try:
+                    if len(loc) == 2:
+                        stat_value = season_stats[loc[0]].get(loc[1], {}).get(stat_key, None)
+                    elif len(loc) == 3:
+                        stat_value = season_stats[loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
+                    else:
+                        stat_value = season_stats.get(location, {}).get(stat_key, None)
+                except KeyError:
+                    logging.error(f"(Team Per-100) Could not find stat for {stat_key} in {location}")
+                    stat_value = None
+
+                if stat_value is not None:
+                    try:
+                        try:
+                            per_100_value = (stat_value / possessions) * 100
+                        except ZeroDivisionError:
+                            per_100_value = 0
+
+                        per_100_key = f"{stat_key}_PER_100"
+
+                        # Update the team document with the new per-100 possession value
+                        teams_collection.update_one(
+                            {"_id": team_doc["_id"]},
+                            {"$set": {f"seasons.{season_key}.STATS.{location}.{per_100_key}": per_100_value}}
+                        )
+                    except Exception as e:
+                        logging.error(f'(Team Per-100) Unable to add {stat_key} for {team_doc["TEAM_ID"]} for {season_key}: {e}')
+        else:
+            continue
 
 
 # Function to calculate per-100 possession values and update the document
 def calculate_and_update_per_100_possessions(team_doc, playoffs):
-    # Get the current call stack
-    stack = inspect.stack()
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"Failed to connect to MongoDB: {e}")
+        exit(1)
 
-    # Check the second item in the stack (the caller)
-    # The first item in the stack is the current function itself
-    caller_frame = stack[1]
+    # List of tuples specifying the stats to calculate per-75 possession values for
+    # Each tuple should be in the format ("stat_key", "location")
+    # Example: [("PTS", "BASIC"), ("AST", "BASIC")]
+    stats_to_calculate = [
+        # BASIC
+        ("FGM", "BASIC"),
+        ("FGA", "BASIC"),
+        ("FTM", "BASIC"),
+        ("FTA", "BASIC"),
+        ("FG3M", "BASIC"),
+        ("FG3A", "BASIC"),
+        ("STL", "BASIC"),
+        ("BLK", "BASIC"),
+        ("REB", "BASIC"),
+        ("OREB", "BASIC"),
+        ("DREB", "BASIC"),
+        ("TOV", "BASIC"),
+        ("PF", "BASIC"),
+        ("PFD", "BASIC"),
+        ("PTS", "BASIC"),
 
-    # Extract the function name of the caller
-    caller_function = caller_frame.function
-
-    # Check if the caller is the main script
-    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
-        print("Called from main script.")
-    else:
-        # Connect to MongoDB
-        try:
-            client = MongoClient(uri)
-            db = client.splash
-            teams_collection = db.nba_teams
-        except Exception as e:
-            logging.error(f"Failed to connect to MongoDB: {e}")
-            exit(1)
+        # HUSTLE
+        ("CONTESTED_SHOTS", "HUSTLE"),
+        ("SCREEN_ASSISTS", "HUSTLE"),
+        ("SCREEN_AST_PTS", "HUSTLE"),
+        ("BOX_OUTS", "HUSTLE"),
+        ("OFF_BOXOUTS", "HUSTLE"),
+        ("DEF_BOXOUTS", "HUSTLE"),
+        ("DEFLECTIONS", "HUSTLE"),
+        ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
+    ]
 
     seasons = team_doc.get("seasons", None)
 
@@ -71,42 +198,10 @@ def calculate_and_update_per_100_possessions(team_doc, playoffs):
                             {"$set": {f"seasons.{season_key}.STATS.{location}.{per_100_key}": per_100_value}}
                         )
                     except Exception as e:
-                        logging.error(f'Unable to add {stat_key} for {team_doc["TEAM_ID"]} for {season_key}: {e}')
+                        logging.error(f'(Stats) Unable to add {stat_key} for {team_doc["TEAM_ID"]} for {season_key}: {e}')
         else:
             continue
 
-
-# List of tuples specifying the stats to calculate per-75 possession values for
-# Each tuple should be in the format ("stat_key", "location")
-# Example: [("PTS", "BASIC"), ("AST", "BASIC")]
-stats_to_calculate = [
-    # BASIC
-    ("FGM", "BASIC"),
-    ("FGA", "BASIC"),
-    ("FTM", "BASIC"),
-    ("FTA", "BASIC"),
-    ("FG3M", "BASIC"),
-    ("FG3A", "BASIC"),
-    ("STL", "BASIC"),
-    ("BLK", "BASIC"),
-    ("REB", "BASIC"),
-    ("OREB", "BASIC"),
-    ("DREB", "BASIC"),
-    ("TOV", "BASIC"),
-    ("PF", "BASIC"),
-    ("PFD", "BASIC"),
-    ("PTS", "BASIC"),
-
-    # HUSTLE
-    ("CONTESTED_SHOTS", "HUSTLE"),
-    ("SCREEN_ASSISTS", "HUSTLE"),
-    ("SCREEN_AST_PTS", "HUSTLE"),
-    ("BOX_OUTS", "HUSTLE"),
-    ("OFF_BOXOUTS", "HUSTLE"),
-    ("DEF_BOXOUTS", "HUSTLE"),
-    ("DEFLECTIONS", "HUSTLE"),
-    ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
-]
 
 if __name__ == "__main__":
     # Configure logging

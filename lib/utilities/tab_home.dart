@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:splash/screens/scoreboard.dart';
+import 'package:splash/screens/game/scoreboard.dart';
 import 'package:splash/screens/standings/standings.dart';
 import 'package:splash/utilities/constants.dart';
 

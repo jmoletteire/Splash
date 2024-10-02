@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -14,7 +15,7 @@ class TeamSearchWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(15.0),
+      padding: EdgeInsets.all(15.0.r),
       child: Column(
         children: [
           TextField(
@@ -45,10 +46,10 @@ class TeamSearchWidget extends StatelessWidget {
                 },
               ),
             ),
-            style: kBebasNormal.copyWith(fontSize: 18.0),
+            style: kBebasNormal.copyWith(fontSize: 18.0.r),
             cursorColor: Colors.white,
           ),
-          const SizedBox(height: 8.0),
+          SizedBox(height: 8.0.r),
           Expanded(
             child: Consumer<SearchProvider>(
               builder: (context, searchProvider, child) {
@@ -66,14 +67,14 @@ class TeamSearchWidget extends StatelessWidget {
                           children: [
                             Image.asset(
                               'images/NBA_Logos/${team['TEAM_ID']}.png',
-                              width: 35,
+                              width: 35.r,
                             ),
-                            const SizedBox(
-                              width: 15.0,
+                            SizedBox(
+                              width: 15.0.r,
                             ),
                             Text(
                               '${team['CITY']} ${team['NICKNAME']}',
-                              style: kBebasNormal.copyWith(fontSize: 18.0),
+                              style: kBebasNormal.copyWith(fontSize: 18.0.r),
                             ),
                           ],
                         ),

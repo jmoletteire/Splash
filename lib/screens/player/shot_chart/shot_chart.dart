@@ -10,6 +10,7 @@ import 'package:splash/screens/player/shot_chart/zone/zone_map.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/half_court_painter.dart';
+import '../../../components/video_player.dart';
 import '../../../utilities/player.dart';
 import 'hex/hex_aggregator.dart';
 import 'hex/hex_map.dart';
@@ -846,6 +847,21 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                       });
                     },
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      clipBehavior: Clip.hardEdge,
+                      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+                      backgroundColor: Colors.grey.shade900,
+                      builder: (BuildContext context) {
+                        return TikTokVideoPlayer(shotChart: filteredShotChart);
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.video_collection),
+                  color: Colors.white,
                 ),
               ],
             ),

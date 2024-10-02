@@ -3060,7 +3060,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'definition':
           'A measure of the time spent guarding different positions (G, F, C) on a 0-100 scale. A player who guarded all 3 positions equally ( ⅓ of the time each) will have a score of 100, while a player who only guarded one position will have a score of 0.',
       'formula':
-          '1 - ( | Gₜ - ⅓ | + | Fₜ - ⅓ | + | Cₜ - ⅓ | ) * 3/4\n\n*Where Gₜ, Fₜ, Cₜ represent % of time spent guarding each position.'
+          '1 - ( | Gₜ - ⅓ | + | Fₜ - ⅓ | + | Cₜ - ⅓ | ) * ¾\n\n*Where Gₜ, Fₜ, Cₜ represent % of time spent guarding each position.'
     },
     'MATCHUP DIFFICULTY': {
       'location': ['ADV'],

@@ -10,28 +10,14 @@ import logging
 
 
 def update_current_season(team_id):
-    # Get the current call stack
-    stack = inspect.stack()
-
-    # Check the second item in the stack (the caller)
-    # The first item in the stack is the current function itself
-    caller_frame = stack[1]
-
-    # Extract the function name of the caller
-    caller_function = caller_frame.function
-
-    # Check if the caller is the main script
-    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
-        print("Called from main script.")
-    else:
-        # Connect to MongoDB
-        try:
-            client = MongoClient(uri)
-            db = client.splash
-            teams_collection = db.nba_teams
-        except Exception as e:
-            logging.error(f"Failed to connect to MongoDB: {e}")
-            exit(1)
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"(Team Seasons) Failed to connect to MongoDB: {e}")
+        exit(1)
 
     try:
         team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id).get_normalized_dict()['TeamStats']
@@ -48,7 +34,7 @@ def update_current_season(team_id):
             # Fetch team stats for this team in given season
             season_stats_dict[k_current_season]['STATS'][k_current_season_type] = fetch_team_stats(team_id=team_id, season=k_current_season, season_type='Regular Season' if k_current_season_type == 'REGULAR SEASON' else 'PLAYOFFS')
 
-            logging.info(f"Updated {k_current_season} stats for {team_id}")
+            logging.info(f"(Team Seasons) Updated {k_current_season} stats for {team_id}")
 
             # Update SEASONS for this team
             teams_collection.update_one(
@@ -71,7 +57,7 @@ def update_current_season(team_id):
                 upsert=True
             )
         except Exception as e:
-            logging.error(f"{k_current_season} season stats unavailable for {team_id}: {e}")
+            logging.error(f"(Team Seasons) {k_current_season} season stats unavailable for {team_id}: {e}")
             teams_collection.update_one(
                 {"TEAM_ID": team_id},
                 {"$set": {
@@ -90,9 +76,9 @@ def update_current_season(team_id):
                 upsert=True
             )
 
-        logging.info(f"Updated current season for team {team_id}")
+        logging.info(f"(Team Seasons) Updated current season for team {team_id}")
     except Exception as e:
-        logging.error(f"Failed to update current season for team {team_id}: {e}")
+        logging.error(f"(Team Seasons) Failed to update current season for team {team_id}: {e}")
 
 
 def fetch_all_seasons(team_id):

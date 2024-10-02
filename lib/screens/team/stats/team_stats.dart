@@ -416,10 +416,10 @@ class _TeamStatsState extends State<TeamStats> {
                             ),
                           if (MediaQuery.of(context).orientation == Orientation.portrait)
                             Positioned(
-                              top: 1,
-                              left: 3,
-                              width: 16,
-                              height: 16, // Adjust based on your switch size
+                              top: 2.r,
+                              left: 8.r,
+                              width: 16.r,
+                              height: 16.r, // Adjust based on your switch size
                               child: IgnorePointer(
                                 ignoring: true,
                                 child: Visibility(

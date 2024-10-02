@@ -21,13 +21,14 @@ def update_game_data():
         exit(1)
 
     try:
+        # Fetch only games that are from the current season and have occurred before today
         today = datetime.today().strftime('%Y-%m-%d')
         query = {
             'SEASON_YEAR': k_current_season[:4],
             'GAME_DATE': {'$lt': today}
         }
 
-        # Fetch only games that are from the current season and have occurred before today
+        # Add Summary and Box Score data for games on past dates
         for game_date in games_collection.find(query, {'_id': 0}):
             for game_id, game_data in game_date['GAMES'].items():
                 game_data['SUMMARY'] = fetch_box_score_summary(game_id)

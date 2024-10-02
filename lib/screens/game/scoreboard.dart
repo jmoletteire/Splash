@@ -8,11 +8,10 @@ import 'package:splash/screens/search_screen.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/nba_api/library/network.dart';
 
-import '../components/custom_icon_button.dart';
-import '../utilities/game_dates.dart';
-import '../utilities/scroll/scroll_controller_notifier.dart';
-import '../utilities/scroll/scroll_controller_provider.dart';
-import 'game/upcoming_game_card.dart';
+import '../../components/custom_icon_button.dart';
+import '../../utilities/game_dates.dart';
+import '../../utilities/scroll/scroll_controller_notifier.dart';
+import '../../utilities/scroll/scroll_controller_provider.dart';
 
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
@@ -129,6 +128,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    _tabController.removeListener(() {}); // Remove any potential listeners
     _notifier.removeController('scoreboard');
     _scrollController.dispose();
     _tabController.dispose();
@@ -375,18 +375,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                             );
                           } else if (gamesData[gameKey] is Map) {
                             Map<String, dynamic> game = gamesData[gameKey];
-                            if (selectedDate.compareTo(DateTime.now()) > 0 &&
-                                game["SUMMARY"]["LineScore"].isNotEmpty) {
-                              gameCards.add(
-                                UpcomingGameCard(
-                                  game: game,
-                                  homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
-                                  awayTeam: game['SUMMARY']['GameSummary'][0]
-                                      ['VISITOR_TEAM_ID'],
-                                ),
-                              );
-                              // Skip if All-Star weekend
-                            } else if (!game["SEASON_ID"].toString().startsWith("3") &&
+                            if (!game["SEASON_ID"].toString().startsWith("3") &&
                                 game['SUMMARY']['LineScore'].isNotEmpty) {
                               gameCards.add(
                                 GameCard(
@@ -452,6 +441,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                     child: Icon(
                       Icons.home,
                       size: 28.0.r,
+                      color: Colors.white,
                     ),
                   )
                 : null,

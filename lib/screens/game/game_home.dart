@@ -71,9 +71,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     });
     await getGame(gameId);
     setState(() {
-      _isUpcoming = DateTime.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'])
-              .compareTo(DateTime.now()) >
-          0;
+      _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
       _isLoading = false;
     });
   }
@@ -91,9 +89,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       setValues(widget.gameId);
     } else {
       game = widget.gameData!;
-      _isUpcoming = DateTime.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'])
-              .compareTo(DateTime.now()) >
-          0;
+      _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
       _isLoading = false;
     }
 

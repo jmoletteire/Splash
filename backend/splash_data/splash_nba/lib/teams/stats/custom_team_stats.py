@@ -95,14 +95,14 @@ def three_and_ft_rate(seasons, season_type):
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+        logging.error(f"(Team 3PAr & FTAr) Failed to connect to MongoDB: {e}")
         exit(1)
 
     # Update each document in the collection
     for document in teams_collection.find({}, {"TEAM_ID": 1, "seasons": 1, "_id": 0}):
         team_id = document['TEAM_ID']
         if team_id != 0:
-            logging.info(f'Processing team {team_id}...')
+            logging.info(f'(Team 3PAr & FTAr) Processing team {team_id}...')
             for season in document['seasons']:
                 if season in seasons:
                     try:
@@ -115,7 +115,7 @@ def three_and_ft_rate(seasons, season_type):
                         three_pt_rate = fg3a / fga
                         fta_rate = fta / fga
                         ft_per_fga = ftm / fga
-                        logging.info(f'Calculated for {season}')
+                        logging.info(f'(Team 3PAr & FTAr) Calculated for {season}')
 
                         # Update the document with the new field
                         teams_collection.update_one(
@@ -126,10 +126,10 @@ def three_and_ft_rate(seasons, season_type):
                              }
                         )
 
-                        logging.info(f'Added stats for {season} for team {team_id}')
+                        logging.info(f'(Team 3PAr & FTAr) Added stats for {season} for team {team_id}')
 
                     except KeyError as e:
-                        print(f"Key error for document {document['TEAM_ID']}: {e}")
+                        print(f"(Team 3PAr & FTAr) Key error for document {document['TEAM_ID']}: {e}")
 
 
 if __name__ == "__main__":

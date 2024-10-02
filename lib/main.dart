@@ -56,23 +56,6 @@ Future<void> setGlobalTimeZone() async {
   GlobalTimeZone.location = getLocation(timeZoneName);
 }
 
-class DeviceSize extends InheritedWidget {
-  final double width;
-  final double height;
-
-  DeviceSize({required this.width, required this.height, required Widget child})
-      : super(child: child);
-
-  static DeviceSize? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<DeviceSize>();
-  }
-
-  @override
-  bool updateShouldNotify(DeviceSize oldWidget) {
-    return width != oldWidget.width || height != oldWidget.height;
-  }
-}
-
 class Splash extends StatelessWidget {
   const Splash({super.key});
 

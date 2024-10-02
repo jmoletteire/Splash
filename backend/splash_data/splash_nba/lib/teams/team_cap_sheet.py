@@ -58,7 +58,7 @@ def update_team_contract_data():
     # Update each document in the collection starting from index
     for i, team in enumerate(teams_collection.find({}, {"TEAM_ID": 1, "_id": 0})):
         if team['TEAM_ID'] != 0:
-            logging.info(f'Processing {i + 1} of 30...')
+            logging.info(f'(Team Contracts) Processing {i + 1} of 30...')
 
             # Define the initial query variables
             variables = {
@@ -137,8 +137,7 @@ def fetch_team_contract_data(url, variables, headers):
         team_contracts = data['data']['nba_tradeMachineTeam']
         return team_contracts
     else:
-        print(f"Request failed with status code {response.status_code}")
-        print(response.text)
+        logging.error(f"(Team Contracts) Request failed with status code {response.status_code}: {response.text}")
 
 
 if __name__ == '__main__':

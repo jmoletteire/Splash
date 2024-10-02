@@ -341,13 +341,11 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 slivers: [
                   BoxPlayerStats(
                     players: awayPlayerStats.sublist(0, 5),
-                    teamPoss: awayTeam['POSS'],
                     playerGroup: 'STARTERS',
                     controller: _awayStartersController,
                   ),
                   BoxPlayerStats(
                     players: awayPlayerStats.sublist(5),
-                    teamPoss: awayTeam['POSS'],
                     playerGroup: 'BENCH',
                     controller: _awayBenchController,
                   ),
@@ -369,13 +367,11 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 slivers: [
                   BoxPlayerStats(
                     players: homePlayerStats.sublist(0, 5),
-                    teamPoss: homeTeam['POSS'],
                     playerGroup: 'STARTERS',
                     controller: _homeStartersController,
                   ),
                   BoxPlayerStats(
                     players: homePlayerStats.sublist(5),
-                    teamPoss: homeTeam['POSS'],
                     playerGroup: 'BENCH',
                     controller: _homeBenchController,
                   ),

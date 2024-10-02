@@ -10,9 +10,8 @@ def update_team_history(team_id):
         client = MongoClient(uri)
         db = client.splash
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+        logging.error(f"(Team History) Failed to connect to MongoDB: {e}")
         exit(1)
 
     try:
@@ -33,7 +32,7 @@ def update_team_history(team_id):
         # Convert the organized data to a list of dictionaries
         organized_data_list = list(organized_data.values())
     except Exception as e:
-        logging.error(f"Error fetching team history for {team_id}: {e}")
+        logging.error(f"(Team History) Error fetching team history for {team_id}: {e}")
         exit(1)
 
     try:
@@ -45,7 +44,7 @@ def update_team_history(team_id):
                 upsert=True
             )
     except Exception as e:
-        logging.error(f"Error updating team history for {team_id}: {e}")
+        logging.error(f"(Team History) Error updating team history for {team_id}: {e}")
 
 
 if __name__ == "__main__":

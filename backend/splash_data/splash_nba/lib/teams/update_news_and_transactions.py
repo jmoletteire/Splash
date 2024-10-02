@@ -21,33 +21,19 @@ def fetch_og_data(url):
             }
         return None
     except Exception as e:
-        print(f"Failed to fetch OG data: {e}")
+        logging.error(f"(Team News) Failed to fetch image for {url}: {e}")
         return None
 
 
 def fetch_team_news():
-    # Get the current call stack
-    stack = inspect.stack()
-
-    # Check the second item in the stack (the caller)
-    # The first item in the stack is the current function itself
-    caller_frame = stack[1]
-
-    # Extract the function name of the caller
-    caller_function = caller_frame.function
-
-    # Check if the caller is the main script
-    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
-        print("Called from main script.")
-    else:
-        # Connect to MongoDB
-        try:
-            client = MongoClient(uri)
-            db = client.splash
-            teams_collection = db.nba_teams
-        except Exception as e:
-            logging.error(f"Failed to connect to MongoDB: {e}")
-            exit(1)
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"(Team News) Failed to connect to MongoDB: {e}")
+        exit(1)
 
     # Key = NatStat, value = MongoDB
     team_codes = {
@@ -92,7 +78,7 @@ def fetch_team_news():
             # Send GET request to the API
             response = requests.get(url)
             data = json.loads(response.text)
-            logging.info(f'\nFetched news for {team_code}')
+            logging.info(f'(Team News) Fetched news for {team_code}')
 
             team_news = teams_collection.find_one({"ABBREVIATION": team_codes[team_code]})
             if team_news and 'NEWS' in team_news and isinstance(team_news['NEWS'], list):
@@ -103,7 +89,7 @@ def fetch_team_news():
             latest_news = []
             for news_item in data['news'].values():
                 if news_item['id'] in existing_news_ids:
-                    logging.info(f"News item {news_item['id']} already exists, skipping the rest for {team_code}")
+                    logging.info(f"(Team News) News item {news_item['id']} already exists, skipping the rest for {team_code}")
                     break
 
                 og_data = fetch_og_data(news_item['url'])
@@ -134,35 +120,21 @@ def fetch_team_news():
                     },
                     upsert=True
                 )
-                logging.info(f"Updated news for {team_code} with {len(latest_news)} new items")
+                logging.info(f"(Team News) Updated news for {team_code} with {len(latest_news)} new items")
 
         except Exception as e:
-            logging.error(f"Failed to retrieve news for {team_code}: {e}\n")
+            logging.error(f"(Team News) Failed to retrieve news for {team_code}: {e}\n")
 
 
 def fetch_team_transactions():
-    # Get the current call stack
-    stack = inspect.stack()
-
-    # Check the second item in the stack (the caller)
-    # The first item in the stack is the current function itself
-    caller_frame = stack[1]
-
-    # Extract the function name of the caller
-    caller_function = caller_frame.function
-
-    # Check if the caller is the main script
-    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
-        print("Called from main script.")
-    else:
-        # Connect to MongoDB
-        try:
-            client = MongoClient(uri)
-            db = client.splash
-            teams_collection = db.nba_teams
-        except Exception as e:
-            logging.error(f"Failed to connect to MongoDB: {e}")
-            exit(1)
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"(Team Transactions) Failed to connect to MongoDB: {e}")
+        exit(1)
 
     # Key = NatStat, value = MongoDB
     team_codes = {
@@ -211,9 +183,9 @@ def fetch_team_transactions():
                 {"$set": {"RECENT_TRANSACTIONS": data['transaction']}},
                 upsert=True
             )
-            logging.info(f" Fetched transactions for {i + 1} of 30\n")
+            logging.info(f"(Team Transactions) Fetched transactions for {i + 1} of 30\n")
         except Exception as e:
-            logging.error(f" Failed to retrieve transactions for {team_code}: {e}\n")
+            logging.error(f"(Team Transactions) Failed to retrieve transactions for {team_code}: {e}\n")
 
 
 if __name__ == "__main__":

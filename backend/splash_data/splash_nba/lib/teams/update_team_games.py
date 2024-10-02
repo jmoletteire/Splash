@@ -20,28 +20,14 @@ def get_game_result(team_pts, opp_pts):
 
 
 def update_games(game_day):
-    # Get the current call stack
-    stack = inspect.stack()
-
-    # Check the second item in the stack (the caller)
-    # The first item in the stack is the current function itself
-    caller_frame = stack[1]
-
-    # Extract the function name of the caller
-    caller_function = caller_frame.function
-
-    # Check if the caller is the main script
-    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
-        print("Called from main script.")
-    else:
-        # Connect to MongoDB
-        try:
-            client = MongoClient(uri)
-            db = client.splash
-            teams_collection = db.nba_teams
-        except Exception as e:
-            logging.error(f"Failed to connect to MongoDB: {e}")
-            exit(1)
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"(Team Games) Failed to connect to MongoDB: {e}")
+        exit(1)
 
     # Iterate through each game on that date
     for game_id, game in game_day["GAMES"].items():
@@ -109,7 +95,7 @@ def update_games(game_day):
                 {"$set": {f"seasons.{season}.GAMES.{game_id}": game_data_visitor}},
             )
         except Exception as e:
-            logging.error(f"Could not process games for {game_day['GAME_DATE']}: {e.with_traceback()}")
+            logging.error(f"(Team Games) Could not process games for {game_day['GAME_DATE']}: {e.with_traceback()}")
             continue
 
 

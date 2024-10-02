@@ -29,16 +29,20 @@ class _GameByGameStatsState extends State<GameByGameStats> {
   List columnNames = [
     'DATE',
     'OPP',
+    'POSS',
     'MIN',
     'PTS',
     'REB',
     'AST',
-    'STL',
-    'BLK',
-    'TOV',
+    'TO',
     'FG',
     '3P',
     'FT',
+    'STL',
+    'BLK',
+    'ORB',
+    'DRB',
+    'PF',
     'eFG%',
     'TS%',
     'USG%',
@@ -136,107 +140,152 @@ class _GameByGameStatsState extends State<GameByGameStats> {
           freezePriority: 1,
         ),
 
+        /// POSS
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
+
         /// MIN
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.12),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
 
         /// PTS
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.11),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.11,
+        ),
 
         /// REB
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.04
-                : MediaQuery.of(context).size.width * 0.08),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.04
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// AST
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.04
-                : MediaQuery.of(context).size.width * 0.08),
-
-        /// STL
-        TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.04
-                : MediaQuery.of(context).size.width * 0.08),
-
-        /// BLK
-        TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.04
-                : MediaQuery.of(context).size.width * 0.08),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.04
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// TOV
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.04
-                : MediaQuery.of(context).size.width * 0.08),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.04
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// FG%
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.12),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
 
         /// 3P%
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.11),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.11,
+        ),
 
         /// FT%
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.11),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.11,
+        ),
+
+        /// STL
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.04
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
+
+        /// BLK
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.04
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
+
+        /// OREB
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
+
+        /// DREB
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
+
+        /// PF
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.08,
+        ),
 
         /// eFG%
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.13),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// TS%
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.13),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// USG%
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.13),
-
-        /// ORTG
-        TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.13),
-
-        /// DRTG
-        TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.13),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// NRTG
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.13),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
+
+        /// ORTG
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
+
+        /// DRTG
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
 
         /// PACE
         TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.13),
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.13,
+        ),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -403,6 +452,8 @@ class _GameByGameStatsState extends State<GameByGameStats> {
           ],
         );
       case 2:
+        return StandingsDataText(text: game['POSS'].toStringAsFixed(0) ?? '-');
+      case 3:
         String convertMinutes(double decimalMinutes) {
           int wholeMinutes = decimalMinutes.floor();
           int seconds = ((decimalMinutes - wholeMinutes) * 60).round();
@@ -412,45 +463,50 @@ class _GameByGameStatsState extends State<GameByGameStats> {
           text: game['MIN'].toStringAsFixed(0) == '0' ? '-' : convertMinutes(game['MIN']),
           size: 14.0.r,
         );
-      case 3:
-        return StandingsDataText(text: game['PTS'].toStringAsFixed(0) ?? '-');
       case 4:
-        return StandingsDataText(text: game['REB'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(text: game['PTS'].toStringAsFixed(0) ?? '-');
       case 5:
-        return StandingsDataText(text: game['AST'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(text: game['REB'].toStringAsFixed(0) ?? '-');
       case 6:
-        return StandingsDataText(text: game['STL'].toStringAsFixed(0) ?? '-');
+        return StandingsDataText(text: game['AST'].toStringAsFixed(0) ?? '-');
       case 7:
-        return StandingsDataText(text: game['BLK'].toStringAsFixed(0) ?? '-');
-      case 8:
         return StandingsDataText(text: game['TOV'].toStringAsFixed(0) ?? '-');
-      case 9:
+      case 8:
         String fgm = game['FGM'].toStringAsFixed(0);
         String fga = game['FGA'].toStringAsFixed(0);
         return StandingsDataText(text: fga == '0' ? '-' : '$fgm-$fga');
-      case 10:
+      case 9:
         String fg3m = game['FG3M'].toStringAsFixed(0);
         String fg3a = game['FG3A'].toStringAsFixed(0);
         return StandingsDataText(text: fg3a == '0' ? '-' : '$fg3m-$fg3a');
-      case 11:
+      case 10:
         String ftm = game['FTM'].toStringAsFixed(0);
         String fta = game['FTA'].toStringAsFixed(0);
         return StandingsDataText(text: fta == '0' ? '-' : '$ftm-$fta');
+      case 11:
+        return StandingsDataText(text: game['STL'].toStringAsFixed(0) ?? '-');
       case 12:
+        return StandingsDataText(text: game['BLK'].toStringAsFixed(0) ?? '-');
+      case 13:
+        return StandingsDataText(text: game['OREB'].toStringAsFixed(0) ?? '-');
+      case 14:
+        return StandingsDataText(text: game['DREB'].toStringAsFixed(0) ?? '-');
+      case 15:
+        return StandingsDataText(text: game['PF'].toStringAsFixed(0) ?? '-');
+      case 16:
         return StandingsDataText(
             text: '${(game['EFG_PCT'] * 100).toStringAsFixed(1)}%' ?? '-');
-      case 13:
-        return StandingsDataText(text: '${(game['TS_PCT'] * 100).toStringAsFixed(1)}%' ?? '-');
-      case 14:
-        return StandingsDataText(
-            text: '${(game['USG_PCT'] * 100).toStringAsFixed(1)}%' ?? '-');
-      case 15:
-        return StandingsDataText(text: game['NET_RATING'].toStringAsFixed(1) ?? '-');
-      case 16:
-        return StandingsDataText(text: game['OFF_RATING'].toStringAsFixed(1) ?? '-');
       case 17:
-        return StandingsDataText(text: game['DEF_RATING'].toStringAsFixed(1) ?? '-');
+        return StandingsDataText(text: '${(game['TS_PCT'] * 100).toStringAsFixed(1)}%');
       case 18:
+        return StandingsDataText(text: '${(game['USG_PCT'] * 100).toStringAsFixed(1)}%');
+      case 19:
+        return StandingsDataText(text: game['NET_RATING'].toStringAsFixed(1) ?? '-');
+      case 20:
+        return StandingsDataText(text: game['OFF_RATING'].toStringAsFixed(1) ?? '-');
+      case 21:
+        return StandingsDataText(text: game['DEF_RATING'].toStringAsFixed(1) ?? '-');
+      case 22:
         return StandingsDataText(text: game['PACE'].toStringAsFixed(1) ?? '-');
       default:
         return const Text('-');

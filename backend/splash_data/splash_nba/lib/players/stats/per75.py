@@ -1,6 +1,171 @@
 from pymongo import MongoClient
-from splash_nba.util.env import uri
+from splash_nba.util.env import uri, k_current_season
 import logging
+
+
+def current_season_per_75(playoffs):
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    # Connect to MongoDB
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    logging.info("Connected to MongoDB")
+
+    # List of tuples specifying the stats to calculate per-75 possession values for
+    # Each tuple should be in the format ("stat_key", "location")
+    # Example: [("PTS", "BASIC"), ("AST", "BASIC")]
+    stats_per_75 = [
+        # BASIC
+        ("FGM", "BASIC"),
+        ("FGA", "BASIC"),
+        ("FTM", "BASIC"),
+        ("FTA", "BASIC"),
+        ("FG3M", "BASIC"),
+        ("FG3A", "BASIC"),
+        ("AST", "BASIC"),
+        ("STL", "BASIC"),
+        ("BLK", "BASIC"),
+        ("BLKA", "BASIC"),
+        ("REB", "BASIC"),
+        ("OREB", "BASIC"),
+        ("DREB", "BASIC"),
+        ("TOV", "BASIC"),
+        ("PF", "BASIC"),
+        ("PFD", "BASIC"),
+        ("PTS", "BASIC"),
+        ("PLUS_MINUS", "BASIC"),
+
+        # HUSTLE
+        ("CONTESTED_SHOTS", "HUSTLE"),
+        ("SCREEN_ASSISTS", "HUSTLE"),
+        ("SCREEN_AST_PTS", "HUSTLE"),
+        ("BOX_OUTS", "HUSTLE"),
+        ("OFF_BOXOUTS", "HUSTLE"),
+        ("DEF_BOXOUTS", "HUSTLE"),
+        ("DEFLECTIONS", "HUSTLE"),
+        ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
+        ("CHARGES_DRAWN", "HUSTLE"),
+        ("DIST_MILES", "HUSTLE.SPEED"),
+        ("DIST_MILES_OFF", "HUSTLE.SPEED"),
+        ("DIST_MILES_DEF", "HUSTLE.SPEED"),
+
+        # ADV -> PASSING
+        ("PASSES_MADE", "ADV.PASSING"),
+        ("PASSES_RECEIVED", "ADV.PASSING"),
+        ("AST", "ADV.PASSING"),
+        ("FT_AST", "ADV.PASSING"),
+        ("SECONDARY_AST", "ADV.PASSING"),
+        ("POTENTIAL_AST", "ADV.PASSING"),
+        ("AST_PTS_CREATED", "ADV.PASSING"),
+        ("AST_ADJ", "ADV.PASSING"),
+
+        # ADV -> TOUCHES
+        ("TOUCHES", "ADV.TOUCHES"),
+        ("FRONT_CT_TOUCHES", "ADV.TOUCHES"),
+        ("TIME_OF_POSS", "ADV.TOUCHES"),
+
+        # ADV -> DRIVES
+        ("DRIVES", "ADV.DRIVES"),
+        ("DRIVE_FGM", "ADV.DRIVES"),
+        ("DRIVE_FGA", "ADV.DRIVES"),
+        ("DRIVE_FTM", "ADV.DRIVES"),
+        ("DRIVE_FTA", "ADV.DRIVES"),
+        ("DRIVE_PTS", "ADV.DRIVES"),
+        ("DRIVE_PASSES", "ADV.DRIVES"),
+        ("DRIVE_AST", "ADV.DRIVES"),
+        ("DRIVE_TOV", "ADV.DRIVES"),
+
+        # ADV -> REBOUNDING
+        ("OREB_CONTEST", "ADV.REBOUNDING"),
+        ("OREB_UNCONTEST", "ADV.REBOUNDING"),
+        ("OREB_CHANCES", "ADV.REBOUNDING"),
+        ("OREB_CHANCE_DEFER", "ADV.REBOUNDING"),
+        ("DREB_CONTEST", "ADV.REBOUNDING"),
+        ("DREB_UNCONTEST", "ADV.REBOUNDING"),
+        ("DREB_CHANCES", "ADV.REBOUNDING"),
+        ("DREB_CHANCE_DEFER", "ADV.REBOUNDING"),
+        ("REB_CONTEST", "ADV.REBOUNDING"),
+        ("REB_UNCONTEST", "ADV.REBOUNDING"),
+        ("REB_CHANCES", "ADV.REBOUNDING"),
+        ("REB_CHANCE_DEFER", "ADV.REBOUNDING")
+    ]
+
+    # Set the batch size
+    batch_size = 25
+
+    # Get the total number of documents
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+    logging.info(f"(PER 75) Total player documents to process: {total_documents}")
+
+    # Process documents in batches
+    for batch_start in range(0, total_documents, batch_size):
+        logging.info(f"(PER 75) Processing batch starting at {batch_start}")
+        batch_cursor = players_collection.find({'ROSTERSTATUS': 'Active'}).skip(batch_start).limit(batch_size)
+
+        for i, player_doc in enumerate(batch_cursor):
+            logging.info(f"(PER 75) Processing {i + 1} of {batch_size}")
+
+            stats = player_doc.get("STATS", None)
+
+            if stats is None:
+                return
+
+            if playoffs:
+                try:
+                    playoff_stats = player_doc['STATS'][k_current_season].get("PLAYOFFS", None)
+                except KeyError:
+                    continue
+
+                if playoff_stats is None:
+                    continue
+
+                adv_stats = playoff_stats.get("ADV", {})
+            else:
+                try:
+                    reg_season_stats = player_doc['STATS'][k_current_season].get("REGULAR SEASON", {})
+                except KeyError:
+                    continue
+
+                adv_stats = reg_season_stats.get("ADV", {})
+
+            possessions = adv_stats.get("POSS", None)
+
+            if possessions:
+                for stat_key, location in stats_per_75:
+                    if playoffs:
+                        location = 'PLAYOFFS.' + location
+                    else:
+                        location = 'REGULAR SEASON.' + location
+
+                    loc = location.split('.')
+
+                    if len(loc) == 2:
+                        stat_value = k_current_season[loc[0]].get(loc[1], {}).get(stat_key, None)
+                    elif len(loc) == 3:
+                        stat_value = k_current_season[loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
+                    else:
+                        stat_value = k_current_season.get(location, {}).get(stat_key, None)
+
+                    if stat_value is not None:
+                        try:
+                            try:
+                                per_75_value = (stat_value / possessions) * 75
+                            except ZeroDivisionError:
+                                per_75_value = 0
+
+                            per_75_key = f"{stat_key}_PER_75"
+
+                            # Update the player document with the new per-75 possession value
+                            players_collection.update_one(
+                                {"_id": player_doc["_id"]},
+                                {"$set": {f"STATS.{k_current_season}.{location}.{per_75_key}": per_75_value}}
+                            )
+                        except Exception as e:
+                            logging.error(f'Unable to add {stat_key} for {player_doc["PLAYER_ID"]} for {k_current_season}: {e}')
+            else:
+                continue
 
 
 # Function to calculate per-75 possession values and update the document
