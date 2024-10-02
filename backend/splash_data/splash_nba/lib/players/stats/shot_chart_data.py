@@ -26,6 +26,9 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
             "GAME_DATE": shot['GAME_DATE'],
             "HTM": shot['HTM'],
             "VTM": shot['VTM'],
+            "PERIOD": shot['PERIOD'],
+            "MIN": shot['MINUTES_REMAINING'],
+            "SEC": shot['SECONDS_REMAINING'],
             "VIDEO": video_data['Meta']['videoUrls'][i]['murl'],
             'THUMBNAIL': video_data['Meta']['videoUrls'][i]['mth'],
         }
@@ -82,8 +85,8 @@ if __name__ == "__main__":
     # Set batch size to process documents
     batch_size = 10
     total_documents = players_collection.count_documents({})
-    processed_count = 31
-    i = 31
+    processed_count = 0
+    i = 0
 
     while processed_count < total_documents:
         with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
