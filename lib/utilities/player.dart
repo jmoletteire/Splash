@@ -26,8 +26,12 @@ class Player {
 
     // Fetch the data from the network
     dynamic jsonData = await network.getData(url);
-    Map<String, dynamic> player = jsonData;
-    return player;
+    try {
+      Map<String, dynamic> player = jsonData;
+      return player;
+    } catch (e) {
+      return {'error': 'player not found'};
+    }
   }
 
   Future<Map<String, dynamic>> getShotChart(

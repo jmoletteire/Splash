@@ -23,9 +23,6 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    // Sort shots by date
-    widget.shotChart.sort(
-        (a, b) => DateTime.parse(a['GAME_DATE']).compareTo(DateTime.parse(b['GAME_DATE'])));
   }
 
   @override
@@ -55,8 +52,13 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
           controller: _scrollController,
           itemCount: widget.shotChart.length,
           itemBuilder: (context, index) {
+            String period = widget.shotChart[index]?['PERIOD'] > 4
+                ? 'OT'
+                : 'Q${widget.shotChart[index]?['PERIOD'] ?? ''}';
+            String timePeriod =
+                '$period ${widget.shotChart[index]?['MIN'] ?? ''}:${widget.shotChart[index]?['SEC'].toString().padLeft(2, '0') ?? ''}';
             return ListTile(
-              leading: widget.shotChart[index]['THUMBNAIL'] == null
+              leading: widget.shotChart[index]?['THUMBNAIL'] == null
                   ? SizedBox(
                       width: 50.r,
                       height: 50.r,
@@ -77,20 +79,20 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
                   ),
                   SizedBox(width: 5.0.r),
                   Text(
-                    '${widget.shotChart[index]['VTM']} @ ${widget.shotChart[index]['HTM']}',
+                    '${widget.shotChart[index]?['VTM'] ?? ''} @ ${widget.shotChart[index]?['HTM'] ?? ''}',
                     style: kBebasNormal.copyWith(fontSize: 18.0.r),
                   ),
                   SizedBox(width: 5.0.r),
                   ConstrainedBox(
                     constraints: BoxConstraints(maxHeight: 20.0.r, maxWidth: 20.0.r),
                     child: Image.asset(
-                      'images/NBA_Logos/${kTeamAbbrToId[widget.shotChart[index]['HTM']]}.png',
+                      'images/NBA_Logos/${kTeamAbbrToId[widget.shotChart[index]?['HTM']] ?? 0}.png',
                     ),
                   ),
                 ],
               ),
               subtitle: Text(
-                widget.shotChart[index]['SHOT_TYPE']!,
+                '$timePeriod - ${widget.shotChart[index]?['SHOT_TYPE'] ?? ''} (${widget.shotChart[index]?['SHOT_MADE_FLAG'] == 1 ? 'Made' : 'Missed'})',
                 style: kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.white70),
               ),
               onTap: () {
@@ -109,38 +111,71 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return PageView.builder(
-      controller: _pageController,
-      scrollDirection: Axis.vertical,
-      itemCount: widget.shotChart.length,
-      onPageChanged: (index) {
-        setState(() {
-          currentIndex = index;
-        });
-      },
-      itemBuilder: (context, index) {
-        return VideoPlayerScreen(
-          videoUrl: widget.shotChart[index]['VIDEO']!,
-          thumbnailUrl: widget.shotChart[index]['THUMBNAIL']!,
-          gameDate:
-              '${widget.shotChart[index]['GAME_DATE']!.substring(0, 4)}-${widget.shotChart[index]['GAME_DATE']!.substring(4, 6)}-${widget.shotChart[index]['GAME_DATE']!.substring(6)}',
-          matchup: '${widget.shotChart[index]['VTM']!} @ ${widget.shotChart[index]['HTM']!}',
-          isMuted: isMuted,
-          playbackSpeed: playbackSpeed,
-          onMuteToggle: () {
-            setState(() {
-              isMuted = !isMuted;
-            });
-          },
-          onSpeedChange: (newSpeed) {
-            setState(() {
-              playbackSpeed = newSpeed;
-            });
-          },
-          onPlaylistPressed: _showPlaylist,
-        );
-      },
-    );
+    try {
+      widget.shotChart.sort((a, b) {
+        int dateComparison =
+            DateTime.parse(a['GAME_DATE']).compareTo(DateTime.parse(b['GAME_DATE']));
+        if (dateComparison != 0) return dateComparison;
+
+        int periodComparison = a['PERIOD'].compareTo(b['PERIOD']);
+        if (periodComparison != 0) return periodComparison;
+
+        int minComparison = b['MIN'].compareTo(a['MIN']);
+        if (minComparison != 0) return minComparison;
+
+        return b['SEC'].compareTo(a['SEC']);
+      });
+      return PageView.builder(
+        controller: _pageController,
+        scrollDirection: Axis.vertical,
+        itemCount: widget.shotChart.length,
+        onPageChanged: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+        itemBuilder: (context, index) {
+          return VideoPlayerScreen(
+            videoUrl: widget.shotChart[index]?['VIDEO'] ?? '',
+            thumbnailUrl: widget.shotChart[index]?['THUMBNAIL'] ?? '',
+            gameDate:
+                '${widget.shotChart[index]['GAME_DATE']!.substring(0, 4)}-${widget.shotChart[index]['GAME_DATE']!.substring(4, 6)}-${widget.shotChart[index]['GAME_DATE']!.substring(6)}',
+            matchup: '${widget.shotChart[index]['VTM']!} @ ${widget.shotChart[index]['HTM']!}',
+            isMuted: isMuted,
+            playbackSpeed: playbackSpeed,
+            onMuteToggle: () {
+              setState(() {
+                isMuted = !isMuted;
+              });
+            },
+            onSpeedChange: (newSpeed) {
+              setState(() {
+                playbackSpeed = newSpeed;
+              });
+            },
+            onPlaylistPressed: _showPlaylist,
+          );
+        },
+      );
+    } catch (e) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.sports_basketball,
+              color: Colors.white38,
+              size: 38.0.r,
+            ),
+            const SizedBox(height: 15.0),
+            Text(
+              'Video Unavailable',
+              style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
 
@@ -221,32 +256,52 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Stack(
       children: [
-        FutureBuilder(
-          future: _initializeVideoPlayerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (_videoPlayerController.value.isPlaying) {
-                      _videoPlayerController.pause();
-                    } else {
-                      _videoPlayerController.play();
-                    }
-                  });
-                },
-                child: isLandscape
-                    ? AspectRatio(
-                        aspectRatio: 16 / 9, child: VideoPlayer(_videoPlayerController))
-                    : AspectRatio(
-                        aspectRatio: 16 / 9, child: VideoPlayer(_videoPlayerController)),
-              );
-            } else {
-              // Show a loading spinner while the video is loading
-              return const Center(child: SpinningIcon());
-            }
-          },
-        ),
+        if (widget.videoUrl == '')
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.videocam_off,
+                  color: Colors.white38,
+                  size: 38.0.r,
+                ),
+                SizedBox(height: 15.0.r),
+                Text(
+                  'Video Unavailable',
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+                ),
+                SizedBox(height: 25.0.r),
+              ],
+            ),
+          ),
+        if (widget.videoUrl != '')
+          FutureBuilder(
+            future: _initializeVideoPlayerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (_videoPlayerController.value.isPlaying) {
+                        _videoPlayerController.pause();
+                      } else {
+                        _videoPlayerController.play();
+                      }
+                    });
+                  },
+                  child: isLandscape
+                      ? AspectRatio(
+                          aspectRatio: 16 / 9, child: VideoPlayer(_videoPlayerController))
+                      : AspectRatio(
+                          aspectRatio: 16 / 9, child: VideoPlayer(_videoPlayerController)),
+                );
+              } else {
+                // Show a loading spinner while the video is loading
+                return const Center(child: SpinningIcon());
+              }
+            },
+          ),
         // Bottom bar with playback controls
         Positioned(
           bottom: 0,

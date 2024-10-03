@@ -49,17 +49,17 @@ class _HexMapState extends State<HexMap> {
         setState(() {
           _selectedHexagon = hex; // Set the selected hexagon
           // Determine the tooltip position, adjusting for edges
-          double adjustedX = tapPosition.dx + 10; // Default offset to the right
-          double adjustedY = tapPosition.dy + 10; // Default offset to the bottom
+          double adjustedX = tapPosition.dx + 10.r; // Default offset to the right
+          double adjustedY = tapPosition.dy + 10.r; // Default offset to the bottom
 
           // Check if the tooltip would overflow the right edge
           if (adjustedX + tooltipWidth > canvasWidth) {
-            adjustedX = tapPosition.dx - tooltipWidth + 30; // Place it to the left
+            adjustedX = tapPosition.dx - tooltipWidth + 30.r; // Place it to the left
           }
 
           // Check if the tooltip would overflow the bottom edge
-          if (adjustedY + tooltipHeight > canvasHeight - 30) {
-            adjustedY = tapPosition.dy - tooltipHeight - 30; // Place it above
+          if (adjustedY + tooltipHeight > canvasHeight - 75.r) {
+            adjustedY = tapPosition.dy - tooltipHeight - 75.r; // Place it above
           }
 
           // Set the final tooltip position
@@ -167,7 +167,7 @@ class _HexMapState extends State<HexMap> {
                             clipBehavior: Clip.hardEdge,
                             constraints:
                                 BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-                            backgroundColor: Colors.grey.shade900,
+                            backgroundColor: const Color(0xFF111111),
                             isScrollControlled: isLandscape,
                             showDragHandle: true,
                             builder: (BuildContext context) {

@@ -134,12 +134,89 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
                           ],
                         ),
                       ),
+                      if (transaction['description'].contains('Exhibit 10'))
+                        SizedBox(width: 18.0.r),
+                      if (transaction['description'].contains('Exhibit 10'))
+                        const DismissibleTooltip(),
                     ],
                   ),
                 ],
               ),
             ],
         ],
+      ),
+    );
+  }
+}
+
+class DismissibleTooltip extends StatefulWidget {
+  const DismissibleTooltip({Key? key}) : super(key: key);
+
+  @override
+  _DismissibleTooltipState createState() => _DismissibleTooltipState();
+}
+
+class _DismissibleTooltipState extends State<DismissibleTooltip> {
+  final GlobalKey _tooltipKey = GlobalKey();
+  bool _isTooltipVisible = false;
+
+  void _toggleTooltip() {
+    setState(() {
+      _isTooltipVisible = !_isTooltipVisible;
+    });
+    if (_isTooltipVisible) {
+      final dynamic tooltip = _tooltipKey.currentState;
+      tooltip.ensureTooltipVisible();
+    } else {
+      final dynamic tooltip = _tooltipKey.currentState;
+      tooltip.deactivate();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _toggleTooltip,
+      child: Tooltip(
+        key: _tooltipKey,
+        padding: const EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        triggerMode: TooltipTriggerMode.manual,
+        showDuration: const Duration(minutes: 2),
+        richMessage: TextSpan(
+          children: [
+            TextSpan(
+              text: 'Exhibit 10\n\n',
+              style: TextStyle(
+                color: Colors.white,
+                height: 0.9,
+                letterSpacing: -1,
+                fontSize: 12.0.r,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            TextSpan(
+              text:
+                  'An Exhibit 10 contract is a one-year, non-guaranteed deal at the league minimum salary, which allows a player to join a team\'s Summer League and/or Training Camp roster. These contracts do not count against the cap unless the player remains on the roster when the regular season begins and has not been converted to a Two-Way deal.',
+              style: TextStyle(
+                color: const Color(0xFFCCCCCC),
+                letterSpacing: -0.8,
+                fontSize: 12.0.r,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.info_outline,
+          color: Colors.white70,
+          size: 18.0.r,
+        ),
       ),
     );
   }

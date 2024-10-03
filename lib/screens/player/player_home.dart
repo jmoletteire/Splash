@@ -68,6 +68,24 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
     }
   }
 
+  void _showErrorSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: kBebasNormal.copyWith(
+          color: Colors.white,
+          fontSize: 16.0.r,
+        ),
+      ),
+      backgroundColor: Colors.red,
+      duration: const Duration(seconds: 3),
+      showCloseIcon: true,
+      closeIconColor: Colors.white,
+      dismissDirection: DismissDirection.vertical,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> getPlayer(String playerId) async {
     final playerCache = Provider.of<PlayerCache>(context, listen: false);
     if (playerCache.containsPlayer(playerId)) {
@@ -79,7 +97,12 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
       setState(() {
         _player = fetchedPlayer;
       });
-      playerCache.addPlayer(playerId, _player);
+      if (_player.containsKey('error')) {
+        Navigator.pop(context);
+        _showErrorSnackBar(context, 'Player not found');
+      } else {
+        playerCache.addPlayer(playerId, _player);
+      }
     }
   }
 
@@ -96,7 +119,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
 
     setState(() {
       _isLoading = false;
-      _isHistoric = _player['TO_YEAR'] <= 1996;
+      _isHistoric = (_player['TO_YEAR'] ?? _player['FROM_YEAR'] ?? 0) <= 1996;
       _playerPages = _isHistoric
           ? [
               ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>

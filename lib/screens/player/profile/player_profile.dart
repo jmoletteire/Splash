@@ -42,7 +42,7 @@ class _PlayerProfileState extends State<PlayerProfile> {
         ? 'Last Played'
         : convertDate(widget.player['BIRTHDATE']);
     var value = widget.player['ROSTERSTATUS'] == "Inactive"
-        ? (widget.player['TO_YEAR'] + 1).toString()
+        ? ((widget.player['TO_YEAR'] ?? widget.player['FROM_YEAR'] ?? 0) + 1).toString()
         : '${calculateAge(widget.player['BIRTHDATE'])} yrs';
 
     var height = widget.player['HEIGHT'].toString().split('-');
@@ -55,11 +55,11 @@ class _PlayerProfileState extends State<PlayerProfile> {
           children: [
             InfoCard(
               info: {
-                'Measure': '$heightFinal | ${widget.player['WEIGHT']} lb',
+                'Measure': '$heightFinal | ${widget.player['WEIGHT'] ?? '-'} lb',
                 'Experience': widget.player['SEASON_EXP'] == 0
                     ? 'Rookie'
                     : widget.player['SEASON_EXP'].toString(),
-                key: value, // Last Played or Age/DOB
+                key: value == '1' ? '-' : value, // Last Played or Age/DOB
                 'Prev. Affiliate': widget.player['SCHOOL'] ?? '-',
                 'Draft': (widget.player['DRAFT_YEAR'] == 'Undrafted' ||
                         widget.player['DRAFT_ROUND'] == null ||

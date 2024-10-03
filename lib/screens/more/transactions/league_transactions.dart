@@ -23,7 +23,8 @@ class LeagueTransactions extends StatefulWidget {
 }
 
 class _LeagueTransactionsState extends State<LeagueTransactions> {
-  late List transactions;
+  late List allTransactions;
+  late List filteredTransactions;
   late String selectedSeason;
   bool _isLoading = true;
   late ScrollController _scrollController;
@@ -33,18 +34,20 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
     final transactionsCache = Provider.of<TransactionsCache>(context, listen: false);
     if (transactionsCache.containsTransactions()) {
       setState(() {
-        transactions = transactionsCache.getTransactions()!;
-        transactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
+        allTransactions = transactionsCache.getTransactions()!;
+        allTransactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
+        filteredTransactions = allTransactions;
         _isLoading = false;
       });
     } else {
       var fetchedTransactions = await TransactionsNetworkHelper().getTransactions();
       setState(() {
-        transactions = fetchedTransactions;
-        transactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
+        allTransactions = fetchedTransactions;
+        allTransactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
+        filteredTransactions = allTransactions;
         _isLoading = false;
       });
-      transactionsCache.addTransactions(transactions);
+      transactionsCache.addTransactions(allTransactions);
     }
   }
 
@@ -197,7 +200,7 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                         }
 
                         List<String> gameDate =
-                            formatDate(transactions[index]['TRANSACTION_DATE']);
+                            formatDate(allTransactions[index]['TRANSACTION_DATE']);
 
                         // Define the main container to return
                         Widget gameContainer = GestureDetector(
@@ -207,7 +210,7 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                               MaterialPageRoute(
                                 builder: (context) => PlayerHome(
                                   playerId:
-                                      transactions[index]['PLAYER_ID'].toStringAsFixed(0),
+                                      allTransactions[index]['PLAYER_ID'].toStringAsFixed(0),
                                 ),
                               ),
                             );
@@ -241,7 +244,7 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                                   ),
                                 ),
                                 Image.asset(
-                                  'images/NBA_Logos/${transactions[index]['TEAM_ID'].toStringAsFixed(0)}.png',
+                                  'images/NBA_Logos/${allTransactions[index]['TEAM_ID'].toStringAsFixed(0)}.png',
                                   width: 22.0.r,
                                 ),
                                 SizedBox(width: 15.0.r),
@@ -249,13 +252,13 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                                   radius: 13.0.r,
                                   backgroundColor: Colors.white10,
                                   playerImageUrl:
-                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${transactions[index]['PLAYER_ID'].toStringAsFixed(0)}.png',
+                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${allTransactions[index]['PLAYER_ID'].toStringAsFixed(0)}.png',
                                 ),
                                 SizedBox(width: 12.0.r),
                                 Expanded(
                                   flex: 6,
                                   child: AutoSizeText(
-                                    transactions[index]['TRANSACTION_DESCRIPTION'],
+                                    allTransactions[index]['TRANSACTION_DESCRIPTION'],
                                     maxLines: 3,
                                     textAlign: TextAlign.start,
                                     style: kBebasNormal.copyWith(fontSize: 14.0.r),
@@ -272,7 +275,7 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                           children: widgets,
                         );
                       },
-                      childCount: transactions.length,
+                      childCount: allTransactions.length,
                     ),
                   ),
                 ),

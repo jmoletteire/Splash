@@ -857,7 +857,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                         clipBehavior: Clip.hardEdge,
                         constraints:
                             BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-                        backgroundColor: Colors.grey.shade900,
+                        backgroundColor: Color(0xFF111111),
                         isScrollControlled: isLandscape,
                         showDragHandle: true,
                         builder: (BuildContext context) {

@@ -44,17 +44,17 @@ class _ZoneMapState extends State<ZoneMap> {
         setState(() {
           _selectedZone = zone;
           // Determine the tooltip position, adjusting for edges
-          double adjustedX = tapPosition.dx + 10.w; // Default offset to the right
-          double adjustedY = tapPosition.dy + 10.h; // Default offset to the bottom
+          double adjustedX = tapPosition.dx + 10.r; // Default offset to the right
+          double adjustedY = tapPosition.dy + 10.r; // Default offset to the bottom
 
           // Check if the tooltip would overflow the right edge
           if (adjustedX + tooltipWidth > canvasWidth) {
-            adjustedX = tapPosition.dx - tooltipWidth + 30.w; // Place it to the left
+            adjustedX = tapPosition.dx - tooltipWidth + 30.r; // Place it to the left
           }
 
           // Check if the tooltip would overflow the bottom edge
-          if (adjustedY + tooltipHeight > canvasHeight - 50.h) {
-            adjustedY = tapPosition.dy - tooltipHeight - 50.h; // Place it above
+          if (adjustedY + tooltipHeight > canvasHeight - 100.r) {
+            adjustedY = tapPosition.dy - tooltipHeight - 100.r; // Place it above
           }
           _tooltipPosition = Offset(adjustedX, adjustedY);
         });
@@ -127,7 +127,7 @@ class _ZoneMapState extends State<ZoneMap> {
                             clipBehavior: Clip.hardEdge,
                             constraints:
                                 BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-                            backgroundColor: Colors.grey.shade900,
+                            backgroundColor: const Color(0xFF111111),
                             isScrollControlled: isLandscape,
                             showDragHandle: true,
                             builder: (BuildContext context) {

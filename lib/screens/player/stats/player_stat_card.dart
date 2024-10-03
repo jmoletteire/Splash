@@ -144,7 +144,8 @@ class _PlayerStatCardState extends State<PlayerStatCard> {
                               stats[stat]?[widget.perMode]['rank_nba_name'],
                             ),
                             numPlayers: widget.playerStats[widget.selectedSeasonType]['BASIC']
-                                ['NUM_PLAYERS'],
+                                    ?['NUM_PLAYERS'] ??
+                                0,
                           ),
                       ],
                     ],
