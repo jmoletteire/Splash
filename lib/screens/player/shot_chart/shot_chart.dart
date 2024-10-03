@@ -755,7 +755,8 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
             ),
             width: MediaQuery.of(context).size.width,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment:
+                  isLandscape ? MainAxisAlignment.center : MainAxisAlignment.spaceEvenly,
               children: [
                 Container(
                   decoration: BoxDecoration(
@@ -857,8 +858,16 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                         constraints:
                             BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                         backgroundColor: Colors.grey.shade900,
+                        isScrollControlled: isLandscape,
+                        showDragHandle: true,
                         builder: (BuildContext context) {
-                          return TikTokVideoPlayer(shotChart: filteredShotChart);
+                          final double videoHeight =
+                              MediaQuery.of(context).size.width * 9 / 16;
+                          final double playlistHeight = 68.0.r;
+                          return SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: videoHeight + playlistHeight,
+                              child: TikTokVideoPlayer(shotChart: filteredShotChart));
                         },
                       );
                     },

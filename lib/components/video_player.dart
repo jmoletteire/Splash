@@ -48,6 +48,7 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
       context: context,
       clipBehavior: Clip.hardEdge,
       constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+      showDragHandle: true,
       backgroundColor: const Color(0xFF111111),
       builder: (context) {
         return ListView.builder(
@@ -215,14 +216,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     super.dispose();
   }
 
-  String formatDuration(Duration duration) {
-    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
-  }
-
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Stack(
       children: [
         FutureBuilder(
@@ -239,10 +235,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     }
                   });
                 },
-                child: Center(
-                  child: AspectRatio(
-                      aspectRatio: 16 / 9, child: VideoPlayer(_videoPlayerController)),
-                ),
+                child: isLandscape
+                    ? AspectRatio(
+                        aspectRatio: 16 / 9, child: VideoPlayer(_videoPlayerController))
+                    : AspectRatio(
+                        aspectRatio: 16 / 9, child: VideoPlayer(_videoPlayerController)),
               );
             } else {
               // Show a loading spinner while the video is loading
@@ -329,10 +326,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                       widget.onSpeedChange(speed);
                                     },
                                     itemBuilder: (context) => [
-                                      PopupMenuItem(value: 0.25, child: Text("0.25x")),
-                                      PopupMenuItem(value: 0.5, child: Text("0.5x")),
-                                      PopupMenuItem(value: 1.0, child: Text("1.0x")),
-                                      PopupMenuItem(value: 2.0, child: Text("2.0x")),
+                                      const PopupMenuItem(value: 0.25, child: Text("0.25x")),
+                                      const PopupMenuItem(value: 0.5, child: Text("0.5x")),
+                                      const PopupMenuItem(value: 1.0, child: Text("1.0x")),
+                                      const PopupMenuItem(value: 2.0, child: Text("2.0x")),
                                     ],
                                   ),
                                 ],

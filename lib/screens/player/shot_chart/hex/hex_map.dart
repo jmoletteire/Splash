@@ -116,8 +116,8 @@ class _HexMapState extends State<HexMap> {
         return HexagonData(
           x: mappedX,
           y: mappedY,
-          width: hex.width,
-          height: hex.height,
+          width: hex.width.r,
+          height: hex.height.r,
           color: hex.color,
           borderColor: Colors.transparent,
         );
@@ -158,7 +158,7 @@ class _HexMapState extends State<HexMap> {
                     children: [
                       Text(
                         _tooltipMessage,
-                        style: kBebasNormal.copyWith(fontSize: 13.0.sp),
+                        style: kBebasNormal.copyWith(fontSize: 13.0.r),
                       ),
                       IconButton(
                         onPressed: () {
@@ -168,8 +168,17 @@ class _HexMapState extends State<HexMap> {
                             constraints:
                                 BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                             backgroundColor: Colors.grey.shade900,
+                            isScrollControlled: isLandscape,
+                            showDragHandle: true,
                             builder: (BuildContext context) {
-                              return TikTokVideoPlayer(shotChart: _selectedHexagon!.shots);
+                              final double videoHeight =
+                                  MediaQuery.of(context).size.width * 9 / 16;
+                              final double playlistHeight = 68.0.r;
+                              return SizedBox(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: videoHeight + playlistHeight,
+                                  child:
+                                      TikTokVideoPlayer(shotChart: _selectedHexagon!.shots));
                             },
                           );
                         },
