@@ -208,16 +208,15 @@ class _GameCardState extends State<GameCard> {
                   Expanded(flex: 3, child: gameTitle(summary['GAME_ID'])),
                   Expanded(
                     child: Text(
-                      summary['GAME_STATUS_TEXT'] == 'Final'
+                      summary['GAME_STATUS_ID'] == 3 // Game has ended
                           ? summary['GAME_STATUS_TEXT']
-                          : summary['LIVE_PERIOD'] == 0
+                          : summary['GAME_STATUS_ID'] == 1 // Game has not started
                               ? adjustTimezone(
                                   summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT'])
-                              : '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ',
+                              : '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ', // Game in-progress
                       style: kBebasNormal.copyWith(
                           fontSize: 14.0.r,
-                          color: summary['GAME_STATUS_TEXT'] == 'Final' ||
-                                  summary['LIVE_PERIOD'] == 0
+                          color: summary['GAME_STATUS_ID'] != 2 // Game NOT in-progress
                               ? Colors.grey.shade300
                               : Colors.white),
                       textAlign: TextAlign.end,
@@ -269,11 +268,10 @@ class _GameCardState extends State<GameCard> {
                                     awayLinescore['TEAM_NAME'] ??
                                     'INT\'L',
                                 style: kGameCardTextStyle.copyWith(
-                                  color: awayLinescore['PTS'] == null ||
-                                          homeLinescore['PTS'] == null
+                                  color: summary['GAME_STATUS_ID'] != 3
                                       ? Colors.white // Game upcoming or in-progress
                                       : awayLinescore['PTS'] > homeLinescore['PTS'] &&
-                                              summary['GAME_STATUS_TEXT'] == 'Final'
+                                              summary['GAME_STATUS_ID'] == 3
                                           ? Colors.white // Away team won
                                           : Colors.grey, // Away team lost
                                   fontSize: 20.0.r,
@@ -302,11 +300,10 @@ class _GameCardState extends State<GameCard> {
                                       : awayLinescore['PTS'].toString(),
                                   textAlign: TextAlign.right,
                                   style: kGameCardTextStyle.copyWith(
-                                    color: awayLinescore['PTS'] == null ||
-                                            homeLinescore['PTS'] == null
+                                    color: summary['GAME_STATUS_ID'] != 3
                                         ? Colors.white // Game upcoming or in-progress
                                         : awayLinescore['PTS'] > homeLinescore['PTS'] &&
-                                                summary['GAME_STATUS_TEXT'] == 'Final'
+                                                summary['GAME_STATUS_ID'] == 3
                                             ? Colors.white // Away team won
                                             : Colors.grey, // Away team lost
                                     fontSize: 20.0.r,
@@ -373,11 +370,10 @@ class _GameCardState extends State<GameCard> {
                                     homeLinescore['TEAM_NAME'] ??
                                     'INT\'L',
                                 style: kGameCardTextStyle.copyWith(
-                                  color: homeLinescore['PTS'] == null ||
-                                          awayLinescore['PTS'] == null
+                                  color: summary['GAME_STATUS_ID'] != 3
                                       ? Colors.white // Game upcoming or in-progress
                                       : homeLinescore['PTS'] > awayLinescore['PTS'] &&
-                                              summary['GAME_STATUS_TEXT'] == 'Final'
+                                              summary['GAME_STATUS_ID'] == 3
                                           ? Colors.white // Home team won
                                           : Colors.grey, // Home team lost
                                   fontSize: 20.0.r,
@@ -406,11 +402,10 @@ class _GameCardState extends State<GameCard> {
                                       : homeLinescore['PTS'].toString(),
                                   textAlign: TextAlign.right,
                                   style: kGameCardTextStyle.copyWith(
-                                    color: homeLinescore['PTS'] == null ||
-                                            awayLinescore['PTS'] == null
+                                    color: summary['GAME_STATUS_ID'] != 3
                                         ? Colors.white // Game upcoming or in-progress
                                         : homeLinescore['PTS'] > awayLinescore['PTS'] &&
-                                                summary['GAME_STATUS_TEXT'] == 'Final'
+                                                summary['GAME_STATUS_ID'] == 3
                                             ? Colors.white // Home team won
                                             : Colors.grey, // Home team lost
                                     fontSize: 20.0.r,

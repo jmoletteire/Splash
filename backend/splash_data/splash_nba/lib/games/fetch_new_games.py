@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+import requests
 from nba_api.stats.endpoints import leaguegamefinder, ScoreboardV2
 from pymongo import MongoClient
 
@@ -8,6 +9,13 @@ from splash_nba.lib.games.fetch_boxscore_basic import fetch_box_score_stats
 from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
 from splash_nba.util.env import uri, k_current_season
 import logging
+
+
+def fetch_odds(odds, game):
+    for game_data in odds:
+        if game_data['gameId'] == game:
+            game_data['markets']
+
 
 
 def update_game_data():
@@ -21,6 +29,14 @@ def update_game_data():
         exit(1)
 
     try:
+        # Fetch the data from the URL
+        url = "https://cdn.nba.com/static/json/liveData/odds/odds_todaysGames.json"
+        response = requests.get(url)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            odds_data = response.json()
+
         # Fetch only games that are from the current season and have occurred before today
         today = datetime.today().strftime('%Y-%m-%d')
         query = {
@@ -34,12 +50,26 @@ def update_game_data():
                 game_data['SUMMARY'] = fetch_box_score_summary(game_id)
                 game_data['BOXSCORE'] = fetch_box_score_stats(game_id)
                 game_data['ADV'] = fetch_box_score_adv(game_id)
+                # game_data['ODDS'] = fetch_odds(odds_data, game_id)
 
     except Exception as e:
         logging.error(f"Error fetching scores: {e}")
 
 
 def fetch_upcoming_games(game_date):
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        games_collection = db.nba_games
+
+    except Exception as e:
+        logging.error(f"(Upcoming Games) Failed to connect to MongoDB: {e}")
+        return
+
     # Map season type codes to names
     season_type_map = {
         '1': 'PRE_SEASON',
@@ -106,7 +136,7 @@ if __name__ == "__main__":
     try:
         # Define date range
         start_date = datetime(2024, 10, 4)
-        end_date = datetime(2024, 4, 13)
+        end_date = datetime(2025, 4, 13)
 
         # Fetch games for each date in the range
         fetch_games_for_date_range(start_date, end_date)

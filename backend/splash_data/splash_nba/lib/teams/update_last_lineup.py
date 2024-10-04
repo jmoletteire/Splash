@@ -44,28 +44,14 @@ def get_last_game(seasons):
 
 
 def get_last_lineup(team_id, last_game_id, last_game_date):
-    # Get the current call stack
-    stack = inspect.stack()
-
-    # Check the second item in the stack (the caller)
-    # The first item in the stack is the current function itself
-    caller_frame = stack[1]
-
-    # Extract the function name of the caller
-    caller_function = caller_frame.function
-
-    # Check if the caller is the main script
-    if caller_function == '<module>':  # '<module>' indicates top-level execution (like __main__)
-        print("Called from main script.")
-    else:
-        # Connect to MongoDB
-        try:
-            client = MongoClient(uri)
-            db = client.splash
-            games_collection = db.nba_games
-        except Exception as e:
-            logging.error(f"Failed to connect to MongoDB: {e}")
-            exit(1)
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        games_collection = db.nba_games
+    except Exception as e:
+        logging.error(f"Failed to connect to MongoDB: {e}")
+        exit(1)
 
     try:
         games = games_collection.find({"GAME_DATE": last_game_date}, {"GAMES": 1, "_id": 0})

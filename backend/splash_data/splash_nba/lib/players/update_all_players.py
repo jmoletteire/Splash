@@ -1,3 +1,4 @@
+import random
 import time
 
 from nba_api.stats.endpoints import commonallplayers, commonplayerinfo
@@ -160,6 +161,9 @@ def update_player_info():
             # Rest 10 seconds every 25 players
             if i % 25 == 0:
                 time.sleep(10)
+            else:
+                # Pause for a random time between 0.5 and 1 second
+                time.sleep(random.uniform(0.5, 1.0))
 
 
 if __name__ == "__main__":

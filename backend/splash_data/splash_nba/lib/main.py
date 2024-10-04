@@ -9,7 +9,7 @@ from nba_api.live.nba.endpoints import boxscore
 from nba_api.stats.endpoints import commonplayoffseries, playerawards, scoreboardv2
 from pymongo import MongoClient
 
-from splash_nba.lib.games.fetch_new_games import update_game_data
+from splash_nba.lib.games.fetch_new_games import update_game_data, fetch_games_for_date_range
 from splash_nba.lib.games.live_scores import fetch_boxscore, fetch_live_scores
 from splash_nba.lib.games.nba_cup import update_current_cup
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
@@ -35,7 +35,7 @@ from splash_nba.lib.teams.stats.per100 import calculate_and_update_per_100_posse
     current_season_per_100_possessions
 from splash_nba.lib.teams.team_cap_sheet import update_team_contract_data
 from splash_nba.lib.teams.team_history import update_team_history
-from splash_nba.lib.teams.update_team_games import update_games
+from splash_nba.lib.teams.update_team_games import update_team_games
 from splash_nba.lib.teams.standings import update_current_standings
 from splash_nba.lib.teams.update_news_and_transactions import fetch_team_transactions, fetch_team_news
 from splash_nba.lib.teams.team_seasons import update_current_season
@@ -44,8 +44,23 @@ from splash_nba.lib.teams.team_rosters import update_current_roster
 from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_lineup
 from splash_nba.util.env import uri, k_current_season, k_current_season_type
 
+# Global flag to prevent further updates for the day
+skip_updates_for_today = False
+
+
+# Function to reset the skip_updates_for_today flag daily
+def reset_flag():
+    global skip_updates_for_today
+    skip_updates_for_today = False
+    logging.info("(Flag Reset) Daily reset complete, live updates will resume.")
+
 
 def games_live_update():
+    global skip_updates_for_today
+    if skip_updates_for_today:
+        logging.info("(Games Live) No games today, skipping further updates.")
+        return  # Skip the update if there are no games today
+
     try:
         client = MongoClient(uri)
         db = client.splash
@@ -64,20 +79,26 @@ def games_live_update():
         logging.error(f'(Games Live) Failed to get scores for today: {e}')
         return
 
-    if games_today:
-        for game in games_today:
-            is_final = game['GAME_STATUS_ID'] == 3
-            line_score = [line for line in line_scores if line['GAME_ID'] == game['GAME_ID']]
-            if not is_final:
-                box_score = boxscore.BoxScore(game_id=game['GAME_ID']).get_dict()['boxscore']
-                games_collection.update_one(
-                    {'GAME_DATE': today},
-                    {'$set': {
-                        f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore': line_score,
-                        f'GAMES.{game["GAME_ID"]}.BOXSCORE': box_score
-                    }
-                    }
-                )
+    # If there are no games today, set the flag to skip further updates for the rest of the day
+    if not games_today:
+        logging.info(f"(Games Live) No games found for today: {today}. Skipping updates for the rest of the day.")
+        skip_updates_for_today = True
+        return
+
+    for game in games_today:
+        in_progress = game['GAME_STATUS_ID'] == 2
+        is_final = game['GAME_STATUS_ID'] == 3
+        line_score = [line for line in line_scores if line['GAME_ID'] == game['GAME_ID']]
+        if in_progress and not is_final:
+            box_score = boxscore.BoxScore(game_id=game['GAME_ID']).get_dict()['game']
+            games_collection.update_one(
+                {'GAME_DATE': today},
+                {'$set': {
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore': line_score,
+                    f'GAMES.{game["GAME_ID"]}.BOXSCORE': box_score
+                }
+                }
+            )
 
 
 def games_daily_update():
@@ -88,6 +109,17 @@ def games_daily_update():
     # Games
     logging.info("Games/Scores..")
     update_game_data()
+
+    # Upcoming Games
+    try:
+        # Define date range
+        start_date = datetime(2024, 10, 4)
+        end_date = datetime(2025, 4, 13)
+
+        # Fetch games for each date in the range
+        fetch_games_for_date_range(start_date, end_date)
+    except Exception as e:
+        logging.error(f"(Games Daily) Failed to fetch upcoming games: {e}")
 
     # NBA Cup
     logging.info("NBA Cup...")
@@ -114,29 +146,28 @@ def teams_daily_update():
 
     logging.info("Updating teams (daily)...")
     try:
-        # Games
+        # Games (0 API calls)
         logging.info("Games...")
         # Sort the documents in nba_games collection by GAME_DATE in descending order
         sorted_games_cursor = games_collection.find(
             {"SEASON_YEAR": k_current_season[0:4]},
             {"GAME_DATE": 1, "GAMES": 1, "_id": 0}
         ).sort("GAME_DATE", -1)
-
         # Process the games in batches
         for i, game_day in enumerate(sorted_games_cursor):
             logging.info(f"Processing {game_day['GAME_DATE']}...")
-            update_games(game_day)
+            update_team_games(game_day)
 
-        # Standings
+        # Standings (min. 30 API calls [more if tiebreakers])
         logging.info("Standings...")
         update_current_standings()
 
-        # News & Transactions
+        # News & Transactions (NATSTAT - 60 API calls)
         logging.info("News & Transactions...")
         fetch_team_transactions()
         fetch_team_news()
 
-        # Cap Sheet
+        # Cap Sheet (0 API calls)
         logging.info("Cap Sheet...")
         update_team_contract_data()
 
@@ -148,36 +179,37 @@ def teams_daily_update():
                 continue
 
             logging.info(f"Processing team {team} ({i + 1} of 30)...")
-            # Team History
+
+            # Team History (30 API calls)
             logging.info("History...")
             update_team_history(team_id=team)
 
-            # Season Stats
+            # Season Stats (120 API calls)
             logging.info("Stats...")
             update_current_season(team_id=team)
-
             # Filter seasons to only include the current season key
             filtered_doc = doc.copy()
             filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if key == k_current_season}
             current_season_per_100_possessions(team_doc=filtered_doc, playoffs=k_current_season_type == 'PLAYOFFS')
 
-            # Current Roster & Coaches
+            # Current Roster & Coaches (~400-500 API calls)
             logging.info("Roster & Coaches...")
             season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
             update_current_roster(team_id=team, season_not_started=season_not_started)
 
-            # Last Starting Lineup
+            # Last Starting Lineup (0 API Calls)
             # Get most recent game by date
             game_id, game_date = get_last_game(doc['seasons'])
-
             # Get starting lineup for most recent game
             last_starting_lineup = get_last_lineup(team, game_id, game_date)
-
             # Update document
             teams_collection.update_one(
                 {"TEAM_ID": team},
                 {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
             )
+
+            # Pause 10 seconds between teams
+            time.sleep(10)
 
         rank_hustle_stats_current_season()
         three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
@@ -499,6 +531,7 @@ def players_daily_update():
 
 # Schedule the tasks
 # schedule.every(1).minute.do(games_live_update)  # Run every 1 minute
+# schedule.every().day.at("00:00").do(reset_flag)  # Reset the flag at midnight
 # schedule.every().day.at("02:30").do(games_daily_update())  # Run every day at 2:30 AM
 # schedule.every().day.at("03:00").do(teams_daily_update())  # Run every day at 3:00 AM
 # schedule.every().day.at("03:30").do(players_daily_update())  # Run every day at 3:30 AM
@@ -531,8 +564,9 @@ if __name__ == '__main__':
         logging.error(f"Failed to connect to MongoDB: {e}")
         exit(1)
 
+    games_live_update()
     # games_daily_update()
-    teams_daily_update()
+    # teams_daily_update()
     # players_daily_update()
 
     #while True:

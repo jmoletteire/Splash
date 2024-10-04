@@ -10,11 +10,13 @@ class BoxTeamStats extends StatefulWidget {
   final List<dynamic> teams;
   final String homeId;
   final String awayId;
+  final bool inProgress;
   const BoxTeamStats({
     super.key,
     required this.teams,
     required this.homeId,
     required this.awayId,
+    required this.inProgress,
   });
 
   @override
@@ -30,12 +32,31 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
 
   void setValues(String homeId, String awayId) {
     setState(() {
-      homeTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
-          ? widget.teams[0]
-          : widget.teams[1];
-      awayTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
-          ? widget.teams[1]
-          : widget.teams[0];
+      if (widget.inProgress) {
+        homeTeam = widget.teams[0];
+        awayTeam = widget.teams[1];
+      } else {
+        homeTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
+            ? widget.teams[0]
+            : widget.teams[1];
+        awayTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
+            ? widget.teams[1]
+            : widget.teams[0];
+      }
+
+      // Add TEAM ABBREVIATION if not exists
+      if (!homeTeam.containsKey('TEAM_ABBREVIATION')) {
+        homeTeam['TEAM_ABBREVIATION'] = kTeamIdToName[homeTeam['teamId']][1] ?? 'FA';
+      }
+      if (!awayTeam.containsKey('TEAM_ABBREVIATION')) {
+        awayTeam['TEAM_ABBREVIATION'] = kTeamIdToName[awayTeam['teamId']][1] ?? 'FA';
+      }
+
+      if (homeTeam.isNotEmpty) {
+        homeTeamColor = kDarkPrimaryColors.contains(homeTeam['TEAM_ABBREVIATION'])
+            ? (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
+            : (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['primaryColor']!);
+      }
 
       if (awayTeam.isNotEmpty) {
         awayTeamColor = kTeamColorOpacity.containsKey(awayTeam['TEAM_ABBREVIATION'])
@@ -43,12 +64,6 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                 ? (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
                 : (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['primaryColor']!)
             : kTeamColors['FA']!['primaryColor']!;
-      }
-
-      if (homeTeam.isNotEmpty) {
-        homeTeamColor = kDarkPrimaryColors.contains(homeTeam['TEAM_ABBREVIATION'])
-            ? (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
-            : (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['primaryColor']!);
       }
     });
   }
@@ -66,6 +81,22 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
 
   @override
   Widget build(BuildContext context) {
+    int awayEstPoss = ((awayTeam['fieldGoalsAttempted'] ?? 0) +
+            (awayTeam['turnovers'] ?? 0) +
+            (0.44 * (awayTeam['freeThrowsAttempted'] ?? 0)) -
+            (awayTeam['reboundsOffensive'] ?? 0))
+        .ceil();
+    int homeEstPoss = ((homeTeam['fieldGoalsAttempted'] ?? 0) +
+            (homeTeam['turnovers'] ?? 0) +
+            (0.44 * (homeTeam['freeThrowsAttempted'] ?? 0)) -
+            (homeTeam['reboundsOffensive'] ?? 0))
+        .ceil();
+
+    int minutes = (int.parse(awayTeam['minutesCalculated']
+                .substring(2, awayTeam['minutesCalculated'].length - 1)) /
+            5)
+        .floor();
+
     return SliverToBoxAdapter(
       child: Skeletonizer(
         enabled: _isLoading,
@@ -105,48 +136,60 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'PTS',
-                            awayTeam: awayTeam['PTS'] ?? 0.0,
-                            homeTeam: homeTeam['PTS'] ?? 0.0,
+                            awayTeam: awayTeam['points'] ?? awayTeam['PTS'] ?? 0.0,
+                            homeTeam: homeTeam['points'] ?? homeTeam['PTS'] ?? 0.0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'PER 100',
-                            awayTeam: awayTeam['OFF_RATING'] ?? 0.0,
-                            homeTeam: homeTeam['OFF_RATING'] ?? 0.0,
+                            awayTeam: awayTeam['OFF_RATING'] ??
+                                awayTeam['points'] / awayEstPoss * 100 ??
+                                0.0,
+                            homeTeam: homeTeam['OFF_RATING'] ??
+                                homeTeam['points'] / homeEstPoss * 100 ??
+                                0.0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'POSSESSIONS',
-                            awayTeam: awayTeam['POSS'] ?? 0.0,
-                            homeTeam: homeTeam['POSS'] ?? 0.0,
+                            awayTeam: awayTeam['POSS'] ?? awayEstPoss ?? 0.0,
+                            homeTeam: homeTeam['POSS'] ?? homeEstPoss ?? 0.0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'PACE',
-                            awayTeam: awayTeam['PACE'] ?? 0.0,
-                            homeTeam: homeTeam['PACE'] ?? 0.0,
+                            awayTeam: awayTeam['PACE'] ?? 48 * awayEstPoss / minutes ?? 0.0,
+                            homeTeam: homeTeam['PACE'] ?? 48 * homeEstPoss / minutes ?? 0.0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'TOV',
-                            awayTeam: awayTeam['TO'] ?? 0,
-                            homeTeam: homeTeam['TO'] ?? 0,
+                            awayTeam: awayTeam['turnoversTotal'] ?? awayTeam['TO'] ?? 0,
+                            homeTeam: homeTeam['turnoversTotal'] ?? homeTeam['TO'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'TOV%',
-                            awayTeam: roundToDecimalPlaces(awayTeam['TM_TOV_PCT'] ?? 0.0, 1),
-                            homeTeam: roundToDecimalPlaces(homeTeam['TM_TOV_PCT'] ?? 0.0, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                awayTeam['TM_TOV_PCT'] ??
+                                    awayTeam['turnovers'] / awayEstPoss ??
+                                    0.0,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                homeTeam['TM_TOV_PCT'] ??
+                                    homeTeam['turnovers'] / homeEstPoss ??
+                                    0.0,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
@@ -170,48 +213,78 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 15.0.r),
                           NonComparisonRow(
                             statName: 'FG',
-                            awayTeam: '${awayTeam['FGM'] ?? 0}-${awayTeam['FGA'] ?? 0}',
-                            homeTeam: '${homeTeam['FGM'] ?? 0}-${homeTeam['FGA'] ?? 0}',
+                            awayTeam:
+                                '${awayTeam['fieldGoalsMade'] ?? awayTeam['FGM'] ?? 0}-${awayTeam['fieldGoalsAttempted'] ?? awayTeam['FGA'] ?? 0}',
+                            homeTeam:
+                                '${homeTeam['fieldGoalsMade'] ?? homeTeam['FGM'] ?? 0}-${homeTeam['fieldGoalsAttempted'] ?? homeTeam['FGA'] ?? 0}',
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FG%',
-                            awayTeam:
-                                roundToDecimalPlaces((awayTeam['FG_PCT'] ?? 0.0) * 100, 1),
-                            homeTeam:
-                                roundToDecimalPlaces((homeTeam['FG_PCT'] ?? 0.0) * 100, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['fieldGoalsPercentage'] ??
+                                        awayTeam['FG_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['fieldGoalsPercentage'] ??
+                                        homeTeam['FG_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           NonComparisonRow(
                             statName: '3P',
-                            awayTeam: '${awayTeam['FG3M'] ?? 0}-${awayTeam['FG3A'] ?? 0}',
-                            homeTeam: '${homeTeam['FG3M'] ?? 0}-${homeTeam['FG3A'] ?? 0}',
+                            awayTeam:
+                                '${awayTeam['threePointersMade'] ?? awayTeam['FG3M'] ?? 0}-${awayTeam['threePointersMade'] ?? awayTeam['FG3A'] ?? 0}',
+                            homeTeam:
+                                '${homeTeam['threePointersMade'] ?? homeTeam['FG3M'] ?? 0}-${homeTeam['threePointersMade'] ?? homeTeam['FG3A'] ?? 0}',
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: '3P%',
-                            awayTeam:
-                                roundToDecimalPlaces((awayTeam['FG3_PCT'] ?? 0.0) * 100, 1),
-                            homeTeam:
-                                roundToDecimalPlaces((homeTeam['FG3_PCT'] ?? 0.0) * 100, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['threePointersPercentage'] ??
+                                        awayTeam['FG3_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['threePointersPercentage'] ??
+                                        homeTeam['FG3_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           NonComparisonRow(
                             statName: 'FT',
-                            awayTeam: '${awayTeam['FTM'] ?? 0}-${awayTeam['FTA'] ?? 0}',
-                            homeTeam: '${homeTeam['FTM'] ?? 0}-${homeTeam['FTA'] ?? 0}',
+                            awayTeam:
+                                '${awayTeam['freeThrowsMade'] ?? awayTeam['FTM'] ?? 0}-${awayTeam['freeThrowsAttempted'] ?? awayTeam['FTA'] ?? 0}',
+                            homeTeam:
+                                '${homeTeam['freeThrowsMade'] ?? homeTeam['FTM'] ?? 0}-${homeTeam['freeThrowsAttempted'] ?? homeTeam['FTA'] ?? 0}',
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FT%',
-                            awayTeam:
-                                roundToDecimalPlaces((awayTeam['FT_PCT'] ?? 0.0) * 100, 1),
-                            homeTeam:
-                                roundToDecimalPlaces((homeTeam['FT_PCT'] ?? 0.0) * 100, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['freeThrowsPercentage'] ??
+                                        awayTeam['FT_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['freeThrowsPercentage'] ??
+                                        homeTeam['FT_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
@@ -219,49 +292,75 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           ComparisonRow(
                             statName: 'FT/FGA',
                             awayTeam: roundToDecimalPlaces(
-                                (awayTeam['FTM'] / awayTeam['FGA']) ?? 0.0, 2),
+                                ((awayTeam['freeThrowsMade'] ?? awayTeam['FTM']) /
+                                        (awayTeam['freeThrowsAttempted'] ??
+                                            awayTeam['FGA'])) ??
+                                    0.0,
+                                2),
                             homeTeam: roundToDecimalPlaces(
-                                (homeTeam['FTM'] / homeTeam['FGA']) ?? 0.0, 2),
+                                ((homeTeam['freeThrowsMade'] ?? homeTeam['FTM']) /
+                                        (homeTeam['freeThrowsAttempted'] ??
+                                            homeTeam['FGA'])) ??
+                                    0.0,
+                                2),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'EFG%',
-                            awayTeam:
-                                roundToDecimalPlaces((awayTeam['EFG_PCT'] ?? 0.0) * 100, 1),
-                            homeTeam:
-                                roundToDecimalPlaces((homeTeam['EFG_PCT'] ?? 0.0) * 100, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['fieldGoalsEffectiveAdjusted'] ??
+                                        awayTeam['EFG_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['fieldGoalsEffectiveAdjusted'] ??
+                                        homeTeam['EFG_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'TS%',
-                            awayTeam:
-                                roundToDecimalPlaces((awayTeam['TS_PCT'] ?? 0.0) * 100, 1),
-                            homeTeam:
-                                roundToDecimalPlaces((homeTeam['TS_PCT'] ?? 0.0) * 100, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['trueShootingPercentage'] ??
+                                        awayTeam['TS_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['trueShootingPercentage'] ??
+                                        homeTeam['TS_PCT'] ??
+                                        0.0) *
+                                    100,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'PTS IN PAINT',
-                            awayTeam: awayTeam['PTS_PAINT'] ?? 0.0,
-                            homeTeam: homeTeam['PTS_PAINT'] ?? 0.0,
+                            awayTeam:
+                                awayTeam['pointsInThePaint'] ?? awayTeam['PTS_PAINT'] ?? 0.0,
+                            homeTeam:
+                                homeTeam['pointsInThePaint'] ?? homeTeam['PTS_PAINT'] ?? 0.0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'PTS OUTSIDE',
-                            awayTeam:
-                                (awayTeam['PTS'] - awayTeam['FTM'] - awayTeam['PTS_PAINT']) ??
-                                    0.0,
-                            homeTeam:
-                                (homeTeam['PTS'] - homeTeam['FTM'] - homeTeam['PTS_PAINT']) ??
-                                    0.0,
+                            awayTeam: (awayTeam['points'] ?? awayTeam['PTS'] ?? 0.0) -
+                                (awayTeam['freeThrowsMade'] ?? awayTeam['FTM'] ?? 0.0) -
+                                (awayTeam['pointsInThePaint'] ?? awayTeam['PTS_PAINT'] ?? 0.0),
+                            homeTeam: (homeTeam['points'] ?? homeTeam['PTS'] ?? 0.0) -
+                                (homeTeam['freeThrowsMade'] ?? homeTeam['FTM'] ?? 0.0) -
+                                (homeTeam['pointsInThePaint'] ?? homeTeam['PTS_PAINT'] ?? 0.0),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
@@ -285,52 +384,80 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'REB',
-                            awayTeam: awayTeam['REB'] ?? 0,
-                            homeTeam: homeTeam['REB'] ?? 0,
+                            awayTeam: awayTeam['reboundsTotal'] ?? awayTeam['REB'] ?? 0,
+                            homeTeam: homeTeam['reboundsTotal'] ?? homeTeam['REB'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'OREB',
-                            awayTeam: awayTeam['OREB'] ?? 0,
-                            homeTeam: homeTeam['OREB'] ?? 0,
+                            awayTeam: awayTeam['reboundsOffensive'] ?? awayTeam['OREB'] ?? 0,
+                            homeTeam: homeTeam['reboundsOffensive'] ?? homeTeam['OREB'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'DREB',
-                            awayTeam: awayTeam['DREB'] ?? 0,
-                            homeTeam: homeTeam['DREB'] ?? 0,
+                            awayTeam: awayTeam['reboundsDefensive'] ?? awayTeam['DREB'] ?? 0,
+                            homeTeam: homeTeam['reboundsDefensive'] ?? homeTeam['DREB'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'OREB%',
-                            awayTeam:
-                                roundToDecimalPlaces((awayTeam['OREB_PCT'] ?? 0.0) * 100, 1),
-                            homeTeam:
-                                roundToDecimalPlaces((homeTeam['OREB_PCT'] ?? 0.0) * 100, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['OREB_PCT'] ??
+                                        awayTeam['reboundsOffensive'] /
+                                            (awayTeam['fieldGoalsAttempted'] -
+                                                awayTeam['fieldGoalsMade']) ??
+                                        0.0) *
+                                    100,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['OREB_PCT'] ??
+                                        homeTeam['reboundsOffensive'] /
+                                            (homeTeam['fieldGoalsAttempted'] -
+                                                homeTeam['fieldGoalsMade']) ??
+                                        0.0) *
+                                    100,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'DREB%',
-                            awayTeam:
-                                roundToDecimalPlaces((awayTeam['DREB_PCT'] ?? 0.0) * 100, 1),
-                            homeTeam:
-                                roundToDecimalPlaces((homeTeam['DREB_PCT'] ?? 0.0) * 100, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['OREB_PCT'] ??
+                                        awayTeam['reboundsDefensive'] /
+                                            (homeTeam['fieldGoalsAttempted'] -
+                                                homeTeam['fieldGoalsMade']) ??
+                                        0.0) *
+                                    100,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['OREB_PCT'] ??
+                                        homeTeam['reboundsDefensive'] /
+                                            (awayTeam['fieldGoalsAttempted'] -
+                                                awayTeam['fieldGoalsMade']) ??
+                                        0.0) *
+                                    100,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: '2ND Chance PTS',
-                            awayTeam: awayTeam['PTS_2ND_CHANCE'] ?? 0.0,
-                            homeTeam: homeTeam['PTS_2ND_CHANCE'] ?? 0.0,
+                            awayTeam: awayTeam['pointsSecondChance'] ??
+                                awayTeam['PTS_2ND_CHANCE'] ??
+                                0.0,
+                            homeTeam: homeTeam['pointsSecondChance'] ??
+                                homeTeam['PTS_2ND_CHANCE'] ??
+                                0.0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
@@ -354,34 +481,36 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'AST',
-                            awayTeam: awayTeam['AST'] ?? 0,
-                            homeTeam: homeTeam['AST'] ?? 0,
+                            awayTeam: awayTeam['assists'] ?? awayTeam['AST'] ?? 0,
+                            homeTeam: homeTeam['assists'] ?? homeTeam['AST'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'AST%',
-                            awayTeam:
-                                roundToDecimalPlaces((awayTeam['AST_PCT'] ?? 0) * 100, 1),
-                            homeTeam:
-                                roundToDecimalPlaces((homeTeam['AST_PCT'] ?? 0) * 100, 1),
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['AST_PCT'] ??
+                                        (awayTeam['assists'] / awayTeam['fieldGoalsMade']) ??
+                                        0) *
+                                    100,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['AST_PCT'] ??
+                                        (homeTeam['assists'] / homeTeam['fieldGoalsMade']) ??
+                                        0) *
+                                    100,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'AST / TOV',
-                            awayTeam: awayTeam['AST_TOV'] ?? 0,
-                            homeTeam: homeTeam['AST_TOV'] ?? 0,
-                            awayTeamColor: awayTeamColor,
-                            homeTeamColor: homeTeamColor,
-                          ),
-                          SizedBox(height: 5.0.r),
-                          ComparisonRow(
-                            statName: 'AST Ratio',
-                            awayTeam: awayTeam['AST_RATIO'] ?? 0,
-                            homeTeam: homeTeam['AST_RATIO'] ?? 0,
+                            awayTeam:
+                                awayTeam['assistsTurnoverRatio'] ?? awayTeam['AST_TOV'] ?? 0,
+                            homeTeam:
+                                homeTeam['assistsTurnoverRatio'] ?? homeTeam['AST_TOV'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
@@ -405,40 +534,42 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'STL',
-                            awayTeam: awayTeam['STL'] ?? 0,
-                            homeTeam: homeTeam['STL'] ?? 0,
+                            awayTeam: awayTeam['steals'] ?? awayTeam['STL'] ?? 0,
+                            homeTeam: homeTeam['steals'] ?? homeTeam['STL'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'BLK',
-                            awayTeam: awayTeam['BLK'] ?? 0,
-                            homeTeam: homeTeam['BLK'] ?? 0,
+                            awayTeam: awayTeam['blocks'] ?? awayTeam['BLK'] ?? 0,
+                            homeTeam: homeTeam['blocks'] ?? homeTeam['BLK'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FOULS',
-                            awayTeam: awayTeam['PF'] ?? 0,
-                            homeTeam: homeTeam['PF'] ?? 0,
+                            awayTeam: awayTeam['foulsPersonal'] ?? awayTeam['PF'] ?? 0,
+                            homeTeam: homeTeam['foulsPersonal'] ?? homeTeam['PF'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'PTS OFF TOV',
-                            awayTeam: awayTeam['PTS_OFF_TO'] ?? 0,
-                            homeTeam: homeTeam['PTS_OFF_TO'] ?? 0,
+                            awayTeam:
+                                awayTeam['pointsFromTurnovers'] ?? awayTeam['PTS_OFF_TO'] ?? 0,
+                            homeTeam:
+                                homeTeam['pointsFromTurnovers'] ?? homeTeam['PTS_OFF_TO'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'FASTBREAK PTS',
-                            awayTeam: awayTeam['PTS_FB'] ?? 0,
-                            homeTeam: homeTeam['PTS_FB'] ?? 0,
+                            awayTeam: awayTeam['pointsFastbreak'] ?? awayTeam['PTS_FB'] ?? 0,
+                            homeTeam: homeTeam['pointsFastbreak'] ?? homeTeam['PTS_FB'] ?? 0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),

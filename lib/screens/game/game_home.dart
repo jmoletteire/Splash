@@ -178,18 +178,18 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       required String awayId,
       required bool isUpcoming,
     }) {
-      if (!isUpcoming) {
-        return GameBoxScore(
-          game: game,
-          homeId: homeId,
-          awayId: awayId,
-          isUpcoming: isUpcoming,
-        );
-      } else {
+      if (isUpcoming) {
         return GamePreviewStats(
           game: game,
           homeId: homeId,
           awayId: awayId,
+        );
+      } else {
+        return GameBoxScore(
+          game: game,
+          homeId: homeId,
+          awayId: awayId,
+          inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
         );
       }
     }
@@ -619,9 +619,9 @@ class GameInfo extends StatelessWidget {
                       fontSize: 36.0.r,
                       color: awayLinescore['PTS'] > homeLinescore['PTS']
                           ? Colors.white
-                          : (gameSummary['GAME_STATUS_TEXT'] == 'Final'
+                          : gameSummary['GAME_STATUS_TEXT'] == 'Final'
                               ? Colors.grey
-                              : Colors.white)),
+                              : Colors.white),
                 ),
               if (!isUpcoming) const Spacer(),
               Column(
@@ -638,9 +638,9 @@ class GameInfo extends StatelessWidget {
                       fontSize: 36.0.r,
                       color: homeLinescore['PTS'] > awayLinescore['PTS']
                           ? Colors.white
-                          : (gameSummary['GAME_STATUS_TEXT'] == 'Final'
+                          : gameSummary['GAME_STATUS_TEXT'] == 'Final'
                               ? Colors.grey
-                              : Colors.white)),
+                              : Colors.white),
                 ),
               const Spacer(),
               GestureDetector(

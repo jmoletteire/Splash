@@ -8,6 +8,12 @@ class PlayerShotChartCache extends ChangeNotifier {
   }
 
   void addPlayer(String playerId, String season, String seasonType, List shotData) {
+    if (_cache.length >= 5) {
+      // Remove the oldest entry when the cache exceeds 5 entries
+      String oldestEntry = _cache.keys.first;
+      _cache.remove(oldestEntry);
+    }
+
     // Check if the playerId exists in the cache
     if (_cache.containsKey(playerId)) {
       // Check if the season exists for this player

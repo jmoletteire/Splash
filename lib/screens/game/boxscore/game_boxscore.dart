@@ -11,13 +11,13 @@ class GameBoxScore extends StatefulWidget {
   final Map<String, dynamic> game;
   final String homeId;
   final String awayId;
-  final bool isUpcoming;
+  final bool inProgress;
   const GameBoxScore({
     super.key,
     required this.game,
     required this.homeId,
     required this.awayId,
-    required this.isUpcoming,
+    required this.inProgress,
   });
 
   @override
@@ -43,9 +43,9 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    gameBoxscore = widget.game['BOXSCORE'];
-    gameAdv = widget.game['ADV'];
-    gameOtherStats = widget.game['SUMMARY']['OtherStats'];
+    gameBoxscore = widget.game['BOXSCORE'] ?? {};
+    gameAdv = widget.game['ADV'] ?? {};
+    gameOtherStats = widget.game['SUMMARY']?['OtherStats'] ?? [];
 
     _boxscoreTabController = TabController(length: 3, vsync: this);
     _boxscoreTabController.addListener(() {
@@ -106,46 +106,15 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           .toList();
     }
 
-    List<Map<String, dynamic>> boxPlayerStats = castToListOfMap(gameBoxscore['PlayerStats']);
-    List<Map<String, dynamic>> advPlayerStats = castToListOfMap(gameAdv['PlayerStats']);
+    // PLAYER STATS
+    List<Map<String, dynamic>> boxPlayerStats =
+        gameAdv.isEmpty ? [] : castToListOfMap(gameBoxscore['PlayerStats']);
+    List<Map<String, dynamic>> advPlayerStats =
+        gameAdv.isEmpty ? [] : castToListOfMap(gameAdv['PlayerStats']);
+
     List<dynamic> playerStats = [];
-    List<dynamic> homePlayerStats = [];
-    List<dynamic> awayPlayerStats = [];
-
-    for (int i = 0; i < boxPlayerStats.length; i++) {
-      playerStats.add({...boxPlayerStats[i], ...advPlayerStats[i]});
-    }
-
-    for (var player in playerStats) {
-      if (player['TEAM_ID'].toString() == widget.homeId) {
-        homePlayerStats.add(player);
-      } else {
-        awayPlayerStats.add(player);
-      }
-    }
-
-    List<Map<String, dynamic>> boxTeamStats = castToListOfMap(gameBoxscore['TeamStats']);
-    List<Map<String, dynamic>> advTeamStats = castToListOfMap(gameAdv['TeamStats']);
-    List<dynamic> teamStats = [];
-
-    for (int i = 0; i < boxTeamStats.length; i++) {
-      int otherStatsIndex =
-          gameOtherStats.indexWhere((stat) => stat['TEAM_ID'] == boxTeamStats[i]['TEAM_ID']);
-      teamStats
-          .add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[otherStatsIndex]});
-    }
-
-    dynamic homeTeam =
-        teamStats[0]['TEAM_ID'].toString() == widget.homeId ? teamStats[0] : teamStats[1];
-    dynamic awayTeam =
-        teamStats[0]['TEAM_ID'].toString() == widget.homeId ? teamStats[1] : teamStats[0];
-
-    var linescore = widget.game['SUMMARY']['LineScore'];
-
-    Map<String, dynamic> homeLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-    Map<String, dynamic> awayLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
+    List<dynamic> homePlayerStats = gameAdv.isEmpty ? gameBoxscore['homeTeam']['players'] : [];
+    List<dynamic> awayPlayerStats = gameAdv.isEmpty ? gameBoxscore['awayTeam']['players'] : [];
 
     String topScorer = '';
     String topRebounder = '';
@@ -155,26 +124,64 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     int highestREB = 0;
     int highestAST = 0;
 
-    for (var player in playerStats) {
-      if ((player['PTS'] ?? 0) > highestPTS) {
-        highestPTS = player['PTS'];
-        topScorer = player['PLAYER_NAME'].toString();
-        int firstSpaceIndex = topScorer.indexOf(' ');
-        topScorer = '${topScorer[0]}. ${topScorer.substring(firstSpaceIndex + 1)}';
+    // GAME IS FINAL (ADV STATS AVAILABLE)
+    if (advPlayerStats.isNotEmpty) {
+      for (int i = 0; i < boxPlayerStats.length; i++) {
+        playerStats.add({...boxPlayerStats[i], ...advPlayerStats[i]});
       }
-      if ((player['REB'] ?? 0) > highestREB) {
-        highestREB = player['REB'];
-        topRebounder = player['PLAYER_NAME'].toString();
-        int firstSpaceIndex = topRebounder.indexOf(' ');
-        topRebounder = '${topRebounder[0]}. ${topRebounder.substring(firstSpaceIndex + 1)}';
-      }
-      if ((player['AST'] ?? 0) > highestAST) {
-        highestAST = player['AST'];
-        topAssistant = player['PLAYER_NAME'].toString();
-        int firstSpaceIndex = topAssistant.indexOf(' ');
-        topAssistant = '${topAssistant[0]}. ${topAssistant.substring(firstSpaceIndex + 1)}';
+
+      for (var player in playerStats) {
+        if ((player['TEAM_ID'] ?? player['teamId']).toString() == widget.homeId) {
+          homePlayerStats.add(player);
+        } else {
+          awayPlayerStats.add(player);
+        }
+        if ((player['PTS'] ?? player['points'] ?? 0) > highestPTS) {
+          highestPTS = player['PTS'] ?? player['points'];
+          topScorer = (player['PLAYER_NAME'] ?? player['nameI']).toString();
+          int firstSpaceIndex = topScorer.indexOf(' ');
+          topScorer = '${topScorer[0]}. ${topScorer.substring(firstSpaceIndex + 1)}';
+        }
+        if ((player['REB'] ?? player['reboundsTotal'] ?? 0) > highestREB) {
+          highestREB = player['REB'] ?? player['reboundsTotal'];
+          topRebounder = (player['PLAYER_NAME'] ?? player['nameI']).toString();
+          int firstSpaceIndex = topRebounder.indexOf(' ');
+          topRebounder = '${topRebounder[0]}. ${topRebounder.substring(firstSpaceIndex + 1)}';
+        }
+        if ((player['AST'] ?? player['assists'] ?? 0) > highestAST) {
+          highestAST = player['AST'] ?? player['assists'];
+          topAssistant = (player['PLAYER_NAME'] ?? player['nameI']).toString();
+          int firstSpaceIndex = topAssistant.indexOf(' ');
+          topAssistant = '${topAssistant[0]}. ${topAssistant.substring(firstSpaceIndex + 1)}';
+        }
       }
     }
+
+    // TEAM STATS
+    List<Map<String, dynamic>> boxTeamStats =
+        gameAdv.isEmpty ? [] : castToListOfMap(gameBoxscore['TeamStats']);
+    List<Map<String, dynamic>> advTeamStats =
+        gameAdv.isEmpty ? [] : castToListOfMap(gameAdv['TeamStats']);
+
+    List<dynamic> teamStats = gameAdv.isEmpty
+        ? [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']]
+        : [];
+
+    if (advTeamStats.isNotEmpty) {
+      for (int i = 0; i < boxTeamStats.length; i++) {
+        int otherStatsIndex =
+            gameOtherStats.indexWhere((stat) => stat['TEAM_ID'] == boxTeamStats[i]['TEAM_ID']);
+        teamStats
+            .add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[otherStatsIndex]});
+      }
+    }
+
+    var linescore = widget.game['SUMMARY']['LineScore'];
+
+    Map<String, dynamic> homeLinescore =
+        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+    Map<String, dynamic> awayLinescore =
+        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
 
     return Column(
       children: [
@@ -231,7 +238,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 ),
               ),
               Text(
-                '  - $highestPTS  PTS',
+                gameAdv.isEmpty ? '' : '  - $highestPTS  PTS',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
               SizedBox(width: 25.0.r),
@@ -244,7 +251,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 ),
               ),
               Text(
-                '  - $highestREB  REB',
+                gameAdv.isEmpty ? '' : '  - $highestREB  REB',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
               SizedBox(width: 25.0.r),
@@ -257,7 +264,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 ),
               ),
               Text(
-                '  - $highestAST  AST',
+                gameAdv.isEmpty ? '' : '  - $highestAST  AST',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
             ],
@@ -269,11 +276,11 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           controller: _boxscoreTabController,
           indicator: CustomTabIndicator(
               controller: _boxscoreTabController,
-              homeTeam: kTeamColorOpacity.containsKey(homePlayerStats[0]['TEAM_ABBREVIATION'])
-                  ? homePlayerStats[0]['TEAM_ABBREVIATION']
+              homeTeam: kTeamColorOpacity.containsKey(homeLinescore['TEAM_ABBREVIATION'])
+                  ? homeLinescore['TEAM_ABBREVIATION']
                   : 'FA',
-              awayTeam: kTeamColorOpacity.containsKey(awayPlayerStats[0]['TEAM_ABBREVIATION'])
-                  ? awayPlayerStats[0]['TEAM_ABBREVIATION']
+              awayTeam: kTeamColorOpacity.containsKey(awayLinescore['TEAM_ABBREVIATION'])
+                  ? awayLinescore['TEAM_ABBREVIATION']
                   : 'FA'),
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
@@ -293,7 +300,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                     ),
                     margin: EdgeInsets.only(bottom: 3.0.r),
                     child: Tab(
-                      text: awayLinescore['TEAM_NICKNAME'],
+                      text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
                     ),
                   ),
                 ),
@@ -325,7 +332,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                       ),
                     ),
                     child: Tab(
-                      text: homeLinescore['TEAM_NICKNAME'],
+                      text: homeLinescore['TEAM_NAME'] ?? homeLinescore['TEAM_NICKNAME'],
                     ),
                   ),
                 ),
@@ -342,11 +349,13 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                   BoxPlayerStats(
                     players: awayPlayerStats.sublist(0, 5),
                     playerGroup: 'STARTERS',
+                    inProgress: widget.inProgress,
                     controller: _awayStartersController,
                   ),
                   BoxPlayerStats(
                     players: awayPlayerStats.sublist(5),
                     playerGroup: 'BENCH',
+                    inProgress: widget.inProgress,
                     controller: _awayBenchController,
                   ),
                 ],
@@ -359,6 +368,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                       teams: teamStats,
                       homeId: widget.homeId,
                       awayId: widget.awayId,
+                      inProgress: widget.inProgress,
                     ),
                   )
                 ],
@@ -368,11 +378,13 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                   BoxPlayerStats(
                     players: homePlayerStats.sublist(0, 5),
                     playerGroup: 'STARTERS',
+                    inProgress: widget.inProgress,
                     controller: _homeStartersController,
                   ),
                   BoxPlayerStats(
                     players: homePlayerStats.sublist(5),
                     playerGroup: 'BENCH',
+                    inProgress: widget.inProgress,
                     controller: _homeBenchController,
                   ),
                 ],

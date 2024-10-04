@@ -309,11 +309,18 @@ class TeamInfo extends StatelessWidget {
       // Extract the sorted keys
       var games = entries.map((e) => e.key).toList();
 
+      final lastGame = DateTime.parse(schedule[games.last]['GAME_DATE']);
+      final today = DateTime.now();
+
+      // Strip the time part by only keeping year, month, and day
+      final lastGameDate = DateTime(lastGame.year, lastGame.month, lastGame.day);
+      final todayDate = DateTime(today.year, today.month, today.day);
+
       // If season has started
-      if (DateTime.parse(schedule[games.last]['GAME_DATE']).compareTo(DateTime.now()) < 0) {
+      if (lastGameDate.compareTo(todayDate) < 0) {
         // Find last game
         for (var game in games) {
-          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(DateTime.now()) < 0) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) < 0) {
             return schedule[game];
           }
         }
@@ -335,11 +342,18 @@ class TeamInfo extends StatelessWidget {
       // Extract the sorted keys
       var games = entries.map((e) => e.key).toList();
 
+      final nextGame = DateTime.parse(schedule[games.last]['GAME_DATE']);
+      final today = DateTime.now();
+
+      // Strip the time part by only keeping year, month, and day
+      final nextGameDate = DateTime(nextGame.year, nextGame.month, nextGame.day);
+      final todayDate = DateTime(today.year, today.month, today.day);
+
       // If season has not ended
-      if (DateTime.parse(schedule[games.last]['GAME_DATE']).compareTo(DateTime.now()) >= 0) {
+      if (nextGameDate.compareTo(todayDate) >= 0) {
         // Find next game
         for (var game in games) {
-          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(DateTime.now()) >= 0) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) >= 0) {
             return schedule[game];
           }
         }
@@ -387,22 +401,6 @@ class TeamInfo extends StatelessWidget {
                     : MediaQuery.of(context).size.height * 0.15,
               ),
             ),
-            /*
-            if (team['TEAM_ID'] != 1610612761)
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 120.0),
-                child: Image.asset(
-                  'images/NBA_Logos/${team['TEAM_ID']}.png',
-                  width: isLandscape
-                      ? MediaQuery.of(context).size.width * 0.1
-                      : MediaQuery.of(context).size.width * 0.5,
-                  height: isLandscape
-                      ? MediaQuery.of(context).size.width * 0.1
-                      : MediaQuery.of(context).size.height * 0.5,
-                ),
-              ),
-
-             */
             SizedBox(width: 20.0.r),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -434,7 +432,7 @@ class TeamInfo extends StatelessWidget {
                         style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.white70),
                       ),
                       Text(
-                        "${kTeamIdToName[lastGame['OPP'].toString()][1]} ",
+                        "${kTeamIdToName[lastGame['OPP'].toString()]?[1] ?? 'INT\'L'} ",
                         style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
                       ),
                       Text(
@@ -476,7 +474,11 @@ class TeamInfo extends StatelessWidget {
                         style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
                       ),
                       Text(
-                        "| ${formatDate(nextGame['GAME_DATE'])[0]}, ${formatDate(nextGame['GAME_DATE'])[1]}",
+                        DateTime.parse(nextGame['GAME_DATE']) ==
+                                DateTime(DateTime.now().year, DateTime.now().month,
+                                    DateTime.now().day)
+                            ? "| Today"
+                            : "| ${formatDate(nextGame['GAME_DATE'])[0]}, ${formatDate(nextGame['GAME_DATE'])[1]}",
                         style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white70),
                       ),
                     ],

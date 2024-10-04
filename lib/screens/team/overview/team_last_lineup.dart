@@ -30,11 +30,18 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
       // Extract the sorted keys
       var games = entries.map((e) => e.key).toList();
 
+      final lastGame = DateTime.parse(schedule[games.last]['GAME_DATE']);
+      final today = DateTime.now();
+
+      // Strip the time part by only keeping year, month, and day
+      final lastGameDate = DateTime(lastGame.year, lastGame.month, lastGame.day);
+      final todayDate = DateTime(today.year, today.month, today.day);
+
       // If season has started
-      if (DateTime.parse(schedule[games.last]['GAME_DATE']).compareTo(DateTime.now()) < 0) {
+      if (lastGameDate.compareTo(todayDate) < 0) {
         // Find last game
         for (var game in games) {
-          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(DateTime.now()) < 0) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) < 0) {
             return schedule[game];
           }
         }

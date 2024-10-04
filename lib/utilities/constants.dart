@@ -1409,7 +1409,7 @@ const Map<String, dynamic> kPlayerStatLabelMap = {
       'first_available': '2013',
       'convert': 'false',
       'round': '1',
-      'definition': 'The number of times a player dribbles the ball per touch.',
+      'definition': 'The number of seconds a player possessed the ball per touch.',
       'formula': ''
     },
     'DRIBBLES PER TOUCH': {

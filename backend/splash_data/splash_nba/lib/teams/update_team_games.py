@@ -19,7 +19,11 @@ def get_game_result(team_pts, opp_pts):
     return "W" if team_pts > opp_pts else "L"
 
 
-def update_games(game_day):
+def update_team_games(game_day):
+    """
+    Iterates over games from games collection and uses the data
+    to write game results to teams collection.
+    """
     # Connect to MongoDB
     try:
         client = MongoClient(uri)
@@ -95,7 +99,7 @@ def update_games(game_day):
                 {"$set": {f"seasons.{season}.GAMES.{game_id}": game_data_visitor}},
             )
         except Exception as e:
-            logging.error(f"(Team Games) Could not process games for {game_day['GAME_DATE']}: {e.with_traceback()}")
+            logging.error(f"(Team Games) Could not process games for {game_day['GAME_DATE']}: {e}")
             continue
 
 
@@ -128,4 +132,4 @@ if __name__ == "__main__":
         # Process the games in batches
         for i, game_day in enumerate(sorted_games_cursor):
             logging.info(f"Processing {i + 1} of {batch_size} ({game_day['GAME_DATE']})")
-            update_games(game_day)
+            update_team_games(game_day)

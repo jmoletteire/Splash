@@ -8,6 +8,11 @@ class PlayerCache extends ChangeNotifier {
   }
 
   void addPlayer(String playerId, Map<String, dynamic> playerData) {
+    if (_cache.length >= 5) {
+      // Remove the oldest entry when the cache exceeds 5 entries
+      String oldestPlayerId = _cache.keys.first;
+      _cache.remove(oldestPlayerId);
+    }
     _cache[playerId] = playerData;
     notifyListeners();
   }
