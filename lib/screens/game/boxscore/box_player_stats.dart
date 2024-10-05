@@ -86,7 +86,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.15
-              : MediaQuery.of(context).size.width * 0.3,
+              : MediaQuery.of(context).size.width * 0.38,
           freezePriority: 1,
         ),
 
@@ -94,7 +94,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.03
-              : MediaQuery.of(context).size.width * 0.1,
+              : MediaQuery.of(context).size.width * 0.08,
         ),
 
         /// MIN
@@ -257,11 +257,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
               padding:
                   column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
               child: Align(
-                alignment: column == 0
-                    ? Alignment.centerLeft
-                    : column == 1
-                        ? Alignment.center
-                        : Alignment.centerRight,
+                alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
                 child: Text(
                   columnNames[column],
                   style: kBebasNormal.copyWith(
@@ -334,7 +330,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       final match = regex.firstMatch(input);
 
       if (match != null) {
-        final minutes = match.group(1);
+        final minutes = int.parse(match.group(1)!); // Convert to int to remove leading zeros
         final seconds = match.group(2);
 
         return '$minutes:$seconds';
@@ -343,12 +339,28 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       return input; // Return the original string if no match is found
     }
 
+    int onCourt = widget.inProgress ? int.parse(widget.players[row]?['oncourt'] ?? '0') : 0;
+    String position =
+        widget.players[row]?['position'] ?? widget.players[row]['START_POSITION'] ?? '';
+    String minutes = widget.players[row]?['statistics']?['minutes'] != null
+        ? formatLiveDuration(widget.players[row]['statistics']['minutes'])
+        : '${widget.players[row]['statistics']['MIN']?.replaceAll(RegExp(r'\..*?(?=:)'), '')}';
+
     switch (column) {
       case 0:
         return Container(
           alignment: Alignment.centerLeft,
           child: Row(
             children: [
+              SizedBox(
+                width: 12.0.r,
+                child: Text(
+                  widget.players[row]['jerseyNum'],
+                  textAlign: TextAlign.center,
+                  style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
+                ),
+              ),
+              SizedBox(width: 8.0.r),
               PlayerAvatar(
                 radius: 12.0.r,
                 backgroundColor: Colors.white12,
@@ -358,31 +370,41 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
               SizedBox(width: 5.0.r),
               Flexible(
                 child: RichText(
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                      children: [
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: widget.players[row]['nameI'] ??
+                            '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(widget.players[row]['PLAYER_NAME'].indexOf(' ') + 1)}' ??
+                            '',
+                        style: kBebasNormal.copyWith(
+                          color: Colors.white70,
+                          fontSize: 14.0.r,
+                        ),
+                      ),
+                      if (widget.playerGroup == 'STARTERS')
                         TextSpan(
-                          text: widget.players[row]['nameI'] ??
-                              '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(widget.players[row]['PLAYER_NAME'].indexOf(' ') + 1)}' ??
-                              '',
+                          text: ', $position',
                           style: kBebasNormal.copyWith(
-                            color: Colors.white70,
-                            fontSize: 14.0.r,
+                            color: Colors.white,
+                            fontSize: 13.0.r,
                           ),
                         ),
-                        if (widget.playerGroup == 'STARTERS')
-                          TextSpan(
-                            text:
-                                ', ${widget.players[row]['position'] ?? widget.players[row]['START_POSITION'] ?? ''}',
-                            style: kBebasNormal.copyWith(
-                              color: Colors.white,
-                              fontSize: 13.0.r,
-                            ),
-                          ),
-                      ],
-                    )),
+                    ],
+                  ),
+                ),
               ),
+              if (onCourt == 1) SizedBox(width: 8.0.r),
+              if (onCourt == 1)
+                Container(
+                  width: 6.0.r, // Size of the dot
+                  height: 6.0.r,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF55F86F), // Green color for the dot
+                    shape: BoxShape.circle, // Circular shape
+                  ),
+                ),
             ],
           ),
         );
@@ -391,7 +413,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
-              '${widget.players[row]['POSS'] ?? '-'}',
+              '${widget.players[row]['statistics']['POSS'] ?? '-'}',
               style: kBebasNormal.copyWith(fontSize: 14.0.r),
             ),
           );
@@ -403,9 +425,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
-              widget.players[row]['minutes'] != null
-                  ? formatLiveDuration(widget.players[row]['minutes'])
-                  : '${widget.players[row]['MIN']?.replaceAll(RegExp(r'\..*?(?=:)'), '')}',
+              minutes == '0:00' ? '-' : minutes,
               style: kBebasNormal.copyWith(fontSize: 14.0.r),
             ),
           );
@@ -416,7 +436,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['points'] ?? widget.players[row]['PTS']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['points'] ?? widget.players[row]['PTS']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -424,7 +444,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['reboundsTotal'] ?? widget.players[row]['REB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsTotal'] ?? widget.players[row]['REB']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -432,7 +452,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['assists'] ?? widget.players[row]['AST']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['assists'] ?? widget.players[row]['AST']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -440,7 +460,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['turnovers'] ?? widget.players[row]['TO']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['turnovers'] ?? widget.players[row]['TO']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -448,7 +468,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['fieldGoalsMade'] ?? widget.players[row]['FGM']).toStringAsFixed(0)}-${(widget.players[row]['fieldGoalsAttempted'] ?? widget.players[row]['FGA']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['fieldGoalsMade'] ?? widget.players[row]['FGM']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['fieldGoalsAttempted'] ?? widget.players[row]['FGA']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -456,7 +476,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['threePointersMade'] ?? widget.players[row]['FG3M']).toStringAsFixed(0)}-${(widget.players[row]['threePointersAttempted'] ?? widget.players[row]['FG3A']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['threePointersMade'] ?? widget.players[row]['FG3M']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['threePointersAttempted'] ?? widget.players[row]['FG3A']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -464,7 +484,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['freeThrowsMade'] ?? widget.players[row]['FTM']).toStringAsFixed(0)}-${(widget.players[row]['freeThrowsAttempted'] ?? widget.players[row]['FTA']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]['FTM']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['freeThrowsAttempted'] ?? widget.players[row]['FTA']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -472,7 +492,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['steals'] ?? widget.players[row]['STL']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['steals'] ?? widget.players[row]['STL']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -480,7 +500,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['blocks'] ?? widget.players[row]['BLK']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['blocks'] ?? widget.players[row]['BLK']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -488,7 +508,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['reboundsOffensive'] ?? widget.players[row]['OREB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsOffensive'] ?? widget.players[row]['OREB']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -496,7 +516,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['reboundsDefensive'] ?? widget.players[row]['DREB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsDefensive'] ?? widget.players[row]['DREB']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -504,7 +524,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['foulsPersonal'] ?? widget.players[row]['PF']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['foulsPersonal'] ?? widget.players[row]['PF']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -512,50 +532,69 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]['plusMinusPoints'] ?? widget.players[row]['PLUS_MINUS']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['plusMinusPoints'] ?? widget.players[row]['PLUS_MINUS']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 16:
         try {
-          return BoxscoreDataText(
-              text:
-                  '${((widget.players[row]['EFG_PCT'] ?? ((widget.players[row]['fieldGoalsMade'] + (0.5 * widget.players[row]['threePointersMade'])) / widget.players[row]['fieldGoalsAttempted'])) * 100).toStringAsFixed(1)}%');
+          int fieldGoalsAttempted =
+              widget.players[row]?['statistics']?['fieldGoalsAttempted'] ?? 0;
+
+          // Check for division by zero
+          if (fieldGoalsAttempted == 0) {
+            try {
+              return BoxscoreDataText(
+                  text:
+                      '${(widget.players[row]['statistics']['EFG_PCT'] * 100).toStringAsFixed(1)}%');
+            } catch (e) {
+              return const BoxscoreDataText(text: '-');
+            }
+          }
+
+          double efgPct = ((widget.players[row]?['statistics']?['fieldGoalsMade'] +
+                      (0.5 * widget.players[row]?['statistics']?['threePointersMade'])) /
+                  fieldGoalsAttempted) *
+              100;
+
+          return BoxscoreDataText(text: '${efgPct.toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 17:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['TS_PCT'] * 100).toStringAsFixed(1)}%');
+              text:
+                  '${(widget.players[row]['statistics']['TS_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 18:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['USG_PCT'] * 100).toStringAsFixed(1)}%');
+              text:
+                  '${(widget.players[row]['statistics']['USG_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 19:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['NET_RATING'].toStringAsFixed(1)}');
+              text: '${widget.players[row]['statistics']['NET_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 20:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['OFF_RATING'].toStringAsFixed(1)}');
+              text: '${widget.players[row]['statistics']['OFF_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 21:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['DEF_RATING'].toStringAsFixed(1)}');
+              text: '${widget.players[row]['statistics']['DEF_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }

@@ -147,6 +147,26 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     String formattedDate = date.toIso8601String().split('T').first;
 
     if (cachedGames.containsKey(formattedDate)) {
+      try {
+        Network network = Network();
+        var url = Uri.http(
+          kFlaskUrl,
+          '/get_games',
+          {'date': formattedDate},
+        );
+        dynamic jsonData = await network.getData(url);
+        Map<String, dynamic> gamesData = jsonData ?? {};
+
+        setState(() {
+          cachedGames[formattedDate] = gamesData;
+          _isLoading = false; // Set loading state to false
+        });
+      } catch (e) {
+        print('Error updating games: $e');
+        setState(() {
+          cachedGames[formattedDate] = 'Error updating games';
+        });
+      }
       return;
     }
 
@@ -404,10 +424,19 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                           ),
                         );
 
-                        return SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Column(
-                            children: gameCards,
+                        return RefreshIndicator(
+                          color: Colors.deepOrange,
+                          onRefresh: () async {
+                            await fetchGames(selectedDate);
+                          },
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            physics:
+                                const AlwaysScrollableScrollPhysics(), // Allows pull to refresh
+                            itemCount: gameCards.length,
+                            itemBuilder: (context, index) {
+                              return gameCards[index];
+                            },
                           ),
                         );
                       } else {

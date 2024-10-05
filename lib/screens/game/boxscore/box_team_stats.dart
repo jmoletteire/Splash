@@ -32,9 +32,11 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
 
   void setValues(String homeId, String awayId) {
     setState(() {
-      if (widget.inProgress) {
+      if (widget.teams[0]['TEAM_ID'] == null) {
         homeTeam = widget.teams[0];
         awayTeam = widget.teams[1];
+        homeTeam['TEAM_ABBREVIATION'] = kTeamIdToName[widget.homeId]?[1] ?? 'FA';
+        awayTeam['TEAM_ABBREVIATION'] = kTeamIdToName[widget.awayId]?[1] ?? 'FA';
       } else {
         homeTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
             ? widget.teams[0]
@@ -42,14 +44,6 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
         awayTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
             ? widget.teams[1]
             : widget.teams[0];
-      }
-
-      // Add TEAM ABBREVIATION if not exists
-      if (!homeTeam.containsKey('TEAM_ABBREVIATION')) {
-        homeTeam['TEAM_ABBREVIATION'] = kTeamIdToName[homeTeam['teamId']][1] ?? 'FA';
-      }
-      if (!awayTeam.containsKey('TEAM_ABBREVIATION')) {
-        awayTeam['TEAM_ABBREVIATION'] = kTeamIdToName[awayTeam['teamId']][1] ?? 'FA';
       }
 
       if (homeTeam.isNotEmpty) {
@@ -81,21 +75,27 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
 
   @override
   Widget build(BuildContext context) {
-    int awayEstPoss = ((awayTeam['fieldGoalsAttempted'] ?? 0) +
-            (awayTeam['turnovers'] ?? 0) +
-            (0.44 * (awayTeam['freeThrowsAttempted'] ?? 0)) -
-            (awayTeam['reboundsOffensive'] ?? 0))
-        .ceil();
-    int homeEstPoss = ((homeTeam['fieldGoalsAttempted'] ?? 0) +
-            (homeTeam['turnovers'] ?? 0) +
-            (0.44 * (homeTeam['freeThrowsAttempted'] ?? 0)) -
-            (homeTeam['reboundsOffensive'] ?? 0))
-        .ceil();
+    int awayEstPoss = 0;
+    int homeEstPoss = 0;
+    int minutes = 0;
 
-    int minutes = (int.parse(awayTeam['minutesCalculated']
-                .substring(2, awayTeam['minutesCalculated'].length - 1)) /
-            5)
-        .floor();
+    if (homeTeam['POSS'] == null) {
+      awayEstPoss = ((awayTeam['fieldGoalsAttempted'] ?? 0) +
+              (awayTeam['turnovers'] ?? 0) +
+              (0.44 * (awayTeam['freeThrowsAttempted'] ?? 0)) -
+              (awayTeam['reboundsOffensive'] ?? 0))
+          .ceil();
+      homeEstPoss = ((homeTeam['fieldGoalsAttempted'] ?? 0) +
+              (homeTeam['turnovers'] ?? 0) +
+              (0.44 * (homeTeam['freeThrowsAttempted'] ?? 0)) -
+              (homeTeam['reboundsOffensive'] ?? 0))
+          .ceil();
+
+      minutes = (int.parse(awayTeam['minutesCalculated']
+                  .substring(2, awayTeam['minutesCalculated'].length - 1)) /
+              5)
+          .floor();
+    }
 
     return SliverToBoxAdapter(
       child: Skeletonizer(
@@ -144,12 +144,20 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'PER 100',
-                            awayTeam: awayTeam['OFF_RATING'] ??
-                                awayTeam['points'] / awayEstPoss * 100 ??
-                                0.0,
-                            homeTeam: homeTeam['OFF_RATING'] ??
-                                homeTeam['points'] / homeEstPoss * 100 ??
-                                0.0,
+                            awayTeam: roundToDecimalPlaces(
+                                awayTeam['OFF_RATING'] ??
+                                    awayTeam['points'] /
+                                        (awayEstPoss == 0 ? 1 : awayEstPoss) *
+                                        100 ??
+                                    0.0,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                homeTeam['OFF_RATING'] ??
+                                    homeTeam['points'] /
+                                        (homeEstPoss == 0 ? 1 : homeEstPoss) *
+                                        100 ??
+                                    0.0,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
@@ -164,8 +172,20 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'PACE',
-                            awayTeam: awayTeam['PACE'] ?? 48 * awayEstPoss / minutes ?? 0.0,
-                            homeTeam: homeTeam['PACE'] ?? 48 * homeEstPoss / minutes ?? 0.0,
+                            awayTeam: roundToDecimalPlaces(
+                                awayTeam['PACE'] ??
+                                    48 *
+                                        ((awayEstPoss + homeEstPoss) / 2) /
+                                        (minutes == 0 ? 1 : minutes) ??
+                                    0.0,
+                                1),
+                            homeTeam: roundToDecimalPlaces(
+                                homeTeam['PACE'] ??
+                                    48 *
+                                        ((awayEstPoss + homeEstPoss) / 2) /
+                                        (minutes == 0 ? 1 : minutes) ??
+                                    0.0,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
@@ -182,12 +202,16 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             statName: 'TOV%',
                             awayTeam: roundToDecimalPlaces(
                                 awayTeam['TM_TOV_PCT'] ??
-                                    awayTeam['turnovers'] / awayEstPoss ??
+                                    100 *
+                                        awayTeam['turnovers'] /
+                                        (awayEstPoss == 0 ? 1 : awayEstPoss) ??
                                     0.0,
                                 1),
                             homeTeam: roundToDecimalPlaces(
                                 homeTeam['TM_TOV_PCT'] ??
-                                    homeTeam['turnovers'] / homeEstPoss ??
+                                    100 *
+                                        homeTeam['turnovers'] /
+                                        (homeEstPoss == 0 ? 1 : homeEstPoss) ??
                                     0.0,
                                 1),
                             awayTeamColor: awayTeamColor,
@@ -240,9 +264,9 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           NonComparisonRow(
                             statName: '3P',
                             awayTeam:
-                                '${awayTeam['threePointersMade'] ?? awayTeam['FG3M'] ?? 0}-${awayTeam['threePointersMade'] ?? awayTeam['FG3A'] ?? 0}',
+                                '${awayTeam['threePointersMade'] ?? awayTeam['FG3M'] ?? 0}-${awayTeam['threePointersAttempted'] ?? awayTeam['FG3A'] ?? 0}',
                             homeTeam:
-                                '${homeTeam['threePointersMade'] ?? homeTeam['FG3M'] ?? 0}-${homeTeam['threePointersMade'] ?? homeTeam['FG3A'] ?? 0}',
+                                '${homeTeam['threePointersMade'] ?? homeTeam['FG3M'] ?? 0}-${homeTeam['threePointersAttempted'] ?? homeTeam['FG3A'] ?? 0}',
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
@@ -292,16 +316,18 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           ComparisonRow(
                             statName: 'FT/FGA',
                             awayTeam: roundToDecimalPlaces(
-                                ((awayTeam['freeThrowsMade'] ?? awayTeam['FTM']) /
-                                        (awayTeam['freeThrowsAttempted'] ??
-                                            awayTeam['FGA'])) ??
-                                    0.0,
+                                (awayTeam['freeThrowsMade'] ?? awayTeam['FTM']) /
+                                    ((awayTeam['freeThrowsAttempted'] ?? awayTeam['FGA']) == 0
+                                        ? 1
+                                        : (awayTeam['freeThrowsAttempted'] ??
+                                            awayTeam['FGA'])),
                                 2),
                             homeTeam: roundToDecimalPlaces(
-                                ((homeTeam['freeThrowsMade'] ?? homeTeam['FTM']) /
-                                        (homeTeam['freeThrowsAttempted'] ??
-                                            homeTeam['FGA'])) ??
-                                    0.0,
+                                (homeTeam['freeThrowsMade'] ?? homeTeam['FTM']) /
+                                    ((homeTeam['freeThrowsAttempted'] ?? homeTeam['FGA']) == 0
+                                        ? 1
+                                        : (homeTeam['freeThrowsAttempted'] ??
+                                            homeTeam['FGA'])),
                                 2),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
@@ -411,16 +437,24 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeam: roundToDecimalPlaces(
                                 (awayTeam['OREB_PCT'] ??
                                         awayTeam['reboundsOffensive'] /
-                                            (awayTeam['fieldGoalsAttempted'] -
-                                                awayTeam['fieldGoalsMade']) ??
+                                            ((awayTeam['fieldGoalsAttempted'] -
+                                                        awayTeam['fieldGoalsMade']) ==
+                                                    0
+                                                ? 1
+                                                : (awayTeam['fieldGoalsAttempted'] -
+                                                    awayTeam['fieldGoalsMade'])) ??
                                         0.0) *
                                     100,
                                 1),
                             homeTeam: roundToDecimalPlaces(
                                 (homeTeam['OREB_PCT'] ??
                                         homeTeam['reboundsOffensive'] /
-                                            (homeTeam['fieldGoalsAttempted'] -
-                                                homeTeam['fieldGoalsMade']) ??
+                                            ((homeTeam['fieldGoalsAttempted'] -
+                                                        homeTeam['fieldGoalsMade']) ==
+                                                    0
+                                                ? 1
+                                                : (homeTeam['fieldGoalsAttempted'] -
+                                                    homeTeam['fieldGoalsMade'])) ??
                                         0.0) *
                                     100,
                                 1),
@@ -431,18 +465,26 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           ComparisonRow(
                             statName: 'DREB%',
                             awayTeam: roundToDecimalPlaces(
-                                (awayTeam['OREB_PCT'] ??
+                                (awayTeam['DREB_PCT'] ??
                                         awayTeam['reboundsDefensive'] /
-                                            (homeTeam['fieldGoalsAttempted'] -
-                                                homeTeam['fieldGoalsMade']) ??
+                                            ((awayTeam['fieldGoalsAttempted'] -
+                                                        awayTeam['fieldGoalsMade']) ==
+                                                    0
+                                                ? 1
+                                                : (awayTeam['fieldGoalsAttempted'] -
+                                                    awayTeam['fieldGoalsMade'])) ??
                                         0.0) *
                                     100,
                                 1),
                             homeTeam: roundToDecimalPlaces(
-                                (homeTeam['OREB_PCT'] ??
+                                (homeTeam['DREB_PCT'] ??
                                         homeTeam['reboundsDefensive'] /
-                                            (awayTeam['fieldGoalsAttempted'] -
-                                                awayTeam['fieldGoalsMade']) ??
+                                            ((homeTeam['fieldGoalsAttempted'] -
+                                                        homeTeam['fieldGoalsMade']) ==
+                                                    0
+                                                ? 1
+                                                : (homeTeam['fieldGoalsAttempted'] -
+                                                    homeTeam['fieldGoalsMade'])) ??
                                         0.0) *
                                     100,
                                 1),
@@ -491,13 +533,19 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             statName: 'AST%',
                             awayTeam: roundToDecimalPlaces(
                                 (awayTeam['AST_PCT'] ??
-                                        (awayTeam['assists'] / awayTeam['fieldGoalsMade']) ??
+                                        (awayTeam['assists'] /
+                                            (awayTeam['fieldGoalsMade'] == 0
+                                                ? 1
+                                                : awayTeam['fieldGoalsMade'])) ??
                                         0) *
                                     100,
                                 1),
                             homeTeam: roundToDecimalPlaces(
                                 (homeTeam['AST_PCT'] ??
-                                        (homeTeam['assists'] / homeTeam['fieldGoalsMade']) ??
+                                        (homeTeam['assists'] /
+                                            (homeTeam['fieldGoalsMade'] == 0
+                                                ? 1
+                                                : homeTeam['fieldGoalsMade'])) ??
                                         0) *
                                     100,
                                 1),
@@ -507,10 +555,12 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'AST / TOV',
-                            awayTeam:
+                            awayTeam: roundToDecimalPlaces(
                                 awayTeam['assistsTurnoverRatio'] ?? awayTeam['AST_TOV'] ?? 0,
-                            homeTeam:
+                                1),
+                            homeTeam: roundToDecimalPlaces(
                                 homeTeam['assistsTurnoverRatio'] ?? homeTeam['AST_TOV'] ?? 0,
+                                1),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),

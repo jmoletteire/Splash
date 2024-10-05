@@ -32,15 +32,18 @@ class _LineupsState extends State<Lineups> {
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> playerStats = gameBoxscore['PlayerStats'];
-    List<dynamic> homePlayerStats = [];
-    List<dynamic> awayPlayerStats = [];
+    int status = widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'];
+    List<dynamic> playerStats = status == 3 ? gameBoxscore['PlayerStats'] ?? [] : [];
+    List<dynamic> homePlayerStats = gameBoxscore['homeTeam']?['players'] ?? [];
+    List<dynamic> awayPlayerStats = gameBoxscore['awayTeam']?['players'] ?? [];
 
-    for (var player in playerStats) {
-      if (player['TEAM_ID'].toString() == widget.homeId) {
-        homePlayerStats.add(player);
-      } else {
-        awayPlayerStats.add(player);
+    if (status == 3 && playerStats.isNotEmpty) {
+      for (var player in playerStats) {
+        if (player['TEAM_ID'].toString() == widget.homeId) {
+          homePlayerStats.add(player);
+        } else {
+          awayPlayerStats.add(player);
+        }
       }
     }
 
@@ -98,43 +101,33 @@ class _LineupsState extends State<Lineups> {
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
                                           PlayerCard(
-                                            playerId:
-                                                awayPlayerStats[0]['PLAYER_ID'].toString(),
-                                            name: awayPlayerStats[0]['PLAYER_NAME'],
-                                            position: awayPlayerStats[0]['START_POSITION'],
+                                            playerId: (awayPlayerStats[0]['PLAYER_ID'] ??
+                                                    awayPlayerStats[0]['personId'])
+                                                .toString(),
+                                            name: awayPlayerStats[0]['PLAYER_NAME'] ??
+                                                awayPlayerStats[0]['name'],
+                                            position: awayPlayerStats[0]['START_POSITION'] ??
+                                                awayPlayerStats[0]['position'],
                                             team: widget.awayId,
                                           ),
                                           PlayerCard(
-                                            playerId:
-                                                awayPlayerStats[2]['PLAYER_ID'].toString(),
-                                            name: awayPlayerStats[2]['PLAYER_NAME'],
-                                            position: awayPlayerStats[2]['START_POSITION'],
+                                            playerId: (awayPlayerStats[2]['PLAYER_ID'] ??
+                                                    awayPlayerStats[2]['personId'])
+                                                .toString(),
+                                            name: awayPlayerStats[2]['PLAYER_NAME'] ??
+                                                awayPlayerStats[2]['name'],
+                                            position: awayPlayerStats[2]['START_POSITION'] ??
+                                                awayPlayerStats[2]['position'],
                                             team: widget.awayId,
                                           ),
                                           PlayerCard(
-                                            playerId:
-                                                awayPlayerStats[1]['PLAYER_ID'].toString(),
-                                            name: awayPlayerStats[1]['PLAYER_NAME'],
-                                            position: awayPlayerStats[1]['START_POSITION'],
-                                            team: widget.awayId,
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          PlayerCard(
-                                            playerId:
-                                                awayPlayerStats[4]['PLAYER_ID'].toString(),
-                                            name: awayPlayerStats[4]['PLAYER_NAME'],
-                                            position: awayPlayerStats[4]['START_POSITION'],
-                                            team: widget.awayId,
-                                          ),
-                                          PlayerCard(
-                                            playerId:
-                                                awayPlayerStats[3]['PLAYER_ID'].toString(),
-                                            name: awayPlayerStats[3]['PLAYER_NAME'],
-                                            position: awayPlayerStats[3]['START_POSITION'],
+                                            playerId: (awayPlayerStats[1]['PLAYER_ID'] ??
+                                                    awayPlayerStats[1]['personId'])
+                                                .toString(),
+                                            name: awayPlayerStats[1]['PLAYER_NAME'] ??
+                                                awayPlayerStats[1]['name'],
+                                            position: awayPlayerStats[1]['START_POSITION'] ??
+                                                awayPlayerStats[1]['position'],
                                             team: widget.awayId,
                                           ),
                                         ],
@@ -143,18 +136,49 @@ class _LineupsState extends State<Lineups> {
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
                                           PlayerCard(
-                                            playerId:
-                                                homePlayerStats[4]['PLAYER_ID'].toString(),
-                                            name: homePlayerStats[4]['PLAYER_NAME'],
-                                            position: homePlayerStats[4]['START_POSITION'],
-                                            team: widget.homeId,
+                                            playerId: (awayPlayerStats[4]['PLAYER_ID'] ??
+                                                    awayPlayerStats[4]['personId'])
+                                                .toString(),
+                                            name: awayPlayerStats[4]['PLAYER_NAME'] ??
+                                                awayPlayerStats[4]['name'],
+                                            position: awayPlayerStats[4]['START_POSITION'] ??
+                                                awayPlayerStats[4]['position'],
+                                            team: widget.awayId,
                                           ),
                                           PlayerCard(
-                                            playerId:
-                                                homePlayerStats[3]['PLAYER_ID'].toString(),
-                                            name: homePlayerStats[3]['PLAYER_NAME'],
-                                            position: homePlayerStats[3]['START_POSITION'],
-                                            team: widget.homeId,
+                                            playerId: (awayPlayerStats[3]['PLAYER_ID'] ??
+                                                    awayPlayerStats[3]['personId'])
+                                                .toString(),
+                                            name: awayPlayerStats[3]['PLAYER_NAME'] ??
+                                                awayPlayerStats[3]['name'],
+                                            position: awayPlayerStats[3]['START_POSITION'] ??
+                                                awayPlayerStats[3]['position'],
+                                            team: widget.awayId,
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          PlayerCard(
+                                            playerId: (homePlayerStats[4]['PLAYER_ID'] ??
+                                                    homePlayerStats[4]['personId'])
+                                                .toString(),
+                                            name: homePlayerStats[4]['PLAYER_NAME'] ??
+                                                homePlayerStats[4]['name'],
+                                            position: homePlayerStats[4]['START_POSITION'] ??
+                                                homePlayerStats[4]['position'],
+                                            team: widget.awayId,
+                                          ),
+                                          PlayerCard(
+                                            playerId: (homePlayerStats[3]['PLAYER_ID'] ??
+                                                    homePlayerStats[3]['personId'])
+                                                .toString(),
+                                            name: homePlayerStats[3]['PLAYER_NAME'] ??
+                                                homePlayerStats[3]['name'],
+                                            position: homePlayerStats[3]['START_POSITION'] ??
+                                                homePlayerStats[3]['position'],
+                                            team: widget.awayId,
                                           ),
                                         ],
                                       ),
@@ -162,25 +186,34 @@ class _LineupsState extends State<Lineups> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           PlayerCard(
-                                            playerId:
-                                                homePlayerStats[0]['PLAYER_ID'].toString(),
-                                            name: homePlayerStats[0]['PLAYER_NAME'],
-                                            position: homePlayerStats[0]['START_POSITION'],
-                                            team: widget.homeId,
+                                            playerId: (homePlayerStats[0]['PLAYER_ID'] ??
+                                                    homePlayerStats[0]['personId'])
+                                                .toString(),
+                                            name: homePlayerStats[0]['PLAYER_NAME'] ??
+                                                homePlayerStats[0]['name'],
+                                            position: homePlayerStats[0]['START_POSITION'] ??
+                                                homePlayerStats[0]['position'],
+                                            team: widget.awayId,
                                           ),
                                           PlayerCard(
-                                            playerId:
-                                                homePlayerStats[2]['PLAYER_ID'].toString(),
-                                            name: homePlayerStats[2]['PLAYER_NAME'],
-                                            position: homePlayerStats[2]['START_POSITION'],
-                                            team: widget.homeId,
+                                            playerId: (homePlayerStats[2]['PLAYER_ID'] ??
+                                                    homePlayerStats[2]['personId'])
+                                                .toString(),
+                                            name: homePlayerStats[2]['PLAYER_NAME'] ??
+                                                homePlayerStats[2]['name'],
+                                            position: homePlayerStats[2]['START_POSITION'] ??
+                                                homePlayerStats[2]['position'],
+                                            team: widget.awayId,
                                           ),
                                           PlayerCard(
-                                            playerId:
-                                                homePlayerStats[1]['PLAYER_ID'].toString(),
-                                            name: homePlayerStats[1]['PLAYER_NAME'],
-                                            position: homePlayerStats[1]['START_POSITION'],
-                                            team: widget.homeId,
+                                            playerId: (homePlayerStats[1]['PLAYER_ID'] ??
+                                                    homePlayerStats[1]['personId'])
+                                                .toString(),
+                                            name: homePlayerStats[1]['PLAYER_NAME'] ??
+                                                homePlayerStats[1]['name'],
+                                            position: homePlayerStats[1]['START_POSITION'] ??
+                                                homePlayerStats[1]['position'],
+                                            team: widget.awayId,
                                           ),
                                         ],
                                       ),
@@ -213,25 +246,37 @@ class _LineupsState extends State<Lineups> {
                               children: [
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: awayPlayerStats[0]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[0]['PLAYER_NAME'],
-                                    position: awayPlayerStats[0]['START_POSITION'],
+                                    playerId: (awayPlayerStats[0]['PLAYER_ID'] ??
+                                            awayPlayerStats[0]['personId'])
+                                        .toString(),
+                                    name: awayPlayerStats[0]['PLAYER_NAME'] ??
+                                        awayPlayerStats[0]['name'],
+                                    position: awayPlayerStats[0]['START_POSITION'] ??
+                                        awayPlayerStats[0]['position'],
                                     team: widget.awayId,
                                   ),
                                 ),
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: awayPlayerStats[2]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[2]['PLAYER_NAME'],
-                                    position: awayPlayerStats[2]['START_POSITION'],
+                                    playerId: (awayPlayerStats[2]['PLAYER_ID'] ??
+                                            awayPlayerStats[2]['personId'])
+                                        .toString(),
+                                    name: awayPlayerStats[2]['PLAYER_NAME'] ??
+                                        awayPlayerStats[2]['name'],
+                                    position: awayPlayerStats[2]['START_POSITION'] ??
+                                        awayPlayerStats[2]['position'],
                                     team: widget.awayId,
                                   ),
                                 ),
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: awayPlayerStats[1]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[1]['PLAYER_NAME'],
-                                    position: awayPlayerStats[1]['START_POSITION'],
+                                    playerId: (awayPlayerStats[1]['PLAYER_ID'] ??
+                                            awayPlayerStats[1]['personId'])
+                                        .toString(),
+                                    name: awayPlayerStats[1]['PLAYER_NAME'] ??
+                                        awayPlayerStats[1]['name'],
+                                    position: awayPlayerStats[1]['START_POSITION'] ??
+                                        awayPlayerStats[1]['position'],
                                     team: widget.awayId,
                                   ),
                                 ),
@@ -243,17 +288,25 @@ class _LineupsState extends State<Lineups> {
                               children: [
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: awayPlayerStats[4]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[4]['PLAYER_NAME'],
-                                    position: awayPlayerStats[4]['START_POSITION'],
+                                    playerId: (awayPlayerStats[4]['PLAYER_ID'] ??
+                                            awayPlayerStats[4]['personId'])
+                                        .toString(),
+                                    name: awayPlayerStats[4]['PLAYER_NAME'] ??
+                                        awayPlayerStats[4]['name'],
+                                    position: awayPlayerStats[4]['START_POSITION'] ??
+                                        awayPlayerStats[4]['position'],
                                     team: widget.awayId,
                                   ),
                                 ),
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: awayPlayerStats[3]['PLAYER_ID'].toString(),
-                                    name: awayPlayerStats[3]['PLAYER_NAME'],
-                                    position: awayPlayerStats[3]['START_POSITION'],
+                                    playerId: (awayPlayerStats[3]['PLAYER_ID'] ??
+                                            awayPlayerStats[3]['personId'])
+                                        .toString(),
+                                    name: awayPlayerStats[3]['PLAYER_NAME'] ??
+                                        awayPlayerStats[3]['name'],
+                                    position: awayPlayerStats[3]['START_POSITION'] ??
+                                        awayPlayerStats[3]['position'],
                                     team: widget.awayId,
                                   ),
                                 ),
@@ -265,18 +318,26 @@ class _LineupsState extends State<Lineups> {
                               children: [
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: homePlayerStats[4]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[4]['PLAYER_NAME'],
-                                    position: homePlayerStats[4]['START_POSITION'],
-                                    team: widget.homeId,
+                                    playerId: (homePlayerStats[4]['PLAYER_ID'] ??
+                                            homePlayerStats[4]['personId'])
+                                        .toString(),
+                                    name: homePlayerStats[4]['PLAYER_NAME'] ??
+                                        homePlayerStats[4]['name'],
+                                    position: homePlayerStats[4]['START_POSITION'] ??
+                                        homePlayerStats[4]['position'],
+                                    team: widget.awayId,
                                   ),
                                 ),
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: homePlayerStats[3]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[3]['PLAYER_NAME'],
-                                    position: homePlayerStats[3]['START_POSITION'],
-                                    team: widget.homeId,
+                                    playerId: (homePlayerStats[3]['PLAYER_ID'] ??
+                                            homePlayerStats[3]['personId'])
+                                        .toString(),
+                                    name: homePlayerStats[3]['PLAYER_NAME'] ??
+                                        homePlayerStats[3]['name'],
+                                    position: homePlayerStats[3]['START_POSITION'] ??
+                                        homePlayerStats[3]['position'],
+                                    team: widget.awayId,
                                   ),
                                 ),
                               ],
@@ -287,26 +348,38 @@ class _LineupsState extends State<Lineups> {
                               children: [
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: homePlayerStats[0]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[0]['PLAYER_NAME'],
-                                    position: homePlayerStats[0]['START_POSITION'],
-                                    team: widget.homeId,
+                                    playerId: (homePlayerStats[0]['PLAYER_ID'] ??
+                                            homePlayerStats[0]['personId'])
+                                        .toString(),
+                                    name: homePlayerStats[0]['PLAYER_NAME'] ??
+                                        homePlayerStats[0]['name'],
+                                    position: homePlayerStats[0]['START_POSITION'] ??
+                                        homePlayerStats[0]['position'],
+                                    team: widget.awayId,
                                   ),
                                 ),
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: homePlayerStats[2]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[2]['PLAYER_NAME'],
-                                    position: homePlayerStats[2]['START_POSITION'],
-                                    team: widget.homeId,
+                                    playerId: (homePlayerStats[2]['PLAYER_ID'] ??
+                                            homePlayerStats[2]['personId'])
+                                        .toString(),
+                                    name: homePlayerStats[2]['PLAYER_NAME'] ??
+                                        homePlayerStats[2]['name'],
+                                    position: homePlayerStats[2]['START_POSITION'] ??
+                                        homePlayerStats[2]['position'],
+                                    team: widget.awayId,
                                   ),
                                 ),
                                 Expanded(
                                   child: PlayerCard(
-                                    playerId: homePlayerStats[1]['PLAYER_ID'].toString(),
-                                    name: homePlayerStats[1]['PLAYER_NAME'],
-                                    position: homePlayerStats[1]['START_POSITION'],
-                                    team: widget.homeId,
+                                    playerId: (homePlayerStats[1]['PLAYER_ID'] ??
+                                            homePlayerStats[1]['personId'])
+                                        .toString(),
+                                    name: homePlayerStats[1]['PLAYER_NAME'] ??
+                                        homePlayerStats[1]['name'],
+                                    position: homePlayerStats[1]['START_POSITION'] ??
+                                        homePlayerStats[1]['position'],
+                                    team: widget.awayId,
                                   ),
                                 ),
                               ],

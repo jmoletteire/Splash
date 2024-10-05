@@ -200,7 +200,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   /// ******************************************************
 
   Widget getTitle(
-      String status, Map<String, dynamic> homeLinescore, Map<String, dynamic> awayLinescore) {
+      int status, Map<String, dynamic> homeLinescore, Map<String, dynamic> awayLinescore) {
     if (_isUpcoming) {
       return Row(
         children: [
@@ -220,7 +220,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 fontSize: 22.0.r,
                 color: awayScore > homeScore
                     ? Colors.white
-                    : (status == 'Final' ? Colors.grey : Colors.white)),
+                    : (status == 3 ? Colors.grey : Colors.white)),
           ),
           SizedBox(width: 15.0.r),
           Text('-', style: kBebasBold.copyWith(fontSize: 22.0.r)),
@@ -231,7 +231,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 fontSize: 22.0.r,
                 color: homeScore > awayScore
                     ? Colors.white
-                    : (status == 'Final' ? Colors.grey : Colors.white)),
+                    : (status == 3 ? Colors.grey : Colors.white)),
           ),
         ],
       );
@@ -284,7 +284,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                       ),
                     ),
                     const SizedBox(width: 15.0),
-                    getTitle(summary['GAME_STATUS_TEXT'], homeLinescore, awayLinescore),
+                    getTitle(summary['GAME_STATUS_ID'], homeLinescore, awayLinescore),
                     const SizedBox(width: 15.0),
                     ConstrainedBox(
                       constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
@@ -434,20 +434,56 @@ class GameInfo extends StatelessWidget {
   final bool isUpcoming;
   final String? gameTime;
 
-  Widget getStatus(String status) {
-    if (status == 'Final') {
+  Widget getStatus(int status) {
+    if (status == 3) {
       return Text('FINAL',
           style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
     }
-    if (status.contains('Q')) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(status.toString().trimRight(), style: kBebasBold.copyWith(fontSize: 16.0.r)),
-          Text(gameSummary['LIVE_PC_TIME'].toString().trimRight(),
-              style: kBebasBold.copyWith(fontSize: 16.0.r)),
-        ],
-      );
+    if (status == 2) {
+      if (gameSummary['LIVE_PC_TIME'] == "0:00") {
+        switch (gameSummary['LIVE_PERIOD']) {
+          case 1:
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('END 1ST', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+              ],
+            );
+          case 2:
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('HT', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+              ],
+            );
+          case 3:
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('END 3RD', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+              ],
+            );
+          default:
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('FINAL', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+              ],
+            );
+        }
+      } else {
+        int period = gameSummary['LIVE_PERIOD'];
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+                '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}',
+                style: kBebasBold.copyWith(fontSize: 16.0.r)),
+            Text(gameSummary['LIVE_PC_TIME'].toString(),
+                style: kBebasBold.copyWith(fontSize: 16.0.r)),
+          ],
+        );
+      }
     } else {
       return Column(
         children: [
@@ -484,7 +520,7 @@ class GameInfo extends StatelessWidget {
               ),
             SizedBox(height: 8.0.r),
           ],
-          Text(gameTime!, style: kBebasBold.copyWith(fontSize: 19.0.r)),
+          Text(gameTime ?? '', style: kBebasBold.copyWith(fontSize: 19.0.r)),
         ],
       );
     }
@@ -619,7 +655,7 @@ class GameInfo extends StatelessWidget {
                       fontSize: 36.0.r,
                       color: awayLinescore['PTS'] > homeLinescore['PTS']
                           ? Colors.white
-                          : gameSummary['GAME_STATUS_TEXT'] == 'Final'
+                          : gameSummary['GAME_STATUS_ID'] == 3
                               ? Colors.grey
                               : Colors.white),
                 ),
@@ -627,7 +663,7 @@ class GameInfo extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getStatus(gameSummary['GAME_STATUS_TEXT']),
+                  getStatus(gameSummary['GAME_STATUS_ID']),
                 ],
               ),
               if (!isUpcoming) const Spacer(),
@@ -638,7 +674,7 @@ class GameInfo extends StatelessWidget {
                       fontSize: 36.0.r,
                       color: homeLinescore['PTS'] > awayLinescore['PTS']
                           ? Colors.white
-                          : gameSummary['GAME_STATUS_TEXT'] == 'Final'
+                          : gameSummary['GAME_STATUS_ID'] == 3
                               ? Colors.grey
                               : Colors.white),
                 ),

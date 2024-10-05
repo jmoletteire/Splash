@@ -125,7 +125,7 @@ class _GameCardState extends State<GameCard> {
     Map<String, dynamic> homeLinescore =
         linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[0] : linescore[1];
     Map<String, dynamic> awayLinescore =
-        linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[1] : linescore[0];
+        linescore[1]['TEAM_ID'] == widget.homeTeam ? linescore[0] : linescore[1];
 
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -208,11 +208,15 @@ class _GameCardState extends State<GameCard> {
                   Expanded(flex: 3, child: gameTitle(summary['GAME_ID'])),
                   Expanded(
                     child: Text(
-                      summary['GAME_STATUS_ID'] == 3 // Game has ended
-                          ? summary['GAME_STATUS_TEXT']
-                          : summary['GAME_STATUS_ID'] == 1 // Game has not started
-                              ? adjustTimezone(
-                                  summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT'])
+                      summary['GAME_STATUS_ID'] == 1 // Game has not started
+                          ? adjustTimezone(
+                              summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT'])
+                          : summary['LIVE_PC_TIME'] == "0:00"
+                              ? summary['LIVE_PERIOD'] == 1 || summary['LIVE_PERIOD'] == 3
+                                  ? 'End ${summary['LIVE_PERIOD']}Q'
+                                  : summary['LIVE_PERIOD'] == 2
+                                      ? 'HT'
+                                      : 'Final'
                               : '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ', // Game in-progress
                       style: kBebasNormal.copyWith(
                           fontSize: 14.0.r,

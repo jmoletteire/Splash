@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/team/team_home.dart';
@@ -158,9 +159,10 @@ class LineScoreRow extends StatelessWidget {
           Expanded(
               child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0.r),
-            child: Text(
+            child: AutoSizeText(
               totalScore.toString(),
               textAlign: TextAlign.end,
+              maxLines: 1,
               style: kBebasNormal.copyWith(fontSize: 18.0.r),
             ),
           )),

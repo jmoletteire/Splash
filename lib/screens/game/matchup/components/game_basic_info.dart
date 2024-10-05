@@ -40,6 +40,14 @@ class GameBasicInfo extends StatelessWidget {
       '6': 'NBA Cup Final'
     };
 
+    String homeId = game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'].toString();
+    var linescore = game['SUMMARY']['LineScore'];
+
+    Map<String, dynamic> homeLinescore =
+        linescore[0]['TEAM_ID'].toString() == homeId ? linescore[0] : linescore[1];
+    Map<String, dynamic> awayLinescore =
+        linescore[0]['TEAM_ID'].toString() == homeId ? linescore[1] : linescore[0];
+
     return Card(
       margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
       color: Colors.grey.shade900,
@@ -47,6 +55,13 @@ class GameBasicInfo extends StatelessWidget {
         padding: EdgeInsets.all(15.0.r),
         child: Column(
           children: [
+            GameBasicInfoRow(
+              icon: Icons.airplanemode_active,
+              data: [
+                '${awayLinescore['TEAM_CITY_NAME']} ${awayLinescore['TEAM_NICKNAME'] ?? awayLinescore['TEAM_NAME']} @ ${homeLinescore['TEAM_CITY_NAME']} ${homeLinescore['TEAM_NICKNAME'] ?? homeLinescore['TEAM_NAME']}'
+              ],
+            ),
+            SizedBox(height: 10.0.r),
             // Date
             GameBasicInfoRow(
               icon: Icons.calendar_month,
@@ -85,11 +100,11 @@ class GameBasicInfo extends StatelessWidget {
 class GameBasicInfoRow extends StatelessWidget {
   const GameBasicInfoRow({
     super.key,
-    required this.icon,
+    this.icon,
     required this.data,
   });
 
-  final IconData icon;
+  final IconData? icon;
   final List<String> data;
 
   @override
@@ -98,10 +113,11 @@ class GameBasicInfoRow extends StatelessWidget {
       alignment: AlignmentDirectional.centerStart,
       child: Wrap(
         children: [
-          Icon(
-            icon,
-            size: 20.0.r,
-          ),
+          if (icon != null)
+            Icon(
+              icon!,
+              size: 20.0.r,
+            ),
           SizedBox(width: 15.0.r),
           ...List.generate(data.length, (index) {
             return Text(

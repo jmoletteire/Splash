@@ -98,6 +98,20 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    List reorderStarters(List starters) {
+      // Create a new list with the desired order of elements
+      List reorderedSublist = [
+        starters[4], // index 4
+        starters[3], // index 3
+        starters[0], // index 0
+        starters[1], // index 1
+        starters[2], // index 2
+      ];
+
+      // Return the reordered sublist
+      return reorderedSublist;
+    }
+
     // Function to safely cast and filter the list
     List<Map<String, dynamic>> castToListOfMap(List<dynamic> dynamicList) {
       return dynamicList
@@ -107,14 +121,14 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     }
 
     // PLAYER STATS
-    List<Map<String, dynamic>> boxPlayerStats =
-        gameAdv.isEmpty ? [] : castToListOfMap(gameBoxscore['PlayerStats']);
+    List boxPlayerStats =
+        gameBoxscore['homeTeam']['players'] + gameBoxscore['awayTeam']['players'];
     List<Map<String, dynamic>> advPlayerStats =
-        gameAdv.isEmpty ? [] : castToListOfMap(gameAdv['PlayerStats']);
+        gameAdv['PlayerStats'] != null ? castToListOfMap(gameAdv['PlayerStats']) : [];
 
     List<dynamic> playerStats = [];
-    List<dynamic> homePlayerStats = gameAdv.isEmpty ? gameBoxscore['homeTeam']['players'] : [];
-    List<dynamic> awayPlayerStats = gameAdv.isEmpty ? gameBoxscore['awayTeam']['players'] : [];
+    List<dynamic> homePlayerStats = gameBoxscore['homeTeam']?['players'] ?? [];
+    List<dynamic> awayPlayerStats = gameBoxscore['awayTeam']?['players'] ?? [];
 
     String topScorer = '';
     String topRebounder = '';
@@ -126,62 +140,91 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
 
     // GAME IS FINAL (ADV STATS AVAILABLE)
     if (advPlayerStats.isNotEmpty) {
-      for (int i = 0; i < boxPlayerStats.length; i++) {
-        playerStats.add({...boxPlayerStats[i], ...advPlayerStats[i]});
+      // Combine stats for away players
+      for (int i = 0; i < awayPlayerStats.length; i++) {
+        String playerId = awayPlayerStats[i]['personId']
+            .toString(); // Use a unique identifier to match players
+
+        // Find matching boxPlayerStats and advPlayerStats by playerId
+        var boxStats = boxPlayerStats.firstWhere(
+            (player) => player['personId'].toString() == playerId,
+            orElse: () => {});
+
+        var advStats = advPlayerStats.isNotEmpty
+            ? advPlayerStats.firstWhere((player) => player['personId'].toString() == playerId,
+                orElse: () => {})
+            : {};
+
+        awayPlayerStats[i]['statistics'] = {
+          ...boxStats['statistics'], // This gets the box score stats for the away player
+          ...advStats // This adds the adv stats if available
+        };
       }
 
-      for (var player in playerStats) {
-        if ((player['TEAM_ID'] ?? player['teamId']).toString() == widget.homeId) {
-          homePlayerStats.add(player);
-        } else {
-          awayPlayerStats.add(player);
+// Combine stats for home players
+      for (int i = 0; i < homePlayerStats.length; i++) {
+        String playerId = homePlayerStats[i]['personId']
+            .toString(); // Use a unique identifier to match players
+
+        // Find matching boxPlayerStats and advPlayerStats by playerId
+        var boxStats = boxPlayerStats.firstWhere(
+            (player) => player['personId'].toString() == playerId,
+            orElse: () => {});
+
+        var advStats = advPlayerStats.isNotEmpty
+            ? advPlayerStats.firstWhere((player) => player['personId'].toString() == playerId,
+                orElse: () => {})
+            : {};
+
+        homePlayerStats[i]['statistics'] = {
+          ...boxStats['statistics'], // This gets the box score stats for the home player
+          ...advStats // This adds the adv stats if available
+        };
+      }
+
+      for (var player in boxPlayerStats) {
+        if ((player['statistics']['points'] ?? 0) > highestPTS) {
+          highestPTS = player['statistics']['points'];
+          topScorer = player['nameI'];
         }
-        if ((player['PTS'] ?? player['points'] ?? 0) > highestPTS) {
-          highestPTS = player['PTS'] ?? player['points'];
-          topScorer = (player['PLAYER_NAME'] ?? player['nameI']).toString();
-          int firstSpaceIndex = topScorer.indexOf(' ');
-          topScorer = '${topScorer[0]}. ${topScorer.substring(firstSpaceIndex + 1)}';
+        if ((player['statistics']['reboundsTotal'] ?? 0) > highestREB) {
+          highestREB = player['statistics']['reboundsTotal'];
+          topRebounder = player['nameI'];
         }
-        if ((player['REB'] ?? player['reboundsTotal'] ?? 0) > highestREB) {
-          highestREB = player['REB'] ?? player['reboundsTotal'];
-          topRebounder = (player['PLAYER_NAME'] ?? player['nameI']).toString();
-          int firstSpaceIndex = topRebounder.indexOf(' ');
-          topRebounder = '${topRebounder[0]}. ${topRebounder.substring(firstSpaceIndex + 1)}';
-        }
-        if ((player['AST'] ?? player['assists'] ?? 0) > highestAST) {
-          highestAST = player['AST'] ?? player['assists'];
-          topAssistant = (player['PLAYER_NAME'] ?? player['nameI']).toString();
-          int firstSpaceIndex = topAssistant.indexOf(' ');
-          topAssistant = '${topAssistant[0]}. ${topAssistant.substring(firstSpaceIndex + 1)}';
+        if ((player['statistics']['assists'] ?? 0) > highestAST) {
+          highestAST = player['statistics']['assists'];
+          topAssistant = player['nameI'];
         }
       }
     }
 
     // TEAM STATS
-    List<Map<String, dynamic>> boxTeamStats =
-        gameAdv.isEmpty ? [] : castToListOfMap(gameBoxscore['TeamStats']);
+    List<Map<String, dynamic>> boxTeamStats = [
+      gameBoxscore['homeTeam']['statistics'],
+      gameBoxscore['awayTeam']['statistics']
+    ];
     List<Map<String, dynamic>> advTeamStats =
         gameAdv.isEmpty ? [] : castToListOfMap(gameAdv['TeamStats']);
 
+    // Adv Stats NOT available, just use basic stats
     List<dynamic> teamStats = gameAdv.isEmpty
         ? [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']]
         : [];
 
+    // Adv Stats ARE available, combine Basic + Adv
     if (advTeamStats.isNotEmpty) {
       for (int i = 0; i < boxTeamStats.length; i++) {
-        int otherStatsIndex =
-            gameOtherStats.indexWhere((stat) => stat['TEAM_ID'] == boxTeamStats[i]['TEAM_ID']);
-        teamStats
-            .add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[otherStatsIndex]});
+        teamStats.add({...boxTeamStats[i], ...advTeamStats[i]});
       }
     }
 
+    // LINE SCORE
     var linescore = widget.game['SUMMARY']['LineScore'];
 
     Map<String, dynamic> homeLinescore =
         linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
     Map<String, dynamic> awayLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
+        linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
 
     return Column(
       children: [
@@ -347,15 +390,17 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               CustomScrollView(
                 slivers: [
                   BoxPlayerStats(
-                    players: awayPlayerStats.sublist(0, 5),
+                    players: reorderStarters(awayPlayerStats.sublist(0, 5)),
                     playerGroup: 'STARTERS',
-                    inProgress: widget.inProgress,
+                    inProgress:
+                        widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     controller: _awayStartersController,
                   ),
                   BoxPlayerStats(
                     players: awayPlayerStats.sublist(5),
                     playerGroup: 'BENCH',
-                    inProgress: widget.inProgress,
+                    inProgress:
+                        widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     controller: _awayBenchController,
                   ),
                 ],
@@ -368,7 +413,8 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                       teams: teamStats,
                       homeId: widget.homeId,
                       awayId: widget.awayId,
-                      inProgress: widget.inProgress,
+                      inProgress:
+                          widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     ),
                   )
                 ],
@@ -376,15 +422,17 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               CustomScrollView(
                 slivers: [
                   BoxPlayerStats(
-                    players: homePlayerStats.sublist(0, 5),
+                    players: reorderStarters(homePlayerStats.sublist(0, 5)),
                     playerGroup: 'STARTERS',
-                    inProgress: widget.inProgress,
+                    inProgress:
+                        widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     controller: _homeStartersController,
                   ),
                   BoxPlayerStats(
                     players: homePlayerStats.sublist(5),
                     playerGroup: 'BENCH',
-                    inProgress: widget.inProgress,
+                    inProgress:
+                        widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     controller: _homeBenchController,
                   ),
                 ],

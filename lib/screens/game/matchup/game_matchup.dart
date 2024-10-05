@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:splash/screens/game/matchup/components/youtube_highlights.dart';
 
 import 'components/game_basic_info.dart';
 import 'components/head_to_head.dart';
@@ -51,6 +52,8 @@ class _GameMatchupState extends State<GameMatchup> {
           sliver: SliverList(
             delegate: SliverChildListDelegate(
               [
+                if (widget.game['SUMMARY'].containsKey('Highlights'))
+                  YoutubeHighlights(videoId: widget.game['SUMMARY']['Highlights']),
                 GameBasicInfo(game: widget.game, isUpcoming: widget.isUpcoming),
                 if (!widget.isUpcoming)
                   Lineups(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),

@@ -34,8 +34,10 @@ class _H2HState extends State<H2H> {
         child: Column(
           children: [
             ComparisonBar(
-              awayTeamWins: widget.game['SUMMARY']['SeasonSeries'][0]['HOME_TEAM_LOSSES'],
-              homeTeamWins: widget.game['SUMMARY']['SeasonSeries'][0]['HOME_TEAM_WINS'],
+              awayTeamWins:
+                  widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_LOSSES'] ?? 0,
+              homeTeamWins:
+                  widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_WINS'] ?? 0,
               awayId: widget.awayId,
               homeId: widget.homeId,
               awayTeam: widget.awayAbbr,
@@ -74,8 +76,16 @@ class ComparisonBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int totalValue = awayTeamWins + homeTeamWins;
-    final double awayTeamPercentage = awayTeamWins / totalValue;
-    final double homeTeamPercentage = homeTeamWins / totalValue;
+    double awayTeamPercentage = 0;
+    double homeTeamPercentage = 0;
+
+    if (totalValue <= 0) {
+      awayTeamPercentage = 0.5;
+      homeTeamPercentage = 0.5;
+    } else {
+      awayTeamPercentage = awayTeamWins / totalValue;
+      homeTeamPercentage = homeTeamWins / totalValue;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,14 +97,14 @@ class ComparisonBar extends StatelessWidget {
               children: [
                 Text(awayTeam, style: kBebasNormal.copyWith(fontSize: 18.0.r)),
                 SizedBox(width: 5.0.r),
-                Image.asset('images/NBA_Logos/${awayId}.png',
+                Image.asset('images/NBA_Logos/$awayId.png',
                     width: awayId == '0' ? 12.0.r : 18.0.r),
               ],
             ),
             Text('SERIES', style: kBebasBold.copyWith(fontSize: 15.0.r)),
             Row(
               children: [
-                Image.asset('images/NBA_Logos/${homeId}.png', width: 18.0.r),
+                Image.asset('images/NBA_Logos/$homeId.png', width: 18.0.r),
                 SizedBox(width: 5.0.r),
                 Text(homeTeam, style: kBebasNormal.copyWith(fontSize: 18.0.r)),
               ],
