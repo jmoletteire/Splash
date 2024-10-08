@@ -415,7 +415,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
                 tabs: [
                   const Tab(text: 'Matchup'),
-                  const Tab(text: 'Play-By-Play'),
+                  if (!_isUpcoming) const Tab(text: 'Play-By-Play'),
                   Tab(text: _isUpcoming ? 'Teams' : 'Box Score'),
                 ],
               ),
@@ -437,23 +437,45 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           ];
         },
         pinnedHeaderSliverHeightBuilder: () {
-          return 104.0 +
-              MediaQuery.of(context).padding.top -
-              ((kToolbarHeight - 15.0.r) + ((kToolbarHeight - 15.0.r) / 4.5.r) + 93.0.r);
+          if (_tabController.index == 1) {
+            return 104.0 + MediaQuery.of(context).padding.top;
+          } else {
+            return 104.0 +
+                MediaQuery.of(context).padding.top -
+                ((kToolbarHeight - 15.0.r) + ((kToolbarHeight - 15.0.r) / 4.5.r) + 93.0.r);
+          }
         },
         onlyOneScrollInBody: true,
         body: TabBarView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: _tabController,
-          children: _gamePages.map((page) {
-            return page(
-              game: game,
-              homeId: widget.homeId,
-              awayId: awayTeamId,
-              isUpcoming: _isUpcoming,
-            );
-          }).toList(),
-        ),
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _tabController,
+            children: [
+              GameMatchup(
+                game: game,
+                homeId: widget.homeId,
+                awayId: widget.awayId,
+                isUpcoming: _isUpcoming,
+              ),
+              if (!_isUpcoming)
+                PlayByPlay(
+                  game: game,
+                  homeId: widget.homeId,
+                  awayId: widget.awayId,
+                ),
+              if (_isUpcoming)
+                GamePreviewStats(
+                  game: game,
+                  homeId: widget.homeId,
+                  awayId: widget.awayId,
+                ),
+              if (!_isUpcoming)
+                GameBoxScore(
+                  game: game,
+                  homeId: widget.homeId,
+                  awayId: widget.awayId,
+                  inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
+                )
+            ]),
       ),
     );
   }

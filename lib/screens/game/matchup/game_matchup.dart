@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/game/matchup/components/youtube_highlights.dart';
+import 'package:splash/utilities/constants.dart';
 
 import 'components/game_basic_info.dart';
 import 'components/head_to_head.dart';
@@ -57,13 +58,16 @@ class _GameMatchupState extends State<GameMatchup> {
                 GameBasicInfo(game: widget.game, isUpcoming: widget.isUpcoming),
                 if (!widget.isUpcoming ||
                     (widget.isUpcoming && widget.game.containsKey('BOXSCORE')))
-                  Lineups(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
+                  Lineups(
+                      game: widget.game,
+                      homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+                      awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0'),
                 if (!widget.isUpcoming ||
                     (widget.isUpcoming && widget.game.containsKey('BOXSCORE')))
                   Inactives(
                     inactivePlayers: widget.game['SUMMARY']?['InactivePlayers'],
-                    homeId: widget.homeId,
-                    awayId: widget.awayId,
+                    homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+                    awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
                     homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
                     awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
                   ),
@@ -71,8 +75,8 @@ class _GameMatchupState extends State<GameMatchup> {
                     widget.game['SUMMARY']['SeasonSeries'].isNotEmpty)
                   H2H(
                     game: widget.game,
-                    homeId: widget.homeId,
-                    awayId: widget.awayId,
+                    homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+                    awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
                     homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
                     awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
                   ),
@@ -80,13 +84,13 @@ class _GameMatchupState extends State<GameMatchup> {
                     widget.game['SUMMARY']['LastMeeting'].isNotEmpty)
                   LastMeeting(
                       lastMeeting: widget.game['SUMMARY']['LastMeeting'][0],
-                      homeId: widget.homeId,
-                      awayId: widget.awayId),
+                      homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+                      awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0'),
                 TeamSeasonStats(
                   season:
                       '${summary['SEASON']}-${(int.parse(summary['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                  homeId: widget.homeId,
-                  awayId: widget.awayId,
+                  homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+                  awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
                 )
               ],
             ),

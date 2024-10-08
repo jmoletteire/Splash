@@ -326,6 +326,7 @@ def games_live_update():
                 logging.info(f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
                 continue  # Skip this game as it's already been finalized
 
+            summary = fetch_box_score_summary(game['gameId'])
             adv = fetch_box_score_adv(game['gameId'])
             highlights = 'No highlights found'  # search_youtube_highlights(youtube_api_key, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
 
@@ -333,8 +334,8 @@ def games_live_update():
                 games_collection.update_one(
                     {'GAME_DATE': today},
                     {'$set': {
-                        # f'GAMES.{game["gameId"]}.SUMMARY': summary,
                         f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': 3,
+                        f'GAMES.{game["gameId"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
                         f'GAMES.{game["gameId"]}.ADV': adv,
                         f'GAMES.{game["gameId"]}.FINAL': True if adv['PlayerStats'][0]['E_OFF_RATING'] is not None else False
                     }
@@ -831,10 +832,10 @@ except Exception as e:
     logging.error(f"Failed to connect to MongoDB: {e}")
     exit(1)
 
-games_daily_update()
-teams_daily_update()
-players_daily_update()
-# games_live_update()
+# games_daily_update()
+# teams_daily_update()
+# players_daily_update()
+games_live_update()
 
 while True:
     schedule.run_pending()

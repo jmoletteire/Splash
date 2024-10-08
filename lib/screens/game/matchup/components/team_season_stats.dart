@@ -129,6 +129,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             ?['OFF_RATING'] ??
                         0.0,
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['OFF_RATING_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['OFF_RATING_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -145,6 +151,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             ?['DEF_RATING'] ??
                         0.0,
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['DEF_RATING_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['DEF_RATING_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -161,6 +173,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             ?['NET_RATING'] ??
                         0.0,
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['NET_RATING_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['NET_RATING_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -177,6 +195,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             ?['PACE'] ??
                         0.0,
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['PACE_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['PACE_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -195,6 +219,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             0.0) *
                         100),
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
+                        ?['FG_PCT_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
+                        ?['FG_PCT_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -213,6 +243,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             0.0) *
                         100),
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
+                        ?['FG3_PCT_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
+                        ?['FG3_PCT_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -231,6 +267,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             0.0) *
                         100),
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
+                        ?['FT_PCT_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
+                        ?['FT_PCT_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -249,6 +291,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             0.0) *
                         100),
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['EFG_PCT_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['EFG_PCT_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -267,6 +315,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             0.0) *
                         100),
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['TS_PCT_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['TS_PCT_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -285,6 +339,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             0.0) *
                         100,
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['OREB_PCT_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['OREB_PCT_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -303,6 +363,12 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                             0.0) *
                         100,
                     1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['TM_TOV_PCT_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['TM_TOV_PCT_RANK'] ??
+                    0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,
               ),
@@ -320,6 +386,8 @@ class ComparisonRow extends StatelessWidget {
     required this.statName,
     required this.awayTeam,
     required this.homeTeam,
+    required this.awayRank,
+    required this.homeRank,
     this.awayTeamColor = Colors.transparent,
     this.homeTeamColor = Colors.transparent,
   });
@@ -327,6 +395,8 @@ class ComparisonRow extends StatelessWidget {
   final String statName;
   final dynamic awayTeam;
   final dynamic homeTeam;
+  final dynamic awayRank;
+  final dynamic homeRank;
   final Color awayTeamColor;
   final Color homeTeamColor;
 
@@ -338,6 +408,28 @@ class ComparisonRow extends StatelessWidget {
     bool twoIsBetter = (statName.contains('DRTG') || statName == 'FOULS PER 75')
         ? homeTeam < awayTeam
         : homeTeam > awayTeam;
+
+    String getRank(int teamRank) {
+      switch (teamRank) {
+        case 0:
+          return '';
+        case 1:
+          return '${teamRank}st';
+        case 2:
+          return '${teamRank}nd';
+        case 3:
+          return '${teamRank}rd';
+        case 21:
+          return '${teamRank}st';
+        case 22:
+          return '${teamRank}nd';
+        case 23:
+          return '${teamRank}rd';
+        default:
+          return '${teamRank}th';
+      }
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -358,10 +450,32 @@ class ComparisonRow extends StatelessWidget {
         ),
         Expanded(
           flex: 2,
-          child: Text(
-            statName,
-            textAlign: TextAlign.center,
-            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(getRank(awayRank),
+                    textAlign: TextAlign.end,
+                    style: kBebasNormal.copyWith(
+                        fontSize: 12.5.r, color: const Color(0xFFCCCCCC))),
+              ),
+              SizedBox(width: 15.0.r),
+              Expanded(
+                child: Text(
+                  statName,
+                  textAlign: TextAlign.center,
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                ),
+              ),
+              SizedBox(width: 15.0.r),
+              Expanded(
+                child: Text(
+                  getRank(homeRank),
+                  style:
+                      kBebasNormal.copyWith(fontSize: 12.5.r, color: const Color(0xFFCCCCCC)),
+                ),
+              ),
+            ],
           ),
         ),
         Expanded(

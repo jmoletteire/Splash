@@ -49,7 +49,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
     }
 
     if (awayTeam.isNotEmpty) {
-      awayTeam['TEAM_ABBREVIATION'] = kTeamIdToName[awayId][1];
+      awayTeam['TEAM_ABBREVIATION'] = kTeamIdToName[awayId]?[1] ?? 'FA';
       awayTeamColor = kTeamColorOpacity.containsKey(awayTeam['TEAM_ABBREVIATION'])
           ? kDarkPrimaryColors.contains(awayTeam['TEAM_ABBREVIATION'])
               ? (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
@@ -66,7 +66,6 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
   @override
   void initState() {
     super.initState();
-    print(widget.teams[0]);
     setValues(widget.homeId, widget.awayId);
   }
 

@@ -310,7 +310,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         ),
         LineScore(
           homeTeam: widget.homeId,
-          awayTeam: widget.awayId,
+          awayTeam: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
           homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
           awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
           homeScores: [

@@ -38,11 +38,12 @@ class _H2HState extends State<H2H> {
                   widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_LOSSES'] ?? 0,
               homeTeamWins:
                   widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_WINS'] ?? 0,
-              awayId: widget.awayId,
+              awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
               homeId: widget.homeId,
               awayTeam: widget.awayAbbr,
               homeTeam: widget.homeAbbr,
-              awayTeamColor: kTeamColors[kTeamIdToName[widget.awayId][1]]!['primaryColor']!,
+              awayTeamColor:
+                  kTeamColors[kTeamIdToName[widget.awayId]?[1] ?? 'FA']!['primaryColor']!,
               homeTeamColor: kTeamColors[kTeamIdToName[widget.homeId][1]]!['primaryColor']!,
             ),
           ],
