@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -33,6 +35,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   bool _isLoading = false;
   bool _pageInitLoad = false;
   Map<String, dynamic> cachedGames = {};
+  late Timer _timer;
 
   List<DateTime> _dates = List.generate(15, (index) {
     return DateTime.now().subtract(const Duration(days: 7)).add(Duration(days: index));
@@ -40,6 +43,13 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
 
   bool isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+  }
+
+  void startPolling(DateTime date) {
+    // Poll every 10 seconds
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      fetchGames(date); // Call fetchGames every 10 seconds to get updated data
+    });
   }
 
   @override
@@ -110,6 +120,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
             _pageInitLoad = false;
           });
         });
+        startPolling(maxDate);
       } else {
         setState(() {
           _pageInitLoad = false;
@@ -132,6 +143,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     _notifier.removeController('scoreboard');
     _scrollController.dispose();
     _tabController.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
@@ -263,6 +275,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
 
                               Navigator.pop(context);
                               await fetchGames(date);
+                              startPolling(selectedDate);
                             }
                           }
 

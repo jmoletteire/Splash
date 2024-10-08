@@ -45,7 +45,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   int selectedYear = 2025;
 
   void _initializeTabController(int index) {
-    int tabLength = 2;
+    int tabLength = 4;
+    /*
     if (playoffDataNotifier.value.isNotEmpty &&
         !playoffDataNotifier.value.containsKey('error')) {
       tabLength += 1;
@@ -60,6 +61,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
     if (index > tabLength - 1) {
       index = 0;
     }
+     */
 
     // Dispose the old TabController if it exists
     _tabController.dispose();
@@ -220,7 +222,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
     cupDataNotifier = ValueNotifier<Map<String, dynamic>>({});
     selectedSeason = kCurrentSeason;
 
-    int tabLength = 2;
+    int tabLength = 4;
+    /*
     if (playoffDataNotifier.value.isNotEmpty &&
         !playoffDataNotifier.value.containsKey('error')) {
       tabLength += 1;
@@ -231,6 +234,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
         !cupDataNotifier.value.containsKey('error')) {
       tabLength += 1;
     }
+
+     */
     _tabController = TabController(length: tabLength, vsync: this);
 
     setTeams();

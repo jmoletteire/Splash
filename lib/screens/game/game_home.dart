@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
+import 'package:splash/screens/game/play_by_play.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
@@ -15,7 +17,6 @@ import '../search_screen.dart';
 import '../team/team_home.dart';
 import 'boxscore/game_boxscore.dart';
 import 'boxscore/game_preview/game_preview_stats.dart';
-import 'game_cache.dart';
 import 'matchup/game_matchup.dart';
 
 class GameHome extends StatefulWidget {
@@ -47,22 +48,22 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   bool _showImages = false;
   bool _isLoading = false;
   bool _isUpcoming = false;
+  late Timer _timer;
 
   Map<int, double> _scrollPositions = {};
 
+  void startPolling(String gameId) {
+    // Poll every 10 seconds
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      getGame(gameId); // Call fetchGames every 10 seconds to get updated data
+    });
+  }
+
   Future<void> getGame(String gameId) async {
-    final gameCache = Provider.of<GameCache>(context, listen: false);
-    if (gameCache.containsGame(gameId)) {
-      setState(() {
-        game = gameCache.getGame(gameId)!;
-      });
-    } else {
-      var fetchedGame = await Game().getGame(gameId);
-      setState(() {
-        game = fetchedGame;
-      });
-      gameCache.addGame(gameId, game);
-    }
+    var fetchedGame = await Game().getGame(gameId);
+    setState(() {
+      game = fetchedGame;
+    });
   }
 
   Future<void> setValues(String gameId) async {
@@ -92,6 +93,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
       _isLoading = false;
     }
+    startPolling(widget.gameId);
 
     _tabController = TabController(length: _gamePages.length, vsync: this);
 
@@ -146,6 +148,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     _tabController.dispose();
     _notifier.removeController('game');
     _scrollController.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
@@ -171,6 +174,17 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           homeId: homeId,
           awayId: awayId,
           isUpcoming: isUpcoming,
+        ),
+    ({
+      required Map<String, dynamic> game,
+      required String homeId,
+      required String awayId,
+      required bool isUpcoming,
+    }) =>
+        PlayByPlay(
+          game: game,
+          homeId: homeId,
+          awayId: awayId,
         ),
     ({
       required Map<String, dynamic> game,
@@ -273,27 +287,57 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                   if (_showImages) ...[
                     if (awayTeamId == '0')
                       SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
-                      child: Image.asset(
-                        'images/NBA_Logos/$awayTeamId.png',
-                        width: awayTeamId == '0' ||
-                                MediaQuery.of(context).orientation == Orientation.landscape
-                            ? MediaQuery.of(context).size.width * 0.0375
-                            : MediaQuery.of(context).size.width * 0.09,
+                    GestureDetector(
+                      onTap: () {
+                        if (awayTeamId != '0') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeamHome(
+                                teamId: widget.awayId,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
+                        child: Image.asset(
+                          awayTeamId == '1610612761'
+                              ? 'images/NBA_Logos/${awayTeamId}_alt.png'
+                              : 'images/NBA_Logos/$awayTeamId.png',
+                          width: awayTeamId == '0' ||
+                                  MediaQuery.of(context).orientation == Orientation.landscape
+                              ? MediaQuery.of(context).size.width * 0.0375
+                              : MediaQuery.of(context).size.width * 0.09,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 15.0),
                     getTitle(summary['GAME_STATUS_ID'], homeLinescore, awayLinescore),
                     const SizedBox(width: 15.0),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
-                      child: Image.asset(
-                        'images/NBA_Logos/${widget.homeId}.png',
-                        width: widget.homeId == '0' ||
-                                MediaQuery.of(context).orientation == Orientation.landscape
-                            ? MediaQuery.of(context).size.width * 0.0375
-                            : MediaQuery.of(context).size.width * 0.09,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TeamHome(
+                              teamId: widget.homeId,
+                            ),
+                          ),
+                        );
+                      },
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
+                        child: Image.asset(
+                          widget.homeId == '1610612761'
+                              ? 'images/NBA_Logos/${widget.homeId}_alt.png'
+                              : 'images/NBA_Logos/${widget.homeId}.png',
+                          width: widget.homeId == '0' ||
+                                  MediaQuery.of(context).orientation == Orientation.landscape
+                              ? MediaQuery.of(context).size.width * 0.0375
+                              : MediaQuery.of(context).size.width * 0.09,
+                        ),
                       ),
                     ),
                   ],
@@ -371,6 +415,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
                 tabs: [
                   const Tab(text: 'Matchup'),
+                  const Tab(text: 'Play-By-Play'),
                   Tab(text: _isUpcoming ? 'Teams' : 'Box Score'),
                 ],
               ),
@@ -632,7 +677,9 @@ class GameInfo extends StatelessWidget {
                       ConstrainedBox(
                         constraints: BoxConstraints(minHeight: 80.0.r, maxHeight: 80.0.r),
                         child: Image.asset(
-                          'images/NBA_Logos/$awayId.png',
+                          awayId == '1610612761'
+                              ? 'images/NBA_Logos/${awayId}_alt.png'
+                              : 'images/NBA_Logos/$awayId.png',
                           width: isLandscape
                               ? MediaQuery.of(context).size.width * 0.1
                               : MediaQuery.of(context).size.width * 0.2,
@@ -696,7 +743,9 @@ class GameInfo extends StatelessWidget {
                     ConstrainedBox(
                       constraints: BoxConstraints(minHeight: 80.0.r, maxHeight: 80.0.r),
                       child: Image.asset(
-                        'images/NBA_Logos/$homeId.png',
+                        homeId == '1610612761'
+                            ? 'images/NBA_Logos/${homeId}_alt.png'
+                            : 'images/NBA_Logos/$homeId.png',
                         width: homeId == '0'
                             ? MediaQuery.of(context).size.width * 0.05
                             : isLandscape

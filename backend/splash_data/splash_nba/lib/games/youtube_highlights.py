@@ -11,11 +11,15 @@ def search_youtube_highlights(api_key, team_one, team_two, date):
     # Format the query with teams and date
     query = f"{team_one} vs {team_two} highlights"
 
+    # NBA's official YouTube channel ID
+    nba_channel_id = "UCWJ2lWNubArHWmf3FIHbfcQ"
+
     # Prepare the request parameters
     params = {
         'part': 'snippet',
         'q': query,
         'key': api_key,
+        'channelId': nba_channel_id,
         'type': 'video',
         'maxResults': 5,  # You can change this to return more results
         'order': 'relevance',  # Sort results by relevance
@@ -35,7 +39,13 @@ def search_youtube_highlights(api_key, team_one, team_two, date):
                 for item in data['items']
                 if item['id']['kind'] == 'youtube#video'
             ]
-            return videos[0][0]
+            if len(videos) > 0:
+                if len(videos[0]) > 0:
+                    return videos[0][0]
+                else:
+                    return 'No highlights found'
+            else:
+                return 'No highlights found'
         else:
             return None
     else:
@@ -54,10 +64,11 @@ if __name__ == '__main__':
     results = search_youtube_highlights(youtube_api_key, team_one, team_two, today)
 
     if results:
-        print("Top YouTube highlight results:")
-        for video_id, title, channel in results:
-            print(f"Title: {title}")
-            print(f"Channel: {channel}")
-            print(f"URL: https://www.youtube.com/watch?v={video_id}\n")
+        print(results)
+        #print("Top YouTube highlight results:")
+        #for video_id in results:
+            #print(f"Title: {title}")
+            #print(f"Channel: {channel}")
+            #print(f"URL: https://www.youtube.com/watch?v={video_id}\n")
     else:
         print("No highlights found for today.")

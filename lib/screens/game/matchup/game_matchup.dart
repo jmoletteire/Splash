@@ -55,11 +55,13 @@ class _GameMatchupState extends State<GameMatchup> {
                 if (widget.game['SUMMARY'].containsKey('Highlights'))
                   YoutubeHighlights(videoId: widget.game['SUMMARY']['Highlights']),
                 GameBasicInfo(game: widget.game, isUpcoming: widget.isUpcoming),
-                if (!widget.isUpcoming)
+                if (!widget.isUpcoming ||
+                    (widget.isUpcoming && widget.game.containsKey('BOXSCORE')))
                   Lineups(game: widget.game, homeId: widget.homeId, awayId: widget.awayId),
-                if (!widget.isUpcoming)
+                if (!widget.isUpcoming ||
+                    (widget.isUpcoming && widget.game.containsKey('BOXSCORE')))
                   Inactives(
-                    inactivePlayers: widget.game['SUMMARY']['InactivePlayers'],
+                    inactivePlayers: widget.game['SUMMARY']?['InactivePlayers'],
                     homeId: widget.homeId,
                     awayId: widget.awayId,
                     homeAbbr: homeLinescore['TEAM_ABBREVIATION'],

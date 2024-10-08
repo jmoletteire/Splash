@@ -17,7 +17,7 @@ class GameBasicInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> officials = [];
-    if (!isUpcoming) {
+    if (!isUpcoming || (isUpcoming && game.containsKey('BOXSCORE'))) {
       for (Map<String, dynamic> official in game['SUMMARY']['Officials']) {
         officials.add('${official['FIRST_NAME']} ${official['LAST_NAME']}');
       }

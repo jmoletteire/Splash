@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class YoutubeHighlights extends StatefulWidget {
@@ -20,8 +21,21 @@ class _YoutubeHighlightsState extends State<YoutubeHighlights> {
     // Initialize the YouTube player controller with the video ID
     _youtubePlayerController = YoutubePlayerController(
       initialVideoId: widget.videoId,
-      flags: const YoutubePlayerFlags(autoPlay: false, mute: true),
+      flags: const YoutubePlayerFlags(
+        autoPlay: false,
+        mute: true,
+        forceHD: true,
+      ),
     );
+  }
+
+  Future<void> _launchFullScreen(String videoId) async {
+    final url = 'https://www.youtube.com/watch?v=$videoId';
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url)); // Use the native iOS player
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override

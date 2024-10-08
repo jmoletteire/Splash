@@ -31,35 +31,31 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
   bool _isLoading = false;
 
   void setValues(String homeId, String awayId) {
-    setState(() {
-      if (widget.teams[0]['TEAM_ID'] == null) {
-        homeTeam = widget.teams[0];
-        awayTeam = widget.teams[1];
-        homeTeam['TEAM_ABBREVIATION'] = kTeamIdToName[widget.homeId]?[1] ?? 'FA';
-        awayTeam['TEAM_ABBREVIATION'] = kTeamIdToName[widget.awayId]?[1] ?? 'FA';
-      } else {
-        homeTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
-            ? widget.teams[0]
-            : widget.teams[1];
-        awayTeam = widget.teams[0]['TEAM_ID'].toString() == widget.homeId
-            ? widget.teams[1]
-            : widget.teams[0];
-      }
+    if (widget.teams[0].containsKey('teamId')) {
+      // Use default order if no TEAM_ID key exists
+      homeTeam = widget.teams.firstWhere((team) => team['teamId'].toString() == homeId);
+      awayTeam = widget.teams.firstWhere((team) => team['teamId'].toString() == awayId);
+    } else {
+      // Assign based on the ID matching homeId
+      homeTeam = widget.teams.firstWhere((team) => team['TEAM_ID'].toString() == homeId);
+      awayTeam = widget.teams.firstWhere((team) => team['TEAM_ID'].toString() == awayId);
+    }
 
-      if (homeTeam.isNotEmpty) {
-        homeTeamColor = kDarkPrimaryColors.contains(homeTeam['TEAM_ABBREVIATION'])
-            ? (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
-            : (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['primaryColor']!);
-      }
+    if (homeTeam.isNotEmpty) {
+      homeTeam['TEAM_ABBREVIATION'] = kTeamIdToName[homeId][1];
+      homeTeamColor = kDarkPrimaryColors.contains(homeTeam['TEAM_ABBREVIATION'])
+          ? (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
+          : (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['primaryColor']!);
+    }
 
-      if (awayTeam.isNotEmpty) {
-        awayTeamColor = kTeamColorOpacity.containsKey(awayTeam['TEAM_ABBREVIATION'])
-            ? kDarkPrimaryColors.contains(awayTeam['TEAM_ABBREVIATION'])
-                ? (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
-                : (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['primaryColor']!)
-            : kTeamColors['FA']!['primaryColor']!;
-      }
-    });
+    if (awayTeam.isNotEmpty) {
+      awayTeam['TEAM_ABBREVIATION'] = kTeamIdToName[awayId][1];
+      awayTeamColor = kTeamColorOpacity.containsKey(awayTeam['TEAM_ABBREVIATION'])
+          ? kDarkPrimaryColors.contains(awayTeam['TEAM_ABBREVIATION'])
+              ? (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
+              : (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['primaryColor']!)
+          : kTeamColors['FA']!['primaryColor']!;
+    }
   }
 
   double roundToDecimalPlaces(double value, int decimalPlaces) {
@@ -70,6 +66,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
   @override
   void initState() {
     super.initState();
+    print(widget.teams[0]);
     setValues(widget.homeId, widget.awayId);
   }
 
@@ -317,16 +314,16 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             statName: 'FT/FGA',
                             awayTeam: roundToDecimalPlaces(
                                 (awayTeam['freeThrowsMade'] ?? awayTeam['FTM']) /
-                                    ((awayTeam['freeThrowsAttempted'] ?? awayTeam['FGA']) == 0
+                                    ((awayTeam['fieldGoalsAttempted'] ?? awayTeam['FGA']) == 0
                                         ? 1
-                                        : (awayTeam['freeThrowsAttempted'] ??
+                                        : (awayTeam['fieldGoalsAttempted'] ??
                                             awayTeam['FGA'])),
                                 2),
                             homeTeam: roundToDecimalPlaces(
                                 (homeTeam['freeThrowsMade'] ?? homeTeam['FTM']) /
-                                    ((homeTeam['freeThrowsAttempted'] ?? homeTeam['FGA']) == 0
+                                    ((homeTeam['fieldGoalsAttempted'] ?? homeTeam['FGA']) == 0
                                         ? 1
-                                        : (homeTeam['freeThrowsAttempted'] ??
+                                        : (homeTeam['fieldGoalsAttempted'] ??
                                             homeTeam['FGA'])),
                                 2),
                             awayTeamColor: awayTeamColor,

@@ -85,6 +85,21 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
   }
 
   @override
+  void didUpdateWidget(covariant GameBoxScore oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Check if the game data has changed
+    if (oldWidget.game != widget.game) {
+      setState(() {
+        // Update the local state with the new game data
+        gameBoxscore = widget.game['BOXSCORE'] ?? {};
+        gameAdv = widget.game['ADV'] ?? {};
+        gameOtherStats = widget.game['SUMMARY']?['OtherStats'] ?? [];
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _boxscoreTabController.dispose();
 
@@ -98,6 +113,8 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    int season = int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON']);
+
     List reorderStarters(List starters) {
       // Create a new list with the desired order of elements
       List reorderedSublist = [
@@ -121,8 +138,9 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     }
 
     // PLAYER STATS
-    List boxPlayerStats =
-        gameBoxscore['homeTeam']['players'] + gameBoxscore['awayTeam']['players'];
+    List boxPlayerStats = season < 2021
+        ? castToListOfMap(gameBoxscore['PlayerStats'])
+        : gameBoxscore['homeTeam']['players'] + gameBoxscore['awayTeam']['players'];
     List<Map<String, dynamic>> advPlayerStats =
         gameAdv['PlayerStats'] != null ? castToListOfMap(gameAdv['PlayerStats']) : [];
 
@@ -138,83 +156,135 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     int highestREB = 0;
     int highestAST = 0;
 
-    // GAME IS FINAL (ADV STATS AVAILABLE)
-    if (advPlayerStats.isNotEmpty) {
-      // Combine stats for away players
-      for (int i = 0; i < awayPlayerStats.length; i++) {
-        String playerId = awayPlayerStats[i]['personId']
-            .toString(); // Use a unique identifier to match players
-
-        // Find matching boxPlayerStats and advPlayerStats by playerId
-        var boxStats = boxPlayerStats.firstWhere(
-            (player) => player['personId'].toString() == playerId,
-            orElse: () => {});
-
-        var advStats = advPlayerStats.isNotEmpty
-            ? advPlayerStats.firstWhere((player) => player['personId'].toString() == playerId,
-                orElse: () => {})
-            : {};
-
-        awayPlayerStats[i]['statistics'] = {
-          ...boxStats['statistics'], // This gets the box score stats for the away player
-          ...advStats // This adds the adv stats if available
-        };
+    // PRE-2021 DATA USES DIFFERENT FORMAT
+    if (season < 2021) {
+      for (int i = 0; i < boxPlayerStats.length; i++) {
+        playerStats.add({...boxPlayerStats[i], ...advPlayerStats[i]});
       }
-
-// Combine stats for home players
-      for (int i = 0; i < homePlayerStats.length; i++) {
-        String playerId = homePlayerStats[i]['personId']
-            .toString(); // Use a unique identifier to match players
-
-        // Find matching boxPlayerStats and advPlayerStats by playerId
-        var boxStats = boxPlayerStats.firstWhere(
-            (player) => player['personId'].toString() == playerId,
-            orElse: () => {});
-
-        var advStats = advPlayerStats.isNotEmpty
-            ? advPlayerStats.firstWhere((player) => player['personId'].toString() == playerId,
-                orElse: () => {})
-            : {};
-
-        homePlayerStats[i]['statistics'] = {
-          ...boxStats['statistics'], // This gets the box score stats for the home player
-          ...advStats // This adds the adv stats if available
-        };
+      for (var player in playerStats) {
+        if (player['TEAM_ID'].toString() == widget.homeId) {
+          homePlayerStats.add(player);
+        } else {
+          awayPlayerStats.add(player);
+        }
+        if ((player['PTS'] ?? 0) > highestPTS) {
+          highestPTS = player['PTS'];
+          topScorer = player['PLAYER_NAME'].toString();
+          int firstSpaceIndex = topScorer.indexOf(' ');
+          topScorer = '${topScorer[0]}. ${topScorer.substring(firstSpaceIndex + 1)}';
+        }
+        if ((player['REB'] ?? 0) > highestREB) {
+          highestREB = player['REB'];
+          topRebounder = player['PLAYER_NAME'].toString();
+          int firstSpaceIndex = topRebounder.indexOf(' ');
+          topRebounder = '${topRebounder[0]}. ${topRebounder.substring(firstSpaceIndex + 1)}';
+        }
+        if ((player['AST'] ?? 0) > highestAST) {
+          highestAST = player['AST'];
+          topAssistant = player['PLAYER_NAME'].toString();
+          int firstSpaceIndex = topAssistant.indexOf(' ');
+          topAssistant = '${topAssistant[0]}. ${topAssistant.substring(firstSpaceIndex + 1)}';
+        }
       }
+    } else {
+      // GAME IS FINAL (ADV STATS AVAILABLE)
+      if (advPlayerStats.isNotEmpty) {
+        // Combine stats for away players
+        for (int i = 0; i < awayPlayerStats.length; i++) {
+          String playerId = awayPlayerStats[i]['personId']
+              .toString(); // Use a unique identifier to match players
 
-      for (var player in boxPlayerStats) {
-        if ((player['statistics']['points'] ?? 0) > highestPTS) {
-          highestPTS = player['statistics']['points'];
-          topScorer = player['nameI'];
+          // Find matching boxPlayerStats and advPlayerStats by playerId
+          var boxStats = boxPlayerStats.firstWhere(
+              (player) => player['personId'].toString() == playerId,
+              orElse: () => {});
+
+          var advStats = advPlayerStats.isNotEmpty
+              ? advPlayerStats.firstWhere(
+                  (player) => player['PLAYER_ID'].toString() == playerId,
+                  orElse: () => {})
+              : {};
+
+          awayPlayerStats[i]['statistics'] = {
+            ...boxStats['statistics'], // This gets the box score stats for the away player
+            ...advStats // This adds the adv stats if available
+          };
         }
-        if ((player['statistics']['reboundsTotal'] ?? 0) > highestREB) {
-          highestREB = player['statistics']['reboundsTotal'];
-          topRebounder = player['nameI'];
-        }
-        if ((player['statistics']['assists'] ?? 0) > highestAST) {
-          highestAST = player['statistics']['assists'];
-          topAssistant = player['nameI'];
+
+        // Combine stats for home players
+        for (int i = 0; i < homePlayerStats.length; i++) {
+          String playerId = homePlayerStats[i]['personId']
+              .toString(); // Use a unique identifier to match players
+
+          // Find matching boxPlayerStats and advPlayerStats by playerId
+          var boxStats = boxPlayerStats.firstWhere(
+              (player) => player['personId'].toString() == playerId,
+              orElse: () => {});
+
+          var advStats = advPlayerStats.isNotEmpty
+              ? advPlayerStats.firstWhere(
+                  (player) => player['PLAYER_ID'].toString() == playerId,
+                  orElse: () => {})
+              : {};
+
+          homePlayerStats[i]['statistics'] = {
+            ...boxStats['statistics'], // This gets the box score stats for the home player
+            ...advStats // This adds the adv stats if available
+          };
         }
       }
     }
 
+    for (var player in boxPlayerStats) {
+      if ((player['statistics']?['points'] ?? player['PTS'] ?? 0) > highestPTS) {
+        highestPTS = player['statistics']['points'];
+        topScorer = player['nameI'];
+      }
+      if ((player['statistics']?['reboundsTotal'] ?? player['REB'] ?? 0) > highestREB) {
+        highestREB = player['statistics']['reboundsTotal'];
+        topRebounder = player['nameI'];
+      }
+      if ((player['statistics']?['assists'] ?? player['AST'] ?? 0) > highestAST) {
+        highestAST = player['statistics']['assists'];
+        topAssistant = player['nameI'];
+      }
+    }
+
     // TEAM STATS
-    List<Map<String, dynamic>> boxTeamStats = [
-      gameBoxscore['homeTeam']['statistics'],
-      gameBoxscore['awayTeam']['statistics']
-    ];
+    List<Map<String, dynamic>> boxTeamStats = season < 2021
+        ? castToListOfMap(gameBoxscore['TeamStats'])
+        : [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']];
     List<Map<String, dynamic>> advTeamStats =
         gameAdv.isEmpty ? [] : castToListOfMap(gameAdv['TeamStats']);
+
+    boxTeamStats[0]['teamId'] = widget.homeId;
+    boxTeamStats[1]['teamId'] = widget.awayId;
 
     // Adv Stats NOT available, just use basic stats
     List<dynamic> teamStats = gameAdv.isEmpty
         ? [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']]
         : [];
 
-    // Adv Stats ARE available, combine Basic + Adv
-    if (advTeamStats.isNotEmpty) {
+    if (season < 2021) {
       for (int i = 0; i < boxTeamStats.length; i++) {
-        teamStats.add({...boxTeamStats[i], ...advTeamStats[i]});
+        int otherStatsIndex =
+            gameOtherStats.indexWhere((stat) => stat['TEAM_ID'] == boxTeamStats[i]['TEAM_ID']);
+        teamStats
+            .add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[otherStatsIndex]});
+      }
+    } else {
+      if (advTeamStats.isNotEmpty) {
+        Map<String, dynamic> findAndCombineStats(String teamId,
+            List<Map<String, dynamic>> boxTeamStats, List<Map<String, dynamic>> advTeamStats) {
+          var boxStats =
+              boxTeamStats.firstWhere((stat) => stat['teamId'] == teamId, orElse: () => {});
+          var advStats =
+              advTeamStats.firstWhere((stat) => stat['TEAM_ID'] == teamId, orElse: () => {});
+          return {...boxStats, ...advStats};
+        }
+
+        teamStats.add(findAndCombineStats(widget.homeId, boxTeamStats, advTeamStats));
+        teamStats.add(findAndCombineStats(widget.awayId, boxTeamStats, advTeamStats));
       }
     }
 
@@ -274,40 +344,40 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
             children: [
               Flexible(
                 child: Text(
-                  topScorer,
+                  highestPTS == 0 ? '' : topScorer,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
                 ),
               ),
               Text(
-                gameAdv.isEmpty ? '' : '  - $highestPTS  PTS',
+                highestPTS == 0 ? '' : '  - $highestPTS  PTS',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
               SizedBox(width: 25.0.r),
               Flexible(
                 child: Text(
-                  topRebounder,
+                  highestREB == 0 ? '' : topRebounder,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
                 ),
               ),
               Text(
-                gameAdv.isEmpty ? '' : '  - $highestREB  REB',
+                highestREB == 0 ? '' : '  - $highestREB  REB',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
               SizedBox(width: 25.0.r),
               Flexible(
                 child: Text(
-                  topAssistant,
+                  highestAST == 0 ? '' : topAssistant,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
                 ),
               ),
               Text(
-                gameAdv.isEmpty ? '' : '  - $highestAST  AST',
+                highestAST == 0 ? '' : '  - $highestAST  AST',
                 style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
               ),
             ],
@@ -341,7 +411,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                         end: Alignment.centerLeft,
                       ),
                     ),
-                    margin: EdgeInsets.only(bottom: 3.0.r),
+                    margin: const EdgeInsets.only(bottom: 1.0),
                     child: Tab(
                       text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
                     ),
@@ -353,7 +423,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               children: [
                 Expanded(
                   child: Container(
-                    margin: EdgeInsets.only(bottom: 3.0.r),
+                    margin: const EdgeInsets.only(bottom: 1.0),
                     color: const Color(0xFF1B1B1B),
                     child: const Tab(
                       text: "TEAM",
@@ -366,7 +436,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               children: [
                 Expanded(
                   child: Container(
-                    margin: EdgeInsets.only(bottom: 3.0.r),
+                    margin: const EdgeInsets.only(bottom: 1.0),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [const Color(0xFF1B1B1B), homeContainerColor],
@@ -507,7 +577,7 @@ class _CustomPainter extends BoxPainter {
       paint.color = Colors.transparent;
     }
 
-    final double indicatorHeight = 3.0;
+    const double indicatorHeight = 2.0;
     final Offset start = offset + Offset(0, configuration.size!.height - indicatorHeight);
     final Offset end = offset +
         Offset(configuration.size!.width, configuration.size!.height - indicatorHeight);

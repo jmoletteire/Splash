@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 
 import requests
@@ -48,7 +49,6 @@ def update_game_data():
         for game_date in games_collection.find(query, {'_id': 0}):
             for game_id, game_data in game_date['GAMES'].items():
                 game_data['SUMMARY'] = fetch_box_score_summary(game_id)
-                game_data['BOXSCORE'] = fetch_box_score_stats(game_id)
                 game_data['ADV'] = fetch_box_score_adv(game_id)
                 # game_data['ODDS'] = fetch_odds(odds_data, game_id)
 
@@ -113,10 +113,17 @@ def fetch_upcoming_games(game_date):
 
 def fetch_games_for_date_range(start_date, end_date):
     current_date = start_date
+    i = 0
     while current_date <= end_date:
         logging.info(f"Fetching games for {current_date.strftime('%Y-%m-%d')}")
         fetch_upcoming_games(current_date.strftime('%Y-%m-%d'))
-        current_date += timedelta(days=1)
+
+        i += 1
+        current_date += timedelta(days=i)
+
+        # Pause 15 seconds every 25 days processed
+        if i % 25 == 0:
+            time.sleep(15)
 
 
 if __name__ == "__main__":

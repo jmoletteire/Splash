@@ -1,17 +1,32 @@
 import random
 import time
 from nba_api.stats.endpoints import boxscoretraditionalv2
-from nba_api.live.nba.endpoints import boxscore
+from nba_api.live.nba.endpoints import playbyplay
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
 
 
 # Function to fetch box score stats for a game
-def fetch_box_score_stats(game_id):
-    # box_score = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id).get_normalized_dict()
-    box_score = boxscore.BoxScore(game_id=game_id).get_dict()['game']
-    return box_score
+def fetch_play_by_play(game_id):
+    keys = [
+        'actionNumber',
+        'clock',
+        'period',
+        'teamId',
+        'personId',
+        'possession',
+        'scoreHome',
+        'scoreAway',
+        'isFieldGoal',
+        'description',
+        'playerNameI'
+    ]
+
+    actions = playbyplay.PlayByPlay(game_id=game_id).get_dict()['game']['actions']
+    pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
+
+    return pbp
 
 
 if __name__ == "__main__":
@@ -52,19 +67,19 @@ if __name__ == "__main__":
                         #if "BOXSCORE" not in game_data:
                         # Fetch box score stats for the game
                         try:
-                            stats = fetch_box_score_stats(game_id)
+                            pbp = fetch_play_by_play(game_id)
                             game_counter += 1
                         except Exception as e:
-                            stats = None
-                            logging.error(f"Error fetching box score for game_id {game_id}: {e}")
+                            pbp = None
+                            logging.error(f"Error fetching play-by-play for game_id {game_id}: {e}")
                             continue
 
                         # Update the game data with the fetched stats
                         try:
-                            # Update the MongoDB document with the fetched stats under the "BOXSCORE" key
+                            # Update the MongoDB document with the fetched stats under the "PBP" key
                             games_collection.update_one(
                                 {'_id': document['_id'], f"GAMES.{game_id}": {"$exists": True}},
-                                {"$set": {f"GAMES.{game_id}.BOXSCORE": stats}}
+                                {"$set": {f"GAMES.{game_id}.PBP": pbp}}
                             )
 
                             print(f"Processed {document['GAME_DATE']} {game_id}")
@@ -80,6 +95,6 @@ if __name__ == "__main__":
                             # Pause for a random time between 0.5 and 1 second
                             time.sleep(random.uniform(0.5, 1.0))
 
-        print("Box score stats update complete.")
+        print("Play-By-Play update complete.")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

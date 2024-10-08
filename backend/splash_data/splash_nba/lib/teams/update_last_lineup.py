@@ -62,14 +62,17 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
             games_data.append(document.get("GAMES"))
 
         last_game = games_data[0][last_game_id]
+        if team_id == 1610612742:
+            print(last_game["BOXSCORE"].keys())
+        team = last_game["BOXSCORE"]["homeTeam"]["players"] if last_game["BOXSCORE"]["homeTeam"]["teamId"] == team_id else last_game["BOXSCORE"]["awayTeam"]["players"]
 
         starters = []
-        for player in last_game["BOXSCORE"]["PlayerStats"]:
-            if player["TEAM_ID"] == team_id and player["START_POSITION"] != "":
+        for player in team:
+            if player["starter"] == "1":
                 starters.append({
-                    "PLAYER_ID": player["PLAYER_ID"],
-                    "NAME": player["PLAYER_NAME"],
-                    "POSITION": player["START_POSITION"],
+                    "PLAYER_ID": player["personId"],
+                    "NAME": player["name"],
+                    "POSITION": player["position"],
                 })
 
             if len(starters) == 5:
@@ -80,7 +83,7 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
         return starters
 
     except Exception as e:
-        logging.error(f"Error while getting last lineup: {e}")
+        logging.error(f"Error while getting last lineup: {e.with_traceback()}")
 
 
 if __name__ == "__main__":

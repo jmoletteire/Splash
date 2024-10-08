@@ -12,7 +12,7 @@ def update_team_history(team_id):
         teams_collection = db.nba_teams
     except Exception as e:
         logging.error(f"(Team History) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     try:
         # Fetch the franchise history data
@@ -33,7 +33,7 @@ def update_team_history(team_id):
         organized_data_list = list(organized_data.values())
     except Exception as e:
         logging.error(f"(Team History) Error fetching team history for {team_id}: {e}")
-        exit(1)
+        return
 
     try:
         # Insert or update the team history in MongoDB

@@ -1,12 +1,12 @@
 import logging
 import random
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 import nba_api
 import schedule
 import time
 
-from nba_api.live.nba.endpoints import scoreboard, boxscore
+from nba_api.live.nba.endpoints import scoreboard, boxscore, playbyplay
 from nba_api.stats.endpoints import commonplayoffseries, playerawards, scoreboardv2
 from pymongo import MongoClient
 
@@ -53,41 +53,17 @@ import re
 
 
 # Global flag to prevent further updates for the day
-skip_updates_for_today = False
+skip_updates = False
 
 
-# Function to reset the skip_updates_for_today flag daily
+# Function to reset the skip_updates flag daily
 def reset_flags():
-    global skip_updates_for_today
-    skip_updates_for_today = False
+    global skip_updates
+    skip_updates = False
     logging.info("(Flag Reset) Daily reset complete, live updates will resume.")
 
 
 def games_live_update():
-    global skip_updates_for_today
-    if skip_updates_for_today:
-        logging.info("(Games Live) No games today, skipping further updates.")
-        return  # Skip the update if there are no games today
-
-    try:
-        client = MongoClient(uri)
-        db = client.splash
-        games_collection = db.nba_games
-    except Exception as e:
-        logging.error(f'(Games Live) Failed to connect to MongoDB: {e}')
-        return
-
-    def format_duration(input_str):
-        # Regular expression to match the minutes and seconds in the format 'PT5M44.05S'
-        match = re.match(r'PT(\d+)M(\d+)\.\d+S', input_str)
-
-        if match:
-            minutes = int(match.group(1))  # Convert to int to avoid leading zeros
-            seconds = match.group(2)
-            return f"{minutes}:{seconds}"
-
-        return input_str  # Return original string if no match is found
-
     teams = {
         1610612737: 'Atlanta Hawks',
         1610612738: 'Boston Celtics',
@@ -120,24 +96,113 @@ def games_live_update():
         1610612765: 'Detroit Pistons',
         1610612766: 'Charlotte Hornets',
     }
+    global skip_updates
+    if skip_updates:
+        logging.info(f"(Games Live) No games today, skipping further updates. [{datetime.now()}]")
+        return  # Skip the update if there are no games today
+
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        games_collection = db.nba_games
+    except Exception as e:
+        logging.error(f'(Games Live) Failed to connect to MongoDB [{datetime.now()}]: {e}')
+        return
+
+    import re
+
+    def format_duration(input_str):
+        # Regular expression to match 'PT' followed by minutes and seconds
+        match = re.match(r'PT(\d+)M(\d+)\.(\d+)S', input_str)
+
+        if match:
+            minutes = int(match.group(1))  # Convert minutes to int
+            seconds = int(match.group(2))  # Convert seconds to int
+            tenths = match.group(3)[0]     # Take only the first digit of the fraction for tenths
+
+            if minutes == 0:  # Less than a minute left, show seconds and tenths
+                return f":{seconds}.{tenths}"
+            else:  # Regular minutes and seconds format
+                return f"{minutes}:{seconds:02d}"  # Format seconds with leading zero if necessary
+
+        return input_str  # Return original string if no match is found
+
+    def parse_game_time(game_time_str):
+        try:
+            # Try parsing with microseconds
+            return datetime.strptime(game_time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            # If microseconds are not present, try parsing without them
+            return datetime.strptime(game_time_str, "%Y-%m-%dT%H:%M:%S%z")
+
     today = datetime.today().strftime('%Y-%m-%d')
+    yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
     scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard().get_dict()
-    linescore = scoreboardv2.ScoreboardV2(game_date=today, day_offset=0).get_normalized_dict()
 
     try:
         games_today = scoreboard['scoreboard']['games']
-        line_scores = linescore['LineScore']
     except KeyError as e:
-        logging.error(f'(Games Live) Failed to get scores for today: {e}')
+        logging.error(f'(Games Live) Failed to get scores for today (KeyError) [{datetime.now()}]: {e}')
         return
 
     # If there are no games today, set the flag to skip further updates for the rest of the day
     if not games_today:
-        logging.info(f"(Games Live) No games found for today: {today}. Skipping updates for the rest of the day.")
-        skip_updates_for_today = True
+        logging.info(f"(Games Live) No games found for today: {today}. Skipping updates for the rest of the day. [{datetime.now()}]")
+        skip_updates = True
         return
 
+    # Check if all games are final
+    all_final = False
     for game in games_today:
+        game_doc = games_collection.find_one({'GAME_DATE': today}, {f'GAMES.{game["gameId"]}.FINAL': 1})
+        if game_doc and game_doc.get('GAMES', {}).get(game['gameId'], {}).get('FINAL', False):
+            all_final = True
+            continue
+        else:
+            all_final = False
+            break
+
+    # all_final = all(game['gameStatus'] == 3 for game in games_today)
+    if all_final:
+        logging.info(f"(Games Live) All games are final for today: {today}. Skipping updates for the rest of the day. [{datetime.now()}]")
+        skip_updates = True
+        return
+
+    # Check if the first game is more than 1 hour away from start time
+    first_game = games_today[0]
+    first_game_time_str = first_game['gameTimeUTC']
+    first_game_time = parse_game_time(first_game_time_str)
+
+    # Make current_time offset-aware in UTC
+    current_time = datetime.now(timezone.utc)
+    time_difference = first_game_time - current_time
+
+    if time_difference > timedelta(hours=1):
+        logging.info(f"(Games Live) First game is more than 1 hour away. Skipping updates. [{datetime.now()}]")
+        return
+
+    # Else if games today + within 1 hour of first tip-off
+    linescore = scoreboardv2.ScoreboardV2(game_date=today, day_offset=0).get_normalized_dict()
+    line_scores = linescore['LineScore']
+
+    for game in games_today:
+        game_time_str = game['gameTimeUTC']
+        game_time = parse_game_time(game_time_str)
+        game_time_difference = game_time - current_time
+        if game_time_difference > timedelta(hours=1):
+            logging.info(f"(Games Live) Game {game['gameId']} is more than 1 hour away. Skipping game. [{datetime.now()}]")
+            continue
+
+        # Check if the gameEt (game Eastern Time) is from yesterday
+        game_et_str = game['gameEt']  # Assuming 'gameEt' contains the game time in Eastern Time
+        game_et_str = game_et_str.replace('Z', '+00:00')  # Replace 'Z' with '+00:00' for UTC
+        game_et = datetime.strptime(game_et_str, '%Y-%m-%dT%H:%M:%S%z')  # Parse with timezone information
+        game_et_date = game_et.strftime('%Y-%m-%d')  # Extract only the date part
+
+        if game_et_date == yesterday:
+            logging.info(f"(Games Live) Game {game['gameId']} occurred yesterday. Skipping game. [{datetime.now()}]")
+            continue
+
         is_upcoming = game['gameStatus'] == 1
         in_progress = game['gameStatus'] == 2
         is_final = game['gameStatus'] == 3
@@ -146,17 +211,50 @@ def games_live_update():
         # If game upcoming or in-progress, check for updates
         if is_upcoming:
             summary = fetch_box_score_summary(game['gameId'])
-            games_collection.update_one(
-                {'GAME_DATE': today},
-                {'$set': {f'GAMES.{game["gameId"]}.SUMMARY': summary}}
-            )
+            try:
+                box_score = boxscore.BoxScore(game_id=game['gameId']).get_dict()['game']
+                games_collection.update_one(
+                    {'GAME_DATE': today},
+                    {'$set': {
+                        f'GAMES.{game["gameId"]}.SUMMARY': summary,
+                        f'GAMES.{game["gameId"]}.BOXSCORE': box_score
+                    }}
+                )
+                logging.info(f'(Games Live) Upcoming game {game["gameId"]} is up to date + Box Score.')
+            except Exception:
+                games_collection.update_one(
+                    {'GAME_DATE': today},
+                    {'$set': {f'GAMES.{game["gameId"]}.SUMMARY': summary}}
+                )
+                logging.info(f'(Games Live) Upcoming game {game["gameId"]} is up to date.')
+
+        # IN-PROGRESS
         elif in_progress:
+            # Summary, Box Score, PBP
             summary = fetch_box_score_summary(game['gameId'])
             box_score = boxscore.BoxScore(game_id=game['gameId']).get_dict()['game']
+
+            keys = [
+                'actionNumber',
+                'clock',
+                'period',
+                'teamId',
+                'personId',
+                'possession',
+                'scoreHome',
+                'scoreAway',
+                'isFieldGoal',
+                'description',
+                'playerNameI'
+            ]
+
+            actions = playbyplay.PlayByPlay(game_id=game['gameId']).get_dict()['game']['actions']
+            pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
 
             home_line_index = 0 if line_score[0]['TEAM_ID'] == box_score['homeTeam']['teamId'] else 1
             away_line_index = 0 if line_score[0]['TEAM_ID'] == box_score['awayTeam']['teamId'] else 1
 
+            # Update data
             games_collection.update_one(
                 {'GAME_DATE': today},
                 {'$set': {
@@ -166,6 +264,7 @@ def games_live_update():
                     f'GAMES.{game["gameId"]}.SUMMARY.Officials': summary['Officials'],
                     f'GAMES.{game["gameId"]}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
                     f'GAMES.{game["gameId"]}.SUMMARY.GameInfo': summary['GameInfo'],
+                    # HOME TEAM
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.GAME_ID': line_score[home_line_index]['GAME_ID'],
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.TEAM_ID': line_score[home_line_index]['TEAM_ID'],
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.TEAM_ABBREVIATION': line_score[home_line_index]['TEAM_ABBREVIATION'],
@@ -186,7 +285,8 @@ def games_live_update():
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT9': box_score['homeTeam']['periods'][12]['score'] if len(box_score['homeTeam']['periods']) > 12 else 0,
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT10': box_score['homeTeam']['periods'][13]['score'] if len(box_score['homeTeam']['periods']) > 13 else 0,
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.PTS': box_score['homeTeam']['score'],
-                    f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES': line_score[away_line_index]['TEAM_WINS_LOSSES'],
+                    f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES': line_score[home_line_index]['TEAM_WINS_LOSSES'],
+                    # AWAY TEAM
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{away_line_index}.GAME_ID': line_score[away_line_index]['GAME_ID'],
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{away_line_index}.TEAM_ID': line_score[away_line_index]['TEAM_ID'],
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{away_line_index}.TEAM_ABBREVIATION': line_score[away_line_index]['TEAM_ABBREVIATION'],
@@ -208,27 +308,49 @@ def games_live_update():
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT10': box_score['awayTeam']['periods'][13]['score'] if len(box_score['awayTeam']['periods']) > 13 else 0,
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{away_line_index}.PTS': box_score['awayTeam']['score'],
                     f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES': line_score[away_line_index]['TEAM_WINS_LOSSES'],
+                    # Summary, Box Score, PBP
                     f'GAMES.{game["gameId"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
                     f'GAMES.{game["gameId"]}.SUMMARY.OtherStats': summary['OtherStats'],
                     f'GAMES.{game["gameId"]}.BOXSCORE': box_score,
+                    f'GAMES.{game["gameId"]}.PBP': pbp,
                 }
                 }
             )
-            logging.info(f'(Games Live) Updated game {game["gameId"]} [{datetime.now()}]')
+            logging.info(f'(Games Live) Updated live game {game["gameId"]} [{datetime.now()}]')
 
         # If game is final, update final box score
         elif is_final:
-            adv = fetch_box_score_adv(game['gameId'])
+            # Check if the final update has already been applied
+            game_doc = games_collection.find_one({'GAME_DATE': today}, {f'GAMES.{game["gameId"]}.FINAL': 1})
+            if game_doc and game_doc.get('GAMES', {}).get(game['gameId'], {}).get('FINAL', False):
+                logging.info(f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
+                continue  # Skip this game as it's already been finalized
 
-            games_collection.update_one(
-                {'GAME_DATE': today},
-                {'$set': {
-                    #f'GAMES.{game["gameId"]}.SUMMARY.Highlights': search_youtube_highlights(youtube_api_key, teams[game['HOME_TEAM_ID']], teams[game['VISITOR_TEAM_ID']], today),
-                    #f'GAMES.{game["gameId"]}.BOXSCORE': fetch_box_score_stats(game['gameId']),
-                    f'GAMES.{game["gameId"]}.ADV': adv
-                }
-                }
-            )
+            adv = fetch_box_score_adv(game['gameId'])
+            highlights = 'No highlights found'  # search_youtube_highlights(youtube_api_key, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
+
+            if highlights == 'No highlights found':
+                games_collection.update_one(
+                    {'GAME_DATE': today},
+                    {'$set': {
+                        # f'GAMES.{game["gameId"]}.SUMMARY': summary,
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': 3,
+                        f'GAMES.{game["gameId"]}.ADV': adv,
+                        f'GAMES.{game["gameId"]}.FINAL': True if adv['PlayerStats'][0]['E_OFF_RATING'] is not None else False
+                    }
+                    }
+                )
+            else:
+                games_collection.update_one(
+                    {'GAME_DATE': today},
+                    {'$set': {
+                        f'GAMES.{game["gameId"]}.SUMMARY.Highlights': highlights,
+                        f'GAMES.{game["gameId"]}.ADV': adv,
+                        f'GAMES.{game["gameId"]}.FINAL': True
+                    }
+                    }
+                )
+            logging.info(f'(Games Live) Finalizing game {game["gameId"]}.')
 
 
 def games_daily_update():
@@ -237,13 +359,14 @@ def games_daily_update():
     Updates games, NBA Cup, and playoff data for each team.
     """
     # Games
-    logging.info("Games/Scores..")
-    update_game_data()
+    # logging.info("Games/Scores..")
+    # update_game_data()
 
     # Upcoming Games
+    logging.info("Upcoming Games..")
     try:
         # Define date range
-        start_date = datetime(2024, 10, 4)
+        start_date = datetime.today()
         end_date = datetime(2025, 4, 13)
 
         # Fetch games for each date in the range
@@ -302,48 +425,62 @@ def teams_daily_update():
         update_team_contract_data()
 
         # Loop through all documents in the collection
-        for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0})):
-            team = doc['TEAM_ID']
+        batch_size = 10
+        total_documents = teams_collection.count_documents({})
+        processed_count = 0
+        while processed_count < total_documents:
+            with teams_collection.find({}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0}).skip(processed_count).limit(
+                    batch_size).batch_size(batch_size) as cursor:
+                documents = list(cursor)
+                if not documents:
+                    break
+                processed_count += len(documents)
 
-            if team == 0:
-                continue
+                for doc in documents:
+                    team = doc['TEAM_ID']
 
-            logging.info(f"Processing team {team} ({i + 1} of 30)...")
+                    if team == 0:
+                        continue
 
-            # Team History (30 API calls)
-            logging.info("History...")
-            update_team_history(team_id=team)
+                    logging.info(f"Processing team {team} ({processed_count} of 30)...")
 
-            # Season Stats (120 API calls)
-            logging.info("Stats...")
-            update_current_season(team_id=team)
-            # Filter seasons to only include the current season key
-            filtered_doc = doc.copy()
-            filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if key == k_current_season}
-            current_season_per_100_possessions(team_doc=filtered_doc, playoffs=k_current_season_type == 'PLAYOFFS')
+                    # Team History (30 API calls)
+                    logging.info("History...")
+                    update_team_history(team_id=team)
+                    time.sleep(15)
 
-            # Current Roster & Coaches (~400-500 API calls)
-            logging.info("Roster & Coaches...")
-            season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
-            update_current_roster(team_id=team, season_not_started=season_not_started)
+                    # Season Stats (120 API calls)
+                    logging.info("Stats...")
+                    update_current_season(team_id=team)
+                    # Filter seasons to only include the current season key
+                    filtered_doc = doc.copy()
+                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if key == k_current_season}
+                    current_season_per_100_possessions(team_doc=filtered_doc, playoffs=k_current_season_type == 'PLAYOFFS')
+                    time.sleep(15)
 
-            # Last Starting Lineup (0 API Calls)
-            # Get most recent game by date
-            game_id, game_date = get_last_game(doc['seasons'])
-            # Get starting lineup for most recent game
-            last_starting_lineup = get_last_lineup(team, game_id, game_date)
-            # Update document
-            teams_collection.update_one(
-                {"TEAM_ID": team},
-                {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
-            )
+                    # Current Roster & Coaches (~400-500 API calls)
+                    logging.info("Roster & Coaches...")
+                    season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
+                    update_current_roster(team_id=team, season_not_started=season_not_started)
+                    time.sleep(15)
 
-            # Pause 10 seconds between teams
-            time.sleep(10)
+                    # Last Starting Lineup (0 API Calls)
+                    # Get most recent game by date
+                    game_id, game_date = get_last_game(doc['seasons'])
+                    # Get starting lineup for most recent game
+                    last_starting_lineup = get_last_lineup(team, game_id, game_date)
+                    # Update document
+                    teams_collection.update_one(
+                        {"TEAM_ID": team},
+                        {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
+                    )
 
-        rank_hustle_stats_current_season()
-        three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
-        current_season_custom_team_stats_rank()
+                    # Pause 15 seconds between teams
+                    time.sleep(15)
+
+                rank_hustle_stats_current_season()
+                three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
+                current_season_custom_team_stats_rank()
     except Exception as e:
         logging.error(f"(Teams Daily) Error updating teams: {e}")
 
@@ -662,9 +799,9 @@ def players_daily_update():
 # Schedule the tasks
 schedule.every(10).seconds.do(games_live_update)  # Run every 1 minute
 schedule.every().day.at("00:00").do(reset_flags)  # Reset the flag at midnight
-# schedule.every().day.at("02:30").do(games_daily_update())  # Run every day at 2:30 AM
-# schedule.every().day.at("03:00").do(teams_daily_update())  # Run every day at 3:00 AM
-# schedule.every().day.at("03:30").do(players_daily_update())  # Run every day at 3:30 AM
+#schedule.every().day.at("02:30").do(games_daily_update())  # Run every day at 2:30 AM
+#schedule.every().day.at("02:45").do(teams_daily_update())  # Run every day at 3:00 AM
+#schedule.every().day.at("03:30").do(players_daily_update())  # Run every day at 3:30 AM
 
 
 # Configure logging
@@ -694,10 +831,10 @@ except Exception as e:
     logging.error(f"Failed to connect to MongoDB: {e}")
     exit(1)
 
-games_live_update()
-# games_daily_update()
-# teams_daily_update()
-# players_daily_update()
+games_daily_update()
+teams_daily_update()
+players_daily_update()
+# games_live_update()
 
 while True:
     schedule.run_pending()

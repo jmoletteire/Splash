@@ -151,25 +151,17 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                     pinned: true,
                     expandedHeight: MediaQuery.of(context).size.height * 0.28,
                     title: _title
-                        ? team['TEAM_ID'] == 1610612761
-                            ? SvgPicture.asset(
-                                'images/NBA_Logos/${team['TEAM_ID']}.svg',
-                                width: isLandscape
-                                    ? MediaQuery.of(context).size.width * 0.09
-                                    : MediaQuery.of(context).size.width * 0.06,
-                                height: isLandscape
-                                    ? MediaQuery.of(context).size.width * 0.09
-                                    : MediaQuery.of(context).size.height * 0.06,
-                              )
-                            : ConstrainedBox(
-                                constraints: const BoxConstraints(maxHeight: 40.0),
-                                child: Image.asset(
-                                  'images/NBA_Logos/${team['TEAM_ID']}.png',
-                                  width: isLandscape
-                                      ? MediaQuery.of(context).size.width * 0.0375
-                                      : MediaQuery.of(context).size.width * 0.15,
-                                ),
-                              )
+                        ? ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 40.0),
+                            child: Image.asset(
+                              team['TEAM_ID'] == 1610612761
+                                  ? 'images/NBA_Logos/${team['TEAM_ID']}_alt.png'
+                                  : 'images/NBA_Logos/${team['TEAM_ID']}.png',
+                              width: isLandscape
+                                  ? MediaQuery.of(context).size.width * 0.0375
+                                  : MediaQuery.of(context).size.width * 0.15,
+                            ),
+                          )
                         : null,
                     centerTitle: true,
                     flexibleSpace: Stack(

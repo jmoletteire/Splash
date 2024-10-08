@@ -122,6 +122,47 @@ class _GameCardState extends State<GameCard> {
     var summary = widget.game['SUMMARY']['GameSummary'][0];
     var linescore = widget.game['SUMMARY']['LineScore'];
 
+    String getGameTime() {
+      switch (summary['GAME_STATUS_ID']) {
+        case 1:
+          // Upcoming
+          return adjustTimezone(summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT']);
+        case 2:
+          // End Quarter
+          if (summary['LIVE_PC_TIME'] == ":0.0" || summary['LIVE_PC_TIME'] == "     ") {
+            switch (summary['LIVE_PERIOD']) {
+              case 1:
+                return 'End 1Q';
+              case 2:
+                return 'HT';
+              case 3:
+                return 'End 3Q';
+              case 4:
+                return 'Final';
+              case 5:
+                return 'Final/OT';
+              default:
+                return 'Final/${summary['LIVE_PERIOD']}OT';
+            }
+          } else {
+            // Game in-progress
+            return '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ';
+          }
+        case 3:
+          // Game Final
+          switch (summary['LIVE_PERIOD']) {
+            case 4:
+              return 'Final';
+            case 5:
+              return 'Final/OT';
+            default:
+              return 'Final/${summary['LIVE_PERIOD'] - 4}OT';
+          }
+        default:
+          return '';
+      }
+    }
+
     Map<String, dynamic> homeLinescore =
         linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[0] : linescore[1];
     Map<String, dynamic> awayLinescore =
@@ -192,8 +233,8 @@ class _GameCardState extends State<GameCard> {
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
                             SvgPicture.asset(
                               'images/ESPN.svg',
-                              width: 5.0.r,
-                              height: 5.0.r,
+                              width: 7.0.r,
+                              height: 7.0.r,
                             ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
                             SvgPicture.asset(
@@ -208,16 +249,7 @@ class _GameCardState extends State<GameCard> {
                   Expanded(flex: 3, child: gameTitle(summary['GAME_ID'])),
                   Expanded(
                     child: Text(
-                      summary['GAME_STATUS_ID'] == 1 // Game has not started
-                          ? adjustTimezone(
-                              summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT'])
-                          : summary['LIVE_PC_TIME'] == "0:00"
-                              ? summary['LIVE_PERIOD'] == 1 || summary['LIVE_PERIOD'] == 3
-                                  ? 'End ${summary['LIVE_PERIOD']}Q'
-                                  : summary['LIVE_PERIOD'] == 2
-                                      ? 'HT'
-                                      : 'Final'
-                              : '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ', // Game in-progress
+                      getGameTime(),
                       style: kBebasNormal.copyWith(
                           fontSize: 14.0.r,
                           color: summary['GAME_STATUS_ID'] != 2 // Game NOT in-progress

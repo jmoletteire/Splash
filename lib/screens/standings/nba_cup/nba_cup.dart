@@ -84,10 +84,10 @@ class _NbaCupState extends State<NbaCup>
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
           labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
-          tabs: const [
+          tabs: [
             Tab(text: 'Groups'),
             Tab(text: 'Wild Card'),
-            Tab(text: 'Knockout'),
+            if (widget.cupData.containsKey('KNOCKOUT')) Tab(text: 'Knockout'),
           ],
         ),
       ),
@@ -162,7 +162,8 @@ class _NbaCupState extends State<NbaCup>
               ],
             ),
           ),
-          KnockoutBracket(knockoutData: widget.cupData['KNOCKOUT'])
+          if (widget.cupData.containsKey('KNOCKOUT'))
+            KnockoutBracket(knockoutData: widget.cupData['KNOCKOUT'])
         ],
       ),
     );

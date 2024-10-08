@@ -434,7 +434,9 @@ class PlayerInfo extends StatelessWidget {
                           ConstrainedBox(
                             constraints: BoxConstraints(maxWidth: 20.0.r),
                             child: Image.asset(
-                              'images/NBA_Logos/${team['TEAM_ID']}.png',
+                              team['TEAM_ID'] == 1610612761
+                                  ? 'images/NBA_Logos/${team['TEAM_ID']}_alt2.png'
+                                  : 'images/NBA_Logos/${team['TEAM_ID']}.png',
                               fit: BoxFit.contain,
                               width: 20.0.r,
                               height: 20.0.r,

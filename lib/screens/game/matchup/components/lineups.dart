@@ -69,7 +69,7 @@ class _LineupsState extends State<Lineups> {
                     ),
                   ),
                   child: Text(
-                    'Lineups',
+                    'Starting Lineups',
                     style: kBebasBold.copyWith(fontSize: 20.0.r),
                   ),
                 ),
