@@ -139,6 +139,8 @@ def update_player_info():
             players_collection.update_one(
                 {"_id": player['_id']},
                 {"$set": {
+                    'DISPLAY_FIRST_LAST': latest_info[0]['DISPLAY_FIRST_LAST'],
+                    'DISPLAY_FI_LAST': latest_info[0]['DISPLAY_FI_LAST'],
                     'WEIGHT': latest_info[0]['WEIGHT'],
                     'SEASON_EXP': latest_info[0]['SEASON_EXP'],
                     'JERSEY': latest_info[0]['JERSEY'],

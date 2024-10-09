@@ -507,7 +507,7 @@ class GameInfo extends StatelessWidget {
           style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
     }
     if (status == 2) {
-      if (gameSummary['LIVE_PC_TIME'] == "0:00") {
+      if (gameSummary['LIVE_PC_TIME'] == ":0.0") {
         switch (gameSummary['LIVE_PERIOD']) {
           case 1:
             return Column(

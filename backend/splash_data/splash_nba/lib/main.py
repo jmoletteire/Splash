@@ -248,8 +248,11 @@ def games_live_update():
                 'playerNameI'
             ]
 
-            actions = playbyplay.PlayByPlay(game_id=game['gameId']).get_dict()['game']['actions']
-            pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
+            try:
+                actions = playbyplay.PlayByPlay(game_id=game['gameId']).get_dict()['game']['actions']
+                pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
+            except Exception:
+                pbp = []
 
             home_line_index = 0 if line_score[0]['TEAM_ID'] == box_score['homeTeam']['teamId'] else 1
             away_line_index = 0 if line_score[0]['TEAM_ID'] == box_score['awayTeam']['teamId'] else 1
@@ -326,15 +329,21 @@ def games_live_update():
                 logging.info(f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
                 continue  # Skip this game as it's already been finalized
 
+            update_team_games(games_collection.find_one({'GAME_DATE': today}, {'GAMES': 1}))
             summary = fetch_box_score_summary(game['gameId'])
             adv = fetch_box_score_adv(game['gameId'])
             highlights = 'No highlights found'  # search_youtube_highlights(youtube_api_key, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
+
+            home_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['HOME_TEAM_ID'] else 1
+            away_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['VISITOR_TEAM_ID'] else 1
 
             if highlights == 'No highlights found':
                 games_collection.update_one(
                     {'GAME_DATE': today},
                     {'$set': {
                         f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': 3,
+                        f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES': line_score[home_line_index]['TEAM_WINS_LOSSES'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES': line_score[away_line_index]['TEAM_WINS_LOSSES'],
                         f'GAMES.{game["gameId"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
                         f'GAMES.{game["gameId"]}.ADV': adv,
                         f'GAMES.{game["gameId"]}.FINAL': True if adv['PlayerStats'][0]['E_OFF_RATING'] is not None else False
@@ -345,6 +354,10 @@ def games_live_update():
                 games_collection.update_one(
                     {'GAME_DATE': today},
                     {'$set': {
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': 3,
+                        f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES': line_score[home_line_index]['TEAM_WINS_LOSSES'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES': line_score[away_line_index]['TEAM_WINS_LOSSES'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
                         f'GAMES.{game["gameId"]}.SUMMARY.Highlights': highlights,
                         f'GAMES.{game["gameId"]}.ADV': adv,
                         f'GAMES.{game["gameId"]}.FINAL': True
