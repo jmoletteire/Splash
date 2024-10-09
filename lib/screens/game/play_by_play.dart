@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/components/player_avatar.dart';
 import 'package:splash/utilities/constants.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 
 import '../player/player_home.dart';
 
@@ -31,11 +32,32 @@ class _PlayByPlayState extends State<PlayByPlay> {
   late List thirdQuarter;
   late List fourthQuarter;
   late List overTime;
+  late String selectedPlayer;
+  late List<Map<String, dynamic>> players;
+  late String team;
+  List<String> teams = ['HOME', 'ALL', 'AWAY'];
+  int initialLabelIndex = 1;
 
   @override
   void initState() {
     super.initState();
     _inProgress = widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2;
+    selectedPlayer = 'ALL';
+    players = [
+      {'id': 0, 'name': 'ALL'}
+    ];
+
+    if (_inProgress) {
+      for (var player in widget.game['BOXSCORE']['homeTeam']['players']) {
+        Map<String, dynamic> playerData = {'id': player['personId'], 'name': player['nameI']};
+        players.add(playerData);
+      }
+      for (var player in widget.game['BOXSCORE']['awayTeam']['players']) {
+        Map<String, dynamic> playerData = {'id': player['personId'], 'name': player['nameI']};
+        players.add(playerData);
+      }
+    }
+
     if (_inProgress) {
       firstQuarter = widget.game['PBP']
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 1)
@@ -194,55 +216,147 @@ class _PlayByPlayState extends State<PlayByPlay> {
       }
     }
 
-    return CustomScrollView(
-      slivers: [
-        if ((_inProgress && overTime.isNotEmpty) || (!_inProgress && firstQuarter.isNotEmpty))
-          Plays(
-            period: _inProgress ? 'Overtime' : '1st Quarter',
-            actions: _inProgress ? overTime : firstQuarter,
-            homeId: widget.homeId,
-            awayId: widget.awayId,
-            homeTeamColor: homeTeamColor,
-            awayTeamColor: awayTeamColor,
+    return Stack(
+      children: [
+        CustomScrollView(
+          slivers: [
+            if ((_inProgress && overTime.isNotEmpty) ||
+                (!_inProgress && firstQuarter.isNotEmpty))
+              Plays(
+                period: _inProgress ? 'Overtime' : '1st Quarter',
+                actions: _inProgress ? overTime : firstQuarter,
+                homeId: widget.homeId,
+                awayId: widget.awayId,
+                homeTeamColor: homeTeamColor,
+                awayTeamColor: awayTeamColor,
+              ),
+            if ((_inProgress && fourthQuarter.isNotEmpty) ||
+                (!_inProgress && secondQuarter.isNotEmpty))
+              Plays(
+                period: _inProgress ? '4th Quarter' : '2nd Quarter',
+                actions: _inProgress ? fourthQuarter : secondQuarter,
+                homeId: widget.homeId,
+                awayId: widget.awayId,
+                homeTeamColor: homeTeamColor,
+                awayTeamColor: awayTeamColor,
+              ),
+            if (thirdQuarter.isNotEmpty)
+              Plays(
+                period: '3rd Quarter',
+                actions: thirdQuarter,
+                homeId: widget.homeId,
+                awayId: widget.awayId,
+                homeTeamColor: homeTeamColor,
+                awayTeamColor: awayTeamColor,
+              ),
+            if ((_inProgress && secondQuarter.isNotEmpty) ||
+                (!_inProgress && fourthQuarter.isNotEmpty))
+              Plays(
+                period: _inProgress ? '2nd Quarter' : '4th Quarter',
+                actions: _inProgress ? secondQuarter : fourthQuarter,
+                homeId: widget.homeId,
+                awayId: widget.awayId,
+                homeTeamColor: homeTeamColor,
+                awayTeamColor: awayTeamColor,
+              ),
+            if ((_inProgress && firstQuarter.isNotEmpty) ||
+                (!_inProgress && overTime.isNotEmpty))
+              Plays(
+                period: _inProgress ? '1st Quarter' : 'Overtime',
+                actions: _inProgress ? firstQuarter : overTime,
+                homeId: widget.homeId,
+                awayId: widget.awayId,
+                homeTeamColor: homeTeamColor,
+                awayTeamColor: awayTeamColor,
+              )
+          ],
+        ),
+        Positioned(
+          bottom: kBottomNavigationBarHeight - kToolbarHeight,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade900,
+              border: Border(
+                top: BorderSide(color: Colors.grey.shade800, width: 0.75),
+                bottom: BorderSide(color: Colors.grey.shade800, width: 0.2),
+              ),
+            ),
+            width: MediaQuery.sizeOf(context).width,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade900,
+                      border: Border.all(color: Colors.deepOrange),
+                      borderRadius: BorderRadius.circular(10.0)),
+                  margin: EdgeInsets.all(11.0.r),
+                  child: DropdownButton<String>(
+                    padding: EdgeInsets.symmetric(horizontal: 15.0.r),
+                    borderRadius: BorderRadius.circular(10.0),
+                    menuMaxHeight: 300.0.r,
+                    dropdownColor: Colors.grey.shade900,
+                    isExpanded: false,
+                    underline: Container(),
+                    value: selectedPlayer,
+                    items:
+                        players.map<DropdownMenuItem<String>>((Map<String, dynamic> player) {
+                      return DropdownMenuItem<String>(
+                        value: player['name'], // Use 'name' from the map
+                        child: Text(
+                          player['name'], // Display 'name' in the dropdown
+                          style: kBebasNormal.copyWith(fontSize: 17.0.r),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedPlayer = value!;
+                      });
+                    },
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade900,
+                      border: Border.all(color: Colors.deepOrange),
+                      borderRadius: BorderRadius.circular(25.0)),
+                  margin: const EdgeInsets.all(11.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: ToggleSwitch(
+                      initialLabelIndex: initialLabelIndex,
+                      totalSwitches: 3,
+                      labels: const ['Home', 'All', 'Away'],
+                      animate: true,
+                      animationDuration: 200,
+                      curve: Curves.decelerate,
+                      cornerRadius: 20.0,
+                      customWidths: [
+                        (MediaQuery.sizeOf(context).width - 28) / 4,
+                        (MediaQuery.sizeOf(context).width - 28) / 4
+                      ],
+                      activeBgColor: [Colors.grey.shade800],
+                      activeFgColor: Colors.white,
+                      inactiveBgColor: Colors.grey.shade900,
+                      customTextStyles: [
+                        kBebasNormal.copyWith(fontSize: 14.0.r),
+                        kBebasNormal.copyWith(fontSize: 14.0.r)
+                      ],
+                      onToggle: (index) {
+                        setState(() {
+                          team = teams[index!];
+                          initialLabelIndex = index;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        if ((_inProgress && fourthQuarter.isNotEmpty) ||
-            (!_inProgress && secondQuarter.isNotEmpty))
-          Plays(
-            period: _inProgress ? '4th Quarter' : '2nd Quarter',
-            actions: _inProgress ? fourthQuarter : secondQuarter,
-            homeId: widget.homeId,
-            awayId: widget.awayId,
-            homeTeamColor: homeTeamColor,
-            awayTeamColor: awayTeamColor,
-          ),
-        if (thirdQuarter.isNotEmpty)
-          Plays(
-            period: '3rd Quarter',
-            actions: thirdQuarter,
-            homeId: widget.homeId,
-            awayId: widget.awayId,
-            homeTeamColor: homeTeamColor,
-            awayTeamColor: awayTeamColor,
-          ),
-        if ((_inProgress && secondQuarter.isNotEmpty) ||
-            (!_inProgress && fourthQuarter.isNotEmpty))
-          Plays(
-            period: _inProgress ? '2nd Quarter' : '4th Quarter',
-            actions: _inProgress ? secondQuarter : fourthQuarter,
-            homeId: widget.homeId,
-            awayId: widget.awayId,
-            homeTeamColor: homeTeamColor,
-            awayTeamColor: awayTeamColor,
-          ),
-        if ((_inProgress && firstQuarter.isNotEmpty) || (!_inProgress && overTime.isNotEmpty))
-          Plays(
-            period: _inProgress ? '1st Quarter' : 'Overtime',
-            actions: _inProgress ? firstQuarter : overTime,
-            homeId: widget.homeId,
-            awayId: widget.awayId,
-            homeTeamColor: homeTeamColor,
-            awayTeamColor: awayTeamColor,
-          )
+        ),
       ],
     );
   }
@@ -341,197 +455,211 @@ class _PlaysState extends State<Plays> {
         Visibility(
           visible: _isExpanded,
           child: SliverList(
-              delegate: SliverChildListDelegate([
-            for (int i = 0; i < widget.actions.length; i++)
-              Container(
-                padding: EdgeInsets.all(8.0.r),
-                decoration: BoxDecoration(
-                  color: widget.actions[i]['possession'] != 0 &&
-                          widget.actions[i]['possession'].toString() == widget.homeId &&
-                          widget.actions[i]['clock'] != "PT12M00.00S"
-                      ? widget.homeTeamColor.withOpacity(0.25)
-                      : widget.actions[i]['possession'] != 0 &&
-                              widget.actions[i]['possession'].toString() == widget.awayId &&
+            delegate: SliverChildListDelegate(
+              [
+                for (int i = 0; i < widget.actions.length; i++)
+                  Container(
+                    padding: EdgeInsets.all(8.0.r),
+                    decoration: BoxDecoration(
+                      color: widget.actions[i]['possession'] != 0 &&
+                              widget.actions[i]['possession'].toString() == widget.homeId &&
                               widget.actions[i]['clock'] != "PT12M00.00S"
-                          ? widget.awayTeamColor.withOpacity(0.25)
-                          : Colors.grey.shade900,
-                  border: Border(
-                    left: widget.actions[i]['clock'] != "PT12M00.00S"
-                        ? BorderSide(
-                            color: widget.actions[i]['possession'].toString() == widget.homeId
-                                ? widget.homeTeamColor
-                                : widget.actions[i]['possession'].toString() == widget.awayId
-                                    ? widget.awayTeamColor
-                                    : Colors.transparent,
-                            width: 5.0)
-                        : const BorderSide(),
-                    bottom: (i < widget.actions.length - 1 &&
-                                widget.actions[i]['possession'] !=
-                                    widget.actions[i + 1]['possession']) ||
-                            widget.actions[i]['description'] == 'Period Start'
-                        ? BorderSide(
-                            color: i + 1 < widget.actions.length &&
-                                    widget.actions[i + 1]['possession'].toString() ==
-                                        widget.homeId
-                                ? widget.homeTeamColor
-                                : i + 1 < widget.actions.length &&
+                          ? widget.homeTeamColor == const Color(0xFF000000)
+                              ? const Color(0xFF111111)
+                              : widget.homeTeamColor.withOpacity(0.25)
+                          : widget.actions[i]['possession'] != 0 &&
+                                  widget.actions[i]['possession'].toString() ==
+                                      widget.awayId &&
+                                  widget.actions[i]['clock'] != "PT12M00.00S"
+                              ? widget.awayTeamColor.withOpacity(0.25)
+                              : Colors.grey.shade900,
+                      border: Border(
+                        left: widget.actions[i]['clock'] != "PT12M00.00S"
+                            ? BorderSide(
+                                color:
+                                    widget.actions[i]['possession'].toString() == widget.homeId
+                                        ? widget.homeTeamColor
+                                        : widget.actions[i]['possession'].toString() ==
+                                                widget.awayId
+                                            ? widget.awayTeamColor
+                                            : Colors.transparent,
+                                width: 5.0)
+                            : const BorderSide(),
+                        bottom: (i < widget.actions.length - 1 &&
+                                    widget.actions[i]['possession'] !=
+                                        widget.actions[i + 1]['possession']) ||
+                                widget.actions[i]['description'] == 'Period Start'
+                            ? BorderSide(
+                                color: i + 1 < widget.actions.length &&
                                         widget.actions[i + 1]['possession'].toString() ==
-                                            widget.awayId
-                                    ? widget.awayTeamColor
-                                    : Colors.transparent,
-                            width: 1.0)
-                        : BorderSide(color: Colors.grey.shade600, width: 0.25),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment
-                      .spaceBetween, // Distributes items with space between them
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        formatDuration(widget.actions[i]['clock']),
-                        textAlign: TextAlign.start,
-                        style: kBebasNormal.copyWith(
-                          color: Colors.grey.shade300,
-                          fontSize: 15.0.r,
-                        ),
+                                            widget.homeId
+                                    ? widget.homeTeamColor
+                                    : i + 1 < widget.actions.length &&
+                                            widget.actions[i + 1]['possession'].toString() ==
+                                                widget.awayId
+                                        ? widget.awayTeamColor
+                                        : Colors.transparent,
+                                width: 1.0)
+                            : BorderSide(color: Colors.grey.shade600, width: 0.25),
                       ),
                     ),
-                    if (widget.actions[i]['personId'] != 0)
-                      ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: 30.0.r, maxHeight: 30.0.r),
-                        child: Image.asset(
-                            'images/NBA_Logos/${kTeamIdToName.containsKey(widget.actions[i]['teamId'].toString()) ? widget.actions[i]['teamId'] : '0'}.png'),
-                      ),
-                    if (widget.actions[i]['personId'] != 0 &&
-                            widget.actions[i]['isFieldGoal'] == 1 ||
-                        widget.actions[i]['description'].contains('Free Throw'))
-                      Expanded(
-                          flex: 2,
-                          child: RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: '${widget.actions[i]['scoreAway']}',
-                                  style: widget.actions[i]['description'].contains('PTS')
-                                      ? kBebasBold.copyWith(
-                                          fontSize: 16.0.r,
-                                          color: widget.actions[i]['possession'].toString() ==
-                                                  widget.awayId
-                                              ? Colors.white
-                                              : Colors.grey.shade500)
-                                      : kBebasNormal.copyWith(
-                                          fontSize: 16.0.r, color: Colors.grey.shade400),
-                                ),
-                                TextSpan(
-                                  text: '  -  ',
-                                  style: widget.actions[i]['description'].contains('PTS')
-                                      ? kBebasBold.copyWith(
-                                          fontSize: 16.0.r, color: Colors.grey.shade400)
-                                      : kBebasNormal.copyWith(
-                                          fontSize: 16.0.r, color: Colors.grey.shade400),
-                                ),
-                                TextSpan(
-                                  text: '${widget.actions[i]['scoreHome']}',
-                                  style: widget.actions[i]['description'].contains('PTS')
-                                      ? kBebasBold.copyWith(
-                                          fontSize: 16.0.r,
-                                          color: widget.actions[i]['possession'].toString() ==
-                                                  widget.homeId
-                                              ? Colors.white
-                                              : Colors.grey.shade500)
-                                      : kBebasNormal.copyWith(
-                                          fontSize: 16.0.r, color: Colors.grey.shade400),
-                                ),
-                              ],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceBetween, // Distributes items with space between them
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            formatDuration(widget.actions[i]['clock']),
+                            textAlign: TextAlign.start,
+                            style: kBebasNormal.copyWith(
+                              color: Colors.grey.shade300,
+                              fontSize: 15.0.r,
                             ),
-                          )),
-                    if (widget.actions[i]['personId'] == 0 ||
-                        widget.actions[i]['isFieldGoal'] != 1 &&
-                            !widget.actions[i]['description'].contains('Free Throw'))
-                      const Spacer(flex: 2),
-                    Expanded(
-                      flex: 5,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment
-                            .spaceBetween, // Ensures text stays left aligned and arrow on the right
-                        children: [
-                          if (widget.actions[i]['description'].contains('Timeout'))
-                            Icon(
-                              Icons.timer,
-                              size: 16.0.r,
-                            ),
-                          if (widget.actions[i]['description'].contains('Timeout'))
-                            SizedBox(width: 5.0.r),
+                          ),
+                        ),
+                        if (widget.actions[i]['personId'] != 0)
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 30.0.r, maxHeight: 30.0.r),
+                            child: Image.asset(
+                                'images/NBA_Logos/${kTeamIdToName.containsKey(widget.actions[i]['teamId'].toString()) ? widget.actions[i]['teamId'] : '0'}.png'),
+                          ),
+                        if (widget.actions[i]['personId'] != 0 &&
+                                widget.actions[i]['isFieldGoal'] == 1 ||
+                            widget.actions[i]['description'].contains('Free Throw'))
                           Expanded(
-                            child: Text(
-                              widget.actions[i]['description'].contains('TEAM')
-                                  ? '${widget.actions[i]['description']} (${kTeamIdToName[widget.actions[i]['teamId'].toString()]?[1] ?? 'INT\'L'})'
-                                  : widget.actions[i]['description'],
-                              textAlign: TextAlign.left,
-                              style: widget.actions[i]['description'].contains('PTS')
-                                  ? kBebasBold.copyWith(fontSize: 14.0.r, color: Colors.white)
-                                  : widget.actions[i]['description'].contains('SUB')
+                              flex: 2,
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: '${widget.actions[i]['scoreAway']}',
+                                      style: widget.actions[i]['description'].contains('PTS')
+                                          ? kBebasBold.copyWith(
+                                              fontSize: 16.0.r,
+                                              color:
+                                                  widget.actions[i]['possession'].toString() ==
+                                                          widget.awayId
+                                                      ? Colors.white
+                                                      : Colors.grey.shade500)
+                                          : kBebasNormal.copyWith(
+                                              fontSize: 16.0.r, color: Colors.grey.shade400),
+                                    ),
+                                    TextSpan(
+                                      text: '  -  ',
+                                      style: widget.actions[i]['description'].contains('PTS')
+                                          ? kBebasBold.copyWith(
+                                              fontSize: 16.0.r, color: Colors.grey.shade400)
+                                          : kBebasNormal.copyWith(
+                                              fontSize: 16.0.r, color: Colors.grey.shade400),
+                                    ),
+                                    TextSpan(
+                                      text: '${widget.actions[i]['scoreHome']}',
+                                      style: widget.actions[i]['description'].contains('PTS')
+                                          ? kBebasBold.copyWith(
+                                              fontSize: 16.0.r,
+                                              color:
+                                                  widget.actions[i]['possession'].toString() ==
+                                                          widget.homeId
+                                                      ? Colors.white
+                                                      : Colors.grey.shade500)
+                                          : kBebasNormal.copyWith(
+                                              fontSize: 16.0.r, color: Colors.grey.shade400),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        if (widget.actions[i]['personId'] == 0 ||
+                            widget.actions[i]['isFieldGoal'] != 1 &&
+                                !widget.actions[i]['description'].contains('Free Throw'))
+                          const Spacer(flex: 2),
+                        Expanded(
+                          flex: 5,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment
+                                .spaceBetween, // Ensures text stays left aligned and arrow on the right
+                            children: [
+                              if (widget.actions[i]['description'].contains('Timeout'))
+                                Icon(
+                                  Icons.timer,
+                                  size: 16.0.r,
+                                ),
+                              if (widget.actions[i]['description'].contains('Timeout'))
+                                SizedBox(width: 5.0.r),
+                              Expanded(
+                                child: Text(
+                                  widget.actions[i]['description'].contains('TEAM')
+                                      ? '${widget.actions[i]['description']} (${kTeamIdToName[widget.actions[i]['teamId'].toString()]?[1] ?? 'INT\'L'})'
+                                      : widget.actions[i]['description'],
+                                  textAlign: TextAlign.left,
+                                  style: widget.actions[i]['description'].contains('PTS')
                                       ? kBebasBold.copyWith(
-                                          fontSize: 14.0.r,
-                                          color: Colors.grey.shade300,
-                                          fontStyle: FontStyle.italic)
-                                      : widget.actions[i]['description'].contains('Timeout')
-                                          ? kBebasNormal.copyWith(
-                                              fontSize: 15.0.r,
+                                          fontSize: 14.0.r, color: Colors.white)
+                                      : widget.actions[i]['description'].contains('SUB')
+                                          ? kBebasBold.copyWith(
+                                              fontSize: 14.0.r,
                                               color: Colors.grey.shade300,
                                               fontStyle: FontStyle.italic)
-                                          : kBebasNormal.copyWith(
-                                              fontSize: 14.0.r, color: Colors.grey.shade300),
-                              overflow: TextOverflow.visible, // Ensures text wraps
-                            ),
-                          ),
-                          if (widget.actions[i]['description']
-                              .contains('SUB in')) // Check for 'SUB'
-                            Icon(
-                              Icons.arrow_upward, // Up arrow icon
-                              color: Colors.green, // Green color for the arrow
-                              size: 16.0.r, // Adjust the size if needed
-                            ),
-                          if (widget.actions[i]['description']
-                              .contains('SUB out')) // Check for 'SUB'
-                            Icon(
-                              Icons.arrow_downward, // Up arrow icon
-                              color: Colors.red, // Green color for the arrow
-                              size: 16.0.r, // Adjust the size if needed
-                            ),
-                        ],
-                      ),
-                    ),
-                    if (widget.actions[i]['personId'] != 0) SizedBox(width: 8.0.r),
-                    if (widget.actions[i]['personId'] != 0)
-                      Expanded(
-                        flex: 1,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PlayerHome(
-                                  playerId: (widget.actions[i]['personId'] ?? 0).toString(),
+                                          : widget.actions[i]['description']
+                                                  .contains('Timeout')
+                                              ? kBebasNormal.copyWith(
+                                                  fontSize: 15.0.r,
+                                                  color: Colors.grey.shade300,
+                                                  fontStyle: FontStyle.italic)
+                                              : kBebasNormal.copyWith(
+                                                  fontSize: 14.0.r,
+                                                  color: Colors.grey.shade300),
+                                  overflow: TextOverflow.visible, // Ensures text wraps
                                 ),
                               ),
-                            );
-                          },
-                          child: PlayerAvatar(
-                            radius: 16.0.r,
-                            backgroundColor: Colors.transparent,
-                            playerImageUrl:
-                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.actions[i]['personId']}.png',
+                              if (widget.actions[i]['description']
+                                  .contains('SUB in')) // Check for 'SUB'
+                                Icon(
+                                  Icons.arrow_upward, // Up arrow icon
+                                  color: Colors.green, // Green color for the arrow
+                                  size: 16.0.r, // Adjust the size if needed
+                                ),
+                              if (widget.actions[i]['description']
+                                  .contains('SUB out')) // Check for 'SUB'
+                                Icon(
+                                  Icons.arrow_downward, // Up arrow icon
+                                  color: Colors.red, // Green color for the arrow
+                                  size: 16.0.r, // Adjust the size if needed
+                                ),
+                            ],
                           ),
                         ),
-                      ),
-                  ],
-                ),
-              )
-          ])),
+                        if (widget.actions[i]['personId'] != 0) SizedBox(width: 8.0.r),
+                        if (widget.actions[i]['personId'] != 0)
+                          Expanded(
+                            flex: 1,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PlayerHome(
+                                      playerId:
+                                          (widget.actions[i]['personId'] ?? 0).toString(),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: PlayerAvatar(
+                                radius: 16.0.r,
+                                backgroundColor: Colors.transparent,
+                                playerImageUrl:
+                                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.actions[i]['personId']}.png',
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  )
+              ],
+            ),
+          ),
         )
       ],
     );

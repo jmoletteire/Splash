@@ -155,7 +155,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                             constraints: const BoxConstraints(maxHeight: 40.0),
                             child: Image.asset(
                               team['TEAM_ID'] == 1610612761
-                                  ? 'images/NBA_Logos/${team['TEAM_ID']}_alt.png'
+                                  ? 'images/NBA_Logos/${team['TEAM_ID']}_alt3.png'
                                   : 'images/NBA_Logos/${team['TEAM_ID']}.png',
                               width: isLandscape
                                   ? MediaQuery.of(context).size.width * 0.0375
@@ -380,7 +380,6 @@ class TeamInfo extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            //if (team['TEAM_ID'] == 1610612761)
             ConstrainedBox(
               constraints: BoxConstraints(minWidth: 110.0.r, maxWidth: 120.0.r),
               child: SvgPicture.asset(

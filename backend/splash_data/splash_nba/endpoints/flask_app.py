@@ -673,9 +673,9 @@ def get_game():
 @app.route('/get_player_shot_chart', methods=['GET'])
 def get_player_shot_chart():
     try:
-        # logging.info(f"(get_player) {request.args}")
+        # logging.info(f"(get_player_shot_chart) {request.args}")
         query_params = request.args.to_dict()
-        # logging.info(f"(get_player) {query_params}")
+        # logging.info(f"(get_player_shot_chart) {query_params}")
 
         # Retrieve the required parameters
         person_id = query_params.get('person_id')
@@ -697,20 +697,33 @@ def get_player_shot_chart():
             return jsonify({"error": "person_id must be an integer"}), 400
 
         # Query the database to find the player by PERSON_ID
-        player = player_shots_collection.find_one(
-            {"PLAYER_ID": player_id},
-            {"_id": 0, f"SEASON.{season}.{season_type}": 1}
-        )
+        player = player_shots_collection.aggregate([
+            {
+                "$search": {
+                    "index": "player_id",
+                    "equals": {
+                        "value": player_id,
+                        "path": "PLAYER_ID"
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    f"SEASON.{season}.{season_type}": 1
+                }
+            }
+        ])
 
         if player:
-            # logging.info(f"(get_player) Retrieved player {person_id} from MongoDB")
+            # logging.info(f"(get_player_shot_chart) Retrieved player {person_id} from MongoDB")
             return jsonify(player)
         else:
-            logging.warning("(get_player) No player found in MongoDB")
+            logging.warning("(get_player_shot_chart) No player found in MongoDB")
             return jsonify({"error": "No player found"}), 404
 
     except Exception as e:
-        logging.error(f"(get_player) Error retrieving player: {e}")
+        logging.error(f"(get_player_shot_chart) Error retrieving player: {e}")
         return jsonify({"error": "Failed to retrieve player"}), 500
 
 
