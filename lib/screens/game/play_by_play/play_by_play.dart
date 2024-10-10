@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:splash/components/player_avatar.dart';
+import 'package:splash/screens/game/play_by_play/pbp_video.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
-import '../player/player_home.dart';
+import '../../player/player_home.dart';
 
 class PlayByPlay extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -36,11 +37,11 @@ class _PlayByPlayState extends State<PlayByPlay> {
   late List overTime;
   late int selectedPlayer;
   late List<Map<String, dynamic>> players;
-  late String team;
+  late String selectedTeam;
+  late List<String> teams;
   late Map<String, int> teamCodes;
   late String homeTeamAbbr;
   late String awayTeamAbbr;
-  late List<String> teams;
   int initialLabelIndex = 1;
 
   void filterActions(int? teamId, int? playerId) {
@@ -118,7 +119,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
     awayTeamAbbr = kTeamIdToName[widget.awayId][1] ?? 'Away';
     teams = [awayTeamAbbr, 'ALL', homeTeamAbbr];
 
-    team = 'ALL';
+    selectedTeam = 'ALL';
     teamCodes = {
       homeTeamAbbr: int.parse(widget.homeId),
       'ALL': 0,
@@ -152,7 +153,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
     }
 
     allActions = widget.game['PBP'];
-    filterActions(teamCodes[team], selectedPlayer);
+    filterActions(teamCodes[selectedTeam], selectedPlayer);
   }
 
   @override
@@ -161,7 +162,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
 
     // Check if the game data has changed
     if (oldWidget.game != widget.game) {
-      filterActions(teamCodes[team], selectedPlayer);
+      filterActions(teamCodes[selectedTeam], selectedPlayer);
     }
   }
 
@@ -188,6 +189,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     String homeAbbr = kTeamIdToName[widget.homeId][1];
     Color homeTeamColor = kDarkPrimaryColors.contains(homeAbbr)
         ? (kTeamColors[homeAbbr]!['secondaryColor']!)
@@ -215,60 +218,89 @@ class _PlayByPlayState extends State<PlayByPlay> {
 
     return Stack(
       children: [
-        CustomScrollView(
-          slivers: [
-            if ((_inProgress && overTime.isNotEmpty) ||
-                (!_inProgress && firstQuarter.isNotEmpty))
-              Plays(
-                period: _inProgress ? 'Overtime' : '1st Quarter',
-                actions: _inProgress ? overTime : firstQuarter,
-                homeId: widget.homeId,
-                awayId: widget.awayId,
-                homeTeamColor: homeTeamColor,
-                awayTeamColor: awayTeamColor,
+        allActions.isEmpty
+            ? Center(
+                heightFactor: 5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.sports_basketball,
+                      color: Colors.white38,
+                      size: 38.0.r,
+                    ),
+                    SizedBox(height: 15.0.r),
+                    Text(
+                      'No Plays Available',
+                      style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+                    ),
+                  ],
+                ),
+              )
+            : CustomScrollView(
+                slivers: [
+                  if ((_inProgress && overTime.isNotEmpty) ||
+                      (!_inProgress && firstQuarter.isNotEmpty))
+                    Plays(
+                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
+                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      period: _inProgress ? 'Overtime' : '1st Quarter',
+                      actions: _inProgress ? overTime : firstQuarter,
+                      homeId: widget.homeId,
+                      awayId: widget.awayId,
+                      homeTeamColor: homeTeamColor,
+                      awayTeamColor: awayTeamColor,
+                    ),
+                  if ((_inProgress && fourthQuarter.isNotEmpty) ||
+                      (!_inProgress && secondQuarter.isNotEmpty))
+                    Plays(
+                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
+                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      period: _inProgress ? '4th Quarter' : '2nd Quarter',
+                      actions: _inProgress ? fourthQuarter : secondQuarter,
+                      homeId: widget.homeId,
+                      awayId: widget.awayId,
+                      homeTeamColor: homeTeamColor,
+                      awayTeamColor: awayTeamColor,
+                    ),
+                  if (thirdQuarter.isNotEmpty)
+                    Plays(
+                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
+                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      period: '3rd Quarter',
+                      actions: thirdQuarter,
+                      homeId: widget.homeId,
+                      awayId: widget.awayId,
+                      homeTeamColor: homeTeamColor,
+                      awayTeamColor: awayTeamColor,
+                    ),
+                  if ((_inProgress && secondQuarter.isNotEmpty) ||
+                      (!_inProgress && fourthQuarter.isNotEmpty))
+                    Plays(
+                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
+                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      period: _inProgress ? '2nd Quarter' : '4th Quarter',
+                      actions: _inProgress ? secondQuarter : fourthQuarter,
+                      homeId: widget.homeId,
+                      awayId: widget.awayId,
+                      homeTeamColor: homeTeamColor,
+                      awayTeamColor: awayTeamColor,
+                    ),
+                  if ((_inProgress && firstQuarter.isNotEmpty) ||
+                      (!_inProgress && overTime.isNotEmpty))
+                    Plays(
+                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
+                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      period: _inProgress ? '1st Quarter' : 'Overtime',
+                      actions: _inProgress ? firstQuarter : overTime,
+                      homeId: widget.homeId,
+                      awayId: widget.awayId,
+                      homeTeamColor: homeTeamColor,
+                      awayTeamColor: awayTeamColor,
+                    ),
+                  SliverPadding(padding: EdgeInsets.only(bottom: 100.0.r))
+                ],
               ),
-            if ((_inProgress && fourthQuarter.isNotEmpty) ||
-                (!_inProgress && secondQuarter.isNotEmpty))
-              Plays(
-                period: _inProgress ? '4th Quarter' : '2nd Quarter',
-                actions: _inProgress ? fourthQuarter : secondQuarter,
-                homeId: widget.homeId,
-                awayId: widget.awayId,
-                homeTeamColor: homeTeamColor,
-                awayTeamColor: awayTeamColor,
-              ),
-            if (thirdQuarter.isNotEmpty)
-              Plays(
-                period: '3rd Quarter',
-                actions: thirdQuarter,
-                homeId: widget.homeId,
-                awayId: widget.awayId,
-                homeTeamColor: homeTeamColor,
-                awayTeamColor: awayTeamColor,
-              ),
-            if ((_inProgress && secondQuarter.isNotEmpty) ||
-                (!_inProgress && fourthQuarter.isNotEmpty))
-              Plays(
-                period: _inProgress ? '2nd Quarter' : '4th Quarter',
-                actions: _inProgress ? secondQuarter : fourthQuarter,
-                homeId: widget.homeId,
-                awayId: widget.awayId,
-                homeTeamColor: homeTeamColor,
-                awayTeamColor: awayTeamColor,
-              ),
-            if ((_inProgress && firstQuarter.isNotEmpty) ||
-                (!_inProgress && overTime.isNotEmpty))
-              Plays(
-                period: _inProgress ? '1st Quarter' : 'Overtime',
-                actions: _inProgress ? firstQuarter : overTime,
-                homeId: widget.homeId,
-                awayId: widget.awayId,
-                homeTeamColor: homeTeamColor,
-                awayTeamColor: awayTeamColor,
-              ),
-            SliverPadding(padding: EdgeInsets.only(bottom: 100.0.r))
-          ],
-        ),
         Positioned(
           bottom: kBottomNavigationBarHeight - kToolbarHeight,
           child: Container(
@@ -287,17 +319,17 @@ class _PlayByPlayState extends State<PlayByPlay> {
                   decoration: BoxDecoration(
                       color: Colors.grey.shade900,
                       border: Border.all(
-                          color: team == homeTeamAbbr
+                          color: selectedTeam == homeTeamAbbr
                               ? kDarkPrimaryColors.contains(homeAbbr)
                                   ? (kTeamColors[homeAbbr]!['secondaryColor']!)
                                   : (kTeamColors[homeAbbr]!['primaryColor']!)
-                              : team == awayTeamAbbr
+                              : selectedTeam == awayTeamAbbr
                                   ? kDarkPrimaryColors.contains(awayAbbr)
                                       ? (kTeamColors[awayAbbr]!['secondaryColor']!)
                                       : (kTeamColors[awayAbbr]!['primaryColor']!)
                                   : Colors.deepOrange),
                       borderRadius: BorderRadius.circular(10.0)),
-                  margin: EdgeInsets.symmetric(vertical: 6.0.r, horizontal: 15.0.r),
+                  margin: EdgeInsets.symmetric(vertical: 6.0.r, horizontal: 8.0.r),
                   width: MediaQuery.of(context).size.width * 0.4,
                   child: DropdownButton<int>(
                     padding: EdgeInsets.symmetric(horizontal: 8.0.r),
@@ -313,26 +345,35 @@ class _PlayByPlayState extends State<PlayByPlay> {
                         child: Row(
                           children: [
                             if (player['name'] != 'ALL')
-                              Text(
-                                player['number'] ?? '',
-                                textAlign: TextAlign.center,
-                                style: kBebasNormal.copyWith(
-                                    color: Colors.grey, fontSize: 12.0.r),
+                              Flexible(
+                                flex: 2,
+                                child: AutoSizeText(
+                                  player['number'] ?? '',
+                                  textAlign: TextAlign.center,
+                                  style: kBebasNormal.copyWith(
+                                      color: Colors.grey, fontSize: 12.0.r),
+                                ),
                               ),
                             if (player['name'] != 'ALL') SizedBox(width: 8.0.r),
                             if (player['name'] != 'ALL')
-                              PlayerAvatar(
-                                radius: 12.0.r,
-                                backgroundColor: Colors.white12,
-                                playerImageUrl:
-                                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['id'] ?? '0'}.png',
+                              Flexible(
+                                flex: 3,
+                                child: PlayerAvatar(
+                                  radius: 12.0.r,
+                                  backgroundColor: Colors.white12,
+                                  playerImageUrl:
+                                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['id'] ?? '0'}.png',
+                                ),
                               ),
                             SizedBox(width: 8.0.r),
-                            AutoSizeText(
-                              player['name'],
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                            Flexible(
+                              flex: 6,
+                              child: AutoSizeText(
+                                player['name'],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                              ),
                             ),
                             SizedBox(width: 8.0.r),
                             if (player['name'] != 'ALL')
@@ -351,7 +392,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       setState(() {
                         selectedPlayer = value!;
                       });
-                      filterActions(teamCodes[team], selectedPlayer);
+                      filterActions(teamCodes[selectedTeam], selectedPlayer);
                     },
                   ),
                 ),
@@ -359,17 +400,17 @@ class _PlayByPlayState extends State<PlayByPlay> {
                   decoration: BoxDecoration(
                       color: Colors.grey.shade900,
                       border: Border.all(
-                          color: team == homeTeamAbbr
+                          color: selectedTeam == homeTeamAbbr
                               ? kDarkPrimaryColors.contains(homeAbbr)
                                   ? (kTeamColors[homeAbbr]!['secondaryColor']!)
                                   : (kTeamColors[homeAbbr]!['primaryColor']!)
-                              : team == awayTeamAbbr
+                              : selectedTeam == awayTeamAbbr
                                   ? kDarkPrimaryColors.contains(awayAbbr)
                                       ? (kTeamColors[awayAbbr]!['secondaryColor']!)
                                       : (kTeamColors[awayAbbr]!['primaryColor']!)
                                   : Colors.deepOrange),
                       borderRadius: BorderRadius.circular(25.0)),
-                  margin: EdgeInsets.symmetric(vertical: 6.0.r, horizontal: 10.0.r),
+                  margin: EdgeInsets.symmetric(vertical: 6.0.r, horizontal: 0.0.r),
                   child: Padding(
                     padding: EdgeInsets.all(3.0.r),
                     child: ToggleSwitch(
@@ -395,13 +436,48 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       ],
                       onToggle: (index) {
                         setState(() {
-                          team = teams[index!];
+                          selectedTeam = teams[index!];
                           initialLabelIndex = index;
                         });
-                        filterActions(teamCodes[team], selectedPlayer);
+                        filterActions(teamCodes[selectedTeam], selectedPlayer);
                       },
                     ),
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      clipBehavior: Clip.hardEdge,
+                      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+                      backgroundColor: const Color(0xFF111111),
+                      isScrollControlled: isLandscape,
+                      showDragHandle: true,
+                      builder: (BuildContext context) {
+                        final double videoHeight = MediaQuery.of(context).size.width * 9 / 16;
+                        final double playlistHeight = 88.0.r;
+                        return SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            height: videoHeight + playlistHeight,
+                            child: PbpVideoPlayer(
+                              pbpVideo: allActions
+                                  .where((e) =>
+                                      e['videoId'] != null &&
+                                      !e['description'].contains('SUB') &&
+                                      !e['description'].contains('Timeout') &&
+                                      !e['description'].contains('Period Start'))
+                                  .toList(),
+                              gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
+                              gameDate: widget.game['SUMMARY']['GameSummary'][0]
+                                  ['GAME_DATE_EST'],
+                              homeAbbr: homeAbbr,
+                              awayAbbr: awayAbbr,
+                            ));
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.video_collection),
+                  color: Colors.white,
                 ),
               ],
             ),
@@ -413,6 +489,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
 }
 
 class Plays extends StatefulWidget {
+  final String gameId;
+  final String gameDate;
   final String period;
   final List actions;
   final String homeId;
@@ -421,6 +499,8 @@ class Plays extends StatefulWidget {
   final Color awayTeamColor;
 
   Plays({
+    required this.gameId,
+    required this.gameDate,
     required this.period,
     required this.actions,
     required this.homeId,
@@ -513,18 +593,21 @@ class _PlaysState extends State<Plays> {
                     decoration: BoxDecoration(
                       color: widget.actions[i]['possession'] != 0 &&
                               widget.actions[i]['possession'].toString() == widget.homeId &&
-                              widget.actions[i]['clock'] != "PT12M00.00S"
+                              (widget.actions[i]['clock'] != "PT12M00.00S" ||
+                                  widget.actions[i]['description'] == 'Period Start')
                           ? widget.homeTeamColor == const Color(0xFF000000)
                               ? const Color(0xFF111111)
                               : widget.homeTeamColor.withOpacity(0.25)
                           : widget.actions[i]['possession'] != 0 &&
                                   widget.actions[i]['possession'].toString() ==
                                       widget.awayId &&
-                                  widget.actions[i]['clock'] != "PT12M00.00S"
+                                  (widget.actions[i]['clock'] != "PT12M00.00S" ||
+                                      widget.actions[i]['description'] == 'Period Start')
                               ? widget.awayTeamColor.withOpacity(0.25)
                               : Colors.grey.shade900,
                       border: Border(
-                        left: widget.actions[i]['clock'] != "PT12M00.00S"
+                        left: widget.actions[i]['clock'] != "PT12M00.00S" ||
+                                widget.actions[i]['description'] == 'Period Start'
                             ? BorderSide(
                                 color:
                                     widget.actions[i]['possession'].toString() == widget.homeId
@@ -538,7 +621,9 @@ class _PlaysState extends State<Plays> {
                         bottom: (i < widget.actions.length - 1 &&
                                     widget.actions[i]['possession'] !=
                                         widget.actions[i + 1]['possession']) ||
-                                widget.actions[i]['description'] == 'Period Start'
+                                widget.actions[i]['description'] == 'Period Start' ||
+                                (i < widget.actions.length - 1 &&
+                                    widget.actions[i + 1]['description'] == 'Period Start')
                             ? BorderSide(
                                 color: i + 1 < widget.actions.length &&
                                         widget.actions[i + 1]['possession'].toString() ==
@@ -626,58 +711,92 @@ class _PlaysState extends State<Plays> {
                           const Spacer(flex: 2),
                         Expanded(
                           flex: 5,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceBetween, // Ensures text stays left aligned and arrow on the right
-                            children: [
-                              if (widget.actions[i]['description'].contains('Timeout'))
-                                Icon(
-                                  Icons.timer,
-                                  size: 16.0.r,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (widget.actions[i]['videoId'] != null &&
+                                  !widget.actions[i]['description'].contains('SUB') &&
+                                  !widget.actions[i]['description'].contains('Timeout') &&
+                                  !widget.actions[i]['description'].contains('Period Start')) {
+                                showModalBottomSheet(
+                                  context: context,
+                                  clipBehavior: Clip.hardEdge,
+                                  constraints: BoxConstraints(
+                                      minWidth: MediaQuery.of(context).size.width),
+                                  backgroundColor: const Color(0xFF111111),
+                                  isScrollControlled: MediaQuery.of(context).orientation ==
+                                      Orientation.landscape,
+                                  showDragHandle: true,
+                                  builder: (BuildContext context) {
+                                    final double videoHeight =
+                                        MediaQuery.of(context).size.width * 9 / 16;
+                                    final double playlistHeight = 88.0.r;
+                                    return SizedBox(
+                                        width: MediaQuery.of(context).size.width,
+                                        height: videoHeight + playlistHeight,
+                                        child: PbpVideoPlayer(
+                                          pbpVideo: [widget.actions[i]],
+                                          gameId: widget.gameId,
+                                          gameDate: widget.gameDate,
+                                          homeAbbr: kTeamIdToName[widget.homeId][1],
+                                          awayAbbr: kTeamIdToName[widget.awayId][1],
+                                        ));
+                                  },
+                                );
+                              }
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment
+                                  .spaceBetween, // Ensures text stays left aligned and arrow on the right
+                              children: [
+                                if (widget.actions[i]['description'].contains('Timeout'))
+                                  Icon(
+                                    Icons.timer,
+                                    size: 16.0.r,
+                                  ),
+                                if (widget.actions[i]['description'].contains('Timeout'))
+                                  SizedBox(width: 5.0.r),
+                                Expanded(
+                                  child: Text(
+                                    widget.actions[i]['description'].contains('TEAM')
+                                        ? '${widget.actions[i]['description']} (${kTeamIdToName[widget.actions[i]['teamId'].toString()]?[1] ?? 'INT\'L'})'
+                                        : widget.actions[i]['description'],
+                                    textAlign: TextAlign.left,
+                                    style: widget.actions[i]['description'].contains('PTS')
+                                        ? kBebasBold.copyWith(
+                                            fontSize: 14.0.r, color: Colors.white)
+                                        : widget.actions[i]['description'].contains('SUB')
+                                            ? kBebasBold.copyWith(
+                                                fontSize: 14.0.r,
+                                                color: Colors.grey.shade300,
+                                                fontStyle: FontStyle.italic)
+                                            : widget.actions[i]['description']
+                                                    .contains('Timeout')
+                                                ? kBebasNormal.copyWith(
+                                                    fontSize: 15.0.r,
+                                                    color: Colors.grey.shade300,
+                                                    fontStyle: FontStyle.italic)
+                                                : kBebasNormal.copyWith(
+                                                    fontSize: 14.0.r,
+                                                    color: Colors.grey.shade300),
+                                    overflow: TextOverflow.visible, // Ensures text wraps
+                                  ),
                                 ),
-                              if (widget.actions[i]['description'].contains('Timeout'))
-                                SizedBox(width: 5.0.r),
-                              Expanded(
-                                child: Text(
-                                  widget.actions[i]['description'].contains('TEAM')
-                                      ? '${widget.actions[i]['description']} (${kTeamIdToName[widget.actions[i]['teamId'].toString()]?[1] ?? 'INT\'L'})'
-                                      : widget.actions[i]['description'],
-                                  textAlign: TextAlign.left,
-                                  style: widget.actions[i]['description'].contains('PTS')
-                                      ? kBebasBold.copyWith(
-                                          fontSize: 14.0.r, color: Colors.white)
-                                      : widget.actions[i]['description'].contains('SUB')
-                                          ? kBebasBold.copyWith(
-                                              fontSize: 14.0.r,
-                                              color: Colors.grey.shade300,
-                                              fontStyle: FontStyle.italic)
-                                          : widget.actions[i]['description']
-                                                  .contains('Timeout')
-                                              ? kBebasNormal.copyWith(
-                                                  fontSize: 15.0.r,
-                                                  color: Colors.grey.shade300,
-                                                  fontStyle: FontStyle.italic)
-                                              : kBebasNormal.copyWith(
-                                                  fontSize: 14.0.r,
-                                                  color: Colors.grey.shade300),
-                                  overflow: TextOverflow.visible, // Ensures text wraps
-                                ),
-                              ),
-                              if (widget.actions[i]['description']
-                                  .contains('SUB in')) // Check for 'SUB'
-                                Icon(
-                                  Icons.arrow_upward, // Up arrow icon
-                                  color: Colors.green, // Green color for the arrow
-                                  size: 16.0.r, // Adjust the size if needed
-                                ),
-                              if (widget.actions[i]['description']
-                                  .contains('SUB out')) // Check for 'SUB'
-                                Icon(
-                                  Icons.arrow_downward, // Up arrow icon
-                                  color: Colors.red, // Green color for the arrow
-                                  size: 16.0.r, // Adjust the size if needed
-                                ),
-                            ],
+                                if (widget.actions[i]['description']
+                                    .contains('SUB in')) // Check for 'SUB'
+                                  Icon(
+                                    Icons.arrow_upward, // Up arrow icon
+                                    color: Colors.green, // Green color for the arrow
+                                    size: 16.0.r, // Adjust the size if needed
+                                  ),
+                                if (widget.actions[i]['description']
+                                    .contains('SUB out')) // Check for 'SUB'
+                                  Icon(
+                                    Icons.arrow_downward, // Up arrow icon
+                                    color: Colors.red, // Green color for the arrow
+                                    size: 16.0.r, // Adjust the size if needed
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                         if (widget.actions[i]['personId'] != 0) SizedBox(width: 8.0.r),

@@ -216,7 +216,20 @@ def games_live_update():
                 games_collection.update_one(
                     {'GAME_DATE': today},
                     {'$set': {
-                        f'GAMES.{game["gameId"]}.SUMMARY': summary,
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_DATE_EST': summary['GameSummary'][0]['GAME_DATE_EST'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_SEQUENCE': summary['GameSummary'][0]['GAME_SEQUENCE'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_ID': summary['GameSummary'][0]['GAME_ID'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': summary['GameSummary'][0]['GAME_STATUS_ID'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_TEXT': summary['GameSummary'][0]['GAME_STATUS_TEXT'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAMECODE': summary['GameSummary'][0]['GAMECODE'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.HOME_TEAM_ID': summary['GameSummary'][0]['HOME_TEAM_ID'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.VISITOR_TEAM_ID': summary['GameSummary'][0]['VISITOR_TEAM_ID'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.SEASON': summary['GameSummary'][0]['SEASON'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PERIOD': summary['GameSummary'][0]['LIVE_PERIOD'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PC_TIME': summary['GameSummary'][0]['LIVE_PC_TIME'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.NATL_TV_BROADCASTER_ABBREVIATION': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PERIOD_TIME_BCAST': summary['GameSummary'][0]['LIVE_PERIOD_TIME_BCAST'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0]['WH_STATUS'],
                         f'GAMES.{game["gameId"]}.BOXSCORE': box_score
                     }}
                 )
@@ -224,7 +237,20 @@ def games_live_update():
             except Exception:
                 games_collection.update_one(
                     {'GAME_DATE': today},
-                    {'$set': {f'GAMES.{game["gameId"]}.SUMMARY': summary}}
+                    {'$set': {f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_DATE_EST': summary['GameSummary'][0]['GAME_DATE_EST'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_SEQUENCE': summary['GameSummary'][0]['GAME_SEQUENCE'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_ID': summary['GameSummary'][0]['GAME_ID'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': summary['GameSummary'][0]['GAME_STATUS_ID'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_TEXT': summary['GameSummary'][0]['GAME_STATUS_TEXT'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAMECODE': summary['GameSummary'][0]['GAMECODE'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.HOME_TEAM_ID': summary['GameSummary'][0]['HOME_TEAM_ID'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.VISITOR_TEAM_ID': summary['GameSummary'][0]['VISITOR_TEAM_ID'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.SEASON': summary['GameSummary'][0]['SEASON'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PERIOD': summary['GameSummary'][0]['LIVE_PERIOD'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PC_TIME': summary['GameSummary'][0]['LIVE_PC_TIME'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.NATL_TV_BROADCASTER_ABBREVIATION': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PERIOD_TIME_BCAST': summary['GameSummary'][0]['LIVE_PERIOD_TIME_BCAST'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0]['WH_STATUS'],}}
                 )
                 logging.info(f'(Games Live) Upcoming game {game["gameId"]} is up to date.')
 
@@ -240,12 +266,15 @@ def games_live_update():
                 'period',
                 'teamId',
                 'personId',
+                'personIdsFilter',
+                'playerNameI',
                 'possession',
                 'scoreHome',
                 'scoreAway',
                 'isFieldGoal',
                 'description',
-                'playerNameI'
+                'xLegacy',
+                'yLegacy'
             ]
 
             try:
@@ -492,9 +521,9 @@ def teams_daily_update():
                     # Pause 15 seconds between teams
                     time.sleep(15)
 
-                rank_hustle_stats_current_season()
-                three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
-                current_season_custom_team_stats_rank()
+        rank_hustle_stats_current_season()
+        three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
+        current_season_custom_team_stats_rank()
     except Exception as e:
         logging.error(f"(Teams Daily) Error updating teams: {e}")
 

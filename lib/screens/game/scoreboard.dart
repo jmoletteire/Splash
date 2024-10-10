@@ -409,7 +409,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                           } else if (gamesData[gameKey] is Map) {
                             Map<String, dynamic> game = gamesData[gameKey];
                             if (!game["SEASON_ID"].toString().startsWith("3") &&
-                                game['SUMMARY']['LineScore'].isNotEmpty) {
+                                (game['SUMMARY']?['LineScore'] ?? {}).isNotEmpty) {
                               gameCards.add(
                                 GameCard(
                                   game: game,

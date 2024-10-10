@@ -122,6 +122,16 @@ class _GameCardState extends State<GameCard> {
     var summary = widget.game['SUMMARY']['GameSummary'][0];
     var linescore = widget.game['SUMMARY']['LineScore'];
 
+    String broadcast = summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP';
+    /*
+    if (summary['HOME_TV_BROADCASTER_ABBREVIATION'] != null) {
+      broadcast += ', ${summary['HOME_TV_BROADCASTER_ABBREVIATION']}';
+    }
+    if (summary['AWAY_TV_BROADCASTER_ABBREVIATION'] != null) {
+      broadcast += ', ${summary['AWAY_TV_BROADCASTER_ABBREVIATION']}';
+    }
+    */
+
     String getGameTime() {
       switch (summary['GAME_STATUS_ID']) {
         case 1:
@@ -142,11 +152,15 @@ class _GameCardState extends State<GameCard> {
               case 5:
                 return 'Final/OT';
               default:
-                return 'Final/${summary['LIVE_PERIOD']}OT';
+                return 'Final/${summary['LIVE_PERIOD'] - 4}OT';
             }
           } else {
             // Game in-progress
-            return '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ';
+            if (summary['LIVE_PERIOD'] <= 4) {
+              return '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ';
+            } else {
+              return '${summary['LIVE_PERIOD'] - 4}OT';
+            }
           }
         case 3:
           // Game Final
@@ -210,7 +224,7 @@ class _GameCardState extends State<GameCard> {
                             summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
                             summary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT')
                           Text(
-                            summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP',
+                            broadcast,
                             style: kBebasBold.copyWith(
                                 fontSize: 14.0.r, color: Colors.grey.shade300),
                             textAlign: TextAlign.start,

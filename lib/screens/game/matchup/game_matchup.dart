@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:splash/screens/game/matchup/components/last_five_games.dart';
 import 'package:splash/screens/game/matchup/components/youtube_highlights.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -83,9 +84,15 @@ class _GameMatchupState extends State<GameMatchup> {
                 if (widget.game['SUMMARY'].keys.toList().contains('LastMeeting') &&
                     widget.game['SUMMARY']['LastMeeting'].isNotEmpty)
                   LastMeeting(
-                      lastMeeting: widget.game['SUMMARY']['LastMeeting'][0],
-                      homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
-                      awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0'),
+                    lastMeeting: widget.game['SUMMARY']['LastMeeting'][0],
+                    homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+                    awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
+                  ),
+                LastFiveGames(
+                  gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                  homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+                  awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
+                ),
                 TeamSeasonStats(
                   season:
                       '${summary['SEASON']}-${(int.parse(summary['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',

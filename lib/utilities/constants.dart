@@ -3580,7 +3580,7 @@ const Map<String, String> kCountryCodes = {
   "Belize": "BZ",
   "Canada": "CA",
   "Cocos (Keeling) Islands": "CC",
-  "Congo, the Democratic Republic of the": "CD",
+  "DRC": "CD",
   "Central African Republic": "CF",
   "Republic of the Congo": "CG",
   "Switzerland": "CH",

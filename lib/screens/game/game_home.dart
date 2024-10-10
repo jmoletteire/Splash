@@ -7,7 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
-import 'package:splash/screens/game/play_by_play.dart';
+import 'package:splash/screens/game/play_by_play/play_by_play.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
@@ -503,8 +503,32 @@ class GameInfo extends StatelessWidget {
 
   Widget getStatus(int status) {
     if (status == 3) {
-      return Text('FINAL',
-          style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
+      switch (gameSummary['LIVE_PERIOD']) {
+        case 4:
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('FINAL',
+                  style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
+            ],
+          );
+        case 5:
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('FINAL/OT',
+                  style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
+            ],
+          );
+        default:
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('FINAL/${gameSummary['LIVE_PERIOD'] - 4}OT',
+                  style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
+            ],
+          );
+      }
     }
     if (status == 2) {
       if (gameSummary['LIVE_PC_TIME'] == ":0.0") {
@@ -530,11 +554,26 @@ class GameInfo extends StatelessWidget {
                 Text('END 3RD', style: kBebasBold.copyWith(fontSize: 20.0.r)),
               ],
             );
+          case 4:
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('FINAL', style: kBebasBold.copyWith(fontSize: 16.0.r)),
+              ],
+            );
+          case 5:
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('FINAL/OT', style: kBebasBold.copyWith(fontSize: 16.0.r)),
+              ],
+            );
           default:
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('FINAL', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+                Text('FINAL/${gameSummary['LIVE_PERIOD'] - 4}OT',
+                    style: kBebasBold.copyWith(fontSize: 16.0.r)),
               ],
             );
         }
@@ -544,7 +583,9 @@ class GameInfo extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-                '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}',
+                period <= 4
+                    ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
+                    : '${(period - 4).toString()}OT',
                 style: kBebasBold.copyWith(fontSize: 16.0.r)),
             Text(gameSummary['LIVE_PC_TIME'].toString(),
                 style: kBebasBold.copyWith(fontSize: 16.0.r)),

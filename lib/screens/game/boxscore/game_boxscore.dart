@@ -403,15 +403,15 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               children: [
                 Expanded(
                   child: Container(
+                    height: 46.0.r,
+                    margin: const EdgeInsets.only(bottom: 1.0),
                     decoration: BoxDecoration(
-                      color: awayContainerColor,
                       gradient: LinearGradient(
                         colors: [const Color(0xFF1B1B1B), awayContainerColor],
                         begin: Alignment.centerRight,
                         end: Alignment.centerLeft,
                       ),
                     ),
-                    margin: const EdgeInsets.only(bottom: 1.0),
                     child: Tab(
                       text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
                     ),
@@ -436,6 +436,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               children: [
                 Expanded(
                   child: Container(
+                    height: 46.0.r,
                     margin: const EdgeInsets.only(bottom: 1.0),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(

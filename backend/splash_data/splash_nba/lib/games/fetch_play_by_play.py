@@ -1,6 +1,6 @@
 import random
 import time
-from nba_api.stats.endpoints import boxscoretraditionalv2
+from nba_api.stats.endpoints import boxscoretraditionalv2, videoeventsasset
 from nba_api.live.nba.endpoints import playbyplay
 from pymongo import MongoClient
 from splash_nba.util.env import uri
@@ -15,16 +15,31 @@ def fetch_play_by_play(game_id):
         'period',
         'teamId',
         'personId',
+        'personIdsFilter',
+        'playerNameI',
         'possession',
         'scoreHome',
         'scoreAway',
         'isFieldGoal',
         'description',
-        'playerNameI'
+        'xLegacy',
+        'yLegacy'
     ]
 
     actions = playbyplay.PlayByPlay(game_id=game_id).get_dict()['game']['actions']
-    pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
+    pbp = []
+
+    for i, action in enumerate(actions):
+        logging.info(f'{i + 1} of {len(actions)}')
+        play_info = {key: action.get(key, 0) for key in keys}
+
+        try:
+            play_info['videoId'] = videoeventsasset.VideoEventsAsset(game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
+            time.sleep(random.uniform(0.5, 1.0))
+        except Exception:
+            play_info['videoId'] = None
+
+        pbp.append(play_info)
 
     return pbp
 
@@ -51,7 +66,7 @@ if __name__ == "__main__":
         i = 0
 
         while processed_count < total_documents:
-            with games_collection.find({}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
+            with games_collection.find({'SEASON_CODE': '12024'}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
                     batch_size).batch_size(batch_size) as cursor:
                 documents = list(cursor)
                 if not documents:
@@ -63,9 +78,7 @@ if __name__ == "__main__":
                     logging.info(f'\nProcessing {i} of {total_documents} ({document["GAME_DATE"]})')
 
                     for game_id, game_data in document['GAMES'].items():
-                        # Check if BOXSCORE already exists for the game
-                        #if "BOXSCORE" not in game_data:
-                        # Fetch box score stats for the game
+                        # Fetch PBP for the game
                         try:
                             pbp = fetch_play_by_play(game_id)
                             game_counter += 1

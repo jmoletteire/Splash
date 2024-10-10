@@ -50,6 +50,17 @@ class GameBasicInfo extends StatelessWidget {
       '6': 'NBA Cup Final'
     };
 
+    String broadcast =
+        game['SUMMARY']['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS';
+    if (game['SUMMARY']['GameSummary'][0]['HOME_TV_BROADCASTER_ABBREVIATION'] != null) {
+      broadcast +=
+          ', ${game['SUMMARY']['GameSummary'][0]['HOME_TV_BROADCASTER_ABBREVIATION']}';
+    }
+    if (game['SUMMARY']['GameSummary'][0]['AWAY_TV_BROADCASTER_ABBREVIATION'] != null) {
+      broadcast +=
+          ', ${game['SUMMARY']['GameSummary'][0]['AWAY_TV_BROADCASTER_ABBREVIATION']}';
+    }
+
     String homeId = game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'].toString();
     var linescore = game['SUMMARY']['LineScore'];
 
@@ -98,10 +109,7 @@ class GameBasicInfo extends StatelessWidget {
             // Broadcast
             GameBasicInfoRow(
               icon: Icons.tv_sharp,
-              data: [
-                game['SUMMARY']['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'] ??
-                    'LEAGUE PASS'
-              ],
+              data: [broadcast],
             ),
             SizedBox(height: 10.0.r),
             // Officials

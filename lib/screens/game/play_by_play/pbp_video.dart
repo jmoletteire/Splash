@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
+import 'package:marquee/marquee.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:video_player/video_player.dart';
 
-class TikTokVideoPlayer extends StatefulWidget {
-  final List shotChart;
+class PbpVideoPlayer extends StatefulWidget {
+  final List pbpVideo;
+  final String gameId;
+  final String gameDate;
+  final String homeAbbr;
+  final String awayAbbr;
 
-  TikTokVideoPlayer({required this.shotChart});
+  PbpVideoPlayer({
+    required this.pbpVideo,
+    required this.gameId,
+    required this.gameDate,
+    required this.homeAbbr,
+    required this.awayAbbr,
+  });
 
   @override
-  _TikTokVideoPlayerState createState() => _TikTokVideoPlayerState();
+  _PbpVideoPlayerState createState() => _PbpVideoPlayerState();
 }
 
-class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
+class _PbpVideoPlayerState extends State<PbpVideoPlayer> {
   PageController _pageController = PageController();
   ScrollController _scrollController = ScrollController();
   int currentIndex = 0;
@@ -32,6 +44,29 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
     super.dispose();
   }
 
+  String formatDuration(String inputStr) {
+    // Regular expression to match 'PT' followed by minutes and seconds with tenths of a second
+    RegExp regex = RegExp(r'PT(\d+)M(\d+)\.(\d+)S');
+    Match? match = regex.firstMatch(inputStr);
+
+    if (match != null) {
+      int minutes = int.parse(match.group(1)!); // Convert minutes to int
+      int seconds = int.parse(match.group(2)!); // Convert seconds to int
+      String tenths = match.group(3)![0]; // Take only the first digit for tenths
+
+      if (minutes == 0) {
+        // Less than a minute left, return seconds and tenths
+        return ":$seconds.$tenths";
+      } else {
+        // Regular minutes and seconds format, with leading zero for seconds if necessary
+        return "$minutes:${seconds.toString().padLeft(2, '0')}";
+      }
+    }
+
+    // Return original string if no match is found
+    return inputStr;
+  }
+
   // Function to show playlist bottom sheet
   void _showPlaylist() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -40,6 +75,10 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
         currentIndex * 72.0.r, // Assuming each list item is 72 pixels tall
       );
     });
+
+    String year = widget.gameDate.substring(0, 4);
+    String month = widget.gameDate.substring(5, 7);
+    String day = widget.gameDate.substring(8, 10);
 
     showModalBottomSheet(
       context: context,
@@ -50,49 +89,59 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
       builder: (context) {
         return ListView.builder(
           controller: _scrollController,
-          itemCount: widget.shotChart.length,
+          itemCount: widget.pbpVideo.length,
           itemBuilder: (context, index) {
-            String period = widget.shotChart[index]?['PERIOD'] > 4
+            String thumbnail =
+                'https://videos.nba.com/nba/pbp/media/$year/$month/$day/${widget.gameId}/${widget.pbpVideo[index]?['actionNumber']}/${widget.pbpVideo[index]?['videoId']}_960x540.jpg';
+            String period = widget.pbpVideo[index]?['period'] > 4
                 ? 'OT'
-                : 'Q${widget.shotChart[index]?['PERIOD'] ?? ''}';
+                : 'Q${widget.pbpVideo[index]?['period'] ?? ''}';
             String timePeriod =
-                '$period ${widget.shotChart[index]?['MIN'] ?? ''}:${widget.shotChart[index]?['SEC'].toString().padLeft(2, '0') ?? ''}';
+                '$period ${formatDuration(widget.pbpVideo[index]?['clock'] ?? '')}';
             return ListTile(
-              leading: widget.shotChart[index]?['THUMBNAIL'] == null
+              leading: widget.pbpVideo[index]?['videoId'] == null ||
+                      widget.pbpVideo[index]?['description'] == 'Period Start'
                   ? SizedBox(
                       width: 50.r,
                       height: 50.r,
                     )
                   : Image.network(
-                      widget.shotChart[index]['THUMBNAIL']!,
+                      thumbnail,
                       width: 50.r,
                       height: 50.r,
                       fit: BoxFit.cover,
+                      errorBuilder:
+                          (BuildContext context, Object error, StackTrace? stackTrace) {
+                        return SizedBox(
+                          width: 50.r,
+                          height: 50.r,
+                        );
+                      },
                     ),
               title: Row(
                 children: [
                   ConstrainedBox(
                     constraints: BoxConstraints(maxHeight: 20.0.r, maxWidth: 20.0.r),
                     child: Image.asset(
-                      'images/NBA_Logos/${kTeamAbbrToId[widget.shotChart[index]['VTM']]}.png',
+                      'images/NBA_Logos/${kTeamAbbrToId[widget.awayAbbr]}.png',
                     ),
                   ),
                   SizedBox(width: 5.0.r),
                   Text(
-                    '${widget.shotChart[index]?['VTM'] ?? ''} @ ${widget.shotChart[index]?['HTM'] ?? ''}',
+                    '${widget.awayAbbr} @ ${widget.homeAbbr}',
                     style: kBebasNormal.copyWith(fontSize: 18.0.r),
                   ),
                   SizedBox(width: 5.0.r),
                   ConstrainedBox(
                     constraints: BoxConstraints(maxHeight: 20.0.r, maxWidth: 20.0.r),
                     child: Image.asset(
-                      'images/NBA_Logos/${kTeamAbbrToId[widget.shotChart[index]?['HTM']] ?? 0}.png',
+                      'images/NBA_Logos/${kTeamAbbrToId[widget.homeAbbr] ?? 0}.png',
                     ),
                   ),
                 ],
               ),
               subtitle: Text(
-                '$timePeriod - ${widget.shotChart[index]?['SHOT_TYPE'] ?? ''} (${widget.shotChart[index]?['SHOT_MADE_FLAG'] == 1 ? 'Made' : 'Missed'})',
+                '$timePeriod - ${widget.pbpVideo[index]?['description'] ?? ''}',
                 style: kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.white70),
               ),
               onTap: () {
@@ -112,35 +161,38 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     try {
-      widget.shotChart.sort((a, b) {
-        int dateComparison =
-            DateTime.parse(a['GAME_DATE']).compareTo(DateTime.parse(b['GAME_DATE']));
-        if (dateComparison != 0) return dateComparison;
-
-        int periodComparison = a['PERIOD'].compareTo(b['PERIOD']);
-        if (periodComparison != 0) return periodComparison;
-
-        int minComparison = b['MIN'].compareTo(a['MIN']);
-        if (minComparison != 0) return minComparison;
-
-        return b['SEC'].compareTo(a['SEC']);
-      });
       return PageView.builder(
         controller: _pageController,
         scrollDirection: Axis.vertical,
-        itemCount: widget.shotChart.length,
+        itemCount: widget.pbpVideo.length,
         onPageChanged: (index) {
           setState(() {
             currentIndex = index;
           });
         },
         itemBuilder: (context, index) {
+          String year = widget.gameDate.substring(0, 4);
+          String month = widget.gameDate.substring(5, 7);
+          String day = widget.gameDate.substring(8, 10);
+
+          String video =
+              'https://videos.nba.com/nba/pbp/media/$year/$month/$day/${widget.gameId}/${widget.pbpVideo[index]?['actionNumber']}/${widget.pbpVideo[index]?['videoId']}_960x540.mp4';
+          String thumbnail =
+              'https://videos.nba.com/nba/pbp/media/$year/$month/$day/${widget.gameId}/${widget.pbpVideo[index]?['actionNumber']}/${widget.pbpVideo[index]?['videoId']}_960x540.jpg';
+
+          String period = widget.pbpVideo[index]?['period'] > 4
+              ? 'OT'
+              : 'Q${widget.pbpVideo[index]?['period'] ?? ''}';
+          String timePeriod =
+              '$period ${formatDuration(widget.pbpVideo[index]?['clock'] ?? '')}';
+
           return VideoPlayerScreen(
-            videoUrl: widget.shotChart[index]?['VIDEO'] ?? '',
-            thumbnailUrl: widget.shotChart[index]?['THUMBNAIL'] ?? '',
-            gameDate:
-                '${widget.shotChart[index]['GAME_DATE']!.substring(0, 4)}-${widget.shotChart[index]['GAME_DATE']!.substring(4, 6)}-${widget.shotChart[index]['GAME_DATE']!.substring(6)}',
-            matchup: '${widget.shotChart[index]['VTM']!} @ ${widget.shotChart[index]['HTM']!}',
+            videoUrl: widget.pbpVideo[index]?['videoId'] == null ? '' : video,
+            thumbnailUrl: widget.pbpVideo[index]?['videoId'] == null ? '' : thumbnail,
+            gameDate: widget.gameDate,
+            matchup: '${widget.awayAbbr} @ ${widget.homeAbbr}',
+            description: widget.pbpVideo[index]?['description'] ?? '',
+            timePeriod: timePeriod,
             isMuted: isMuted,
             playbackSpeed: playbackSpeed,
             onMuteToggle: () {
@@ -184,6 +236,8 @@ class VideoPlayerScreen extends StatefulWidget {
   final String thumbnailUrl;
   final String gameDate;
   final String matchup;
+  final String timePeriod;
+  final String description;
   final bool isMuted;
   final double playbackSpeed;
   final VoidCallback onMuteToggle;
@@ -195,6 +249,8 @@ class VideoPlayerScreen extends StatefulWidget {
     required this.thumbnailUrl,
     required this.gameDate,
     required this.matchup,
+    required this.timePeriod,
+    required this.description,
     required this.isMuted,
     required this.playbackSpeed,
     required this.onMuteToggle,
@@ -212,26 +268,77 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Future<void>? _initializeVideoPlayerFuture;
   Duration? videoDuration;
   Duration currentPosition = Duration.zero;
+  bool shouldScroll = false;
+  bool videoAvailable = true;
 
   @override
   void initState() {
     super.initState();
-    _videoPlayerController = VideoPlayerController.networkUrl(
-      Uri.parse(widget.videoUrl),
-    );
-    _initializeVideoPlayerFuture = _videoPlayerController.initialize().then((_) {
-      // Autoplay the video once it is initialized
-      _videoPlayerController.play();
+    _checkVideoUrl(); // Check if the video link is valid
+
+    // Calculate if text needs to scroll
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkTextOverflow();
     });
-    _videoPlayerController.setLooping(true);
-    _videoPlayerController.setVolume(widget.isMuted ? 0.0 : 1.0);
-    _videoPlayerController.setPlaybackSpeed(widget.playbackSpeed);
-    _videoPlayerController.addListener(() {
+  }
+
+  Future<void> _checkVideoUrl() async {
+    try {
+      _videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(widget.videoUrl),
+      );
+
+      // Make a HEAD request to the video URL to check availability
+      final response = await http.head(Uri.parse(widget.videoUrl));
+
+      if (response.statusCode == 200) {
+        // If available, initialize the video player
+        _initializeVideoPlayerFuture = _videoPlayerController.initialize().then((_) {
+          // Autoplay the video once it is initialized
+          _videoPlayerController.play();
+        });
+        _videoPlayerController.setLooping(true);
+        _videoPlayerController.setVolume(widget.isMuted ? 0.0 : 1.0);
+        _videoPlayerController.setPlaybackSpeed(widget.playbackSpeed);
+        _videoPlayerController.addListener(() {
+          setState(() {
+            currentPosition = _videoPlayerController.value.position;
+            videoDuration = _videoPlayerController.value.duration;
+          });
+        });
+      } else {
+        setState(() {
+          videoAvailable = false; // If not available, show the error message
+        });
+      }
+    } catch (e) {
+      // If an error occurs (e.g., network error), set video as unavailable
       setState(() {
-        currentPosition = _videoPlayerController.value.position;
-        videoDuration = _videoPlayerController.value.duration;
+        videoAvailable = false;
       });
-    });
+    }
+  }
+
+  void _checkTextOverflow() {
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      double availableWidth = renderBox.size.width;
+
+      // Use TextPainter to calculate the width of the text
+      TextPainter textPainter = TextPainter(
+        text: TextSpan(
+          text: "${widget.timePeriod} | ${widget.description}",
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.grey.shade400),
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(); // Perform the layout calculation
+
+      setState(() {
+        shouldScroll = textPainter.width > availableWidth;
+      });
+    }
   }
 
   @override
@@ -256,7 +363,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Stack(
       children: [
-        if (widget.videoUrl == '')
+        if (widget.videoUrl == '' || !videoAvailable)
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -271,11 +378,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   'Video Unavailable',
                   style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
                 ),
-                SizedBox(height: 25.0.r),
+                SizedBox(height: 65.0.r),
               ],
             ),
           ),
-        if (widget.videoUrl != '')
+        if (widget.videoUrl != '' && videoAvailable)
           FutureBuilder(
             future: _initializeVideoPlayerFuture,
             builder: (context, snapshot) {
@@ -328,7 +435,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                                   const Icon(Icons.video_collection, color: Colors.white),
                                   SizedBox(width: 8.0.r),
                                   Text(
-                                    widget.gameDate,
+                                    '${widget.gameDate.substring(0, 4)}-${widget.gameDate.substring(5, 7)}-${widget.gameDate.substring(8, 10)}',
                                     style: kBebasNormal.copyWith(
                                         fontSize: 16.0.r, color: Colors.grey.shade300),
                                   ),
@@ -395,6 +502,31 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       ),
                     ],
                   ),
+                  // Ticker for the current video title
+                  SizedBox(
+                    height: 20.0.r,
+                    child: shouldScroll
+                        ? Marquee(
+                            text: "${widget.timePeriod} | ${widget.description}", // Title text
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                            scrollAxis: Axis.horizontal,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            blankSpace: 30.0,
+                            velocity: 20.0,
+                            pauseAfterRound: const Duration(seconds: 1),
+                            startPadding: 0.0,
+                            accelerationDuration: const Duration(seconds: 1),
+                            accelerationCurve: Curves.linear,
+                            decelerationDuration: const Duration(milliseconds: 500),
+                            decelerationCurve: Curves.easeOut,
+                          )
+                        : Text(
+                            "${widget.timePeriod} | ${widget.description}",
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                  ),
                 ],
               ),
             ),
@@ -403,7 +535,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         // Playback progress bar
         // Thin slider resembling a top border
         Positioned(
-          bottom: 55.r,
+          bottom: 75.r,
           left: -12.r,
           right: -12.r,
           child: SliderTheme(

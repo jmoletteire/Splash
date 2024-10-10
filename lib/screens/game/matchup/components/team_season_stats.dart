@@ -13,6 +13,7 @@ class TeamSeasonStats extends StatefulWidget {
   final String season;
   final String homeId;
   final String awayId;
+
   const TeamSeasonStats({
     super.key,
     required this.season,
@@ -454,10 +455,18 @@ class ComparisonRow extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(getRank(awayRank),
-                    textAlign: TextAlign.end,
-                    style: kBebasNormal.copyWith(
-                        fontSize: 12.5.r, color: const Color(0xFFCCCCCC))),
+                child: Text(
+                  getRank(awayRank),
+                  textAlign: TextAlign.end,
+                  style: kBebasNormal.copyWith(
+                    fontSize: 12.5.r,
+                    color: awayRank < 11
+                        ? Colors.green
+                        : awayRank < 21
+                            ? Colors.orangeAccent
+                            : Colors.redAccent,
+                  ),
+                ),
               ),
               SizedBox(width: 15.0.r),
               Expanded(
@@ -471,8 +480,14 @@ class ComparisonRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   getRank(homeRank),
-                  style:
-                      kBebasNormal.copyWith(fontSize: 12.5.r, color: const Color(0xFFCCCCCC)),
+                  style: kBebasNormal.copyWith(
+                    fontSize: 12.5.r,
+                    color: homeRank < 11
+                        ? Colors.green
+                        : homeRank < 21
+                            ? Colors.orangeAccent
+                            : Colors.redAccent,
+                  ),
                 ),
               ),
             ],
