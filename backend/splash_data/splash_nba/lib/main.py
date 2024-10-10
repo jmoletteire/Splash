@@ -847,7 +847,7 @@ except Exception as e:
 
 # games_daily_update()
 # teams_daily_update()
-players_daily_update()
+# players_daily_update()
 games_live_update()
 
 while True:

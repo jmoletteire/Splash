@@ -715,9 +715,11 @@ def get_player_shot_chart():
             }
         ])
 
-        if player:
+        player = list(player)
+
+        if len(player) > 0:
             # logging.info(f"(get_player_shot_chart) Retrieved player {person_id} from MongoDB")
-            return jsonify(player)
+            return jsonify(player[0])
         else:
             logging.warning("(get_player_shot_chart) No player found in MongoDB")
             return jsonify({"error": "No player found"}), 404

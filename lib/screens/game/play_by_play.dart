@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -27,80 +28,131 @@ class PlayByPlay extends StatefulWidget {
 
 class _PlayByPlayState extends State<PlayByPlay> {
   late bool _inProgress;
+  late List allActions;
   late List firstQuarter;
   late List secondQuarter;
   late List thirdQuarter;
   late List fourthQuarter;
   late List overTime;
-  late String selectedPlayer;
+  late int selectedPlayer;
   late List<Map<String, dynamic>> players;
   late String team;
-  List<String> teams = ['HOME', 'ALL', 'AWAY'];
+  late Map<String, int> teamCodes;
+  late String homeTeamAbbr;
+  late String awayTeamAbbr;
+  late List<String> teams;
   int initialLabelIndex = 1;
 
-  @override
-  void initState() {
-    super.initState();
-    _inProgress = widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2;
-    selectedPlayer = 'ALL';
-    players = [
-      {'id': 0, 'name': 'ALL'}
-    ];
-
-    if (_inProgress) {
-      for (var player in widget.game['BOXSCORE']['homeTeam']['players']) {
-        Map<String, dynamic> playerData = {'id': player['personId'], 'name': player['nameI']};
-        players.add(playerData);
-      }
-      for (var player in widget.game['BOXSCORE']['awayTeam']['players']) {
-        Map<String, dynamic> playerData = {'id': player['personId'], 'name': player['nameI']};
-        players.add(playerData);
-      }
+  void filterActions(int? teamId, int? playerId) {
+    if (teamId == 0 && playerId == 0) {
+      setState(() {
+        allActions = widget.game['PBP'];
+      });
+    } else if (teamId != 0 && playerId == 0) {
+      setState(() {
+        allActions = widget.game['PBP'].where((e) => e['possession'] == teamId).toList();
+      });
+    } else if (teamId == 0 && playerId != 0) {
+      setState(() {
+        allActions = widget.game['PBP'].where((e) => e['personId'] == playerId).toList();
+      });
+    } else {
+      setState(() {
+        allActions = widget.game['PBP']
+            .where((e) => e['possession'] == teamId && e['personId'] == playerId)
+            .toList();
+      });
     }
 
     if (_inProgress) {
-      firstQuarter = widget.game['PBP']
+      firstQuarter = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 1)
           .toList()
           .reversed
           .toList();
-      secondQuarter = widget.game['PBP']
+      secondQuarter = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 2)
           .toList()
           .reversed
           .toList();
-      thirdQuarter = widget.game['PBP']
+      thirdQuarter = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 3)
           .toList()
           .reversed
           .toList();
-      fourthQuarter = widget.game['PBP']
+      fourthQuarter = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 4)
           .toList()
           .reversed
           .toList();
-      overTime = widget.game['PBP']
+      overTime = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] > 4)
           .toList()
           .reversed
           .toList();
     } else {
-      firstQuarter = widget.game['PBP']
+      firstQuarter = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 1)
           .toList();
-      secondQuarter = widget.game['PBP']
+      secondQuarter = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 2)
           .toList();
-      thirdQuarter = widget.game['PBP']
+      thirdQuarter = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 3)
           .toList();
-      fourthQuarter = widget.game['PBP']
+      fourthQuarter = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 4)
           .toList();
-      overTime = widget.game['PBP']
+      overTime = allActions
           .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] > 4)
           .toList();
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _inProgress = widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2;
+
+    homeTeamAbbr = kTeamIdToName[widget.homeId][1] ?? 'Home';
+    awayTeamAbbr = kTeamIdToName[widget.awayId][1] ?? 'Away';
+    teams = [awayTeamAbbr, 'ALL', homeTeamAbbr];
+
+    team = 'ALL';
+    teamCodes = {
+      homeTeamAbbr: int.parse(widget.homeId),
+      'ALL': 0,
+      awayTeamAbbr: int.parse(widget.awayId),
+    };
+
+    selectedPlayer = 0;
+    players = [
+      {'id': 0, 'name': 'ALL'}
+    ];
+
+    if (widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] > 1) {
+      for (var player in widget.game['BOXSCORE']['homeTeam']['players']) {
+        Map<String, dynamic> playerData = {
+          'id': player['personId'],
+          'team': widget.homeId,
+          'name': player['nameI'],
+          'number': player['jerseyNum'],
+        };
+        players.add(playerData);
+      }
+      for (var player in widget.game['BOXSCORE']['awayTeam']['players']) {
+        Map<String, dynamic> playerData = {
+          'id': player['personId'],
+          'team': widget.awayId,
+          'name': player['nameI'],
+          'number': player['jerseyNum'],
+        };
+        players.add(playerData);
+      }
+    }
+
+    allActions = widget.game['PBP'];
+    filterActions(teamCodes[team], selectedPlayer);
   }
 
   @override
@@ -109,62 +161,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
 
     // Check if the game data has changed
     if (oldWidget.game != widget.game) {
-      setState(() {
-        // Update the local state with the new game data
-        if (_inProgress) {
-          firstQuarter = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 1)
-              .toList()
-              .reversed
-              .toList();
-          secondQuarter = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 2)
-              .toList()
-              .reversed
-              .toList();
-          thirdQuarter = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 3)
-              .toList()
-              .reversed
-              .toList();
-          fourthQuarter = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 4)
-              .toList()
-              .reversed
-              .toList();
-          overTime = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] > 4)
-              .toList()
-              .reversed
-              .toList();
-        } else {
-          firstQuarter = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 1)
-              .toList();
-          secondQuarter = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 2)
-              .toList();
-          thirdQuarter = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 3)
-              .toList();
-          fourthQuarter = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 4)
-              .toList();
-          overTime = widget.game['PBP']
-              .where(
-                  (e) => e is Map<String, dynamic> && e['period'] != null && e['period'] > 4)
-              .toList();
-        }
-      });
+      filterActions(teamCodes[team], selectedPlayer);
     }
   }
 
@@ -268,7 +265,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
                 awayId: widget.awayId,
                 homeTeamColor: homeTeamColor,
                 awayTeamColor: awayTeamColor,
-              )
+              ),
+            SliverPadding(padding: EdgeInsets.only(bottom: 100.0.r))
           ],
         ),
         Positioned(
@@ -288,59 +286,110 @@ class _PlayByPlayState extends State<PlayByPlay> {
                 Container(
                   decoration: BoxDecoration(
                       color: Colors.grey.shade900,
-                      border: Border.all(color: Colors.deepOrange),
+                      border: Border.all(
+                          color: team == homeTeamAbbr
+                              ? kDarkPrimaryColors.contains(homeAbbr)
+                                  ? (kTeamColors[homeAbbr]!['secondaryColor']!)
+                                  : (kTeamColors[homeAbbr]!['primaryColor']!)
+                              : team == awayTeamAbbr
+                                  ? kDarkPrimaryColors.contains(awayAbbr)
+                                      ? (kTeamColors[awayAbbr]!['secondaryColor']!)
+                                      : (kTeamColors[awayAbbr]!['primaryColor']!)
+                                  : Colors.deepOrange),
                       borderRadius: BorderRadius.circular(10.0)),
-                  margin: EdgeInsets.all(11.0.r),
-                  child: DropdownButton<String>(
-                    padding: EdgeInsets.symmetric(horizontal: 15.0.r),
+                  margin: EdgeInsets.symmetric(vertical: 6.0.r, horizontal: 15.0.r),
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  child: DropdownButton<int>(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0.r),
                     borderRadius: BorderRadius.circular(10.0),
                     menuMaxHeight: 300.0.r,
                     dropdownColor: Colors.grey.shade900,
-                    isExpanded: false,
+                    isExpanded: true,
                     underline: Container(),
                     value: selectedPlayer,
-                    items:
-                        players.map<DropdownMenuItem<String>>((Map<String, dynamic> player) {
-                      return DropdownMenuItem<String>(
-                        value: player['name'], // Use 'name' from the map
-                        child: Text(
-                          player['name'], // Display 'name' in the dropdown
-                          style: kBebasNormal.copyWith(fontSize: 17.0.r),
+                    items: players.map<DropdownMenuItem<int>>((Map<String, dynamic> player) {
+                      return DropdownMenuItem<int>(
+                        value: player['id'],
+                        child: Row(
+                          children: [
+                            if (player['name'] != 'ALL')
+                              Text(
+                                player['number'] ?? '',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    color: Colors.grey, fontSize: 12.0.r),
+                              ),
+                            if (player['name'] != 'ALL') SizedBox(width: 8.0.r),
+                            if (player['name'] != 'ALL')
+                              PlayerAvatar(
+                                radius: 12.0.r,
+                                backgroundColor: Colors.white12,
+                                playerImageUrl:
+                                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['id'] ?? '0'}.png',
+                              ),
+                            SizedBox(width: 8.0.r),
+                            AutoSizeText(
+                              player['name'],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: kBebasNormal.copyWith(fontSize: 15.0.r),
+                            ),
+                            SizedBox(width: 8.0.r),
+                            if (player['name'] != 'ALL')
+                              ConstrainedBox(
+                                constraints:
+                                    BoxConstraints(maxWidth: 15.0.r, maxHeight: 15.0.r),
+                                child: Image.asset(
+                                  'images/NBA_Logos/${player['team']}.png',
+                                ),
+                              ),
+                          ],
                         ),
                       );
                     }).toList(),
-                    onChanged: (String? value) {
+                    onChanged: (int? value) {
                       setState(() {
                         selectedPlayer = value!;
                       });
+                      filterActions(teamCodes[team], selectedPlayer);
                     },
                   ),
                 ),
-                const Spacer(),
                 Container(
                   decoration: BoxDecoration(
                       color: Colors.grey.shade900,
-                      border: Border.all(color: Colors.deepOrange),
+                      border: Border.all(
+                          color: team == homeTeamAbbr
+                              ? kDarkPrimaryColors.contains(homeAbbr)
+                                  ? (kTeamColors[homeAbbr]!['secondaryColor']!)
+                                  : (kTeamColors[homeAbbr]!['primaryColor']!)
+                              : team == awayTeamAbbr
+                                  ? kDarkPrimaryColors.contains(awayAbbr)
+                                      ? (kTeamColors[awayAbbr]!['secondaryColor']!)
+                                      : (kTeamColors[awayAbbr]!['primaryColor']!)
+                                  : Colors.deepOrange),
                       borderRadius: BorderRadius.circular(25.0)),
-                  margin: const EdgeInsets.all(11.0),
+                  margin: EdgeInsets.symmetric(vertical: 6.0.r, horizontal: 10.0.r),
                   child: Padding(
-                    padding: const EdgeInsets.all(3.0),
+                    padding: EdgeInsets.all(3.0.r),
                     child: ToggleSwitch(
                       initialLabelIndex: initialLabelIndex,
                       totalSwitches: 3,
-                      labels: const ['Home', 'All', 'Away'],
+                      labels: [awayTeamAbbr, 'ALL', homeTeamAbbr],
                       animate: true,
                       animationDuration: 200,
                       curve: Curves.decelerate,
                       cornerRadius: 20.0,
                       customWidths: [
-                        (MediaQuery.sizeOf(context).width - 28) / 4,
-                        (MediaQuery.sizeOf(context).width - 28) / 4
+                        (MediaQuery.sizeOf(context).width - 28) / 7,
+                        (MediaQuery.sizeOf(context).width - 28) / 7,
+                        (MediaQuery.sizeOf(context).width - 28) / 7
                       ],
                       activeBgColor: [Colors.grey.shade800],
                       activeFgColor: Colors.white,
                       inactiveBgColor: Colors.grey.shade900,
                       customTextStyles: [
+                        kBebasNormal.copyWith(fontSize: 14.0.r),
                         kBebasNormal.copyWith(fontSize: 14.0.r),
                         kBebasNormal.copyWith(fontSize: 14.0.r)
                       ],
@@ -349,6 +398,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                           team = teams[index!];
                           initialLabelIndex = index;
                         });
+                        filterActions(teamCodes[team], selectedPlayer);
                       },
                     ),
                   ),

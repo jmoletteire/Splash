@@ -3502,6 +3502,39 @@ const List<String> kDarkPrimaryColors = [
 
 const List<String> kDarkSecondaryColors = ['CHA', 'CHI', 'DET', 'POR', 'TOR'];
 
+const Map<String, String> kArenas = {
+  'State Farm Arena': 'Atlanta, GA',
+  'TD Garden': 'Boston, MA',
+  'United Center': 'Chicago, IL',
+  'Barclays Center': 'Brooklyn, NY',
+  'Spectrum Center': 'Charlotte, NC',
+  'Rocket Mortgage FieldHouse': 'Cleveland, OH',
+  'American Airlines Center': 'Dallas, TX',
+  'Ball Arena': 'Denver, CO',
+  'Little Caesars Arena': 'Detroit, MI',
+  'Chase Center': 'San Francisco, CA',
+  'Toyota Center': 'Houston, TX',
+  'Gainbridge FieldHouse': 'Indianapolis, IN',
+  'Intuit Dome': 'Inglewood, CA',
+  'Staples Center': 'Los Angeles, CA',
+  'FedExForum': 'Memphis, TN',
+  'Kaseya Center': 'Miami, FL',
+  'Fiserv Forum': 'Milwaukee, WI',
+  'Target Center': 'Minneapolis, MN',
+  'Smoothie King Center': 'New Orleans, LA',
+  'Madison Square Garden': 'New York, NY',
+  'Kia Center': 'Orlando, FL',
+  'Paycom Center': 'Oklahoma City, OK',
+  'Wells Fargo Center': 'Philadelphia, PA',
+  'Footprint Center': 'Phoenix, AZ',
+  'Moda Center': 'Portland, OR',
+  'Golden 1 Center': 'Sacramento, CA',
+  'Frost Bank Center': 'San Antonio, TX',
+  'Scotiabank Arena': 'Toronto, ON',
+  'Delta Center': 'Salt Lake City, UT',
+  'Capital One Arena': 'Washington, D.C.',
+};
+
 const Map<String, String> kSchoolNames = {
   'Central Florida': 'UCF',
   'California-Los Angeles': 'UCLA',

@@ -130,7 +130,7 @@ def update_player_info():
         exit(1)
 
     # Loop through each document in the collection
-    for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active"})):
+    for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active"}, {"PERSON_ID": 1, "_id": 1})):
         person_id = player['PERSON_ID']
         latest_info = get_player_info(person_id)
 
@@ -139,6 +139,8 @@ def update_player_info():
             players_collection.update_one(
                 {"_id": player['_id']},
                 {"$set": {
+                    'FIRST_NAME': latest_info[0]['FIRST_NAME'],
+                    'LAST_NAME': latest_info[0]['LAST_NAME'],
                     'DISPLAY_FIRST_LAST': latest_info[0]['DISPLAY_FIRST_LAST'],
                     'DISPLAY_FI_LAST': latest_info[0]['DISPLAY_FI_LAST'],
                     'WEIGHT': latest_info[0]['WEIGHT'],
@@ -181,8 +183,8 @@ if __name__ == "__main__":
 
         try:
             # add_historic_players()
-            add_players()
-            restructure_new_docs()
+            #add_players()
+            #restructure_new_docs()
             update_player_info()
         except Exception as e:
             logging.error(f"Error adding players: {e}")

@@ -17,12 +17,22 @@ class GameBasicInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> officials = [];
+    String arena = '';
+
     if (!isUpcoming || (isUpcoming && game.containsKey('BOXSCORE'))) {
       for (Map<String, dynamic> official in game['SUMMARY']['Officials']) {
         officials.add('${official['FIRST_NAME']} ${official['LAST_NAME']}');
       }
+      arena =
+          '${game['BOXSCORE']['arena']['arenaName']} - ${game['BOXSCORE']['arena']['arenaCity']}, ${game['BOXSCORE']['arena']['arenaState']}';
     } else {
       officials.add('TBA');
+      if (kArenas.containsKey(game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '')) {
+        arena =
+            '${game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? ''} - ${kArenas[game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '']}';
+      } else {
+        arena = game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '';
+      }
     }
 
     // Parse the input string into a DateTime object
@@ -56,25 +66,34 @@ class GameBasicInfo extends StatelessWidget {
         child: Column(
           children: [
             GameBasicInfoRow(
-              icon: Icons.airplanemode_active,
-              data: [
-                '${awayLinescore['TEAM_CITY_NAME']} ${awayLinescore['TEAM_NICKNAME'] ?? awayLinescore['TEAM_NAME']} @ ${homeLinescore['TEAM_CITY_NAME']} ${homeLinescore['TEAM_NICKNAME'] ?? homeLinescore['TEAM_NAME']}'
-              ],
-            ),
-            SizedBox(height: 10.0.r),
-            // Date
-            GameBasicInfoRow(
               icon: Icons.calendar_month,
-              data: [formattedDate],
-            ),
-            SizedBox(height: 10.0.r),
-            GameBasicInfoRow(
-              icon: Icons.sports_basketball,
               data: [
                 seasonTypes[game['SUMMARY']['GameSummary'][0]['GAME_ID'].substring(2, 3)] ??
                     '-'
               ],
             ),
+            SizedBox(height: 10.0.r),
+            GameBasicInfoRow(
+              icon: Icons.sports_basketball,
+              data: [
+                '${awayLinescore['TEAM_CITY_NAME']} ${awayLinescore['TEAM_NICKNAME'] ?? awayLinescore['TEAM_NAME']} @ ${homeLinescore['TEAM_CITY_NAME']} ${homeLinescore['TEAM_NICKNAME'] ?? homeLinescore['TEAM_NAME']}'
+              ],
+            ),
+            SizedBox(height: 10.0.r),
+            if (int.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'].substring(0, 4)) <
+                2021)
+              // Date
+              GameBasicInfoRow(
+                icon: Icons.calendar_month,
+                data: [formattedDate],
+              ),
+            if (int.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'].substring(0, 4)) >
+                2021)
+              // Date
+              GameBasicInfoRow(
+                icon: Icons.stadium,
+                data: [arena],
+              ),
             SizedBox(height: 10.0.r),
             // Broadcast
             GameBasicInfoRow(
