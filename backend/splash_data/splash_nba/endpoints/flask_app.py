@@ -672,7 +672,7 @@ def get_game():
         return jsonify({"error": "Failed to retrieve games"}), 500
 
 
-@app.route('/get_game/get_team_player_stats', methods=['GET'])
+@app.route('/get_team_player_stats', methods=['GET'])
 def get_team_player_stats():
     try:
         # logging.info(f"(get_team_player_stats) {request.args}")

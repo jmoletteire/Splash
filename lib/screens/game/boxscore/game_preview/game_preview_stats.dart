@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_leaders.dart';
+import 'package:splash/screens/game/boxscore/game_preview/team_players_helper.dart';
 import 'package:splash/screens/game/boxscore/team_player_stats.dart';
 
 import '../../../../utilities/constants.dart';
@@ -33,12 +34,58 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
   bool _isLoading = false;
   late Map<String, dynamic> homeTeam;
   late Map<String, dynamic> awayTeam;
+  late List homePlayers;
+  late List awayPlayers;
   Color awayContainerColor = const Color(0xFF111111);
   Color homeContainerColor = const Color(0xFF111111);
   Color teamContainerColor = const Color(0xFF111111);
 
   @override
   bool get wantKeepAlive => true;
+
+  Future<void> getPlayers(String homeId, String awayId) async {
+    homePlayers = await TeamPlayers().getTeamPlayers(homeId);
+    awayPlayers = await TeamPlayers().getTeamPlayers(awayId);
+  }
+
+  Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
+    final teamCache = Provider.of<TeamCache>(context, listen: false);
+    List<Future<Map<String, dynamic>>> teamFutures = teamIds.map((teamId) async {
+      try {
+        if (teamCache.containsTeam(teamId)) {
+          return teamCache.getTeam(teamId)!;
+        } else {
+          var fetchedTeam = await Team().getTeam(teamId);
+          teamCache.addTeam(teamId, fetchedTeam);
+          return fetchedTeam;
+        }
+      } catch (e) {
+        return {'error': 'not found'}; // Return an empty map in case of an error
+      }
+    }).toList();
+
+    return await Future.wait(teamFutures);
+  }
+
+  void setTeams() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      List<Map<String, dynamic>> fetchedTeams = await getTeams(kEastConfTeamIds);
+      getPlayers(widget.homeId, widget.awayId);
+
+      setState(() {
+        homeTeam = fetchedTeams[0];
+        awayTeam = fetchedTeams[1];
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -73,44 +120,6 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
       }
     });
     _tabController.index = 1;
-  }
-
-  Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
-    final teamCache = Provider.of<TeamCache>(context, listen: false);
-    List<Future<Map<String, dynamic>>> teamFutures = teamIds.map((teamId) async {
-      try {
-        if (teamCache.containsTeam(teamId)) {
-          return teamCache.getTeam(teamId)!;
-        } else {
-          var fetchedTeam = await Team().getTeam(teamId);
-          teamCache.addTeam(teamId, fetchedTeam);
-          return fetchedTeam;
-        }
-      } catch (e) {
-        return {'error': 'not found'}; // Return an empty map in case of an error
-      }
-    }).toList();
-
-    return await Future.wait(teamFutures);
-  }
-
-  void setTeams() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      List<Map<String, dynamic>> fetchedTeams = await getTeams(kEastConfTeamIds);
-
-      setState(() {
-        homeTeam = fetchedTeams[0];
-        awayTeam = fetchedTeams[1];
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
   }
 
   @override
