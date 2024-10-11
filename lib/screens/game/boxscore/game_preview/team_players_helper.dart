@@ -11,7 +11,7 @@ class TeamPlayers {
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_game/get_team_player_stats',
+      '/get_team_player_stats',
       queryParams,
     );
 

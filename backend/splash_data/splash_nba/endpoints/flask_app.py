@@ -6,11 +6,11 @@ from flask_compress import Compress
 from pymongo import MongoClient
 import logging
 
-from splash_nba.util.env import k_current_season, k_prev_season
-
 app = Flask(__name__)
 Compress(app)
 bytes_transferred = 0
+k_prev_season = '2023-24'
+k_current_season = '2024-25'
 
 # MongoDB connection setup
 try:
