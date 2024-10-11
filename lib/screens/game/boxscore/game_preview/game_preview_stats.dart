@@ -166,7 +166,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                     ),
                     margin: const EdgeInsets.only(bottom: 1.0),
                     child: Tab(
-                      text: awayLinescore['TEAM_NAME'],
+                      text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
                     ),
                   ),
                 ),
@@ -198,7 +198,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                       ),
                     ),
                     child: Tab(
-                      text: homeLinescore['TEAM_NAME'],
+                      text: homeLinescore['TEAM_NAME'] ?? homeLinescore['TEAM_NICKNAME'],
                     ),
                   ),
                 ),
@@ -214,7 +214,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
               children: [
                 CustomScrollView(
                   slivers: [
-                    TeamPlayerStats(players: homePlayers, controller: _homeController),
+                    TeamPlayerStats(players: awayPlayers, controller: _awayController),
                   ],
                 ),
                 CustomScrollView(
@@ -232,7 +232,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                 ),
                 CustomScrollView(
                   slivers: [
-                    TeamPlayerStats(players: awayPlayers, controller: _awayController),
+                    TeamPlayerStats(players: homePlayers, controller: _homeController),
                   ],
                 ),
               ],

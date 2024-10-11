@@ -141,6 +141,7 @@ List<String> kSeasons = [
 /// ******************************************************
 
 const kCurrentSeason = '2024-25';
+const kPrevSeason = '2023-24';
 const kLeagueSalaryCap = {
   '1996': 24693000,
   '1997': 26900000,
@@ -197,6 +198,16 @@ const kLeagueSecondApron = {
 /// ******************************************************
 ///                        MAPS
 /// ******************************************************
+
+Map<String, String> kPositionMap = {
+  'Guard': 'G',
+  'Guard-Forward': 'G-F',
+  'Forward-Guard': 'F-G',
+  'Forward': 'F',
+  'Forward-Center': 'F-C',
+  'Center-Forward': 'C-F',
+  'Center': 'C'
+};
 
 Map<String, String> kTeamFullNameToId = {
   'Atlanta Hawks': '1610612737',

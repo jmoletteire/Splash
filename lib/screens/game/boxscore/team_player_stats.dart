@@ -30,32 +30,50 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
     super.initState();
     columnNames = [
       'PLAYER',
-      'POSS',
-      'MIN',
-      'PTS',
-      'REB',
-      'AST',
-      'TO',
-      'FG',
-      '3P',
-      'FT',
-      'STL',
-      'BLK',
-      'ORB',
-      'DRB',
-      'PF',
+      'GP',
+      'MPG',
+      'PPG',
+      'RPG',
+      'APG',
+      'SPG',
+      'BPG',
+      'TOPG',
+      'FG%',
+      '3P%',
+      'FT%',
       'eFG%',
       'TS%',
       'USG%',
       '+/-',
+      'NRTG',
       'ORTG',
       'DRTG',
-      'NRTG',
     ];
+
+    // Sort players by MIN / GP for the current or previous season
+    String season =
+        widget.players[0]['STATS'].containsKey(kCurrentSeason) ? kCurrentSeason : kPrevSeason;
+    String seasonType = widget.players[0]['STATS'][season].containsKey('PLAYOFFS')
+        ? 'PLAYOFFS'
+        : 'REGULAR SEASON';
+    widget.players.sort((a, b) {
+      try {
+        double minPerGameA = a['STATS'][season][seasonType]['BASIC']['MIN'] /
+            a['STATS'][season]['REGULAR SEASON']['BASIC']['GP'];
+        double minPerGameB = b['STATS'][season][seasonType]['BASIC']['MIN'] /
+            b['STATS'][season]['REGULAR SEASON']['BASIC']['GP'];
+
+        return minPerGameB.compareTo(minPerGameA); // Sort in descending order
+      } catch (e) {
+        return 0; // Handle errors if MIN or GP data is missing
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
     return SliverTableView.builder(
       horizontalScrollController: widget.controller,
       style: const TableViewStyle(
@@ -78,72 +96,137 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
       columns: [
         /// PLAYER
         TableColumn(
-          width: MediaQuery.of(context).size.width * 0.3,
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.15
+              : MediaQuery.of(context).size.width * 0.38,
           freezePriority: 1,
         ),
 
-        /// POSS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        /// GP
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.075,
+        ),
 
         /// MIN
-        TableColumn(width: MediaQuery.of(context).size.width * 0.125),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// PTS
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1225,
+        ),
 
         /// REB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// AST
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
-
-        /// TOV
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
-
-        /// FGM - FGA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
-
-        /// 3PM - 3PA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
-
-        /// FTM - FTA
-        TableColumn(width: MediaQuery.of(context).size.width * 0.11),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// STL
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.04
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
         /// BLK
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
-        /// OREB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        /// TOV
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.03
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
 
-        /// DREB
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        /// FGM - FGA
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.15,
+        ),
 
-        /// PF
-        TableColumn(width: MediaQuery.of(context).size.width * 0.08),
+        /// 3PM - 3PA
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.135,
+        ),
+
+        /// FTM - FTA
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.135,
+        ),
 
         /// EFG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.135,
+        ),
 
         /// TS%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.135,
+        ),
 
         /// USG%
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.135,
+        ),
 
         /// +/-
-        TableColumn(width: MediaQuery.of(context).size.width * 0.1),
-
-        /// ORTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
-
-        /// DRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.125,
+        ),
 
         /// NRTG
-        TableColumn(width: MediaQuery.of(context).size.width * 0.12),
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.125,
+        ),
+
+        /// ORTG
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
+
+        /// DRTG
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.06
+              : MediaQuery.of(context).size.width * 0.12,
+        ),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -215,7 +298,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
           child: contentBuilder(context, (context, column) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: getContent(widget.players[row], row, column, context),
+              child: getContent(row, column, context),
             );
           }),
         ),
@@ -223,22 +306,37 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
     );
   }
 
-  Widget getContent(
-      Map<String, dynamic> playerSeasons, int row, int column, BuildContext context) {
+  Widget getContent(int row, int column, BuildContext context) {
+    String season = widget.players[row]['STATS'].containsKey(kCurrentSeason)
+        ? kCurrentSeason
+        : kPrevSeason;
+
+    String seasonType = widget.players[0]['STATS'][season].containsKey('PLAYOFFS')
+        ? 'PLAYOFFS'
+        : 'REGULAR SEASON';
+
     switch (column) {
       case 0:
-        int firstSpaceIndex = widget.players[row]['PLAYER_NAME'].indexOf(' ');
         return Container(
           alignment: Alignment.centerLeft,
           child: Row(
             children: [
+              SizedBox(
+                width: 12.0.r,
+                child: Text(
+                  widget.players[row]['JERSEY'] ?? '',
+                  textAlign: TextAlign.center,
+                  style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
+                ),
+              ),
+              SizedBox(width: 8.0.r),
               PlayerAvatar(
                 radius: 12.0,
                 backgroundColor: Colors.white12,
                 playerImageUrl:
-                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PLAYER_ID']}.png',
+                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PERSON_ID']}.png',
               ),
-              const SizedBox(width: 5.0),
+              SizedBox(width: 5.0.r),
               Flexible(
                 child: RichText(
                     maxLines: 1,
@@ -246,18 +344,17 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text:
-                              '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(firstSpaceIndex + 1)}',
+                          text: '${widget.players[row]['DISPLAY_FI_LAST'] ?? ''}',
                           style: kBebasNormal.copyWith(
                             color: Colors.white70,
-                            fontSize: 15.0,
+                            fontSize: 14.0,
                           ),
                         ),
                         TextSpan(
-                          text: ', ${widget.players[row]['POSITION']}',
+                          text: ', ${kPositionMap[widget.players[row]['POSITION']] ?? ''}',
                           style: kBebasNormal.copyWith(
                             color: Colors.white,
-                            fontSize: 15.0,
+                            fontSize: 13.0,
                           ),
                         ),
                       ],
@@ -271,8 +368,8 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
-              '${widget.players[row]['POSS']}',
-              style: kBebasNormal.copyWith(fontSize: 16.0),
+              widget.players[row]['STATS'][season][seasonType]['BASIC']['GP'].toString(),
+              style: kBebasNormal.copyWith(fontSize: 15.0.r, color: const Color(0xFFD0D0D0)),
             ),
           );
         } catch (e) {
@@ -280,11 +377,14 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         }
       case 2:
         try {
+          double minPerG = widget.players[row]['STATS'][season][seasonType]['BASIC']['MIN'] /
+              widget.players[row]['STATS'][season][seasonType]['BASIC']['GP'];
+
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
-              '${widget.players[row]['MIN'].replaceAll(RegExp(r'\..*?(?=:)'), '')}',
-              style: kBebasNormal.copyWith(fontSize: 16.0),
+              minPerG.toStringAsFixed(1),
+              style: kBebasNormal.copyWith(fontSize: 15.0.r, color: const Color(0xFFD0D0D0)),
             ),
           );
         } catch (e) {
@@ -292,25 +392,33 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         }
       case 3:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['PTS'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['PTS'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 4:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['REB'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['REB'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 5:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['AST'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['AST'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 6:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['TO'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['STL'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -318,7 +426,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${widget.players[row]['FGM'].toStringAsFixed(0)}-${widget.players[row]['FGA'].toStringAsFixed(0)}');
+                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['BLK'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -326,7 +434,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${widget.players[row]['FG3M'].toStringAsFixed(0)}-${widget.players[row]['FG3A'].toStringAsFixed(0)}');
+                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['TOV'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -334,86 +442,79 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         try {
           return BoxscoreDataText(
               text:
-                  '${widget.players[row]['FTM'].toStringAsFixed(0)}-${widget.players[row]['FTA'].toStringAsFixed(0)}');
+                  '${(100 * widget.players[row]['STATS'][season][seasonType]['BASIC']['FGM'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['FGA']).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 10:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['STL'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(100 * widget.players[row]['STATS'][season][seasonType]['BASIC']['FG3M'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['FG3A']).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 11:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['BLK'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(100 * widget.players[row]['STATS'][season][seasonType]['BASIC']['FTM'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['FTA']).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 12:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['OREB'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(widget.players[row]['STATS'][season][seasonType]['ADV']['EFG_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 13:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['DREB'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(widget.players[row]['STATS'][season][seasonType]['ADV']['TS_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 14:
         try {
-          return BoxscoreDataText(text: '${widget.players[row]['PF'].toStringAsFixed(0)}');
+          return BoxscoreDataText(
+              text:
+                  '${(widget.players[row]['STATS'][season][seasonType]['ADV']['USG_PCT'] * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 15:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['EFG_PCT'] * 100).toStringAsFixed(1)}%');
+              text:
+                  '${widget.players[row]['STATS'][season][seasonType]['BASIC']['PLUS_MINUS'].toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 16:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['TS_PCT'] * 100).toStringAsFixed(1)}%');
+              text:
+                  '${widget.players[row]['STATS'][season][seasonType]['ADV']['NET_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 17:
         try {
           return BoxscoreDataText(
-              text: '${(widget.players[row]['USG_PCT'] * 100).toStringAsFixed(1)}%');
+              text:
+                  '${widget.players[row]['STATS'][season][seasonType]['ADV']['OFF_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 18:
         try {
           return BoxscoreDataText(
-              text: '${widget.players[row]['PLUS_MINUS'].toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 19:
-        try {
-          return BoxscoreDataText(
-              text: '${widget.players[row]['OFF_RATING'].toStringAsFixed(1)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 20:
-        try {
-          return BoxscoreDataText(
-              text: '${widget.players[row]['DEF_RATING'].toStringAsFixed(1)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 21:
-        try {
-          return BoxscoreDataText(
-              text: '${widget.players[row]['NET_RATING'].toStringAsFixed(1)}');
+              text:
+                  '${widget.players[row]['STATS'][season][seasonType]['ADV']['DEF_RATING'].toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -424,9 +525,10 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
 }
 
 class BoxscoreDataText extends StatelessWidget {
-  const BoxscoreDataText({super.key, required this.text, this.alignment});
+  const BoxscoreDataText({super.key, required this.text, this.alignment, this.color});
 
   final Alignment? alignment;
+  final Color? color;
   final String text;
 
   @override
@@ -436,7 +538,7 @@ class BoxscoreDataText extends StatelessWidget {
       child: AutoSizeText(
         text,
         maxLines: 1,
-        style: kBebasNormal.copyWith(fontSize: 17.0),
+        style: kBebasNormal.copyWith(fontSize: 15.0.r, color: color),
       ),
     );
   }
