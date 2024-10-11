@@ -723,6 +723,7 @@ def get_team_player_stats():
                     "POSITION": 1,
                     "JERSEY": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.ADV.POSS": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.GP": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.MIN": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.PTS": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.REB": 1,
@@ -748,6 +749,7 @@ def get_team_player_stats():
                     f"STATS.{k_prev_season}.REGULAR SEASON.ADV.NET_RATING": 1,
 
                     f"STATS.{k_current_season}.REGULAR SEASON.ADV.POSS": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.GP": 1,
                     f"STATS.{k_current_season}.REGULAR SEASON.BASIC.MIN": 1,
                     f"STATS.{k_current_season}.REGULAR SEASON.BASIC.PTS": 1,
                     f"STATS.{k_current_season}.REGULAR SEASON.BASIC.REB": 1,
@@ -773,6 +775,7 @@ def get_team_player_stats():
                     f"STATS.{k_current_season}.REGULAR SEASON.ADV.NET_RATING": 1,
 
                     f"STATS.{k_current_season}.PLAYOFFS.ADV.POSS": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.GP": 1,
                     f"STATS.{k_current_season}.PLAYOFFS.BASIC.MIN": 1,
                     f"STATS.{k_current_season}.PLAYOFFS.BASIC.PTS": 1,
                     f"STATS.{k_current_season}.PLAYOFFS.BASIC.REB": 1,

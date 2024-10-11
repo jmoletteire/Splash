@@ -44,7 +44,6 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
   bool get wantKeepAlive => true;
 
   Future<List> getPlayers(String homeId, String awayId) async {
-    print('called');
     List home = await TeamPlayers().getTeamPlayers(homeId);
     List away = await TeamPlayers().getTeamPlayers(awayId);
 
@@ -78,7 +77,6 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     try {
       List<Map<String, dynamic>> fetchedTeams = await getTeams(kEastConfTeamIds);
       List fetchedPlayers = await getPlayers(widget.homeId, widget.awayId);
-      print(fetchedPlayers);
 
       setState(() {
         homeTeam = fetchedTeams[0];
@@ -216,7 +214,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
               children: [
                 CustomScrollView(
                   slivers: [
-                    TeamPlayerStats(players: [], controller: _homeController),
+                    TeamPlayerStats(players: homePlayers, controller: _homeController),
                   ],
                 ),
                 CustomScrollView(
@@ -234,7 +232,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                 ),
                 CustomScrollView(
                   slivers: [
-                    TeamPlayerStats(players: [], controller: _awayController),
+                    TeamPlayerStats(players: awayPlayers, controller: _awayController),
                   ],
                 ),
               ],
