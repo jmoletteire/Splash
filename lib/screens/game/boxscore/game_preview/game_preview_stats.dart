@@ -34,8 +34,8 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
   bool _isLoading = false;
   late Map<String, dynamic> homeTeam;
   late Map<String, dynamic> awayTeam;
-  late List homePlayers;
-  late List awayPlayers;
+  List homePlayers = [];
+  List awayPlayers = [];
   Color awayContainerColor = const Color(0xFF111111);
   Color homeContainerColor = const Color(0xFF111111);
   Color teamContainerColor = const Color(0xFF111111);
@@ -43,9 +43,12 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
   @override
   bool get wantKeepAlive => true;
 
-  Future<void> getPlayers(String homeId, String awayId) async {
-    homePlayers = await TeamPlayers().getTeamPlayers(homeId);
-    awayPlayers = await TeamPlayers().getTeamPlayers(awayId);
+  Future<List> getPlayers(String homeId, String awayId) async {
+    print('called');
+    List home = await TeamPlayers().getTeamPlayers(homeId);
+    List away = await TeamPlayers().getTeamPlayers(awayId);
+
+    return [home, away];
   }
 
   Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
@@ -74,11 +77,14 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
 
     try {
       List<Map<String, dynamic>> fetchedTeams = await getTeams(kEastConfTeamIds);
-      getPlayers(widget.homeId, widget.awayId);
+      List fetchedPlayers = await getPlayers(widget.homeId, widget.awayId);
+      print(fetchedPlayers);
 
       setState(() {
         homeTeam = fetchedTeams[0];
         awayTeam = fetchedTeams[1];
+        homePlayers = fetchedPlayers[0];
+        awayPlayers = fetchedPlayers[1];
       });
     } catch (e) {
       setState(() {
@@ -93,6 +99,8 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     _tabController = TabController(length: 3, vsync: this);
     _homeController = ScrollController();
     _awayController = ScrollController();
+
+    setTeams();
 
     _tabController.addListener(() {
       _selectedIndex.value = _tabController.index;

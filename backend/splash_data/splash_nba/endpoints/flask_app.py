@@ -699,13 +699,13 @@ def get_team_player_stats():
                         "must": [
                             {
                                 "equals": {
-                                    "query": team_id,
+                                    "value": team_id,
                                     "path": "TEAM_ID"
                                 }
                             },
                             {
                                 "equals": {
-                                    "query": "Active",
+                                    "value": "Active",
                                     "path": "ROSTERSTATUS"
                                 }
                             }

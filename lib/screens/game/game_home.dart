@@ -95,7 +95,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     }
     startPolling(widget.gameId);
 
-    _tabController = TabController(length: _gamePages.length, vsync: this);
+    _tabController = TabController(length: _isUpcoming ? 2 : 3, vsync: this);
 
     _scrollController = ScrollController()
       ..addListener(() {
