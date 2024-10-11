@@ -716,6 +716,12 @@ def get_team_player_stats():
             {
                 "$project": {
                     "_id": 0,
+                    "PERSON_ID": 1,
+                    "TEAM_ID": 1,
+                    "DISPLAY_FI_LAST": 1,
+                    "DISPLAY_FIRST_LAST": 1,
+                    "POSITION": 1,
+                    "JERSEY": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.ADV.POSS": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.MIN": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.PTS": 1,
