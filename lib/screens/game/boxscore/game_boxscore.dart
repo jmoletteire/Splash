@@ -563,16 +563,11 @@ class _CustomPainter extends BoxPainter {
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     Paint paint = Paint();
     if (controller.index == 0) {
-      paint.color = kDarkSecondaryColors.contains(awayTeam)
-          ? (kTeamColors[awayTeam]!['primaryColor']!)
-          : (kTeamColors[awayTeam]!['secondaryColor']!);
-      ;
+      paint.color = kTeamColors[awayTeam]?['secondaryColor'] ?? Colors.white;
     } else if (controller.index == 1) {
       paint.color = Colors.deepOrange;
     } else if (controller.index == 2) {
-      paint.color = kDarkSecondaryColors.contains(homeTeam)
-          ? (kTeamColors[homeTeam]!['primaryColor']!)
-          : (kTeamColors[homeTeam]!['secondaryColor']!);
+      paint.color = kTeamColors[homeTeam]?['secondaryColor'] ?? Colors.white;
       ;
     } else {
       paint.color = Colors.transparent;

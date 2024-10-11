@@ -12,11 +12,13 @@ from splash_nba.util.env import uri, k_current_season
 import logging
 
 
-def fetch_odds(odds, game):
-    for game_data in odds:
-        if game_data['gameId'] == game:
-            game_data['markets']
-
+def fetch_odds(nba_today_odds, game_id):
+    for game_data in nba_today_odds:
+        if game_data['gameId'] == game_id:
+            games_collection.update_one(
+                {'GAME_DATE': datetime.today().strftime('%Y-%m-%d')},
+                {'$set': {f'GAMES.{game_id}.ODDS.srMatchId': game_data['srMatchId']}},
+            )
 
 
 def update_game_data():

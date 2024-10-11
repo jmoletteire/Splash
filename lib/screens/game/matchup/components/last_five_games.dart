@@ -65,7 +65,8 @@ class _LastFiveGamesState extends State<LastFiveGames> {
         if (lastGameDate.compareTo(todayDate) < 0) {
           // Find last game
           for (var game in games) {
-            if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) < 0) {
+            if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) < 0 &&
+                (schedule[game]['RESULT'] == 'W' || schedule[game]['RESULT'] == 'L')) {
               schedule[game]['GAME_ID'] = game;
               gamesToAdd.add(schedule[game]);
             }

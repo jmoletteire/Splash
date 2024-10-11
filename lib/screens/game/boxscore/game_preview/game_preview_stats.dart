@@ -149,7 +149,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                         end: Alignment.centerLeft,
                       ),
                     ),
-                    margin: const EdgeInsets.only(bottom: 3.0),
+                    margin: const EdgeInsets.only(bottom: 1.0),
                     child: Tab(
                       text: awayLinescore['TEAM_NAME'],
                     ),
@@ -161,7 +161,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
               children: [
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 3.0),
+                    margin: const EdgeInsets.only(bottom: 1.0),
                     color: const Color(0xFF1B1B1B),
                     child: const Tab(
                       text: "TEAM",
@@ -174,7 +174,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
               children: [
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 3.0),
+                    margin: const EdgeInsets.only(bottom: 1.0),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [const Color(0xFF1B1B1B), homeContainerColor],
@@ -276,22 +276,18 @@ class _CustomPainter extends BoxPainter {
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     Paint paint = Paint();
     if (controller.index == 0) {
-      paint.color = kDarkSecondaryColors.contains(awayTeam)
-          ? (kTeamColors[awayTeam]!['primaryColor']!)
-          : (kTeamColors[awayTeam]!['secondaryColor']!);
+      paint.color = kTeamColors[awayTeam]?['secondaryColor'] ?? Colors.white;
       ;
     } else if (controller.index == 1) {
       paint.color = Colors.deepOrange;
     } else if (controller.index == 2) {
-      paint.color = kDarkSecondaryColors.contains(homeTeam)
-          ? (kTeamColors[homeTeam]!['primaryColor']!)
-          : (kTeamColors[homeTeam]!['secondaryColor']!);
+      paint.color = kTeamColors[homeTeam]?['secondaryColor'] ?? Colors.white;
       ;
     } else {
       paint.color = Colors.transparent;
     }
 
-    final double indicatorHeight = 3.0;
+    const double indicatorHeight = 2.0;
     final Offset start = offset + Offset(0, configuration.size!.height - indicatorHeight);
     final Offset end = offset +
         Offset(configuration.size!.width, configuration.size!.height - indicatorHeight);

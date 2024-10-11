@@ -466,13 +466,13 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 GamePreviewStats(
                   game: game,
                   homeId: widget.homeId,
-                  awayId: widget.awayId,
+                  awayId: awayTeamId,
                 ),
               if (!_isUpcoming)
                 GameBoxScore(
                   game: game,
                   homeId: widget.homeId,
-                  awayId: widget.awayId,
+                  awayId: awayTeamId,
                   inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                 )
             ]),
@@ -598,10 +598,12 @@ class GameInfo extends StatelessWidget {
           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV' &&
               gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
               gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
-              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT')
+              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT' &&
+              gameSummary['GAME_STATUS_TEXT'] != 'Cancelled')
             Text(gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS',
                 style: kBebasBold.copyWith(fontSize: 19.0.r)),
-          if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
+          if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != null &&
+              gameSummary['GAME_STATUS_TEXT'] != 'Cancelled') ...[
             if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
               SvgPicture.asset(
                 'images/NBA_TV.svg',

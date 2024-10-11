@@ -6,6 +6,8 @@ from flask_compress import Compress
 from pymongo import MongoClient
 import logging
 
+from splash_nba.util.env import k_current_season, k_prev_season
+
 app = Flask(__name__)
 Compress(app)
 bytes_transferred = 0
@@ -668,6 +670,142 @@ def get_game():
     except Exception as e:
         logging.error(f"(get_game) Error retrieving games: {e}")
         return jsonify({"error": "Failed to retrieve games"}), 500
+
+
+@app.route('/get_game/get_team_player_stats', methods=['GET'])
+def get_team_player_stats():
+    try:
+        # logging.info(f"(get_team_player_stats) {request.args}")
+        query_params = request.args.to_dict()
+        # logging.info(f"(get_team_player_stats) {query_params}")
+
+        # Retrieve the required parameter
+        team_id_str = query_params.get('team_id')
+        if not team_id_str:
+            return jsonify({"error": "team_id is required"}), 400
+
+        # Convert the person_id to an integer
+        try:
+            team_id = int(team_id_str)
+        except ValueError:
+            return jsonify({"error": "team_id must be an integer"}), 400
+
+        # Query the database
+        players = players_collection.aggregate([
+            {
+                "$search": {
+                    "index": "active_by_team",
+                    "compound": {
+                        "must": [
+                            {
+                                "equals": {
+                                    "query": team_id,
+                                    "path": "TEAM_ID"
+                                }
+                            },
+                            {
+                                "equals": {
+                                    "query": "Active",
+                                    "path": "ROSTERSTATUS"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.POSS": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.MIN": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.PTS": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.REB": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.AST": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.STL": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.BLK": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.TOV": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FGM": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FGA": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FG3M": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FG3A": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FTM": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FTA": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.OREB": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.DREB": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.PF": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.PLUS_MINUS": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.EFG_PCT": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.TS_PCT": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.USG_PCT": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.OFF_RATING": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.DEF_RATING": 1,
+                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.NET_RATING": 1,
+
+                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.POSS": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.MIN": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.PTS": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.REB": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.AST": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.STL": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.BLK": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.TOV": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FGM": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FGA": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FG3M": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FG3A": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FTM": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FTA": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.OREB": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.DREB": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.PF": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.PLUS_MINUS": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.EFG_PCT": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.TS_PCT": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.USG_PCT": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.OFF_RATING": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.DEF_RATING": 1,
+                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.NET_RATING": 1,
+
+                    f"STATS.{k_current_season}.PLAYOFFS.ADV.POSS": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.MIN": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.PTS": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.REB": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.AST": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.STL": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.BLK": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.TOV": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FGM": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FGA": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FG3M": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FG3A": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FTM": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FTA": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.OREB": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.DREB": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.PF": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.PLUS_MINUS": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.ADV.EFG_PCT": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.ADV.TS_PCT": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.ADV.USG_PCT": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.ADV.OFF_RATING": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.ADV.DEF_RATING": 1,
+                    f"STATS.{k_current_season}.PLAYOFFS.ADV.NET_RATING": 1,
+                }
+            }
+        ])
+
+        players = list(players)
+
+        if len(players) > 0:
+            # logging.info(f"(get_team_player_stats) Retrieved player {person_id} from MongoDB")
+            return jsonify(players)
+        else:
+            logging.warning("(get_team_player_stats) No player found in MongoDB")
+            return jsonify({"error": "No player found"}), 404
+
+    except Exception as e:
+        logging.error(f"(get_team_player_stats) Error retrieving player: {e}")
+        return jsonify({"error": "Failed to retrieve player"}), 500
 
 
 @app.route('/get_player_shot_chart', methods=['GET'])

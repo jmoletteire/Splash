@@ -403,12 +403,14 @@ class ComparisonRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool oneIsBetter = (statName.contains('DRTG') || statName == 'FOULS PER 75')
-        ? awayTeam < homeTeam
-        : awayTeam > homeTeam;
-    bool twoIsBetter = (statName.contains('DRTG') || statName == 'FOULS PER 75')
-        ? homeTeam < awayTeam
-        : homeTeam > awayTeam;
+    bool oneIsBetter =
+        (statName.contains('DRTG') || statName == 'FOULS PER 75' || statName.contains('TOV'))
+            ? awayTeam < homeTeam
+            : awayTeam > homeTeam;
+    bool twoIsBetter =
+        (statName.contains('DRTG') || statName == 'FOULS PER 75' || statName.contains('TOV'))
+            ? homeTeam < awayTeam
+            : homeTeam > awayTeam;
 
     String getRank(int teamRank) {
       switch (teamRank) {

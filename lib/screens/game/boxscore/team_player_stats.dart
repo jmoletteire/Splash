@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
@@ -154,21 +155,16 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         context,
         (context, column) {
           return Material(
-            color: Colors.grey.shade800,
+            color: const Color(0xFF303030),
             child: Padding(
-              padding: column == 0
-                  ? const EdgeInsets.only(left: 20.0)
-                  : const EdgeInsets.only(right: 8.0),
+              padding:
+                  column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
               child: Align(
-                alignment: column == 0
-                    ? Alignment.centerLeft
-                    : column == 1
-                        ? Alignment.center
-                        : Alignment.centerRight,
+                alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
                 child: Text(
                   columnNames[column],
                   style: kBebasNormal.copyWith(
-                    fontSize: 16.0,
+                    fontSize: 14.0.r,
                   ),
                 ),
               ),
@@ -192,6 +188,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
               ),
             ),
           ),
+          child: child,
         ),
       );
 

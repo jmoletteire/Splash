@@ -230,6 +230,12 @@ def games_live_update():
                         f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.NATL_TV_BROADCASTER_ABBREVIATION': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
                         f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PERIOD_TIME_BCAST': summary['GameSummary'][0]['LIVE_PERIOD_TIME_BCAST'],
                         f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0]['WH_STATUS'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.Officials': summary['Officials'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameInfo': summary['GameInfo'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.OtherStats': summary['OtherStats'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.LineScore': summary['LineScore'],
                         f'GAMES.{game["gameId"]}.BOXSCORE': box_score
                     }}
                 )
@@ -250,7 +256,13 @@ def games_live_update():
                               f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PC_TIME': summary['GameSummary'][0]['LIVE_PC_TIME'],
                               f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.NATL_TV_BROADCASTER_ABBREVIATION': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
                               f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PERIOD_TIME_BCAST': summary['GameSummary'][0]['LIVE_PERIOD_TIME_BCAST'],
-                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0]['WH_STATUS'],}}
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0]['WH_STATUS'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.Officials': summary['Officials'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.GameInfo': summary['GameInfo'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
+                              f'GAMES.{game["gameId"]}.SUMMARY.OtherStats': summary['OtherStats'],
+                              }}
                 )
                 logging.info(f'(Games Live) Upcoming game {game["gameId"]} is up to date.')
 
@@ -842,9 +854,9 @@ def players_daily_update():
 # Schedule the tasks
 schedule.every(10).seconds.do(games_live_update)  # Run every 1 minute
 schedule.every().day.at("00:00").do(reset_flags)  # Reset the flag at midnight
-#schedule.every().day.at("02:30").do(games_daily_update())  # Run every day at 2:30 AM
-#schedule.every().day.at("02:45").do(teams_daily_update())  # Run every day at 3:00 AM
-#schedule.every().day.at("03:30").do(players_daily_update())  # Run every day at 3:30 AM
+schedule.every().day.at("02:00").do(games_daily_update)  # Run every day at 2:30 AM
+schedule.every().day.at("02:15").do(teams_daily_update)  # Run every day at 3:00 AM
+schedule.every().day.at("04:00").do(players_daily_update)  # Run every day at 3:30 AM
 
 
 # Configure logging
@@ -874,10 +886,10 @@ except Exception as e:
     logging.error(f"Failed to connect to MongoDB: {e}")
     exit(1)
 
-# games_daily_update()
-# teams_daily_update()
-# players_daily_update()
-games_live_update()
+games_daily_update()
+teams_daily_update()
+players_daily_update()
+# games_live_update()
 
 while True:
     schedule.run_pending()

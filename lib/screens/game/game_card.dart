@@ -121,21 +121,44 @@ class _GameCardState extends State<GameCard> {
   Widget build(BuildContext context) {
     var summary = widget.game['SUMMARY']['GameSummary'][0];
     var linescore = widget.game['SUMMARY']['LineScore'];
+    Map<String, dynamic> odds = {};
+
+    try {
+      odds = widget.game['ODDS']?['LIVE']?['29219'];
+    } catch (e) {
+      odds = {};
+    }
+
+    String spread = '';
+    String overUnder = '';
+
+    try {
+      double raw = double.parse(odds['oddstypes']['168']['hcp']['value']);
+      if (raw > 0) {
+        spread = '+${raw.toStringAsFixed(1)}';
+      } else {
+        spread = raw.toStringAsFixed(1);
+      }
+    } catch (e) {
+      spread = '';
+    }
+
+    try {
+      double raw = double.parse(odds['oddstypes']['18']['hcp']['value']);
+      overUnder = raw.toStringAsFixed(1);
+    } catch (e) {
+      overUnder = '';
+    }
 
     String broadcast = summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP';
-    /*
-    if (summary['HOME_TV_BROADCASTER_ABBREVIATION'] != null) {
-      broadcast += ', ${summary['HOME_TV_BROADCASTER_ABBREVIATION']}';
-    }
-    if (summary['AWAY_TV_BROADCASTER_ABBREVIATION'] != null) {
-      broadcast += ', ${summary['AWAY_TV_BROADCASTER_ABBREVIATION']}';
-    }
-    */
 
     String getGameTime() {
       switch (summary['GAME_STATUS_ID']) {
         case 1:
           // Upcoming
+          if (summary['GAME_STATUS_TEXT'] == 'Cancelled') {
+            return summary['GAME_STATUS_TEXT'];
+          }
           return adjustTimezone(summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT']);
         case 2:
           // End Quarter
@@ -194,9 +217,12 @@ class _GameCardState extends State<GameCard> {
               gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
               homeId: widget.homeTeam.toString(),
               awayId: widget.awayTeam.toString(),
-              gameTime: summary['GAME_STATUS_ID'] == 1
-                  ? adjustTimezone(summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT'])
-                  : null,
+              gameTime:
+                  summary['GAME_STATUS_ID'] == 1 && summary['GAME_STATUS_TEXT'] != 'Cancelled'
+                      ? adjustTimezone(summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT'])
+                      : summary['GAME_STATUS_TEXT'] == 'Cancelled'
+                          ? 'Cancelled'
+                          : null,
             ),
           ),
         );
@@ -360,11 +386,11 @@ class _GameCardState extends State<GameCard> {
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 15.0.r),
+                              if (odds.isNotEmpty) SizedBox(width: 15.0.r),
                               Expanded(
-                                flex: 1,
+                                flex: odds.isEmpty ? 0 : 1,
                                 child: Text(
-                                  '206.5',
+                                  spread,
                                   textAlign: TextAlign.right,
                                   style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                                 ),
@@ -462,11 +488,11 @@ class _GameCardState extends State<GameCard> {
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 15.0.r),
+                              if (odds.isNotEmpty) SizedBox(width: 15.0.r),
                               Expanded(
-                                flex: 1,
+                                flex: odds.isEmpty ? 0 : 1,
                                 child: Text(
-                                  '-6.5',
+                                  overUnder,
                                   textAlign: TextAlign.right,
                                   style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
                                 ),

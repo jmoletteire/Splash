@@ -447,7 +447,10 @@ class _TeamGamesState extends State<TeamGames> {
                                       children: [
                                         Text(
                                           teamGames[gamesList[index]]['RESULT'] != 'W' &&
-                                                  teamGames[gamesList[index]]['RESULT'] != 'L'
+                                                  teamGames[gamesList[index]]['RESULT'] !=
+                                                      'L' &&
+                                                  teamGames[gamesList[index]]['RESULT'] !=
+                                                      'Cancelled'
                                               ? adjustTimezone(
                                                   teamGames[gamesList[index]]['GAME_DATE'],
                                                   teamGames[gamesList[index]]['RESULT'])
