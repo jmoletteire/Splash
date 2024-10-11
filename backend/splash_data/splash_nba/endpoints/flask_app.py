@@ -704,8 +704,8 @@ def get_team_player_stats():
                                 }
                             },
                             {
-                                "equals": {
-                                    "value": "Active",
+                                "text": {
+                                    "query": "Active",
                                     "path": "ROSTERSTATUS"
                                 }
                             }
@@ -797,15 +797,15 @@ def get_team_player_stats():
         players = list(players)
 
         if len(players) > 0:
-            # logging.info(f"(get_team_player_stats) Retrieved player {person_id} from MongoDB")
+            # logging.info(f"(get_team_player_stats) Retrieved players from MongoDB")
             return jsonify(players)
         else:
-            logging.warning("(get_team_player_stats) No player found in MongoDB")
-            return jsonify({"error": "No player found"}), 404
+            logging.warning("(get_team_player_stats) No players found in MongoDB")
+            return jsonify({"error": "No players found"}), 404
 
     except Exception as e:
-        logging.error(f"(get_team_player_stats) Error retrieving player: {e}")
-        return jsonify({"error": "Failed to retrieve player"}), 500
+        logging.error(f"(get_team_player_stats) Error retrieving players: {e}")
+        return jsonify({"error": "Failed to retrieve players"}), 500
 
 
 @app.route('/get_player_shot_chart', methods=['GET'])
