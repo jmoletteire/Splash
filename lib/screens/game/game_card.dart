@@ -124,7 +124,7 @@ class _GameCardState extends State<GameCard> {
     Map<String, dynamic> odds = {};
 
     try {
-      odds = widget.game['ODDS']?['LIVE']?['29219'];
+      odds = widget.game['ODDS']?['BOOK']?['18186'];
     } catch (e) {
       odds = {};
     }
@@ -133,7 +133,7 @@ class _GameCardState extends State<GameCard> {
     String overUnder = '';
 
     try {
-      double raw = double.parse(odds['oddstypes']['168']['hcp']['value']);
+      double raw = double.parse(odds['oddstypes']['4']['hcp']['value']);
       if (raw > 0) {
         spread = '+${raw.toStringAsFixed(1)}';
       } else {
@@ -144,7 +144,7 @@ class _GameCardState extends State<GameCard> {
     }
 
     try {
-      double raw = double.parse(odds['oddstypes']['18']['hcp']['value']);
+      double raw = double.parse(odds['oddstypes']['3']['hcp']['value']);
       overUnder = raw.toStringAsFixed(1);
     } catch (e) {
       overUnder = '';

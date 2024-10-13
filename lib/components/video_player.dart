@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:marquee/marquee.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:video_player/video_player.dart';
@@ -135,12 +136,20 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
           });
         },
         itemBuilder: (context, index) {
+          String period = widget.shotChart[index]?['PERIOD'] > 4
+              ? 'OT'
+              : 'Q${widget.shotChart[index]?['PERIOD'] ?? ''}';
+          String timePeriod =
+              '$period ${widget.shotChart[index]?['MIN'] ?? ''}:${widget.shotChart[index]?['SEC'].toString().padLeft(2, '0') ?? ''}';
           return VideoPlayerScreen(
             videoUrl: widget.shotChart[index]?['VIDEO'] ?? '',
             thumbnailUrl: widget.shotChart[index]?['THUMBNAIL'] ?? '',
             gameDate:
                 '${widget.shotChart[index]['GAME_DATE']!.substring(0, 4)}-${widget.shotChart[index]['GAME_DATE']!.substring(4, 6)}-${widget.shotChart[index]['GAME_DATE']!.substring(6)}',
             matchup: '${widget.shotChart[index]['VTM']!} @ ${widget.shotChart[index]['HTM']!}',
+            timePeriod: timePeriod,
+            description:
+                '${widget.shotChart[index]?['SHOT_TYPE'] ?? ''} (${widget.shotChart[index]?['SHOT_MADE_FLAG'] == 1 ? 'Made' : 'Missed'})',
             isMuted: isMuted,
             playbackSpeed: playbackSpeed,
             onMuteToggle: () {
@@ -184,6 +193,8 @@ class VideoPlayerScreen extends StatefulWidget {
   final String thumbnailUrl;
   final String gameDate;
   final String matchup;
+  final String timePeriod;
+  final String description;
   final bool isMuted;
   final double playbackSpeed;
   final VoidCallback onMuteToggle;
@@ -195,6 +206,8 @@ class VideoPlayerScreen extends StatefulWidget {
     required this.thumbnailUrl,
     required this.gameDate,
     required this.matchup,
+    required this.timePeriod,
+    required this.description,
     required this.isMuted,
     required this.playbackSpeed,
     required this.onMuteToggle,
@@ -212,6 +225,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Future<void>? _initializeVideoPlayerFuture;
   Duration? videoDuration;
   Duration currentPosition = Duration.zero;
+  bool shouldScroll = false;
 
   @override
   void initState() {
@@ -232,6 +246,33 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         videoDuration = _videoPlayerController.value.duration;
       });
     });
+
+    // Calculate if text needs to scroll
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkTextOverflow();
+    });
+  }
+
+  void _checkTextOverflow() {
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      double availableWidth = renderBox.size.width;
+
+      // Use TextPainter to calculate the width of the text
+      TextPainter textPainter = TextPainter(
+        text: TextSpan(
+          text: "${widget.timePeriod} | ${widget.description}",
+          style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.grey.shade400),
+        ),
+        maxLines: 1,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout(); // Perform the layout calculation
+
+      setState(() {
+        shouldScroll = textPainter.width > availableWidth;
+      });
+    }
   }
 
   @override
@@ -271,7 +312,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   'Video Unavailable',
                   style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
                 ),
-                SizedBox(height: 25.0.r),
+                SizedBox(height: 65.0.r),
               ],
             ),
           ),
@@ -395,6 +436,30 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    height: 20.0.r,
+                    child: shouldScroll
+                        ? Marquee(
+                            text: "${widget.timePeriod} | ${widget.description}", // Title text
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                            scrollAxis: Axis.horizontal,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            blankSpace: 30.0,
+                            velocity: 20.0,
+                            pauseAfterRound: const Duration(seconds: 1),
+                            startPadding: 0.0,
+                            accelerationDuration: const Duration(seconds: 1),
+                            accelerationCurve: Curves.linear,
+                            decelerationDuration: const Duration(milliseconds: 500),
+                            decelerationCurve: Curves.easeOut,
+                          )
+                        : Text(
+                            "${widget.timePeriod} | ${widget.description}",
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                  ),
                 ],
               ),
             ),
@@ -403,7 +468,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         // Playback progress bar
         // Thin slider resembling a top border
         Positioned(
-          bottom: 55.r,
+          bottom: 75.r,
           left: -12.r,
           right: -12.r,
           child: SliderTheme(

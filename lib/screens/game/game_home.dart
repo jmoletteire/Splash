@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
+import 'package:splash/screens/game/game_odds.dart';
 import 'package:splash/screens/game/play_by_play/play_by_play.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
@@ -44,13 +45,80 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+  Map<int, double> _scrollPositions = {};
   Map<String, dynamic> game = {};
   bool _showImages = false;
   bool _isLoading = false;
   bool _isUpcoming = false;
   late Timer _timer;
+  Map<String, dynamic> odds = {};
+  String moneyLine = '';
+  String spread = '';
+  String overUnder = '';
 
-  Map<int, double> _scrollPositions = {};
+  int decimalToMoneyline(double decimalOdds) {
+    if (decimalOdds <= 1.0) {
+      throw ArgumentError('Decimal odds must be greater than 1.');
+    }
+
+    if (decimalOdds >= 2.0) {
+      // Positive moneyline odds
+      return ((decimalOdds - 1.0) * 100).round();
+    } else {
+      // Negative moneyline odds
+      return (-100 / (decimalOdds - 1.0)).round();
+    }
+  }
+
+  void setOdds() {
+    try {
+      odds = widget.gameData?['ODDS']?['BOOK']?['18186'];
+    } catch (e) {
+      odds = {};
+      return;
+    }
+
+    // MoneyLine
+    try {
+      int raw =
+          decimalToMoneyline(double.parse(odds['oddstypes']['1']['outcomes']['1']['odds']));
+      if (raw > 0) {
+        moneyLine = '+${raw.toString()}';
+      } else {
+        moneyLine = raw.toString();
+      }
+    } catch (e) {
+      moneyLine = '';
+    }
+
+    // Spread
+    try {
+      double raw = double.parse(odds['oddstypes']['4']['hcp']['value']);
+      if (raw > 0) {
+        spread = '+${raw.toStringAsFixed(1)}';
+      } else {
+        spread = raw.toStringAsFixed(1);
+      }
+    } catch (e) {
+      spread = '';
+    }
+
+    // Over/Under
+    try {
+      double raw = double.parse(odds['oddstypes']['3']['hcp']['value']);
+      overUnder = raw.toStringAsFixed(1);
+    } catch (e) {
+      overUnder = '';
+    }
+
+    setState(() {
+      odds = {
+        'ML': moneyLine,
+        'SPREAD': spread,
+        'OU': overUnder,
+      };
+    });
+  }
 
   void startPolling(String gameId) {
     // Poll every 10 seconds
@@ -94,8 +162,15 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       _isLoading = false;
     }
     startPolling(widget.gameId);
+    setOdds();
 
-    _tabController = TabController(length: _isUpcoming ? 2 : 3, vsync: this);
+    int tabLength = _isUpcoming
+        ? 3
+        : odds.isNotEmpty
+            ? 4
+            : 3;
+
+    _tabController = TabController(length: tabLength, vsync: this);
 
     _scrollController = ScrollController()
       ..addListener(() {
@@ -398,6 +473,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         homeId: widget.homeId,
                         awayId: awayTeamId,
                         isUpcoming: _isUpcoming,
+                        odds: odds,
                         gameTime: widget.gameTime,
                       ),
                       collapseMode: CollapseMode.pin,
@@ -417,6 +493,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                   const Tab(text: 'Matchup'),
                   if (!_isUpcoming) const Tab(text: 'Play-By-Play'),
                   Tab(text: _isUpcoming ? 'Teams' : 'Box Score'),
+                  if (odds.isNotEmpty) const Tab(text: 'Odds')
                 ],
               ),
               actions: [
@@ -474,7 +551,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                   homeId: widget.homeId,
                   awayId: awayTeamId,
                   inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
-                )
+                ),
+              if (odds.isNotEmpty) Odds(odds: widget.gameData?['ODDS']?['BOOK']),
             ]),
       ),
     );
@@ -490,6 +568,7 @@ class GameInfo extends StatelessWidget {
     required this.homeId,
     required this.awayId,
     required this.isUpcoming,
+    this.odds,
     this.gameTime,
   });
 
@@ -499,6 +578,7 @@ class GameInfo extends StatelessWidget {
   final String homeId;
   final String awayId;
   final bool isUpcoming;
+  final Map<String, dynamic>? odds;
   final String? gameTime;
 
   Widget getStatus(int status) {
@@ -830,6 +910,80 @@ class GameInfo extends StatelessWidget {
               if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1)
             ],
           ),
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0.r),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          odds?['SPREAD'] == null ? '' : kTeamIdToName[awayId]?[1] ?? 'INT\'L',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(
+                              fontSize: 14.0.r, color: Colors.grey.shade300),
+                        ),
+                        SizedBox(width: 5.0.r),
+                        Text(
+                          odds?['SPREAD'] ?? '',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(
+                              fontSize: 14.0.r, color: Colors.grey.shade300),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          odds?['OU'] == null ? '' : 'O/U',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(
+                              fontSize: 14.0.r, color: Colors.grey.shade300),
+                        ),
+                        SizedBox(width: 5.0.r),
+                        Text(
+                          odds?['OU'] ?? '',
+                          style: kBebasNormal.copyWith(
+                              fontSize: 14.0.r, color: Colors.grey.shade300),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          odds?['ML'] == null ? '' : kTeamIdToName[homeId]?[1] ?? 'INT\'L',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(
+                              fontSize: 14.0.r, color: Colors.grey.shade300),
+                        ),
+                        SizedBox(width: 5.0.r),
+                        Text(
+                          odds?['ML'] ?? '',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(
+                              fontSize: 14.0.r, color: Colors.grey.shade300),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: MediaQuery.sizeOf(context).height / 11)
+          ],
         ),
       ],
     );

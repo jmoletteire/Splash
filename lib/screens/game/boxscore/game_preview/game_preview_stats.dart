@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_leaders.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_players_helper.dart';
 import 'package:splash/screens/game/boxscore/team_player_stats.dart';
@@ -84,6 +85,9 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
         homePlayers = fetchedPlayers[0];
         awayPlayers = fetchedPlayers[1];
       });
+      setState(() {
+        _isLoading = false;
+      });
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -137,110 +141,114 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     Map<String, dynamic> awayLinescore =
         linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
 
-    return Column(
-      children: [
-        TabBar(
-          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 0.0),
-          controller: _tabController,
-          indicator: CustomTabIndicator(
-            controller: _tabController,
-            homeTeam: kTeamIdToName[widget.homeId][1],
-            awayTeam: kTeamIdToName[widget.awayId][1],
-          ),
-          unselectedLabelColor: Colors.grey,
-          labelColor: Colors.white,
-          labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
-          tabs: <Widget>[
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: awayContainerColor,
-                      gradient: LinearGradient(
-                        colors: [const Color(0xFF1B1B1B), awayContainerColor],
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft,
+    return _isLoading
+        ? const SpinningIcon()
+        : Column(
+            children: [
+              TabBar(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 0.0),
+                controller: _tabController,
+                indicator: CustomTabIndicator(
+                  controller: _tabController,
+                  homeTeam: kTeamIdToName[widget.homeId][1],
+                  awayTeam: kTeamIdToName[widget.awayId][1],
+                ),
+                unselectedLabelColor: Colors.grey,
+                labelColor: Colors.white,
+                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+                tabs: <Widget>[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: awayContainerColor,
+                            gradient: LinearGradient(
+                              colors: [const Color(0xFF1B1B1B), awayContainerColor],
+                              begin: Alignment.centerRight,
+                              end: Alignment.centerLeft,
+                            ),
+                          ),
+                          margin: const EdgeInsets.only(bottom: 1.0),
+                          child: Tab(
+                            text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
+                          ),
+                        ),
                       ),
-                    ),
-                    margin: const EdgeInsets.only(bottom: 1.0),
-                    child: Tab(
-                      text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
-                    ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 1.0),
+                          color: const Color(0xFF1B1B1B),
+                          child: const Tab(
+                            text: "TEAM",
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 1.0),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [const Color(0xFF1B1B1B), homeContainerColor],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                          ),
+                          child: Tab(
+                            text: homeLinescore['TEAM_NAME'] ?? homeLinescore['TEAM_NICKNAME'],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Expanded(
+                child: ScrollConfiguration(
+                  behavior: MyCustomScrollBehavior(),
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      CustomScrollView(
+                        slivers: [
+                          TeamPlayerStats(players: awayPlayers, controller: _awayController),
+                        ],
+                      ),
+                      CustomScrollView(
+                        slivers: [
+                          SliverPadding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            sliver: TeamLeaders(
+                              season:
+                                  '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                              homeId: widget.homeId,
+                              awayId: widget.awayId,
+                              homePlayers: homePlayers,
+                              awayPlayers: awayPlayers,
+                            ),
+                          )
+                        ],
+                      ),
+                      CustomScrollView(
+                        slivers: [
+                          TeamPlayerStats(players: homePlayers, controller: _homeController),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 1.0),
-                    color: const Color(0xFF1B1B1B),
-                    child: const Tab(
-                      text: "TEAM",
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 1.0),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [const Color(0xFF1B1B1B), homeContainerColor],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                    ),
-                    child: Tab(
-                      text: homeLinescore['TEAM_NAME'] ?? homeLinescore['TEAM_NICKNAME'],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        Expanded(
-          child: ScrollConfiguration(
-            behavior: MyCustomScrollBehavior(),
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                CustomScrollView(
-                  slivers: [
-                    TeamPlayerStats(players: awayPlayers, controller: _awayController),
-                  ],
-                ),
-                CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      sliver: TeamLeaders(
-                        season:
-                            '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                        homeId: widget.homeId,
-                        awayId: widget.awayId,
-                      ),
-                    )
-                  ],
-                ),
-                CustomScrollView(
-                  slivers: [
-                    TeamPlayerStats(players: homePlayers, controller: _homeController),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+              ),
+            ],
+          );
   }
 }
 

@@ -63,6 +63,275 @@ def reset_flags():
     logging.info("(Flag Reset) Daily reset complete, live updates will resume.")
 
 
+def games_prev_day():
+    teams = {
+        1610612737: 'Atlanta Hawks',
+        1610612738: 'Boston Celtics',
+        1610612739: 'Cleveland Cavaliers',
+        1610612740: 'New Orleans Pelicans',
+        1610612741: 'Chicago Bulls',
+        1610612742: 'Dallas Mavericks',
+        1610612743: 'Denver Nuggets',
+        1610612744: 'Golden State Warriors',
+        1610612745: 'Houston Rockets',
+        1610612746: 'Los Angeles Clippers',
+        1610612747: 'Los Angeles Lakers',
+        1610612748: 'Miami Heat',
+        1610612749: 'Milwaukee Bucks',
+        1610612750: 'Minnesota Timberwolves',
+        1610612751: 'Brooklyn Nets',
+        1610612752: 'New York Knicks',
+        1610612753: 'Orlando Magic',
+        1610612754: 'Indiana Pacers',
+        1610612755: 'Philadelphia 76ers',
+        1610612756: 'Phoenix Suns',
+        1610612757: 'Portland Trail Blazers',
+        1610612758: 'Sacramento Kings',
+        1610612759: 'San Antonio Spurs',
+        1610612760: 'Oklahoma City Thunder',
+        1610612761: 'Toronto Raptors',
+        1610612762: 'Utah Jazz',
+        1610612763: 'Memphis Grizzlies',
+        1610612764: 'Washington Wizards',
+        1610612765: 'Detroit Pistons',
+        1610612766: 'Charlotte Hornets',
+    }
+    global skip_updates
+    if skip_updates:
+        logging.info(f"(Games Live) No games today, skipping further updates. [{datetime.now()}]")
+        return  # Skip the update if there are no games today
+
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        games_collection = db.nba_games
+    except Exception as e:
+        logging.error(f'(Games Live) Failed to connect to MongoDB [{datetime.now()}]: {e}')
+        return
+
+    def format_duration(input_str):
+        # Regular expression to match 'PT' followed by minutes and seconds
+        match = re.match(r'PT(\d+)M(\d+)\.(\d+)S', input_str)
+
+        if match:
+            minutes = int(match.group(1))  # Convert minutes to int
+            seconds = int(match.group(2))  # Convert seconds to int
+            tenths = match.group(3)[0]     # Take only the first digit of the fraction for tenths
+
+            if minutes == 0:  # Less than a minute left, show seconds and tenths
+                return f":{seconds}.{tenths}"
+            else:  # Regular minutes and seconds format
+                return f"{minutes}:{seconds:02d}"  # Format seconds with leading zero if necessary
+
+        return input_str  # Return original string if no match is found
+
+    yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+
+    # Else if games today + within 1 hour of first tip-off
+    linescore = scoreboardv2.ScoreboardV2(game_date=yesterday, day_offset=0).get_normalized_dict()
+    line_scores = linescore['LineScore']
+    games_yesterday = linescore['GameHeader']
+
+    for game in games_yesterday:
+        is_upcoming = game['GAME_STATUS_ID'] == 1
+        in_progress = game['GAME_STATUS_ID'] == 2
+        is_final = game['GAME_STATUS_ID'] == 3
+        line_score = [line for line in line_scores if line['GAME_ID'] == game['GAME_ID']]
+
+        # If game upcoming or in-progress, check for updates
+        if is_upcoming:
+            summary = fetch_box_score_summary(game['GAME_ID'])
+            try:
+                box_score = boxscore.BoxScore(game_id=game['GAME_ID']).get_dict()['game']
+                games_collection.update_one(
+                    {'GAME_DATE': yesterday},
+                    {'$set': {
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_DATE_EST': summary['GameSummary'][0]['GAME_DATE_EST'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_SEQUENCE': summary['GameSummary'][0]['GAME_SEQUENCE'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_ID': summary['GameSummary'][0]['GAME_ID'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': summary['GameSummary'][0]['GAME_STATUS_ID'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAME_STATUS_TEXT': summary['GameSummary'][0]['GAME_STATUS_TEXT'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.GAMECODE': summary['GameSummary'][0]['GAMECODE'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.HOME_TEAM_ID': summary['GameSummary'][0]['HOME_TEAM_ID'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.VISITOR_TEAM_ID': summary['GameSummary'][0]['VISITOR_TEAM_ID'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.SEASON': summary['GameSummary'][0]['SEASON'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PERIOD': summary['GameSummary'][0]['LIVE_PERIOD'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PC_TIME': summary['GameSummary'][0]['LIVE_PC_TIME'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.NATL_TV_BROADCASTER_ABBREVIATION': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.LIVE_PERIOD_TIME_BCAST': summary['GameSummary'][0]['LIVE_PERIOD_TIME_BCAST'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0]['WH_STATUS'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.Officials': summary['Officials'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.GameInfo': summary['GameInfo'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.OtherStats': summary['OtherStats'],
+                        f'GAMES.{game["gameId"]}.SUMMARY.LineScore': summary['LineScore'],
+                        f'GAMES.{game["gameId"]}.BOXSCORE': box_score
+                    }}
+                )
+                logging.info(f'(Games Live) Upcoming game {game["GAME_ID"]} is up to date + Box Score.')
+            except Exception:
+                games_collection.update_one(
+                    {'GAME_DATE': yesterday},
+                    {'$set': {f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAME_DATE_EST': summary['GameSummary'][0]['GAME_DATE_EST'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAME_SEQUENCE': summary['GameSummary'][0]['GAME_SEQUENCE'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAME_ID': summary['GameSummary'][0]['GAME_ID'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': summary['GameSummary'][0]['GAME_STATUS_ID'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAME_STATUS_TEXT': summary['GameSummary'][0]['GAME_STATUS_TEXT'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAMECODE': summary['GameSummary'][0]['GAMECODE'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.HOME_TEAM_ID': summary['GameSummary'][0]['HOME_TEAM_ID'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.VISITOR_TEAM_ID': summary['GameSummary'][0]['VISITOR_TEAM_ID'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.SEASON': summary['GameSummary'][0]['SEASON'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.LIVE_PERIOD': summary['GameSummary'][0]['LIVE_PERIOD'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.LIVE_PC_TIME': summary['GameSummary'][0]['LIVE_PC_TIME'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.NATL_TV_BROADCASTER_ABBREVIATION': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.LIVE_PERIOD_TIME_BCAST': summary['GameSummary'][0]['LIVE_PERIOD_TIME_BCAST'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0]['WH_STATUS'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.Officials': summary['Officials'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.GameInfo': summary['GameInfo'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
+                              f'GAMES.{game["GAME_ID"]}.SUMMARY.OtherStats': summary['OtherStats'],
+                              }}
+                )
+                logging.info(f'(Games Live) Upcoming game {game["GAME_ID"]} is up to date.')
+
+        # IN-PROGRESS
+        elif in_progress:
+            # Summary, Box Score, PBP
+            summary = fetch_box_score_summary(game['GAME_ID'])
+            box_score = boxscore.BoxScore(game_id=game['GAME_ID']).get_dict()['game']
+
+            keys = [
+                'actionNumber',
+                'clock',
+                'period',
+                'teamId',
+                'personId',
+                'personIdsFilter',
+                'playerNameI',
+                'possession',
+                'scoreHome',
+                'scoreAway',
+                'isFieldGoal',
+                'description',
+                'xLegacy',
+                'yLegacy'
+            ]
+
+            try:
+                actions = playbyplay.PlayByPlay(game_id=game['GAME_ID']).get_dict()['game']['actions']
+                pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
+            except Exception:
+                pbp = []
+
+            home_line_index = 0 if line_score[0]['TEAM_ID'] == box_score['homeTeam']['teamId'] else 1
+            away_line_index = 0 if line_score[0]['TEAM_ID'] == box_score['awayTeam']['teamId'] else 1
+
+            # Update data
+            games_collection.update_one(
+                {'GAME_DATE': yesterday},
+                {'$set': {
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': box_score['gameStatus'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.LIVE_PERIOD': box_score['period'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.LIVE_PC_TIME': format_duration(box_score['gameClock']),
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.Officials': summary['Officials'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.GameInfo': summary['GameInfo'],
+                    # HOME TEAM
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.GAME_ID': line_score[home_line_index]['GAME_ID'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.TEAM_ID': line_score[home_line_index]['TEAM_ID'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.TEAM_ABBREVIATION': line_score[home_line_index]['TEAM_ABBREVIATION'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.TEAM_CITY_NAME': line_score[home_line_index]['TEAM_CITY_NAME'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.TEAM_NICKNAME': line_score[home_line_index]['TEAM_NAME'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_QTR1': box_score['homeTeam']['periods'][0]['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_QTR2': box_score['homeTeam']['periods'][1]['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_QTR3': box_score['homeTeam']['periods'][2]['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_QTR4': box_score['homeTeam']['periods'][3]['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT1': box_score['homeTeam']['periods'][4]['score'] if len(box_score['homeTeam']['periods']) > 4 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT2': box_score['homeTeam']['periods'][5]['score'] if len(box_score['homeTeam']['periods']) > 5 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT3': box_score['homeTeam']['periods'][6]['score'] if len(box_score['homeTeam']['periods']) > 6 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT4': box_score['homeTeam']['periods'][7]['score'] if len(box_score['homeTeam']['periods']) > 7 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT5': box_score['homeTeam']['periods'][8]['score'] if len(box_score['homeTeam']['periods']) > 8 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT6': box_score['homeTeam']['periods'][9]['score'] if len(box_score['homeTeam']['periods']) > 9 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT7': box_score['homeTeam']['periods'][10]['score'] if len(box_score['homeTeam']['periods']) > 10 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT8': box_score['homeTeam']['periods'][11]['score'] if len(box_score['homeTeam']['periods']) > 11 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT9': box_score['homeTeam']['periods'][12]['score'] if len(box_score['homeTeam']['periods']) > 12 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS_OT10': box_score['homeTeam']['periods'][13]['score'] if len(box_score['homeTeam']['periods']) > 13 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.PTS': box_score['homeTeam']['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES': line_score[home_line_index]['TEAM_WINS_LOSSES'],
+                    # AWAY TEAM
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.GAME_ID': line_score[away_line_index]['GAME_ID'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.TEAM_ID': line_score[away_line_index]['TEAM_ID'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.TEAM_ABBREVIATION': line_score[away_line_index]['TEAM_ABBREVIATION'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.TEAM_CITY_NAME': line_score[away_line_index]['TEAM_CITY_NAME'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.TEAM_NICKNAME': line_score[away_line_index]['TEAM_NAME'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_QTR1': box_score['awayTeam']['periods'][0]['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_QTR2': box_score['awayTeam']['periods'][1]['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_QTR3': box_score['awayTeam']['periods'][2]['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_QTR4': box_score['awayTeam']['periods'][3]['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT1': box_score['awayTeam']['periods'][4]['score'] if len(box_score['awayTeam']['periods']) > 4 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT2': box_score['awayTeam']['periods'][5]['score'] if len(box_score['awayTeam']['periods']) > 5 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT3': box_score['awayTeam']['periods'][6]['score'] if len(box_score['awayTeam']['periods']) > 6 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT4': box_score['awayTeam']['periods'][7]['score'] if len(box_score['awayTeam']['periods']) > 7 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT5': box_score['awayTeam']['periods'][8]['score'] if len(box_score['awayTeam']['periods']) > 8 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT6': box_score['awayTeam']['periods'][9]['score'] if len(box_score['awayTeam']['periods']) > 9 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT7': box_score['awayTeam']['periods'][10]['score'] if len(box_score['awayTeam']['periods']) > 10 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT8': box_score['awayTeam']['periods'][11]['score'] if len(box_score['awayTeam']['periods']) > 11 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT9': box_score['awayTeam']['periods'][12]['score'] if len(box_score['awayTeam']['periods']) > 12 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS_OT10': box_score['awayTeam']['periods'][13]['score'] if len(box_score['awayTeam']['periods']) > 13 else 0,
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.PTS': box_score['awayTeam']['score'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES': line_score[away_line_index]['TEAM_WINS_LOSSES'],
+                    # Summary, Box Score, PBP
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
+                    f'GAMES.{game["GAME_ID"]}.SUMMARY.OtherStats': summary['OtherStats'],
+                    f'GAMES.{game["GAME_ID"]}.BOXSCORE': box_score,
+                    f'GAMES.{game["GAME_ID"]}.PBP': pbp,
+                }
+                }
+            )
+            logging.info(f'(Games Live) Updated live game {game["GAME_ID"]} [{datetime.now()}]')
+
+        # If game is final, update final box score
+        elif is_final:
+            update_team_games(games_collection.find_one({'GAME_DATE': yesterday}, {'GAMES': 1}))
+            summary = fetch_box_score_summary(game['GAME_ID'])
+            adv = fetch_box_score_adv(game['GAME_ID'])
+            highlights = 'No highlights found'  # search_youtube_highlights(youtube_api_key, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
+
+            home_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['HOME_TEAM_ID'] else 1
+            away_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['VISITOR_TEAM_ID'] else 1
+
+            if highlights == 'No highlights found':
+                games_collection.update_one(
+                    {'GAME_DATE': yesterday},
+                    {'$set': {
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': 3,
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES': line_score[home_line_index]['TEAM_WINS_LOSSES'],
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES': line_score[away_line_index]['TEAM_WINS_LOSSES'],
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
+                        f'GAMES.{game["GAME_ID"]}.ADV': adv,
+                        f'GAMES.{game["GAME_ID"]}.FINAL': True if adv['PlayerStats'][0]['E_OFF_RATING'] is not None else False
+                    }
+                    }
+                )
+            else:
+                games_collection.update_one(
+                    {'GAME_DATE': yesterday},
+                    {'$set': {
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.GameSummary.0.GAME_STATUS_ID': 3,
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES': line_score[home_line_index]['TEAM_WINS_LOSSES'],
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES': line_score[away_line_index]['TEAM_WINS_LOSSES'],
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
+                        f'GAMES.{game["GAME_ID"]}.SUMMARY.Highlights': highlights,
+                        f'GAMES.{game["GAME_ID"]}.ADV': adv,
+                        f'GAMES.{game["GAME_ID"]}.FINAL': True
+                    }
+                    }
+                )
+            logging.info(f'(Games Live) Finalizing game {game["GAME_ID"]}.')
+
+
 def games_live_update():
     teams = {
         1610612737: 'Atlanta Hawks',
@@ -890,6 +1159,7 @@ games_daily_update()
 teams_daily_update()
 players_daily_update()
 # games_live_update()
+# games_prev_day()
 
 while True:
     schedule.run_pending()

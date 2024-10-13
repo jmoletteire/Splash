@@ -66,7 +66,7 @@ if __name__ == "__main__":
         i = 0
 
         while processed_count < total_documents:
-            with games_collection.find({'GAME_DATE': '2024-10-10'}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
+            with games_collection.find({'GAME_DATE': '2024-10-11'}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
                     batch_size).batch_size(batch_size) as cursor:
                 documents = list(cursor)
                 if not documents:

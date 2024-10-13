@@ -863,7 +863,7 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
                         builder: (BuildContext context) {
                           final double videoHeight =
                               MediaQuery.of(context).size.width * 9 / 16;
-                          final double playlistHeight = 68.0.r;
+                          final double playlistHeight = 88.0.r;
                           return SizedBox(
                               width: MediaQuery.of(context).size.width,
                               height: videoHeight + playlistHeight,

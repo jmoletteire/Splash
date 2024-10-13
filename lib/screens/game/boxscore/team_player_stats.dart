@@ -287,7 +287,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => PlayerHome(
-                    playerId: widget.players[row]['PLAYER_ID'].toString(),
+                    playerId: widget.players[row]['PERSON_ID'].toString(),
                   ),
                 ),
               );
