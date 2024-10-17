@@ -239,9 +239,14 @@ class _LineupsState extends State<Lineups> {
                   } else {
                     return Stack(
                       children: [
-                        CustomPaint(
-                          size: Size(368.r, 346.r),
-                          painter: FullCourtPainter(isLandscape: isLandscape),
+                        Column(
+                          children: [
+                            SizedBox(height: 1.5.r),
+                            CustomPaint(
+                              size: Size(368.r, 346.r),
+                              painter: FullCourtPainter(isLandscape: isLandscape),
+                            ),
+                          ],
                         ),
                         Column(
                           children: [

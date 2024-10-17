@@ -1,7 +1,5 @@
 import os
 import time
-
-import openai
 from flask import Flask, jsonify, request, Response
 from flask_compress import Compress
 from pymongo import MongoClient

@@ -496,7 +496,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 indicatorWeight: 3.0,
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+                labelStyle: kBebasNormal.copyWith(fontSize: 17.0.r),
                 tabs: [
                   const Tab(text: 'Matchup'),
                   if (!_isUpcoming) const Tab(text: 'Play-By-Play'),
