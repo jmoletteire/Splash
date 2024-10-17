@@ -23,7 +23,7 @@ class PlayerContracts extends StatefulWidget {
 
 class _PlayerContractsState extends State<PlayerContracts> {
   late Map<String, dynamic> contracts;
-  int _sortedColumnIndex = 4; // Default to sorting by '24-25' cap hit
+  int _sortedColumnIndex = 5; // Default to sorting by '24-25' cap hit
   bool _isAscending = false; // Default sort direction
 
   Map<String, String> contractTeamIds = {
@@ -63,6 +63,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
   List columnNames = [
     'PLAYER',
     'TEAM',
+    'POS',
     'AGE',
     'YRS',
     '\'24-25',
@@ -99,7 +100,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
         ..sort((a, b) {
           var aValue, bValue;
 
-          if (columnIndex >= 4) {
+          if (columnIndex >= 5) {
             String yearKey = '20${columnNames[columnIndex].substring(1, 3)}';
             aValue = a.value['years'][yearKey]?['capHit'] ?? 0;
             bValue = b.value['years'][yearKey]?['capHit'] ?? 0;
@@ -109,13 +110,24 @@ class _PlayerContractsState extends State<PlayerContracts> {
             bValue = contractTeamIds[
                 b.value['years']?[kCurrentSeason.substring(0, 4)]?['teamId'] ?? '0'];
           } else if (columnIndex == 2) {
+            if (a.value['position'] != null && a.value['position'] != '') {
+              aValue = a.value['position'];
+            } else {
+              aValue = 'Z';
+            }
+            if (b.value['position'] != null && b.value['position'] != '') {
+              bValue = b.value['position'];
+            } else {
+              bValue = 'Z';
+            }
+          } else if (columnIndex == 3) {
             aValue = int.tryParse(
                     a.value['years']?[kCurrentSeason.substring(0, 4)]?['age'] ?? '0') ??
                 0;
             bValue = int.tryParse(
                     b.value['years']?[kCurrentSeason.substring(0, 4)]?['age'] ?? '0') ??
                 0;
-          } else if (columnIndex == 3) {
+          } else if (columnIndex == 4) {
             aValue = a.value['years'].length;
             bValue = b.value['years'].length;
           } else {
@@ -168,6 +180,13 @@ class _PlayerContractsState extends State<PlayerContracts> {
               : MediaQuery.of(context).size.width * 0.12,
         ),
 
+        /// POSITION
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
+        ),
+
         /// AGE
         TableColumn(
           width: isLandscape
@@ -175,7 +194,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
               : MediaQuery.of(context).size.width * 0.1,
         ),
 
-        /// POS
+        /// YEARS
         TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.05
@@ -407,8 +426,16 @@ class _PlayerContractsState extends State<PlayerContracts> {
           return const CapSheetText(text: '-');
         }
 
-      /// AGE
+      /// POSITION
       case 2:
+        try {
+          return CapSheetText(text: player['position']);
+        } catch (stack) {
+          return const CapSheetText(text: '-');
+        }
+
+      /// AGE
+      case 3:
         try {
           return CapSheetText(text: player['years']['2024']['age']);
         } catch (stack) {
@@ -416,7 +443,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
         }
 
       /// YRS REMAINING
-      case 3:
+      case 4:
         try {
           return CapSheetText(text: '${yearsRemaining}Y');
         } catch (stack) {
@@ -424,7 +451,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
         }
 
       /// 24-25
-      case 4:
+      case 5:
         try {
           return CapSheetText(
               text: player['years']['2024']['capHit'] == 0
@@ -438,7 +465,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
         }
 
       /// 25-26
-      case 5:
+      case 6:
         try {
           if (isFreeAgentYear) {
             int year = int.parse('20${columnNames[column].substring(4)}');
@@ -471,7 +498,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
         }
 
       /// 26-27
-      case 6:
+      case 7:
         try {
           if (isFreeAgentYear) {
             int year = int.parse('20${columnNames[column].substring(4)}');
@@ -504,7 +531,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
         }
 
       /// 27-28
-      case 7:
+      case 8:
         try {
           if (isFreeAgentYear) {
             int year = int.parse('20${columnNames[column].substring(4)}');
@@ -537,7 +564,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
         }
 
       /// 28-29
-      case 8:
+      case 9:
         try {
           if (isFreeAgentYear) {
             int year = int.parse('20${columnNames[column].substring(4)}');
@@ -570,7 +597,7 @@ class _PlayerContractsState extends State<PlayerContracts> {
         }
 
       /// 29-30
-      case 9:
+      case 10:
         try {
           if (isFreeAgentYear) {
             int year = int.parse('20${columnNames[column].substring(4)}');

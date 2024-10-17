@@ -25,7 +25,7 @@ class UpcomingFreeAgents extends StatefulWidget {
 
 class _UpcomingFreeAgentsState extends State<UpcomingFreeAgents> {
   late Map<String, dynamic> contracts;
-  int _sortedColumnIndex = 3; // Default to sorting by '24-25' cap hit
+  int _sortedColumnIndex = 4; // Default to sorting by '24-25' cap hit
   bool _isAscending = false; // Default sort direction
 
   Map<String, String> contractTeamIds = {
@@ -192,34 +192,34 @@ class _UpcomingFreeAgentsState extends State<UpcomingFreeAgents> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.125,
+              : MediaQuery.of(context).size.width * 0.12,
         ),
 
         /// POSITION
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.125,
+              : MediaQuery.of(context).size.width * 0.1,
         ),
 
         /// AGE
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.125,
+              : MediaQuery.of(context).size.width * 0.1,
         ),
 
         /// SALARY
         TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.05
-                : MediaQuery.of(context).size.width * 0.2),
+                : MediaQuery.of(context).size.width * 0.16),
 
         /// TYPE
         TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.125
-                : MediaQuery.of(context).size.width * 0.19),
+                : MediaQuery.of(context).size.width * 0.16),
       ],
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -244,7 +244,7 @@ class _UpcomingFreeAgentsState extends State<UpcomingFreeAgents> {
                 child: Align(
                   alignment: column == 0
                       ? Alignment.centerLeft
-                      : column == 4
+                      : column == 5
                           ? Alignment.center
                           : Alignment.centerRight,
                   child: Row(
