@@ -341,6 +341,7 @@ class _TeamGamesState extends State<TeamGames> {
                                 awayId: teamGames[gamesList[index]]['HOME_AWAY'] == '@'
                                     ? widget.team['TEAM_ID'].toString()
                                     : teamGames[gamesList[index]]['OPP'].toString(),
+                                gameDate: teamGames[gamesList[index]]['GAME_DATE'],
                                 gameTime: teamGames[gamesList[index]]['RESULT'] != 'W' &&
                                         teamGames[gamesList[index]]['RESULT'] != 'L'
                                     ? adjustTimezone(

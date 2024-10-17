@@ -229,6 +229,8 @@ class _GameCardState extends State<GameCard> {
               gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
               homeId: widget.homeTeam.toString(),
               awayId: widget.awayTeam.toString(),
+              gameDate:
+                  widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'].substring(0, 10),
               gameTime:
                   summary['GAME_STATUS_ID'] == 1 && summary['GAME_STATUS_TEXT'] != 'Cancelled'
                       ? adjustTimezone(summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT'])

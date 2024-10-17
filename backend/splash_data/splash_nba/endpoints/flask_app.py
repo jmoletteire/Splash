@@ -673,9 +673,11 @@ def get_game():
             }
         ])
 
+        game = list(game)
+
         if game:
             # logging.info(f"(get_game) Retrieved game {game_id} from MongoDB")
-            return jsonify(game["GAMES"][game_id])
+            return jsonify(game[0]["GAMES"][game_id])
         else:
             logging.warning("(get_game) No games found in MongoDB")
             return jsonify({"error": "No games found"})

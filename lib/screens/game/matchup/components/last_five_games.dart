@@ -238,6 +238,7 @@ class _LastFiveGamesState extends State<LastFiveGames> {
                 awayId: homeLastFive[index]['HOME_AWAY'] == '@'
                     ? widget.homeId
                     : homeLastFive[index]['OPP'].toString(),
+                gameDate: homeLastFive[index]['GAME_DATE'],
               ),
             ),
           );
@@ -343,6 +344,7 @@ class _LastFiveGamesState extends State<LastFiveGames> {
                 awayId: awayLastFive[index]['HOME_AWAY'] == '@'
                     ? widget.awayId
                     : awayLastFive[index]['OPP'].toString(),
+                gameDate: awayLastFive[index]['GAME_DATE'],
               ),
             ),
           );

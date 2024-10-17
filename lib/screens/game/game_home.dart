@@ -26,6 +26,7 @@ class GameHome extends StatefulWidget {
   final String gameId;
   final String homeId;
   final String awayId;
+  final String gameDate;
   final String? gameTime;
 
   const GameHome({
@@ -34,6 +35,7 @@ class GameHome extends StatefulWidget {
     required this.gameId,
     required this.homeId,
     required this.awayId,
+    required this.gameDate,
     this.gameTime,
   });
 
@@ -128,25 +130,25 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     });
   }
 
-  void startPolling(String gameId) {
+  void startPolling(String gameId, String gameDate) {
     // Poll every 10 seconds
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      getGame(gameId); // Call fetchGames every 10 seconds to get updated data
+      getGame(gameId, gameDate); // Call fetchGames every 10 seconds to get updated data
     });
   }
 
-  Future<void> getGame(String gameId) async {
-    var fetchedGame = await Game().getGame(gameId);
+  Future<void> getGame(String gameId, String gameDate) async {
+    var fetchedGame = await Game().getGame(gameId, gameDate);
     setState(() {
       game = fetchedGame;
     });
   }
 
-  Future<void> setValues(String gameId) async {
+  Future<void> setValues(String gameId, String gameDate) async {
     setState(() {
       _isLoading = true;
     });
-    await getGame(gameId);
+    await getGame(gameId, gameDate);
     setOdds(game);
     setState(() {
       _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
@@ -164,14 +166,14 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     super.initState();
 
     if (widget.gameData == null) {
-      setValues(widget.gameId);
+      setValues(widget.gameId, widget.gameDate);
     } else {
       game = widget.gameData!;
       setOdds(game);
       _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
       _isLoading = false;
     }
-    startPolling(widget.gameId);
+    startPolling(widget.gameId, widget.gameDate);
 
     int tabLength = 4;
 

@@ -40,14 +40,14 @@ class _LastMeetingState extends State<LastMeeting> {
     return [dayOfWeek, monthDate];
   }
 
-  Future<void> getGame(String gameId) async {
+  Future<void> getGame(String gameId, String gameDate) async {
     final gameCache = Provider.of<GameCache>(context, listen: false);
     if (gameCache.containsGame(gameId)) {
       setState(() {
         game = gameCache.getGame(gameId)!;
       });
     } else {
-      var fetchedGame = await Game().getGame(gameId);
+      var fetchedGame = await Game().getGame(gameId, gameDate);
       setState(() {
         game = fetchedGame;
       });
@@ -55,11 +55,11 @@ class _LastMeetingState extends State<LastMeeting> {
     }
   }
 
-  Future<void> setValues(String gameId) async {
+  Future<void> setValues(String gameId, String gameDate) async {
     setState(() {
       _isLoading = true;
     });
-    await getGame(gameId);
+    await getGame(gameId, gameDate);
     setState(() {
       _isLoading = false;
     });
@@ -69,7 +69,8 @@ class _LastMeetingState extends State<LastMeeting> {
   void initState() {
     super.initState();
     gameDate = formatDate(widget.lastMeeting['LAST_GAME_DATE_EST']);
-    setValues(widget.lastMeeting['LAST_GAME_ID']);
+    setValues(widget.lastMeeting['LAST_GAME_ID'],
+        widget.lastMeeting['LAST_GAME_DATE_EST'].substring(0, 10));
   }
 
   @override
@@ -95,6 +96,7 @@ class _LastMeetingState extends State<LastMeeting> {
                 gameId: widget.lastMeeting['LAST_GAME_ID'],
                 homeId: lastHomeId,
                 awayId: lastAwayId,
+                gameDate: widget.lastMeeting['LAST_GAME_DATE_EST'].substring(0, 10),
               ),
             ),
           );

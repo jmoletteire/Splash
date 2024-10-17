@@ -181,6 +181,7 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
                               gameId: game['GAME_ID'],
                               homeId: homeTeam,
                               awayId: awayTeam,
+                              gameDate: game['GAME_DATE'].substring(0, 10),
                             ),
                           ),
                         );

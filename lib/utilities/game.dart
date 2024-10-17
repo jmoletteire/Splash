@@ -4,9 +4,9 @@ import 'package:splash/utilities/nba_api/library/network.dart';
 class Game {
   Network network = Network();
 
-  Future<Map<String, dynamic>> getGame(String gameId) async {
+  Future<Map<String, dynamic>> getGame(String gameId, String gameDate) async {
     // Create the query parameters map
-    Map<String, String> queryParams = {'gameId': gameId};
+    Map<String, String> queryParams = {'gameId': gameId, 'date': gameDate};
 
     // Create the URL with query parameters
     var url = Uri.http(

@@ -375,6 +375,7 @@ class _GameByGameStatsState extends State<GameByGameStats> {
                     gameId: widget.gameIds[row],
                     homeId: homeAway == true ? teamId : oppId,
                     awayId: homeAway == true ? oppId : teamId,
+                    gameDate: widget.schedule[gameId]['GAME_DATE'].substring(0, 10),
                   ),
                 ),
               );

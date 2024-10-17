@@ -189,6 +189,7 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                 gameId: series['nextGameId'].toString(),
                 homeId: series['highSeedId'].toString(),
                 awayId: series['lowSeedId'].toString(),
+                gameDate: series['nextGameDateTimeEt'].substring(0, 10),
               ),
             ),
           );
