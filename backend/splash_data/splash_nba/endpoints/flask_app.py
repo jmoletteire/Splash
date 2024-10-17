@@ -632,18 +632,7 @@ def get_games():
 
         games = list(games)
         if len(games) > 0:
-            games_dict = games[0]['GAMES']
-
-            # Sort the dictionary by the values of SUMMARY.GameSummary.0.GAME_SEQUENCE
-            sorted_games = dict(
-                sorted(
-                    games_dict.items(),  # Keep the items (key-value pairs) from the dictionary
-                    key=lambda item: (
-                        item[1].get('SUMMARY', {}).get('GameSummary', [{}])[0].get('GAME_SEQUENCE', float('inf'))
-                    )
-                )
-            )
-            return jsonify(sorted_games)
+            return jsonify(games[0]['GAMES'])
         else:
             logging.warning("(get_games) No games found in MongoDB")
             return jsonify({"error": "No games found"})
