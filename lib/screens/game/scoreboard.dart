@@ -167,7 +167,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
           {'date': formattedDate},
         );
         dynamic jsonData = await network.getData(url);
-        Map<String, dynamic> gamesData = jsonData ?? {};
+        Map<String, dynamic> gamesData = jsonData[0] ?? {};
 
         setState(() {
           cachedGames[formattedDate] = gamesData;

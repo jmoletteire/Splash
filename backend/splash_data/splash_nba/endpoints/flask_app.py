@@ -634,11 +634,13 @@ def get_games():
         if len(games) > 0:
             games_dict = games[0]['GAMES']
 
-            # Sort the dictionary values by SUMMARY.GameSummary.0.GAME_SEQUENCE
-            sorted_games = sorted(
-                games_dict.values(),
-                key=lambda x: (
-                    x.get('SUMMARY', {}).get('GameSummary', [{}])[0].get('GAME_SEQUENCE', float('inf'))
+            # Sort the dictionary by the values of SUMMARY.GameSummary.0.GAME_SEQUENCE
+            sorted_games = dict(
+                sorted(
+                    games_dict.items(),  # Keep the items (key-value pairs) from the dictionary
+                    key=lambda item: (
+                        item[1].get('SUMMARY', {}).get('GameSummary', [{}])[0].get('GAME_SEQUENCE', float('inf'))
+                    )
                 )
             )
             return jsonify(sorted_games)
