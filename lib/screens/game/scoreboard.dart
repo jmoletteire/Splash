@@ -169,6 +169,19 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
         dynamic jsonData = await network.getData(url);
         Map<String, dynamic> gamesData = jsonData[0] ?? {};
 
+        var sortedEntries = gamesData.entries.toList()
+          ..sort((a, b) {
+            var aValue, bValue;
+
+            aValue = a.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
+            bValue = b.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
+
+            return aValue.compareTo(bValue);
+          });
+
+        // Assign the sorted list back to widget.teams
+        gamesData = Map.fromEntries(sortedEntries);
+
         setState(() {
           cachedGames[formattedDate] = gamesData;
           _isLoading = false; // Set loading state to false
