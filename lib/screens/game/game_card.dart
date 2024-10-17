@@ -122,9 +122,16 @@ class _GameCardState extends State<GameCard> {
     var summary = widget.game['SUMMARY']['GameSummary'][0];
     var linescore = widget.game['SUMMARY']['LineScore'];
     Map<String, dynamic> odds = {};
+    bool _isLive = false;
 
     try {
-      odds = widget.game['ODDS']?['BOOK']?['18186'];
+      if (summary['GAME_STATUS_ID'] != 1 &&
+          widget.game['ODDS']?['LIVE'].containsKey('26338')) {
+        odds = widget.game['ODDS']?['LIVE']?['26338'];
+        _isLive = true;
+      } else {
+        odds = widget.game['ODDS']?['BOOK']?['18186'];
+      }
     } catch (e) {
       odds = {};
     }
@@ -133,7 +140,7 @@ class _GameCardState extends State<GameCard> {
     String overUnder = '';
 
     try {
-      double raw = double.parse(odds['oddstypes']['4']['hcp']['value']);
+      double raw = double.parse(odds['oddstypes'][_isLive ? '168' : '4']['hcp']['value']);
       if (raw > 0) {
         spread = '+${raw.toStringAsFixed(1)}';
       } else {
@@ -144,7 +151,7 @@ class _GameCardState extends State<GameCard> {
     }
 
     try {
-      double raw = double.parse(odds['oddstypes']['3']['hcp']['value']);
+      double raw = double.parse(odds['oddstypes'][_isLive ? '18' : '3']['hcp']['value']);
       overUnder = raw.toStringAsFixed(1);
     } catch (e) {
       overUnder = '';
@@ -153,6 +160,11 @@ class _GameCardState extends State<GameCard> {
     String broadcast = summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LP';
 
     String getGameTime() {
+      if (widget.game.containsKey('BOXSCORE')) {
+        if (widget.game['BOXSCORE']['gameStatusText'] == 'pregame') {
+          return 'Pregame';
+        }
+      }
       switch (summary['GAME_STATUS_ID']) {
         case 1:
           // Upcoming

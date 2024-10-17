@@ -72,6 +72,7 @@ class _CapSheetState extends State<CapSheet> {
     '\'29-30',
   ];
 
+  /*
   List _mergeContracts(List contracts) {
     Map<String, Map<String, dynamic>> mergedContracts = {};
 
@@ -114,11 +115,15 @@ class _CapSheetState extends State<CapSheet> {
     return mergedContracts.values.toList();
   }
 
+   */
+
   @override
   void initState() {
     super.initState();
-    contracts = _mergeContracts(widget.team['contracts']);
-    _addTotalsRow();
+    //contracts = _mergeContracts(widget.team['contracts']);
+    contracts = widget.team['contracts'];
+    //_addTotalsRow();
+    _addSalaryCapDifferenceRow(contracts[contracts.length - 1]);
     _sortContracts(_sortedColumnIndex, _isAscending);
   }
 

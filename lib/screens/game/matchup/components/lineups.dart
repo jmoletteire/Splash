@@ -84,9 +84,14 @@ class _LineupsState extends State<Lineups> {
                   if (isLandscape) {
                     return Stack(
                       children: [
-                        CustomPaint(
-                          size: Size(368.r, 346.r),
-                          painter: FullCourtPainter(isLandscape: isLandscape),
+                        Row(
+                          children: [
+                            SizedBox(width: 45.0.r),
+                            CustomPaint(
+                              size: Size(368.r, 346.r),
+                              painter: FullCourtPainter(isLandscape: isLandscape),
+                            ),
+                          ],
                         ),
                         Row(
                           children: [
@@ -466,7 +471,7 @@ class FullCourtPainter extends CustomPainter {
     final courtHeight = isLandscape ? size.width : size.height;
 
     // Add a scaling factor for the three-point arc radius in landscape mode
-    final threePointArcScalingFactor = isLandscape ? 0.893 : 1.0;
+    final threePointArcScalingFactor = isLandscape ? 0.8875 : 1.0;
 
     // Draw the half court line
     isLandscape
@@ -510,23 +515,6 @@ class FullCourtPainter extends CustomPainter {
         false,
         paint,
       );
-
-      /*
-      // Left Hash
-      canvas.drawLine(
-        Offset(0, courtHeight - (courtHeight * 28 / 47)),
-        Offset(courtWidth * (3 / 50), courtHeight - (courtHeight * (28 / 47))),
-        paint,
-      );
-
-      // Right Hash
-      canvas.drawLine(
-        Offset(courtWidth - courtWidth * (3 / 50), courtHeight - (courtHeight * 28 / 47)),
-        Offset(courtWidth, courtHeight - (courtHeight * (28 / 47))),
-        paint,
-      );
-
-       */
 
       // Draw baseline
       canvas.drawLine(
@@ -623,9 +611,11 @@ class FullCourtPainter extends CustomPainter {
       );
 
       // Above the Break (Arc)
+      int offset = isLandscape ? -5 : 0;
+
       canvas.drawArc(
         Rect.fromCircle(
-            center: Offset(courtWidth / 2, courtHeight - (courtHeight * (5 / 47))),
+            center: Offset(courtWidth / 2, offset + courtHeight - (courtHeight * (5 / 47))),
             radius: threePointLineRadius),
         -3.14 + (0.123 * 3.14), // Start angle in quadrant 2
         (3.14 - (0.123 * 2 * 3.14)),

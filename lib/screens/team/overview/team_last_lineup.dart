@@ -41,7 +41,8 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
       if (lastGameDate.compareTo(todayDate) < 0) {
         // Find last game
         for (var game in games) {
-          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) < 0) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) < 0 &&
+              schedule[game]['RESULT'] != 'Cancelled') {
             return schedule[game];
           }
         }
@@ -88,7 +89,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                         children: [
                           TextSpan(
                             text:
-                                '${formatDate(lastGame['GAME_DATE'])} - ${lastGame['HOME_AWAY']} ${kTeamIdToName[lastGame['OPP'].toString()][1]} (${lastGame['TEAM_PTS']}-${lastGame['OPP_PTS']} ',
+                                '${formatDate(lastGame['GAME_DATE'])} - ${lastGame['HOME_AWAY']} ${kTeamIdToName[lastGame['OPP'].toString()]?[1] ?? 'INT\'L'} (${lastGame['TEAM_PTS']}-${lastGame['OPP_PTS']} ',
                             style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.grey),
                           ),
                           TextSpan(

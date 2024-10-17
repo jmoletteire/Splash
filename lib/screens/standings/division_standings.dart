@@ -8,14 +8,18 @@ import 'package:splash/utilities/constants.dart';
 import '../team/team_home.dart';
 
 class DivisionStandings extends StatefulWidget {
+  final Key key;
   final List columnNames;
   final List standings;
   final String season;
+  final ScrollController divController;
 
   DivisionStandings({
+    required this.key,
     required this.columnNames,
     required this.standings,
     required this.season,
+    required this.divController,
   });
 
   @override
@@ -90,7 +94,7 @@ class _DivisionStandingsState extends State<DivisionStandings> {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return SliverTableView.builder(
-      horizontalScrollController: scrollController,
+      horizontalScrollController: widget.divController,
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
           vertical: TableViewVerticalDividersStyle.symmetric(

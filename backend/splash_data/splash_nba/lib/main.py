@@ -14,6 +14,7 @@ from splash_nba.lib.games.fetch_adv_boxscore import fetch_box_score_adv
 from splash_nba.lib.games.fetch_boxscore_basic import fetch_box_score_stats
 from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
 from splash_nba.lib.games.fetch_new_games import update_game_data, fetch_games_for_date_range
+from splash_nba.lib.games.game_odds import fetch_odds
 from splash_nba.lib.games.live_scores import fetch_boxscore, fetch_live_scores
 from splash_nba.lib.games.nba_cup import update_current_cup
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
@@ -1121,7 +1122,8 @@ def players_daily_update():
 
 
 # Schedule the tasks
-schedule.every(10).seconds.do(games_live_update)  # Run every 1 minute
+schedule.every(10).seconds.do(games_live_update)  # Update games
+schedule.every(10).seconds.do(fetch_odds)  # Update odds
 schedule.every().day.at("00:00").do(reset_flags)  # Reset the flag at midnight
 schedule.every().day.at("02:00").do(games_daily_update)  # Run every day at 2:30 AM
 schedule.every().day.at("02:15").do(teams_daily_update)  # Run every day at 3:00 AM
@@ -1155,10 +1157,10 @@ except Exception as e:
     logging.error(f"Failed to connect to MongoDB: {e}")
     exit(1)
 
-games_daily_update()
-teams_daily_update()
-players_daily_update()
-# games_live_update()
+#games_daily_update()
+#teams_daily_update()
+#players_daily_update()
+#games_live_update()
 # games_prev_day()
 
 while True:

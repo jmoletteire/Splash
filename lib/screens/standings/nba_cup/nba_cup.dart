@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:splash/screens/standings/nba_cup/knockout_bracket.dart';
 import 'package:splash/screens/standings/nba_cup/wildcard_standings.dart';
 
@@ -19,10 +20,11 @@ class NbaCup extends StatefulWidget {
 
 class _NbaCupState extends State<NbaCup>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late TabController _tabController = TabController(length: 3, vsync: this);
+  late TabController _tabController;
   late Map<String, dynamic> groups;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+  late LinkedScrollControllerGroup _groupControllers;
 
   @override
   bool get wantKeepAlive => true;
@@ -31,6 +33,9 @@ class _NbaCupState extends State<NbaCup>
   void initState() {
     super.initState();
     setGroups();
+    _tabController =
+        TabController(length: widget.cupData.containsKey('KNOCKOUT') ? 3 : 2, vsync: this);
+    _groupControllers = LinkedScrollControllerGroup();
   }
 
   @override
@@ -100,6 +105,7 @@ class _NbaCupState extends State<NbaCup>
               controller: _scrollController,
               slivers: groups.keys.map((groupName) {
                 return GroupStandings(
+                  key: UniqueKey(),
                   columnNames: [
                     groupName,
                     'W',
@@ -116,6 +122,7 @@ class _NbaCupState extends State<NbaCup>
                   ],
                   standings: groups[groupName]!,
                   season: widget.selectedSeason,
+                  groupController: _groupControllers.addAndGet(),
                 );
               }).toList(),
             ),

@@ -38,12 +38,13 @@ class _PlayerProfileState extends State<PlayerProfile> {
 
   @override
   Widget build(BuildContext context) {
-    var key = widget.player['ROSTERSTATUS'] == 'Inactive'
+    var key = widget.player['ROSTERSTATUS'] == 'Inactive' || widget.player['BIRTHDATE'] == null
         ? 'Last Played'
         : convertDate(widget.player['BIRTHDATE']);
-    var value = widget.player['ROSTERSTATUS'] == "Inactive"
-        ? ((widget.player['TO_YEAR'] ?? widget.player['FROM_YEAR'] ?? 0) + 1).toString()
-        : '${calculateAge(widget.player['BIRTHDATE'])} yrs';
+    var value =
+        widget.player['ROSTERSTATUS'] == "Inactive" || widget.player['BIRTHDATE'] == null
+            ? ((widget.player['TO_YEAR'] ?? widget.player['FROM_YEAR'] ?? 0) + 1).toString()
+            : '${calculateAge(widget.player['BIRTHDATE'])} yrs';
 
     var height = widget.player['HEIGHT'].toString().split('-');
     var heightFinal = widget.player['HEIGHT'] == "" ? "" : '${height[0]}\'${height[1]}\"';

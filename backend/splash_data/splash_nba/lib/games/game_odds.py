@@ -12,6 +12,32 @@ from splash_nba.util.env import uri, k_current_season
 import logging
 
 
+def draft_kings_odds():
+    url = 'https://sportsbook-nash.draftkings.com/api/sportscontent/dkusnj/v1/leagues/42648'
+    response = requests.get(url)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        dk_odds = response.json()
+    else:
+        logging.error(f"Failed to fetch DraftKings odds")
+        return
+
+    games = {}
+    for event in dk_odds['events']:
+        games[event['id']] = {
+            'id': event['id'],
+            'name': event['name'],
+            'homeId': event['participants'][0]['id'],
+            'awayId': event['participants'][1]['id']
+        }
+
+    for market in dk_odds['markets']:
+        if market['eventId'] not in games.keys():
+            continue
+        games[market['eventId']]['marketId'] = market['id']
+
+
 def fetch_odds():
     # Connect to MongoDB
     try:
@@ -88,7 +114,10 @@ def fetch_odds():
 
     for game_date in games_collection.find({'GAME_DATE': today}, {'_id': 0}):
         for game_id, game_data in game_date['GAMES'].items():
-            odds_response = requests.get(sr_url + game_data['ODDS']['srMatchId'], headers=headers)
+            try:
+                odds_response = requests.get(sr_url + game_data['ODDS']['srMatchId'], headers=headers)
+            except Exception:
+                continue
 
             # Check if the request was successful
             if odds_response.status_code == 200:
@@ -100,23 +129,27 @@ def fetch_odds():
             try:
                 live_odds_bookmakers = live_odds['doc'][0]['data']['liveoddsbookmakers']
             except KeyError:
-                logging.error(f"Live odds unavailable")
+                # logging.error(f"Live odds unavailable")
                 live_odds_bookmakers = []
 
             try:
                 bookmakers = live_odds['doc'][0]['data']['bookmakers']
             except KeyError:
-                logging.error(f"Book odds unavailable")
+                # logging.error(f"Book odds unavailable")
                 bookmakers = []
 
-            games_collection.update_one(
-                {"GAME_DATE": today},
-                {'$set': {f"GAMES.{game_id}.ODDS.LIVE": live_odds_bookmakers, f"GAMES.{game_id}.ODDS.BOOK": bookmakers}},
-            )
+            if len(bookmakers) > 0:
+                games_collection.update_one(
+                    {"GAME_DATE": today},
+                    {'$set': {f"GAMES.{game_id}.ODDS.LIVE": live_odds_bookmakers, f"GAMES.{game_id}.ODDS.BOOK": bookmakers}},
+                )
 
     for game_date in games_collection.find({'GAME_DATE': tomorrow}, {'_id': 0}):
         for game_id, game_data in game_date['GAMES'].items():
-            odds_response = requests.get(sr_url + game_data['ODDS']['srMatchId'], headers=headers)
+            try:
+                odds_response = requests.get(sr_url + game_data['ODDS']['srMatchId'], headers=headers)
+            except Exception:
+                continue
 
             # Check if the request was successful
             if odds_response.status_code == 200:
@@ -128,19 +161,20 @@ def fetch_odds():
             try:
                 live_odds_bookmakers = live_odds['doc'][0]['data']['liveoddsbookmakers']
             except KeyError:
-                logging.error(f"Live odds unavailable")
+                # logging.error(f"Live odds unavailable")
                 live_odds_bookmakers = []
 
             try:
                 bookmakers = live_odds['doc'][0]['data']['bookmakers']
             except KeyError:
-                logging.error(f"Book odds unavailable")
+                # logging.error(f"Book odds unavailable")
                 bookmakers = []
 
-            games_collection.update_one(
-                {"GAME_DATE": tomorrow},
-                {'$set': {f"GAMES.{game_id}.ODDS.LIVE": live_odds_bookmakers, f"GAMES.{game_id}.ODDS.BOOK": bookmakers}},
-            )
+            if len(bookmakers) > 0:
+                games_collection.update_one(
+                    {"GAME_DATE": tomorrow},
+                    {'$set': {f"GAMES.{game_id}.ODDS.LIVE": live_odds_bookmakers, f"GAMES.{game_id}.ODDS.BOOK": bookmakers}},
+                )
 
 
 if __name__ == "__main__":

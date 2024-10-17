@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/standings/playoffs/playoff_bracket.dart';
@@ -38,6 +39,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   late String selectedSeason;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+  late LinkedScrollControllerGroup _divControllers;
   late TabController _tabController;
   late ValueNotifier<Map<String, dynamic>> playoffDataNotifier;
   late ValueNotifier<Map<String, dynamic>> cupDataNotifier;
@@ -45,8 +47,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   int selectedYear = 2025;
 
   void _initializeTabController(int index) {
-    int tabLength = 4;
-    /*
+    int tabLength = 2;
     if (playoffDataNotifier.value.isNotEmpty &&
         !playoffDataNotifier.value.containsKey('error')) {
       tabLength += 1;
@@ -61,7 +62,6 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
     if (index > tabLength - 1) {
       index = 0;
     }
-     */
 
     // Dispose the old TabController if it exists
     _tabController.dispose();
@@ -222,25 +222,21 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
     cupDataNotifier = ValueNotifier<Map<String, dynamic>>({});
     selectedSeason = kCurrentSeason;
 
-    int tabLength = 4;
-    /*
-    if (playoffDataNotifier.value.isNotEmpty &&
-        !playoffDataNotifier.value.containsKey('error')) {
-      tabLength += 1;
-    }
-
-    if (selectedYear >= 2024 &&
-        cupDataNotifier.value.isNotEmpty &&
-        !cupDataNotifier.value.containsKey('error')) {
-      tabLength += 1;
-    }
-
-     */
-    _tabController = TabController(length: tabLength, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
+    _divControllers = LinkedScrollControllerGroup();
 
     setTeams();
     getPlayoffs(selectedSeason);
     getNbaCup(selectedSeason);
+
+    // Listen to the changes in playoff and cup data to update tabs
+    playoffDataNotifier.addListener(() {
+      _initializeTabController(_tabController.index);
+    });
+
+    cupDataNotifier.addListener(() {
+      _initializeTabController(_tabController.index);
+    });
   }
 
   @override
@@ -268,207 +264,218 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
               color: Colors.deepOrange,
             ),
           )
-        : Scaffold(
-            backgroundColor: const Color(0xFF111111),
-            appBar: AppBar(
-              backgroundColor: Colors.grey.shade900,
-              surfaceTintColor: Colors.grey.shade900,
-              title: Text(
-                'Splash',
-                style:
-                    TextStyle(color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 32.0.r),
-              ),
-              actions: [
-                CustomIconButton(
-                  icon: Icons.search,
-                  size: 30.0.r,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchScreen(),
+        : ValueListenableBuilder<Map<String, dynamic>>(
+            valueListenable: playoffDataNotifier,
+            builder: (context, cupData, _) {
+              return ValueListenableBuilder<Map<String, dynamic>>(
+                  valueListenable: cupDataNotifier,
+                  builder: (context, cupData, _) {
+                    return Scaffold(
+                      backgroundColor: const Color(0xFF111111),
+                      appBar: AppBar(
+                        backgroundColor: Colors.grey.shade900,
+                        surfaceTintColor: Colors.grey.shade900,
+                        title: Text(
+                          'Splash',
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 32.0.r),
+                        ),
+                        actions: [
+                          CustomIconButton(
+                            icon: Icons.search,
+                            size: 30.0.r,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SearchScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          CustomIconButton(
+                            icon: Icons.calendar_month,
+                            size: 30.0.r,
+                            onPressed: () {
+                              _showYearPicker(context);
+                            },
+                          ),
+                        ],
+                        bottom: TabBar(
+                          controller: _tabController,
+                          isScrollable: true,
+                          tabAlignment: TabAlignment.start,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicatorColor: Colors.deepOrange,
+                          indicatorWeight: 3.0,
+                          unselectedLabelColor: Colors.grey,
+                          labelColor: Colors.white,
+                          labelStyle:
+                              kBebasNormal.copyWith(fontSize: 18.0.r.clamp(14.0, 25.0)),
+                          tabs: [
+                            const Tab(text: 'Conference'),
+                            const Tab(text: 'Division'),
+                            if (int.parse(selectedSeason.substring(0, 4)) >= 1986 &&
+                                !playoffDataNotifier.value.containsKey('error'))
+                              const Tab(text: 'Playoffs'),
+                            if (int.parse(selectedSeason.substring(0, 4)) >= 2023 &&
+                                !cupDataNotifier.value.containsKey('error'))
+                              const Tab(text: 'NBA Cup'),
+                          ],
+                        ),
+                      ),
+                      body: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          ScrollConfiguration(
+                            behavior: MyCustomScrollBehavior(),
+                            child: CustomScrollView(
+                              controller: _scrollController,
+                              slivers: [
+                                ConferenceStandings(
+                                  columnNames: const [
+                                    'EASTERN',
+                                    'W',
+                                    'L',
+                                    'PCT',
+                                    'GB',
+                                    'NRTG',
+                                    'ORTG',
+                                    'DRTG',
+                                    'PACE',
+                                    'STREAK',
+                                    'Last 10',
+                                    'HOME',
+                                    'ROAD',
+                                    '> .500',
+                                    'EAST',
+                                    'WEST',
+                                    'ATL',
+                                    'CEN',
+                                    'SE',
+                                    'NW',
+                                    'PAC',
+                                    'SW',
+                                    '100+ PTS',
+                                    'LEAD HT',
+                                    'LEAD 3Q',
+                                    'W - FG%',
+                                    'W - REB',
+                                    'W - TOV'
+                                  ],
+                                  standings: eastTeams,
+                                  season: selectedSeason,
+                                ),
+                                ConferenceStandings(
+                                  columnNames: const [
+                                    'WESTERN',
+                                    'W',
+                                    'L',
+                                    'PCT',
+                                    'GB',
+                                    'NRTG',
+                                    'ORTG',
+                                    'DRTG',
+                                    'PACE',
+                                    'STREAK',
+                                    'Last 10',
+                                    'HOME',
+                                    'ROAD',
+                                    '> .500',
+                                    'EAST',
+                                    'WEST',
+                                    'ATL',
+                                    'CEN',
+                                    'SE',
+                                    'NW',
+                                    'PAC',
+                                    'SW',
+                                    '100+ PTS',
+                                    'LEAD HT',
+                                    'LEAD 3Q',
+                                    'W - FG%',
+                                    'W - REB',
+                                    'W - TOV'
+                                  ],
+                                  standings: westTeams,
+                                  season: selectedSeason,
+                                ),
+                                const StandingsGlossary(),
+                              ],
+                            ),
+                          ),
+                          ScrollConfiguration(
+                            behavior: MyCustomScrollBehavior(),
+                            child: CustomScrollView(
+                              controller: _scrollController,
+                              slivers: divisions.keys.map((divisionName) {
+                                return DivisionStandings(
+                                  key: UniqueKey(),
+                                  columnNames: [
+                                    divisionName,
+                                    'W',
+                                    'L',
+                                    'PCT',
+                                    'GB',
+                                    'NRTG',
+                                    'ORTG',
+                                    'DRTG',
+                                    'PACE',
+                                    'STREAK',
+                                    'Last 10',
+                                    'HOME',
+                                    'ROAD',
+                                    '> .500',
+                                    'EAST',
+                                    'WEST',
+                                    'ATL',
+                                    'CEN',
+                                    'SE',
+                                    'NW',
+                                    'PAC',
+                                    'SW',
+                                    '100+ PTS',
+                                    'LEAD HT',
+                                    'LEAD 3Q',
+                                    'W - FG%',
+                                    'W - REB',
+                                    'W - TOV'
+                                  ],
+                                  standings: divisions[divisionName]!,
+                                  season: selectedSeason,
+                                  divController: _divControllers.addAndGet(),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          if (int.parse(selectedSeason.substring(0, 4)) >= 1986 &&
+                              !playoffDataNotifier.value.containsKey('error'))
+                            ValueListenableBuilder<Map<String, dynamic>>(
+                              valueListenable: playoffDataNotifier,
+                              builder: (context, playoffData, _) {
+                                return PlayoffBracket(
+                                  key: ValueKey(selectedYear),
+                                  playoffData: playoffData,
+                                );
+                              },
+                            ),
+                          if (int.parse(selectedSeason.substring(0, 4)) >= 2023 &&
+                              !cupDataNotifier.value.containsKey('error'))
+                            ValueListenableBuilder<Map<String, dynamic>>(
+                              valueListenable: cupDataNotifier,
+                              builder: (context, cupData, _) {
+                                return NbaCup(
+                                  key: ValueKey(selectedYear),
+                                  cupData: cupData,
+                                  selectedSeason: selectedSeason,
+                                );
+                              },
+                            ),
+                        ],
                       ),
                     );
-                  },
-                ),
-                CustomIconButton(
-                  icon: Icons.calendar_month,
-                  size: 30.0.r,
-                  onPressed: () {
-                    _showYearPicker(context);
-                  },
-                ),
-              ],
-              bottom: TabBar(
-                controller: _tabController,
-                isScrollable: true,
-                tabAlignment: TabAlignment.start,
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicatorColor: Colors.deepOrange,
-                indicatorWeight: 3.0,
-                unselectedLabelColor: Colors.grey,
-                labelColor: Colors.white,
-                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r.clamp(14.0, 25.0)),
-                tabs: [
-                  const Tab(text: 'Conference'),
-                  const Tab(text: 'Division'),
-                  if (int.parse(selectedSeason.substring(0, 4)) >= 1986 &&
-                      !playoffDataNotifier.value.containsKey('error'))
-                    const Tab(text: 'Playoffs'),
-                  if (int.parse(selectedSeason.substring(0, 4)) >= 2023 &&
-                      !cupDataNotifier.value.containsKey('error'))
-                    const Tab(text: 'NBA Cup'),
-                ],
-              ),
-            ),
-            body: TabBarView(
-              controller: _tabController,
-              children: [
-                ScrollConfiguration(
-                  behavior: MyCustomScrollBehavior(),
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    slivers: [
-                      ConferenceStandings(
-                        columnNames: const [
-                          'EASTERN',
-                          'W',
-                          'L',
-                          'PCT',
-                          'GB',
-                          'NRTG',
-                          'ORTG',
-                          'DRTG',
-                          'PACE',
-                          'STREAK',
-                          'Last 10',
-                          'HOME',
-                          'ROAD',
-                          '> .500',
-                          'EAST',
-                          'WEST',
-                          'ATL',
-                          'CEN',
-                          'SE',
-                          'NW',
-                          'PAC',
-                          'SW',
-                          '100+ PTS',
-                          'LEAD HT',
-                          'LEAD 3Q',
-                          'W - FG%',
-                          'W - REB',
-                          'W - TOV'
-                        ],
-                        standings: eastTeams,
-                        season: selectedSeason,
-                      ),
-                      ConferenceStandings(
-                        columnNames: const [
-                          'WESTERN',
-                          'W',
-                          'L',
-                          'PCT',
-                          'GB',
-                          'NRTG',
-                          'ORTG',
-                          'DRTG',
-                          'PACE',
-                          'STREAK',
-                          'Last 10',
-                          'HOME',
-                          'ROAD',
-                          '> .500',
-                          'EAST',
-                          'WEST',
-                          'ATL',
-                          'CEN',
-                          'SE',
-                          'NW',
-                          'PAC',
-                          'SW',
-                          '100+ PTS',
-                          'LEAD HT',
-                          'LEAD 3Q',
-                          'W - FG%',
-                          'W - REB',
-                          'W - TOV'
-                        ],
-                        standings: westTeams,
-                        season: selectedSeason,
-                      ),
-                      const StandingsGlossary(),
-                    ],
-                  ),
-                ),
-                ScrollConfiguration(
-                  behavior: MyCustomScrollBehavior(),
-                  child: CustomScrollView(
-                    controller: _scrollController,
-                    slivers: divisions.keys.map((divisionName) {
-                      return DivisionStandings(
-                        columnNames: [
-                          divisionName,
-                          'W',
-                          'L',
-                          'PCT',
-                          'GB',
-                          'NRTG',
-                          'ORTG',
-                          'DRTG',
-                          'PACE',
-                          'STREAK',
-                          'Last 10',
-                          'HOME',
-                          'ROAD',
-                          '> .500',
-                          'EAST',
-                          'WEST',
-                          'ATL',
-                          'CEN',
-                          'SE',
-                          'NW',
-                          'PAC',
-                          'SW',
-                          '100+ PTS',
-                          'LEAD HT',
-                          'LEAD 3Q',
-                          'W - FG%',
-                          'W - REB',
-                          'W - TOV'
-                        ],
-                        standings: divisions[divisionName]!,
-                        season: selectedSeason,
-                      );
-                    }).toList(),
-                  ),
-                ),
-                if (int.parse(selectedSeason.substring(0, 4)) >= 1986 &&
-                    !playoffDataNotifier.value.containsKey('error'))
-                  ValueListenableBuilder<Map<String, dynamic>>(
-                    valueListenable: playoffDataNotifier,
-                    builder: (context, playoffData, _) {
-                      return PlayoffBracket(
-                        key: ValueKey(selectedYear),
-                        playoffData: playoffData,
-                      );
-                    },
-                  ),
-                if (int.parse(selectedSeason.substring(0, 4)) >= 2023 &&
-                    !cupDataNotifier.value.containsKey('error'))
-                  ValueListenableBuilder<Map<String, dynamic>>(
-                    valueListenable: cupDataNotifier,
-                    builder: (context, cupData, _) {
-                      return NbaCup(
-                        key: ValueKey(selectedYear),
-                        cupData: cupData,
-                        selectedSeason: selectedSeason,
-                      );
-                    },
-                  ),
-              ],
-            ),
-          );
+                  });
+            });
   }
 }
 

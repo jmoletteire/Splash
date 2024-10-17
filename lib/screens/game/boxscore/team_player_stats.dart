@@ -140,7 +140,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         /// STL
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.04
+              ? MediaQuery.of(context).size.width * 0.03
               : MediaQuery.of(context).size.width * 0.1,
         ),
 
@@ -182,21 +182,21 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         /// EFG%
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
+              ? MediaQuery.of(context).size.width * 0.05
               : MediaQuery.of(context).size.width * 0.135,
         ),
 
         /// TS%
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
+              ? MediaQuery.of(context).size.width * 0.05
               : MediaQuery.of(context).size.width * 0.135,
         ),
 
         /// USG%
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
+              ? MediaQuery.of(context).size.width * 0.05
               : MediaQuery.of(context).size.width * 0.135,
         ),
 
@@ -210,21 +210,21 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         /// NRTG
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
+              ? MediaQuery.of(context).size.width * 0.05
               : MediaQuery.of(context).size.width * 0.125,
         ),
 
         /// ORTG
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
+              ? MediaQuery.of(context).size.width * 0.05
               : MediaQuery.of(context).size.width * 0.12,
         ),
 
         /// DRTG
         TableColumn(
           width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.06
+              ? MediaQuery.of(context).size.width * 0.05
               : MediaQuery.of(context).size.width * 0.12,
         ),
       ],

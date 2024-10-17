@@ -47,61 +47,81 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                       width: 42.0.r,
                       height: 42.0.r,
                     ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '${series['highSeedRank'].toString()} ',
-                          style: kBebasBold.copyWith(
-                            fontSize: 12.0.r,
-                            color: teamTwoWins ? Colors.grey : Colors.white,
+              if (series['highSeedRank'] != 0)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '${series['highSeedRank'].toString()} ',
+                            style: kBebasBold.copyWith(
+                              fontSize: 12.0.r,
+                              color: teamTwoWins ? Colors.grey : Colors.white,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: series['highSeedTricode'],
-                          style: kBebasBold.copyWith(
-                            fontSize: 20.0.r,
-                            color: teamTwoWins ? Colors.grey : Colors.white,
+                          TextSpan(
+                            text: series['highSeedTricode'],
+                            style: kBebasBold.copyWith(
+                              fontSize: 20.0.r,
+                              color: teamTwoWins ? Colors.grey : Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    series['highSeedScore'].toString(),
-                    style: kBebasBold.copyWith(
-                      fontSize: 24.0.r,
-                      color: teamTwoWins ? Colors.grey : Colors.white,
+          if (series['nextGameStatus'] != 1)
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      series['highSeedScore'].toString(),
+                      style: kBebasBold.copyWith(
+                        fontSize: 24.0.r,
+                        color: teamTwoWins ? Colors.grey : Colors.white,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '    -    ',
-                    style: kBebasNormal.copyWith(fontSize: 24.0.r),
-                  ),
-                  Text(
-                    series['lowSeedScore'].toString(),
-                    style: kBebasBold.copyWith(
-                      fontSize: 24.0.r,
-                      color: teamOneWins ? Colors.grey : Colors.white,
+                    Text(
+                      '    -    ',
+                      style: kBebasNormal.copyWith(fontSize: 24.0.r),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                    Text(
+                      series['lowSeedScore'].toString(),
+                      style: kBebasBold.copyWith(
+                        fontSize: 24.0.r,
+                        color: teamOneWins ? Colors.grey : Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          if (series['nextGameStatus'] == 1)
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      series['nextGameStatusText'].toString(),
+                      style: kBebasBold.copyWith(
+                        fontSize: 24.0.r,
+                        color: teamTwoWins ? Colors.grey : Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -115,31 +135,32 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
                       width: 42.0.r,
                       height: 42.0.r,
                     ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '${series['lowSeedRank'].toString()} ',
-                          style: kBebasBold.copyWith(
-                            fontSize: 12.0.r,
-                            color: teamOneWins ? Colors.grey : Colors.white,
+              if (series['lowSeedRank'] != 0)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '${series['lowSeedRank'].toString()} ',
+                            style: kBebasBold.copyWith(
+                              fontSize: 12.0.r,
+                              color: teamOneWins ? Colors.grey : Colors.white,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: series['lowSeedTricode'],
-                          style: kBebasBold.copyWith(
-                            fontSize: 20.0.r,
-                            color: teamOneWins ? Colors.grey : Colors.white,
+                          TextSpan(
+                            text: series['lowSeedTricode'],
+                            style: kBebasBold.copyWith(
+                              fontSize: 20.0.r,
+                              color: teamOneWins ? Colors.grey : Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         ],
@@ -160,16 +181,18 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GameHome(
-              gameId: series['nextGameId'].toString(),
-              homeId: series['highSeedId'].toString(),
-              awayId: series['lowSeedId'].toString(),
+        if (teamOne != '0' && teamTwo != '0') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GameHome(
+                gameId: series['nextGameId'].toString(),
+                homeId: series['highSeedId'].toString(),
+                awayId: series['lowSeedId'].toString(),
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 8.0.r),
@@ -201,97 +224,125 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      teamTwoWinsSeries
-                          ? GrayscaleImage(
-                              imagePath: 'images/NBA_Logos/$teamOne.png', size: 28.0.r)
-                          : Image.asset(
-                              'images/NBA_Logos/$teamOne.png',
-                              width: 28.0.r,
-                              height: 28.0.r,
-                            ),
-                      const Text(' '),
-                      teamOneWinsSeries
-                          ? GrayscaleImage(
-                              imagePath: 'images/NBA_Logos/$teamTwo.png', size: 28.0.r)
-                          : Image.asset(
-                              'images/NBA_Logos/$teamTwo.png',
-                              width: 28.0.r,
-                              height: 28.0.r,
-                            ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '${series['highSeedRank'].toString()} ',
-                              style: kBebasBold.copyWith(
-                                fontSize: 10.0.r, // smaller font size for TEAM_TWO_SEED
-                                color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                  if (teamOne != '0' && teamTwo != '0')
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        teamTwoWinsSeries
+                            ? GrayscaleImage(
+                                imagePath: 'images/NBA_Logos/$teamOne.png', size: 28.0.r)
+                            : Image.asset(
+                                'images/NBA_Logos/$teamOne.png',
+                                width: 28.0.r,
+                                height: 28.0.r,
                               ),
-                            ),
-                            TextSpan(
-                              text: series['highSeedTricode'],
-                              style: kBebasBold.copyWith(
-                                fontSize: 16.0.r, // keep the current styling for TEAM_TWO_ABBR
-                                color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                        const Text(' '),
+                        teamOneWinsSeries
+                            ? GrayscaleImage(
+                                imagePath: 'images/NBA_Logos/$teamTwo.png', size: 28.0.r)
+                            : Image.asset(
+                                'images/NBA_Logos/$teamTwo.png',
+                                width: 28.0.r,
+                                height: 28.0.r,
                               ),
+                      ],
+                    ),
+                  if (series['highSeedRank'] != 0 &&
+                      series['highSeedTricode'] != '' &&
+                      series['lowSeedRank'] != 0 &&
+                      series['lowSeedTricode'] != '')
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        if (series['highSeedRank'] != 0 && series['highSeedTricode'] != '')
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: '${series['highSeedRank'].toString()} ',
+                                  style: kBebasBold.copyWith(
+                                    fontSize: 10.0.r, // smaller font size for TEAM_TWO_SEED
+                                    color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: series['highSeedTricode'],
+                                  style: kBebasBold.copyWith(
+                                    fontSize:
+                                        16.0.r, // keep the current styling for TEAM_TWO_ABBR
+                                    color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      const Text(' '),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '${series['lowSeedRank'].toString()} ',
-                              style: kBebasBold.copyWith(
-                                fontSize: 10.0.r, // smaller font size for TEAM_TWO_SEED
-                                color: teamOneWinsSeries ? Colors.grey : Colors.white,
-                              ),
+                          ),
+                        const Text(' '),
+                        if (series['lowSeedRank'] != 0 && series['lowSeedTricode'] != '')
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: '${series['lowSeedRank'].toString()} ',
+                                  style: kBebasBold.copyWith(
+                                    fontSize: 10.0.r, // smaller font size for TEAM_TWO_SEED
+                                    color: teamOneWinsSeries ? Colors.grey : Colors.white,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: series['lowSeedTricode'],
+                                  style: kBebasBold.copyWith(
+                                    fontSize:
+                                        16.0.r, // keep the current styling for TEAM_TWO_ABBR
+                                    color: teamOneWinsSeries ? Colors.grey : Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
-                            TextSpan(
-                              text: series['lowSeedTricode'],
-                              style: kBebasBold.copyWith(
-                                fontSize: 16.0.r, // keep the current styling for TEAM_TWO_ABBR
-                                color: teamOneWinsSeries ? Colors.grey : Colors.white,
-                              ),
-                            ),
-                          ],
+                          )
+                      ],
+                    ),
+                  if (series['highSeedRank'] == 0 &&
+                      series['highSeedTricode'] == '' &&
+                      series['lowSeedRank'] == 0 &&
+                      series['lowSeedTricode'] == '')
+                    SizedBox(height: 5.0.r),
+                  if (series['nextGameStatus'] != 1)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          series['highSeedScore'].toString(),
+                          style: kBebasBold.copyWith(
+                            fontSize: 16.0.r,
+                            color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        series['highSeedScore'].toString(),
-                        style: kBebasBold.copyWith(
-                          fontSize: 16.0.r,
-                          color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                        Text(
+                          '-',
+                          style: kBebasNormal.copyWith(fontSize: 16.0.r),
                         ),
-                      ),
-                      Text(
-                        '-',
-                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
-                      ),
-                      Text(
-                        series['lowSeedScore'].toString(),
-                        style: kBebasBold.copyWith(
-                          fontSize: 16.0.r,
-                          color: teamOneWinsSeries ? Colors.grey : Colors.white,
+                        Text(
+                          series['lowSeedScore'].toString(),
+                          style: kBebasBold.copyWith(
+                            fontSize: 16.0.r,
+                            color: teamOneWinsSeries ? Colors.grey : Colors.white,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  if (series['nextGameStatus'] == 1)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          series['nextGameStatusText'].toString(),
+                          style: kBebasBold.copyWith(
+                            fontSize: 16.0.r,
+                            color: teamTwoWinsSeries ? Colors.grey : Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
       ),

@@ -5,6 +5,89 @@ import requests
 import json
 
 
+def merge_contracts(contracts):
+    merged_contracts = {}
+
+    for contract in contracts['contracts']:
+        player_id = contract['player']['id']
+        contract_type = contract['contractType']
+
+        if player_id in merged_contracts:
+            # Merge the contracts by year
+            for year in contract['years']:
+                start_year = str(year['fromYear'])
+
+                # Check if the year already exists
+                if start_year in merged_contracts[player_id]['years']:
+                    # If the year already exists, keep the upcoming contract's year data
+                    if contract_type == 'upcoming':
+                        merged_contracts[player_id]['years'][start_year] = year
+                else:
+                    # If the year doesn't exist, add it to the map
+                    merged_contracts[player_id]['years'][start_year] = year
+
+            # Update the contractType if it's an upcoming contract
+            if contract_type == 'upcoming':
+                merged_contracts[player_id]['contractType'] = 'upcoming'
+        else:
+            # First time adding this player's contract
+            merged_contracts[player_id] = contract.copy()
+            # Convert years to a map
+            merged_contracts[player_id]['years'] = {
+                str(year['fromYear']): year for year in contract['years']
+            }
+
+    # Convert the merged contracts map back to a list
+    return list(merged_contracts.values())
+
+
+def add_totals_row(contracts):
+    years = [
+        '\'24-25',
+        '\'25-26',
+        '\'26-27',
+        '\'27-28',
+        '\'28-29',
+        '\'29-30',
+    ]
+
+    totals_row = {
+        'player': {'id': 'totals', 'firstName': '', 'lastName': 'Total'},
+        'years': {
+            f"20{year[1:3]}": {'capHit': 0, 'age': '0'} for year in years
+        }
+    }
+
+    age_sums = {}  # To store the sum of ages for each year
+    player_counts = {}  # To store the count of players for each year
+
+    # Iterate over each contract and sum the cap hits and ages
+    for contract in contracts['contracts']:
+        for year_key in totals_row['years'].keys():
+            if year_key in contract['years']:
+                totals_row['years'][year_key]['capHit'] += contract['years'][year_key]['capHit']
+
+                # Parse the age string and count the players for calculating the average age
+                age_string = contract['years'][year_key].get('age', '')
+                if age_string:
+                    age = float(age_string)
+                    if age > 0:
+                        age_sums[year_key] = age_sums.get(year_key, 0) + age
+                        player_counts[year_key] = player_counts.get(year_key, 0) + 1
+
+    # Calculate the average age for each year and round to one decimal place
+    for year_key in totals_row['years'].keys():
+        if player_counts.get(year_key, 0) > 0:
+            average_age = age_sums[year_key] / player_counts[year_key]
+            totals_row['years'][year_key]['age'] = f"{average_age:.1f}"
+        else:
+            totals_row['years'][year_key]['age'] = '0'
+
+    # Add the totals row to the contracts list
+    contracts['contracts'].append(totals_row)
+    return contracts
+
+
 def update_team_contract_data():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
@@ -206,6 +289,8 @@ if __name__ == '__main__':
 
         # Fetch all paginated data
         contracts = fetch_team_contract_data(url, variables, headers)
+        contracts['contracts'] = merge_contracts(contracts)
+        add_totals_row(contracts)
 
         teams_collection.update_one(
             {"TEAM_ID": team['TEAM_ID']},

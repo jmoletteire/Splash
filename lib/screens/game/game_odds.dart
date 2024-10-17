@@ -120,23 +120,23 @@ class _OddsState extends State<Odds> {
       int raw =
           decimalToMoneyline(double.parse(odds['oddstypes']['3']['outcomes']['2']['odds']));
       if (raw > 0) {
-        moneyLine = '+${raw.toString()}';
+        overOdds = '+${raw.toString()}';
       } else {
-        moneyLine = raw.toString();
+        overOdds = raw.toString();
       }
     } catch (e) {
-      moneyLine = '';
+      overOdds = '';
     }
     try {
       int raw =
           decimalToMoneyline(double.parse(odds['oddstypes']['3']['outcomes']['3']['odds']));
       if (raw > 0) {
-        moneyLine = '+${raw.toString()}';
+        underOdds = '+${raw.toString()}';
       } else {
-        moneyLine = raw.toString();
+        underOdds = raw.toString();
       }
     } catch (e) {
-      moneyLine = '';
+      underOdds = '';
     }
 
     odds = {
@@ -229,10 +229,25 @@ class OddsCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    '${fanDuel[betType]['VALUE']}  (${fanDuel[betType]['ODDS2']})',
-                    textAlign: TextAlign.center,
-                    style: kBebasNormal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        fanDuel[betType]['VALUE'],
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal,
+                      ),
+                      Text(
+                        betType == 'MONEYLINE' || fanDuel[betType]['ODDS1'] == ''
+                            ? fanDuel[betType]['ODDS1']
+                            : '  (${fanDuel[betType]['ODDS1']})',
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal.copyWith(
+                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                            color:
+                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -244,10 +259,29 @@ class OddsCard extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    '${fanDuel[betType]['VALUE']}  (${fanDuel[betType]['ODDS2']})',
-                    textAlign: TextAlign.center,
-                    style: kBebasNormal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        betType == 'SPREAD'
+                            ? fanDuel[betType]['VALUE'].substring(0, 1) == '+'
+                                ? '-${fanDuel[betType]['VALUE'].substring(1)}'
+                                : '+${fanDuel[betType]['VALUE'].substring(1)}'
+                            : fanDuel[betType]['VALUE'],
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal,
+                      ),
+                      Text(
+                        betType == 'MONEYLINE' || fanDuel[betType]['ODDS2'] == ''
+                            ? fanDuel[betType]['ODDS2']
+                            : '  (${fanDuel[betType]['ODDS2']})',
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal.copyWith(
+                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                            color:
+                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -257,10 +291,25 @@ class OddsCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    '${draftKings[betType]['VALUE']}  (${draftKings[betType]['ODDS2']})',
-                    textAlign: TextAlign.center,
-                    style: kBebasNormal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        draftKings[betType]['VALUE'],
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal,
+                      ),
+                      Text(
+                        betType == 'MONEYLINE' || draftKings[betType]['ODDS1'] == ''
+                            ? draftKings[betType]['ODDS1']
+                            : '  (${draftKings[betType]['ODDS1']})',
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal.copyWith(
+                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                            color:
+                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -272,10 +321,29 @@ class OddsCard extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    '${draftKings[betType]['VALUE']}  (${draftKings[betType]['ODDS2']})',
-                    textAlign: TextAlign.center,
-                    style: kBebasNormal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        betType == 'SPREAD'
+                            ? draftKings[betType]['VALUE'].substring(0, 1) == '+'
+                                ? '-${draftKings[betType]['VALUE'].substring(1)}'
+                                : '+${draftKings[betType]['VALUE'].substring(1)}'
+                            : draftKings[betType]['VALUE'],
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal,
+                      ),
+                      Text(
+                        betType == 'MONEYLINE' || draftKings[betType]['ODDS2'] == ''
+                            ? draftKings[betType]['ODDS2']
+                            : '  (${draftKings[betType]['ODDS2']})',
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal.copyWith(
+                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                            color:
+                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -285,10 +353,25 @@ class OddsCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    '${mgm[betType]['VALUE']}  (${mgm[betType]['ODDS2']})',
-                    textAlign: TextAlign.center,
-                    style: kBebasNormal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        mgm[betType]['VALUE'],
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal,
+                      ),
+                      Text(
+                        betType == 'MONEYLINE' || mgm[betType]['ODDS1'] == ''
+                            ? mgm[betType]['ODDS1']
+                            : '  (${mgm[betType]['ODDS1']})',
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal.copyWith(
+                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                            color:
+                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -300,10 +383,29 @@ class OddsCard extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    '${mgm[betType]['VALUE']}  (${mgm[betType]['ODDS2']})',
-                    textAlign: TextAlign.center,
-                    style: kBebasNormal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        betType == 'SPREAD'
+                            ? mgm[betType]['VALUE'].substring(0, 1) == '+'
+                                ? '-${mgm[betType]['VALUE'].substring(1)}'
+                                : '+${mgm[betType]['VALUE'].substring(1)}'
+                            : mgm[betType]['VALUE'],
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal,
+                      ),
+                      Text(
+                        betType == 'MONEYLINE' || mgm[betType]['ODDS2'] == ''
+                            ? mgm[betType]['ODDS2']
+                            : '  (${mgm[betType]['ODDS2']})',
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal.copyWith(
+                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                            color:
+                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -313,10 +415,25 @@ class OddsCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    '${bet365[betType]['VALUE']}  (${bet365[betType]['ODDS2']})',
-                    textAlign: TextAlign.center,
-                    style: kBebasNormal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        bet365[betType]['VALUE'],
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal,
+                      ),
+                      Text(
+                        betType == 'MONEYLINE' || bet365[betType]['ODDS1'] == ''
+                            ? bet365[betType]['ODDS1']
+                            : '  (${bet365[betType]['ODDS1']})',
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal.copyWith(
+                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                            color:
+                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -328,10 +445,29 @@ class OddsCard extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    '${bet365[betType]['VALUE']}  (${bet365[betType]['ODDS2']})',
-                    textAlign: TextAlign.center,
-                    style: kBebasNormal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        betType == 'SPREAD'
+                            ? bet365[betType]['VALUE'].substring(0, 1) == '+'
+                                ? '-${bet365[betType]['VALUE'].substring(1)}'
+                                : '+${bet365[betType]['VALUE'].substring(1)}'
+                            : bet365[betType]['VALUE'],
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal,
+                      ),
+                      Text(
+                        betType == 'MONEYLINE' || bet365[betType]['ODDS2'] == ''
+                            ? bet365[betType]['ODDS2']
+                            : '  (${bet365[betType]['ODDS2']})',
+                        textAlign: TextAlign.center,
+                        style: kBebasNormal.copyWith(
+                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                            color:
+                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
+                      ),
+                    ],
                   ),
                 ),
               ],

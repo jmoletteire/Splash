@@ -34,7 +34,7 @@ def get_last_game(seasons):
             # Find the latest game date that is less than today
             for game_key, game_data in reversed(entries):
                 game_date = datetime.date(int(game_data["GAME_DATE"][0:4]), int(game_data["GAME_DATE"][5:7]), int(game_data["GAME_DATE"][8:]))  # Adjust the format as necessary
-                if game_date < today:
+                if game_date < today and game_data['RESULT'] != 'Cancelled':
                     return game_key, game_data["GAME_DATE"]
         else:
             continue
@@ -62,8 +62,6 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
             games_data.append(document.get("GAMES"))
 
         last_game = games_data[0][last_game_id]
-        if team_id == 1610612742:
-            print(last_game["BOXSCORE"].keys())
         team = last_game["BOXSCORE"]["homeTeam"]["players"] if last_game["BOXSCORE"]["homeTeam"]["teamId"] == team_id else last_game["BOXSCORE"]["awayTeam"]["players"]
 
         starters = []
@@ -83,7 +81,7 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
         return starters
 
     except Exception as e:
-        logging.error(f"Error while getting last lineup: {e.with_traceback()}")
+        logging.error(f"Error while getting last lineup: {e}")
 
 
 if __name__ == "__main__":

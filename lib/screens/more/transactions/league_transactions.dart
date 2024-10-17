@@ -2,9 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
-import 'package:splash/screens/more/transactions/transactions_cache.dart';
 import 'package:splash/screens/more/transactions/transactions_network_helper.dart';
 import 'package:splash/utilities/constants.dart';
 
@@ -31,24 +29,13 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
   late ScrollControllerNotifier _notifier;
 
   Future<void> getTransactions() async {
-    final transactionsCache = Provider.of<TransactionsCache>(context, listen: false);
-    if (transactionsCache.containsTransactions()) {
-      setState(() {
-        allTransactions = transactionsCache.getTransactions()!;
-        allTransactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
-        filteredTransactions = allTransactions;
-        _isLoading = false;
-      });
-    } else {
-      var fetchedTransactions = await TransactionsNetworkHelper().getTransactions();
-      setState(() {
-        allTransactions = fetchedTransactions;
-        allTransactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
-        filteredTransactions = allTransactions;
-        _isLoading = false;
-      });
-      transactionsCache.addTransactions(allTransactions);
-    }
+    var fetchedTransactions = await TransactionsNetworkHelper().getTransactions();
+    setState(() {
+      allTransactions = fetchedTransactions;
+      allTransactions.sort((a, b) => b['TRANSACTION_DATE'].compareTo(a['TRANSACTION_DATE']));
+      filteredTransactions = allTransactions;
+      _isLoading = false;
+    });
   }
 
   @override

@@ -312,7 +312,8 @@ class TeamInfo extends StatelessWidget {
       if (lastGameDate.compareTo(todayDate) < 0) {
         // Find last game
         for (var game in games) {
-          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) < 0) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) < 0 &&
+              schedule[game]['RESULT'] != 'Cancelled') {
             return schedule[game];
           }
         }
@@ -345,7 +346,8 @@ class TeamInfo extends StatelessWidget {
       if (nextGameDate.compareTo(todayDate) >= 0) {
         // Find next game
         for (var game in games) {
-          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) >= 0) {
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) >= 0 &&
+              schedule[game]['RESULT'] != 'Cancelled') {
             return schedule[game];
           }
         }

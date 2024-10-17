@@ -71,8 +71,16 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   }
 
   void setOdds() {
+    bool _isLive = false;
+
     try {
-      odds = widget.gameData?['ODDS']?['BOOK']?['18186'];
+      if (widget.gameData?['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] != 1 &&
+          widget.gameData?['ODDS']?['LIVE'].containsKey('26338')) {
+        odds = widget.gameData?['ODDS']?['LIVE']?['26338'];
+        _isLive = true;
+      } else {
+        odds = widget.gameData?['ODDS']?['BOOK']?['18186'];
+      }
     } catch (e) {
       odds = {};
       return;
@@ -80,8 +88,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
     // MoneyLine
     try {
-      int raw =
-          decimalToMoneyline(double.parse(odds['oddstypes']['1']['outcomes']['1']['odds']));
+      int raw = decimalToMoneyline(
+          double.parse(odds['oddstypes'][_isLive ? '19' : '1']['outcomes']['1']['odds']));
       if (raw > 0) {
         moneyLine = '+${raw.toString()}';
       } else {
@@ -93,7 +101,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
     // Spread
     try {
-      double raw = double.parse(odds['oddstypes']['4']['hcp']['value']);
+      double raw = double.parse(odds['oddstypes'][_isLive ? '168' : '4']['hcp']['value']);
       if (raw > 0) {
         spread = '+${raw.toStringAsFixed(1)}';
       } else {
@@ -105,7 +113,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
     // Over/Under
     try {
-      double raw = double.parse(odds['oddstypes']['3']['hcp']['value']);
+      double raw = double.parse(odds['oddstypes'][_isLive ? '18' : '3']['hcp']['value']);
       overUnder = raw.toStringAsFixed(1);
     } catch (e) {
       overUnder = '';
@@ -492,7 +500,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 tabs: [
                   const Tab(text: 'Matchup'),
                   if (!_isUpcoming) const Tab(text: 'Play-By-Play'),
-                  Tab(text: _isUpcoming ? 'Teams' : 'Box Score'),
+                  Tab(text: _isUpcoming ? 'Stats' : 'Box Score'),
                   if (odds.isNotEmpty) const Tab(text: 'Odds')
                 ],
               ),
@@ -982,7 +990,7 @@ class GameInfo extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: MediaQuery.sizeOf(context).height / 11)
+            SizedBox(height: MediaQuery.sizeOf(context).height / 12)
           ],
         ),
       ],

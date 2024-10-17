@@ -213,64 +213,40 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                 ],
               ),
               Expanded(
-                child: ScrollConfiguration(
-                  behavior: MyCustomScrollBehavior(),
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      CustomScrollView(
-                        slivers: [
-                          TeamPlayerStats(players: awayPlayers, controller: _awayController),
-                        ],
-                      ),
-                      CustomScrollView(
-                        slivers: [
-                          SliverPadding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            sliver: TeamLeaders(
-                              season:
-                                  '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                              homeId: widget.homeId,
-                              awayId: widget.awayId,
-                              homePlayers: homePlayers,
-                              awayPlayers: awayPlayers,
-                            ),
-                          )
-                        ],
-                      ),
-                      CustomScrollView(
-                        slivers: [
-                          TeamPlayerStats(players: homePlayers, controller: _homeController),
-                        ],
-                      ),
-                    ],
-                  ),
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    CustomScrollView(
+                      slivers: [
+                        TeamPlayerStats(players: awayPlayers, controller: _awayController),
+                      ],
+                    ),
+                    CustomScrollView(
+                      slivers: [
+                        SliverPadding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          sliver: TeamLeaders(
+                            season:
+                                '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                            homeId: widget.homeId,
+                            awayId: widget.awayId,
+                            homePlayers: homePlayers,
+                            awayPlayers: awayPlayers,
+                          ),
+                        ),
+                        //PointsOfEmphasis(points: widget.game['SUMMARY']['PointsOfEmphasis']),
+                      ],
+                    ),
+                    CustomScrollView(
+                      slivers: [
+                        TeamPlayerStats(players: homePlayers, controller: _homeController),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           );
-  }
-}
-
-class MyCustomScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildOverscrollIndicator(
-      BuildContext context, Widget child, ScrollableDetails axisDirection) {
-    return child;
-  }
-
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return CustomScrollPhysics();
-  }
-}
-
-class CustomScrollPhysics extends ClampingScrollPhysics {
-  CustomScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
-
-  @override
-  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CustomScrollPhysics(parent: buildParent(ancestor));
   }
 }
 

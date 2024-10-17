@@ -119,6 +119,28 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
               ),
               SizedBox(height: 10.0.r),
               ComparisonRow(
+                statName: 'NRTG',
+                awayTeam: roundToDecimalPlaces(
+                    awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                            ?['NET_RATING'] ??
+                        0.0,
+                    1),
+                homeTeam: roundToDecimalPlaces(
+                    homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                            ?['NET_RATING'] ??
+                        0.0,
+                    1),
+                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['NET_RATING_RANK'] ??
+                    0,
+                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
+                        ?['NET_RATING_RANK'] ??
+                    0,
+                awayTeamColor: awayTeamColor,
+                homeTeamColor: homeTeamColor,
+              ),
+              SizedBox(height: 5.0.r),
+              ComparisonRow(
                 statName: 'ORTG',
                 awayTeam: roundToDecimalPlaces(
                     awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
@@ -157,28 +179,6 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
                     0,
                 homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
                         ?['DEF_RATING_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: 'NRTG',
-                awayTeam: roundToDecimalPlaces(
-                    awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ?['NET_RATING'] ??
-                        0.0,
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ?['NET_RATING'] ??
-                        0.0,
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['NET_RATING_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['NET_RATING_RANK'] ??
                     0,
                 awayTeamColor: awayTeamColor,
                 homeTeamColor: homeTeamColor,

@@ -47,104 +47,157 @@ class _TeamCapSheetState extends State<TeamCapSheet> {
                           builder: (BuildContext context) {
                             return Padding(
                               padding: const EdgeInsets.all(20.0),
-                              child: Column(children: [
-                                RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'Hard Cap',
-                                        style: TextStyle(
-                                            fontFamily: 'Roboto',
-                                            fontSize: 17.0.r,
-                                            fontWeight: FontWeight.bold),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'Hard Cap',
+                                            style: TextStyle(
+                                                fontFamily: 'Roboto',
+                                                fontSize: 18.0.r,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          const TextSpan(
+                                            text: '\n\nFirst Apron\n',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text:
+                                                'A team becomes hard-capped at the first tax apron (\$${NumberFormat.decimalPattern().format(kLeagueFirstApron[kCurrentSeason.substring(0, 4)])}) by making any of the following moves:',
+                                            style: const TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: '\n\n\t\tBi-Annual Exception',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\t\t - Uses any portion of the BAE to either sign a player, or acquire a player via trade or waiver claim.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: '\n\n\t\tSign-and-Trade',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\t\t - Acquires player via sign-and-trade with another team.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: '\n\n\t\tMid-Level Exception',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\t\t - Uses more than the taxpayer portion of the MLE to sign a player to a contract. This means signing a player either to a salary that exceeds the taxpayer MLE, or to a contract longer than 2 years.\n\t\t - Uses any portion of the taxpayer MLE to acquire a player via trade or waiver claim.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: '\n\n\t\tSign Waived Player',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\t\t - Signs a player who was waived during the regular season and whose pre-waiver salary was higher than the non-taxpayer mid-level exception.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: '\n\n\t\tTrade',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\t\t - Uses an outgoing player (or multiple players) in a trade for matching purposes to take back more than 100% of the outgoing salary.\n\t\t - Uses a traded player exception generated during the previous offseason or regular season.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: '\n\n\nSecond Apron\n',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text:
+                                                'A team becomes hard-capped at the second tax apron (\$${NumberFormat.decimalPattern().format(kLeagueSecondApron[kCurrentSeason.substring(0, 4)])}) by making any of the following moves:',
+                                            style: const TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\n\t\t - Uses any portion of the mid-level exception to sign a player to a contract.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\n\t\t - Aggregates two or more players in a trade for salary-matching purposes.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text: '\n\n\t\t - Sends out cash in a trade.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\n\t\t - Sends out a player via sign-and-trade and uses that player’s outgoing salary to take back a contract.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                          const TextSpan(
+                                            text:
+                                                '\n\n\t\t - Sends out a player via sign-and-trade and uses the resulting traded player exception to acquire a player via trade or waiver claim.',
+                                            style: TextStyle(
+                                              fontFamily: 'Roboto',
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      const TextSpan(
-                                        text: '\n\nFirst Apron\n',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text:
-                                            'A team becomes hard-capped at the first tax apron (\$${NumberFormat.decimalPattern().format(kLeagueFirstApron[kCurrentSeason.substring(0, 4)])}) by making any of the following moves:',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text: '\n\n\t\tBi-Annual Exception',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text: ' - True Shooting %, Unassisted %',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text: '\n\n\t\tSign-and-Trade',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text:
-                                            ' - Acquires player via sign-and-trade with another team.',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text: '\n\n\t\tMid-Level Exception',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text:
-                                            ' - Offensive Rebound %, Defensive Rebound %, Box Outs per 75, Adjust Rebound Chance %',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text: '\n\n\t\tPlaymaking',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text:
-                                            ' - Adjusted Assists per 75, Potential Assists per 75, Adjusted Assist-to-Pass %, Box Creation',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text: '\n\n\t\tHustle',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text:
-                                            ' - Pace, Loose Balls Recovered per 75, Screen Assist Points per 75, Charges Drawn',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ]),
+                              ),
                             );
                           },
                         );
@@ -251,8 +304,8 @@ class _TeamCapSheetState extends State<TeamCapSheet> {
                     ],
                   ),
                   SizedBox(height: 20.0.r),
-                  Wrap(
-                    runSpacing: 2.5,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Two-Way (TW) Contract',
