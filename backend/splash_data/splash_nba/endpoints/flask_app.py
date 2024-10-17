@@ -631,13 +631,14 @@ def get_games():
         ])
 
         games = list(games)
-        logging.info(f"(get_games) games: {games}")
         if len(games) > 0:
-            # Sort the GAMES array by SUMMARY.GameSummary.0.GAME_SEQUENCE
+            games_dict = games[0]['GAMES']
+
+            # Sort the dictionary values by SUMMARY.GameSummary.0.GAME_SEQUENCE
             sorted_games = sorted(
-                games[0]['GAMES'],
+                games_dict.values(),
                 key=lambda x: (
-                    x.get('SUMMARY', {}).get('GameSummary', [{}])[0].get('GAME_SEQUENCE', 0)
+                    x.get('SUMMARY', {}).get('GameSummary', [{}])[0].get('GAME_SEQUENCE', float('inf'))
                 )
             )
             return jsonify(sorted_games)
