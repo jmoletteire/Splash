@@ -627,19 +627,18 @@ def get_games():
                     "_id": 0,
                     "GAMES": 1
                 }
-            },
-            # Optional $sort stage to enforce no sorting
-            # or specify a field and order if you want a particular sorting behavior
-            {
-                "$sort": {}  # No sorting stage if sorting is unintended
             }
         ])
 
         games = list(games)
 
         if len(games) > 0:
-            # logging.info(f"(get_games) Retrieved games for {game_date} from MongoDB")
-            return jsonify(games[0]['GAMES'])
+            # Sort the GAMES array by SUMMARY.GameSummary.0.GAME_SEQUENCE
+            sorted_games = sorted(
+                games[0]['GAMES'],
+                key=lambda x: x['SUMMARY']['GameSummary'][0]['GAME_SEQUENCE']
+            )
+            return jsonify(sorted_games)
         else:
             logging.warning("(get_games) No games found in MongoDB")
             return jsonify({"error": "No games found"})
