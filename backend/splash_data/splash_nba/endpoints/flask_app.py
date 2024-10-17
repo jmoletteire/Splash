@@ -631,7 +631,9 @@ def get_games():
         ])
 
         games = list(games)
+
         if len(games) > 0:
+            # logging.info(f"(get_games) Retrieved games for {game_date} from MongoDB")
             return jsonify(games[0]['GAMES'])
         else:
             logging.warning("(get_games) No games found in MongoDB")
