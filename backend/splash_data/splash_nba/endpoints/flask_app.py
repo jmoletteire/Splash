@@ -627,6 +627,11 @@ def get_games():
                     "_id": 0,
                     "GAMES": 1
                 }
+            },
+            # Optional $sort stage to enforce no sorting
+            # or specify a field and order if you want a particular sorting behavior
+            {
+                "$sort": {}  # No sorting stage if sorting is unintended
             }
         ])
 
