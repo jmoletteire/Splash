@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:splash/screens/more/contracts/players/player_contracts.dart';
+import 'package:splash/screens/more/contracts/players/upcoming_free_agents.dart';
 import 'package:splash/screens/more/contracts/teams/team_cap_space.dart';
 
 import '../../../components/custom_icon_button.dart';
@@ -34,7 +36,7 @@ class _ContractsState extends State<Contracts> with TickerProviderStateMixin {
     if (teamCache.containsTeam(teamId)) {
       setState(() {
         List contracts = teamCache.getTeam(teamId)!['CAP_SHEET']['contracts'];
-        teams[teamId] = contracts[contracts.length - 1];
+        teams[teamId] = contracts;
         teams[teamId]['teamId'] = teamId;
         _isLoading = false;
       });
@@ -42,7 +44,7 @@ class _ContractsState extends State<Contracts> with TickerProviderStateMixin {
       var fetchedTeam = await Team().getTeam(teamId);
       List contracts = fetchedTeam['CAP_SHEET']['contracts'];
       setState(() {
-        teams[teamId] = contracts[contracts.length - 1];
+        teams[teamId] = contracts;
         teams[teamId]['teamId'] = teamId;
         _isLoading = false;
       });
@@ -209,7 +211,7 @@ class _ContractsState extends State<Contracts> with TickerProviderStateMixin {
                         tabs: const [
                           Tab(text: 'Teams'),
                           Tab(text: 'Players'),
-                          Tab(text: 'Free Agents'),
+                          Tab(text: 'Upcoming FA'),
                         ]),
                     actions: [
                       CustomIconButton(
@@ -236,8 +238,13 @@ class _ContractsState extends State<Contracts> with TickerProviderStateMixin {
                 controller: _tabController,
                 children: [
                   CustomScrollView(slivers: [TeamCapSpace(teams: teams)]),
-                  Placeholder(),
-                  Placeholder(),
+                  CustomScrollView(slivers: [PlayerContracts(teams: teams)]),
+                  CustomScrollView(slivers: [
+                    UpcomingFreeAgents(
+                      teams: teams,
+                      season: kCurrentSeason,
+                    )
+                  ]),
                 ],
               ),
             ),

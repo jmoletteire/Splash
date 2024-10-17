@@ -70,18 +70,22 @@ class _TeamCapSpaceState extends State<TeamCapSpace> {
   @override
   void initState() {
     super.initState();
-    contracts = widget.teams;
-    for (var team in contracts.entries) {
-      for (var yearKey in team.value['years'].keys) {
+    contracts = {};
+    for (var team in widget.teams.entries) {
+      contracts[team.key] = team.value[team.value.length - 1];
+      for (var yearKey in team.value[team.value.length - 1]['years'].keys) {
         int leagueCap = kLeagueSalaryCap[yearKey]!;
         int leagueFirstApron = kLeagueFirstApron[yearKey]!;
         int leagueSecondApron = kLeagueSecondApron[yearKey]!;
 
-        int totalCapHit = team.value['years'][yearKey]['capHit'];
+        int totalCapHit = team.value[team.value.length - 1]['years'][yearKey]['capHit'];
 
-        team.value['years'][yearKey]['capHitDiff'] = leagueCap - totalCapHit;
-        team.value['years'][yearKey]['firstApronDiff'] = leagueFirstApron - totalCapHit;
-        team.value['years'][yearKey]['secondApronDiff'] = leagueSecondApron - totalCapHit;
+        team.value[team.value.length - 1]['years'][yearKey]['capHitDiff'] =
+            leagueCap - totalCapHit;
+        team.value[team.value.length - 1]['years'][yearKey]['firstApronDiff'] =
+            leagueFirstApron - totalCapHit;
+        team.value[team.value.length - 1]['years'][yearKey]['secondApronDiff'] =
+            leagueSecondApron - totalCapHit;
       }
     }
     _sortContracts(_sortedColumnIndex, _isAscending);
