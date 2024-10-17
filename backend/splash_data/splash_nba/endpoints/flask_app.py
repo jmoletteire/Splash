@@ -652,12 +652,26 @@ def get_game():
         # logging.info(f"(get_game) {query_params}")
 
         game_id = query_params['gameId']
+        game_date = query_params['date']
 
         # Query the database
-        game = games_collection.find_one(
-            {f"GAMES.{game_id}": {"$exists": True}},
-            {"_id": 0, f"GAMES.{game_id}": 1}
-        )
+        game = games_collection.aggregate([
+            {
+                "$search": {
+                    "index": "game_index",
+                    "phrase": {
+                        "query": game_date,
+                        "path": "GAME_DATE"
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    f"GAMES.{game_id}": 1
+                }
+            }
+        ])
 
         if game:
             # logging.info(f"(get_game) Retrieved game {game_id} from MongoDB")

@@ -266,7 +266,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
           )
         : ValueListenableBuilder<Map<String, dynamic>>(
             valueListenable: playoffDataNotifier,
-            builder: (context, cupData, _) {
+            builder: (context, playoffData, _) {
               return ValueListenableBuilder<Map<String, dynamic>>(
                   valueListenable: cupDataNotifier,
                   builder: (context, cupData, _) {

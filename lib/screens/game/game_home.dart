@@ -70,16 +70,16 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     }
   }
 
-  void setOdds() {
+  void setOdds(Map<String, dynamic> game) {
     bool _isLive = false;
 
     try {
-      if (widget.gameData?['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] != 1 &&
-          widget.gameData?['ODDS']?['LIVE'].containsKey('26338')) {
-        odds = widget.gameData?['ODDS']?['LIVE']?['26338'];
+      if (game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] != 1 &&
+          game['ODDS']?['LIVE'].containsKey('26338')) {
+        odds = game['ODDS']?['LIVE']?['26338'];
         _isLive = true;
       } else {
-        odds = widget.gameData?['ODDS']?['BOOK']?['18186'];
+        odds = game['ODDS']?['BOOK']?['18186'];
       }
     } catch (e) {
       odds = {};
@@ -147,6 +147,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       _isLoading = true;
     });
     await getGame(gameId);
+    setOdds(game);
     setState(() {
       _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
       _isLoading = false;
@@ -166,17 +167,17 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       setValues(widget.gameId);
     } else {
       game = widget.gameData!;
+      setOdds(game);
       _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
       _isLoading = false;
     }
     startPolling(widget.gameId);
-    setOdds();
 
-    int tabLength = _isUpcoming
-        ? 3
-        : odds.isNotEmpty
-            ? 4
-            : 3;
+    int tabLength = 4;
+
+    if (_isUpcoming) {
+      tabLength -= 1;
+    }
 
     _tabController = TabController(length: tabLength, vsync: this);
 
@@ -560,7 +561,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                   awayId: awayTeamId,
                   inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                 ),
-              if (odds.isNotEmpty) Odds(odds: widget.gameData?['ODDS']?['BOOK']),
+              if (odds.isNotEmpty) Odds(odds: game['ODDS']?['BOOK']),
             ]),
       ),
     );

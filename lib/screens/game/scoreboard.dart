@@ -167,7 +167,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
           {'date': formattedDate},
         );
         dynamic jsonData = await network.getData(url);
-        Map<String, dynamic> gamesData = jsonData[0] ?? {};
+        Map<String, dynamic> gamesData = jsonData ?? {};
 
         var sortedEntries = gamesData.entries.toList()
           ..sort((a, b) {
@@ -208,6 +208,19 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
       );
       dynamic jsonData = await network.getData(url);
       Map<String, dynamic> gamesData = jsonData ?? {};
+
+      var sortedEntries = gamesData.entries.toList()
+        ..sort((a, b) {
+          var aValue, bValue;
+
+          aValue = a.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
+          bValue = b.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
+
+          return aValue.compareTo(bValue);
+        });
+
+      // Assign the sorted list back to widget.teams
+      gamesData = Map.fromEntries(sortedEntries);
 
       setState(() {
         cachedGames[formattedDate] = gamesData;
