@@ -179,7 +179,7 @@ class _GameCardState extends State<GameCard> {
               case 1:
                 return 'End 1Q';
               case 2:
-                return 'HT';
+                return 'HALF';
               case 3:
                 return 'End 3Q';
               case 4:
@@ -193,8 +193,10 @@ class _GameCardState extends State<GameCard> {
             // Game in-progress
             if (summary['LIVE_PERIOD'] <= 4) {
               return '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ';
+            } else if (summary['LIVE_PERIOD'] == 5) {
+              return '${summary['LIVE_PC_TIME'].toString()} OT';
             } else {
-              return '${summary['LIVE_PERIOD'] - 4}OT';
+              return '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'] - 4}OT';
             }
           }
         case 3:
@@ -216,6 +218,8 @@ class _GameCardState extends State<GameCard> {
         linescore[0]['TEAM_ID'] == widget.homeTeam ? linescore[0] : linescore[1];
     Map<String, dynamic> awayLinescore =
         linescore[1]['TEAM_ID'] == widget.homeTeam ? linescore[0] : linescore[1];
+
+    String status = getGameTime();
 
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -270,7 +274,9 @@ class _GameCardState extends State<GameCard> {
                             textAlign: TextAlign.start,
                           ),
                         if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] != null) ...[
-                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV' ||
+                              summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN2' ||
+                              summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN/ESPN2')
                             SizedBox(width: 3.0.r),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
                             SvgPicture.asset(
@@ -290,6 +296,13 @@ class _GameCardState extends State<GameCard> {
                               width: 7.0.r,
                               height: 7.0.r,
                             ),
+                          if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN2' ||
+                              summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN/ESPN2')
+                            SvgPicture.asset(
+                              'images/ESPN_E.svg',
+                              width: 9.0.r,
+                              height: 9.0.r,
+                            ),
                           if (summary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
                             SvgPicture.asset(
                               'images/abc.svg',
@@ -302,14 +315,34 @@ class _GameCardState extends State<GameCard> {
                   ),
                   Expanded(flex: 3, child: gameTitle(summary['GAME_ID'])),
                   Expanded(
-                    child: Text(
-                      getGameTime(),
-                      style: kBebasNormal.copyWith(
-                          fontSize: 14.0.r,
-                          color: summary['GAME_STATUS_ID'] != 2 // Game NOT in-progress
-                              ? Colors.grey.shade300
-                              : Colors.white),
-                      textAlign: TextAlign.end,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if ((summary['GAME_STATUS_ID'] == 1 && status == 'Pregame') ||
+                            summary['GAME_STATUS_ID'] == 2)
+                          Container(
+                            width: 4.0.r, // Size of the dot
+                            height: 4.0.r,
+                            decoration: BoxDecoration(
+                              color: status == 'Pregame'
+                                  ? Colors.orangeAccent
+                                  : const Color(0xFF55F86F),
+                              shape: BoxShape.circle, // Circular shape
+                            ),
+                          ),
+                        if ((summary['GAME_STATUS_ID'] == 1 && status == 'Pregame') ||
+                            summary['GAME_STATUS_ID'] == 2)
+                          SizedBox(width: 3.0.r),
+                        Text(
+                          status,
+                          style: kBebasNormal.copyWith(
+                              fontSize: 14.0.r,
+                              color: summary['GAME_STATUS_ID'] != 2 // Game NOT in-progress
+                                  ? Colors.grey.shade300
+                                  : Colors.white),
+                          textAlign: TextAlign.end,
+                        ),
+                      ],
                     ),
                   )
                 ],
@@ -406,7 +439,12 @@ class _GameCardState extends State<GameCard> {
                                 child: Text(
                                   spread,
                                   textAlign: TextAlign.right,
-                                  style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontFamily: 'Bebas_Neue',
+                                    fontSize: 14.0.r,
+                                    textBaseline: TextBaseline.alphabetic,
+                                  ),
                                 ),
                               ),
                             ],
@@ -508,7 +546,12 @@ class _GameCardState extends State<GameCard> {
                                 child: Text(
                                   overUnder,
                                   textAlign: TextAlign.right,
-                                  style: kGameCardTextStyle.copyWith(fontSize: 14.0.r),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontFamily: 'Bebas_Neue',
+                                    fontSize: 14.0.r,
+                                    textBaseline: TextBaseline.alphabetic,
+                                  ),
                                 ),
                               ),
                             ],

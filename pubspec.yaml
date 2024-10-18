@@ -94,7 +94,10 @@ flutter:
     - images/NBA_75th_anniversary_logo.svg
     - images/NBA_TV.svg
     - images/TNT.svg
+    - images/NBA_on_TNT.svg
     - images/ESPN.svg
+    - images/ESPN2.svg
+    - images/ESPN_E.svg
     - images/abc.svg
     - images/playoffs.svg
     - images/default_player_image.png

@@ -123,7 +123,9 @@ class _CapSheetState extends State<CapSheet> {
     //contracts = _mergeContracts(widget.team['contracts']);
     contracts = widget.team['contracts'];
     //_addTotalsRow();
-    _addSalaryCapDifferenceRow(contracts[contracts.length - 1]);
+    if (contracts[contracts.length - 1]['lastName'] == 'Total') {
+      _addSalaryCapDifferenceRow(contracts[contracts.length - 1]);
+    }
     _sortContracts(_sortedColumnIndex, _isAscending);
   }
 
@@ -182,6 +184,8 @@ class _CapSheetState extends State<CapSheet> {
       }
     };
 
+    print(totalsRow);
+
     for (var yearKey in differenceRow['years'].keys) {
       int leagueCap = kLeagueSalaryCap[yearKey]!;
       int totalCapHit = totalsRow['years'][yearKey]['capHit'];
@@ -235,6 +239,8 @@ class _CapSheetState extends State<CapSheet> {
       _sortedColumnIndex = columnIndex;
       _isAscending = ascending;
 
+      print(contracts.length);
+
       // Separate the Total and Salary Cap Difference rows
       var totalRow = contracts[contracts.length - 4];
       var salaryCapDiffRow = contracts[contracts.length - 3];
@@ -270,6 +276,8 @@ class _CapSheetState extends State<CapSheet> {
       if (salaryCapDiffRow != null) contracts.add(salaryCapDiffRow);
       if (firstApronDiffRow != null) contracts.add(firstApronDiffRow);
       if (secondApronDiffRow != null) contracts.add(secondApronDiffRow);
+
+      print(contracts.length);
     });
   }
 

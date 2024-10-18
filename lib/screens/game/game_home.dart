@@ -317,24 +317,78 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           Text(
             awayScore.toString(),
             style: kBebasBold.copyWith(
-                fontSize: 22.0.r,
+                fontSize: 26.0.r,
                 color: awayScore > homeScore
                     ? Colors.white
                     : (status == 3 ? Colors.grey : Colors.white)),
           ),
-          SizedBox(width: 15.0.r),
-          Text('-', style: kBebasBold.copyWith(fontSize: 22.0.r)),
-          SizedBox(width: 15.0.r),
+          SizedBox(width: 20.0.r),
+          getStatus(status, game['SUMMARY']['GameSummary'][0]),
+          //Text('-', style: kBebasBold.copyWith(fontSize: 22.0.r)),
+          SizedBox(width: 20.0.r),
           Text(
             homeScore.toString(),
             style: kBebasBold.copyWith(
-                fontSize: 22.0.r,
+                fontSize: 26.0.r,
                 color: homeScore > awayScore
                     ? Colors.white
                     : (status == 3 ? Colors.grey : Colors.white)),
           ),
         ],
       );
+    }
+  }
+
+  Widget getStatus(int status, Map<String, dynamic> summary) {
+    if (status == 3) {
+      switch (summary['LIVE_PERIOD']) {
+        case 4:
+          return Text('FINAL',
+              style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
+        case 5:
+          return Text('FINAL/OT',
+              style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
+        default:
+          return Text('FINAL/${summary['LIVE_PERIOD'] - 4}OT',
+              style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
+      }
+    }
+    if (status == 2) {
+      if (summary['LIVE_PC_TIME'] == ":0.0") {
+        switch (summary['LIVE_PERIOD']) {
+          case 1:
+            return Text('END 1ST', style: kBebasBold.copyWith(fontSize: 16.0.r));
+          case 2:
+            return Text('HALF', style: kBebasBold.copyWith(fontSize: 16.0.r));
+          case 3:
+            return Text('END 3RD', style: kBebasBold.copyWith(fontSize: 16.0.r));
+          case 4:
+            return Text('FINAL', style: kBebasBold.copyWith(fontSize: 16.0.r));
+          case 5:
+            return Text('FINAL/OT', style: kBebasBold.copyWith(fontSize: 16.0.r));
+          default:
+            return Text('FINAL/${summary['LIVE_PERIOD'] - 4}OT',
+                style: kBebasBold.copyWith(fontSize: 16.0.r));
+        }
+      } else {
+        int period = summary['LIVE_PERIOD'];
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+                period <= 4
+                    ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
+                    : period == 5
+                        ? 'OT'
+                        : '${(period - 4).toString()}OT',
+                style: kBebasBold.copyWith(fontSize: 12.0.r)),
+            Text(summary['LIVE_PC_TIME'].toString(),
+                style: kBebasBold.copyWith(fontSize: 14.0.r)),
+          ],
+        );
+      }
+    } else {
+      return Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r));
     }
   }
 
@@ -635,7 +689,7 @@ class GameInfo extends StatelessWidget {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('HT', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+                Text('HALF', style: kBebasBold.copyWith(fontSize: 20.0.r)),
               ],
             );
           case 3:
@@ -676,7 +730,9 @@ class GameInfo extends StatelessWidget {
             Text(
                 period <= 4
                     ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
-                    : '${(period - 4).toString()}OT',
+                    : period == 5
+                        ? 'OT'
+                        : '${(period - 4).toString()}OT',
                 style: kBebasBold.copyWith(fontSize: 16.0.r)),
             Text(gameSummary['LIVE_PC_TIME'].toString(),
                 style: kBebasBold.copyWith(fontSize: 16.0.r)),
@@ -688,6 +744,7 @@ class GameInfo extends StatelessWidget {
         children: [
           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV' &&
               gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
+              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN2' &&
               gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
               gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT' &&
               gameSummary['GAME_STATUS_TEXT'] != 'Cancelled')
@@ -703,13 +760,19 @@ class GameInfo extends StatelessWidget {
               ),
             if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
               SvgPicture.asset(
-                'images/TNT.svg',
-                width: 32.0.r,
-                height: 32.0.r,
+                'images/NBA_on_TNT.svg',
+                width: 28.0.r,
+                height: 28.0.r,
               ),
             if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
               SvgPicture.asset(
                 'images/ESPN.svg',
+                width: 12.0.r,
+                height: 12.0.r,
+              ),
+            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN2')
+              SvgPicture.asset(
+                'images/ESPN2.svg',
                 width: 12.0.r,
                 height: 12.0.r,
               ),

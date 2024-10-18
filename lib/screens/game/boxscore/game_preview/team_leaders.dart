@@ -440,7 +440,7 @@ class PlayerCard extends StatelessWidget {
       child: Column(
         children: [
           PlayerAvatar(
-            radius: 28.0.r,
+            radius: 24.0.r,
             backgroundColor: Colors.grey.shade800,
             playerImageUrl: 'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
           ),

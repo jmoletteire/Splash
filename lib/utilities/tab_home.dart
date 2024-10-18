@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:splash/screens/game/scoreboard.dart';
 import 'package:splash/screens/standings/standings.dart';
 import 'package:splash/utilities/constants.dart';
+import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
+import 'package:splash/utilities/scroll/scroll_controller_provider.dart';
 
 import '../screens/more/more.dart';
 
@@ -41,8 +43,13 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
         _selectedIndex = index;
       });
     } else {
-      /// If tab pressed again, navigate to root of tab's navigation stack.
-      _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
+      // If already at the root of the stack, scroll to top
+      if (_navigatorKeys[index].currentState?.canPop() == false) {
+        ScrollControllerNotifier _notifier = ScrollControllerProvider.of(context)!.notifier;
+        _notifier.scrollToTop();
+      } else {
+        _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
+      }
     }
   }
 

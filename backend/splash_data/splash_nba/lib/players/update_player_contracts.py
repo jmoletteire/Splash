@@ -6,7 +6,7 @@ import json
 import difflib
 
 
-def is_similar(description1, description2, threshold=0.5):
+def is_similar(description1, description2, threshold=0.4):
     similarity = difflib.SequenceMatcher(None, description1, description2).ratio()
     return similarity >= threshold
 
@@ -169,11 +169,11 @@ if __name__ == '__main__':
     }
 
     # Start updating from index
-    starting_index = 1692
+    starting_index = 0
 
     # Update each document in the collection starting from index
-    for i, player in enumerate(players_collection.find().skip(starting_index)):
-        logging.info(f'Processing {starting_index + i} of {players_collection.count_documents({})}...')
+    for i, player in enumerate(players_collection.find({"ROSTERSTATUS": 'Active'}).skip(starting_index)):
+        logging.info(f'Processing {starting_index + i} of {players_collection.count_documents({"ROSTERSTATUS": "Active"})}...')
 
         player_id = str(player['PERSON_ID'])
 

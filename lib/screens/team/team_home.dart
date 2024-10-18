@@ -407,7 +407,7 @@ class TeamInfo extends StatelessWidget {
                     children: [
                       TextSpan(
                         text:
-                            '  (${getStanding(team['seasons'][kCurrentSeason]['CONF_RANK'])} ${team['CONF'].substring(0, 4)})',
+                            '  (${getStanding(team['seasons'][kCurrentSeason]['STANDINGS']['PlayoffRank'])} ${team['seasons'][kCurrentSeason]['STANDINGS']['Conference'].substring(0, 4)})',
                         style: kBebasNormal.copyWith(fontSize: 22.0.r),
                       ),
                     ],

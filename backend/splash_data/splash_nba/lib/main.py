@@ -725,7 +725,7 @@ def teams_daily_update():
     logging.info("Updating teams (daily)...")
     try:
         # Games (0 API calls)
-        logging.info("Games...")
+        logging.info("Team Games (0 API calls)...")
         # Sort the documents in nba_games collection by GAME_DATE in descending order
         sorted_games_cursor = games_collection.find(
             {"SEASON_YEAR": k_current_season[0:4]},
@@ -737,16 +737,16 @@ def teams_daily_update():
             update_team_games(game_day)
 
         # Standings (min. 30 API calls [more if tiebreakers])
-        logging.info("Standings...")
+        logging.info("Standings (min. 30 API calls)...")
         update_current_standings()
 
         # News & Transactions (NATSTAT - 60 API calls)
-        logging.info("News & Transactions...")
+        logging.info("News & Transactions (0 API calls)...")
         fetch_team_transactions()
         fetch_team_news()
 
         # Cap Sheet (0 API calls)
-        logging.info("Cap Sheet...")
+        logging.info("Cap Sheet (0 API calls)...")
         update_team_contract_data()
 
         # Loop through all documents in the collection
@@ -770,12 +770,12 @@ def teams_daily_update():
                     logging.info(f"Processing team {team} ({processed_count} of 30)...")
 
                     # Team History (30 API calls)
-                    logging.info("History...")
+                    logging.info("History (30 API calls)...")
                     update_team_history(team_id=team)
                     time.sleep(15)
 
                     # Season Stats (120 API calls)
-                    logging.info("Stats...")
+                    logging.info("Stats (120 API calls)...")
                     update_current_season(team_id=team)
                     # Filter seasons to only include the current season key
                     filtered_doc = doc.copy()
@@ -784,12 +784,13 @@ def teams_daily_update():
                     time.sleep(15)
 
                     # Current Roster & Coaches (~400-500 API calls)
-                    logging.info("Roster & Coaches...")
+                    logging.info("Roster & Coaches (~400-500 API calls)...")
                     season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
                     update_current_roster(team_id=team, season_not_started=season_not_started)
                     time.sleep(15)
 
                     # Last Starting Lineup (0 API Calls)
+                    logging.info("Last Starting Lineup (0 API calls)...")
                     # Get most recent game by date
                     game_id, game_date = get_last_game(doc['seasons'])
                     # Get starting lineup for most recent game
@@ -1074,49 +1075,49 @@ def players_daily_update():
     # INFO
     try:
         player_info()
-        #print('Skip')
+        #print('Skip Player Info')
     except Exception as e:
         logging.error(f"Error updating player info: {e}")
 
     # STATS
     try:
         #player_stats()
-        print('Skip')
+        print('Skip Player Stats')
     except Exception as e:
         logging.error(f"Error updating player stats: {e}")
 
     # CAREER
     try:
         #player_career_stats()
-        print('Skip')
+        print('Skip Player Career')
     except Exception as e:
         logging.error(f"Error updating player career stats: {e}")
 
     # GAME LOGS
     try:
         #player_game_logs()
-        print('Skip')
+        print('Skip Player Game Logs')
     except Exception as e:
         logging.error(f"Error updating player game logs: {e}")
 
     # SHOT CHART
     try:
         #player_shot_charts()
-        print('Skip')
+        print('Skip Player Shot Charts')
     except Exception as e:
         logging.error(f"Error updating player shot charts: {e}")
 
     # CONTRACT & TRANSACTIONS
     try:
         player_contracts_and_trans()
-        #print('Skip')
+        #print('Skip Player Contracts')
     except Exception as e:
         logging.error(f"Error updating player contracts & transactions: {e}")
 
     # AWARDS
     try:
         #player_awards()
-        print('Skip')
+        print('Skip Player Awards')
     except Exception as e:
         logging.error(f"Error updating player awards: {e}")
 
@@ -1158,9 +1159,9 @@ except Exception as e:
     exit(1)
 
 #games_daily_update()
-#teams_daily_update()
-#players_daily_update()
-#games_live_update()
+teams_daily_update()
+players_daily_update()
+games_live_update()
 # games_prev_day()
 
 while True:

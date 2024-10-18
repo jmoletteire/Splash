@@ -206,275 +206,609 @@ class OddsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 11.0.r),
-      color: Colors.grey.shade900,
-      child: Padding(
-        padding: EdgeInsets.all(15.0.r),
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
-                ),
+    return LayoutBuilder(builder: (context, constraints) {
+      if (fanDuel.isNotEmpty || draftKings.isNotEmpty || mgm.isNotEmpty || bet365.isNotEmpty) {
+        if (betType == 'TOTAL') {
+          return Card(
+            margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 11.0.r),
+            color: Colors.grey.shade900,
+            child: Padding(
+              padding: EdgeInsets.all(15.0.r),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
+                      ),
+                    ),
+                    child: Text(
+                      betType,
+                      style: kBebasBold.copyWith(fontSize: 18.0.r),
+                    ),
+                  ),
+                  SizedBox(height: 10.0.r),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
+                            ),
+                          ),
+                          child: Text(
+                            'UNDER',
+                            textAlign: TextAlign.center,
+                            style: kBebasBold.copyWith(fontSize: 18.0.r),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
+                            ),
+                          ),
+                          child: Text(
+                            'OVER',
+                            textAlign: TextAlign.center,
+                            style: kBebasBold.copyWith(fontSize: 18.0.r),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 15.0.r),
+                  if (fanDuel.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                fanDuel[betType]['ODDS1'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0.r, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Spacer(),
+                              Expanded(
+                                flex: 2,
+                                child: ConstrainedBox(
+                                  constraints:
+                                      BoxConstraints(maxWidth: 120.0.r, maxHeight: 25.0.r),
+                                  child: Image.asset(
+                                    'images/books/fandue_alt.png',
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  fanDuel[betType]['VALUE'],
+                                  textAlign: TextAlign.center,
+                                  style: kBebasNormal,
+                                ),
+                              ),
+                              Spacer(),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                fanDuel[betType]['ODDS2'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0.r, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (draftKings.isNotEmpty) SizedBox(height: 30.0.r),
+                  if (draftKings.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                draftKings[betType]['ODDS1'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0.r, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Spacer(),
+                              Expanded(
+                                flex: 2,
+                                child: ConstrainedBox(
+                                  constraints:
+                                      BoxConstraints(maxWidth: 120.0.r, maxHeight: 30.0.r),
+                                  child: Image.asset(
+                                    'images/books/draftkings_alt.png',
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  draftKings[betType]['VALUE'],
+                                  textAlign: TextAlign.center,
+                                  style: kBebasNormal,
+                                ),
+                              ),
+                              Spacer(),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                draftKings[betType]['ODDS2'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0.r, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (mgm.isNotEmpty) SizedBox(height: 30.0.r),
+                  if (mgm.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                mgm[betType]['ODDS1'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0.r, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Spacer(),
+                              Expanded(
+                                flex: 2,
+                                child: ConstrainedBox(
+                                  constraints:
+                                      BoxConstraints(maxWidth: 120.0.r, maxHeight: 20.0.r),
+                                  child: Image.asset(
+                                    'images/books/mgm_alt.png',
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  mgm[betType]['VALUE'],
+                                  textAlign: TextAlign.center,
+                                  style: kBebasNormal,
+                                ),
+                              ),
+                              Spacer(),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                mgm[betType]['ODDS2'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0.r, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (bet365.isNotEmpty) SizedBox(height: 30.0.r),
+                  if (bet365.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                bet365[betType]['ODDS1'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0.r, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Spacer(),
+                              Expanded(
+                                flex: 2,
+                                child: ConstrainedBox(
+                                  constraints:
+                                      BoxConstraints(maxWidth: 120.0.r, maxHeight: 12.0.r),
+                                  child: Image.asset(
+                                    'images/books/bet365_alt.png',
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  bet365[betType]['VALUE'],
+                                  textAlign: TextAlign.center,
+                                  style: kBebasNormal,
+                                ),
+                              ),
+                              Spacer(),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                bet365[betType]['ODDS2'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: 20.0.r, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
               ),
-              child: Text(
-                betType,
-                style: kBebasBold.copyWith(fontSize: 18.0.r),
+            ),
+          );
+        } else {
+          return Card(
+            margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 11.0.r),
+            color: Colors.grey.shade900,
+            child: Padding(
+              padding: EdgeInsets.all(15.0.r),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
+                      ),
+                    ),
+                    child: Text(
+                      betType,
+                      style: kBebasBold.copyWith(fontSize: 18.0.r),
+                    ),
+                  ),
+                  SizedBox(height: 10.0.r),
+                  if (fanDuel.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                fanDuel[betType]['VALUE'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal,
+                              ),
+                              Text(
+                                betType == 'MONEYLINE' || fanDuel[betType]['ODDS1'] == ''
+                                    ? fanDuel[betType]['ODDS1']
+                                    : '  (${fanDuel[betType]['ODDS1']})',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                                    color: betType == 'MONEYLINE'
+                                        ? Colors.white
+                                        : Colors.grey.shade400),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 120.0.r, maxHeight: 40.0.r),
+                            child: Image.asset(
+                              'images/books/fanduel.png',
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                betType == 'SPREAD'
+                                    ? fanDuel[betType]['VALUE'].substring(0, 1) == '+'
+                                        ? '-${fanDuel[betType]['VALUE'].substring(1)}'
+                                        : '+${fanDuel[betType]['VALUE'].substring(1)}'
+                                    : fanDuel[betType]['VALUE'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal,
+                              ),
+                              Text(
+                                betType == 'MONEYLINE' || fanDuel[betType]['ODDS2'] == ''
+                                    ? fanDuel[betType]['ODDS2']
+                                    : '  (${fanDuel[betType]['ODDS2']})',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                                    color: betType == 'MONEYLINE'
+                                        ? Colors.white
+                                        : Colors.grey.shade400),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (draftKings.isNotEmpty) SizedBox(height: 30.0.r),
+                  if (draftKings.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                draftKings[betType]['VALUE'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal,
+                              ),
+                              Text(
+                                betType == 'MONEYLINE' || draftKings[betType]['ODDS1'] == ''
+                                    ? draftKings[betType]['ODDS1']
+                                    : '  (${draftKings[betType]['ODDS1']})',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                                    color: betType == 'MONEYLINE'
+                                        ? Colors.white
+                                        : Colors.grey.shade400),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 120.0.r, maxHeight: 30.0.r),
+                            child: Image.asset(
+                              'images/books/draftkings.png',
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                betType == 'SPREAD'
+                                    ? draftKings[betType]['VALUE'].substring(0, 1) == '+'
+                                        ? '-${draftKings[betType]['VALUE'].substring(1)}'
+                                        : '+${draftKings[betType]['VALUE'].substring(1)}'
+                                    : draftKings[betType]['VALUE'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal,
+                              ),
+                              Text(
+                                betType == 'MONEYLINE' || draftKings[betType]['ODDS2'] == ''
+                                    ? draftKings[betType]['ODDS2']
+                                    : '  (${draftKings[betType]['ODDS2']})',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                                    color: betType == 'MONEYLINE'
+                                        ? Colors.white
+                                        : Colors.grey.shade400),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (mgm.isNotEmpty) SizedBox(height: 30.0.r),
+                  if (mgm.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                mgm[betType]?['VALUE'] ?? '',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal,
+                              ),
+                              Text(
+                                betType == 'MONEYLINE' || mgm[betType]['ODDS1'] == ''
+                                    ? mgm[betType]['ODDS1']
+                                    : '  (${mgm[betType]['ODDS1']})',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                                    color: betType == 'MONEYLINE'
+                                        ? Colors.white
+                                        : Colors.grey.shade400),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 120.0.r, maxHeight: 25.0.r),
+                            child: Image.asset(
+                              'images/books/mgm.png',
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                betType == 'SPREAD'
+                                    ? mgm[betType]['VALUE'].substring(0, 1) == '+'
+                                        ? '-${mgm[betType]['VALUE'].substring(1)}'
+                                        : '+${mgm[betType]['VALUE'].substring(1)}'
+                                    : mgm[betType]['VALUE'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal,
+                              ),
+                              Text(
+                                betType == 'MONEYLINE' || mgm[betType]['ODDS2'] == ''
+                                    ? mgm[betType]['ODDS2']
+                                    : '  (${mgm[betType]['ODDS2']})',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                                    color: betType == 'MONEYLINE'
+                                        ? Colors.white
+                                        : Colors.grey.shade400),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  if (bet365.isNotEmpty) SizedBox(height: 30.0.r),
+                  if (bet365.isNotEmpty)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                bet365[betType]['VALUE'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal,
+                              ),
+                              Text(
+                                betType == 'MONEYLINE' || bet365[betType]['ODDS1'] == ''
+                                    ? bet365[betType]['ODDS1']
+                                    : '  (${bet365[betType]['ODDS1']})',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                                    color: betType == 'MONEYLINE'
+                                        ? Colors.white
+                                        : Colors.grey.shade400),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 120.0.r, maxHeight: 40.0.r),
+                            child: Image.asset(
+                              'images/books/bet365.png',
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                betType == 'SPREAD'
+                                    ? bet365[betType]['VALUE'].substring(0, 1) == '+'
+                                        ? '-${bet365[betType]['VALUE'].substring(1)}'
+                                        : '+${bet365[betType]['VALUE'].substring(1)}'
+                                    : bet365[betType]['VALUE'],
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal,
+                              ),
+                              Text(
+                                betType == 'MONEYLINE' || bet365[betType]['ODDS2'] == ''
+                                    ? bet365[betType]['ODDS2']
+                                    : '  (${bet365[betType]['ODDS2']})',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(
+                                    fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
+                                    color: betType == 'MONEYLINE'
+                                        ? Colors.white
+                                        : Colors.grey.shade400),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
               ),
             ),
-            SizedBox(height: 10.0.r),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        fanDuel[betType]['VALUE'],
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal,
-                      ),
-                      Text(
-                        betType == 'MONEYLINE' || fanDuel[betType]['ODDS1'] == ''
-                            ? fanDuel[betType]['ODDS1']
-                            : '  (${fanDuel[betType]['ODDS1']})',
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal.copyWith(
-                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
-                            color:
-                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 120.0.r, maxHeight: 40.0.r),
-                    child: Image.asset(
-                      'images/books/fanduel.png',
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        betType == 'SPREAD'
-                            ? fanDuel[betType]['VALUE'].substring(0, 1) == '+'
-                                ? '-${fanDuel[betType]['VALUE'].substring(1)}'
-                                : '+${fanDuel[betType]['VALUE'].substring(1)}'
-                            : fanDuel[betType]['VALUE'],
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal,
-                      ),
-                      Text(
-                        betType == 'MONEYLINE' || fanDuel[betType]['ODDS2'] == ''
-                            ? fanDuel[betType]['ODDS2']
-                            : '  (${fanDuel[betType]['ODDS2']})',
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal.copyWith(
-                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
-                            color:
-                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 30.0.r),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        draftKings[betType]['VALUE'],
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal,
-                      ),
-                      Text(
-                        betType == 'MONEYLINE' || draftKings[betType]['ODDS1'] == ''
-                            ? draftKings[betType]['ODDS1']
-                            : '  (${draftKings[betType]['ODDS1']})',
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal.copyWith(
-                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
-                            color:
-                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 120.0.r, maxHeight: 30.0.r),
-                    child: Image.asset(
-                      'images/books/draftkings.png',
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        betType == 'SPREAD'
-                            ? draftKings[betType]['VALUE'].substring(0, 1) == '+'
-                                ? '-${draftKings[betType]['VALUE'].substring(1)}'
-                                : '+${draftKings[betType]['VALUE'].substring(1)}'
-                            : draftKings[betType]['VALUE'],
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal,
-                      ),
-                      Text(
-                        betType == 'MONEYLINE' || draftKings[betType]['ODDS2'] == ''
-                            ? draftKings[betType]['ODDS2']
-                            : '  (${draftKings[betType]['ODDS2']})',
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal.copyWith(
-                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
-                            color:
-                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 30.0.r),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        mgm[betType]['VALUE'],
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal,
-                      ),
-                      Text(
-                        betType == 'MONEYLINE' || mgm[betType]['ODDS1'] == ''
-                            ? mgm[betType]['ODDS1']
-                            : '  (${mgm[betType]['ODDS1']})',
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal.copyWith(
-                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
-                            color:
-                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 120.0.r, maxHeight: 25.0.r),
-                    child: Image.asset(
-                      'images/books/mgm.png',
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        betType == 'SPREAD'
-                            ? mgm[betType]['VALUE'].substring(0, 1) == '+'
-                                ? '-${mgm[betType]['VALUE'].substring(1)}'
-                                : '+${mgm[betType]['VALUE'].substring(1)}'
-                            : mgm[betType]['VALUE'],
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal,
-                      ),
-                      Text(
-                        betType == 'MONEYLINE' || mgm[betType]['ODDS2'] == ''
-                            ? mgm[betType]['ODDS2']
-                            : '  (${mgm[betType]['ODDS2']})',
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal.copyWith(
-                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
-                            color:
-                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 30.0.r),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        bet365[betType]['VALUE'],
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal,
-                      ),
-                      Text(
-                        betType == 'MONEYLINE' || bet365[betType]['ODDS1'] == ''
-                            ? bet365[betType]['ODDS1']
-                            : '  (${bet365[betType]['ODDS1']})',
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal.copyWith(
-                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
-                            color:
-                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 120.0.r, maxHeight: 40.0.r),
-                    child: Image.asset(
-                      'images/books/bet365.png',
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        betType == 'SPREAD'
-                            ? bet365[betType]['VALUE'].substring(0, 1) == '+'
-                                ? '-${bet365[betType]['VALUE'].substring(1)}'
-                                : '+${bet365[betType]['VALUE'].substring(1)}'
-                            : bet365[betType]['VALUE'],
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal,
-                      ),
-                      Text(
-                        betType == 'MONEYLINE' || bet365[betType]['ODDS2'] == ''
-                            ? bet365[betType]['ODDS2']
-                            : '  (${bet365[betType]['ODDS2']})',
-                        textAlign: TextAlign.center,
-                        style: kBebasNormal.copyWith(
-                            fontSize: betType == 'MONEYLINE' ? 20.0.r : 18.0.r,
-                            color:
-                                betType == 'MONEYLINE' ? Colors.white : Colors.grey.shade400),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+          );
+        }
+      } else {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.attach_money,
+                color: Colors.white38,
+                size: 40.0.r,
+              ),
+              SizedBox(height: 15.0.r),
+              Text(
+                'No Odds Available',
+                style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+              ),
+            ],
+          ),
+        );
+      }
+    });
   }
 }

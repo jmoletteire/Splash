@@ -46,6 +46,97 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
     '30': 'WAS'
   };
 
+  List<String> splitOutsideParenthesesAndBrackets(String input) {
+    List<String> result = [];
+    StringBuffer currentSegment = StringBuffer();
+    int parenthesesDepth = 0;
+    int bracketsDepth = 0;
+
+    for (int i = 0; i < input.length; i++) {
+      String char = input[i];
+
+      // Adjust the depth counters for parentheses and brackets
+      if (char == '(') {
+        parenthesesDepth++;
+      } else if (char == ')') {
+        parenthesesDepth--;
+      } else if (char == '[') {
+        bracketsDepth++;
+      } else if (char == ']') {
+        bracketsDepth--;
+      }
+
+      // Detect ' and ' outside of parentheses or brackets
+      if (parenthesesDepth == 0 && bracketsDepth == 0 && input.startsWith(' and ', i)) {
+        // Add the current segment to the result and clear the buffer
+        result.add(currentSegment.toString());
+        currentSegment.clear();
+        // Skip the ' and ' part in the input
+        i += 4; // Length of ' and ' is 5 characters
+      } else {
+        currentSegment.write(char);
+      }
+    }
+
+    // Add the last segment
+    if (currentSegment.isNotEmpty) {
+      result.add(currentSegment.toString());
+    }
+
+    return result;
+  }
+
+  String parseTrade(String trade) {
+    // Split by team names followed by "traded"
+    List<String> tradeFull = trade.split(': ');
+
+    if (tradeFull.length < 2) {
+      /*
+      List<String> details = trade.split(' with ');
+      List<String> assets = splitOutsideParenthesesAndBrackets(details[0]);
+
+      String tradeDetails = '${details[0]}:';
+      for (String asset in assets) {
+        tradeDetails += '\n\t\t - $asset';
+      }
+
+       */
+      return trade;
+    }
+
+    List<String> tradeDetails = tradeFull[1].split('; ');
+
+    List<String> tradeFormatted = [];
+    for (String tradePart in tradeDetails) {
+      String fromTeam = tradePart.split(' traded ')[0];
+      String toTeam = tradePart.split(' to ')[1];
+      String assets = tradePart.split(' traded ')[1].split(' to ')[0];
+      List<String> assetsList = assets.split(', ');
+
+      // Initialize tradeLeg with fromTeam and toTeam
+      String tradeLeg = '\n$fromTeam → $toTeam:';
+
+      // Append each asset as a bullet point
+      for (String asset in assetsList) {
+        if (asset.contains(' and ')) {
+          List<String> splitAsset = asset.split(' and ');
+          for (String asset in splitAsset) {
+            tradeLeg += '\n\t\t\t - $asset';
+          }
+        } else {
+          tradeLeg += '\n\t\t\t - $asset';
+        }
+      }
+
+      tradeFormatted.add(tradeLeg);
+    }
+
+    tradeFormatted.insert(0, '${tradeFull[0]}:');
+
+    // Join all formatted trades into a single string
+    return tradeFormatted.join('\n');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -123,7 +214,9 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              transaction['description'],
+                              transaction['transactionType'] == 'traded'
+                                  ? parseTrade(transaction['description'])
+                                  : transaction['description'],
                               style: kBebasNormal.copyWith(fontSize: 14.0.r),
                             ),
                             Text(

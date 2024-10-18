@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_leaders.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_players_helper.dart';
+import 'package:splash/screens/game/boxscore/game_preview/team_records.dart';
 import 'package:splash/screens/game/boxscore/team_player_stats.dart';
 
 import '../../../../utilities/constants.dart';
@@ -76,7 +77,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     });
 
     try {
-      List<Map<String, dynamic>> fetchedTeams = await getTeams(kEastConfTeamIds);
+      List<Map<String, dynamic>> fetchedTeams = await getTeams([widget.homeId, widget.awayId]);
       List fetchedPlayers = await getPlayers(widget.homeId, widget.awayId);
 
       setState(() {
@@ -224,7 +225,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                     CustomScrollView(
                       slivers: [
                         SliverPadding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          padding: EdgeInsets.only(top: 10.0.r),
                           sliver: TeamLeaders(
                             season:
                                 '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
@@ -232,6 +233,15 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                             awayId: widget.awayId,
                             homePlayers: homePlayers,
                             awayPlayers: awayPlayers,
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: EdgeInsets.only(bottom: 10.0.r),
+                          sliver: TeamRecord(
+                            season:
+                                '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                            homeTeam: homeTeam,
+                            awayTeam: awayTeam,
                           ),
                         ),
                         //PointsOfEmphasis(points: widget.game['SUMMARY']['PointsOfEmphasis']),
