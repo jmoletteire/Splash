@@ -151,6 +151,27 @@ def update_team_contract_data():
 
             # Fetch all paginated data
             contracts = fetch_team_contract_data(url, variables, headers)
+            contracts['contracts'] = merge_contracts(contracts)
+            add_totals_row(contracts)
+
+            position_map = {
+                'Guard': 'G',
+                'Guard-Forward': 'G-F',
+                'Forward-Guard': 'F-G',
+                'Forward': 'F',
+                'Forward-Center': 'F-C',
+                'Center-Forward': 'C-F',
+                'Center': 'C',
+                '': ''
+            }
+
+            for contract in contracts['contracts']:
+                if contract['player']['id'] != 'totals':
+                    player = players_collection.find_one({'PERSON_ID': int(contract['playerId'])}, {'_id': 0, 'POSITION': 1})
+                    if player:
+                        position = player.get('POSITION', None)
+                        if position is not None:
+                            contract['position'] = position_map[position]
 
             teams_collection.update_one(
                 {"TEAM_ID": team['TEAM_ID']},

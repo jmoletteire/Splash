@@ -55,12 +55,18 @@ class _PlayByPlayState extends State<PlayByPlay> {
       });
     } else if (teamId == 0 && playerId != 0) {
       setState(() {
-        allActions = widget.game['PBP'].where((e) => e['personId'] == playerId).toList();
+        allActions = widget.game['PBP']
+            .where(
+                (e) => e['personIdsFilter'] != null && e['personIdsFilter'].contains(playerId))
+            .toList();
       });
     } else {
       setState(() {
         allActions = widget.game['PBP']
-            .where((e) => e['possession'] == teamId && e['personId'] == playerId)
+            .where((e) =>
+                e['possession'] == teamId &&
+                e['personIdsFilter'] != null &&
+                e['personIdsFilter'].contains(playerId))
             .toList();
       });
     }
@@ -242,6 +248,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                   if ((_inProgress && overTime.isNotEmpty) ||
                       (!_inProgress && firstQuarter.isNotEmpty))
                     Plays(
+                      allActions: allActions,
                       gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: _inProgress ? 'Overtime' : '1st Quarter',
@@ -254,6 +261,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                   if ((_inProgress && fourthQuarter.isNotEmpty) ||
                       (!_inProgress && secondQuarter.isNotEmpty))
                     Plays(
+                      allActions: allActions,
                       gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: _inProgress ? '4th Quarter' : '2nd Quarter',
@@ -265,6 +273,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                     ),
                   if (thirdQuarter.isNotEmpty)
                     Plays(
+                      allActions: allActions,
                       gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: '3rd Quarter',
@@ -277,6 +286,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                   if ((_inProgress && secondQuarter.isNotEmpty) ||
                       (!_inProgress && fourthQuarter.isNotEmpty))
                     Plays(
+                      allActions: allActions,
                       gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: _inProgress ? '2nd Quarter' : '4th Quarter',
@@ -289,6 +299,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                   if ((_inProgress && firstQuarter.isNotEmpty) ||
                       (!_inProgress && overTime.isNotEmpty))
                     Plays(
+                      allActions: allActions,
                       gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: _inProgress ? '1st Quarter' : 'Overtime',
@@ -457,22 +468,24 @@ class _PlayByPlayState extends State<PlayByPlay> {
                         final double videoHeight = MediaQuery.of(context).size.width * 9 / 16;
                         final double playlistHeight = 88.0.r;
                         return SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: videoHeight + playlistHeight,
-                            child: PbpVideoPlayer(
-                              pbpVideo: allActions
-                                  .where((e) =>
-                                      e['videoId'] != null &&
-                                      !e['description'].contains('SUB') &&
-                                      !e['description'].contains('Timeout') &&
-                                      !e['description'].contains('Period Start'))
-                                  .toList(),
-                              gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
-                              gameDate: widget.game['SUMMARY']['GameSummary'][0]
-                                  ['GAME_DATE_EST'],
-                              homeAbbr: homeAbbr,
-                              awayAbbr: awayAbbr,
-                            ));
+                          width: MediaQuery.of(context).size.width,
+                          height: videoHeight + playlistHeight,
+                          child: PbpVideoPlayer(
+                            pbpVideo: allActions
+                                .where((e) =>
+                                    e['videoId'] != null &&
+                                    !e['description'].contains('SUB') &&
+                                    !e['description'].contains('Timeout') &&
+                                    !e['description'].contains('Period Start'))
+                                .toList(),
+                            gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
+                            gameDate: widget.game['SUMMARY']['GameSummary'][0]
+                                ['GAME_DATE_EST'],
+                            homeAbbr: homeAbbr,
+                            awayAbbr: awayAbbr,
+                            index: 0,
+                          ),
+                        );
                       },
                     );
                   },
@@ -489,6 +502,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
 }
 
 class Plays extends StatefulWidget {
+  final List allActions;
   final String gameId;
   final String gameDate;
   final String period;
@@ -499,6 +513,7 @@ class Plays extends StatefulWidget {
   final Color awayTeamColor;
 
   Plays({
+    required this.allActions,
     required this.gameId,
     required this.gameDate,
     required this.period,
@@ -717,6 +732,15 @@ class _PlaysState extends State<Plays> {
                                   !widget.actions[i]['description'].contains('SUB') &&
                                   !widget.actions[i]['description'].contains('Timeout') &&
                                   !widget.actions[i]['description'].contains('Period Start')) {
+                                int index = widget.allActions
+                                    .where((e) =>
+                                        e['videoId'] != null &&
+                                        !e['description'].contains('SUB') &&
+                                        !e['description'].contains('Timeout') &&
+                                        !e['description'].contains('Period Start'))
+                                    .toList()
+                                    .indexWhere(
+                                        (e) => e['videoId'] == widget.actions[i]['videoId']);
                                 showModalBottomSheet(
                                   context: context,
                                   clipBehavior: Clip.hardEdge,
@@ -734,11 +758,18 @@ class _PlaysState extends State<Plays> {
                                         width: MediaQuery.of(context).size.width,
                                         height: videoHeight + playlistHeight,
                                         child: PbpVideoPlayer(
-                                          pbpVideo: [widget.actions[i]],
+                                          pbpVideo: widget.allActions
+                                              .where((e) =>
+                                                  e['videoId'] != null &&
+                                                  !e['description'].contains('SUB') &&
+                                                  !e['description'].contains('Timeout') &&
+                                                  !e['description'].contains('Period Start'))
+                                              .toList(),
                                           gameId: widget.gameId,
                                           gameDate: widget.gameDate,
                                           homeAbbr: kTeamIdToName[widget.homeId][1],
                                           awayAbbr: kTeamIdToName[widget.awayId][1],
+                                          index: index,
                                         ));
                                   },
                                 );

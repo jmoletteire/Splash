@@ -14,6 +14,7 @@ from splash_nba.lib.games.fetch_adv_boxscore import fetch_box_score_adv
 from splash_nba.lib.games.fetch_boxscore_basic import fetch_box_score_stats
 from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
 from splash_nba.lib.games.fetch_new_games import update_game_data, fetch_games_for_date_range
+from splash_nba.lib.games.fetch_play_by_play import fetch_play_by_play, update_play_by_play
 from splash_nba.lib.games.game_odds import fetch_odds
 from splash_nba.lib.games.live_scores import fetch_boxscore, fetch_live_scores
 from splash_nba.lib.games.nba_cup import update_current_cup
@@ -640,7 +641,10 @@ def games_live_update():
                 logging.info(f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
                 continue  # Skip this game as it's already been finalized
 
+            # Update team schedules with game results
             update_team_games(games_collection.find_one({'GAME_DATE': today}, {'GAMES': 1}))
+
+            # Finalize Box Score, Adv Stats, and Summary
             summary = fetch_box_score_summary(game['gameId'])
             adv = fetch_box_score_adv(game['gameId'])
             highlights = 'No highlights found'  # search_youtube_highlights(youtube_api_key, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
@@ -686,6 +690,9 @@ def games_daily_update():
     # Games
     # logging.info("Games/Scores..")
     # update_game_data()
+
+    logging.info("Video PBP..")
+    update_play_by_play()
 
     # Upcoming Games
     logging.info("Upcoming Games..")
@@ -787,7 +794,7 @@ def teams_daily_update():
                     logging.info("Roster & Coaches (~400-500 API calls)...")
                     season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
                     update_current_roster(team_id=team, season_not_started=season_not_started)
-                    time.sleep(15)
+                    time.sleep(30)
 
                     # Last Starting Lineup (0 API Calls)
                     logging.info("Last Starting Lineup (0 API calls)...")

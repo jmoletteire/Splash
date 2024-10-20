@@ -245,7 +245,7 @@ class OddsCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Spacer(),
+                      const Spacer(),
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
@@ -284,7 +284,7 @@ class OddsCard extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Spacer(),
+                              const Spacer(),
                               Expanded(
                                 flex: 2,
                                 child: ConstrainedBox(
@@ -303,7 +303,7 @@ class OddsCard extends StatelessWidget {
                                   style: kBebasNormal,
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                             ],
                           ),
                         ),
@@ -344,7 +344,7 @@ class OddsCard extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Spacer(),
+                              const Spacer(),
                               Expanded(
                                 flex: 2,
                                 child: ConstrainedBox(
@@ -363,7 +363,7 @@ class OddsCard extends StatelessWidget {
                                   style: kBebasNormal,
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                             ],
                           ),
                         ),
@@ -404,7 +404,7 @@ class OddsCard extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Spacer(),
+                              const Spacer(),
                               Expanded(
                                 flex: 2,
                                 child: ConstrainedBox(
@@ -423,7 +423,7 @@ class OddsCard extends StatelessWidget {
                                   style: kBebasNormal,
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                             ],
                           ),
                         ),
@@ -464,7 +464,7 @@ class OddsCard extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Spacer(),
+                              const Spacer(),
                               Expanded(
                                 flex: 2,
                                 child: ConstrainedBox(
@@ -483,7 +483,7 @@ class OddsCard extends StatelessWidget {
                                   style: kBebasNormal,
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                             ],
                           ),
                         ),

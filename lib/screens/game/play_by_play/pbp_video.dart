@@ -12,6 +12,7 @@ class PbpVideoPlayer extends StatefulWidget {
   final String gameDate;
   final String homeAbbr;
   final String awayAbbr;
+  final int index;
 
   PbpVideoPlayer({
     required this.pbpVideo,
@@ -19,6 +20,7 @@ class PbpVideoPlayer extends StatefulWidget {
     required this.gameDate,
     required this.homeAbbr,
     required this.awayAbbr,
+    required this.index,
   });
 
   @override
@@ -26,15 +28,15 @@ class PbpVideoPlayer extends StatefulWidget {
 }
 
 class _PbpVideoPlayerState extends State<PbpVideoPlayer> {
-  PageController _pageController = PageController();
+  late PageController _pageController;
   ScrollController _scrollController = ScrollController();
-  int currentIndex = 0;
   bool isMuted = true;
   double playbackSpeed = 1.0;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: widget.index);
   }
 
   @override
@@ -72,7 +74,7 @@ class _PbpVideoPlayerState extends State<PbpVideoPlayer> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Ensure the scroll happens after the bottom sheet is fully rendered
       _scrollController.jumpTo(
-        currentIndex * 72.0.r, // Assuming each list item is 72 pixels tall
+        _pageController.page! * 72.0.r, // Assuming each list item is 72 pixels tall
       );
     });
 
@@ -149,7 +151,7 @@ class _PbpVideoPlayerState extends State<PbpVideoPlayer> {
                 _pageController.jumpToPage(index);
                 Navigator.pop(context); // Close the bottom sheet
               },
-              selected: index == currentIndex, // Highlight current video
+              selected: index == _pageController.page, // Highlight current video
               selectedTileColor: Colors.grey.shade800,
             );
           },
@@ -166,9 +168,7 @@ class _PbpVideoPlayerState extends State<PbpVideoPlayer> {
         scrollDirection: Axis.vertical,
         itemCount: widget.pbpVideo.length,
         onPageChanged: (index) {
-          setState(() {
-            currentIndex = index;
-          });
+          setState(() {});
         },
         itemBuilder: (context, index) {
           String year = widget.gameDate.substring(0, 4);

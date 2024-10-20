@@ -77,20 +77,21 @@ def fetch_odds():
         games_tomorrow_dict.update(document.get('GAMES', {}))
 
     # Now loop over nba_today_odds['games'] and update based on gameId
-    for game_data in nba_today_odds['games']:
-        game_id = game_data['gameId']
+    if nba_today_odds['games']:
+        for game_data in nba_today_odds['games']:
+            game_id = game_data['gameId']
 
-        if game_id in games_today_dict:
-            games_collection.update_one(
-                {"GAME_DATE": today},
-                {'$set': {f"GAMES.{game_id}.ODDS.srMatchId": game_data['srMatchId']}},
-            )
+            if game_id in games_today_dict:
+                games_collection.update_one(
+                    {"GAME_DATE": today},
+                    {'$set': {f"GAMES.{game_id}.ODDS.srMatchId": game_data['srMatchId']}},
+                )
 
-        if game_id in games_tomorrow_dict:
-            games_collection.update_one(
-                {"GAME_DATE": tomorrow},
-                {'$set': {f"GAMES.{game_id}.ODDS.srMatchId": game_data['srMatchId']}},
-            )
+            if game_id in games_tomorrow_dict:
+                games_collection.update_one(
+                    {"GAME_DATE": tomorrow},
+                    {'$set': {f"GAMES.{game_id}.ODDS.srMatchId": game_data['srMatchId']}},
+                )
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',

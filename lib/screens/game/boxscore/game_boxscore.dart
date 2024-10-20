@@ -276,10 +276,10 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
       if (advTeamStats.isNotEmpty) {
         Map<String, dynamic> findAndCombineStats(String teamId,
             List<Map<String, dynamic>> boxTeamStats, List<Map<String, dynamic>> advTeamStats) {
-          var boxStats =
-              boxTeamStats.firstWhere((stat) => stat['teamId'] == teamId, orElse: () => {});
-          var advStats =
-              advTeamStats.firstWhere((stat) => stat['TEAM_ID'] == teamId, orElse: () => {});
+          var boxStats = boxTeamStats.firstWhere((stat) => stat['teamId'].toString() == teamId,
+              orElse: () => {});
+          var advStats = advTeamStats
+              .firstWhere((stat) => stat['TEAM_ID'].toString() == teamId, orElse: () => {});
           return {...boxStats, ...advStats};
         }
 

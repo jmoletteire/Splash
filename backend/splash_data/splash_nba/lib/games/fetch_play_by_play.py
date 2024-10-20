@@ -1,10 +1,48 @@
 import random
 import time
+from datetime import datetime
+
 from nba_api.stats.endpoints import boxscoretraditionalv2, videoeventsasset
 from nba_api.live.nba.endpoints import playbyplay
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
+
+
+def update_play_by_play():
+    # Video PBP
+    today = datetime.today().strftime('%Y-%m-%d')
+    with games_collection.find({'GAME_DATE': today}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}) as cursor:
+        docs = list(cursor)
+        if not docs:
+            return
+
+        for doc in docs:
+            logging.info(f'\nAdding Video PBP for {doc["GAME_DATE"]}')
+
+            for game_id, game_data in doc['GAMES'].items():
+                # Fetch PBP for the game
+                try:
+                    pbp = fetch_play_by_play(game_id)
+                except Exception as e:
+                    logging.error(f"Error fetching play-by-play for game_id {game_id}: {e}")
+                    continue
+
+                # Update the game data with the fetched stats
+                try:
+                    # Update the MongoDB document with the fetched stats under the "PBP" key
+                    games_collection.update_one(
+                        {'_id': doc['_id'], f"GAMES.{game_id}": {"$exists": True}},
+                        {"$set": {f"GAMES.{game_id}.PBP": pbp}}
+                    )
+
+                    print(f"Processed {doc['GAME_DATE']} {game_id}")
+                except Exception as e:
+                    logging.error(f"Error updating box score for game_id {game_id}: {e}")
+                    continue
+
+                # Pause 30 seconds between games
+                time.sleep(30)
 
 
 # Function to fetch box score stats for a game
@@ -66,7 +104,7 @@ if __name__ == "__main__":
         i = 0
 
         while processed_count < total_documents:
-            with games_collection.find({'GAME_DATE': '2024-10-17'}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
+            with games_collection.find({'GAME_DATE': {'$lte': '2024-06-17'}}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
                     batch_size).batch_size(batch_size) as cursor:
                 documents = list(cursor)
                 if not documents:
