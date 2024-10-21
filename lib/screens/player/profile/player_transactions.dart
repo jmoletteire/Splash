@@ -202,6 +202,7 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
               Wrap(
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Image.asset(
                         'images/NBA_Logos/${kTeamAbbrToId[fanspoTeamIds[transaction['teamId']]] ?? 0}.png',
@@ -209,7 +210,8 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
                         height: 30.0.r,
                       ),
                       SizedBox(width: 10.0.r),
-                      Flexible(
+                      Expanded(
+                        flex: 10,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -228,9 +230,13 @@ class _PlayerTransactionsState extends State<PlayerTransactions> {
                         ),
                       ),
                       if (transaction['description'].contains('Exhibit 10'))
-                        SizedBox(width: 18.0.r),
-                      if (transaction['description'].contains('Exhibit 10'))
-                        const DismissibleTooltip(),
+                        const Expanded(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            DismissibleTooltip(),
+                          ],
+                        )),
                     ],
                   ),
                 ],

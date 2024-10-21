@@ -208,6 +208,9 @@ class _TeamHistoryState extends State<TeamHistory> {
 
     return CustomScrollView(
       slivers: [
+        SliverToBoxAdapter(
+          child: ExpandableCard(team: widget.team),
+        ),
         SliverPinnedHeader(
           child: Column(
             children: [
@@ -376,6 +379,238 @@ class _TeamHistoryState extends State<TeamHistory> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class ExpandableCard extends StatefulWidget {
+  final Map<String, dynamic> team;
+
+  const ExpandableCard({Key? key, required this.team}) : super(key: key);
+
+  @override
+  _ExpandableCardState createState() => _ExpandableCardState();
+}
+
+class _ExpandableCardState extends State<ExpandableCard> {
+  bool isExpanded = false;
+  late Map<String, dynamic> seasons;
+  List<String> leagueTitleYears = [];
+  List<String> confTitleYears = [];
+  List<String> divTitleYears = [];
+  List<String> playoffYears = [];
+
+  @override
+  void initState() {
+    super.initState();
+    seasons = widget.team['seasons'];
+
+    for (var season in seasons.entries) {
+      String key = '';
+      if (season.key == kCurrentSeason) {
+        continue;
+      } else {
+        key = int.parse(season.key.toString().substring(0, 4)) < 1999
+            ? '19${season.key.toString().substring(5)}'
+            : '20${season.key.toString().substring(5)}';
+      }
+
+      if (season.value['NBA_FINALS_APPEARANCE'] == 'LEAGUE CHAMPION') {
+        leagueTitleYears.add(key);
+        confTitleYears.add(key);
+      } else if (season.value['NBA_FINALS_APPEARANCE'] == 'FINALS APPEARANCE') {
+        confTitleYears.add(key);
+      }
+
+      if ((season.value?['STANDINGS']?['DivisionRank'] ?? season.value['DIV_RANK']) == 1) {
+        divTitleYears.add(key);
+      }
+
+      if (season.value['PO_WINS'] > 0 || season.value['PO_LOSSES'] > 0) {
+        playoffYears.add(key);
+      }
+    }
+  }
+
+  Widget awardYears(List<String> seasons) {
+    seasons.sort();
+
+    return Wrap(
+      alignment: WrapAlignment.center,
+      children: [
+        for (var i = 0; i < seasons.length; i++)
+          Text(
+            '${seasons[i]}${i == seasons.length - 1 ? '' : ', '}',
+            style: kBebasNormal.copyWith(
+              fontSize: 14.0.r,
+              color: Colors.grey,
+            ),
+          ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      margin: EdgeInsets.all(11.0.r),
+      color: Colors.grey.shade900,
+      child: InkWell(
+        radius: MediaQuery.of(context).size.width,
+        onTap: () {
+          setState(() {
+            isExpanded = !isExpanded;
+          });
+        },
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(15.0.r, 15.0.r, 15.0.r, 5.0.r),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      widget.team['team_history']?[0]?['LEAGUE_TITLES'] == 0
+                          ? '-'
+                          : (widget.team['team_history']?[0]?['LEAGUE_TITLES'] ?? 0)
+                              .toString(),
+                      textAlign: TextAlign.center,
+                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      widget.team['team_history']?[0]?['CONF_TITLES'] == 0
+                          ? '-'
+                          : (widget.team['team_history']?[0]?['CONF_TITLES'] ?? 0).toString(),
+                      textAlign: TextAlign.center,
+                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      widget.team['team_history']?[0]?['DIV_TITLES'] == 0
+                          ? '-'
+                          : (widget.team['team_history']?[0]?['DIV_TITLES'] ?? 0).toString(),
+                      textAlign: TextAlign.center,
+                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      widget.team['team_history']?[0]?['PO_APPEARANCES'] == 0
+                          ? '-'
+                          : (widget.team['team_history']?[0]?['PO_APPEARANCES'] ?? 0)
+                              .toString(),
+                      textAlign: TextAlign.center,
+                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      'LEAGUE TITLES',
+                      textAlign: TextAlign.center,
+                      style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      'CONF TITLES',
+                      textAlign: TextAlign.center,
+                      style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      'DIV TITLES',
+                      textAlign: TextAlign.center,
+                      style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      'PLAYOFFS',
+                      textAlign: TextAlign.center,
+                      style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.white70),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 2.0.r),
+              Icon(
+                isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                size: 20,
+                color: Colors.white70,
+              ),
+              if (isExpanded)
+                Column(
+                  children: [
+                    const Divider(color: Colors.white54),
+                    if (leagueTitleYears.isNotEmpty) SizedBox(height: 10.0.r),
+                    if (leagueTitleYears.isNotEmpty)
+                      Column(
+                        children: [
+                          Text(
+                            'FINALS',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          awardYears(leagueTitleYears),
+                        ],
+                      ),
+                    if (confTitleYears.isNotEmpty) SizedBox(height: 10.0.r),
+                    if (confTitleYears.isNotEmpty)
+                      Column(
+                        children: [
+                          Text(
+                            'CONFERENCE',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          awardYears(confTitleYears),
+                        ],
+                      ),
+                    if (divTitleYears.isNotEmpty) SizedBox(height: 10.0.r),
+                    if (divTitleYears.isNotEmpty)
+                      Column(
+                        children: [
+                          Text(
+                            'DIVISION',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          awardYears(divTitleYears),
+                        ],
+                      ),
+                    if (playoffYears.isNotEmpty) SizedBox(height: 10.0.r),
+                    if (playoffYears.isNotEmpty)
+                      Column(
+                        children: [
+                          Text(
+                            'PLAYOFFS',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          awardYears(playoffYears),
+                          SizedBox(height: 5.0.r),
+                        ],
+                      ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

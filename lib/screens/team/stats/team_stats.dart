@@ -176,10 +176,10 @@ class _TeamStatsState extends State<TeamStats> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Card(
-                margin: const EdgeInsets.all(11.0),
+                margin: EdgeInsets.all(11.0.r),
                 color: Colors.grey.shade900,
                 child: Padding(
-                  padding: const EdgeInsets.all(15.0),
+                  padding: EdgeInsets.all(15.0.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -196,7 +196,7 @@ class _TeamStatsState extends State<TeamStats> {
                           Expanded(
                             flex: 1,
                             child: Text(
-                              '${getStanding(widget.team['seasons'][selectedSeason]['CONF_RANK'] ?? 0)} ${widget.team['CONF'].substring(0, 4)}',
+                              '${getStanding(widget.team['seasons']?[selectedSeason]?['STANDINGS']?['PlayoffRank'] ?? 0)} ${widget.team['seasons']?[selectedSeason]?['STANDINGS']?['Conference'] ?? widget.team['CONF'].substring(0, 4)}',
                               textAlign: TextAlign.center,
                               style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
                             ),
@@ -248,7 +248,7 @@ class _TeamStatsState extends State<TeamStats> {
               ),
               if (seasons.indexOf(selectedSeason) < 8)
                 Card(
-                  margin: const EdgeInsets.fromLTRB(11.0, 0.0, 11.0, 11.0),
+                  margin: EdgeInsets.fromLTRB(11.0.r, 0.0.r, 11.0.r, 11.0.r),
                   color: Colors.grey.shade900,
                   child: Padding(
                     padding: EdgeInsets.all(60.0.r),
