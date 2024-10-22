@@ -18,7 +18,7 @@ def find_new_data(old_data, new_data):
     return new_entries
 
 
-if __name__ == "__main__":
+def update_transactions():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -44,3 +44,7 @@ if __name__ == "__main__":
         transactions_collection.insert_many(new_data)
     else:
         print(f"Failed to fetch data. Status code: {response.status_code}")
+
+
+if __name__ == "__main__":
+    update_transactions()

@@ -111,6 +111,7 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
           ),
           FiltersBottomSheet(onDone: _handleFiltersDone)
         ],
+        /*
         bottom: TabBar(
           controller: _tabController,
           indicatorSize: TabBarIndicatorSize.tab,
@@ -121,6 +122,8 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
           labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
           tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
         ),
+
+         */
       ),
       body: Center(
         child: queryData == null || queryData!.isEmpty
@@ -145,20 +148,17 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
                     )
                 ],
               )
-            : ScrollConfiguration(
-                behavior: MyCustomScrollBehavior(),
-                child: CustomScrollView(
-                  controller: _scrollController,
-                  slivers: [
-                    PlayersTable(
-                      selectedColumns: selectedColumns,
-                      selectedSeason: selectedSeason!,
-                      selectedSeasonType: selectedSeasonType!,
-                      players: queryData!,
-                      updateSelectedColumns: updateSelectedColumns,
-                    ),
-                  ],
-                ),
+            : CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  PlayersTable(
+                    selectedColumns: selectedColumns,
+                    selectedSeason: selectedSeason!,
+                    selectedSeasonType: selectedSeasonType!,
+                    players: queryData!,
+                    updateSelectedColumns: updateSelectedColumns,
+                  ),
+                ],
               ),
       ),
     );

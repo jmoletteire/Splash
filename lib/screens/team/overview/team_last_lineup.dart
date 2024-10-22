@@ -62,7 +62,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
     var lastGame = getLastGame();
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Card(
-      margin: EdgeInsets.all(11.0.r),
+      margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0.r),
       color: Colors.grey.shade900,
       child: Column(
         children: [

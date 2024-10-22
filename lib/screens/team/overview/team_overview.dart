@@ -25,7 +25,7 @@ class _TeamOverviewState extends State<TeamOverview> {
           TeamLastLineup(team: widget.team),
           TeamRecentTransactions(team: widget.team),
           Card(
-            margin: EdgeInsets.all(11.0.r),
+            margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0.r),
             color: Colors.grey.shade900,
             child: Padding(
               padding: EdgeInsets.all(15.0.r),

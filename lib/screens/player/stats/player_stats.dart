@@ -150,7 +150,7 @@ class _PlayerStatsState extends State<PlayerStats> {
                   color: Colors.white38,
                   size: 38.0.r,
                 ),
-                const SizedBox(height: 15.0),
+                SizedBox(height: 15.0.r),
                 Text(
                   'No Stats Available',
                   style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),

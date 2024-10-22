@@ -121,7 +121,7 @@ class _TeamRecentTransactionsState extends State<TeamRecentTransactions> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(11.0.r),
+      margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0.r),
       color: Colors.grey.shade900,
       child: Padding(
         padding: EdgeInsets.all(15.0.r),

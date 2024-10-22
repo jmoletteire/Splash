@@ -29,10 +29,11 @@ class _YoutubeHighlightsState extends State<YoutubeHighlights> {
     );
   }
 
-  Future<void> _launchFullScreen(String videoId) async {
-    final url = 'https://www.youtube.com/watch?v=$videoId';
+  Future<void> _launchFullScreen() async {
+    final url = 'https://www.youtube.com/watch?v=${widget.videoId}';
     if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url)); // Use the native iOS player
+      await launchUrl(Uri.parse(url),
+          mode: LaunchMode.platformDefault); // Use the native iOS player
     } else {
       throw 'Could not launch $url';
     }

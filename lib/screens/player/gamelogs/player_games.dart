@@ -263,7 +263,7 @@ class _PlayerGamesState extends State<PlayerGames> {
             slivers: [
               SliverToBoxAdapter(
                 child: Center(
-                  heightFactor: 5,
+                  heightFactor: 6,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
