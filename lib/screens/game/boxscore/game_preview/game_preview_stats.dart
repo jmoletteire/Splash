@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_leaders.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_players_helper.dart';
-import 'package:splash/screens/game/boxscore/game_preview/team_records.dart';
 import 'package:splash/screens/game/boxscore/team_player_stats.dart';
+import 'package:splash/screens/game/matchup/components/team_season_stats.dart';
 
 import '../../../../utilities/constants.dart';
 import '../../../../utilities/team.dart';
@@ -237,11 +237,13 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                         ),
                         SliverPadding(
                           padding: EdgeInsets.only(bottom: 10.0.r),
-                          sliver: TeamRecord(
-                            season:
-                                '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                            homeTeam: homeTeam,
-                            awayTeam: awayTeam,
+                          sliver: SliverToBoxAdapter(
+                            child: TeamSeasonStats(
+                              season:
+                                  '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                              homeId: widget.homeId,
+                              awayId: widget.awayId,
+                            ),
                           ),
                         ),
                         //PointsOfEmphasis(points: widget.game['SUMMARY']['PointsOfEmphasis']),

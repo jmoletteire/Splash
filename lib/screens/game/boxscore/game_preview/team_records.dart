@@ -1,18 +1,26 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../utilities/constants.dart';
+import '../../../../utilities/team.dart';
+import '../../../team/team_cache.dart';
 
 class TeamRecord extends StatefulWidget {
   final String season;
-  final Map<String, dynamic> homeTeam;
-  final Map<String, dynamic> awayTeam;
+  final String homeId;
+  final String awayId;
+  final Map<String, dynamic>? homeTeam;
+  final Map<String, dynamic>? awayTeam;
   const TeamRecord({
     super.key,
     required this.season,
-    required this.homeTeam,
-    required this.awayTeam,
+    required this.homeId,
+    required this.awayId,
+    this.homeTeam,
+    this.awayTeam,
   });
 
   @override
@@ -20,6 +28,70 @@ class TeamRecord extends StatefulWidget {
 }
 
 class _TeamRecordState extends State<TeamRecord> {
+  Map<String, dynamic>? homeTeam;
+  Map<String, dynamic>? awayTeam;
+  Map<String, dynamic>? homeStandings;
+  Map<String, dynamic>? awayStandings;
+  Color? homeColor;
+  Color? awayColor;
+  bool _isLoading = false;
+
+  Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
+    final teamCache = Provider.of<TeamCache>(context, listen: false);
+    List<Future<Map<String, dynamic>>> teamFutures = teamIds.map((teamId) async {
+      try {
+        if (teamCache.containsTeam(teamId)) {
+          return teamCache.getTeam(teamId)!;
+        } else {
+          var fetchedTeam = await Team().getTeam(teamId);
+          teamCache.addTeam(teamId, fetchedTeam);
+          return fetchedTeam;
+        }
+      } catch (e) {
+        return {'error': 'not found'}; // Return an empty map in case of an error
+      }
+    }).toList();
+
+    return await Future.wait(teamFutures);
+  }
+
+  void setTeams() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      List<Map<String, dynamic>> fetchedTeams = await getTeams([widget.homeId, widget.awayId]);
+
+      homeTeam = fetchedTeams[0];
+      awayTeam = fetchedTeams[1];
+      homeStandings = homeTeam?['seasons']?[widget.season]?['STANDINGS'] ?? {};
+      awayStandings = awayTeam?['seasons']?[widget.season]?['STANDINGS'] ?? {};
+      awayColor = kDarkPrimaryColors.contains(awayTeam?['ABBREVIATION'] ?? 'FA')
+          ? (kTeamColors[awayTeam?['ABBREVIATION'] ?? 'FA']!['secondaryColor']!)
+          : (kTeamColors[awayTeam?['ABBREVIATION'] ?? 'FA']!['primaryColor']!);
+
+      homeColor = kDarkPrimaryColors.contains(homeTeam?['ABBREVIATION'] ?? 'FA')
+          ? (kTeamColors[homeTeam?['ABBREVIATION'] ?? 'FA']!['secondaryColor']!)
+          : (kTeamColors[homeTeam?['ABBREVIATION'] ?? 'FA']!['primaryColor']!);
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      homeTeam = {};
+      awayTeam = {};
+      homeStandings = {};
+      awayStandings = {};
+      awayColor = Colors.transparent;
+      homeColor = Colors.transparent;
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   String getStanding(int confRank) {
     switch (confRank) {
       case 1:
@@ -40,22 +112,32 @@ class _TeamRecordState extends State<TeamRecord> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.homeTeam == null || widget.awayTeam == null) {
+      setTeams();
+    } else {
+      homeTeam = widget.homeTeam!;
+      awayTeam = widget.awayTeam!;
+      homeStandings = homeTeam?['seasons']?[widget.season]?['STANDINGS'] ?? {};
+      awayStandings = awayTeam?['seasons']?[widget.season]?['STANDINGS'] ?? {};
+      awayColor = kDarkPrimaryColors.contains(awayTeam?['ABBREVIATION'] ?? 'FA')
+          ? (kTeamColors[awayTeam?['ABBREVIATION'] ?? 'FA']!['secondaryColor']!)
+          : (kTeamColors[awayTeam?['ABBREVIATION'] ?? 'FA']!['primaryColor']!);
+
+      homeColor = kDarkPrimaryColors.contains(homeTeam?['ABBREVIATION'] ?? 'FA')
+          ? (kTeamColors[homeTeam?['ABBREVIATION'] ?? 'FA']!['secondaryColor']!)
+          : (kTeamColors[homeTeam?['ABBREVIATION'] ?? 'FA']!['primaryColor']!);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Color teamOneColor = kDarkPrimaryColors.contains(widget.awayTeam['ABBREVIATION'])
-        ? (kTeamColors[widget.awayTeam['ABBREVIATION']]!['secondaryColor']!)
-        : (kTeamColors[widget.awayTeam['ABBREVIATION']]!['primaryColor']!);
-
-    Color teamTwoColor = kDarkPrimaryColors.contains(widget.homeTeam['ABBREVIATION'])
-        ? (kTeamColors[widget.homeTeam['ABBREVIATION']]!['secondaryColor']!)
-        : (kTeamColors[widget.homeTeam['ABBREVIATION']]!['primaryColor']!);
-
-    var homeStandings = widget.homeTeam['seasons'][widget.season]['STANDINGS'];
-    var awayStandings = widget.awayTeam['seasons'][widget.season]['STANDINGS'];
-
-    return SliverToBoxAdapter(
+    return Skeletonizer(
+      enabled: _isLoading,
       child: Card(
         color: Colors.grey.shade900,
-        margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
+        margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 11.0.r),
         child: Padding(
           padding: EdgeInsets.all(15.0.r),
           child: Column(
@@ -74,124 +156,124 @@ class _TeamRecordState extends State<TeamRecord> {
               SizedBox(height: 15.0.r),
               NonComparisonRow(
                 statName: 'RECORD',
-                teamOne: awayStandings['Record'],
-                teamTwo: homeStandings['Record'],
+                teamOne: awayStandings?['Record'] ?? '0-0',
+                teamTwo: homeStandings?['Record'] ?? '0-0',
               ),
               SizedBox(height: 5.0.r),
               NonComparisonRow(
                 statName: 'WIN %',
-                teamOne: awayStandings['WinPCT'].toStringAsFixed(3),
-                teamTwo: homeStandings['WinPCT'].toStringAsFixed(3),
+                teamOne: (awayStandings?['WinPCT'] ?? 0).toStringAsFixed(3),
+                teamTwo: (homeStandings?['WinPCT'] ?? 0).toStringAsFixed(3),
               ),
               SizedBox(height: 5.0.r),
               NonComparisonRow(
                 statName: 'STANDINGS',
-                teamOne: getStanding(awayStandings['PlayoffRank']),
-                teamTwo: getStanding(homeStandings['PlayoffRank']),
+                teamOne: getStanding(awayStandings?['PlayoffRank'] ?? 0),
+                teamTwo: getStanding(homeStandings?['PlayoffRank'] ?? 0),
               ),
               SizedBox(height: 5.0.r),
               NonComparisonRow(
                 statName: 'CONF',
-                teamOne: awayStandings['Conference'],
-                teamTwo: homeStandings['Conference'],
+                teamOne: awayStandings?['Conference'] ?? '',
+                teamTwo: homeStandings?['Conference'] ?? '',
               ),
               SizedBox(height: 15.0.r),
               ComparisonRow(
-                statName: 'vs ${awayStandings['Conference']}',
-                teamOne: awayStandings['vs${awayStandings['Conference']}'],
-                teamTwo: homeStandings['vs${awayStandings['Conference']}'],
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                statName: 'vs ${awayStandings?['Conference'] ?? ''}',
+                teamOne: awayStandings?['vs${awayStandings?['Conference'] ?? ''}'] ?? '0-0',
+                teamTwo: homeStandings?['vs${awayStandings?['Conference'] ?? ''}'] ?? '0-0',
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
-              if (homeStandings['Conference'] != awayStandings['Conference'])
+              if ((homeStandings?['Conference'] ?? '') != (awayStandings?['Conference'] ?? ''))
                 SizedBox(height: 5.0.r),
-              if (homeStandings['Conference'] != awayStandings['Conference'])
+              if ((homeStandings?['Conference'] ?? '') != (awayStandings?['Conference'] ?? ''))
                 ComparisonRow(
-                  statName: 'vs ${homeStandings['Conference']}',
-                  teamOne: awayStandings['vs${homeStandings['Conference']}'],
-                  teamTwo: homeStandings['vs${homeStandings['Conference']}'],
-                  teamOneColor: teamOneColor,
-                  teamTwoColor: teamTwoColor,
+                  statName: 'vs ${homeStandings?['Conference'] ?? ''}',
+                  teamOne: awayStandings?['vs${homeStandings?['Conference'] ?? ''}'] ?? '0-0',
+                  teamTwo: homeStandings?['vs${homeStandings?['Conference'] ?? ''}'] ?? '0-0',
+                  teamOneColor: awayColor ?? Colors.transparent,
+                  teamTwoColor: homeColor ?? Colors.transparent,
                 ),
               SizedBox(height: 5.0.r),
               ComparisonRow(
-                statName: 'vs ${awayStandings['Division']}',
-                teamOne: awayStandings['vs${awayStandings['Division']}'],
-                teamTwo: homeStandings['vs${awayStandings['Division']}'],
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                statName: 'vs ${awayStandings?['Division'] ?? ''}',
+                teamOne: awayStandings?['vs${awayStandings?['Division'] ?? ''}'] ?? '0-0',
+                teamTwo: homeStandings?['vs${awayStandings?['Division'] ?? ''}'] ?? '0-0',
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
-              if (homeStandings['Division'] != awayStandings['Division'])
+              if ((homeStandings?['Division'] ?? '') != (awayStandings?['Division'] ?? ''))
                 SizedBox(height: 5.0.r),
-              if (homeStandings['Division'] != awayStandings['Division'])
+              if ((homeStandings?['Division'] ?? '') != (awayStandings?['Division'] ?? ''))
                 ComparisonRow(
-                  statName: 'vs ${homeStandings['Division']}',
-                  teamOne: awayStandings['vs${homeStandings['Division']}'],
-                  teamTwo: homeStandings['vs${homeStandings['Division']}'],
-                  teamOneColor: teamOneColor,
-                  teamTwoColor: teamTwoColor,
+                  statName: 'vs ${homeStandings?['Division'] ?? ''}',
+                  teamOne: awayStandings?['vs${homeStandings?['Division'] ?? ''}'] ?? '0-0',
+                  teamTwo: homeStandings?['vs${homeStandings?['Division'] ?? ''}'] ?? '0-0',
+                  teamOneColor: awayColor ?? Colors.transparent,
+                  teamTwoColor: homeColor ?? Colors.transparent,
                 ),
               SizedBox(height: 15.0.r),
               ComparisonRow(
                 statName: 'HOME',
-                teamOne: awayStandings['HOME'].trimRight(),
-                teamTwo: homeStandings['HOME'].trimRight(),
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                teamOne: (awayStandings?['HOME'] ?? '0-0').trimRight(),
+                teamTwo: (homeStandings?['HOME'] ?? '0-0').trimRight(),
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
               SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'ROAD',
-                teamOne: awayStandings['ROAD'].trimRight(),
-                teamTwo: homeStandings['ROAD'].trimRight(),
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                teamOne: (awayStandings?['ROAD'] ?? '0-0').trimRight(),
+                teamTwo: (homeStandings?['ROAD'] ?? '0-0').trimRight(),
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
               SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'LAST 10',
-                teamOne: awayStandings['L10'].trimRight(),
-                teamTwo: homeStandings['L10'].trimRight(),
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                teamOne: (awayStandings?['L10'] ?? '0-0').trimRight(),
+                teamTwo: (homeStandings?['L10'] ?? '0-0').trimRight(),
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
               SizedBox(height: 5.0.r),
               NonComparisonRow(
                 statName: 'STREAK',
-                teamOne: awayStandings['strCurrentStreak'],
-                teamTwo: homeStandings['strCurrentStreak'],
+                teamOne: awayStandings?['strCurrentStreak'] ?? 'W 0',
+                teamTwo: homeStandings?['strCurrentStreak'] ?? 'W 0',
               ),
               SizedBox(height: 15.0.r),
               ComparisonRow(
                 statName: 'OT',
-                teamOne: awayStandings['OT'].trimRight(),
-                teamTwo: homeStandings['OT'].trimRight(),
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                teamOne: (awayStandings?['OT'] ?? '0-0').trimRight(),
+                teamTwo: (homeStandings?['OT'] ?? '0-0').trimRight(),
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
               SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: '3 PTS OR LESS',
-                teamOne: awayStandings['ThreePTSOrLess'].trimRight(),
-                teamTwo: homeStandings['ThreePTSOrLess'].trimRight(),
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                teamOne: (awayStandings?['ThreePTSOrLess'] ?? '0-0').trimRight(),
+                teamTwo: (homeStandings?['ThreePTSOrLess'] ?? '0-0').trimRight(),
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
               SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: '10+ PTS',
-                teamOne: awayStandings['TenPTSOrMore'].trimRight(),
-                teamTwo: homeStandings['TenPTSOrMore'].trimRight(),
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                teamOne: (awayStandings?['TenPTSOrMore'] ?? '0-0').trimRight(),
+                teamTwo: (homeStandings?['TenPTSOrMore'] ?? '0-0').trimRight(),
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
               SizedBox(height: 5.0.r),
               ComparisonRow(
                 statName: 'Opp Over .500',
-                teamOne: awayStandings['OppOver500'].trimRight(),
-                teamTwo: homeStandings['OppOver500'].trimRight(),
-                teamOneColor: teamOneColor,
-                teamTwoColor: teamTwoColor,
+                teamOne: (awayStandings?['OppOver500'] ?? '0-0').trimRight(),
+                teamTwo: (homeStandings?['OppOver500'] ?? '0-0').trimRight(),
+                teamOneColor: awayColor ?? Colors.transparent,
+                teamTwoColor: homeColor ?? Colors.transparent,
               ),
             ],
           ),

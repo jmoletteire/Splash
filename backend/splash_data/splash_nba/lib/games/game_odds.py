@@ -79,7 +79,10 @@ def fetch_odds():
     # Now loop over nba_today_odds['games'] and update based on gameId
     if nba_today_odds['games']:
         for game_data in nba_today_odds['games']:
-            game_id = game_data['gameId']
+            game_id = game_data.get('gameId', None)
+
+            if game_id is None:
+                continue
 
             if game_id in games_today_dict:
                 games_collection.update_one(

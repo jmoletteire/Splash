@@ -291,7 +291,7 @@ class OddsCard extends StatelessWidget {
                                   constraints:
                                       BoxConstraints(maxWidth: 120.0.r, maxHeight: 25.0.r),
                                   child: Image.asset(
-                                    'images/books/fandue_alt.png',
+                                    'images/books/fanduel_alt.png',
                                   ),
                                 ),
                               ),

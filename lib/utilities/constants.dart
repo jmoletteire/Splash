@@ -3366,7 +3366,7 @@ const kTeamColors = {
     "secondaryColor": Color(0xFF000000)
   }, // Chicago Bulls
   "CLE": {
-    "primaryColor": Color(0xFF860038),
+    "primaryColor": Color(0xFF780F35),
     "secondaryColor": Color(0xFFFFB81A)
   }, // Cleveland Cavaliers
   "DAL": {
@@ -3422,8 +3422,9 @@ const kTeamColors = {
     "secondaryColor": Color(0xFF85714D)
   }, // New Orleans Pelicans
   "NYK": {
-    "primaryColor": Color(0xFF016BB6),
-    "secondaryColor": Color(0xFFF58426)
+    "primaryColor": Color(0xFF00438C),
+    //"primaryColor": Color(0xFF016BB6),
+    "secondaryColor": Color(0xFFF48326)
   }, // New York Knicks
   "OKC": {
     "primaryColor": Color(0xFF007AC2),
@@ -3457,7 +3458,10 @@ const kTeamColors = {
     "primaryColor": Color(0xFFCE1141),
     "secondaryColor": Color(0xFF000000)
   }, // Toronto Raptors
-  "UTA": {"primaryColor": Color(0xFF2F0370), "secondaryColor": Color(0xFF57A0CB)}, // Utah Jazz
+  "UTA": {
+    "primaryColor": Color(0xFF2F0370),
+    "secondaryColor": Color(0xFF57A0CB),
+  }, // Utah Jazz
   "WAS": {
     "primaryColor": Color(0xFF002B5C),
     "secondaryColor": Color(0xFFE31837)
@@ -3485,7 +3489,7 @@ const kTeamColorOpacity = {
   "MIL": {"opacity": 0.94}, // Milwaukee Bucks
   "MIN": {"opacity": 0.94}, // Minnesota Timberwolves
   "NOP": {"opacity": 0.94}, // New Orleans Pelicans
-  "NYK": {"opacity": 0.86}, // New York Knicks
+  "NYK": {"opacity": 0.92}, // New York Knicks
   "OKC": {"opacity": 0.94}, // Oklahoma City Thunder
   "ORL": {"opacity": 0.94}, // Orlando Magic
   "PHI": {"opacity": 0.90}, // Philadelphia 76ers
@@ -3527,7 +3531,7 @@ const Map<String, String> kArenas = {
   'Toyota Center': 'Houston, TX',
   'Gainbridge FieldHouse': 'Indianapolis, IN',
   'Intuit Dome': 'Inglewood, CA',
-  'Staples Center': 'Los Angeles, CA',
+  'Crypto.com Arena': 'Los Angeles, CA',
   'FedExForum': 'Memphis, TN',
   'Kaseya Center': 'Miami, FL',
   'Fiserv Forum': 'Milwaukee, WI',

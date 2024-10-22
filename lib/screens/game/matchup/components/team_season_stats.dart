@@ -100,7 +100,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
     return Skeletonizer(
       enabled: _isLoading,
       child: Card(
-        margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
+        margin: EdgeInsets.fromLTRB(11.0.r, 0.0.r, 11.0.r, 0.0),
         color: Colors.grey.shade900,
         child: Padding(
           padding: EdgeInsets.all(15.0.r),

@@ -79,9 +79,9 @@ class _TeamHistoryState extends State<TeamHistory> {
         return 'Won NBA Finals';
       }
     }
-    // Top 2 seeds first round byes (pre-1983)
+    // 6 teams each conference, top 2 seeds first round byes (pre-1984)
     else if (int.parse(teamSeason['YEAR'].substring(0, 4)) >= 1970) {
-      if (teamSeason['CONF_RANK'] > 8) {
+      if (teamSeason['CONF_RANK'] > 6) {
         return '-';
       } else if (teamSeason['CONF_RANK'] <= 2) {
         if (teamSeason['PO_WINS'] < 4) {
@@ -417,9 +417,12 @@ class _ExpandableCardState extends State<ExpandableCard> {
 
       if (season.value['NBA_FINALS_APPEARANCE'] == 'LEAGUE CHAMPION') {
         leagueTitleYears.add(key);
-        confTitleYears.add(key);
-      } else if (season.value['NBA_FINALS_APPEARANCE'] == 'FINALS APPEARANCE') {
-        confTitleYears.add(key);
+      }
+      if (int.parse(season.key.toString().substring(0, 4)) >= 1970) {
+        if (season.value['NBA_FINALS_APPEARANCE'] == 'LEAGUE CHAMPION' ||
+            season.value['NBA_FINALS_APPEARANCE'] == 'FINALS APPEARANCE') {
+          confTitleYears.add(key);
+        }
       }
 
       if ((season.value?['STANDINGS']?['DivisionRank'] ?? season.value['DIV_RANK']) == 1) {

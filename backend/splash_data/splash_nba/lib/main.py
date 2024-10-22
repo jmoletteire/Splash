@@ -1109,8 +1109,8 @@ def players_daily_update():
 
     # SHOT CHART
     try:
-        #player_shot_charts()
-        print('Skip Player Shot Charts')
+        player_shot_charts()
+        #print('Skip Player Shot Charts')
     except Exception as e:
         logging.error(f"Error updating player shot charts: {e}")
 
@@ -1123,8 +1123,8 @@ def players_daily_update():
 
     # AWARDS
     try:
-        #player_awards()
-        print('Skip Player Awards')
+        player_awards()
+        #print('Skip Player Awards')
     except Exception as e:
         logging.error(f"Error updating player awards: {e}")
 
@@ -1166,8 +1166,8 @@ except Exception as e:
     exit(1)
 
 #games_daily_update()
-teams_daily_update()
-players_daily_update()
+#teams_daily_update()
+#players_daily_update()
 games_live_update()
 # games_prev_day()
 
