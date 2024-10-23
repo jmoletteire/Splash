@@ -57,6 +57,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   String moneyLine = '';
   String spread = '';
   String overUnder = '';
+  String countdown = '';
 
   int decimalToMoneyline(double decimalOdds) {
     if (decimalOdds <= 1.0) {
@@ -154,6 +155,16 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
       _isLoading = false;
     });
+
+    if (_isUpcoming) {
+      if (game.containsKey('BOXSCORE')) {
+        if (game['BOXSCORE']['gameStatusText'] == 'pregame') {
+          setState(() {
+            countdown = game['BOXSCORE']['gameClock'];
+          });
+        }
+      }
+    }
   }
 
   /// ******************************************************
@@ -171,6 +182,15 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       game = widget.gameData!;
       setOdds(game);
       _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
+      if (_isUpcoming) {
+        if (game.containsKey('BOXSCORE')) {
+          if (game['BOXSCORE']['gameStatusText'] == 'pregame') {
+            setState(() {
+              countdown = game['BOXSCORE']['gameClock'];
+            });
+          }
+        }
+      }
       _isLoading = false;
     }
     startPolling(widget.gameId, widget.gameDate);
@@ -532,6 +552,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     padding: const EdgeInsets.only(top: 15.0),
                     child: FlexibleSpaceBar(
                       background: GameInfo(
+                        countdown: countdown == '' ? null : countdown,
                         gameSummary: summary,
                         homeLinescore: homeLinescore,
                         awayLinescore: awayLinescore,
@@ -627,6 +648,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 class GameInfo extends StatelessWidget {
   const GameInfo({
     super.key,
+    this.countdown,
     required this.gameSummary,
     required this.homeLinescore,
     required this.awayLinescore,
@@ -637,6 +659,7 @@ class GameInfo extends StatelessWidget {
     this.gameTime,
   });
 
+  final String? countdown;
   final Map<String, dynamic> gameSummary;
   final Map<String, dynamic> homeLinescore;
   final Map<String, dynamic> awayLinescore;
@@ -784,7 +807,9 @@ class GameInfo extends StatelessWidget {
               ),
             SizedBox(height: 8.0.r),
           ],
-          Text(gameTime ?? '', style: kBebasBold.copyWith(fontSize: 19.0.r)),
+          if (countdown == '')
+            Text(gameTime ?? '', style: kBebasBold.copyWith(fontSize: 19.0.r)),
+          if (countdown != '' && countdown != null) CountdownTimer(durationString: countdown!),
         ],
       );
     }
@@ -1060,6 +1085,79 @@ class GameInfo extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class CountdownTimer extends StatefulWidget {
+  final String durationString;
+
+  CountdownTimer({required this.durationString});
+
+  @override
+  _CountdownTimerState createState() => _CountdownTimerState();
+}
+
+class _CountdownTimerState extends State<CountdownTimer> {
+  late Duration _duration;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _duration = _parseIso8601Duration(widget.durationString);
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  // Function to parse the ISO 8601 duration string
+  Duration _parseIso8601Duration(String isoDuration) {
+    final regex = RegExp(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(\.\d+)?)S)?');
+    final match = regex.firstMatch(isoDuration);
+
+    if (match == null) {
+      throw FormatException("Invalid ISO 8601 duration format: $isoDuration");
+    }
+
+    final hours = int.tryParse(match.group(1) ?? '0') ?? 0;
+    final minutes = int.tryParse(match.group(2) ?? '0') ?? 0;
+    final seconds = double.tryParse(match.group(3) ?? '0') ?? 0;
+
+    return Duration(
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds.toInt(),
+      milliseconds: ((seconds - seconds.toInt()) * 1000).round(),
+    );
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_duration.inSeconds <= 0) {
+          _timer?.cancel();
+        } else {
+          _duration -= Duration(seconds: 1);
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final minutes = _duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = _duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+
+    return Center(
+      child: Text(
+        '$minutes:$seconds',
+        style: kBebasBold.copyWith(fontSize: 16.0.r),
+      ),
     );
   }
 }

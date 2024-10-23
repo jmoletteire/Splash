@@ -141,15 +141,17 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           ComparisonRow(
                             statName: 'PER POSS',
                             awayTeam: roundToDecimalPlaces(
-                                (awayTeam['OFF_RATING'] / 100) ??
-                                    awayTeam['points'] /
-                                        (awayEstPoss == 0 ? 1 : awayEstPoss) ??
+                                awayTeam['points'] /
+                                        (awayTeam['POSS'] ?? awayEstPoss == 0
+                                            ? 1
+                                            : awayEstPoss) ??
                                     0.0,
                                 2),
                             homeTeam: roundToDecimalPlaces(
-                                (homeTeam['OFF_RATING'] / 100) ??
-                                    homeTeam['points'] /
-                                        (homeEstPoss == 0 ? 1 : homeEstPoss) ??
+                                homeTeam['points'] /
+                                        (homeTeam['POSS'] ?? homeEstPoss == 0
+                                            ? 1
+                                            : homeEstPoss) ??
                                     0.0,
                                 2),
                             awayTeamColor: awayTeamColor,
