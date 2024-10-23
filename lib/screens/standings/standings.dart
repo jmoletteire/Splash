@@ -40,6 +40,9 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
   late LinkedScrollControllerGroup _divControllers;
+  late LinkedScrollControllerGroup _confControllers;
+  late ScrollController _eastController;
+  late ScrollController _westController;
   late TabController _tabController;
   late ValueNotifier<Map<String, dynamic>> playoffDataNotifier;
   late ValueNotifier<Map<String, dynamic>> cupDataNotifier;
@@ -224,6 +227,9 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
 
     _tabController = TabController(length: 2, vsync: this);
     _divControllers = LinkedScrollControllerGroup();
+    _confControllers = LinkedScrollControllerGroup();
+    _eastController = _confControllers.addAndGet();
+    _westController = _confControllers.addAndGet();
 
     setTeams();
     getPlayoffs(selectedSeason);
@@ -327,8 +333,11 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                       body: TabBarView(
                         controller: _tabController,
                         children: [
-                          ScrollConfiguration(
-                            behavior: MyCustomScrollBehavior(),
+                          RefreshIndicator(
+                            color: Colors.deepOrange,
+                            onRefresh: () async {
+                              await setTeams();
+                            },
                             child: CustomScrollView(
                               controller: _scrollController,
                               slivers: [
@@ -365,6 +374,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                   ],
                                   standings: eastTeams,
                                   season: selectedSeason,
+                                  scrollController: _eastController,
                                 ),
                                 ConferenceStandings(
                                   columnNames: const [
@@ -399,13 +409,17 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                   ],
                                   standings: westTeams,
                                   season: selectedSeason,
+                                  scrollController: _westController,
                                 ),
                                 const StandingsGlossary(),
                               ],
                             ),
                           ),
-                          ScrollConfiguration(
-                            behavior: MyCustomScrollBehavior(),
+                          RefreshIndicator(
+                            color: Colors.deepOrange,
+                            onRefresh: () async {
+                              await setTeams();
+                            },
                             child: CustomScrollView(
                               controller: _scrollController,
                               slivers: divisions.keys.map((divisionName) {
@@ -453,9 +467,15 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                             ValueListenableBuilder<Map<String, dynamic>>(
                               valueListenable: playoffDataNotifier,
                               builder: (context, playoffData, _) {
-                                return PlayoffBracket(
-                                  key: ValueKey(selectedYear),
-                                  playoffData: playoffData,
+                                return RefreshIndicator(
+                                  color: Colors.deepOrange,
+                                  onRefresh: () async {
+                                    await getPlayoffs(selectedSeason);
+                                  },
+                                  child: PlayoffBracket(
+                                    key: ValueKey(selectedYear),
+                                    playoffData: playoffData,
+                                  ),
                                 );
                               },
                             ),
@@ -1269,12 +1289,5 @@ class StandingsGlossary extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class MyCustomScrollBehavior extends ScrollBehavior {
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const ClampingScrollPhysics();
   }
 }

@@ -11,7 +11,6 @@ def current_season_shooting_stat_ranks(season_type):
     client = MongoClient(uri)
     db = client.splash
     players_collection = db.nba_players
-    logging.info("Connected to MongoDB")
 
     shot_types = [
         'Catch and Shoot',

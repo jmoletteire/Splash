@@ -259,9 +259,11 @@ class _GroupStandingsState extends State<GroupStandings> {
               diff,
               style: kBebasNormal.copyWith(
                 fontSize: 16.0.r,
-                color: teams[row]['diff'] >= 0
+                color: teams[row]['diff'] > 0
                     ? const Color(0xFF55F86F)
-                    : const Color(0xFFFC3126),
+                    : teams[row]['diff'] == 0
+                        ? Colors.white
+                        : const Color(0xFFFC3126),
               ),
             ),
           );

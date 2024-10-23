@@ -40,7 +40,8 @@ class _TeamLeadersState extends State<TeamLeaders> {
   late String awayLeaderRpg;
   late String awayLeaderApg;
 
-  String season = '';
+  String homeSeason = '';
+  String awaySeason = '';
   String seasonType = '';
 
   @override
@@ -49,9 +50,9 @@ class _TeamLeadersState extends State<TeamLeaders> {
 
     // Sort players by MIN / GP for the current or previous season
     int i = 0;
-    while (season == '') {
+    while (homeSeason == '') {
       try {
-        season = widget.homePlayers[i]['STATS'].containsKey(kCurrentSeason)
+        homeSeason = widget.homePlayers[i]['STATS'].containsKey(kCurrentSeason)
             ? kCurrentSeason
             : kPrevSeason;
       } catch (e) {
@@ -61,13 +62,25 @@ class _TeamLeadersState extends State<TeamLeaders> {
     }
 
     int j = 0;
+    while (awaySeason == '') {
+      try {
+        awaySeason = widget.awayPlayers[j]['STATS'].containsKey(kCurrentSeason)
+            ? kCurrentSeason
+            : kPrevSeason;
+      } catch (e) {
+        j++;
+        continue;
+      }
+    }
+
+    int k = 0;
     while (seasonType == '') {
       try {
-        seasonType = widget.homePlayers[j]['STATS'][season].containsKey('PLAYOFFS')
+        seasonType = widget.homePlayers[k]['STATS'][homeSeason].containsKey('PLAYOFFS')
             ? 'PLAYOFFS'
             : 'REGULAR SEASON';
       } catch (e) {
-        j++;
+        k++;
         continue;
       }
     }
@@ -77,14 +90,14 @@ class _TeamLeadersState extends State<TeamLeaders> {
         double ptsPerGameA = 0.0;
         double ptsPerGameB = 0.0;
         try {
-          ptsPerGameA = a['STATS'][season][seasonType]['BASIC']['PTS'] /
-              a['STATS'][season][seasonType]['BASIC']['GP'];
+          ptsPerGameA = a['STATS'][homeSeason][seasonType]['BASIC']['PTS'] /
+              a['STATS'][homeSeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           ptsPerGameA = 0.0;
         }
         try {
-          ptsPerGameB = b['STATS'][season][seasonType]['BASIC']['PTS'] /
-              b['STATS'][season][seasonType]['BASIC']['GP'];
+          ptsPerGameB = b['STATS'][homeSeason][seasonType]['BASIC']['PTS'] /
+              b['STATS'][homeSeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           ptsPerGameB = 0.0;
         }
@@ -96,8 +109,8 @@ class _TeamLeadersState extends State<TeamLeaders> {
     });
 
     homePtsLeader = widget.homePlayers[0];
-    homeLeaderPpg = (widget.homePlayers[0]['STATS'][season][seasonType]['BASIC']['PTS'] /
-            widget.homePlayers[0]['STATS'][season][seasonType]['BASIC']['GP'])
+    homeLeaderPpg = (widget.homePlayers[0]['STATS'][homeSeason][seasonType]['BASIC']['PTS'] /
+            widget.homePlayers[0]['STATS'][homeSeason][seasonType]['BASIC']['GP'])
         .toStringAsFixed(1);
 
     widget.homePlayers.sort((a, b) {
@@ -105,14 +118,14 @@ class _TeamLeadersState extends State<TeamLeaders> {
         double rebPerGameA = 0.0;
         double rebPerGameB = 0.0;
         try {
-          rebPerGameA = a['STATS'][season][seasonType]['BASIC']['REB'] /
-              a['STATS'][season][seasonType]['BASIC']['GP'];
+          rebPerGameA = a['STATS'][homeSeason][seasonType]['BASIC']['REB'] /
+              a['STATS'][homeSeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           rebPerGameA = 0.0;
         }
         try {
-          rebPerGameB = b['STATS'][season][seasonType]['BASIC']['REB'] /
-              b['STATS'][season][seasonType]['BASIC']['GP'];
+          rebPerGameB = b['STATS'][homeSeason][seasonType]['BASIC']['REB'] /
+              b['STATS'][homeSeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           rebPerGameB = 0.0;
         }
@@ -124,8 +137,8 @@ class _TeamLeadersState extends State<TeamLeaders> {
     });
 
     homeRebLeader = widget.homePlayers[0];
-    homeLeaderRpg = (widget.homePlayers[0]['STATS'][season][seasonType]['BASIC']['REB'] /
-            widget.homePlayers[0]['STATS'][season][seasonType]['BASIC']['GP'])
+    homeLeaderRpg = (widget.homePlayers[0]['STATS'][homeSeason][seasonType]['BASIC']['REB'] /
+            widget.homePlayers[0]['STATS'][homeSeason][seasonType]['BASIC']['GP'])
         .toStringAsFixed(1);
 
     widget.homePlayers.sort((a, b) {
@@ -133,14 +146,14 @@ class _TeamLeadersState extends State<TeamLeaders> {
         double astPerGameA = 0.0;
         double astPerGameB = 0.0;
         try {
-          astPerGameA = a['STATS'][season][seasonType]['BASIC']['AST'] /
-              a['STATS'][season][seasonType]['BASIC']['GP'];
+          astPerGameA = a['STATS'][homeSeason][seasonType]['BASIC']['AST'] /
+              a['STATS'][homeSeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           astPerGameA = 0.0;
         }
         try {
-          astPerGameB = b['STATS'][season][seasonType]['BASIC']['AST'] /
-              b['STATS'][season][seasonType]['BASIC']['GP'];
+          astPerGameB = b['STATS'][homeSeason][seasonType]['BASIC']['AST'] /
+              b['STATS'][homeSeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           astPerGameB = 0.0;
         }
@@ -152,8 +165,8 @@ class _TeamLeadersState extends State<TeamLeaders> {
     });
 
     homeAstLeader = widget.homePlayers[0];
-    homeLeaderApg = (widget.homePlayers[0]['STATS'][season][seasonType]['BASIC']['AST'] /
-            widget.homePlayers[0]['STATS'][season][seasonType]['BASIC']['GP'])
+    homeLeaderApg = (widget.homePlayers[0]['STATS'][homeSeason][seasonType]['BASIC']['AST'] /
+            widget.homePlayers[0]['STATS'][homeSeason][seasonType]['BASIC']['GP'])
         .toStringAsFixed(1);
 
     widget.awayPlayers.sort((a, b) {
@@ -161,14 +174,14 @@ class _TeamLeadersState extends State<TeamLeaders> {
         double ptsPerGameA = 0.0;
         double ptsPerGameB = 0.0;
         try {
-          ptsPerGameA = a['STATS'][season][seasonType]['BASIC']['PTS'] /
-              a['STATS'][season][seasonType]['BASIC']['GP'];
+          ptsPerGameA = a['STATS'][awaySeason][seasonType]['BASIC']['PTS'] /
+              a['STATS'][awaySeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           ptsPerGameA = 0.0;
         }
         try {
-          ptsPerGameB = b['STATS'][season][seasonType]['BASIC']['PTS'] /
-              b['STATS'][season][seasonType]['BASIC']['GP'];
+          ptsPerGameB = b['STATS'][awaySeason][seasonType]['BASIC']['PTS'] /
+              b['STATS'][awaySeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           ptsPerGameB = 0.0;
         }
@@ -180,8 +193,8 @@ class _TeamLeadersState extends State<TeamLeaders> {
     });
 
     awayPtsLeader = widget.awayPlayers[0];
-    awayLeaderPpg = (widget.awayPlayers[0]['STATS'][season][seasonType]['BASIC']['PTS'] /
-            widget.awayPlayers[0]['STATS'][season][seasonType]['BASIC']['GP'])
+    awayLeaderPpg = (widget.awayPlayers[0]['STATS'][awaySeason][seasonType]['BASIC']['PTS'] /
+            widget.awayPlayers[0]['STATS'][awaySeason][seasonType]['BASIC']['GP'])
         .toStringAsFixed(1);
 
     widget.awayPlayers.sort((a, b) {
@@ -189,14 +202,14 @@ class _TeamLeadersState extends State<TeamLeaders> {
         double rebPerGameA = 0.0;
         double rebPerGameB = 0.0;
         try {
-          rebPerGameA = a['STATS'][season][seasonType]['BASIC']['REB'] /
-              a['STATS'][season][seasonType]['BASIC']['GP'];
+          rebPerGameA = a['STATS'][awaySeason][seasonType]['BASIC']['REB'] /
+              a['STATS'][awaySeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           rebPerGameA = 0.0;
         }
         try {
-          rebPerGameB = b['STATS'][season][seasonType]['BASIC']['REB'] /
-              b['STATS'][season][seasonType]['BASIC']['GP'];
+          rebPerGameB = b['STATS'][awaySeason][seasonType]['BASIC']['REB'] /
+              b['STATS'][awaySeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           rebPerGameB = 0.0;
         }
@@ -208,8 +221,8 @@ class _TeamLeadersState extends State<TeamLeaders> {
     });
 
     awayRebLeader = widget.awayPlayers[0];
-    awayLeaderRpg = (widget.awayPlayers[0]['STATS'][season][seasonType]['BASIC']['REB'] /
-            widget.awayPlayers[0]['STATS'][season][seasonType]['BASIC']['GP'])
+    awayLeaderRpg = (widget.awayPlayers[0]['STATS'][awaySeason][seasonType]['BASIC']['REB'] /
+            widget.awayPlayers[0]['STATS'][awaySeason][seasonType]['BASIC']['GP'])
         .toStringAsFixed(1);
 
     widget.awayPlayers.sort((a, b) {
@@ -217,14 +230,14 @@ class _TeamLeadersState extends State<TeamLeaders> {
         double astPerGameA = 0.0;
         double astPerGameB = 0.0;
         try {
-          astPerGameA = a['STATS'][season][seasonType]['BASIC']['AST'] /
-              a['STATS'][season][seasonType]['BASIC']['GP'];
+          astPerGameA = a['STATS'][awaySeason][seasonType]['BASIC']['AST'] /
+              a['STATS'][awaySeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           astPerGameA = 0.0;
         }
         try {
-          astPerGameB = b['STATS'][season][seasonType]['BASIC']['AST'] /
-              b['STATS'][season][seasonType]['BASIC']['GP'];
+          astPerGameB = b['STATS'][awaySeason][seasonType]['BASIC']['AST'] /
+              b['STATS'][awaySeason][seasonType]['BASIC']['GP'];
         } catch (e) {
           astPerGameB = 0.0;
         }
@@ -236,8 +249,8 @@ class _TeamLeadersState extends State<TeamLeaders> {
     });
 
     awayAstLeader = widget.awayPlayers[0];
-    awayLeaderApg = (widget.awayPlayers[0]['STATS'][season][seasonType]['BASIC']['AST'] /
-            widget.awayPlayers[0]['STATS'][season][seasonType]['BASIC']['GP'])
+    awayLeaderApg = (widget.awayPlayers[0]['STATS'][awaySeason][seasonType]['BASIC']['AST'] /
+            widget.awayPlayers[0]['STATS'][awaySeason][seasonType]['BASIC']['GP'])
         .toStringAsFixed(1);
   }
 
@@ -271,6 +284,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                       playerId: awayPtsLeader['PERSON_ID'].toString(),
                       name: awayPtsLeader['DISPLAY_FI_LAST'],
                       position: kPositionMap[awayPtsLeader['POSITION']]!,
+                      jersey: awayPtsLeader['JERSEY'],
                       team: awayPtsLeader['TEAM_ID'].toString(),
                     ),
                   ),
@@ -278,7 +292,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       awayLeaderPpg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
                     ),
                   ),
                   Expanded(
@@ -295,7 +309,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       homeLeaderPpg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
                     ),
                   ),
                   Expanded(
@@ -303,6 +317,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                       playerId: homePtsLeader['PERSON_ID'].toString(),
                       name: homePtsLeader['DISPLAY_FI_LAST'],
                       position: kPositionMap[homePtsLeader['POSITION']]!,
+                      jersey: homePtsLeader['JERSEY'],
                       team: homePtsLeader['TEAM_ID'].toString(),
                     ),
                   ),
@@ -317,6 +332,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                       playerId: awayRebLeader['PERSON_ID'].toString(),
                       name: awayRebLeader['DISPLAY_FI_LAST'],
                       position: kPositionMap[awayRebLeader['POSITION']]!,
+                      jersey: awayRebLeader['JERSEY'],
                       team: awayRebLeader['TEAM_ID'].toString(),
                     ),
                   ),
@@ -324,7 +340,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       awayLeaderRpg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
                     ),
                   ),
                   Expanded(
@@ -341,7 +357,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       homeLeaderRpg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
                     ),
                   ),
                   Expanded(
@@ -349,6 +365,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                       playerId: homeRebLeader['PERSON_ID'].toString(),
                       name: homeRebLeader['DISPLAY_FI_LAST'],
                       position: kPositionMap[homeRebLeader['POSITION']]!,
+                      jersey: homeRebLeader['JERSEY'],
                       team: homeRebLeader['TEAM_ID'].toString(),
                     ),
                   ),
@@ -363,6 +380,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                       playerId: awayAstLeader['PERSON_ID'].toString(),
                       name: awayAstLeader['DISPLAY_FI_LAST'],
                       position: kPositionMap[awayAstLeader['POSITION']]!,
+                      jersey: awayAstLeader['JERSEY'],
                       team: awayAstLeader['TEAM_ID'].toString(),
                     ),
                   ),
@@ -370,7 +388,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       awayLeaderApg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
                     ),
                   ),
                   Expanded(
@@ -387,7 +405,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       homeLeaderApg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 20.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
                     ),
                   ),
                   Expanded(
@@ -395,6 +413,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                       playerId: homeAstLeader['PERSON_ID'].toString(),
                       name: homeAstLeader['DISPLAY_FI_LAST'],
                       position: kPositionMap[homeAstLeader['POSITION']]!,
+                      jersey: homeAstLeader['JERSEY'],
                       team: homeAstLeader['TEAM_ID'].toString(),
                     ),
                   ),
@@ -412,6 +431,7 @@ class PlayerCard extends StatelessWidget {
   final String playerId;
   final String name;
   final String position;
+  final String jersey;
   final String team;
 
   const PlayerCard({
@@ -419,6 +439,7 @@ class PlayerCard extends StatelessWidget {
     required this.playerId,
     required this.name,
     required this.position,
+    required this.jersey,
     required this.team,
   }) : super(key: key);
 
@@ -440,7 +461,7 @@ class PlayerCard extends StatelessWidget {
       child: Column(
         children: [
           PlayerAvatar(
-            radius: 24.0.r,
+            radius: 22.0.r,
             backgroundColor: Colors.grey.shade800,
             playerImageUrl: 'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
           ),
@@ -448,11 +469,11 @@ class PlayerCard extends StatelessWidget {
           AutoSizeText(
             name,
             maxLines: 1,
-            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+            style: kBebasNormal.copyWith(fontSize: 15.0.r),
           ),
           Text(
-            position,
-            style: kBebasOffWhite.copyWith(fontSize: 14.0.r, color: Colors.white70),
+            '#$jersey | $position',
+            style: kBebasOffWhite.copyWith(fontSize: 13.0.r, color: Colors.white70),
           ),
         ],
       ),

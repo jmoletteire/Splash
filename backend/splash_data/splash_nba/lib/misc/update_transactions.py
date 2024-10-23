@@ -26,7 +26,6 @@ def update_transactions():
     client = MongoClient(uri)
     db = client.splash
     transactions_collection = db.nba_transactions
-    logging.info("Connected to MongoDB")
 
     # Fetch the data from the URL
     url = "https://stats.nba.com/js/data/playermovement/NBA_Player_Movement.json"
@@ -41,7 +40,11 @@ def update_transactions():
 
         new_data = find_new_data(existing_data, data['NBA_Player_Movement']['rows'])
 
-        transactions_collection.insert_many(new_data)
+        try:
+            transactions_collection.insert_many(new_data)
+        except Exception:
+            logging.info("No transactions to add.")
+            return
     else:
         print(f"Failed to fetch data. Status code: {response.status_code}")
 

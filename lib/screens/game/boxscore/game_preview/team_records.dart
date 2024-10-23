@@ -313,9 +313,11 @@ class NonComparisonRow extends StatelessWidget {
                   style: kBebasNormal.copyWith(
                       fontSize: 18.0.r,
                       color: statName == 'STREAK'
-                          ? teamOne.contains('W')
-                              ? const Color(0xFF55F86F)
-                              : const Color(0xFFFC3126)
+                          ? teamOne == 'W 0'
+                              ? Colors.white
+                              : teamOne.contains('W')
+                                  ? const Color(0xFF55F86F)
+                                  : const Color(0xFFFC3126)
                           : Colors.white),
                 ),
               ),
@@ -343,9 +345,11 @@ class NonComparisonRow extends StatelessWidget {
                   style: kBebasNormal.copyWith(
                       fontSize: 18.0.r,
                       color: statName == 'STREAK'
-                          ? teamTwo.contains('W')
-                              ? const Color(0xFF55F86F)
-                              : const Color(0xFFFC3126)
+                          ? teamTwo == 'W 0'
+                              ? Colors.white
+                              : teamTwo.contains('W')
+                                  ? const Color(0xFF55F86F)
+                                  : const Color(0xFFFC3126)
                           : Colors.white),
                 ),
               ),

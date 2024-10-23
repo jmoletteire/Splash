@@ -43,7 +43,8 @@ season_types = ['REGULAR SEASON', 'PLAYOFFS']
 
 
 # CHECKED
-def update_scoring_breakdown_and_pct_unassisted(season_type):
+# TEAM-LEVEL
+def update_scoring_breakdown_and_pct_unassisted(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -52,8 +53,6 @@ def update_scoring_breakdown_and_pct_unassisted(season_type):
         client = MongoClient(uri)
         db = client.splash
         players_collection = db.nba_players
-        teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Scoring Breakdown) Unable to connect to MongoDB: {e}')
         exit(1)
@@ -86,7 +85,7 @@ def update_scoring_breakdown_and_pct_unassisted(season_type):
     for player_id, data in player_data.items():
         try:
             players_collection.update_one(
-                {'PERSON_ID': player_id},
+                {'PERSON_ID': player_id, 'TEAM_ID': team_id},
                 {'$set': {
                     f'STATS.{k_current_season}.{season_type}.ADV.SCORING_BREAKDOWN': data['scoring'],
                 }},
@@ -97,7 +96,8 @@ def update_scoring_breakdown_and_pct_unassisted(season_type):
 
 
 # CHECKED
-def update_matchup_difficulty_and_dps(season_type):
+# TEAM-LEVEL
+def update_matchup_difficulty_and_dps(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -107,20 +107,19 @@ def update_matchup_difficulty_and_dps(season_type):
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Matchup Diff & DIE) Unable to connect to MongoDB: {e}')
         exit(1)
 
     # Set batch size to process documents
     batch_size = 25
-    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
     processed_count = 0
     i = 0
 
     # Update all ACTIVE players
     while processed_count < total_documents:
-        with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+        with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -213,7 +212,8 @@ def update_matchup_difficulty_and_dps(season_type):
 
 
 # CHECKED
-def update_versatility_score(season_type):
+# TEAM-LEVEL
+def update_versatility_score(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -222,21 +222,19 @@ def update_versatility_score(season_type):
         client = MongoClient(uri)
         db = client.splash
         players_collection = db.nba_players
-        teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Versatility) Unable to connect to MongoDB: {e}')
         exit(1)
 
     # Set batch size to process documents
     batch_size = 25
-    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
     processed_count = 0
     i = 0
 
     # Update all ACTIVE players
     while processed_count < total_documents:
-        with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+        with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -255,15 +253,15 @@ def update_versatility_score(season_type):
 
                     try:
                         t_G = matchups['MatchupsRollup'][0]['PERCENT_OF_TIME']
-                    except KeyError:
+                    except Exception:
                         t_G = 0
                     try:
                         t_F = matchups['MatchupsRollup'][1]['PERCENT_OF_TIME']
-                    except KeyError:
+                    except Exception:
                         t_F = 0
                     try:
                         t_C = matchups['MatchupsRollup'][2]['PERCENT_OF_TIME']
-                    except KeyError:
+                    except Exception:
                         t_C = 0
 
                     score = 1 - ((abs(t_G - (1/3)) + abs(t_F - (1/3)) + abs(t_C - (1/3))) / (4/3))
@@ -283,7 +281,8 @@ def update_versatility_score(season_type):
 
 
 # CHECKED
-def update_adj_turnover_pct(season_type):
+# TEAM-LEVEL
+def update_adj_turnover_pct(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -293,20 +292,19 @@ def update_adj_turnover_pct(season_type):
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(cTOV) Unable to connect to MongoDB: {e}')
         exit(1)
 
     # Set batch size to process documents
     batch_size = 25
-    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
     processed_count = 0
     i = 0
 
     # Update all ACTIVE players
     while processed_count < total_documents:
-        with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+        with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -345,7 +343,8 @@ def update_adj_turnover_pct(season_type):
 
 
 # CHECKED
-def update_offensive_load(season_type):
+# TEAM-LEVEL
+def update_offensive_load(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -355,20 +354,19 @@ def update_offensive_load(season_type):
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Offensive Load) Unable to connect to MongoDB: {e}')
         exit(1)
 
     # Set batch size to process documents
     batch_size = 25
-    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
     processed_count = 0
     i = 0
 
     # Update all ACTIVE players
     while processed_count < total_documents:
-        with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+        with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -416,7 +414,8 @@ def update_offensive_load(season_type):
 
 
 # CHECKED
-def update_box_creation(season_type):
+# TEAM-LEVEL
+def update_box_creation(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -426,7 +425,6 @@ def update_box_creation(season_type):
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Box Creation) Unable to connect to MongoDB: {e}')
         exit(1)
@@ -442,13 +440,13 @@ def update_box_creation(season_type):
 
     # Set batch size to process documents
     batch_size = 25
-    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
     processed_count = 0
     i = 0
 
     # Update all ACTIVE players
     while processed_count < total_documents:
-        with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+        with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -499,7 +497,8 @@ def update_box_creation(season_type):
 
 
 # CHECKED
-def update_drive_stats(season_type):
+# TEAM-LEVEL
+def update_drive_stats(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -509,20 +508,19 @@ def update_drive_stats(season_type):
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Drives) Unable to connect to MongoDB: {e}')
         exit(1)
 
     # Set batch size to process documents
     batch_size = 25
-    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
     processed_count = 0
     i = 0
 
     # Update all ACTIVE players
     while processed_count < total_documents:
-        with players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
+        with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -592,7 +590,8 @@ def update_drive_stats(season_type):
 
 
 # CHECKED
-def update_touches_breakdown(season_type):
+# TEAM-LEVEL
+def update_touches_breakdown(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -602,14 +601,15 @@ def update_touches_breakdown(season_type):
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Touches Breakdown) Unable to connect to MongoDB: {e}')
         exit(1)
 
+    docs = players_collection.count_documents({"ROSTERSTATUS": "Active", "TEAM_ID": team_id})
+
     # Update each document in the collection
-    for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'})):
-        logging.info(f'(Touches Breakdown) Processing {i} of {players_collection.count_documents({"ROSTERSTATUS": "Active"})}...')
+    for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})):
+        logging.info(f'(Touches Breakdown) Processing {i} of {docs}...')
         try:
             # Extract the values needed for calculation
             try:
@@ -661,7 +661,8 @@ def update_touches_breakdown(season_type):
 
 
 # CHECKED
-def update_shot_distribution(season_type):
+# TEAM-LEVEL
+def update_shot_distribution(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -671,7 +672,6 @@ def update_shot_distribution(season_type):
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Shot Distribution) Unable to connect to MongoDB: {e}')
         exit(1)
@@ -680,19 +680,18 @@ def update_shot_distribution(season_type):
     batch_size = 25
 
     # Get the total number of ACTIVE players
-    num_players = players_collection.count_documents({{'ROSTERSTATUS': 'Active'}})
+    num_players = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
 
     # Process documents in batches
     for batch_start in range(0, num_players, batch_size):
         logging.info(f'(Shot Distribution) Processing batch starting at {batch_start}')
-        players = players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, 'TEAM_ID': 1, '_id': 0}).skip(batch_start).limit(batch_size)
+        players = players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'TEAM_ID': 1, '_id': 0}).skip(batch_start).limit(batch_size)
 
         for i, player in enumerate(players):
             logging.info(f'(Shot Distribution) Processing {i + 1} of {num_players} players...')
 
             try:
                 player_id = player['PERSON_ID']
-                team_id = player['TEAM_ID']
             except KeyError:
                 continue
 
@@ -740,7 +739,8 @@ def update_shot_distribution(season_type):
 
 
 # CHECKED
-def update_player_tracking_stats(season_type):
+# TEAM-LEVEL
+def update_player_tracking_stats(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -749,49 +749,47 @@ def update_player_tracking_stats(season_type):
         client = MongoClient(uri)
         db = client.splash
         players_collection = db.nba_players
-        teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Player Tracking) Unable to connect to MongoDB: {e}')
         exit(1)
 
     if season_type == 'PLAYOFFS':
-        player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
+        player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
                                                              season=k_current_season,
                                                              season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
-        player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
+        player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
                                                              season=k_current_season,
                                                              season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
-        player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Drives',
+        player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
                                                             season=k_current_season,
                                                             season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
         player_rebounding = \
-            leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Rebounding',
+            leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
                                                 season=k_current_season,
                                                 season_type_all_star='Playoffs').get_normalized_dict()[
                 'LeagueDashPtStats']
-        player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='SpeedDistance',
+        player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
                                                                 season=k_current_season,
                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
     else:
-        player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
+        player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
                                                              season=k_current_season).get_normalized_dict()[
             'LeagueDashPtStats']
-        player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
+        player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
                                                              season=k_current_season).get_normalized_dict()[
             'LeagueDashPtStats']
-        player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Drives',
+        player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
                                                             season=k_current_season).get_normalized_dict()[
             'LeagueDashPtStats']
         player_rebounding = \
-            leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Rebounding',
+            leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
                                                 season=k_current_season).get_normalized_dict()[
                 'LeagueDashPtStats']
-        player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='SpeedDistance',
+        player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
                                                                 season=k_current_season).get_normalized_dict()[
             'LeagueDashPtStats']
 
@@ -848,7 +846,8 @@ def update_player_tracking_stats(season_type):
 
 
 # CHECKED
-def update_three_and_ft_rate(season_type):
+# TEAM-LEVEL
+def update_three_and_ft_rate(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -857,15 +856,15 @@ def update_three_and_ft_rate(season_type):
         client = MongoClient(uri)
         db = client.splash
         players_collection = db.nba_players
-        teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(3PAr & FTAr) Unable to connect to MongoDB: {e}')
         exit(1)
 
+    docs = players_collection.count_documents({"ROSTERSTATUS": "Active", "TEAM_ID": team_id})
+
     # Update each document in the collection
-    for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active"})):
-        logging.info(f'(3PAr & FTAr) Processing {i + 1} of {players_collection.count_documents({{"ROSTERSTATUS": "Active"}})}...')
+    for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active", "TEAM_ID": team_id})):
+        logging.info(f'(3PAr & FTAr) Processing {i + 1} of {docs}...')
         try:
             # Extract the values needed for calculation
             try:
@@ -910,7 +909,8 @@ def update_three_and_ft_rate(season_type):
 
 
 # CHECKED
-def update_poss_per_game(season_type):
+# TEAM-LEVEL
+def update_poss_per_game(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -919,15 +919,15 @@ def update_poss_per_game(season_type):
         client = MongoClient(uri)
         db = client.splash
         players_collection = db.nba_players
-        teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Poss Per Game) Unable to connect to MongoDB: {e}')
         exit(1)
 
+    docs = players_collection.count_documents({"ROSTERSTATUS": "Active", "TEAM_ID": team_id})
+
     # Update all ACTIVE players
-    for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active"})):
-        logging.info(f'(Poss Per Game) Processing {i} of {players_collection.count_documents({"ROSTERSTATUS": "Active"})}...')
+    for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active", "TEAM_ID": team_id})):
+        logging.info(f'(Poss Per Game) Processing {i} of {docs}...')
         try:
             # Extract the values needed for calculation
             try:
@@ -958,7 +958,8 @@ def update_poss_per_game(season_type):
 
 
 # CHECKED
-def update_player_on_off(season_type):
+# TEAM-LEVEL
+def update_player_on_off(season_type, team_id):
     try:
         # Configure logging
         logging.basicConfig(level=logging.INFO)
@@ -968,13 +969,12 @@ def update_player_on_off(season_type):
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
-        logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f'(Player On/Off) Unable to connect to MongoDB: {e}')
         exit(1)
 
     logging.info(f'(Player On/Off) Processing season {k_current_season}...')
-    for team in teams_collection.find({}, {'TEAM_ID': 1, '_id': 0}):
+    for team in teams_collection.find({'TEAM_ID': team_id}, {'TEAM_ID': 1, '_id': 0}):
         if team['TEAM_ID'] == 0:
             continue
 

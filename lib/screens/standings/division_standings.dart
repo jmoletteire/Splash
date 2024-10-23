@@ -360,10 +360,17 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         return StandingsDataText(text: gb == '0.0' ? '-' : gb);
       case 5:
         try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['NET_RATING']!
-                  .toStringAsFixed(1));
+          double netRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
+              ['ADV']['NET_RATING'];
+          String positive = netRating > 0.0 ? '+' : '';
+          return Container(
+            alignment: Alignment.centerRight,
+            child: Text('$positive${netRating.toStringAsFixed(1)}',
+                style: kBebasNormal.copyWith(
+                  fontSize: 16.0.r,
+                  color: netRating > 0.0 ? const Color(0xFF55F86F) : const Color(0xFFFC3126),
+                )),
+          );
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
@@ -396,16 +403,19 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         }
       case 9:
         try {
+          String streak =
+              teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak'];
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
-              teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!,
+              streak,
               style: kBebasNormal.copyWith(
                 fontSize: 16.0.r,
-                color: teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!
-                        .contains('W')
-                    ? const Color(0xFF55F86F)
-                    : const Color(0xFFFC3126),
+                color: streak == 'W 0'
+                    ? Colors.white
+                    : streak.contains('W')
+                        ? const Color(0xFF55F86F)
+                        : const Color(0xFFFC3126),
               ),
             ),
           );

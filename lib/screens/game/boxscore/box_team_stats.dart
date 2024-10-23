@@ -139,21 +139,39 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           ),
                           SizedBox(height: 5.0.r),
                           ComparisonRow(
-                            statName: 'PER 100',
+                            statName: 'PER POSS',
                             awayTeam: roundToDecimalPlaces(
-                                awayTeam['OFF_RATING'] ??
+                                (awayTeam['OFF_RATING'] / 100) ??
                                     awayTeam['points'] /
-                                        (awayEstPoss == 0 ? 1 : awayEstPoss) *
-                                        100 ??
+                                        (awayEstPoss == 0 ? 1 : awayEstPoss) ??
                                     0.0,
-                                1),
+                                2),
                             homeTeam: roundToDecimalPlaces(
-                                homeTeam['OFF_RATING'] ??
+                                (homeTeam['OFF_RATING'] / 100) ??
                                     homeTeam['points'] /
-                                        (homeEstPoss == 0 ? 1 : homeEstPoss) *
-                                        100 ??
+                                        (homeEstPoss == 0 ? 1 : homeEstPoss) ??
                                     0.0,
-                                1),
+                                2),
+                            awayTeamColor: awayTeamColor,
+                            homeTeamColor: homeTeamColor,
+                          ),
+                          SizedBox(height: 5.0.r),
+                          ComparisonRow(
+                            statName: 'PER SHOT',
+                            awayTeam: roundToDecimalPlaces(
+                                (awayTeam['points'] - awayTeam['freeThrowsMade']) /
+                                        (awayTeam['fieldGoalsAttempted'] == 0
+                                            ? 1
+                                            : awayTeam['fieldGoalsAttempted']) ??
+                                    0.0,
+                                2),
+                            homeTeam: roundToDecimalPlaces(
+                                (homeTeam['points'] - homeTeam['freeThrowsMade']) /
+                                        (homeTeam['fieldGoalsAttempted'] == 0
+                                            ? 1
+                                            : homeTeam['fieldGoalsAttempted']) ??
+                                    0.0,
+                                2),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),

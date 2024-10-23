@@ -16,7 +16,7 @@ def update_current_season(team_id):
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
-        logging.error(f"(Team Seasons) Failed to connect to MongoDB: {e}")
+        logging.error(f"\t(Team Seasons) Failed to connect to MongoDB: {e}")
         exit(1)
 
     try:
@@ -32,9 +32,7 @@ def update_current_season(team_id):
 
         try:
             # Fetch team stats for this team in given season
-            season_stats_dict[k_current_season]['STATS'][k_current_season_type] = fetch_team_stats(team_id=team_id, season=k_current_season, season_type='Regular Season' if k_current_season_type == 'REGULAR SEASON' else 'PLAYOFFS')
-
-            logging.info(f"(Team Seasons) Updated {k_current_season} stats for {team_id}")
+            season_stats_dict[k_current_season]['STATS'] = {k_current_season_type: fetch_team_stats(team_id=team_id, season=k_current_season, season_type='Regular Season' if k_current_season_type == 'REGULAR SEASON' else 'PLAYOFFS')}
 
             # Update SEASONS for this team
             teams_collection.update_one(
@@ -57,7 +55,7 @@ def update_current_season(team_id):
                 upsert=True
             )
         except Exception as e:
-            logging.error(f"(Team Seasons) {k_current_season} season stats unavailable for {team_id}: {e}")
+            logging.error(f"\t(Team Seasons) {k_current_season} season stats unavailable for {team_id}: {e}")
             teams_collection.update_one(
                 {"TEAM_ID": team_id},
                 {"$set": {
@@ -76,9 +74,9 @@ def update_current_season(team_id):
                 upsert=True
             )
 
-        logging.info(f"(Team Seasons) Updated current season for team {team_id}")
+            logging.info(f"\t(Team Seasons) Updated {k_current_season} stats for {team_id}.")
     except Exception as e:
-        logging.error(f"(Team Seasons) Failed to update current season for team {team_id}: {e}")
+        logging.error(f"\t(Team Seasons) Failed to update current season for team {team_id}: {e}")
 
 
 def fetch_all_seasons(team_id):
@@ -125,11 +123,11 @@ if __name__ == "__main__":
 
     try:
         # Loop through all documents in the collection
-        for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, "_id": 0})):
-            team = doc['TEAM_ID']
-            #update_current_season(team)
-            fetch_all_seasons(team)
+        #for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, "_id": 0})):
+            #team = doc['TEAM_ID']
+            update_current_season(1610612750)
+            #fetch_all_seasons(team)
             # time.sleep(30)
-        #rank_hustle_stats_current_season()
+       # rank_hustle_stats_current_season()
     except Exception as e:
         logging.error(f"Error updating team seasons: {e}")

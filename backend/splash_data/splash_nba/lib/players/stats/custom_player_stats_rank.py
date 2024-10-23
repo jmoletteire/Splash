@@ -11,7 +11,6 @@ def current_season_custom_stats_rank():
     client = MongoClient(uri)
     db = client.splash
     players_collection = db.nba_players
-    logging.info("Connected to MongoDB")
 
     # Stats to rank
     custom_stats = [
@@ -232,6 +231,7 @@ def current_season_custom_stats_rank():
                 {"$set": {
                     f"STATS.{k_current_season}.{stat[1]}.{stat[0]}_RANK": res}}
             )
+
 
 def custom_stats_rank():
     # Configure logging

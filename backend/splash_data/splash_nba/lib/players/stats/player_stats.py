@@ -5,6 +5,15 @@ import logging
 
 
 def update_player_playoff_stats():
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    # Replace with your MongoDB connection string
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    logging.info("Connected to MongoDB")
+
     basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=k_current_season, season_type_all_star='Playoffs').get_normalized_dict()['LeagueDashPlayerStats']
     adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=k_current_season, season_type_all_star='Playoffs').get_normalized_dict()['LeagueDashPlayerStats']
 
@@ -34,6 +43,15 @@ def update_player_playoff_stats():
 
 
 def update_player_stats():
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    # Replace with your MongoDB connection string
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    logging.info("Connected to MongoDB")
+
     # Fetch basic and advanced stats for the given season
     basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=k_current_season).get_normalized_dict()['LeagueDashPlayerStats']
     adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=k_current_season).get_normalized_dict()['LeagueDashPlayerStats']

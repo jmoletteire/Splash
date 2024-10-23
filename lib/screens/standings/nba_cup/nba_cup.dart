@@ -99,15 +99,37 @@ class _NbaCupState extends State<NbaCup>
       body: TabBarView(
         controller: _tabController,
         children: [
-          ScrollConfiguration(
-            behavior: MyCustomScrollBehavior(),
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: groups.keys.map((groupName) {
-                return GroupStandings(
-                  key: UniqueKey(),
-                  columnNames: [
-                    groupName,
+          CustomScrollView(
+            controller: _scrollController,
+            slivers: groups.keys.map((groupName) {
+              return GroupStandings(
+                key: UniqueKey(),
+                columnNames: [
+                  groupName,
+                  'W',
+                  'L',
+                  'PCT',
+                  'GB',
+                  'DIFF',
+                  'PTS',
+                  'OPP',
+                  'GAME 1',
+                  'GAME 2',
+                  'GAME 3',
+                  'GAME 4',
+                ],
+                standings: groups[groupName]!,
+                season: widget.selectedSeason,
+                groupController: _groupControllers.addAndGet(),
+              );
+            }).toList(),
+          ),
+          CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              WildcardStandings(
+                  columnNames: const [
+                    'EAST',
                     'W',
                     'L',
                     'PCT',
@@ -120,66 +142,31 @@ class _NbaCupState extends State<NbaCup>
                     'GAME 3',
                     'GAME 4',
                   ],
-                  standings: groups[groupName]!,
-                  season: widget.selectedSeason,
-                  groupController: _groupControllers.addAndGet(),
-                );
-              }).toList(),
-            ),
-          ),
-          ScrollConfiguration(
-            behavior: MyCustomScrollBehavior(),
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                WildcardStandings(
-                    columnNames: const [
-                      'EAST',
-                      'W',
-                      'L',
-                      'PCT',
-                      'GB',
-                      'DIFF',
-                      'PTS',
-                      'OPP',
-                      'GAME 1',
-                      'GAME 2',
-                      'GAME 3',
-                      'GAME 4',
-                    ],
-                    standings: widget.cupData['WILD CARD']['East']!,
-                    season: widget.selectedSeason),
-                WildcardStandings(
-                    columnNames: const [
-                      'WEST',
-                      'W',
-                      'L',
-                      'PCT',
-                      'GB',
-                      'DIFF',
-                      'PTS',
-                      'OPP',
-                      'GAME 1',
-                      'GAME 2',
-                      'GAME 3',
-                      'GAME 4',
-                    ],
-                    standings: widget.cupData['WILD CARD']['West']!,
-                    season: widget.selectedSeason),
-              ],
-            ),
+                  standings: widget.cupData['WILD CARD']['East']!,
+                  season: widget.selectedSeason),
+              WildcardStandings(
+                  columnNames: const [
+                    'WEST',
+                    'W',
+                    'L',
+                    'PCT',
+                    'GB',
+                    'DIFF',
+                    'PTS',
+                    'OPP',
+                    'GAME 1',
+                    'GAME 2',
+                    'GAME 3',
+                    'GAME 4',
+                  ],
+                  standings: widget.cupData['WILD CARD']['West']!,
+                  season: widget.selectedSeason),
+            ],
           ),
           if (widget.cupData.containsKey('KNOCKOUT'))
             KnockoutBracket(knockoutData: widget.cupData['KNOCKOUT'])
         ],
       ),
     );
-  }
-}
-
-class MyCustomScrollBehavior extends ScrollBehavior {
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const ClampingScrollPhysics();
   }
 }

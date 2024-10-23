@@ -226,7 +226,7 @@ class ZoneAggregator {
         zone.color = Colors.transparent; // Or any indicator for zero attempts
       } else {
         double fgPercentage = zone.FGM / zone.FGA;
-        double shotTypeAverage = leagueAverages['Zone'][zone.zoneName]['FG_PCT'];
+        double shotTypeAverage = leagueAverages['Zone']?[zone.zoneName]?['FG_PCT'] ?? 0.0;
         double percentDiff = fgPercentage - shotTypeAverage;
 
         // Assign colors based on FG% ranges, similar to hexagons

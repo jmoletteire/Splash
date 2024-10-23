@@ -64,7 +64,7 @@ class HexagonAggregator {
 
       double FGPercentage = hex.FGM / hex.FGA;
       double shotTypeAverage =
-          leagueAverages[hex.shotZoneRange['Zone']][hex.shotZoneRange['Range']];
+          leagueAverages[hex.shotZoneRange['Zone']]?[hex.shotZoneRange['Range']] ?? 0.00;
       double percentDiff = FGPercentage - shotTypeAverage;
 
       // Assign colors based on FG% ranges

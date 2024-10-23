@@ -32,9 +32,11 @@ class _PlayerStatsState extends State<PlayerStats> {
   double getPercentile(List<String> location, String stat) {
     num rank = (location.length == 1
             ? widget.player['STATS'][selectedSeason][selectedSeasonType][location[0]]
-                ['${stat}_RANK']
-            : widget.player['STATS'][selectedSeason][selectedSeasonType][location[0]]
-                [location[1]]['${stat}_RANK']) ??
+                    ['${stat}_RANK'] ??
+                0
+            : widget.player['STATS']?[selectedSeason]?[selectedSeasonType]?[location[0]]
+                    ?[location[1]]?['${stat}_RANK'] ??
+                0) ??
         0;
     return 1 -
         ((rank - 1) /

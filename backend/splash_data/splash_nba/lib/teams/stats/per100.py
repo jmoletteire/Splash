@@ -12,7 +12,7 @@ def current_season_per_100_possessions(team_doc, playoffs):
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
-        logging.error(f"(Team Per-100) Failed to connect to MongoDB: {e}")
+        logging.error(f"\t(Team Per-100) Failed to connect to MongoDB: {e}")
         exit(1)
 
     # List of tuples specifying the stats to calculate per-75 possession values for
@@ -70,7 +70,7 @@ def current_season_per_100_possessions(team_doc, playoffs):
             if reg_season_stats is None:
                 continue
 
-            adv_stats = season_stats.get("ADV", {})
+            adv_stats = reg_season_stats.get("ADV", {})
 
         possessions = adv_stats.get("POSS", None)
 
@@ -91,7 +91,7 @@ def current_season_per_100_possessions(team_doc, playoffs):
                     else:
                         stat_value = season_stats.get(location, {}).get(stat_key, None)
                 except KeyError:
-                    logging.error(f"(Team Per-100) Could not find stat for {stat_key} in {location}")
+                    logging.error(f"\t(Team Per-100) Could not find stat for {stat_key} in {location}")
                     stat_value = None
 
                 if stat_value is not None:
@@ -105,11 +105,11 @@ def current_season_per_100_possessions(team_doc, playoffs):
 
                         # Update the team document with the new per-100 possession value
                         teams_collection.update_one(
-                            {"_id": team_doc["_id"]},
+                            {"TEAM_ID": team_doc["TEAM_ID"]},
                             {"$set": {f"seasons.{season_key}.STATS.{location}.{per_100_key}": per_100_value}}
                         )
                     except Exception as e:
-                        logging.error(f'(Team Per-100) Unable to add {stat_key} for {team_doc["TEAM_ID"]} for {season_key}: {e}')
+                        logging.error(f"\t(Team Per-100) Unable to add {stat_key} for {team_doc['TEAM_ID']} for {season_key}: {e}")
         else:
             continue
 
@@ -213,7 +213,7 @@ if __name__ == "__main__":
     teams_collection = db.nba_teams
     logging.info("Connected to MongoDB")
 
-    playoffs = True
+    playoffs = False
 
     # Set the batch size
     batch_size = 10  # Adjust this value based on your needs and system performance
@@ -230,5 +230,6 @@ if __name__ == "__main__":
         for i, team_doc in enumerate(batch_cursor):
             logging.info(f'Processing {i + 1} of {batch_size}')
             calculate_and_update_per_100_possessions(team_doc, playoffs)
+            #current_season_per_100_possessions(team_doc, playoffs)
 
     print("Per-100 possession values have been calculated and updated.")

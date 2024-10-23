@@ -49,9 +49,9 @@ class _CareerStatsState extends State<CareerStats> {
     'eFG%',
     'TS%',
     'USG%',
+    'NRTG',
     'ORTG',
     'DRTG',
-    'NRTG',
     'DIE',
   ];
   List<String> tradedYears = [];
@@ -270,6 +270,15 @@ class _CareerStatsState extends State<CareerStats> {
 
         if (widget.seasonType != 'COLLEGE')
 
+          /// NRTG
+          TableColumn(
+            width: isLandscape
+                ? MediaQuery.of(context).size.width * 0.06
+                : MediaQuery.of(context).size.width * 0.13,
+          ),
+
+        if (widget.seasonType != 'COLLEGE')
+
           /// ORTG
           TableColumn(
             width: isLandscape
@@ -280,15 +289,6 @@ class _CareerStatsState extends State<CareerStats> {
         if (widget.seasonType != 'COLLEGE')
 
           /// DRTG
-          TableColumn(
-            width: isLandscape
-                ? MediaQuery.of(context).size.width * 0.06
-                : MediaQuery.of(context).size.width * 0.13,
-          ),
-
-        if (widget.seasonType != 'COLLEGE')
-
-          /// NRTG
           TableColumn(
             width: isLandscape
                 ? MediaQuery.of(context).size.width * 0.06
@@ -836,7 +836,7 @@ class _CareerStatsState extends State<CareerStats> {
           }
           return StandingsDataText(
             text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
-                ? season['ORTG_ON_OFF'].toStringAsFixed(1)
+                ? season['NRTG_ON_OFF'].toStringAsFixed(1)
                 : '-',
             color: tradedYears.contains(season['SEASON_ID']) &&
                     season['TEAM_ABBREVIATION'] != 'TOT'
@@ -853,7 +853,7 @@ class _CareerStatsState extends State<CareerStats> {
           }
           return StandingsDataText(
             text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
-                ? season['DRTG_ON_OFF'].toStringAsFixed(1)
+                ? season['ORTG_ON_OFF'].toStringAsFixed(1)
                 : '-',
             color: tradedYears.contains(season['SEASON_ID']) &&
                     season['TEAM_ABBREVIATION'] != 'TOT'
@@ -870,7 +870,7 @@ class _CareerStatsState extends State<CareerStats> {
           }
           return StandingsDataText(
             text: int.parse(season['SEASON_ID'].substring(0, 4)) >= 2007
-                ? season['NRTG_ON_OFF'].toStringAsFixed(1)
+                ? season['DRTG_ON_OFF'].toStringAsFixed(1)
                 : '-',
             color: tradedYears.contains(season['SEASON_ID']) &&
                     season['TEAM_ABBREVIATION'] != 'TOT'

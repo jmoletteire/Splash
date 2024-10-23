@@ -352,56 +352,54 @@ class _KnockoutBracketState extends State<KnockoutBracket> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Stack(
-        children: [
-          // CustomPaint for drawing lines
-          CustomPaint(
-            size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
-            painter: BracketPainter(widget.knockoutData),
-          ),
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  seriesCard(widget.knockoutData[0], widget.knockoutData[0]['roundNumber']),
-                  seriesCard(widget.knockoutData[1], widget.knockoutData[1]['roundNumber']),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 60),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  seriesCard(widget.knockoutData[4], widget.knockoutData[4]['roundNumber']),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 60),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  seriesCard(widget.knockoutData[6], widget.knockoutData[6]['roundNumber']),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 60),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  seriesCard(widget.knockoutData[5], widget.knockoutData[5]['roundNumber']),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 60),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  seriesCard(widget.knockoutData[2], widget.knockoutData[2]['roundNumber']),
-                  seriesCard(widget.knockoutData[3], widget.knockoutData[3]['roundNumber']),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
+    return Stack(
+      children: [
+        // CustomPaint for drawing lines
+        CustomPaint(
+          size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+          painter: BracketPainter(widget.knockoutData),
+        ),
+        Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                seriesCard(widget.knockoutData[0], widget.knockoutData[0]['roundNumber']),
+                seriesCard(widget.knockoutData[1], widget.knockoutData[1]['roundNumber']),
+              ],
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height / 60),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                seriesCard(widget.knockoutData[4], widget.knockoutData[4]['roundNumber']),
+              ],
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height / 60),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                seriesCard(widget.knockoutData[6], widget.knockoutData[6]['roundNumber']),
+              ],
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height / 60),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                seriesCard(widget.knockoutData[5], widget.knockoutData[5]['roundNumber']),
+              ],
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height / 60),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                seriesCard(widget.knockoutData[2], widget.knockoutData[2]['roundNumber']),
+                seriesCard(widget.knockoutData[3], widget.knockoutData[3]['roundNumber']),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

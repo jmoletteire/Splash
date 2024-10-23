@@ -1,6 +1,6 @@
 import random
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from nba_api.stats.endpoints import boxscoretraditionalv2, videoeventsasset
 from nba_api.live.nba.endpoints import playbyplay
@@ -10,9 +10,16 @@ import logging
 
 
 def update_play_by_play():
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    client = MongoClient(uri)
+    db = client.splash
+    games_collection = db.nba_games
+
     # Video PBP
-    today = datetime.today().strftime('%Y-%m-%d')
-    with games_collection.find({'GAME_DATE': today}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}) as cursor:
+    yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    with games_collection.find({'GAME_DATE': yesterday}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}) as cursor:
         docs = list(cursor)
         if not docs:
             return
@@ -111,7 +118,7 @@ if __name__ == "__main__":
         while processed_count < total_documents:
             with games_collection.find({
                 "$and": [
-                    {"GAME_DATE": {"$lt": "2024-03-01"}},
+                    {"GAME_DATE": {"$lt": "2023-11-04"}},
                     {"SEASON_CODE": '22023'}
                 ]
             }, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(

@@ -50,7 +50,7 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
         db = client.splash
         games_collection = db.nba_games
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+        logging.error(f"\tFailed to connect to MongoDB: {e}")
         exit(1)
 
     try:
@@ -81,7 +81,7 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
         return starters
 
     except Exception as e:
-        logging.error(f"Error while getting last lineup: {e}")
+        logging.error(f"\tError while getting last lineup: {e}")
 
 
 if __name__ == "__main__":

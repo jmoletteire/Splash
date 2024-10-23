@@ -85,9 +85,12 @@ class _TeamComparisonState extends State<TeamComparison> {
                   selectedSeasonTwo = seasonsTwo[1];
                   seasonsTwo.removeAt(0);
                 }
-
-                teamTwo['seasons'][selectedSeasonTwo]['STATS']['PLAYOFFS'].keys.contains('ADV')
-                    ? seasonTypesTwo = ['REGULAR SEASON', 'PLAYOFFS']
+                teamTwo['seasons'][selectedSeasonTwo]['STATS'].keys.contains('PLAYOFFS')
+                    ? teamTwo['seasons'][selectedSeasonTwo]['STATS']['PLAYOFFS']
+                            .keys
+                            .contains('ADV')
+                        ? seasonTypesTwo = ['REGULAR SEASON', 'PLAYOFFS']
+                        : seasonTypesTwo = ['REGULAR SEASON']
                     : seasonTypesTwo = ['REGULAR SEASON'];
                 selectedSeasonTypeTwo = seasonTypesTwo.first;
               } else {
@@ -180,8 +183,10 @@ class _TeamComparisonState extends State<TeamComparison> {
         seasonsOne.removeAt(0);
       }
 
-      teamOne['seasons'][selectedSeasonOne]['STATS']['PLAYOFFS'].keys.contains('ADV')
-          ? seasonTypesOne = ['REGULAR SEASON', 'PLAYOFFS']
+      teamOne['seasons'][selectedSeasonOne]['STATS'].keys.contains('PLAYOFFS')
+          ? teamOne['seasons'][selectedSeasonOne]['STATS']['PLAYOFFS'].keys.contains('ADV')
+              ? seasonTypesOne = ['REGULAR SEASON', 'PLAYOFFS']
+              : seasonTypesOne = ['REGULAR SEASON']
           : seasonTypesOne = ['REGULAR SEASON'];
 
       selectedSeasonTypeOne = seasonTypesOne.first;

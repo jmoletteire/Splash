@@ -37,7 +37,8 @@ class _TeamHistoryState extends State<TeamHistory> {
 
   String getPlayoffs(dynamic teamSeason) {
     if (teamSeason['CONF_RANK'] == 0 &&
-        int.parse(teamSeason['YEAR'].substring(0, 4)) >= 1970) {
+            int.parse(teamSeason['YEAR'].substring(0, 4)) >= 1970 ||
+        (teamSeason['PO_WINS'] == 0 && teamSeason['PO_LOSSES'] == 0)) {
       return '-';
     }
 

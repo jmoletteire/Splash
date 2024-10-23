@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from splash_nba.util.env import uri, k_current_season
+from splash_nba.util.env import uri, k_current_season, k_current_season_type
 import logging
 
 
@@ -37,10 +37,10 @@ def rank_hustle_stats_current_season():
                 {
                     "$setWindowFields": {
                         "sortBy": {
-                            f"seasons.{k_current_season}.STATS.HUSTLE.{stat}": -1
+                            f"seasons.{k_current_season}.STATS.{k_current_season_type}.HUSTLE.{stat}": -1
                         },
                         "output": {
-                            f"seasons.{k_current_season}.STATS.HUSTLE.{stat}_RANK": {
+                            f"seasons.{k_current_season}.STATS.{k_current_season_type}.HUSTLE.{stat}_RANK": {
                                 "$documentNumber": {}
                             }
                         }

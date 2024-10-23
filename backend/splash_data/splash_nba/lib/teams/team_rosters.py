@@ -15,7 +15,7 @@ def update_current_roster(team_id, season_not_started):
         teams_collection = db.nba_teams
         players_collection = db.nba_players
     except Exception as e:
-        logging.error(f"(Team Rosters) Failed to connect to MongoDB: {e}")
+        logging.error(f"\t(Team Rosters) Failed to connect to MongoDB: {e}")
         exit(1)
 
     try:
@@ -23,7 +23,7 @@ def update_current_roster(team_id, season_not_started):
         team_roster = team_data['CommonTeamRoster']
         team_coaches = team_data['Coaches']
     except Exception as e:
-        logging.error(f"(Team Rosters) Unable to fetch {k_current_season} roster for team {team_id}: {e}")
+        logging.error(f"\t(Team Rosters) Unable to fetch {k_current_season} roster for team {team_id}: {e}")
 
     try:
         team_roster_dict = {}
@@ -58,7 +58,7 @@ def update_current_roster(team_id, season_not_started):
                 team_roster_dict[str(player['PLAYER_ID'])] = player
 
             except Exception as e:
-                logging.error(f"(Team Rosters) Unable to fetch {player['PLAYER']} for team {team_id} for {k_current_season}: {e}")
+                logging.error(f"\t(Team Rosters) Unable to fetch {player['PLAYER']} for team {team_id} for {k_current_season}: {e}")
                 player['GP'] = 0
                 player['GS'] = 0
                 player['MIN'] = 0
@@ -72,9 +72,9 @@ def update_current_roster(team_id, season_not_started):
             {"$set": {f"seasons.{k_current_season}.ROSTER": team_roster_dict, f"seasons.{k_current_season}.COACHES": team_coaches}},
             upsert=True
         )
-        logging.info(f"(Team Rosters) Updated {k_current_season} roster for team {team_id}")
+        logging.info(f"\t(Team Rosters) Updated {k_current_season} roster/coaches for team {team_id}")
     except Exception as e:
-        logging.error(f"(Team Rosters) Unable to update {k_current_season} roster for team {team_id}: {e}")
+        logging.error(f"\t(Team Rosters) Unable to update {k_current_season} roster for team {team_id}: {e}")
 
 
 def fetch_roster(team_id, season):

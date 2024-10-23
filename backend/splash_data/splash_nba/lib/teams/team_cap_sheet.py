@@ -96,6 +96,7 @@ def update_team_contract_data():
     client = MongoClient(uri)
     db = client.splash
     teams_collection = db.nba_teams
+    players_collection = db.nba_players
 
     # Define the GraphQL endpoint
     url = "https://fanspo.com/api/graphql"

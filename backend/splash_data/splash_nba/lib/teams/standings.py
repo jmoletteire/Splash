@@ -439,5 +439,5 @@ if __name__ == "__main__":
         logging.error(f"Failed to connect to MongoDB: {e}")
         exit(1)
 
-    fetch_all_standings()
-    # update_current_standings()
+    #fetch_all_standings()
+    update_current_standings()

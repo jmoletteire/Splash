@@ -3,7 +3,7 @@ from splash_nba.util.env import uri, k_current_season
 import logging
 
 
-def current_season_per_75(playoffs):
+def current_season_per_75(playoffs, team_id):
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -11,7 +11,6 @@ def current_season_per_75(playoffs):
     client = MongoClient(uri)
     db = client.splash
     players_collection = db.nba_players
-    logging.info("Connected to MongoDB")
 
     # List of tuples specifying the stats to calculate per-75 possession values for
     # Each tuple should be in the format ("stat_key", "location")
@@ -96,16 +95,15 @@ def current_season_per_75(playoffs):
     batch_size = 25
 
     # Get the total number of documents
-    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+    total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
     logging.info(f"(PER 75) Total player documents to process: {total_documents}")
 
     # Process documents in batches
     for batch_start in range(0, total_documents, batch_size):
-        logging.info(f"(PER 75) Processing batch starting at {batch_start}")
-        batch_cursor = players_collection.find({'ROSTERSTATUS': 'Active'}).skip(batch_start).limit(batch_size)
+        batch_cursor = players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}).skip(batch_start).limit(batch_size)
 
         for i, player_doc in enumerate(batch_cursor):
-            logging.info(f"(PER 75) Processing {i + 1} of {batch_size}")
+            logging.info(f"(PER 75) Processing {i + 1} of {total_documents}")
 
             stats = player_doc.get("STATS", None)
 
@@ -124,8 +122,11 @@ def current_season_per_75(playoffs):
                 adv_stats = playoff_stats.get("ADV", {})
             else:
                 try:
-                    reg_season_stats = player_doc['STATS'][k_current_season].get("REGULAR SEASON", {})
+                    reg_season_stats = player_doc['STATS'][k_current_season].get("REGULAR SEASON", None)
                 except KeyError:
+                    continue
+
+                if reg_season_stats is None:
                     continue
 
                 adv_stats = reg_season_stats.get("ADV", {})
@@ -142,11 +143,11 @@ def current_season_per_75(playoffs):
                     loc = location.split('.')
 
                     if len(loc) == 2:
-                        stat_value = k_current_season[loc[0]].get(loc[1], {}).get(stat_key, None)
+                        stat_value = stats[k_current_season][loc[0]].get(loc[1], {}).get(stat_key, None)
                     elif len(loc) == 3:
-                        stat_value = k_current_season[loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
+                        stat_value = stats[k_current_season][loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
                     else:
-                        stat_value = k_current_season.get(location, {}).get(stat_key, None)
+                        stat_value = stats[k_current_season].get(location, {}).get(stat_key, None)
 
                     if stat_value is not None:
                         try:

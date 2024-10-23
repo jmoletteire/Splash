@@ -12,11 +12,13 @@ class ConferenceStandings extends StatefulWidget {
   final List columnNames;
   final List<Map<String, dynamic>> standings;
   final String season;
+  final ScrollController scrollController;
 
   ConferenceStandings({
     required this.columnNames,
     required this.standings,
     required this.season,
+    required this.scrollController,
   });
 
   @override
@@ -92,7 +94,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return SliverTableView.builder(
-      horizontalScrollController: scrollController,
+      horizontalScrollController: widget.scrollController,
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
           vertical: TableViewVerticalDividersStyle.symmetric(
@@ -386,10 +388,17 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         return StandingsDataText(text: gb == '0.0' ? '-' : gb);
       case 5:
         try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['NET_RATING']!
-                  .toStringAsFixed(1));
+          double netRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
+              ['ADV']['NET_RATING'];
+          String positive = netRating > 0.0 ? '+' : '';
+          return Container(
+            alignment: Alignment.centerRight,
+            child: Text('$positive${netRating.toStringAsFixed(1)}',
+                style: kBebasNormal.copyWith(
+                  fontSize: 16.0.r,
+                  color: netRating > 0.0 ? const Color(0xFF55F86F) : const Color(0xFFFC3126),
+                )),
+          );
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
@@ -422,16 +431,19 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 9:
         try {
+          String streak =
+              teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak'];
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
               teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!,
               style: kBebasNormal.copyWith(
                 fontSize: 16.0.r,
-                color: teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!
-                        .contains('W')
-                    ? const Color(0xFF55F86F)
-                    : const Color(0xFFFC3126),
+                color: streak == 'W 0'
+                    ? Colors.white
+                    : streak.contains('W')
+                        ? const Color(0xFF55F86F)
+                        : const Color(0xFFFC3126),
               ),
             ),
           );

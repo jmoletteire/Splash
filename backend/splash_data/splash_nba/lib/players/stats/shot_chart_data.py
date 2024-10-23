@@ -1,13 +1,22 @@
 import random
 import time
+from collections import defaultdict
 
-from nba_api.stats.endpoints import shotchartdetail, videodetailsasset
+from nba_api.stats.endpoints import shotchartdetail, videodetailsasset, shotchartleaguewide
 from pymongo import MongoClient
 from splash_nba.util.env import uri
 import logging
 
 
 def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    # Replace with your MongoDB connection string
+    client = MongoClient(uri)
+    db = client.splash
+    player_shots_collection = db.nba_player_shot_data
+
     shot_data = shotchartdetail.ShotChartDetail(player_id=player, team_id=team, season_nullable=season,
                                                 season_type_all_star=season_type,
                                                 context_measure_simple='FGA').get_normalized_dict()
@@ -59,6 +68,56 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
             {'$set': {
                 'PLAYER_ID': 0,
                 f'SEASON.{season}.{season_type}': lg_avg
+            }},
+            upsert=True
+        )
+
+        league_avg = shotchartleaguewide.ShotChartLeagueWide(season=season).get_normalized_dict()
+
+        # Mapping from SHOT_ZONE_AREA and SHOT_ZONE_BASIC to your Dart zone names
+        zone_mapping = {
+            ('Above the Break 3', 'Left Side Center(LC)'): 'AB3 (L)',
+            ('Above the Break 3', 'Left Side(L)'): 'AB3 (L)',
+            ('Above the Break 3', 'Right Side Center(RC)'): 'AB3 (R)',
+            ('Above the Break 3', 'Right Side(R)'): 'AB3 (R)',
+            ('Above the Break 3', 'Center(C)'): 'AB3 (C)',
+            ('Left Corner 3', 'Left Side(L)'): 'C3 (L)',
+            ('Right Corner 3', 'Right Side(R)'): 'C3 (R)',
+            ('Mid-Range', 'Left Side Center(LC)'): 'LONG MID RANGE (L)',
+            ('Mid-Range', 'Left Side(L)'): 'LONG MID RANGE (L)',
+            ('Mid-Range', 'Right Side Center(RC)'): 'LONG MID RANGE (R)',
+            ('Mid-Range', 'Right Side(R)'): 'LONG MID RANGE (R)',
+            ('Mid-Range', 'Center(C)'): 'LONG MID RANGE (C)',
+            ('In The Paint (Non-RA)', 'Left Side(L)'): 'SHORT MID RANGE',
+            ('In The Paint (Non-RA)', 'Right Side(R)'): 'SHORT MID RANGE',
+            ('In The Paint (Non-RA)', 'Center(C)'): 'SHORT MID RANGE',
+            ('Restricted Area', 'Center(C)'): 'RESTRICTED AREA',
+            ('Backcourt', 'Back Court(BC)'): 'Backcourt'
+        }
+
+        # Initialize a default dict to accumulate FGA, FGM
+        zone_aggregates = defaultdict(lambda: {'FGA': 0, 'FGM': 0})
+
+        # Aggregating data based on zone_mapping
+        for entry in league_avg['League_Wide']:
+            key = (entry['SHOT_ZONE_BASIC'], entry['SHOT_ZONE_AREA'])
+            if key in zone_mapping:
+                zone = zone_mapping[key]
+                zone_aggregates[zone]['FGA'] += entry['FGA']
+                zone_aggregates[zone]['FGM'] += entry['FGM']
+
+        # Calculate FG_PCT for each zone
+        for zone, stats in zone_aggregates.items():
+            stats['FG_PCT'] = stats['FGM'] / stats['FGA'] if stats['FGA'] > 0 else 0
+
+        # Convert to dictionary of dictionaries with Zone Names as keys and FG_PCT values as the values
+        final_zone_data = {zone: {'FG_PCT': stats['FG_PCT']} for zone, stats in zone_aggregates.items()}
+
+        player_shots_collection.update_one(
+            {'PLAYER_ID': 0},
+            {'$set': {
+                'PLAYER_ID': 0,
+                f'SEASON.{season}.{season_type}.Zone': final_zone_data
             }},
             upsert=True
         )
