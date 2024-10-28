@@ -416,6 +416,7 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
                           children: [
                             ListView.builder(
                               shrinkWrap: true,
+                              padding: EdgeInsets.only(bottom: 20.0.r),
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: prevGamesMap[game['OPP']]!.length,
                               itemBuilder: (BuildContext context, int index) {
