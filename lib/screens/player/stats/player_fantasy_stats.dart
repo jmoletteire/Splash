@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../game/game_home.dart';
+import '../../team/team_cache.dart';
 
 class PlayerFantasyStats extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -16,6 +18,10 @@ class PlayerFantasyStats extends StatefulWidget {
 
 class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
   List gamelogs = [];
+  List nextFiveGames = [];
+  Map<int, dynamic> prevGamesMap = {};
+  Map<int, bool> _isExpandedMap = {};
+  late TeamCache teamCache;
 
   Map<String, dynamic> getGames() {
     Map<String, dynamic> seasons = widget.player['STATS'] ?? {};
@@ -33,10 +39,54 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
     return {};
   }
 
+  void getNextGames() {
+    Map<String, dynamic> schedule = widget.team['seasons'][kCurrentSeason]['GAMES'] ?? {};
+
+    if (schedule.isNotEmpty) {
+      // Convert the map to a list of entries
+      var entries = schedule.entries.toList();
+
+      // Sort the entries by the GAME_DATE value
+      entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
+
+      // Extract the sorted keys
+      var games = entries.map((e) => e.key).toList();
+
+      final nextGame = DateTime.parse(schedule[games.last]['GAME_DATE']);
+      final today = DateTime.now();
+
+      // Strip the time part by only keeping year, month, and day
+      final nextGameDate = DateTime(nextGame.year, nextGame.month, nextGame.day);
+      final todayDate = DateTime(today.year, today.month, today.day);
+
+      // If season has not ended
+      if (nextGameDate.compareTo(todayDate) >= 0) {
+        // Find next game
+        for (var game in games) {
+          if (nextFiveGames.length == 5) {
+            break;
+          }
+          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) >= 0 &&
+              schedule[game]['RESULT'] != 'Cancelled') {
+            nextFiveGames.add(schedule[game]);
+            _isExpandedMap[schedule[game]['OPP']] = false;
+            prevGamesMap[schedule[game]['OPP']] = gamelogs
+                .where((e) =>
+                    kTeamAbbrToId[e['MATCHUP'].substring(e['MATCHUP'].length - 3)] ==
+                    schedule[game]['OPP'].toString())
+                .toList();
+          }
+        }
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    teamCache = Provider.of<TeamCache>(context, listen: false);
     getGames();
+    getNextGames();
   }
 
   @override
@@ -56,36 +106,190 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
       return [dayOfWeek, monthDate];
     }
 
-    return SingleChildScrollView(
-      child: Stack(children: [
-        Column(
-          children: [
-            // Other content can go here
-            SizedBox(height: 20.0.r),
-            Text(
-              'Recent Games',
-              style: kBebasBold.copyWith(fontSize: 20.0.r),
+    String getStanding(int rank) {
+      switch (rank) {
+        case 1:
+          return '${rank}st';
+        case 2:
+          return '${rank}nd';
+        case 3:
+          return '${rank}rd';
+        case 21:
+          return '${rank}st';
+        case 22:
+          return '${rank}nd';
+        case 23:
+          return '${rank}rd';
+        default:
+          return '${rank}th';
+      }
+    }
+
+    Widget upcomingGameRow(Map<String, dynamic> game) {
+      List<String> gameDate = formatDate(game['GAME_DATE']);
+      Map<String, dynamic>? opp = teamCache.getTeam(game['OPP'].toString());
+      Map<String, dynamic> oppStats = {};
+
+      if (opp != null) {
+        if (opp['seasons'].containsKey(kCurrentSeason)) {
+          oppStats['DRTG'] = [
+            opp['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']['ADV']['DEF_RATING'],
+            opp['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']['ADV']['DEF_RATING_RANK']
+          ];
+          oppStats['PACE'] = [
+            opp['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']['ADV']['PACE'],
+            opp['seasons'][kCurrentSeason]['STATS']['REGULAR SEASON']['ADV']['PACE_RANK']
+          ];
+        }
+      }
+
+      return Row(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  gameDate[0],
+                  style: kBebasNormal.copyWith(fontSize: 11.0.r, color: Colors.white70),
+                ),
+                Text(
+                  gameDate[1],
+                  style: kBebasNormal.copyWith(fontSize: 11.0.r),
+                ),
+              ],
             ),
-            SizedBox(height: 10.0.r),
-            Stack(children: [
-              Positioned(
-                  bottom: 50.0.r,
-                  child: Opacity(
-                    opacity: 0.2,
-                    child: ColorFiltered(
-                      colorFilter: const ColorFilter.matrix(<double>[
-                        0.2126, 0.7152, 0.0722, 0, 0, // Red channel
-                        0.2126, 0.7152, 0.0722, 0, 0, // Green channel
-                        0.2126, 0.7152, 0.0722, 0, 0, // Blue channel
-                        0, 0, 0, 1, 0, // Alpha channel
-                      ]),
-                      child: Image.network(
-                        'https://cdn.nba.com/silos/nba/latest/440x700/${widget.player['PERSON_ID']}.png',
-                        width: MediaQuery.of(context).size.width,
-                        height: 250.0.r,
-                      ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  game['HOME_AWAY'] == '@' ? '@ ' : ' ',
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                ),
+                Text(
+                  kTeamIdToName[game['OPP'].toString()][1],
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                ),
+                SizedBox(width: 8.0.r),
+                SizedBox(
+                  width: 25.0.r,
+                  height: 20.0.r,
+                  child: Image.asset('images/NBA_Logos/${game['OPP']}.png'),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 5,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      '${oppStats['DRTG'][0]} ',
+                      style: kBebasNormal.copyWith(
+                          fontSize: 16.0.r,
+                          color: oppStats['DRTG'][1] <= 5
+                              ? const Color(0xDFFF3333)
+                              : oppStats['DRTG'][1] <= 10
+                                  ? Colors.redAccent
+                                  : oppStats['DRTG'][1] <= 20
+                                      ? Colors.orangeAccent
+                                      : oppStats['DRTG'][1] <= 25
+                                          ? const Color(0xFF32CE78)
+                                          : const Color(0xFF03A208)),
                     ),
-                  )),
+                    Text(
+                      '  ${getStanding(oppStats['DRTG'][1])}',
+                      style: kBebasNormal.copyWith(
+                          fontSize: 12.0.r,
+                          color: oppStats['DRTG'][1] <= 5
+                              ? const Color(0xDFFF3333)
+                              : oppStats['DRTG'][1] <= 10
+                                  ? Colors.redAccent
+                                  : oppStats['DRTG'][1] <= 20
+                                      ? Colors.orangeAccent
+                                      : oppStats['DRTG'][1] <= 25
+                                          ? const Color(0xFF32CE78)
+                                          : const Color(0xFF03A208)),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      '${oppStats['PACE'][0].toStringAsFixed(1)} ',
+                      style: kBebasNormal.copyWith(
+                          fontSize: 16.0.r,
+                          color: oppStats['PACE'][1] > 25
+                              ? const Color(0xDFFF3333)
+                              : oppStats['PACE'][1] > 20
+                                  ? Colors.redAccent
+                                  : oppStats['PACE'][1] > 10
+                                      ? Colors.orangeAccent
+                                      : oppStats['PACE'][1] > 5
+                                          ? const Color(0xFF32CE78)
+                                          : const Color(0xFF03A208)),
+                    ),
+                    Text(
+                      '  ${getStanding(oppStats['PACE'][1])}',
+                      style: kBebasNormal.copyWith(
+                          fontSize: 12.0.r,
+                          color: oppStats['PACE'][1] > 25
+                              ? const Color(0xDFFF3333)
+                              : oppStats['PACE'][1] > 20
+                                  ? Colors.redAccent
+                                  : oppStats['PACE'][1] > 10
+                                      ? Colors.orangeAccent
+                                      : oppStats['PACE'][1] > 5
+                                          ? const Color(0xFF32CE78)
+                                          : const Color(0xFF03A208)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Other content can go here
+          SizedBox(height: 20.0.r),
+          Text(
+            'Recent Games',
+            style: kBebasBold.copyWith(fontSize: 20.0.r),
+          ),
+          SizedBox(height: 10.0.r),
+          Stack(
+            children: [
+              Positioned(
+                bottom: 50.0.r,
+                child: Opacity(
+                  opacity: 0.2,
+                  child: ColorFiltered(
+                    colorFilter: const ColorFilter.matrix(<double>[
+                      0.2126, 0.7152, 0.0722, 0, 0, // Red channel
+                      0.2126, 0.7152, 0.0722, 0, 0, // Green channel
+                      0.2126, 0.7152, 0.0722, 0, 0, // Blue channel
+                      0, 0, 0, 1, 0, // Alpha channel
+                    ]),
+                    child: Image.network(
+                      'https://cdn.nba.com/silos/nba/latest/440x700/${widget.player['PERSON_ID']}.png',
+                      width: MediaQuery.of(context).size.width,
+                      height: 250.0.r,
+                    ),
+                  ),
+                ),
+              ),
               SizedBox(
                 height: 250.0.r,
                 child: ListView.builder(
@@ -137,23 +341,517 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
                   },
                 ),
               ),
-            ]),
-            // More content below the bar chart
-            SizedBox(height: 20.0.r),
-            Text(
-              'More Content Below the Bar Chart',
-              style: TextStyle(fontSize: 18),
+            ],
+          ),
+          // More content below the bar chart
+          SizedBox(height: 25.0.r),
+          const Text(
+            'Upcoming Games',
+            style: kBebasNormal,
+          ),
+          SizedBox(height: 5.0.r),
+          Card(
+            color: Colors.grey.shade900,
+            margin: EdgeInsets.fromLTRB(11.0.r, 0.0, 11.0.r, 11.0.r),
+            child: Padding(
+              padding: EdgeInsets.all(11.0.r),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Date',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Opp',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 5,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              'DRTG',
+                              style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                            ),
+                            Text(
+                              'PACE',
+                              style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
+                  for (var game in nextFiveGames)
+                    Container(
+                      decoration: BoxDecoration(
+                          border: Border(bottom: BorderSide(color: Colors.grey.shade700))),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          tilePadding: EdgeInsets.zero,
+                          title: upcomingGameRow(game),
+                          trailing: Icon(
+                            _isExpandedMap[game['OPP']]!
+                                ? Icons.expand_less
+                                : Icons.expand_more,
+                            color: Colors.white70,
+                          ),
+                          onExpansionChanged: (bool expanded) {
+                            setState(() {
+                              _isExpandedMap[game['OPP']] = expanded;
+                            });
+                          },
+                          children: [
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: prevGamesMap[game['OPP']]!.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                int year = int.parse(prevGamesMap[game['OPP']]![index]
+                                        ['GAME_ID']
+                                    .toString()
+                                    .substring(3, 5));
+                                String season = '20$year-${year + 1}';
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (index == 0 ||
+                                        (index > 0 &&
+                                            prevGamesMap[game['OPP']]![index]['GAME_ID']
+                                                    .toString()
+                                                    .substring(3, 5) !=
+                                                prevGamesMap[game['OPP']]![index - 1]
+                                                        ['GAME_ID']
+                                                    .toString()
+                                                    .substring(3, 5)))
+                                      Column(
+                                        children: [
+                                          SizedBox(height: 10.0.r),
+                                          Text(season,
+                                              style: kBebasNormal.copyWith(fontSize: 14.0.r)),
+                                          SizedBox(height: 5.0.r),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 3,
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'DATE',
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'OPP',
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 3,
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        'FP',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'MIN',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'POSS',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 5.0.r),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'PTS',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'REB',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'AST',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'STL',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'BLK',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  'TOV',
+                                                  textAlign: TextAlign.center,
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  formatDate(prevGamesMap[game['OPP']]![index]
+                                                      ['GAME_DATE'])[1],
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  prevGamesMap[game['OPP']]![index]['MATCHUP']
+                                                              [4] ==
+                                                          '@'
+                                                      ? prevGamesMap[game['OPP']]![index]
+                                                              ['MATCHUP']
+                                                          .substring(4)
+                                                      : prevGamesMap[game['OPP']]![index]
+                                                              ['MATCHUP']
+                                                          .substring(8),
+                                                  style:
+                                                      kBebasNormal.copyWith(fontSize: 13.0.r),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 3,
+                                          child: Row(children: [
+                                            Expanded(
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                margin: const EdgeInsets.all(0.5),
+                                                decoration: BoxDecoration(
+                                                  color: (prevGamesMap[game['OPP']]![index]
+                                                                  ['NBA_FANTASY_PTS'] ??
+                                                              0) >=
+                                                          40.0
+                                                      ? Colors.greenAccent
+                                                      : (prevGamesMap[game['OPP']]![index]
+                                                                      ['NBA_FANTASY_PTS'] ??
+                                                                  0) >=
+                                                              20.0
+                                                          ? const Color(0xFFFAE16E)
+                                                          : const Color(0xFFF38989),
+                                                  borderRadius: BorderRadius.circular(3.0),
+                                                ),
+                                                child: Text(
+                                                  (prevGamesMap[game['OPP']]![index]
+                                                              ['NBA_FANTASY_PTS'] ??
+                                                          0)
+                                                      .toStringAsFixed(1),
+                                                  style: kBebasNormal.copyWith(
+                                                      fontSize: 14.0.r,
+                                                      color: Colors.grey.shade800),
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                margin: const EdgeInsets.all(0.5),
+                                                decoration: BoxDecoration(
+                                                  color: (prevGamesMap[game['OPP']]![index]
+                                                                  ['MIN'] ??
+                                                              0) >=
+                                                          29.5
+                                                      ? Colors.greenAccent
+                                                      : (prevGamesMap[game['OPP']]![index]
+                                                                      ['MIN'] ??
+                                                                  0) >
+                                                              24.5
+                                                          ? const Color(0xFFFAE16E)
+                                                          : const Color(0xFFF38989),
+                                                  borderRadius: BorderRadius.circular(3.0),
+                                                ),
+                                                child: Text(
+                                                  (prevGamesMap[game['OPP']]![index]['MIN'] ??
+                                                          0)
+                                                      .toStringAsFixed(0),
+                                                  style: kBebasNormal.copyWith(
+                                                      fontSize: 14.0.r,
+                                                      color: Colors.grey.shade800),
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                margin: const EdgeInsets.all(0.5),
+                                                decoration: BoxDecoration(
+                                                  color: (prevGamesMap[game['OPP']]![index]
+                                                                  ['POSS'] ??
+                                                              0) >=
+                                                          50
+                                                      ? Colors.greenAccent
+                                                      : (prevGamesMap[game['OPP']]![index]
+                                                                      ['POSS'] ??
+                                                                  0) >
+                                                              38
+                                                          ? const Color(0xFFFAE16E)
+                                                          : const Color(0xFFF38989),
+                                                  borderRadius: BorderRadius.circular(3.0),
+                                                ),
+                                                child: Text(
+                                                  (prevGamesMap[game['OPP']]![index]['POSS'] ??
+                                                          0)
+                                                      .toStringAsFixed(0),
+                                                  style: kBebasNormal.copyWith(
+                                                      fontSize: 14.0.r,
+                                                      color: Colors.grey.shade800),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 5.0.r),
+                                          ]),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.all(0.5),
+                                            decoration: BoxDecoration(
+                                              color: (prevGamesMap[game['OPP']]![index]
+                                                              ['PTS'] ??
+                                                          0) >=
+                                                      20
+                                                  ? Colors.greenAccent
+                                                  : (prevGamesMap[game['OPP']]![index]
+                                                                  ['PTS'] ??
+                                                              0) >=
+                                                          10
+                                                      ? const Color(0xFFFAE16E)
+                                                      : const Color(0xFFF38989),
+                                              borderRadius: BorderRadius.circular(3.0),
+                                            ),
+                                            child: Text(
+                                              (prevGamesMap[game['OPP']]![index]['PTS'] ?? 0)
+                                                  .toStringAsFixed(0),
+                                              style: kBebasNormal.copyWith(
+                                                  fontSize: 14.0.r,
+                                                  color: Colors.grey.shade800),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.all(0.5),
+                                            decoration: BoxDecoration(
+                                              color: (prevGamesMap[game['OPP']]![index]
+                                                              ['REB'] ??
+                                                          0) >=
+                                                      8
+                                                  ? Colors.greenAccent
+                                                  : (prevGamesMap[game['OPP']]![index]
+                                                                  ['REB'] ??
+                                                              0) >=
+                                                          5
+                                                      ? const Color(0xFFFAE16E)
+                                                      : const Color(0xFFF38989),
+                                              borderRadius: BorderRadius.circular(3.0),
+                                            ),
+                                            child: Text(
+                                              (prevGamesMap[game['OPP']]![index]['REB'] ?? 0)
+                                                  .toStringAsFixed(0),
+                                              style: kBebasNormal.copyWith(
+                                                  fontSize: 14.0.r,
+                                                  color: Colors.grey.shade800),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.all(0.5),
+                                            decoration: BoxDecoration(
+                                              color: (prevGamesMap[game['OPP']]![index]
+                                                              ['AST'] ??
+                                                          0) >=
+                                                      5
+                                                  ? Colors.greenAccent
+                                                  : (prevGamesMap[game['OPP']]![index]
+                                                                  ['AST'] ??
+                                                              0) >=
+                                                          3
+                                                      ? const Color(0xFFFAE16E)
+                                                      : const Color(0xFFF38989),
+                                              borderRadius: BorderRadius.circular(3.0),
+                                            ),
+                                            child: Text(
+                                              (prevGamesMap[game['OPP']]![index]['AST'] ?? 0)
+                                                  .toStringAsFixed(0),
+                                              style: kBebasNormal.copyWith(
+                                                  fontSize: 14.0.r,
+                                                  color: Colors.grey.shade800),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.all(0.5),
+                                            decoration: BoxDecoration(
+                                              color: (prevGamesMap[game['OPP']]![index]
+                                                              ['STL'] ??
+                                                          0) >=
+                                                      2
+                                                  ? Colors.greenAccent
+                                                  : (prevGamesMap[game['OPP']]![index]
+                                                                  ['STL'] ??
+                                                              0) ==
+                                                          1
+                                                      ? const Color(0xFFFAE16E)
+                                                      : const Color(0xFFF38989),
+                                              borderRadius: BorderRadius.circular(3.0),
+                                            ),
+                                            child: Text(
+                                              (prevGamesMap[game['OPP']]![index]['STL'] ?? 0)
+                                                  .toStringAsFixed(0),
+                                              style: kBebasNormal.copyWith(
+                                                  fontSize: 14.0.r,
+                                                  color: Colors.grey.shade800),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.all(0.5),
+                                            decoration: BoxDecoration(
+                                              color: (prevGamesMap[game['OPP']]![index]
+                                                              ['BLK'] ??
+                                                          0) >=
+                                                      2
+                                                  ? Colors.greenAccent
+                                                  : (prevGamesMap[game['OPP']]![index]
+                                                                  ['BLK'] ??
+                                                              0) ==
+                                                          1
+                                                      ? const Color(0xFFFAE16E)
+                                                      : const Color(0xFFF38989),
+                                              borderRadius: BorderRadius.circular(3.0),
+                                            ),
+                                            child: Text(
+                                              (prevGamesMap[game['OPP']]![index]['BLK'] ?? 0)
+                                                  .toStringAsFixed(0),
+                                              style: kBebasNormal.copyWith(
+                                                  fontSize: 14.0.r,
+                                                  color: Colors.grey.shade800),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            margin: const EdgeInsets.all(0.5),
+                                            decoration: BoxDecoration(
+                                              color: (prevGamesMap[game['OPP']]![index]
+                                                              ['TOV'] ??
+                                                          0) <
+                                                      2
+                                                  ? Colors.greenAccent
+                                                  : (prevGamesMap[game['OPP']]![index]
+                                                                  ['TOV'] ??
+                                                              0) ==
+                                                          2
+                                                      ? const Color(0xFFFAE16E)
+                                                      : const Color(0xFFF38989),
+                                              borderRadius: BorderRadius.circular(3.0),
+                                            ),
+                                            child: Text(
+                                              (prevGamesMap[game['OPP']]![index]['TOV'] ?? 0)
+                                                  .toStringAsFixed(0),
+                                              style: kBebasNormal.copyWith(
+                                                  fontSize: 14.0.r,
+                                                  color: Colors.grey.shade800),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ),
             ),
-            SizedBox(height: 20.0.r),
-            // Example of additional content that scrolls vertically
-            Container(
-              height: 300,
-              color: Colors.blue[100],
-              child: Center(child: Text('Scrollable Content')),
-            ),
-          ],
-        ),
-      ]),
+          ),
+          SizedBox(height: 20.0.r),
+        ],
+      ),
     );
   }
 }
@@ -179,17 +877,17 @@ class Bar extends StatelessWidget {
   void showGameDetails(BuildContext context, Map<String, dynamic> gameData) {
     Color getColor(double value) {
       if (value > 35 && value <= 45) {
-        return Color(0xFF70DAC7);
+        return const Color(0xFF70DAC7);
       } else if (value > 25 && value <= 35) {
-        return Color(0xFFC2DB2F);
+        return const Color(0xFFC2DB2F);
       } else if (value > 15 && value <= 25) {
-        return Color(0xFFF0CE1D);
+        return const Color(0xFFF0CE1D);
       } else if (value > 5 && value <= 15) {
-        return Color(0xFFF7AA37);
+        return const Color(0xFFF7AA37);
       } else if (value <= 5) {
-        return Color(0xFFFF999B);
+        return const Color(0xFFFF999B);
       } else {
-        return Color(0xFF32CE78);
+        return const Color(0xFF32CE78);
       }
     }
 
@@ -356,17 +1054,17 @@ class Bar extends StatelessWidget {
 
     Color getColor(double value) {
       if (value > 35 && value <= 45) {
-        return Color(0xFF70DAC7);
+        return const Color(0xFF70DAC7);
       } else if (value > 25 && value <= 35) {
-        return Color(0xFFC2DB2F);
+        return const Color(0xFFC2DB2F);
       } else if (value > 15 && value <= 25) {
-        return Color(0xFFF0CE1D);
+        return const Color(0xFFF0CE1D);
       } else if (value > 5 && value <= 15) {
-        return Color(0xFFF7AA37);
+        return const Color(0xFFF7AA37);
       } else if (value <= 5) {
-        return Color(0xFFFF999B);
+        return const Color(0xFFFF999B);
       } else {
-        return Color(0xFF32CE78);
+        return const Color(0xFF32CE78);
       }
     }
 
