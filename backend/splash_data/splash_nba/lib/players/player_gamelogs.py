@@ -24,7 +24,7 @@ def gamelogs(player_id, season, season_type):
         if season >= '1996-97':
             adv_gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
 
-    base_keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:32]
+    base_keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:34]
     if season >= '1996-97':
         adv_keys = ['OFF_RATING', 'DEF_RATING', 'NET_RATING', 'EFG_PCT', 'TS_PCT', 'USG_PCT', 'PACE', 'POSS', 'MIN_SEC']
 
@@ -63,8 +63,8 @@ if __name__ == "__main__":
     # Set batch size to process documents
     batch_size = 25
     total_documents = players_collection.count_documents({})
-    processed_count = 0
-    i = 0
+    processed_count = 2251
+    i = 2251
 
     while processed_count < total_documents:
         with players_collection.find({}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(

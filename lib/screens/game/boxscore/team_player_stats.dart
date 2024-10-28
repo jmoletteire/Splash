@@ -58,10 +58,10 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         : 'REGULAR SEASON';
     widget.players.sort((a, b) {
       try {
-        double minPerGameA = a['STATS'][season][seasonType]['BASIC']['MIN'] /
-            a['STATS'][season]['REGULAR SEASON']['BASIC']['GP'];
-        double minPerGameB = b['STATS'][season][seasonType]['BASIC']['MIN'] /
-            b['STATS'][season]['REGULAR SEASON']['BASIC']['GP'];
+        double minPerGameA = (a?['STATS']?[season]?[seasonType]?['BASIC']?['MIN'] ?? 0) /
+            (a?['STATS']?[season]?['REGULAR SEASON']?['BASIC']?['GP'] ?? 1);
+        double minPerGameB = (b?['STATS']?[season]?[seasonType]?['BASIC']?['MIN'] ?? 0) /
+            (b?['STATS']?[season]?['REGULAR SEASON']?['BASIC']?['GP'] ?? 1);
 
         return minPerGameB.compareTo(minPerGameA); // Sort in descending order
       } catch (e) {
@@ -324,7 +324,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
               SizedBox(
                 width: 12.0.r,
                 child: Text(
-                  widget.players[row]['JERSEY'] ?? '',
+                  widget.players[row]?['JERSEY'] ?? '',
                   textAlign: TextAlign.center,
                   style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
                 ),
@@ -344,14 +344,14 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: '${widget.players[row]['DISPLAY_FI_LAST'] ?? ''}',
+                          text: '${widget.players[row]?['DISPLAY_FI_LAST'] ?? ''}',
                           style: kBebasNormal.copyWith(
                             color: Colors.white70,
                             fontSize: 14.0,
                           ),
                         ),
                         TextSpan(
-                          text: ', ${kPositionMap[widget.players[row]['POSITION']] ?? ''}',
+                          text: ', ${kPositionMap[widget.players[row]?['POSITION']] ?? ''}',
                           style: kBebasNormal.copyWith(
                             color: Colors.white,
                             fontSize: 13.0,
@@ -368,7 +368,8 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
-              widget.players[row]['STATS'][season][seasonType]['BASIC']['GP'].toString(),
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['GP'] ?? '-')
+                  .toString(),
               style: kBebasNormal.copyWith(fontSize: 15.0.r, color: const Color(0xFFD0D0D0)),
             ),
           );

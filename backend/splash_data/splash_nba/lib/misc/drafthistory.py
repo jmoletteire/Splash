@@ -26,6 +26,65 @@ def age_at_draft(year, birth_date):
     return age
 
 
+def get_starters():
+    for draft in draft_collection.find():
+        starters = 0
+        for player in draft['SELECTIONS']:
+            try:
+                player_career = players_collection.find_one({'PERSON_ID': player['PERSON_ID']}, {'CAREER': 1, '_id': 0}).get('CAREER', {})
+
+                if player_career:
+                    player_seasons = player_career.get('REGULAR SEASON', {}).get('SEASONS', [])
+                    player_playoff_seasons = player_career.get('PLAYOFFS', {}).get('SEASONS', [])
+                    available_games = 0
+                    career_gs = 0
+
+                    if player_seasons:
+                        career_gs += player_career.get('REGULAR SEASON', {}).get('TOTALS', {}).get('GS', 0)
+                        for i, season in enumerate(player_seasons):
+                            if season['TEAM_ABBREVIATION'] == 'TOT':
+                                continue
+                            if i < len(player_seasons) - 1:
+                                if player_seasons[i + 1]['SEASON_ID'] == season['SEASON_ID'] and player_seasons[i + 1]['TEAM_ABBREVIATION'] != 'TOT':
+                                    continue
+
+                            season_id = season['SEASON_ID']
+                            team_id = season['TEAM_ID']
+
+                            team = teams_collection.find_one({'TEAM_ID': team_id}, {f'seasons.{season_id}.GP': 1, f'seasons.{season_id}.PO_WINS': 1, f'seasons.{season_id}.PO_LOSSES': 1, '_id': 0})
+                            available_games += team['seasons'][season_id]['GP'] + team['seasons'][season_id]['PO_WINS'] + team['seasons'][season_id]['PO_LOSSES']
+                    else:
+                        logging.info(f"\tSeason Stats unavailable for {player['PLAYER_NAME']} ({player['SEASON']})")
+
+                    if player_playoff_seasons:
+                        career_gs += player_career.get('PLAYOFFS', {}).get('TOTALS', {}).get('GS', 0)
+
+                    try:
+                        is_starter = (career_gs / available_games) > 0.5
+                    except ZeroDivisionError:
+                        is_starter = False
+
+                    if is_starter:
+                        starters += 1
+                        player['STARTER'] = 1
+                    else:
+                        player['STARTER'] = 0
+                else:
+                    logging.info(f"\tCareer Stats unavailable for {player['PLAYER_NAME']} ({player['SEASON']})")
+
+                logging.info(f"\tAdded info for {player['PLAYER_NAME']} ({player['SEASON']})")
+            except Exception as e:
+                logging.error(f"\tFailed to add info for {player['PLAYER_NAME']} ({player['SEASON']}): {e}")
+
+        draft_collection.update_one(
+            {"YEAR": draft['YEAR']},
+            {"$set": {
+                "SELECTIONS": draft['SELECTIONS'],
+                "STARTERS": starters,
+            }},
+        )
+
+
 def get_awards(player):
     award_checks = {
         'hof': 0,
@@ -144,7 +203,9 @@ if __name__ == "__main__":
     db = client.splash
     draft_collection = db.nba_draft_history
     players_collection = db.nba_players
+    teams_collection = db.nba_teams
     logging.info("Connected to MongoDB")
 
     #draft_history()
-    get_additional_info()
+    #get_additional_info()
+    get_starters()

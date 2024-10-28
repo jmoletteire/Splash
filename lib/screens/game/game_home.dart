@@ -151,8 +151,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     });
     await getGame(gameId, gameDate);
     setOdds(game);
+    _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
     setState(() {
-      _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
       _isLoading = false;
     });
 
@@ -325,7 +325,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       return Row(
         children: [
           SizedBox(width: 15.0.r),
-          Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r)),
+          if (countdown == '')
+            Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r)),
+          if (countdown != '') CountdownTimer(durationString: countdown),
           SizedBox(width: 15.0.r),
         ],
       );
@@ -807,7 +809,7 @@ class GameInfo extends StatelessWidget {
               ),
             SizedBox(height: 8.0.r),
           ],
-          if (countdown == '')
+          if (countdown == '' || countdown == null)
             Text(gameTime ?? '', style: kBebasBold.copyWith(fontSize: 19.0.r)),
           if (countdown != '' && countdown != null) CountdownTimer(durationString: countdown!),
         ],
@@ -1156,7 +1158,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
     return Center(
       child: Text(
         '$minutes:$seconds',
-        style: kBebasBold.copyWith(fontSize: 16.0.r),
+        style: kBebasBold.copyWith(fontSize: 22.0.r),
       ),
     );
   }

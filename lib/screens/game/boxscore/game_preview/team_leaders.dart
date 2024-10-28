@@ -292,7 +292,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       awayLeaderPpg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 24.0.r),
                     ),
                   ),
                   Expanded(
@@ -309,7 +309,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       homeLeaderPpg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 24.0.r),
                     ),
                   ),
                   Expanded(
@@ -340,7 +340,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       awayLeaderRpg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 24.0.r),
                     ),
                   ),
                   Expanded(
@@ -357,7 +357,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       homeLeaderRpg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 24.0.r),
                     ),
                   ),
                   Expanded(
@@ -388,7 +388,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       awayLeaderApg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 24.0.r),
                     ),
                   ),
                   Expanded(
@@ -405,7 +405,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Text(
                       homeLeaderApg,
                       textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(fontSize: 25.0.r),
+                      style: kBebasNormal.copyWith(fontSize: 24.0.r),
                     ),
                   ),
                   Expanded(

@@ -413,8 +413,9 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return Container(
             alignment: Alignment.centerRight,
-            child: Text(
+            child: AutoSizeText(
               '${widget.players[row]?['statistics']?['POSS'] ?? widget.players[row]['POSS'] ?? '-'}',
+              maxLines: 1,
               style: kBebasNormal.copyWith(fontSize: 14.0.r),
             ),
           );

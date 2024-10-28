@@ -35,6 +35,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
 
       // Convert the map to a list of entries
       var entries = widget.team['seasons'][selectedSeason]['ROSTER'].entries.toList();
+      int teamGP = widget.team['seasons'][selectedSeason]['GP'];
 
       // Filter out players with GP == 0
       /*
@@ -53,15 +54,15 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         return startPercentB.compareTo(startPercentA);
       });
 
-      // Identify starters (first 5 players) and apply GS < 41 and MPG < 20.0 rule
+      // Identify starters (first 5 players) by applying GS >= 50% and MPG < 20.0 rule
       List<MapEntry<String, dynamic>> startersEntries = [];
       List<MapEntry<String, dynamic>> benchCandidates = [];
 
       for (var entry in entries) {
         // Check if player meets the condition for being a starter
         if (startersEntries.length < 5) {
-          if (entry.value['GS'] >= 20 &&
-              (entry.value['GS'] >= 41 || entry.value['MPG'] >= 20.0)) {
+          if (entry.value['GS'] >= (teamGP / 4) &&
+              (entry.value['GS'] >= (teamGP / 2) || entry.value['MPG'] >= 20.0)) {
             startersEntries.add(entry);
           } else {
             // If they don't meet the criteria, add them to the benchCandidates list

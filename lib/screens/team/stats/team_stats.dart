@@ -47,7 +47,10 @@ class _TeamStatsState extends State<TeamStats> {
   }
 
   String getPlayoffs(dynamic teamSeason) {
-    if (!teamSeason.containsKey('CONF_RANK') || teamSeason['CONF_RANK'] == 0) {
+    if (!teamSeason.containsKey('CONF_RANK') ||
+        teamSeason['CONF_RANK'] == 0 ||
+        (widget.team['seasons']?[selectedSeason]?['PO_WINS'] == 0 &&
+            widget.team['seasons']?[selectedSeason]?['PO_LOSSES'] == 0)) {
       return '-';
     }
 

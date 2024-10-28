@@ -75,7 +75,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
     int homeEstPoss = 0;
     int minutes = 0;
 
-    if (homeTeam['POSS'] == null) {
+    if (homeTeam['POSS'] == null || homeTeam['POSS'] == 0) {
       awayEstPoss = ((awayTeam['fieldGoalsAttempted'] ?? 0) +
               (awayTeam['turnovers'] ?? 0) +
               (0.44 * (awayTeam['freeThrowsAttempted'] ?? 0)) -
@@ -141,18 +141,22 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           ComparisonRow(
                             statName: 'PER POSS',
                             awayTeam: roundToDecimalPlaces(
-                                awayTeam['points'] /
-                                        (awayTeam['POSS'] ?? awayEstPoss == 0
-                                            ? 1
-                                            : awayEstPoss) ??
-                                    0.0,
+                                (awayTeam['points'] ?? 0) /
+                                    ((awayTeam?['POSS'] ??
+                                                (awayEstPoss == 0 ? 1 : awayEstPoss)) !=
+                                            0
+                                        ? (awayTeam?['POSS'] ??
+                                            (awayEstPoss == 0 ? 1 : awayEstPoss))
+                                        : (awayEstPoss == 0 ? 1 : awayEstPoss)),
                                 2),
                             homeTeam: roundToDecimalPlaces(
-                                homeTeam['points'] /
-                                        (homeTeam['POSS'] ?? homeEstPoss == 0
-                                            ? 1
-                                            : homeEstPoss) ??
-                                    0.0,
+                                (homeTeam['points'] ?? 0) /
+                                    ((homeTeam?['POSS'] ??
+                                                (homeEstPoss == 0 ? 1 : homeEstPoss)) !=
+                                            0
+                                        ? (homeTeam?['POSS'] ??
+                                            (homeEstPoss == 0 ? 1 : homeEstPoss))
+                                        : (homeEstPoss == 0 ? 1 : homeEstPoss)),
                                 2),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
@@ -180,8 +184,12 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'POSSESSIONS',
-                            awayTeam: awayTeam['POSS'] ?? awayEstPoss ?? 0.0,
-                            homeTeam: homeTeam['POSS'] ?? homeEstPoss ?? 0.0,
+                            awayTeam: awayTeam['POSS'] == null || awayTeam['POSS'] == 0
+                                ? awayEstPoss
+                                : awayTeam['POSS'] ?? 0.0,
+                            homeTeam: homeTeam['POSS'] == null || homeTeam['POSS'] == 0
+                                ? awayEstPoss
+                                : homeTeam['POSS'] ?? 0.0,
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
@@ -544,7 +552,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
-                          SizedBox(height: 15.0.r),
+                          SizedBox(height: 5.0.r),
                           ComparisonRow(
                             statName: 'AST%',
                             awayTeam: roundToDecimalPlaces(

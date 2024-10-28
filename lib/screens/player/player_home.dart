@@ -14,7 +14,7 @@ import 'package:splash/screens/player/gamelogs/player_gamelogs.dart';
 import 'package:splash/screens/player/player_cache.dart';
 import 'package:splash/screens/player/profile/player_profile.dart';
 import 'package:splash/screens/player/shot_chart/shot_chart.dart';
-import 'package:splash/screens/player/stats/player_stats.dart';
+import 'package:splash/screens/player/stats/player_stats_home.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
@@ -131,7 +131,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
               ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
                   PlayerProfile(team: team, player: player),
               ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
-                  PlayerStats(team: team, player: player),
+                  PlayerStatsHome(team: team, player: player),
               ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>
                   PlayerGamelogs(team: team, player: player),
               ({required Map<String, dynamic> team, required Map<String, dynamic> player}) =>

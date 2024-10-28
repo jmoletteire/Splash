@@ -702,37 +702,42 @@ def update_shot_distribution(season_type, team_id):
                                                                       season_type_all_star='Playoffs'
                                                                       ).get_normalized_dict()
             else:
-                player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
-                                                                      player_id=player_id,
-                                                                      season=k_current_season
-                                                                      ).get_normalized_dict()
+                try:
+                    player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
+                                                                          player_id=player_id,
+                                                                          season=k_current_season
+                                                                          ).get_normalized_dict()
+                except Exception:
+                    player_shooting = {'GeneralShooting': [], 'ClosestDefenderShooting': []}
 
             shot_type = player_shooting['GeneralShooting']
             closest_defender = player_shooting['ClosestDefenderShooting']
 
             try:
-                for j in range(len(shot_type)):
-                    shot_type_keys = list(shot_type[j].keys())[6:]
+                if shot_type:
+                    for j in range(len(shot_type)):
+                        shot_type_keys = list(shot_type[j].keys())[6:]
 
-                    players_collection.update_one(
-                        {'PERSON_ID': player_id},
-                        {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type[j]["SHOT_TYPE"]}': {
-                                key: shot_type[j][key] for key in shot_type_keys}
-                        }
-                        },
-                    )
-                for j in range(len(closest_defender)):
-                    closest_defender_keys = list(closest_defender[j].keys())[6:]
+                        players_collection.update_one(
+                            {'PERSON_ID': player_id},
+                            {'$set': {
+                                f'STATS.{k_current_season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type[j]["SHOT_TYPE"]}': {
+                                    key: shot_type[j][key] for key in shot_type_keys}
+                            }
+                            },
+                        )
+                if closest_defender:
+                    for j in range(len(closest_defender)):
+                        closest_defender_keys = list(closest_defender[j].keys())[6:]
 
-                    players_collection.update_one(
-                        {'PERSON_ID': player_id},
-                        {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender[j]["CLOSE_DEF_DIST_RANGE"]}': {
-                                key: closest_defender[j][key] for key in closest_defender_keys}
-                        }
-                        },
-                    )
+                        players_collection.update_one(
+                            {'PERSON_ID': player_id},
+                            {'$set': {
+                                f'STATS.{k_current_season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender[j]["CLOSE_DEF_DIST_RANGE"]}': {
+                                    key: closest_defender[j][key] for key in closest_defender_keys}
+                            }
+                            },
+                        )
             except Exception as e:
                 logging.error(f'(Shot Distribution) Unable to add stats for {player_id}: {e}')
                 continue
@@ -776,56 +781,95 @@ def update_player_tracking_stats(season_type, team_id):
                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
     else:
-        player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
-                                                             season=k_current_season).get_normalized_dict()[
-            'LeagueDashPtStats']
-        player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
-                                                             season=k_current_season).get_normalized_dict()[
-            'LeagueDashPtStats']
-        player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
-                                                            season=k_current_season).get_normalized_dict()[
-            'LeagueDashPtStats']
-        player_rebounding = \
-            leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
-                                                season=k_current_season).get_normalized_dict()[
+        try:
+            player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
+                                                                 season=k_current_season).get_normalized_dict()[
                 'LeagueDashPtStats']
-        player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
+        except Exception:
+            player_touches = []
+
+        try:
+            player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
+                                                                 season=k_current_season).get_normalized_dict()[
+                'LeagueDashPtStats']
+        except Exception:
+            player_passing = []
+
+        try:
+            player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
                                                                 season=k_current_season).get_normalized_dict()[
-            'LeagueDashPtStats']
+                'LeagueDashPtStats']
+        except Exception:
+            player_drives = []
+
+        try:
+            player_rebounding = \
+                leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
+                                                    season=k_current_season).get_normalized_dict()[
+                    'LeagueDashPtStats']
+        except Exception:
+            player_rebounding = []
+
+        try:
+            player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
+                                                                    season=k_current_season).get_normalized_dict()[
+                'LeagueDashPtStats']
+        except Exception:
+            player_speed_dist = []
 
     num_players = len(player_speed_dist)
 
     logging.info(f'(Player Tracking) Processing {num_players} for season {k_current_season} {season_type}...')
 
-    touch_keys = list(player_touches[0].keys())[9:15]
-    passing_keys = list(player_passing[0].keys())[8:]
-    drives_keys = list(player_drives[0].keys())[8:]
-    rebounding_keys = list(player_rebounding[0].keys())[8:]
-    speed_dist_keys = list(player_speed_dist[0].keys())[8:]
+    touch_keys = list(player_touches[0].keys())[9:15] if len(player_touches) > 0 else []
+    passing_keys = list(player_passing[0].keys())[8:] if len(player_passing) > 0 else []
+    drives_keys = list(player_drives[0].keys())[8:] if len(player_drives) > 0 else []
+    rebounding_keys = list(player_rebounding[0].keys())[8:] if len(player_rebounding) > 0 else []
+    speed_dist_keys = list(player_speed_dist[0].keys())[8:] if len(player_speed_dist) > 0 else []
 
     # Initialize dictionaries for each data type
     player_data = defaultdict(lambda: {'touches': {}, 'passing': {}, 'drives': {}, 'rebounding': {}, 'speed_dist': {}})
 
     # Fill in the player data from each list
-    for player in player_touches:
-        player_id = player['PLAYER_ID']
-        player_data[player_id]['touches'] = {key: player[key] for key in touch_keys}
+    if player_touches:
+        for player in player_touches:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['touches'] = {key: player[key] for key in touch_keys}
+    else:
+        for player_id in player_data.keys():
+            player_data[player_id]['touches'] = {}
 
-    for player in player_passing:
-        player_id = player['PLAYER_ID']
-        player_data[player_id]['passing'] = {key: player[key] for key in passing_keys}
+    if player_passing:
+        for player in player_passing:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['passing'] = {key: player[key] for key in passing_keys}
+    else:
+        for player_id in player_data.keys():
+            player_data[player_id]['passing'] = {}
 
-    for player in player_drives:
-        player_id = player['PLAYER_ID']
-        player_data[player_id]['drives'] = {key: player[key] for key in drives_keys}
+    if player_drives:
+        for player in player_drives:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['drives'] = {key: player[key] for key in drives_keys}
+    else:
+        for player_id in player_data.keys():
+            player_data[player_id]['drives'] = {}
 
-    for player in player_rebounding:
-        player_id = player['PLAYER_ID']
-        player_data[player_id]['rebounding'] = {key: player[key] for key in rebounding_keys}
+    if player_rebounding:
+        for player in player_rebounding:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['rebounding'] = {key: player[key] for key in rebounding_keys}
+    else:
+        for player_id in player_data.keys():
+            player_data[player_id]['rebounding'] = {}
 
-    for player in player_speed_dist:
-        player_id = player['PLAYER_ID']
-        player_data[player_id]['speed_dist'] = {key: player[key] for key in speed_dist_keys}
+    if player_speed_dist:
+        for player in player_speed_dist:
+            player_id = player['PLAYER_ID']
+            player_data[player_id]['speed_dist'] = {key: player[key] for key in speed_dist_keys}
+    else:
+        for player_id in player_data.keys():
+            player_data[player_id]['speed_dist'] = {}
 
     # Update the MongoDB collection
     for player_id, data in player_data.items():

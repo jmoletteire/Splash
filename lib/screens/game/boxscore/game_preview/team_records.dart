@@ -269,7 +269,7 @@ class _TeamRecordState extends State<TeamRecord> {
               ),
               SizedBox(height: 5.0.r),
               ComparisonRow(
-                statName: 'Opp Over .500',
+                statName: 'Opp .500+',
                 teamOne: (awayStandings?['OppOver500'] ?? '0-0').trimRight(),
                 teamTwo: (homeStandings?['OppOver500'] ?? '0-0').trimRight(),
                 teamOneColor: awayColor ?? Colors.transparent,

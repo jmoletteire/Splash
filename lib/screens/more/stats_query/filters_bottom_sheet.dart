@@ -30,6 +30,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
   List<String> positions = ['ALL', 'G', 'F', 'C', 'G/F', 'F/C'];
   List<String> seasonTypes = ['REGULAR SEASON', 'PLAYOFFS'];
   List<String> seasons = [
+    '2024-25',
     '2023-24',
     '2022-23',
     '2021-22',

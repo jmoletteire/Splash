@@ -25,8 +25,8 @@ class Draft extends StatefulWidget {
 class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
   late List<dynamic> draft;
   late List<dynamic> draftByPick;
-  late Map<String, int> draftStats;
-  late Map<String, int> pickStats;
+  late Map<String, dynamic> draftStats;
+  late Map<String, dynamic> pickStats;
   List<dynamic> firstRound = [];
   List<dynamic> secondRound = [];
   List<dynamic> thirdRound = [];
@@ -134,10 +134,26 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
         draft = fetchedDraft['SELECTIONS'];
         draftStats = {
           'TOTAL': draft.length,
-          'HOF': fetchedDraft['HOF'] ?? 0,
-          'MVP': fetchedDraft['MVP'] ?? 0,
-          'ALL_NBA': fetchedDraft['ALL_NBA'] ?? 0,
-          'ALL_STAR': fetchedDraft['ALL_STAR'] ?? 0,
+          'HOF': {
+            'NUM': fetchedDraft['HOF'] ?? 0,
+            'PLAYERS': draft.where((e) => e['HOF'] > 0).toList()
+          },
+          'MVP': {
+            'NUM': fetchedDraft['MVP'] ?? 0,
+            'PLAYERS': draft.where((e) => e['MVP'] > 0).toList()
+          },
+          'ALL_NBA': {
+            'NUM': fetchedDraft['ALL_NBA'] ?? 0,
+            'PLAYERS': draft.where((e) => e['ALL_NBA'] > 0).toList()
+          },
+          'ALL_STAR': {
+            'NUM': fetchedDraft['ALL_STAR'] ?? 0,
+            'PLAYERS': draft.where((e) => e['ALL_STAR'] > 0).toList()
+          },
+          'STARTERS': {
+            'NUM': fetchedDraft['STARTERS'] ?? 0,
+            'PLAYERS': draft.where((e) => (e['STARTER'] ?? 0) > 0).toList()
+          },
         };
         setPicks();
         _isLoadingByYear = false;
@@ -148,10 +164,26 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
         draft = fetchedDraft['SELECTIONS'];
         draftStats = {
           'TOTAL': draft.length,
-          'HOF': fetchedDraft['HOF'] ?? 0,
-          'MVP': fetchedDraft['MVP'] ?? 0,
-          'ALL_NBA': fetchedDraft['ALL_NBA'] ?? 0,
-          'ALL_STAR': fetchedDraft['ALL_STAR'] ?? 0,
+          'HOF': {
+            'NUM': fetchedDraft['HOF'] ?? 0,
+            'PLAYERS': draft.where((e) => e['HOF'] > 0).toList()
+          },
+          'MVP': {
+            'NUM': fetchedDraft['MVP'] ?? 0,
+            'PLAYERS': draft.where((e) => e['MVP'] > 0).toList()
+          },
+          'ALL_NBA': {
+            'NUM': fetchedDraft['ALL_NBA'] ?? 0,
+            'PLAYERS': draft.where((e) => e['ALL_NBA'] > 0).toList()
+          },
+          'ALL_STAR': {
+            'NUM': fetchedDraft['ALL_STAR'] ?? 0,
+            'PLAYERS': draft.where((e) => e['ALL_STAR'] > 0).toList()
+          },
+          'STARTERS': {
+            'NUM': fetchedDraft['STARTERS'] ?? 0,
+            'PLAYERS': draft.where((e) => (e['STARTER'] ?? 0) > 0).toList()
+          },
         };
         setPicks();
         _isLoadingByYear = false;
@@ -169,6 +201,14 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
     num allNba = 0;
     num allStar = 0;
     num roty = 0;
+    num starter = 0;
+
+    List hofPlayers = [];
+    List mvpPlayers = [];
+    List allNbaPlayers = [];
+    List allStarPlayers = [];
+    List rotyPlayers = [];
+    List starterPlayers = [];
 
     for (var player in fetchedPicks) {
       total += 1;
@@ -177,14 +217,41 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
       allNba += player['ALL_NBA'] ?? 0;
       allStar += player['ALL_STAR'] ?? 0;
       roty += player['ROTY'] ?? 0;
+      starter += player['STARTER'] ?? 0;
+
+      if (player['HOF'] > 0) {
+        hofPlayers.add(player);
+        hofPlayers.sort((a, b) => b['SEASON'].compareTo(a['SEASON']));
+      }
+      if (player['MVP'] > 0) {
+        mvpPlayers.add(player);
+        mvpPlayers.sort((a, b) => b['SEASON'].compareTo(a['SEASON']));
+      }
+      if (player['ALL_NBA'] > 0) {
+        allNbaPlayers.add(player);
+        allNbaPlayers.sort((a, b) => b['SEASON'].compareTo(a['SEASON']));
+      }
+      if (player['ALL_STAR'] > 0) {
+        allStarPlayers.add(player);
+        allStarPlayers.sort((a, b) => b['SEASON'].compareTo(a['SEASON']));
+      }
+      if (player['ROTY'] > 0) {
+        rotyPlayers.add(player);
+        rotyPlayers.sort((a, b) => b['SEASON'].compareTo(a['SEASON']));
+      }
+      if ((player['STARTER'] ?? 0) > 0) {
+        starterPlayers.add(player);
+        starterPlayers.sort((a, b) => b['SEASON'].compareTo(a['SEASON']));
+      }
     }
     pickStats = {
       'TOTAL': total.toInt(),
-      'HOF': hof.toInt(),
-      'MVP': mvp.toInt(),
-      'ALL_NBA': allNba.toInt(),
-      'ALL_STAR': allStar.toInt(),
-      'ROTY': roty.toInt(),
+      'HOF': {'NUM': hof.toInt(), 'PLAYERS': hofPlayers},
+      'MVP': {'NUM': mvp.toInt(), 'PLAYERS': mvpPlayers},
+      'ALL_NBA': {'NUM': allNba.toInt(), 'PLAYERS': allNbaPlayers},
+      'ALL_STAR': {'NUM': allStar.toInt(), 'PLAYERS': allStarPlayers},
+      'STARTERS': {'NUM': starter.toInt(), 'PLAYERS': starterPlayers},
+      'ROTY': {'NUM': roty.toInt(), 'PLAYERS': rotyPlayers},
     };
 
     setState(() {
@@ -302,9 +369,12 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
               context: context,
               constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
               backgroundColor: const Color(0xFF111111),
+              scrollControlDisabledMaxHeightRatio: 0.7,
+              showDragHandle: true,
               builder: (context) {
                 return DraftStats(
                   draftStats: draftStats,
+                  byPick: false,
                 );
               },
             );
@@ -367,9 +437,12 @@ class _DraftState extends State<Draft> with SingleTickerProviderStateMixin {
               context: context,
               constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
               backgroundColor: const Color(0xFF111111),
+              scrollControlDisabledMaxHeightRatio: 0.7,
+              showDragHandle: true,
               builder: (context) {
                 return DraftStats(
                   draftStats: pickStats,
+                  byPick: true,
                 );
               },
             );

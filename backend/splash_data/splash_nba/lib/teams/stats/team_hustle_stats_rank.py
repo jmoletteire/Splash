@@ -57,7 +57,7 @@ def rank_hustle_stats_current_season():
             for result in results:
                 teams_collection.update_one(
                     {"_id": result["_id"]},
-                    {"$set": {f"seasons.{k_current_season}.STATS.HUSTLE.{stat}_RANK": result['seasons'][k_current_season]['STATS']['HUSTLE'][f'{stat}_RANK']}}
+                    {"$set": {f"seasons.{k_current_season}.STATS.{k_current_season_type}.HUSTLE.{stat}_RANK": result['seasons'][k_current_season]['STATS']['HUSTLE'][f'{stat}_RANK']}}
                 )
         except Exception as e:
             logging.error(f"(Team Hustle Rank) Failed to add {stat} to database: {e}")
@@ -65,6 +65,18 @@ def rank_hustle_stats_current_season():
 
 
 def rank_hustle_stats_all_seasons():
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"(Team Hustle Rank) Failed to connect to MongoDB: {e}")
+        exit(1)
+
     # Stats to rank
     hustle_stats = [
         'CONTESTED_SHOTS',

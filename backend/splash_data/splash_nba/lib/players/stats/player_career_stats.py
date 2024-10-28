@@ -15,7 +15,6 @@ def update_player_career_stats(player):
     db = client.splash
     players_collection = db.nba_players
     teams_collection = db.nba_teams
-    logging.info("Connected to MongoDB")
 
     player_totals = playercareerstats.PlayerCareerStats(player_id=player).get_normalized_dict()
     player_per_game = playercareerstats.PlayerCareerStats(player_id=player, per_mode36='PerGame').get_normalized_dict()

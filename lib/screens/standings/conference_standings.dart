@@ -154,7 +154,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         /// ROAD
         TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
 
-        /// Over .500
+        /// Opp .500+
         TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
 
         /// EAST

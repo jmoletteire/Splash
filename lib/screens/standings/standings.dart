@@ -197,6 +197,19 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
     return await Future.wait(teamFutures);
   }
 
+  Future<List<Map<String, dynamic>>> getTeamsRefresh(List<String> teamIds) async {
+    List<Future<Map<String, dynamic>>> teamFutures = teamIds.map((teamId) async {
+      try {
+        var fetchedTeam = await Team().getTeam(teamId);
+        return fetchedTeam;
+      } catch (e) {
+        return {'error': 'not found'}; // Return an empty map in case of an error
+      }
+    }).toList();
+
+    return await Future.wait(teamFutures);
+  }
+
   Future<void> setTeams() async {
     setState(() {
       _isLoading = true;
@@ -336,7 +349,15 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                           RefreshIndicator(
                             color: Colors.deepOrange,
                             onRefresh: () async {
-                              await setTeams();
+                              List<Map<String, dynamic>> fetchedEastTeams =
+                                  await getTeamsRefresh(kEastConfTeamIds);
+                              List<Map<String, dynamic>> fetchedWestTeams =
+                                  await getTeamsRefresh(kWestConfTeamIds);
+
+                              setState(() {
+                                eastTeams = [];
+                                westTeams = [];
+                              });
                             },
                             child: CustomScrollView(
                               controller: _scrollController,
@@ -356,7 +377,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                     'Last 10',
                                     'HOME',
                                     'ROAD',
-                                    '> .500',
+                                    '.500+',
                                     'EAST',
                                     'WEST',
                                     'ATL',
@@ -391,7 +412,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                     'Last 10',
                                     'HOME',
                                     'ROAD',
-                                    '> .500',
+                                    '.500+',
                                     'EAST',
                                     'WEST',
                                     'ATL',
@@ -418,7 +439,15 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                           RefreshIndicator(
                             color: Colors.deepOrange,
                             onRefresh: () async {
-                              await setTeams();
+                              List<Map<String, dynamic>> fetchedEastTeams =
+                                  await getTeamsRefresh(kEastConfTeamIds);
+                              List<Map<String, dynamic>> fetchedWestTeams =
+                                  await getTeamsRefresh(kWestConfTeamIds);
+
+                              setState(() {
+                                eastTeams = [];
+                                westTeams = [];
+                              });
                             },
                             child: CustomScrollView(
                               controller: _scrollController,
@@ -439,7 +468,7 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                     'Last 10',
                                     'HOME',
                                     'ROAD',
-                                    '> .500',
+                                    '.500+',
                                     'EAST',
                                     'WEST',
                                     'ATL',

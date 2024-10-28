@@ -393,7 +393,8 @@ class _GameCardState extends State<GameCard> {
                                 style: kGameCardTextStyle.copyWith(
                                   color: summary['GAME_STATUS_ID'] != 3
                                       ? Colors.white // Game upcoming or in-progress
-                                      : awayLinescore['PTS'] > homeLinescore['PTS'] &&
+                                      : (awayLinescore['PTS'] ?? 0) >
+                                                  (homeLinescore['PTS'] ?? 0) &&
                                               summary['GAME_STATUS_ID'] == 3
                                           ? Colors.white // Away team won
                                           : Colors.grey, // Away team lost
@@ -425,7 +426,8 @@ class _GameCardState extends State<GameCard> {
                                   style: kGameCardTextStyle.copyWith(
                                     color: summary['GAME_STATUS_ID'] != 3
                                         ? Colors.white // Game upcoming or in-progress
-                                        : awayLinescore['PTS'] > homeLinescore['PTS'] &&
+                                        : (awayLinescore['PTS'] ?? 0) >
+                                                    (homeLinescore['PTS'] ?? 0) &&
                                                 summary['GAME_STATUS_ID'] == 3
                                             ? Colors.white // Away team won
                                             : Colors.grey, // Away team lost
@@ -500,7 +502,8 @@ class _GameCardState extends State<GameCard> {
                                 style: kGameCardTextStyle.copyWith(
                                   color: summary['GAME_STATUS_ID'] != 3
                                       ? Colors.white // Game upcoming or in-progress
-                                      : homeLinescore['PTS'] > awayLinescore['PTS'] &&
+                                      : (homeLinescore['PTS'] ?? 0) >
+                                                  (awayLinescore['PTS'] ?? 0) &&
                                               summary['GAME_STATUS_ID'] == 3
                                           ? Colors.white // Home team won
                                           : Colors.grey, // Home team lost
@@ -532,7 +535,8 @@ class _GameCardState extends State<GameCard> {
                                   style: kGameCardTextStyle.copyWith(
                                     color: summary['GAME_STATUS_ID'] != 3
                                         ? Colors.white // Game upcoming or in-progress
-                                        : homeLinescore['PTS'] > awayLinescore['PTS'] &&
+                                        : (homeLinescore['PTS'] ?? 0) >
+                                                    (awayLinescore['PTS'] ?? 0) &&
                                                 summary['GAME_STATUS_ID'] == 3
                                             ? Colors.white // Home team won
                                             : Colors.grey, // Home team lost
