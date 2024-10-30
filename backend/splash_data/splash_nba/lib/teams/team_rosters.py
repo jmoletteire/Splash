@@ -54,6 +54,22 @@ def update_current_roster(team_id, season_not_started):
                     player['MIN'] = 0
                     player['MPG'] = 0
 
+                try:
+                    player_roto = players_collection.find_one({'PERSON_ID': player['PLAYER_ID']}, {'PlayerRotowires': 1, '_id': 0})['PlayerRotowires'][0]
+                    player['Injured'] = player_roto['Injured']
+                    player['Injured_Status'] = player_roto['Injured_Status']
+                    player['Injury_Location'] = player_roto['Injury_Location']
+                    player['Injury_Type'] = player_roto['Injury_Type']
+                    player['Injury_Detail'] = player_roto['Injury_Detail']
+                    player['Injury_Side'] = player_roto['Injury_Side']
+                except Exception:
+                    player['Injured'] = "NO"
+                    player['Injured_Status'] = ""
+                    player['Injury_Location'] = ""
+                    player['Injury_Type'] = ""
+                    player['Injury_Detail'] = ""
+                    player['Injury_Side'] = ""
+
                 # Player dictionary {"player_id": {data}}
                 team_roster_dict[str(player['PLAYER_ID'])] = player
 
@@ -63,6 +79,12 @@ def update_current_roster(team_id, season_not_started):
                 player['GS'] = 0
                 player['MIN'] = 0
                 player['MPG'] = 0
+                player['Injured'] = "NO"
+                player['Injured_Status'] = ""
+                player['Injury_Location'] = ""
+                player['Injury_Type'] = ""
+                player['Injury_Detail'] = ""
+                player['Injury_Side'] = ""
                 team_roster_dict[str(player['PLAYER_ID'])] = player
                 continue
 
@@ -157,11 +179,13 @@ if __name__ == "__main__":
         # All Teams
         for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, "seasons": 1, "_id": 0})):
             team = doc['TEAM_ID']
-            seasons = doc['seasons']
-            for season in seasons.keys():
-                if season < '1980-81':
-                    fetch_roster(team, season)
-                    time.sleep(2)
+            season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
+            update_current_roster(team_id=team, season_not_started=season_not_started)
+            #seasons = doc['seasons']
+            #for season in seasons.keys():
+            #    if season < '1980-81':
+            #        fetch_roster(team, season)
+            #        time.sleep(2)
             logging.info(f"Processed {i + 1} of 30")
             time.sleep(30)
         logging.info("Done")

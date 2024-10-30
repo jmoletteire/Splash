@@ -285,10 +285,12 @@ class _PlayerShotChartState extends State<PlayerShotChart> with AutomaticKeepAli
     int fga = 0;
 
     if (shotChart.isEmpty) {
-      fgm = widget.player['STATS'][selectedSeason][selectedSeasonType.toUpperCase()]['BASIC']
-          ['FGM'];
-      fga = widget.player['STATS'][selectedSeason][selectedSeasonType.toUpperCase()]['BASIC']
-          ['FGA'];
+      fgm = widget.player['STATS']?[selectedSeason]?[selectedSeasonType.toUpperCase()]
+              ?['BASIC']?['FGM'] ??
+          0;
+      fga = widget.player['STATS']?[selectedSeason]?[selectedSeasonType.toUpperCase()]
+              ?['BASIC']?['FGA'] ??
+          0;
     } else {
       for (var shot in shotChart) {
         fga++;

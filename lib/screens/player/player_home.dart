@@ -364,6 +364,68 @@ class PlayerInfo extends StatelessWidget {
   final Map<String, dynamic> team;
   final Map<String, dynamic> player;
 
+  Widget playerNameAndStatus() {
+    /*if (player.containsKey('PlayerRotowires')) {
+      if (player['PlayerRotowires'][0]['Injured'] == 'YES') {
+        return Row(
+          children: [
+            Text(
+              player['FIRST_NAME'],
+              style: kBebasBold.copyWith(fontSize: 28.0.r),
+            ),
+            SizedBox(width: 10.0.r),
+            Icon(
+              Icons.healing,
+              size: 30.0.r,
+              color: Colors.redAccent,
+            ),
+          ],
+        );
+      } else if (player['GREATEST_75_FLAG'] == 'Y') {
+        return Row(
+          children: [
+            Text(
+              player['FIRST_NAME'],
+              style: kBebasBold.copyWith(fontSize: 28.0.r),
+            ),
+            SizedBox(width: 10.0.r),
+            SvgPicture.asset(
+              'images/NBA_75th_anniversary_logo.svg',
+              width: 30.0.r,
+              height: 30.0.r,
+            ),
+          ],
+        );
+      } else {
+        return Text(
+          player['FIRST_NAME'],
+          style: kBebasBold.copyWith(fontSize: 28.0.r),
+        );
+      }
+    } else */
+    if (player['GREATEST_75_FLAG'] == 'Y') {
+      return Row(
+        children: [
+          Text(
+            player['FIRST_NAME'],
+            style: kBebasBold.copyWith(fontSize: 28.0.r),
+          ),
+          SizedBox(width: 10.0.r),
+          SvgPicture.asset(
+            'images/NBA_75th_anniversary_logo.svg',
+            width: 30.0.r,
+            height: 30.0.r,
+          ),
+        ],
+      );
+    } else {
+      return Text(
+        player['FIRST_NAME'],
+        style: kBebasBold.copyWith(fontSize: 28.0.r),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -384,25 +446,7 @@ class PlayerInfo extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  player['GREATEST_75_FLAG'] == 'Y'
-                      ? Row(
-                          children: [
-                            Text(
-                              player['FIRST_NAME'],
-                              style: kBebasBold.copyWith(fontSize: 28.0.r),
-                            ),
-                            SizedBox(width: 10.0.r),
-                            SvgPicture.asset(
-                              'images/NBA_75th_anniversary_logo.svg',
-                              width: 30.0.r,
-                              height: 30.0.r,
-                            ),
-                          ],
-                        )
-                      : Text(
-                          player['FIRST_NAME'],
-                          style: kBebasBold.copyWith(fontSize: 28.0.r),
-                        ),
+                  playerNameAndStatus(),
                   Text(
                     player['LAST_NAME'],
                     style: kBebasBold.copyWith(fontSize: 28.0.r),

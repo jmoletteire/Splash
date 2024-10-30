@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:splash/screens/player/stats/player_rotowire_news.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../game/game_home.dart';
@@ -265,8 +266,8 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
           // Other content can go here
           SizedBox(height: 20.0.r),
           Text(
-            'Recent Games',
-            style: kBebasBold.copyWith(fontSize: 20.0.r),
+            'Performance',
+            style: kBebasBold.copyWith(fontSize: 18.0.r),
           ),
           SizedBox(height: 10.0.r),
           Stack(
@@ -285,13 +286,13 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
                     child: Image.network(
                       'https://cdn.nba.com/silos/nba/latest/440x700/${widget.player['PERSON_ID']}.png',
                       width: MediaQuery.of(context).size.width,
-                      height: 250.0.r,
+                      height: 300.0.r,
                     ),
                   ),
                 ),
               ),
               SizedBox(
-                height: 250.0.r,
+                height: 300.0.r,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   reverse: true,
@@ -306,9 +307,14 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
                         DateFormat('yy').format(DateTime.parse(currentGameDate));
 
                     // Check if this is the first item or if the month has changed
-                    bool isNewMonth = DateFormat('MMM')
-                            .format(DateTime.parse(gamelogs[index + 1]['GAME_DATE'])) !=
-                        currentMonth;
+                    bool isNewMonth = false;
+                    try {
+                      isNewMonth = DateFormat('MMM')
+                              .format(DateTime.parse(gamelogs[index + 1]['GAME_DATE'])) !=
+                          currentMonth;
+                    } catch (e) {
+                      isNewMonth = false;
+                    }
 
                     return Row(
                       children: [
@@ -322,7 +328,7 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
                               SizedBox(height: 5.0.r),
                               Container(
                                 width: 2.0,
-                                height: 180.0.r,
+                                height: 215.0.r,
                                 color: Colors.grey,
                               ),
                               SizedBox(width: 8.0.r), // Spacing between the line and the bar
@@ -345,9 +351,9 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
           ),
           // More content below the bar chart
           SizedBox(height: 25.0.r),
-          const Text(
+          Text(
             'Upcoming Games',
-            style: kBebasNormal,
+            style: kBebasBold.copyWith(fontSize: 18.0.r),
           ),
           SizedBox(height: 5.0.r),
           Card(
@@ -850,7 +856,19 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
               ),
             ),
           ),
-          SizedBox(height: 20.0.r),
+          SizedBox(height: 5.0.r),
+          Text(
+            'Recent News',
+            style: kBebasBold.copyWith(fontSize: 18.0.r),
+          ),
+          SizedBox(height: 5.0.r),
+          if (widget.player.containsKey('PlayerRotowires'))
+            for (var newsItem in widget.player['PlayerRotowires'])
+              PlayerRotowireNews(
+                playerNews: newsItem,
+                teamAbbr: widget.player['TEAM_ABBREVIATION'],
+              ),
+          SizedBox(height: 5.0.r),
         ],
       ),
     );
@@ -1050,7 +1068,7 @@ class Bar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Normalize the bar height based on a maximum value, e.g., 120
-    double normalizedHeight = ((value / 100) * 200).clamp(30.0.r, 175.0.r);
+    double normalizedHeight = (value * 3).clamp(30.0.r, 215.0.r);
     double valueContainerHeight = 30.0.r; // Height of the rounded container for the value
 
     Color getColor(double value) {
@@ -1105,7 +1123,7 @@ class Bar extends StatelessWidget {
                 ),
                 // Value container with rounded edges
                 Positioned(
-                  top: 215.0.r - normalizedHeight - valueContainerHeight,
+                  top: 252.5.r - normalizedHeight - valueContainerHeight,
                   child: InkWell(
                     onTap: () => showGameDetails(context, game),
                     child: Container(

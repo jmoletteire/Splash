@@ -30,19 +30,24 @@ class _PlayerStatsState extends State<PlayerStats> {
   late final ExpandableCardController _controller;
 
   double getPercentile(List<String> location, String stat) {
-    num rank = (location.length == 1
-            ? widget.player['STATS'][selectedSeason][selectedSeasonType][location[0]]
-                    ['${stat}_RANK'] ??
-                0
-            : widget.player['STATS']?[selectedSeason]?[selectedSeasonType]?[location[0]]
-                    ?[location[1]]?['${stat}_RANK'] ??
-                0) ??
-        0;
-    return 1 -
-        ((rank - 1) /
-            (widget.player['STATS'][selectedSeason][selectedSeasonType]['BASIC']
-                    ['NUM_PLAYERS'] -
-                1));
+    try {
+      num rank = (location.length == 1
+              ? widget.player['STATS'][selectedSeason][selectedSeasonType][location[0]]
+                      ['${stat}_RANK'] ??
+                  0
+              : widget.player['STATS']?[selectedSeason]?[selectedSeasonType]?[location[0]]
+                      ?[location[1]]?['${stat}_RANK'] ??
+                  0) ??
+          0;
+      return 1 -
+          ((rank - 1) /
+              ((widget.player['STATS']?[selectedSeason]?[selectedSeasonType]?['BASIC']
+                          ?['NUM_PLAYERS'] ??
+                      501) -
+                  1));
+    } catch (e) {
+      return 0.0;
+    }
   }
 
   double getFinalPercentile(String group) {
@@ -186,10 +191,14 @@ class _PlayerStatsState extends State<PlayerStats> {
                                           end: perMode == 'PER_75'
                                               ? widget.player['STATS'][selectedSeason]
                                                   [selectedSeasonType]['BASIC']['PTS_PER_75']
-                                              : (widget.player['STATS'][selectedSeason]
-                                                      [selectedSeasonType]['BASIC']['PTS'] /
-                                                  widget.player['STATS'][selectedSeason]
-                                                      [selectedSeasonType]['BASIC']['GP']),
+                                              : ((widget.player['STATS']?[selectedSeason]
+                                                              ?[selectedSeasonType]?['BASIC']
+                                                          ?['PTS'] ??
+                                                      0) /
+                                                  (widget.player['STATS']?[selectedSeason]
+                                                              ?[selectedSeasonType]?['BASIC']
+                                                          ?['GP'] ??
+                                                      1)),
                                         ),
                                         duration: const Duration(milliseconds: 250),
                                         builder:
@@ -210,10 +219,14 @@ class _PlayerStatsState extends State<PlayerStats> {
                                             end: perMode == 'PER_75'
                                                 ? widget.player['STATS'][selectedSeason]
                                                     [selectedSeasonType]['BASIC']['REB_PER_75']
-                                                : (widget.player['STATS'][selectedSeason]
-                                                        [selectedSeasonType]['BASIC']['REB'] /
-                                                    widget.player['STATS'][selectedSeason]
-                                                        [selectedSeasonType]['BASIC']['GP']),
+                                                : ((widget.player['STATS']?[selectedSeason]
+                                                                ?[selectedSeasonType]?['BASIC']
+                                                            ?['REB'] ??
+                                                        0) /
+                                                    (widget.player['STATS']?[selectedSeason]
+                                                                ?[selectedSeasonType]?['BASIC']
+                                                            ?['GP'] ??
+                                                        1)),
                                           ),
                                           duration: const Duration(milliseconds: 250),
                                           builder: (BuildContext context, num value,
@@ -231,17 +244,18 @@ class _PlayerStatsState extends State<PlayerStats> {
                                           tween: Tween(
                                             begin: 0,
                                             end: perMode == 'PER_75'
-                                                ? (widget.player['STATS'][selectedSeason]
-                                                                [selectedSeasonType]['BASIC']
-                                                            ['AST'] /
+                                                ? (widget.player['STATS'][selectedSeason][selectedSeasonType]
+                                                            ['BASIC']['AST'] /
                                                         widget.player['STATS'][selectedSeason]
                                                                 [selectedSeasonType]['ADV']
                                                             ['POSS']) *
                                                     75
-                                                : (widget.player['STATS'][selectedSeason]
-                                                        [selectedSeasonType]['BASIC']['AST'] /
-                                                    widget.player['STATS'][selectedSeason]
-                                                        [selectedSeasonType]['BASIC']['GP']),
+                                                : ((widget.player['STATS']?[selectedSeason]?[selectedSeasonType]
+                                                            ?['BASIC']?['AST'] ??
+                                                        0) /
+                                                    (widget.player['STATS']?[selectedSeason]
+                                                            ?[selectedSeasonType]?['BASIC']?['GP'] ??
+                                                        1)),
                                           ),
                                           duration: const Duration(milliseconds: 250),
                                           builder: (BuildContext context, num value,

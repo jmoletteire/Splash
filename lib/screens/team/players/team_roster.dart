@@ -307,6 +307,19 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                   ),
                                 ),
                                 Expanded(
+                                    child: Text(
+                                  widget.team['seasons'][selectedSeason]['ROSTER']
+                                      ?[players[index]]?['Injured_Status'],
+                                  style: kBebasNormal.copyWith(
+                                    fontSize: 14.0.r,
+                                    color: widget.team['seasons'][selectedSeason]['ROSTER']
+                                                ?[players[index]]?['Injured_Status'] ==
+                                            'OUT'
+                                        ? Colors.redAccent
+                                        : Colors.orangeAccent,
+                                  ),
+                                )),
+                                Expanded(
                                   flex: 2,
                                   child: Text(
                                     widget.team['seasons'][selectedSeason]['ROSTER']

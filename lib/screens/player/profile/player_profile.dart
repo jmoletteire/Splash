@@ -73,6 +73,9 @@ class _PlayerProfileState extends State<PlayerProfile> {
                 'Country': widget.player['COUNTRY'] ?? '-',
               },
             ),
+            if (widget.player.containsKey('PlayerRotowires'))
+              if (widget.player['PlayerRotowires'][0]['Injured'] == 'YES')
+                InjuryCard(injuryDetails: widget.player['PlayerRotowires'][0]),
             PlayerAwards(
               playerAwards: widget.player['AWARDS'],
             ),
@@ -201,6 +204,72 @@ class _InfoCardState extends State<InfoCard> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class InjuryCard extends StatelessWidget {
+  final Map<String, dynamic> injuryDetails;
+  const InjuryCard({super.key, required this.injuryDetails});
+
+  Color getColor(String status) {
+    if (status == 'OUT') {
+      return Colors.redAccent;
+    } else if (status == 'GTD' || status == 'DTD') {
+      return Colors.orangeAccent;
+    } else {
+      return Colors.white;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade900,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      padding: const EdgeInsets.all(15.0),
+      margin: EdgeInsets.only(top: 11.0.r),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
+                  ),
+                ),
+                child: Text(
+                  'Injured',
+                  style: kBebasBold.copyWith(fontSize: 18.0.r),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.0.r),
+          Row(
+            children: [
+              Text(
+                injuryDetails['Injured_Status'],
+                style: kBebasNormal.copyWith(
+                    fontSize: 16.0.r, color: getColor(injuryDetails['Injured_Status'])),
+              ),
+              Text(
+                ' - ${injuryDetails['Injury_Side']} ${injuryDetails['Injury_Type']}',
+                style: kBebasNormal.copyWith(fontSize: 16.0.r),
+              ),
+              if (injuryDetails['Injury_Detail'] != '')
+                Text(
+                  ' (${injuryDetails['Injury_Detail']})',
+                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                ),
+            ],
+          )
+        ],
       ),
     );
   }
