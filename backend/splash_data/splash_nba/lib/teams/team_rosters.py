@@ -62,6 +62,7 @@ def update_current_roster(team_id, season_not_started):
                     player['Injury_Type'] = player_roto['Injury_Type']
                     player['Injury_Detail'] = player_roto['Injury_Detail']
                     player['Injury_Side'] = player_roto['Injury_Side']
+                    player['EST_RETURN'] = player_roto['EST_RETURN']
                 except Exception:
                     player['Injured'] = "NO"
                     player['Injured_Status'] = ""
@@ -69,6 +70,7 @@ def update_current_roster(team_id, season_not_started):
                     player['Injury_Type'] = ""
                     player['Injury_Detail'] = ""
                     player['Injury_Side'] = ""
+                    player['EST_RETURN'] = ""
 
                 # Player dictionary {"player_id": {data}}
                 team_roster_dict[str(player['PLAYER_ID'])] = player
@@ -85,6 +87,7 @@ def update_current_roster(team_id, season_not_started):
                 player['Injury_Type'] = ""
                 player['Injury_Detail'] = ""
                 player['Injury_Side'] = ""
+                player['EST_RETURN'] = ""
                 team_roster_dict[str(player['PLAYER_ID'])] = player
                 continue
 

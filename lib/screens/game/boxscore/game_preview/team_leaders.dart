@@ -469,6 +469,7 @@ class PlayerCard extends StatelessWidget {
           AutoSizeText(
             name,
             maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: kBebasNormal.copyWith(fontSize: 15.0.r),
           ),
           Text(

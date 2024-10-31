@@ -1801,7 +1801,7 @@ except Exception as e:
     exit(1)
 
 # games_daily_update()
-# teams_daily_update()
+teams_daily_update()
 # players_daily_update()
 games_live_update()
 # games_prev_day()

@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/screens/player/profile/player_awards.dart';
 import 'package:splash/screens/player/profile/player_contract.dart';
@@ -54,6 +55,12 @@ class _PlayerProfileState extends State<PlayerProfile> {
         padding: const EdgeInsets.all(15.0),
         child: Column(
           children: [
+            if (widget.player.containsKey('PlayerRotowires'))
+              if (widget.player['PlayerRotowires'][0]['Injured'] == 'YES')
+                InjuryCard(
+                  injuryDetails: widget.player['PlayerRotowires'][0],
+                  teamAbbr: widget.player['TEAM_ABBREVIATION'],
+                ),
             InfoCard(
               info: {
                 'Measure': '$heightFinal | ${widget.player['WEIGHT'] ?? '-'} lb',
@@ -73,9 +80,6 @@ class _PlayerProfileState extends State<PlayerProfile> {
                 'Country': widget.player['COUNTRY'] ?? '-',
               },
             ),
-            if (widget.player.containsKey('PlayerRotowires'))
-              if (widget.player['PlayerRotowires'][0]['Injured'] == 'YES')
-                InjuryCard(injuryDetails: widget.player['PlayerRotowires'][0]),
             PlayerAwards(
               playerAwards: widget.player['AWARDS'],
             ),
@@ -209,12 +213,20 @@ class _InfoCardState extends State<InfoCard> {
   }
 }
 
-class InjuryCard extends StatelessWidget {
+class InjuryCard extends StatefulWidget {
   final Map<String, dynamic> injuryDetails;
-  const InjuryCard({super.key, required this.injuryDetails});
+  final String teamAbbr;
+  const InjuryCard({super.key, required this.injuryDetails, required this.teamAbbr});
+
+  @override
+  State<InjuryCard> createState() => _InjuryCardState();
+}
+
+class _InjuryCardState extends State<InjuryCard> {
+  bool _isExpanded = false;
 
   Color getColor(String status) {
-    if (status == 'OUT') {
+    if (status == 'OUT' || status == 'OFS') {
       return Colors.redAccent;
     } else if (status == 'GTD' || status == 'DTD') {
       return Colors.orangeAccent;
@@ -223,53 +235,177 @@ class InjuryCard extends StatelessWidget {
     }
   }
 
+  String timeAgo(String dateTimeString) {
+    final inputFormat = DateFormat('MM/dd/yyyy HH:mm:ss');
+    final DateTime givenDateTime = inputFormat.parse(dateTimeString);
+    // Convert current time to GST (GMT+4)
+    final DateTime now = DateTime.now().toUtc().add(const Duration(hours: 7));
+    final Duration difference = now.difference(givenDateTime);
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} min ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else if (difference.inDays < 2) {
+      return '${difference.inDays} day ago';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else {
+      final outputFormat = DateFormat('MMM d');
+      return outputFormat.format(givenDateTime);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade900,
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      padding: const EdgeInsets.all(15.0),
-      margin: EdgeInsets.only(top: 11.0.r),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Card(
+      color: getColor(widget.injuryDetails['Injured_Status']).withOpacity(0.2),
+      clipBehavior: Clip.hardEdge,
+      margin: EdgeInsets.only(bottom: 11.0.r),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        widget.injuryDetails['Injured_Status'] == 'OFS'
+                            ? 'Out for Season'
+                            : widget.injuryDetails['Injured_Status'] == 'GTD' ||
+                                    widget.injuryDetails['Injured_Status'] == 'DTD'
+                                ? 'Day-To-Day'
+                                : widget.injuryDetails['Injured_Status'],
+                        style: kBebasNormal.copyWith(
+                            fontSize: 16.0.r,
+                            color: getColor(widget.injuryDetails['Injured_Status'])),
+                      ),
+                      Text(
+                        ' - ${widget.injuryDetails['Injury_Side'] == 'Not Specified' || widget.injuryDetails['Injury_Side'] == '' ? '' : '${widget.injuryDetails['Injury_Side']} '}${widget.injuryDetails['Injury_Type']}',
+                        style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                      ),
+                      if (widget.injuryDetails['Injury_Detail'] != '')
+                        Text(
+                          ' (${widget.injuryDetails['Injury_Detail']})',
+                          style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                        ),
+                    ],
                   ),
-                ),
-                child: Text(
-                  'Injured',
-                  style: kBebasBold.copyWith(fontSize: 18.0.r),
-                ),
-              ),
+                  Column(
+                    children: [
+                      Text('Est. Return', style: kBebasNormal.copyWith(fontSize: 11.0.r)),
+                      Text(widget.injuryDetails['EST_RETURN'] ?? 'TBD',
+                          style: kBebasNormal.copyWith(fontSize: 14.0.r))
+                    ],
+                  )
+                ],
+              )
             ],
           ),
-          SizedBox(height: 10.0.r),
-          Row(
-            children: [
-              Text(
-                injuryDetails['Injured_Status'],
-                style: kBebasNormal.copyWith(
-                    fontSize: 16.0.r, color: getColor(injuryDetails['Injured_Status'])),
+          trailing: Icon(
+            _isExpanded ? Icons.expand_less : Icons.expand_more,
+            color: Colors.white70,
+          ),
+          onExpansionChanged: (bool expanded) {
+            setState(() {
+              _isExpanded = expanded;
+            });
+          },
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(12.0.r, 6.0.r, 12.0.r, 12.0.r),
+              child: Column(
+                children: [
+                  RichText(
+                      text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: widget.injuryDetails['ListItemShort'] ?? '',
+                        style: TextStyle(
+                          color: const Color(0xFFEEEEEE),
+                          letterSpacing: -0.8,
+                          fontSize: 13.0.r,
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    ],
+                  )),
+                  SizedBox(height: 5.0.r),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        'images/rotowire.svg',
+                        height: 17.0.r,
+                        width: 20.0.r,
+                      ),
+                      SizedBox(width: 5.0.r),
+                      Text(
+                        timeAgo(widget.injuryDetails['ListItemPubDate']),
+                        style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.0.r),
+                  Stack(
+                    children: [
+                      // Colored bar extending to the height of RichText
+                      Positioned.fill(
+                        left: 0, // Position the bar on the left side
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 3.0.r, // Width of the colored bar
+                              color: kTeamColors.containsKey(widget.teamAbbr)
+                                  ? kDarkPrimaryColors.contains(widget.teamAbbr)
+                                      ? kTeamColors[widget.teamAbbr]!['secondaryColor']
+                                      : kTeamColors[widget.teamAbbr]!['primaryColor']
+                                  : Colors.blue,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: 10.0.r), // Space between bar and RichText
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Analysis: ',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  letterSpacing: -0.8,
+                                  fontSize: 12.0.r,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              TextSpan(
+                                text: widget.injuryDetails['ListItemDescription'],
+                                style: TextStyle(
+                                  color: const Color(0xFFCCCCCC),
+                                  letterSpacing: -0.8,
+                                  fontSize: 12.0.r,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              Text(
-                ' - ${injuryDetails['Injury_Side']} ${injuryDetails['Injury_Type']}',
-                style: kBebasNormal.copyWith(fontSize: 16.0.r),
-              ),
-              if (injuryDetails['Injury_Detail'] != '')
-                Text(
-                  ' (${injuryDetails['Injury_Detail']})',
-                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
-                ),
-            ],
-          )
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

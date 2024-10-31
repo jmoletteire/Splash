@@ -339,26 +339,27 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
               SizedBox(width: 5.0.r),
               Flexible(
                 child: RichText(
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '${widget.players[row]?['DISPLAY_FI_LAST'] ?? ''}',
-                          style: kBebasNormal.copyWith(
-                            color: Colors.white70,
-                            fontSize: 14.0,
-                          ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '${widget.players[row]?['DISPLAY_FI_LAST'] ?? ''}',
+                        style: kBebasNormal.copyWith(
+                          color: Colors.white70,
+                          fontSize: 14.0,
                         ),
-                        TextSpan(
-                          text: ', ${kPositionMap[widget.players[row]?['POSITION']] ?? ''}',
-                          style: kBebasNormal.copyWith(
-                            color: Colors.white,
-                            fontSize: 13.0,
-                          ),
+                      ),
+                      TextSpan(
+                        text: ', ${kPositionMap[widget.players[row]?['POSITION']] ?? ''}',
+                        style: kBebasNormal.copyWith(
+                          color: Colors.white,
+                          fontSize: 13.0,
                         ),
-                      ],
-                    )),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

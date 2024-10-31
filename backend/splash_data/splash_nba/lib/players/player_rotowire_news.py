@@ -6,6 +6,7 @@ from splash_nba.util.env import uri
 import logging
 import requests
 import json
+from bs4 import BeautifulSoup
 
 
 def player_rotowire_ids():
@@ -16,7 +17,55 @@ def player_rotowire_ids():
     client = MongoClient(uri)
     db = client.splash
     players_collection = db.nba_players
-    logging.info("Connected to MongoDB")
+
+    # URL template for fetching player news
+    url = "https://www.rotowire.com/basketball/tables/injury-report.php?team=ALL&pos=ALL"
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        for player in response.json():
+            # Define the search criteria
+            player_name = player['player']
+            team_abbreviation = player['team']
+            roto_id = player['ID']
+
+            # Aggregation pipeline for fuzzy matching
+            pipeline = [
+                {
+                    "$search": {
+                        "index": "person_id",  # Replace with your actual search index name
+                        "text": {
+                            "query": player_name,
+                            "path": "DISPLAY_FIRST_LAST",
+                            "fuzzy": {"maxEdits": 2}  # Adjust maxEdits as needed
+                        }
+                    }
+                },
+                {
+                    "$match": {"TEAM_ABBREVIATION": team_abbreviation}
+                },
+                {
+                    "$limit": 1
+                }
+            ]
+
+            # Execute the search
+            result = list(players_collection.aggregate(pipeline))
+
+            # If a match is found, update the ROTO_ID
+            if result:
+                player_id = result[0]["PERSON_ID"]
+                players_collection.update_one(
+                    {"PERSON_ID": player_id},
+                    {"$set": {"ROTO_ID": roto_id}}
+                )
+                logging.info(f"Added Roto ID for {player['player']}")
+            else:
+                print("No close match found for player.")
+
+    else:
+        logging.error(f"Failed to fetch injury report. Status code: {response.status_code}")
 
     # URL template for fetching player news
     url = "https://www.rotowire.com/basketball/tables/rotations.php"
@@ -36,6 +85,46 @@ def player_rotowire_ids():
                 logging.info(f"Added Roto ID for {player['player']}")
     else:
         logging.error(f"Failed to fetch news for rotations. Status code: {response.status_code}")
+
+
+def player_rotowire_injuries():
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    # Replace with your MongoDB connection string
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+
+    # Base URL for the initial JSON data and the player page
+    injury_report_url = "https://www.rotowire.com/basketball/tables/injury-report.php?team=ALL&pos=ALL"
+    base_url = "https://www.rotowire.com"
+
+    # Step 1: Fetch the JSON data from the injury report page
+    response = requests.get(injury_report_url)
+    data = response.json()
+
+    # Step 2: Iterate through each player in the JSON data
+    injury_dates = {}  # Dictionary to store player names and their estimated return dates
+
+    for item in data:
+        player_url = base_url + item["URL"]
+
+        # Step 3: Fetch the player page
+        player_response = requests.get(player_url)
+        player_soup = BeautifulSoup(player_response.text, 'html.parser')
+
+        # Step 4: Find the injury data div and extract the date
+        injury_data_divs = player_soup.find_all("div", class_="p-card__injury-data")
+
+        if len(injury_data_divs) > 1:  # Check if there is a second div
+            # Extract the date from the second div
+            est_return_div = injury_data_divs[1]
+            est_return_date = est_return_div.find("b").get_text(strip=True)
+            player_name = item["player"]  # Assuming 'Name' key contains the player's name
+            injury_dates[player_name] = est_return_date
+            players_collection.update_one({'ROTO_ID': item['ID']}, {"$set": {"PlayerRotowires.0.EST_RETURN": est_return_date}})
+            logging.info(f"{player_name}: {est_return_date}")
 
 
 def player_rotowire_news_short(player_id):
@@ -94,7 +183,7 @@ def player_rotowire_news():
             continue  # Skip if no PERSON_ID is found
 
         # Fetch news data for the player
-        url = f"{base_url}?playerId={player_id}"
+        url = f"{base_url}?playerId={player_id}&limit=10&offset=0"
         response = requests.get(url)
 
         if response.status_code == 200:
@@ -120,5 +209,6 @@ def player_rotowire_news():
 
 
 if __name__ == "__main__":
-    # player_rotowire_ids()
+    #player_rotowire_ids()
     player_rotowire_news()
+    player_rotowire_injuries()

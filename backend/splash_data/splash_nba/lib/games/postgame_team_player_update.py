@@ -428,7 +428,7 @@ teams_dict = {
 played_list = list(teams_dict.keys())
 
 #update_teams(played_list)
-#update_players(played_list)
+update_players(played_list)
 check_games_final()
 
 while True:

@@ -482,6 +482,7 @@ class RotationRow extends StatelessWidget {
                 width: 15.0.r,
               ),
               Flexible(
+                flex: 4,
                 child: Text(
                   player['PLAYER'],
                   overflow: TextOverflow.ellipsis,
@@ -489,6 +490,22 @@ class RotationRow extends StatelessWidget {
                   style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
                 ),
               ),
+              if (player.containsKey('Injured'))
+                if (player['Injured'] == 'YES')
+                  Flexible(
+                    child: Text(
+                      player['Injured_Status'] == 'OUT' || player['Injured_Status'] == 'OFS'
+                          ? '\t\t OUT'
+                          : '\t\t DTD',
+                      style: kBebasNormal.copyWith(
+                        fontSize: 11.0.r,
+                        color: player['Injured_Status'] == 'OUT' ||
+                                player['Injured_Status'] == 'OFS'
+                            ? Colors.redAccent
+                            : Colors.orangeAccent,
+                      ),
+                    ),
+                  )
             ],
           ),
         ),

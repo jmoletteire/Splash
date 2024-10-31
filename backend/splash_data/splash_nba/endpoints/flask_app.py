@@ -737,6 +737,7 @@ def get_team_player_stats():
                     "DISPLAY_FIRST_LAST": 1,
                     "POSITION": 1,
                     "JERSEY": 1,
+                    "PlayerRotowires.0.Injured_Status": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.ADV.POSS": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.GP": 1,
                     f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.MIN": 1,
