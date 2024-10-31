@@ -30,6 +30,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
     super.initState();
     columnNames = [
       'PLAYER',
+      '',
       'GP',
       'MPG',
       'PPG',
@@ -100,6 +101,13 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
               ? MediaQuery.of(context).size.width * 0.15
               : MediaQuery.of(context).size.width * 0.38,
           freezePriority: 1,
+        ),
+
+        /// STATUS
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.075,
         ),
 
         /// GP
@@ -364,6 +372,28 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
             ],
           ),
         );
+      case 1:
+        try {
+          String status = widget.players[row]?['PlayerRotowires']?[0]?['Injured_Status'] ?? '';
+          print(widget.players[row]['PlayerRotowires']);
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.0.r),
+            decoration: BoxDecoration(
+              color: status == ''
+                  ? Colors.transparent
+                  : status == 'OUT' || status == 'OFS'
+                      ? Colors.redAccent
+                      : Colors.orangeAccent,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Text(
+              status,
+              style: kBebasNormal.copyWith(fontSize: 18.0.r),
+            ),
+          );
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
       case 1:
         try {
           return Container(
