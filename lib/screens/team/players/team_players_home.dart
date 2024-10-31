@@ -24,7 +24,7 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -49,6 +49,7 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
               Tab(text: 'Roster'),
               Tab(text: 'Depth Chart'),
               Tab(text: 'Rotation'),
+              Tab(text: 'Injuries'),
             ]),
         Expanded(
           child: TabBarView(
@@ -56,6 +57,7 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
             children: [
               TeamRoster(team: widget.team),
               DepthChart(team: widget.team),
+              TeamRotation(team: widget.team),
               TeamRotation(team: widget.team),
             ],
           ),

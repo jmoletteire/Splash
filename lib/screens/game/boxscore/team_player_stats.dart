@@ -30,7 +30,6 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
     super.initState();
     columnNames = [
       'PLAYER',
-      '',
       'GP',
       'MPG',
       'PPG',
@@ -99,15 +98,8 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         TableColumn(
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.15
-              : MediaQuery.of(context).size.width * 0.38,
+              : MediaQuery.of(context).size.width * 0.43,
           freezePriority: 1,
-        ),
-
-        /// STATUS
-        TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.075,
         ),
 
         /// GP
@@ -266,22 +258,34 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
 
   /// This is used to wrap both regular and placeholder rows to achieve fade
   /// transition between them and to insert optional row divider.
-  Widget _wrapRow(int index, Widget child) => KeyedSubtree(
-        key: ValueKey(index),
-        child: DecoratedBox(
-          position: DecorationPosition.foreground,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade900,
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.grey.shade200,
-                width: 0.125,
-              ),
+  Widget _wrapRow(int index, Widget child) {
+    String status = '';
+    try {
+      status = widget.players[index]?['PlayerRotowires']?[0]?['Injured_Status'] ?? '';
+    } catch (e) {
+      status = '';
+    }
+    return KeyedSubtree(
+      key: ValueKey(index),
+      child: DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          color: status == ''
+              ? Colors.grey.shade900
+              : status == 'OUT' || status == 'OFS'
+                  ? Colors.redAccent.withOpacity(0.125)
+                  : Colors.orangeAccent.withOpacity(0.125),
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey.shade200,
+              width: 0.125,
             ),
           ),
-          child: child,
         ),
-      );
+        child: child,
+      ),
+    );
+  }
 
   Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
     return _wrapRow(
@@ -301,8 +305,8 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
               );
             });
           },
-          splashColor: Colors.white,
-          highlightColor: Colors.white,
+          splashColor: Colors.white10,
+          highlightColor: Colors.white10,
           child: contentBuilder(context, (context, column) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -325,6 +329,12 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
 
     switch (column) {
       case 0:
+        String status = '';
+        try {
+          status = widget.players[row]?['PlayerRotowires']?[0]?['Injured_Status'] ?? '';
+        } catch (e) {
+          status = '';
+        }
         return Container(
           alignment: Alignment.centerLeft,
           child: Row(
@@ -369,31 +379,29 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
                   ),
                 ),
               ),
+              SizedBox(width: 5.0.r),
+              Container(
+                margin: EdgeInsets.only(left: 8.0.r),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: AutoSizeText(
+                  status,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: kBebasNormal.copyWith(
+                      fontSize: 14.0.r,
+                      color: status == ''
+                          ? Colors.grey.shade900
+                          : status == 'OUT' || status == 'OFS'
+                              ? Colors.red
+                              : Colors.orangeAccent),
+                ),
+              )
             ],
           ),
         );
-      case 1:
-        try {
-          String status = widget.players[row]?['PlayerRotowires']?[0]?['Injured_Status'] ?? '';
-          print(widget.players[row]['PlayerRotowires']);
-          return Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.0.r),
-            decoration: BoxDecoration(
-              color: status == ''
-                  ? Colors.transparent
-                  : status == 'OUT' || status == 'OFS'
-                      ? Colors.redAccent
-                      : Colors.orangeAccent,
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Text(
-              status,
-              style: kBebasNormal.copyWith(fontSize: 18.0.r),
-            ),
-          );
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
       case 1:
         try {
           return Container(
