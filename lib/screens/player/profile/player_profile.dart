@@ -324,7 +324,7 @@ class _InjuryCardState extends State<InjuryCard> {
                       text: TextSpan(
                     children: [
                       TextSpan(
-                        text: widget.injuryDetails['ListItemShort'] ?? '',
+                        text: widget.injuryDetails['ListItemShort'].toString() ?? '',
                         style: TextStyle(
                           color: const Color(0xFFEEEEEE),
                           letterSpacing: -0.8,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/screens/team/players/depth_chart.dart';
 import 'package:splash/screens/team/players/rotation.dart';
+import 'package:splash/screens/team/players/team_injuries.dart';
 import 'package:splash/screens/team/players/team_roster.dart';
 
 import '../../../utilities/constants.dart';
@@ -58,7 +59,7 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
               TeamRoster(team: widget.team),
               DepthChart(team: widget.team),
               TeamRotation(team: widget.team),
-              TeamRotation(team: widget.team),
+              TeamInjuries(team: widget.team),
             ],
           ),
         ),

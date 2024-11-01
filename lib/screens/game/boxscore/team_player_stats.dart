@@ -382,16 +382,12 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
               SizedBox(width: 5.0.r),
               Container(
                 margin: EdgeInsets.only(left: 8.0.r),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
                 child: AutoSizeText(
                   status,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: kBebasNormal.copyWith(
-                      fontSize: 14.0.r,
+                      fontSize: 13.0.r,
                       color: status == ''
                           ? Colors.grey.shade900
                           : status == 'OUT' || status == 'OFS'

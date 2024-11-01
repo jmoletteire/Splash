@@ -181,6 +181,24 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
     Color teamColor = kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
         ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
+
+    Color getColor(String index) {
+      return widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] == ''
+          ? Colors.grey.shade900
+          : widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+                      'OUT' ||
+                  widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+                      'OFS'
+              ? Colors.redAccent.withOpacity(0.15)
+              : widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+                          'GTD' ||
+                      widget.team['seasons'][selectedSeason]['ROSTER'][index]
+                              ['Injured_Status'] ==
+                          'DTD'
+                  ? Colors.orangeAccent.withOpacity(0.15)
+                  : Colors.grey.shade900;
+    }
+
     return _isLoading
         ? Center(
             child: SpinningIcon(
@@ -319,7 +337,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                             padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
                             height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
-                                color: Colors.grey.shade900,
+                                color: getColor(starters[index]),
                                 border: const Border(
                                     bottom: BorderSide(color: Colors.white54, width: 0.125))),
                             child: RotationRow(
@@ -426,7 +444,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                             padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
                             height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
-                                color: Colors.grey.shade900,
+                                color: getColor(bench[index]),
                                 border: const Border(
                                     bottom: BorderSide(color: Colors.white54, width: 0.125))),
                             child: RotationRow(
@@ -498,7 +516,7 @@ class RotationRow extends StatelessWidget {
                           ? '\t\t OUT'
                           : '\t\t DTD',
                       style: kBebasNormal.copyWith(
-                        fontSize: 11.0.r,
+                        fontSize: 12.0.r,
                         color: player['Injured_Status'] == 'OUT' ||
                                 player['Injured_Status'] == 'OFS'
                             ? Colors.redAccent
@@ -547,7 +565,7 @@ class RotationRow extends StatelessWidget {
             duration: const Duration(milliseconds: 250),
             builder: (BuildContext context, num value, Widget? child) {
               return Text(
-                value.toStringAsFixed(1),
+                value == 0 ? '-' : value.toStringAsFixed(1),
                 textAlign: TextAlign.end,
                 style: kBebasNormal.copyWith(fontSize: 15.0.r),
               );
@@ -565,7 +583,7 @@ class RotationRow extends StatelessWidget {
             duration: const Duration(milliseconds: 250),
             builder: (BuildContext context, num value, Widget? child) {
               return Text(
-                value.toStringAsFixed(0),
+                value == 0 ? '-' : value.toStringAsFixed(0),
                 textAlign: TextAlign.end,
                 style: kBebasNormal.copyWith(fontSize: 15.0.r),
               );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 import '../../../components/player_avatar.dart';
 import '../../../utilities/constants.dart';
@@ -92,44 +94,385 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height: MediaQuery.of(context).size.height * 0.04,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade900,
-            border: const Border(
-              bottom: BorderSide(
-                color: Colors.white24,
-                width: 1,
+    Color getColor(String index) {
+      return widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] == ''
+          ? Colors.grey.shade900
+          : widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+                      'OUT' ||
+                  widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+                      'OFS'
+              ? Colors.redAccent.withOpacity(0.15)
+              : widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+                          'GTD' ||
+                      widget.team['seasons'][selectedSeason]['ROSTER'][index]
+                              ['Injured_Status'] ==
+                          'DTD'
+                  ? Colors.orangeAccent.withOpacity(0.15)
+                  : Colors.grey.shade900;
+    }
+
+    return CustomScrollView(
+      slivers: [
+        SliverPinnedHeader(
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.04,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade900,
+              border: const Border(
+                bottom: BorderSide(
+                  color: Colors.white24,
+                  width: 1,
+                ),
               ),
             ),
-          ),
-          child: DropdownButton<String>(
-            padding: EdgeInsets.symmetric(horizontal: 15.0.r),
-            borderRadius: BorderRadius.circular(10.0),
-            menuMaxHeight: 300.0.r,
-            dropdownColor: Colors.grey.shade900,
-            isExpanded: true,
-            underline: Container(),
-            value: selectedSeason,
-            items: seasons.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                  style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
-                ),
-              );
-            }).toList(),
-            onChanged: (String? value) {
-              setState(() {
-                selectedSeason = value!;
-                setPlayers();
-              });
-            },
+            child: DropdownButton<String>(
+              padding: EdgeInsets.symmetric(horizontal: 15.0.r),
+              borderRadius: BorderRadius.circular(10.0),
+              menuMaxHeight: 300.0.r,
+              dropdownColor: Colors.grey.shade900,
+              isExpanded: true,
+              underline: Container(),
+              value: selectedSeason,
+              items: seasons.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                setState(() {
+                  selectedSeason = value!;
+                  setPlayers();
+                });
+              },
+            ),
           ),
         ),
+        MultiSliver(
+          pushPinnedChildren: true,
+          children: [
+            SliverPinnedHeader(
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 0.0, 6.0.r),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF303030),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white30,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 14.0.r),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 10,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Guards \t(${guards.length})',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'MIN',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'GS',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayerHome(
+                            playerId: guards[index],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                          color: getColor(guards[index]),
+                          border: const Border(
+                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                      child: RotationRow(
+                        player: widget.team['seasons'][selectedSeason]['ROSTER']
+                            [guards[index]],
+                      ),
+                    ),
+                  );
+                },
+                childCount: guards.length,
+              ),
+            ),
+          ],
+        ),
+        MultiSliver(
+          pushPinnedChildren: true,
+          children: [
+            SliverPinnedHeader(
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 0.0, 6.0.r),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF303030),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white30,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 14.0.r),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 10,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Forwards \t(${forwards.length})',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'MIN',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'GS',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayerHome(
+                            playerId: forwards[index],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                          color: getColor(forwards[index]),
+                          border: const Border(
+                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                      child: RotationRow(
+                        player: widget.team['seasons'][selectedSeason]['ROSTER']
+                            [forwards[index]],
+                      ),
+                    ),
+                  );
+                },
+                childCount: forwards.length,
+              ),
+            ),
+          ],
+        ),
+        MultiSliver(
+          pushPinnedChildren: true,
+          children: [
+            SliverPinnedHeader(
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20.0.r, 6.0.r, 0.0, 6.0.r),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF303030),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white30,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 14.0.r),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 10,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Centers \t(${centers.length})',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'MIN',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'GS',
+                                    style: kBebasOffWhite.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlayerHome(
+                            playerId: centers[index],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                          color: getColor(centers[index]),
+                          border: const Border(
+                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                      child: RotationRow(
+                        player: widget.team['seasons'][selectedSeason]['ROSTER']
+                            [centers[index]],
+                      ),
+                    ),
+                  );
+                },
+                childCount: centers.length,
+              ),
+            ),
+          ],
+        ),
+        /*
         Card(
           margin: const EdgeInsets.fromLTRB(11.0, 11.0, 11.0, 11.0),
           color: Colors.grey.shade900,
@@ -217,6 +560,139 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
                 ),
               ]),
             ),
+          ),
+        ),
+
+         */
+      ],
+    );
+  }
+}
+
+class RotationRow extends StatelessWidget {
+  final Map<String, dynamic> player;
+
+  const RotationRow({super.key, required this.player});
+
+  Color getProgressColor(double percentile) {
+    if (percentile < 1 / 3) {
+      return const Color(0xDFFF3333);
+    }
+    if (percentile > 2 / 3) {
+      return const Color(0xBB00FF6F);
+    } else {
+      return Colors.orange;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    num minutesPerGame = player['MPG'] ?? 0;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Expanded(
+          flex: 5,
+          child: Row(
+            children: [
+              PlayerAvatar(
+                radius: 14.0.r,
+                backgroundColor: Colors.white12,
+                playerImageUrl:
+                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${player['PLAYER_ID']}.png',
+              ),
+              SizedBox(
+                width: 15.0.r,
+              ),
+              Flexible(
+                flex: 4,
+                child: Text(
+                  player['PLAYER'],
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: kBebasOffWhite.copyWith(fontSize: 15.0.r),
+                ),
+              ),
+              if (player.containsKey('Injured'))
+                if (player['Injured'] == 'YES')
+                  Flexible(
+                    child: Text(
+                      player['Injured_Status'] == 'OUT' || player['Injured_Status'] == 'OFS'
+                          ? '\t\t OUT'
+                          : '\t\t DTD',
+                      style: kBebasNormal.copyWith(
+                        fontSize: 12.0.r,
+                        color: player['Injured_Status'] == 'OUT' ||
+                                player['Injured_Status'] == 'OFS'
+                            ? Colors.redAccent
+                            : Colors.orangeAccent,
+                      ),
+                    ),
+                  )
+            ],
+          ),
+        ),
+
+        /// Position
+        Expanded(
+          flex: 1,
+          child: Text(
+            player['POSITION'] ?? '-',
+            textAlign: TextAlign.right,
+            style: kBebasNormal.copyWith(fontSize: 15.0.r),
+          ),
+        ),
+        SizedBox(width: 5.0.r),
+
+        /// Horizontal bar percentile (full == 100th, empty == 0th)
+        Expanded(
+          flex: 4,
+          child: LinearPercentIndicator(
+            lineHeight: 9.0.r,
+            backgroundColor: const Color(0xFF444444),
+            progressColor: getProgressColor(minutesPerGame / 48),
+            percent: minutesPerGame / 48,
+            barRadius: const Radius.circular(10.0),
+            animation: true,
+            animateFromLastPercent: true,
+            animationDuration: 400,
+          ),
+        ),
+
+        /// MPG
+        Expanded(
+          flex: 1,
+          child: TweenAnimationBuilder<num>(
+            tween: Tween(
+              begin: 0,
+              end: minutesPerGame,
+            ),
+            duration: const Duration(milliseconds: 250),
+            builder: (BuildContext context, num value, Widget? child) {
+              return Text(
+                value == 0 ? '-' : value.toStringAsFixed(1),
+                textAlign: TextAlign.end,
+                style: kBebasNormal.copyWith(fontSize: 15.0.r),
+              );
+            },
+          ),
+        ),
+
+        Expanded(
+          flex: 1,
+          child: TweenAnimationBuilder<num>(
+            tween: Tween(
+              begin: 0,
+              end: player['GS'],
+            ),
+            duration: const Duration(milliseconds: 250),
+            builder: (BuildContext context, num value, Widget? child) {
+              return Text(
+                value == 0 ? '-' : value.toStringAsFixed(0),
+                textAlign: TextAlign.end,
+                style: kBebasNormal.copyWith(fontSize: 15.0.r),
+              );
+            },
           ),
         ),
       ],

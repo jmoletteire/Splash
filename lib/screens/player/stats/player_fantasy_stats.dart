@@ -260,196 +260,326 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
       );
     }
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Other content can go here
-          SizedBox(height: 20.0.r),
-          Text(
-            'Performance',
-            style: kBebasBold.copyWith(fontSize: 18.0.r),
-          ),
-          SizedBox(height: 10.0.r),
-          Stack(
-            children: [
-              Positioned(
-                bottom: 50.0.r,
-                child: Opacity(
-                  opacity: 0.2,
-                  child: ColorFiltered(
-                    colorFilter: const ColorFilter.matrix(<double>[
-                      0.2126, 0.7152, 0.0722, 0, 0, // Red channel
-                      0.2126, 0.7152, 0.0722, 0, 0, // Green channel
-                      0.2126, 0.7152, 0.0722, 0, 0, // Blue channel
-                      0, 0, 0, 1, 0, // Alpha channel
-                    ]),
-                    child: Image.network(
-                      'https://cdn.nba.com/silos/nba/latest/440x700/${widget.player['PERSON_ID']}.png',
-                      width: MediaQuery.of(context).size.width,
-                      height: 300.0.r,
-                    ),
-                  ),
+    return !widget.player.keys.contains('STATS') || !widget.player['STATS'].isNotEmpty
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.sports_basketball,
+                  color: Colors.white38,
+                  size: 38.0.r,
                 ),
-              ),
-              SizedBox(
-                height: 300.0.r,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  reverse: true,
-                  itemCount: gamelogs.length,
-                  itemBuilder: (context, index) {
-                    String matchup = gamelogs[index]['MATCHUP'].toString();
-                    String oppId = kTeamAbbrToId[matchup.substring(matchup.length - 3)] ?? '0';
-                    String currentGameDate = gamelogs[index]['GAME_DATE'];
-                    String currentMonth =
-                        DateFormat('MMM').format(DateTime.parse(currentGameDate));
-                    String currentYear =
-                        DateFormat('yy').format(DateTime.parse(currentGameDate));
+                SizedBox(height: 15.0.r),
+                Text(
+                  'No Stats Available',
+                  style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+                ),
+              ],
+            ),
+          )
+        : SingleChildScrollView(
+            child: Column(
+              children: [
+                // Other content can go here
+                SizedBox(height: 20.0.r),
+                Text(
+                  'Performance',
+                  style: kBebasBold.copyWith(fontSize: 18.0.r),
+                ),
+                SizedBox(height: 10.0.r),
+                Stack(
+                  children: [
+                    Positioned(
+                      bottom: 50.0.r,
+                      child: Opacity(
+                        opacity: 0.2,
+                        child: ColorFiltered(
+                          colorFilter: const ColorFilter.matrix(<double>[
+                            0.2126, 0.7152, 0.0722, 0, 0, // Red channel
+                            0.2126, 0.7152, 0.0722, 0, 0, // Green channel
+                            0.2126, 0.7152, 0.0722, 0, 0, // Blue channel
+                            0, 0, 0, 1, 0, // Alpha channel
+                          ]),
+                          child: Image.network(
+                            'https://cdn.nba.com/silos/nba/latest/440x700/${widget.player['PERSON_ID']}.png',
+                            width: MediaQuery.of(context).size.width,
+                            height: 300.0.r,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 300.0.r,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        reverse: true,
+                        itemCount: gamelogs.length,
+                        itemBuilder: (context, index) {
+                          String matchup = gamelogs[index]['MATCHUP'].toString();
+                          String oppId =
+                              kTeamAbbrToId[matchup.substring(matchup.length - 3)] ?? '0';
+                          String currentGameDate = gamelogs[index]['GAME_DATE'];
+                          String currentMonth =
+                              DateFormat('MMM').format(DateTime.parse(currentGameDate));
+                          String currentYear =
+                              DateFormat('yy').format(DateTime.parse(currentGameDate));
 
-                    // Check if this is the first item or if the month has changed
-                    bool isNewMonth = false;
-                    try {
-                      isNewMonth = DateFormat('MMM')
-                              .format(DateTime.parse(gamelogs[index + 1]['GAME_DATE'])) !=
-                          currentMonth;
-                    } catch (e) {
-                      isNewMonth = false;
-                    }
+                          // Check if this is the first item or if the month has changed
+                          bool isNewMonth = false;
+                          try {
+                            isNewMonth = DateFormat('MMM').format(
+                                    DateTime.parse(gamelogs[index + 1]['GAME_DATE'])) !=
+                                currentMonth;
+                          } catch (e) {
+                            isNewMonth = false;
+                          }
 
-                    return Row(
-                      children: [
-                        if (isNewMonth)
-                          Column(
+                          return Row(
                             children: [
-                              Text(
-                                '$currentMonth \'$currentYear',
+                              if (isNewMonth)
+                                Column(
+                                  children: [
+                                    Text(
+                                      '$currentMonth \'$currentYear',
+                                      style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                    ),
+                                    SizedBox(height: 5.0.r),
+                                    Container(
+                                      width: 2.0,
+                                      height: 215.0.r,
+                                      color: Colors.grey,
+                                    ),
+                                    SizedBox(
+                                        width: 8.0.r), // Spacing between the line and the bar
+                                  ],
+                                ),
+                              Bar(
+                                game: gamelogs[index],
+                                playerName: widget.player['DISPLAY_FIRST_LAST'] ?? '',
+                                date: formatDate(gamelogs[index]['GAME_DATE']),
+                                opp: oppId, // Use your oppId here
+                                homeAway: gamelogs[index]['MATCHUP'][4] != '@' ? 'vs' : '@',
+                                value: gamelogs[index]?['NBA_FANTASY_PTS'] ?? 0,
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                // More content below the bar chart
+                SizedBox(height: 25.0.r),
+                Text(
+                  'Upcoming Games',
+                  style: kBebasBold.copyWith(fontSize: 18.0.r),
+                ),
+                SizedBox(height: 5.0.r),
+                Card(
+                  color: Colors.grey.shade900,
+                  margin: EdgeInsets.fromLTRB(11.0.r, 0.0, 11.0.r, 11.0.r),
+                  child: Padding(
+                    padding: EdgeInsets.all(11.0.r),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Date',
+                                textAlign: TextAlign.center,
                                 style: kBebasNormal.copyWith(fontSize: 14.0.r),
                               ),
-                              SizedBox(height: 5.0.r),
-                              Container(
-                                width: 2.0,
-                                height: 215.0.r,
-                                color: Colors.grey,
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                'Opp',
+                                textAlign: TextAlign.center,
+                                style: kBebasNormal.copyWith(fontSize: 14.0.r),
                               ),
-                              SizedBox(width: 8.0.r), // Spacing between the line and the bar
-                            ],
-                          ),
-                        Bar(
-                          game: gamelogs[index],
-                          playerName: widget.player['DISPLAY_FIRST_LAST'] ?? '',
-                          date: formatDate(gamelogs[index]['GAME_DATE']),
-                          opp: oppId, // Use your oppId here
-                          homeAway: gamelogs[index]['MATCHUP'][4] != '@' ? 'vs' : '@',
-                          value: gamelogs[index]?['NBA_FANTASY_PTS'] ?? 0,
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          // More content below the bar chart
-          SizedBox(height: 25.0.r),
-          Text(
-            'Upcoming Games',
-            style: kBebasBold.copyWith(fontSize: 18.0.r),
-          ),
-          SizedBox(height: 5.0.r),
-          Card(
-            color: Colors.grey.shade900,
-            margin: EdgeInsets.fromLTRB(11.0.r, 0.0, 11.0.r, 11.0.r),
-            child: Padding(
-              padding: EdgeInsets.all(11.0.r),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Date',
-                          textAlign: TextAlign.center,
-                          style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          'Opp',
-                          textAlign: TextAlign.center,
-                          style: kBebasNormal.copyWith(fontSize: 14.0.r),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 5,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              'DRTG',
-                              style: kBebasNormal.copyWith(fontSize: 14.0.r),
                             ),
-                            Text(
-                              'PACE',
-                              style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                            Expanded(
+                              flex: 5,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    'DRTG',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    'PACE',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                ],
+                              ),
                             ),
+                            Spacer(),
                           ],
                         ),
-                      ),
-                      Spacer(),
-                    ],
-                  ),
-                  for (var game in nextFiveGames)
-                    Container(
-                      decoration: BoxDecoration(
-                          border: Border(bottom: BorderSide(color: Colors.grey.shade700))),
-                      child: Theme(
-                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                        child: ExpansionTile(
-                          tilePadding: EdgeInsets.zero,
-                          title: upcomingGameRow(game),
-                          trailing: Icon(
-                            _isExpandedMap[game['OPP']]!
-                                ? Icons.expand_less
-                                : Icons.expand_more,
-                            color: Colors.white70,
-                          ),
-                          onExpansionChanged: (bool expanded) {
-                            setState(() {
-                              _isExpandedMap[game['OPP']] = expanded;
-                            });
-                          },
-                          children: [
-                            ListView.builder(
-                              shrinkWrap: true,
-                              padding: EdgeInsets.only(bottom: 20.0.r),
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: prevGamesMap[game['OPP']]!.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                int year = int.parse(prevGamesMap[game['OPP']]![index]
-                                        ['GAME_ID']
-                                    .toString()
-                                    .substring(3, 5));
-                                String season = '20$year-${year + 1}';
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (index == 0 ||
-                                        (index > 0 &&
-                                            prevGamesMap[game['OPP']]![index]['GAME_ID']
-                                                    .toString()
-                                                    .substring(3, 5) !=
-                                                prevGamesMap[game['OPP']]![index - 1]
-                                                        ['GAME_ID']
-                                                    .toString()
-                                                    .substring(3, 5)))
-                                      Column(
+                        for (var game in nextFiveGames)
+                          Container(
+                            decoration: BoxDecoration(
+                                border:
+                                    Border(bottom: BorderSide(color: Colors.grey.shade700))),
+                            child: Theme(
+                              data:
+                                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                              child: ExpansionTile(
+                                tilePadding: EdgeInsets.zero,
+                                title: upcomingGameRow(game),
+                                trailing: Icon(
+                                  _isExpandedMap[game['OPP']]!
+                                      ? Icons.expand_less
+                                      : Icons.expand_more,
+                                  color: Colors.white70,
+                                ),
+                                onExpansionChanged: (bool expanded) {
+                                  setState(() {
+                                    _isExpandedMap[game['OPP']] = expanded;
+                                  });
+                                },
+                                children: [
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.only(bottom: 20.0.r),
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    itemCount: prevGamesMap[game['OPP']]!.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      int year = int.parse(prevGamesMap[game['OPP']]![index]
+                                              ['GAME_ID']
+                                          .toString()
+                                          .substring(3, 5));
+                                      String season = '20$year-${year + 1}';
+                                      return Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          SizedBox(height: 10.0.r),
-                                          Text(season,
-                                              style: kBebasNormal.copyWith(fontSize: 14.0.r)),
-                                          SizedBox(height: 5.0.r),
+                                          if (index == 0 ||
+                                              (index > 0 &&
+                                                  prevGamesMap[game['OPP']]![index]['GAME_ID']
+                                                          .toString()
+                                                          .substring(3, 5) !=
+                                                      prevGamesMap[game['OPP']]![index - 1]
+                                                              ['GAME_ID']
+                                                          .toString()
+                                                          .substring(3, 5)))
+                                            Column(
+                                              children: [
+                                                SizedBox(height: 10.0.r),
+                                                Text(season,
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 14.0.r)),
+                                                SizedBox(height: 5.0.r),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                            child: Text(
+                                                              'DATE',
+                                                              style: kBebasNormal.copyWith(
+                                                                  fontSize: 12.0.r),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                              'OPP',
+                                                              style: kBebasNormal.copyWith(
+                                                                  fontSize: 12.0.r),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                            child: Text(
+                                                              'FP',
+                                                              textAlign: TextAlign.center,
+                                                              style: kBebasNormal.copyWith(
+                                                                  fontSize: 12.0.r),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                              'MIN',
+                                                              textAlign: TextAlign.center,
+                                                              style: kBebasNormal.copyWith(
+                                                                  fontSize: 12.0.r),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                              'POSS',
+                                                              textAlign: TextAlign.center,
+                                                              style: kBebasNormal.copyWith(
+                                                                  fontSize: 12.0.r),
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 5.0.r),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'PTS',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'REB',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'AST',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'STL',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'BLK',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'TOV',
+                                                        textAlign: TextAlign.center,
+                                                        style: kBebasNormal.copyWith(
+                                                            fontSize: 12.0.r),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
                                           Row(
                                             children: [
                                               Expanded(
@@ -458,16 +588,26 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
                                                   children: [
                                                     Expanded(
                                                       child: Text(
-                                                        'DATE',
+                                                        formatDate(
+                                                            prevGamesMap[game['OPP']]![index]
+                                                                ['GAME_DATE'])[1],
                                                         style: kBebasNormal.copyWith(
                                                             fontSize: 12.0.r),
                                                       ),
                                                     ),
                                                     Expanded(
                                                       child: Text(
-                                                        'OPP',
+                                                        prevGamesMap[game['OPP']]![index]
+                                                                    ['MATCHUP'][4] ==
+                                                                '@'
+                                                            ? prevGamesMap[game['OPP']]![index]
+                                                                    ['MATCHUP']
+                                                                .substring(4)
+                                                            : prevGamesMap[game['OPP']]![index]
+                                                                    ['MATCHUP']
+                                                                .substring(8),
                                                         style: kBebasNormal.copyWith(
-                                                            fontSize: 12.0.r),
+                                                            fontSize: 13.0.r),
                                                       ),
                                                     ),
                                                   ],
@@ -475,403 +615,310 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
                                               ),
                                               Expanded(
                                                 flex: 3,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
+                                                child: Row(children: [
+                                                  Expanded(
+                                                    child: Container(
+                                                      alignment: Alignment.center,
+                                                      margin: const EdgeInsets.all(0.5),
+                                                      decoration: BoxDecoration(
+                                                        color: (prevGamesMap[game['OPP']]![
+                                                                            index]
+                                                                        ['NBA_FANTASY_PTS'] ??
+                                                                    0) >=
+                                                                40.0
+                                                            ? Colors.greenAccent
+                                                            : (prevGamesMap[game['OPP']]![
+                                                                                index][
+                                                                            'NBA_FANTASY_PTS'] ??
+                                                                        0) >=
+                                                                    20.0
+                                                                ? const Color(0xFFFAE16E)
+                                                                : const Color(0xFFF38989),
+                                                        borderRadius:
+                                                            BorderRadius.circular(3.0),
+                                                      ),
                                                       child: Text(
-                                                        'FP',
-                                                        textAlign: TextAlign.center,
+                                                        (prevGamesMap[game['OPP']]![index]
+                                                                    ['NBA_FANTASY_PTS'] ??
+                                                                0)
+                                                            .toStringAsFixed(1),
                                                         style: kBebasNormal.copyWith(
-                                                            fontSize: 12.0.r),
+                                                            fontSize: 14.0.r,
+                                                            color: Colors.grey.shade800),
                                                       ),
                                                     ),
-                                                    Expanded(
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      alignment: Alignment.center,
+                                                      margin: const EdgeInsets.all(0.5),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            (prevGamesMap[game['OPP']]![index]
+                                                                            ['MIN'] ??
+                                                                        0) >=
+                                                                    29.5
+                                                                ? Colors.greenAccent
+                                                                : (prevGamesMap[game['OPP']]![
+                                                                                    index]
+                                                                                ['MIN'] ??
+                                                                            0) >
+                                                                        24.5
+                                                                    ? const Color(0xFFFAE16E)
+                                                                    : const Color(0xFFF38989),
+                                                        borderRadius:
+                                                            BorderRadius.circular(3.0),
+                                                      ),
                                                       child: Text(
-                                                        'MIN',
-                                                        textAlign: TextAlign.center,
+                                                        (prevGamesMap[game['OPP']]![index]
+                                                                    ['MIN'] ??
+                                                                0)
+                                                            .toStringAsFixed(0),
                                                         style: kBebasNormal.copyWith(
-                                                            fontSize: 12.0.r),
+                                                            fontSize: 14.0.r,
+                                                            color: Colors.grey.shade800),
                                                       ),
                                                     ),
-                                                    Expanded(
+                                                  ),
+                                                  Expanded(
+                                                    child: Container(
+                                                      alignment: Alignment.center,
+                                                      margin: const EdgeInsets.all(0.5),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            (prevGamesMap[game['OPP']]![index]
+                                                                            ['POSS'] ??
+                                                                        0) >=
+                                                                    50
+                                                                ? Colors.greenAccent
+                                                                : (prevGamesMap[game['OPP']]![
+                                                                                    index]
+                                                                                ['POSS'] ??
+                                                                            0) >
+                                                                        38
+                                                                    ? const Color(0xFFFAE16E)
+                                                                    : const Color(0xFFF38989),
+                                                        borderRadius:
+                                                            BorderRadius.circular(3.0),
+                                                      ),
                                                       child: Text(
-                                                        'POSS',
-                                                        textAlign: TextAlign.center,
+                                                        (prevGamesMap[game['OPP']]![index]
+                                                                    ['POSS'] ??
+                                                                0)
+                                                            .toStringAsFixed(0),
                                                         style: kBebasNormal.copyWith(
-                                                            fontSize: 12.0.r),
+                                                            fontSize: 14.0.r,
+                                                            color: Colors.grey.shade800),
                                                       ),
                                                     ),
-                                                    SizedBox(width: 5.0.r),
-                                                  ],
+                                                  ),
+                                                  SizedBox(width: 5.0.r),
+                                                ]),
+                                              ),
+                                              Expanded(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  margin: const EdgeInsets.all(0.5),
+                                                  decoration: BoxDecoration(
+                                                    color: (prevGamesMap[game['OPP']]![index]
+                                                                    ['PTS'] ??
+                                                                0) >=
+                                                            20
+                                                        ? Colors.greenAccent
+                                                        : (prevGamesMap[game['OPP']]![index]
+                                                                        ['PTS'] ??
+                                                                    0) >=
+                                                                10
+                                                            ? const Color(0xFFFAE16E)
+                                                            : const Color(0xFFF38989),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                  child: Text(
+                                                    (prevGamesMap[game['OPP']]![index]
+                                                                ['PTS'] ??
+                                                            0)
+                                                        .toStringAsFixed(0),
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 14.0.r,
+                                                        color: Colors.grey.shade800),
+                                                  ),
                                                 ),
                                               ),
                                               Expanded(
-                                                child: Text(
-                                                  'PTS',
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  margin: const EdgeInsets.all(0.5),
+                                                  decoration: BoxDecoration(
+                                                    color: (prevGamesMap[game['OPP']]![index]
+                                                                    ['REB'] ??
+                                                                0) >=
+                                                            8
+                                                        ? Colors.greenAccent
+                                                        : (prevGamesMap[game['OPP']]![index]
+                                                                        ['REB'] ??
+                                                                    0) >=
+                                                                5
+                                                            ? const Color(0xFFFAE16E)
+                                                            : const Color(0xFFF38989),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                  child: Text(
+                                                    (prevGamesMap[game['OPP']]![index]
+                                                                ['REB'] ??
+                                                            0)
+                                                        .toStringAsFixed(0),
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 14.0.r,
+                                                        color: Colors.grey.shade800),
+                                                  ),
                                                 ),
                                               ),
                                               Expanded(
-                                                child: Text(
-                                                  'REB',
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  margin: const EdgeInsets.all(0.5),
+                                                  decoration: BoxDecoration(
+                                                    color: (prevGamesMap[game['OPP']]![index]
+                                                                    ['AST'] ??
+                                                                0) >=
+                                                            5
+                                                        ? Colors.greenAccent
+                                                        : (prevGamesMap[game['OPP']]![index]
+                                                                        ['AST'] ??
+                                                                    0) >=
+                                                                3
+                                                            ? const Color(0xFFFAE16E)
+                                                            : const Color(0xFFF38989),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                  child: Text(
+                                                    (prevGamesMap[game['OPP']]![index]
+                                                                ['AST'] ??
+                                                            0)
+                                                        .toStringAsFixed(0),
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 14.0.r,
+                                                        color: Colors.grey.shade800),
+                                                  ),
                                                 ),
                                               ),
                                               Expanded(
-                                                child: Text(
-                                                  'AST',
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  margin: const EdgeInsets.all(0.5),
+                                                  decoration: BoxDecoration(
+                                                    color: (prevGamesMap[game['OPP']]![index]
+                                                                    ['STL'] ??
+                                                                0) >=
+                                                            2
+                                                        ? Colors.greenAccent
+                                                        : (prevGamesMap[game['OPP']]![index]
+                                                                        ['STL'] ??
+                                                                    0) ==
+                                                                1
+                                                            ? const Color(0xFFFAE16E)
+                                                            : const Color(0xFFF38989),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                  child: Text(
+                                                    (prevGamesMap[game['OPP']]![index]
+                                                                ['STL'] ??
+                                                            0)
+                                                        .toStringAsFixed(0),
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 14.0.r,
+                                                        color: Colors.grey.shade800),
+                                                  ),
                                                 ),
                                               ),
                                               Expanded(
-                                                child: Text(
-                                                  'STL',
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  margin: const EdgeInsets.all(0.5),
+                                                  decoration: BoxDecoration(
+                                                    color: (prevGamesMap[game['OPP']]![index]
+                                                                    ['BLK'] ??
+                                                                0) >=
+                                                            2
+                                                        ? Colors.greenAccent
+                                                        : (prevGamesMap[game['OPP']]![index]
+                                                                        ['BLK'] ??
+                                                                    0) ==
+                                                                1
+                                                            ? const Color(0xFFFAE16E)
+                                                            : const Color(0xFFF38989),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                  child: Text(
+                                                    (prevGamesMap[game['OPP']]![index]
+                                                                ['BLK'] ??
+                                                            0)
+                                                        .toStringAsFixed(0),
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 14.0.r,
+                                                        color: Colors.grey.shade800),
+                                                  ),
                                                 ),
                                               ),
                                               Expanded(
-                                                child: Text(
-                                                  'BLK',
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Text(
-                                                  'TOV',
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  margin: const EdgeInsets.all(0.5),
+                                                  decoration: BoxDecoration(
+                                                    color: (prevGamesMap[game['OPP']]![index]
+                                                                    ['TOV'] ??
+                                                                0) <
+                                                            2
+                                                        ? Colors.greenAccent
+                                                        : (prevGamesMap[game['OPP']]![index]
+                                                                        ['TOV'] ??
+                                                                    0) ==
+                                                                2
+                                                            ? const Color(0xFFFAE16E)
+                                                            : const Color(0xFFF38989),
+                                                    borderRadius: BorderRadius.circular(3.0),
+                                                  ),
+                                                  child: Text(
+                                                    (prevGamesMap[game['OPP']]![index]
+                                                                ['TOV'] ??
+                                                            0)
+                                                        .toStringAsFixed(0),
+                                                    style: kBebasNormal.copyWith(
+                                                        fontSize: 14.0.r,
+                                                        color: Colors.grey.shade800),
+                                                  ),
                                                 ),
                                               ),
                                             ],
-                                          )
+                                          ),
                                         ],
-                                      ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  formatDate(prevGamesMap[game['OPP']]![index]
-                                                      ['GAME_DATE'])[1],
-                                                  style:
-                                                      kBebasNormal.copyWith(fontSize: 12.0.r),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Text(
-                                                  prevGamesMap[game['OPP']]![index]['MATCHUP']
-                                                              [4] ==
-                                                          '@'
-                                                      ? prevGamesMap[game['OPP']]![index]
-                                                              ['MATCHUP']
-                                                          .substring(4)
-                                                      : prevGamesMap[game['OPP']]![index]
-                                                              ['MATCHUP']
-                                                          .substring(8),
-                                                  style:
-                                                      kBebasNormal.copyWith(fontSize: 13.0.r),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 3,
-                                          child: Row(children: [
-                                            Expanded(
-                                              child: Container(
-                                                alignment: Alignment.center,
-                                                margin: const EdgeInsets.all(0.5),
-                                                decoration: BoxDecoration(
-                                                  color: (prevGamesMap[game['OPP']]![index]
-                                                                  ['NBA_FANTASY_PTS'] ??
-                                                              0) >=
-                                                          40.0
-                                                      ? Colors.greenAccent
-                                                      : (prevGamesMap[game['OPP']]![index]
-                                                                      ['NBA_FANTASY_PTS'] ??
-                                                                  0) >=
-                                                              20.0
-                                                          ? const Color(0xFFFAE16E)
-                                                          : const Color(0xFFF38989),
-                                                  borderRadius: BorderRadius.circular(3.0),
-                                                ),
-                                                child: Text(
-                                                  (prevGamesMap[game['OPP']]![index]
-                                                              ['NBA_FANTASY_PTS'] ??
-                                                          0)
-                                                      .toStringAsFixed(1),
-                                                  style: kBebasNormal.copyWith(
-                                                      fontSize: 14.0.r,
-                                                      color: Colors.grey.shade800),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                alignment: Alignment.center,
-                                                margin: const EdgeInsets.all(0.5),
-                                                decoration: BoxDecoration(
-                                                  color: (prevGamesMap[game['OPP']]![index]
-                                                                  ['MIN'] ??
-                                                              0) >=
-                                                          29.5
-                                                      ? Colors.greenAccent
-                                                      : (prevGamesMap[game['OPP']]![index]
-                                                                      ['MIN'] ??
-                                                                  0) >
-                                                              24.5
-                                                          ? const Color(0xFFFAE16E)
-                                                          : const Color(0xFFF38989),
-                                                  borderRadius: BorderRadius.circular(3.0),
-                                                ),
-                                                child: Text(
-                                                  (prevGamesMap[game['OPP']]![index]['MIN'] ??
-                                                          0)
-                                                      .toStringAsFixed(0),
-                                                  style: kBebasNormal.copyWith(
-                                                      fontSize: 14.0.r,
-                                                      color: Colors.grey.shade800),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                alignment: Alignment.center,
-                                                margin: const EdgeInsets.all(0.5),
-                                                decoration: BoxDecoration(
-                                                  color: (prevGamesMap[game['OPP']]![index]
-                                                                  ['POSS'] ??
-                                                              0) >=
-                                                          50
-                                                      ? Colors.greenAccent
-                                                      : (prevGamesMap[game['OPP']]![index]
-                                                                      ['POSS'] ??
-                                                                  0) >
-                                                              38
-                                                          ? const Color(0xFFFAE16E)
-                                                          : const Color(0xFFF38989),
-                                                  borderRadius: BorderRadius.circular(3.0),
-                                                ),
-                                                child: Text(
-                                                  (prevGamesMap[game['OPP']]![index]['POSS'] ??
-                                                          0)
-                                                      .toStringAsFixed(0),
-                                                  style: kBebasNormal.copyWith(
-                                                      fontSize: 14.0.r,
-                                                      color: Colors.grey.shade800),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: 5.0.r),
-                                          ]),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            margin: const EdgeInsets.all(0.5),
-                                            decoration: BoxDecoration(
-                                              color: (prevGamesMap[game['OPP']]![index]
-                                                              ['PTS'] ??
-                                                          0) >=
-                                                      20
-                                                  ? Colors.greenAccent
-                                                  : (prevGamesMap[game['OPP']]![index]
-                                                                  ['PTS'] ??
-                                                              0) >=
-                                                          10
-                                                      ? const Color(0xFFFAE16E)
-                                                      : const Color(0xFFF38989),
-                                              borderRadius: BorderRadius.circular(3.0),
-                                            ),
-                                            child: Text(
-                                              (prevGamesMap[game['OPP']]![index]['PTS'] ?? 0)
-                                                  .toStringAsFixed(0),
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 14.0.r,
-                                                  color: Colors.grey.shade800),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            margin: const EdgeInsets.all(0.5),
-                                            decoration: BoxDecoration(
-                                              color: (prevGamesMap[game['OPP']]![index]
-                                                              ['REB'] ??
-                                                          0) >=
-                                                      8
-                                                  ? Colors.greenAccent
-                                                  : (prevGamesMap[game['OPP']]![index]
-                                                                  ['REB'] ??
-                                                              0) >=
-                                                          5
-                                                      ? const Color(0xFFFAE16E)
-                                                      : const Color(0xFFF38989),
-                                              borderRadius: BorderRadius.circular(3.0),
-                                            ),
-                                            child: Text(
-                                              (prevGamesMap[game['OPP']]![index]['REB'] ?? 0)
-                                                  .toStringAsFixed(0),
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 14.0.r,
-                                                  color: Colors.grey.shade800),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            margin: const EdgeInsets.all(0.5),
-                                            decoration: BoxDecoration(
-                                              color: (prevGamesMap[game['OPP']]![index]
-                                                              ['AST'] ??
-                                                          0) >=
-                                                      5
-                                                  ? Colors.greenAccent
-                                                  : (prevGamesMap[game['OPP']]![index]
-                                                                  ['AST'] ??
-                                                              0) >=
-                                                          3
-                                                      ? const Color(0xFFFAE16E)
-                                                      : const Color(0xFFF38989),
-                                              borderRadius: BorderRadius.circular(3.0),
-                                            ),
-                                            child: Text(
-                                              (prevGamesMap[game['OPP']]![index]['AST'] ?? 0)
-                                                  .toStringAsFixed(0),
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 14.0.r,
-                                                  color: Colors.grey.shade800),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            margin: const EdgeInsets.all(0.5),
-                                            decoration: BoxDecoration(
-                                              color: (prevGamesMap[game['OPP']]![index]
-                                                              ['STL'] ??
-                                                          0) >=
-                                                      2
-                                                  ? Colors.greenAccent
-                                                  : (prevGamesMap[game['OPP']]![index]
-                                                                  ['STL'] ??
-                                                              0) ==
-                                                          1
-                                                      ? const Color(0xFFFAE16E)
-                                                      : const Color(0xFFF38989),
-                                              borderRadius: BorderRadius.circular(3.0),
-                                            ),
-                                            child: Text(
-                                              (prevGamesMap[game['OPP']]![index]['STL'] ?? 0)
-                                                  .toStringAsFixed(0),
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 14.0.r,
-                                                  color: Colors.grey.shade800),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            margin: const EdgeInsets.all(0.5),
-                                            decoration: BoxDecoration(
-                                              color: (prevGamesMap[game['OPP']]![index]
-                                                              ['BLK'] ??
-                                                          0) >=
-                                                      2
-                                                  ? Colors.greenAccent
-                                                  : (prevGamesMap[game['OPP']]![index]
-                                                                  ['BLK'] ??
-                                                              0) ==
-                                                          1
-                                                      ? const Color(0xFFFAE16E)
-                                                      : const Color(0xFFF38989),
-                                              borderRadius: BorderRadius.circular(3.0),
-                                            ),
-                                            child: Text(
-                                              (prevGamesMap[game['OPP']]![index]['BLK'] ?? 0)
-                                                  .toStringAsFixed(0),
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 14.0.r,
-                                                  color: Colors.grey.shade800),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            margin: const EdgeInsets.all(0.5),
-                                            decoration: BoxDecoration(
-                                              color: (prevGamesMap[game['OPP']]![index]
-                                                              ['TOV'] ??
-                                                          0) <
-                                                      2
-                                                  ? Colors.greenAccent
-                                                  : (prevGamesMap[game['OPP']]![index]
-                                                                  ['TOV'] ??
-                                                              0) ==
-                                                          2
-                                                      ? const Color(0xFFFAE16E)
-                                                      : const Color(0xFFF38989),
-                                              borderRadius: BorderRadius.circular(3.0),
-                                            ),
-                                            child: Text(
-                                              (prevGamesMap[game['OPP']]![index]['TOV'] ?? 0)
-                                                  .toStringAsFixed(0),
-                                              style: kBebasNormal.copyWith(
-                                                  fontSize: 14.0.r,
-                                                  color: Colors.grey.shade800),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                );
-                              },
-                            )
-                          ],
-                        ),
-                      ),
-                    )
-                ],
-              ),
+                                      );
+                                    },
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 5.0.r),
+                Text(
+                  'Recent News',
+                  style: kBebasBold.copyWith(fontSize: 18.0.r),
+                ),
+                SizedBox(height: 5.0.r),
+                if (widget.player.containsKey('PlayerRotowires'))
+                  for (var newsItem in widget.player['PlayerRotowires'])
+                    PlayerRotowireNews(
+                      playerNews: newsItem,
+                      teamAbbr: widget.player['TEAM_ABBREVIATION'],
+                    ),
+                SizedBox(height: 5.0.r),
+              ],
             ),
-          ),
-          SizedBox(height: 5.0.r),
-          Text(
-            'Recent News',
-            style: kBebasBold.copyWith(fontSize: 18.0.r),
-          ),
-          SizedBox(height: 5.0.r),
-          if (widget.player.containsKey('PlayerRotowires'))
-            for (var newsItem in widget.player['PlayerRotowires'])
-              PlayerRotowireNews(
-                playerNews: newsItem,
-                teamAbbr: widget.player['TEAM_ABBREVIATION'],
-              ),
-          SizedBox(height: 5.0.r),
-        ],
-      ),
-    );
+          );
   }
 }
 
