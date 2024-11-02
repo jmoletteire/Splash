@@ -21,7 +21,7 @@ class _SimilarPlayersState extends State<SimilarPlayers> {
       margin: EdgeInsets.fromLTRB(11.0.r, 0.0.r, 11.0.r, 11.0.r),
       color: Colors.grey.shade900,
       child: Padding(
-        padding: EdgeInsets.all(8.0.r),
+        padding: EdgeInsets.symmetric(horizontal: 8.0.r, vertical: 12.0.r),
         child: Column(
           children: [
             Container(
@@ -46,6 +46,7 @@ class _SimilarPlayersState extends State<SimilarPlayers> {
                       name: player['NAME'],
                       position: player['POSITION'],
                       team: player['TEAM_ID'].toString(),
+                      score: player['SIMILARITY_SCORE'],
                     ),
                   )
               ],
@@ -62,6 +63,7 @@ class PlayerCard extends StatelessWidget {
   final String name;
   final String position;
   final String team;
+  final double score;
 
   const PlayerCard({
     Key? key,
@@ -69,6 +71,7 @@ class PlayerCard extends StatelessWidget {
     required this.name,
     required this.position,
     required this.team,
+    required this.score,
   }) : super(key: key);
 
   @override
@@ -96,21 +99,36 @@ class PlayerCard extends StatelessWidget {
             name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.grey.shade300),
+            style: kBebasNormal.copyWith(fontSize: 14.0.r, color: Colors.grey.shade300),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: 14.0.r,
-                height: 14.0.r,
+                width: 13.0.r,
+                height: 13.0.r,
                 child: Image.asset('images/NBA_Logos/$team.png'),
               ),
               AutoSizeText(
-                '  ${kPositionMap[position]!}',
+                '  ${kPositionMap[position]!} | ',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: kBebasNormal.copyWith(fontSize: 13.0.r, color: Colors.grey.shade300),
+                style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey.shade300),
+              ),
+              AutoSizeText(
+                score.toStringAsFixed(0),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: kBebasNormal.copyWith(
+                  fontSize: 14.0.r,
+                  color: score >= 80
+                      ? const Color(0xFF55D86F) //Colors.green
+                      : score >= 70
+                          ? Colors.yellowAccent
+                          : score >= 60
+                              ? Colors.orangeAccent
+                              : Colors.redAccent,
+                ),
               ),
             ],
           ),

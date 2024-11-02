@@ -1,3 +1,4 @@
+import numpy as np
 from pymongo import MongoClient
 from sklearn.metrics.pairwise import euclidean_distances
 import pandas as pd
@@ -95,19 +96,31 @@ def find_similar_players():
                     player_data.append(other_player_ranks)
                     player_ids.append(other_player_data)
 
-                # Calculate similarity (Euclidean distance)
-                player_df = pd.DataFrame(player_data, index=player_ids, columns=rank_stat_paths)
-                distances = euclidean_distances([player_ranks], player_df.values)[0]
-                similar_player_indices = distances.argsort()[1:6]  # Skip self (distance 0)
+                # Calculate similarity (Euclidean distance) only if player_data is not empty
+                if player_data:
+                    player_df = pd.DataFrame(player_data, index=player_ids, columns=rank_stat_paths)
+                    distances = euclidean_distances([player_ranks], player_df.values)[0]
 
-                # Get top 5 similar players
-                similar_players = [player_ids[idx] for idx in similar_player_indices]
+                    # Normalize distances to similarity scores between 0 and 100
+                    max_dist = np.max(distances)
+                    min_dist = np.min(distances)
+                    similarity_scores = 100 * (1 - (distances - min_dist) / (max_dist - min_dist))
 
-                # similar_players_dict[player_id][season] = similar_players
-                players_collection.update_one(
-                    {"PERSON_ID": player_id},
-                    {"$set": {f'STATS.{season}.{season_type}.SIMILAR_PLAYERS': similar_players}},
-                )
+                    # Get top 5 similar players with their similarity scores
+                    similar_player_indices = similarity_scores.argsort()[::-1][1:6]
+
+                    # Add similarity score to each similar player's dictionary
+                    similar_players = []
+                    for idx in similar_player_indices:
+                        similar_player = player_ids[idx]
+                        similar_player["SIMILARITY_SCORE"] = similarity_scores[idx]
+                        similar_players.append(similar_player)
+
+                    # Update the MongoDB document with the similar players and their scores
+                    players_collection.update_one(
+                        {"PERSON_ID": player_id},
+                        {"$set": {f'STATS.{season}.{season_type}.SIMILAR_PLAYERS': similar_players}},
+                    )
 
 
 # Run the function and get similar players
