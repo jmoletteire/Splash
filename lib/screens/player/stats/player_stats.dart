@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:splash/screens/player/stats/similar_players.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 import '../../../components/animated_polar_chart.dart';
@@ -174,10 +175,10 @@ class _PlayerStatsState extends State<PlayerStats> {
                     delegate: SliverChildListDelegate(
                       [
                         Card(
-                          margin: const EdgeInsets.all(11.0),
+                          margin: EdgeInsets.all(11.0.r),
                           color: Colors.grey.shade900,
                           child: Padding(
-                            padding: const EdgeInsets.all(15.0),
+                            padding: EdgeInsets.all(15.0.r),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -304,6 +305,8 @@ class _PlayerStatsState extends State<PlayerStats> {
                             ),
                           ),
                         ),
+                        if (widget.player['STATS'][selectedSeason][selectedSeasonType].containsKey('SIMILAR_PLAYERS'))
+                          SimilarPlayers(players: widget.player['STATS'][selectedSeason][selectedSeasonType]['SIMILAR_PLAYERS']),
                         if (int.parse(selectedSeason.substring(0, 4)) > 2015)
                           Card(
                             margin: EdgeInsets.fromLTRB(11.0.r, 0.0, 11.0.r, 11.0.r),

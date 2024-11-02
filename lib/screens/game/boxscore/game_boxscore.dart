@@ -384,8 +384,8 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           ),
         ),
         TabBar.secondary(
-          padding: const EdgeInsets.symmetric(horizontal: 0.0),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 0.0),
+          padding: EdgeInsets.symmetric(horizontal: 0.0.r),
+          labelPadding: EdgeInsets.symmetric(horizontal: 0.0.r),
           controller: _boxscoreTabController,
           indicator: CustomTabIndicator(
               controller: _boxscoreTabController,
@@ -404,7 +404,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 Expanded(
                   child: Container(
                     height: 46.0.r,
-                    margin: const EdgeInsets.only(bottom: 1.0),
+                    margin: EdgeInsets.only(bottom: 1.0.r),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [const Color(0xFF1B1B1B), awayContainerColor],
@@ -423,7 +423,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
               children: [
                 Expanded(
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 1.0),
+                    margin: EdgeInsets.only(bottom: 1.0.r),
                     color: const Color(0xFF1B1B1B),
                     child: const Tab(
                       text: "TEAM",
@@ -437,7 +437,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                 Expanded(
                   child: Container(
                     height: 46.0.r,
-                    margin: const EdgeInsets.only(bottom: 1.0),
+                    margin: EdgeInsets.only(bottom: 1.0.r),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [const Color(0xFF1B1B1B), homeContainerColor],
@@ -513,28 +513,6 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         ),
       ],
     );
-  }
-}
-
-class MyCustomScrollBehavior extends ScrollBehavior {
-  @override
-  Widget buildOverscrollIndicator(
-      BuildContext context, Widget child, ScrollableDetails axisDirection) {
-    return child;
-  }
-
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return CustomScrollPhysics();
-  }
-}
-
-class CustomScrollPhysics extends ClampingScrollPhysics {
-  CustomScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
-
-  @override
-  CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return CustomScrollPhysics(parent: buildParent(ancestor));
   }
 }
 

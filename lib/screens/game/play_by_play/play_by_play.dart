@@ -586,7 +586,7 @@ class _PlaysState extends State<Plays> {
                 children: [
                   Text(
                     widget.period,
-                    style: kBebasNormal.copyWith(fontSize: 16.0),
+                    style: kBebasNormal.copyWith(fontSize: 16.0.r),
                   ),
                   Icon(
                     _isExpanded ? Icons.expand_less : Icons.expand_more,

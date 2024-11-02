@@ -475,9 +475,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 15.0),
+                    SizedBox(width: 15.0.r),
                     getTitle(summary['GAME_STATUS_ID'], homeLinescore, awayLinescore),
-                    const SizedBox(width: 15.0),
+                    SizedBox(width: 15.0.r),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -602,13 +602,15 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           ];
         },
         pinnedHeaderSliverHeightBuilder: () {
-          if (_tabController.index == 1) {
-            return 104.0 + MediaQuery.of(context).padding.top;
-          } else {
-            return 104.0 +
-                MediaQuery.of(context).padding.top -
-                ((kToolbarHeight - 15.0.r) + ((kToolbarHeight - 15.0.r) / 4.5.r) + 93.0.r);
-          }
+          /*
+            * The extra subtraction here is really just for the BoxScore so
+            * that it pins the secondary tab after we scroll past the LineScore.
+            * Other pages like Matchup and Odds aren't pinning anything, so it
+            * doesn't matter as much where we set the pin height.
+            * */
+          return 104.0 +
+              MediaQuery.of(context).padding.top -
+              ((kToolbarHeight - 15.0.r) + ((kToolbarHeight - 15.0.r) / 4.5.r) + 93.0.r);
         },
         onlyOneScrollInBody: true,
         body: TabBarView(
