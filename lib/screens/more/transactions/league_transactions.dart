@@ -205,10 +205,13 @@ class _LeagueTransactionsState extends State<LeagueTransactions> {
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 12.0.r, vertical: 8.0.r),
                             height: MediaQuery.sizeOf(context).height * 0.065,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: Color(0xFF1B1B1B),
                               border: Border(
-                                  bottom: BorderSide(color: Colors.white70, width: 0.125)),
+                                  bottom: BorderSide(
+                                color: Colors.grey.shade700,
+                                width: 0.5,
+                              )),
                             ),
                             child: Row(
                               children: [

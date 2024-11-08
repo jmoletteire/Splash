@@ -168,10 +168,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     // Show filtered static pages if there are matches
                     ...searchProvider.filteredStaticPageSuggestions.map(
                       (page) => ListTile(
-                        shape: const Border(
+                        shape: Border(
                           bottom: BorderSide(
-                            color: Colors.grey, // Set the color of the border
-                            width: 0.125, // Set the width of the border
+                            color: Colors.grey.shade700,
+                            width: 0.5,
                           ),
                         ),
                         title: Row(
@@ -196,10 +196,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     ...searchProvider.playerSuggestions.map(
                       (player) => ListTile(
-                        shape: const Border(
+                        shape: Border(
                           bottom: BorderSide(
-                            color: Colors.grey, // Set the color of the border
-                            width: 0.125, // Set the width of the border
+                            color: Colors.grey.shade700,
+                            width: 0.5,
                           ),
                         ),
                         title: Row(

@@ -141,8 +141,8 @@ class _WildcardStandingsState extends State<WildcardStandings> {
                   color: Colors.grey.shade900.withOpacity(0.75),
                   border: Border(
                     bottom: BorderSide(
-                      color: Colors.white,
-                      width: index == 2 ? 2.0 : 0.125,
+                      color: index == 2 ? Colors.white : Colors.grey.shade700,
+                      width: index == 2 ? 2.0 : 0.5,
                       style: BorderStyle.solid,
                     ),
                   )),

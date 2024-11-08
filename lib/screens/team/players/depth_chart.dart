@@ -244,8 +244,11 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
                       height: MediaQuery.of(context).size.height * 0.05,
                       decoration: BoxDecoration(
                           color: getColor(guards[index]),
-                          border: const Border(
-                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                          border: Border(
+                              bottom: BorderSide(
+                            color: Colors.grey.shade800,
+                            width: 0.5,
+                          ))),
                       child: RotationRow(
                         player: widget.team['seasons'][selectedSeason]['ROSTER']
                             [guards[index]],
@@ -351,8 +354,11 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
                       height: MediaQuery.of(context).size.height * 0.05,
                       decoration: BoxDecoration(
                           color: getColor(forwards[index]),
-                          border: const Border(
-                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                          border: Border(
+                              bottom: BorderSide(
+                            color: Colors.grey.shade800,
+                            width: 0.5,
+                          ))),
                       child: RotationRow(
                         player: widget.team['seasons'][selectedSeason]['ROSTER']
                             [forwards[index]],
@@ -458,8 +464,11 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
                       height: MediaQuery.of(context).size.height * 0.05,
                       decoration: BoxDecoration(
                           color: getColor(centers[index]),
-                          border: const Border(
-                              bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                          border: Border(
+                              bottom: BorderSide(
+                            color: Colors.grey.shade800,
+                            width: 0.5,
+                          ))),
                       child: RotationRow(
                         player: widget.team['seasons'][selectedSeason]['ROSTER']
                             [centers[index]],

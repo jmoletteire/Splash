@@ -78,10 +78,10 @@ class PlayerSearchWidget extends StatelessWidget {
                   children: [
                     ...searchProvider.playerSuggestions.map(
                       (player) => ListTile(
-                        shape: const Border(
+                        shape: Border(
                           bottom: BorderSide(
-                            color: Colors.grey, // Set the color of the border
-                            width: 0.125, // Set the width of the border
+                            color: Colors.grey.shade700,
+                            width: 0.5,
                           ),
                         ),
                         title: Row(

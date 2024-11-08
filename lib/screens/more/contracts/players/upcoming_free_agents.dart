@@ -281,8 +281,8 @@ class _UpcomingFreeAgentsState extends State<UpcomingFreeAgents> {
             color: const Color(0xFF202020),
             border: Border(
               bottom: BorderSide(
-                color: Colors.grey.shade200,
-                width: 0.125,
+                color: Colors.grey.shade700,
+                width: 0.5,
               ),
             ),
           ),

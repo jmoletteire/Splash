@@ -142,8 +142,8 @@ class _AwardsByAwardState extends State<AwardsByAward> {
             color: Colors.grey.shade900,
             border: Border(
               bottom: BorderSide(
-                color: Colors.grey.shade200,
-                width: 0.125.h,
+                color: Colors.grey.shade700,
+                width: 0.5,
               ),
             ),
           ),

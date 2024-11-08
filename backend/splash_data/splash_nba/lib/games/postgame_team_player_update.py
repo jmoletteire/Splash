@@ -17,6 +17,7 @@ from splash_nba.lib.players.stats.player_hustle_stats import update_player_hustl
 from splash_nba.lib.players.stats.player_stats import update_player_stats, update_player_playoff_stats
 from splash_nba.lib.players.stats.shooting_stat_rank import current_season_shooting_stat_ranks
 from splash_nba.lib.players.stats.shot_chart_data import get_shot_chart_data
+from splash_nba.lib.players.stats.similar_players import update_similar_players
 from splash_nba.lib.players.stats.update_custom_player_stats import update_player_on_off, update_poss_per_game, \
     update_three_and_ft_rate, update_player_tracking_stats, update_touches_breakdown, update_shot_distribution, \
     update_drive_stats, update_scoring_breakdown_and_pct_unassisted, update_versatility_score, update_box_creation, \
@@ -129,6 +130,7 @@ def update_teams(team_ids):
                     # Pause 15 seconds between teams
                     time.sleep(15)
 
+        # After looping through all teams, calculate ranks/standings
         rank_hustle_stats_current_season()
         three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
         current_season_custom_team_stats_rank()
@@ -213,6 +215,9 @@ def update_players(team_ids):
         # Rank
         current_season_custom_stats_rank()
         current_season_shooting_stat_ranks(k_current_season_type)
+
+        # Similar Players
+        update_similar_players()
 
     def player_career_stats(team_id):
         # Stats
@@ -333,7 +338,7 @@ def update_players(team_ids):
 
     # STATS
     try:
-        player_stats()
+        # player_stats()
         print('Skip Player Stats')
     except Exception as e:
         logging.error(f"Error updating player stats: {e}")

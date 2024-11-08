@@ -277,8 +277,8 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
                   : Colors.orangeAccent.withOpacity(0.125),
           border: Border(
             bottom: BorderSide(
-              color: Colors.grey.shade200,
-              width: 0.125,
+              color: Colors.grey.shade700,
+              width: 0.5,
             ),
           ),
         ),

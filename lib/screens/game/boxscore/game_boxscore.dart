@@ -463,6 +463,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                   BoxPlayerStats(
                     players: reorderStarters(awayPlayerStats.sublist(0, 5)),
                     playerGroup: 'STARTERS',
+                    team: teamStats[1],
                     inProgress:
                         widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     controller: _awayStartersController,
@@ -470,6 +471,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                   BoxPlayerStats(
                     players: awayPlayerStats.sublist(5),
                     playerGroup: 'BENCH',
+                    team: teamStats[1],
                     inProgress:
                         widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     controller: _awayBenchController,
@@ -495,6 +497,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                   BoxPlayerStats(
                     players: reorderStarters(homePlayerStats.sublist(0, 5)),
                     playerGroup: 'STARTERS',
+                    team: teamStats[0],
                     inProgress:
                         widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     controller: _homeStartersController,
@@ -502,6 +505,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                   BoxPlayerStats(
                     players: homePlayerStats.sublist(5),
                     playerGroup: 'BENCH',
+                    team: teamStats[0],
                     inProgress:
                         widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                     controller: _homeBenchController,

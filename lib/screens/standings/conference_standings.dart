@@ -142,6 +142,12 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         /// PACE
         TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
 
+        /// SOS
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+        /// rSOS
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
         /// STREAK
         TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
 
@@ -211,9 +217,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
           return Material(
             color: Colors.grey.shade800,
             child: Padding(
-              padding: column == 0
-                  ? const EdgeInsets.only(left: 20.0)
-                  : const EdgeInsets.only(right: 8.0),
+              padding:
+                  column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
               child: Align(
                 alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
                 child: AutoSizeText('${widget.columnNames[column]}',
@@ -240,7 +245,15 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                 border: int.parse(widget.season.substring(0, 4)) < 2019 || index != 5
                     ? Border(
                         bottom: BorderSide(
-                          color: Colors.white,
+                          color: (int.parse(widget.season.substring(0, 4)) >= 2019 &&
+                                      index == 9) ||
+                                  (int.parse(widget.season.substring(0, 4)) < 2019 &&
+                                      int.parse(widget.season.substring(0, 4)) > 1983 &&
+                                      index == 7) ||
+                                  (int.parse(widget.season.substring(0, 4)) <= 1983 &&
+                                      index == 5)
+                              ? Colors.white
+                              : Colors.grey.shade700,
                           width: int.parse(widget.season.substring(0, 4)) >= 2019 && index == 9
                               ? 3.0
                               : int.parse(widget.season.substring(0, 4)) < 2019 &&
@@ -250,7 +263,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                                   : int.parse(widget.season.substring(0, 4)) <= 1983 &&
                                           index == 5
                                       ? 3.0
-                                      : 0.125,
+                                      : 0.5,
                           style: BorderStyle.solid,
                         ),
                       )
@@ -299,8 +312,11 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
           }),
           splashColor: Colors.white,
           child: contentBuilder(context, (context, column) {
+            List<String> noPadding = ['ORTG', 'DRTG', 'PACE', 'SOS', 'R-SOS'];
             return Padding(
-              padding: EdgeInsets.only(right: 8.0.r),
+              padding: noPadding.contains(widget.columnNames[column])
+                  ? EdgeInsets.only(right: 0.0.r)
+                  : EdgeInsets.only(right: 8.0.r),
               child: getContent(teams, row, column, context),
             );
           }),
@@ -352,7 +368,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                       ),
                       TextSpan(
                         text: getClinched(teams[row]['seasons'][widget.season]['STANDINGS']),
-                        style: kBebasNormal.copyWith(fontSize: 10.0.r, letterSpacing: 0.8),
+                        style: kBebasNormal.copyWith(fontSize: 11.0.r, letterSpacing: 0.8),
                       ),
                     ],
                   ),
@@ -404,32 +420,240 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 6:
         try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['OFF_RATING']!
-                  .toStringAsFixed(1));
+          double offRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
+              ['ADV']['OFF_RATING'];
+          int oRtgRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+              ['OFF_RATING_RANK'];
+
+          // Define the three colors for the gradient
+          Color green = const Color(0xFF55F86F);
+          Color lightGreen = Colors.lightGreenAccent;
+          Color yellow = Colors.yellowAccent;
+          Color orange = Colors.orangeAccent;
+          Color red = const Color(0xFFFC3126);
+
+          // Calculate the interpolated color based on oRtgRank
+          Color color;
+          if (oRtgRank <= 10) {
+            // Rank 1-10, full green
+            double factor = oRtgRank / 10; // scales 1-10 to 0-1
+            color = Color.lerp(green, lightGreen, factor) ?? lightGreen;
+          } else if (oRtgRank <= 15) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (oRtgRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(lightGreen, yellow, factor) ?? yellow;
+          } else if (oRtgRank <= 20) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (oRtgRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(yellow, orange, factor) ?? orange;
+          } else {
+            // Rank 21-30, interpolate between orange and red
+            double factor = (oRtgRank - 20) / 10; // scales 21-30 to 0-1
+            color = Color.lerp(orange, red, factor) ?? red;
+          }
+
+          return Container(
+            alignment: Alignment.centerRight,
+            color: color.withOpacity(0.1), // background with lighter opacity
+            padding: EdgeInsets.only(right: 5.0.r),
+            child: Text(
+              offRating.toStringAsFixed(1),
+              style: kBebasNormal.copyWith(fontSize: 16.0.r, color: color),
+            ),
+          );
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 7:
         try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['DEF_RATING']!
-                  .toStringAsFixed(1));
+          double defRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
+              ['ADV']['DEF_RATING'];
+          int dRtgRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+              ['DEF_RATING_RANK'];
+
+          // Define the three colors for the gradient
+          Color green = const Color(0xFF55F86F);
+          Color lightGreen = Colors.lightGreenAccent;
+          Color yellow = Colors.yellowAccent;
+          Color orange = Colors.orangeAccent;
+          Color red = const Color(0xFFFC3126);
+
+          // Calculate the interpolated color based on oRtgRank
+          Color color;
+          if (dRtgRank <= 10) {
+            // Rank 1-10, full green
+            double factor = dRtgRank / 10; // scales 1-10 to 0-1
+            color = Color.lerp(green, lightGreen, factor) ?? lightGreen;
+          } else if (dRtgRank <= 15) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (dRtgRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(lightGreen, yellow, factor) ?? yellow;
+          } else if (dRtgRank <= 20) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (dRtgRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(yellow, orange, factor) ?? orange;
+          } else {
+            // Rank 21-30, interpolate between orange and red
+            double factor = (dRtgRank - 20) / 10; // scales 21-30 to 0-1
+            color = Color.lerp(orange, red, factor) ?? red;
+          }
+
+          return Container(
+            alignment: Alignment.centerRight,
+            color: color.withOpacity(0.1), // background with lighter opacity
+            padding: EdgeInsets.only(right: 5.0.r),
+            child: Text(
+              defRating.toStringAsFixed(1),
+              style: kBebasNormal.copyWith(fontSize: 16.0.r, color: color),
+            ),
+          );
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 8:
         try {
+          double pace =
+              teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']['PACE'];
+          int paceRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+              ['PACE_RANK'];
+
+          // Define the three colors for the gradient
+          Color green = Colors.pink;
+          Color lightGreen = Colors.pinkAccent;
+          Color yellow = Colors.white;
+          Color orange = Colors.lightBlueAccent;
+          Color red = Colors.blue;
+
+          // Calculate the interpolated color based on oRtgRank
+          Color color;
+          if (paceRank <= 10) {
+            // Rank 1-10, full green
+            double factor = paceRank / 10; // scales 1-10 to 0-1
+            color = Color.lerp(green, lightGreen, factor) ?? lightGreen;
+          } else if (paceRank <= 15) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (paceRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(lightGreen, yellow, factor) ?? yellow;
+          } else if (paceRank <= 20) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (paceRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(yellow, orange, factor) ?? orange;
+          } else {
+            // Rank 21-30, interpolate between orange and red
+            double factor = (paceRank - 20) / 10; // scales 21-30 to 0-1
+            color = Color.lerp(orange, red, factor) ?? red;
+          }
+
+          return Container(
+            alignment: Alignment.centerRight,
+            color: color.withOpacity(0.1), // background with lighter opacity
+            padding: EdgeInsets.only(right: 5.0.r),
+            child: Text(
+              pace.toStringAsFixed(1),
+              style: kBebasNormal.copyWith(fontSize: 16.0.r, color: color),
+            ),
+          );
+          /*
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
                       ['PACE']!
                   .toStringAsFixed(1));
+
+           */
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 9:
+        try {
+          double sos = teams[row]['seasons'][widget.season]['STANDINGS']['SOS'];
+          int sosRank = teams[row]['seasons'][widget.season]['STANDINGS']['SOS_RANK'];
+
+          // Define the three colors for the gradient
+          Color green = const Color(0xFF55F86F);
+          Color lightGreen = Colors.lightGreenAccent;
+          Color yellow = Colors.yellowAccent;
+          Color orange = Colors.orangeAccent;
+          Color red = const Color(0xFFFC3126);
+
+          // Calculate the interpolated color based on oRtgRank
+          Color color;
+          if (sosRank <= 10) {
+            // Rank 1-10, full green
+            double factor = sosRank / 10; // scales 1-10 to 0-1
+            color = Color.lerp(green, lightGreen, factor) ?? lightGreen;
+          } else if (sosRank <= 15) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (sosRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(lightGreen, yellow, factor) ?? yellow;
+          } else if (sosRank <= 20) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (sosRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(yellow, orange, factor) ?? orange;
+          } else {
+            // Rank 21-30, interpolate between orange and red
+            double factor = (sosRank - 20) / 10; // scales 21-30 to 0-1
+            color = Color.lerp(orange, red, factor) ?? red;
+          }
+
+          return Container(
+            alignment: Alignment.centerRight,
+            color: color.withOpacity(0.1),
+            padding: EdgeInsets.only(right: 5.0.r),
+            child: Text(sos.toStringAsFixed(3),
+                style: kBebasNormal.copyWith(
+                  fontSize: 16.0.r,
+                  color: color,
+                )),
+          );
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
+      case 10:
+        try {
+          double sos = teams[row]['seasons'][widget.season]['STANDINGS']['rSOS'];
+          int sosRank = teams[row]['seasons'][widget.season]['STANDINGS']['rSOS_RANK'];
+
+          // Define the three colors for the gradient
+          Color green = const Color(0xFF55F86F);
+          Color lightGreen = Colors.lightGreenAccent;
+          Color yellow = Colors.yellowAccent;
+          Color orange = Colors.orangeAccent;
+          Color red = const Color(0xFFFC3126);
+
+          // Calculate the interpolated color based on oRtgRank
+          Color color;
+          if (sosRank <= 10) {
+            // Rank 1-10, full green
+            double factor = sosRank / 10; // scales 1-10 to 0-1
+            color = Color.lerp(green, lightGreen, factor) ?? lightGreen;
+          } else if (sosRank <= 15) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (sosRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(lightGreen, yellow, factor) ?? yellow;
+          } else if (sosRank <= 20) {
+            // Rank 11-20, interpolate between green and orange
+            double factor = (sosRank - 10) / 10; // scales 11-20 to 0-1
+            color = Color.lerp(yellow, orange, factor) ?? orange;
+          } else {
+            // Rank 21-30, interpolate between orange and red
+            double factor = (sosRank - 20) / 10; // scales 21-30 to 0-1
+            color = Color.lerp(orange, red, factor) ?? red;
+          }
+
+          return Container(
+            alignment: Alignment.centerRight,
+            color: color.withOpacity(0.1),
+            padding: EdgeInsets.only(right: 5.0.r),
+            child: Text(sos.toStringAsFixed(3),
+                style: kBebasNormal.copyWith(
+                  fontSize: 16.0.r,
+                  color: color,
+                )),
+          );
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
+      case 11:
         try {
           String streak =
               teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak'];
@@ -450,126 +674,126 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 10:
+      case 12:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['L10']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 11:
+      case 13:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['HOME']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 12:
+      case 14:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['ROAD']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 13:
+      case 15:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['OppOver500']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 14:
+      case 16:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['vsEast']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 15:
+      case 17:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['vsWest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 16:
+      case 18:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 17:
+      case 19:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 18:
+      case 20:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 19:
+      case 21:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 20:
+      case 22:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 21:
+      case 23:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 22:
+      case 24:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['Score100PTS']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 23:
+      case 25:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtHalf']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 24:
+      case 26:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtThird']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 25:
+      case 27:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInFGPCT']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 26:
+      case 28:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInReb']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
-      case 27:
+      case 29:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['FewerTurnovers']!);
@@ -592,11 +816,11 @@ class StandingsDataText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: color ?? Colors.transparent,
+      color: color?.withOpacity(0.1) ?? Colors.transparent,
       alignment: alignment ?? Alignment.centerRight,
       child: Text(
         text,
-        style: kBebasNormal.copyWith(fontSize: 17.0.r),
+        style: kBebasNormal.copyWith(fontSize: 17.0.r, color: color),
       ),
     );
   }

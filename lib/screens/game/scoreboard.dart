@@ -171,12 +171,27 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
 
         var sortedEntries = gamesData.entries.toList()
           ..sort((a, b) {
-            var aValue, bValue;
+            int getStatusPriority(int status) {
+              // Assign priority: 2 has the highest priority, then 1, and 3 last
+              if (status == 2) return 1;
+              if (status == 1) return 2;
+              return 3; // For status 3 or any other value
+            }
 
-            aValue = a.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
-            bValue = b.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
+            var aStatus = a.value['SUMMARY']?['GameSummary']?[0]?['GAME_STATUS_ID'] ?? 0;
+            var bStatus = b.value['SUMMARY']?['GameSummary']?[0]?['GAME_STATUS_ID'] ?? 0;
 
-            return aValue.compareTo(bValue);
+            // Compare based on custom priority
+            int statusCompare =
+                getStatusPriority(aStatus).compareTo(getStatusPriority(bStatus));
+            if (statusCompare != 0) {
+              return statusCompare;
+            } else {
+              // If GAME_STATUS_IDs are the same, fall back to sorting by GAME_SEQUENCE
+              var aSequence = a.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
+              var bSequence = b.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
+              return aSequence.compareTo(bSequence);
+            }
           });
 
         // Assign the sorted list back to widget.teams

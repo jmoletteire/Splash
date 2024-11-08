@@ -338,8 +338,11 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                             height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
                                 color: getColor(starters[index]),
-                                border: const Border(
-                                    bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                                border: Border(
+                                    bottom: BorderSide(
+                                  color: Colors.grey.shade800,
+                                  width: 0.5,
+                                ))),
                             child: RotationRow(
                               player: widget.team['seasons'][selectedSeason]['ROSTER']
                                   [starters[index]],
@@ -445,8 +448,11 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                             height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
                                 color: getColor(bench[index]),
-                                border: const Border(
-                                    bottom: BorderSide(color: Colors.white54, width: 0.125))),
+                                border: Border(
+                                    bottom: BorderSide(
+                                  color: Colors.grey.shade800,
+                                  width: 0.5,
+                                ))),
                             child: RotationRow(
                               player: widget.team['seasons'][selectedSeason]['ROSTER']
                                   [bench[index]],

@@ -333,9 +333,11 @@ class _TeamInjuriesState extends State<TeamInjuries> with AutomaticKeepAliveClie
                                                 'GTD'
                                             ? Colors.orangeAccent.withOpacity(0.1)
                                             : Colors.grey.shade900,
-                                    border: const Border(
-                                        bottom:
-                                            BorderSide(color: Colors.white54, width: 0.125))),
+                                    border: Border(
+                                        bottom: BorderSide(
+                                      color: Colors.grey.shade800,
+                                      width: 0.5,
+                                    ))),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [

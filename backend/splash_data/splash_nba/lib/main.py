@@ -24,6 +24,7 @@ from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playo
 from splash_nba.lib.games.youtube_highlights import search_youtube_highlights
 from splash_nba.lib.misc.update_transactions import update_transactions
 from splash_nba.lib.players.player_gamelogs import gamelogs
+from splash_nba.lib.players.player_rotowire_news import player_rotowire_news, player_rotowire_injuries, player_rotowires
 from splash_nba.lib.players.stats.custom_player_stats_rank import current_season_custom_stats_rank
 from splash_nba.lib.players.stats.per75 import current_season_per_75
 from splash_nba.lib.players.stats.player_career_stats import update_player_career_stats
@@ -1466,7 +1467,7 @@ def update_players(team_ids):
                 # Pause 30 seconds every 25 players
                 time.sleep(30)
 
-    logging.info("Updating players (daily)...")
+    logging.info("Updating players...")
 
     # STATS
     try:
@@ -1768,6 +1769,7 @@ def players_daily_update():
 # Schedule the tasks
 schedule.every(10).seconds.do(games_live_update)  # Update games
 schedule.every(10).seconds.do(fetch_odds)  # Update odds
+schedule.every(30).minutes.do(player_rotowires)  # Update odds
 schedule.every().day.at("00:00").do(reset_flags)  # Reset the flag at midnight
 schedule.every().day.at("02:00").do(games_daily_update)  # Run every day at 2:00 AM
 schedule.every().day.at("03:00").do(teams_daily_update)  # Run every day at 3:00 AM
@@ -1801,7 +1803,7 @@ except Exception as e:
     exit(1)
 
 # games_daily_update()
-teams_daily_update()
+# teams_daily_update()
 # players_daily_update()
 games_live_update()
 # games_prev_day()

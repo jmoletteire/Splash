@@ -148,7 +148,12 @@ class _PlayerStatsState extends State<PlayerStats> {
     Color teamSecondaryColor = kDarkSecondaryColors.contains(widget.team['ABBREVIATION'])
         ? (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!);
-    return !widget.player.keys.contains('STATS') || !widget.player['STATS'].isNotEmpty
+    return !widget.player.keys.contains('STATS') ||
+            widget.player['STATS'].isEmpty ||
+            (widget.player.keys.contains('STATS') &&
+                widget.player['STATS'][selectedSeason][selectedSeasonType]['ADV']
+                        ['POSS_PER_GM'] ==
+                    0)
         ? Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -305,8 +310,11 @@ class _PlayerStatsState extends State<PlayerStats> {
                             ),
                           ),
                         ),
-                        if (widget.player['STATS'][selectedSeason][selectedSeasonType].containsKey('SIMILAR_PLAYERS'))
-                          SimilarPlayers(players: widget.player['STATS'][selectedSeason][selectedSeasonType]['SIMILAR_PLAYERS']),
+                        if (widget.player['STATS'][selectedSeason][selectedSeasonType]
+                            .containsKey('SIMILAR_PLAYERS'))
+                          SimilarPlayers(
+                              players: widget.player['STATS'][selectedSeason]
+                                  [selectedSeasonType]['SIMILAR_PLAYERS']),
                         if (int.parse(selectedSeason.substring(0, 4)) > 2015)
                           Card(
                             margin: EdgeInsets.fromLTRB(11.0.r, 0.0, 11.0.r, 11.0.r),

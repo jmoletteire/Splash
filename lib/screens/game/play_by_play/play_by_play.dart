@@ -138,23 +138,35 @@ class _PlayByPlayState extends State<PlayByPlay> {
     ];
 
     if (widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] > 1) {
-      for (var player in widget.game['BOXSCORE']['homeTeam']['players']) {
-        Map<String, dynamic> playerData = {
-          'id': player['personId'],
-          'team': widget.homeId,
-          'name': player['nameI'],
-          'number': player['jerseyNum'],
-        };
-        players.add(playerData);
-      }
-      for (var player in widget.game['BOXSCORE']['awayTeam']['players']) {
-        Map<String, dynamic> playerData = {
-          'id': player['personId'],
-          'team': widget.awayId,
-          'name': player['nameI'],
-          'number': player['jerseyNum'],
-        };
-        players.add(playerData);
+      if (widget.game['BOXSCORE'].containsKey('homeTeam')) {
+        for (var player in widget.game['BOXSCORE']['homeTeam']['players']) {
+          Map<String, dynamic> playerData = {
+            'id': player['personId'],
+            'team': widget.homeId,
+            'name': player['nameI'],
+            'number': player['jerseyNum'],
+          };
+          players.add(playerData);
+        }
+        for (var player in widget.game['BOXSCORE']['awayTeam']['players']) {
+          Map<String, dynamic> playerData = {
+            'id': player['personId'],
+            'team': widget.awayId,
+            'name': player['nameI'],
+            'number': player['jerseyNum'],
+          };
+          players.add(playerData);
+        }
+      } else {
+        for (var player in widget.game['BOXSCORE']['PlayerStats']) {
+          Map<String, dynamic> playerData = {
+            'id': player['PLAYER_ID'],
+            'team': player['TEAM_ID'],
+            'name': player['PLAYER_NAME'],
+            'number': 0,
+          };
+          players.add(playerData);
+        }
       }
     }
 

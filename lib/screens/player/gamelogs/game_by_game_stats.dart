@@ -345,8 +345,8 @@ class _GameByGameStatsState extends State<GameByGameStats> {
             color: Colors.grey.shade900,
             border: Border(
               bottom: BorderSide(
-                color: Colors.grey.shade200,
-                width: 0.125,
+                color: Colors.grey.shade700,
+                width: 0.5,
               ),
             ),
           ),

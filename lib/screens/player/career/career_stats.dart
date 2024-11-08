@@ -764,7 +764,9 @@ class _CareerStatsState extends State<CareerStats> {
             }
           } else {
             efgPct = season['EFG_PCT'] * 100;
-            if (efgPct == 0.0) {
+            if (efgPct == 0.0 ||
+                (tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT')) {
               try {
                 efgPct = 100 * (season['FGM'] + (0.5 * (season['FG3M'] ?? 0))) / season['FGA'];
               } catch (e) {
@@ -795,7 +797,9 @@ class _CareerStatsState extends State<CareerStats> {
             }
           } else {
             tsPct = season['TS_PCT'] * 100;
-            if (tsPct == 0.0) {
+            if (tsPct == 0.0 ||
+                (tradedYears.contains(season['SEASON_ID']) &&
+                    season['TEAM_ABBREVIATION'] != 'TOT')) {
               try {
                 tsPct = 100 * season['PTS'] / (2 * (season['FGA'] + (0.44 * season['FTA'])));
               } catch (e) {
@@ -841,7 +845,11 @@ class _CareerStatsState extends State<CareerStats> {
             color: tradedYears.contains(season['SEASON_ID']) &&
                     season['TEAM_ABBREVIATION'] != 'TOT'
                 ? Colors.grey.shade300
-                : null,
+                : season['NRTG_ON_OFF'] == 0.0
+                    ? Colors.white
+                    : season['NRTG_ON_OFF'] > 0.0
+                        ? const Color(0xFF55F86F)
+                        : const Color(0xFFFC3126),
           );
         } catch (stack) {
           return const StandingsDataText(text: '-');
@@ -858,7 +866,11 @@ class _CareerStatsState extends State<CareerStats> {
             color: tradedYears.contains(season['SEASON_ID']) &&
                     season['TEAM_ABBREVIATION'] != 'TOT'
                 ? Colors.grey.shade300
-                : null,
+                : season['ORTG_ON_OFF'] == 0.0
+                    ? Colors.white
+                    : season['ORTG_ON_OFF'] > 0.0
+                        ? const Color(0xFF55F86F)
+                        : const Color(0xFFFC3126),
           );
         } catch (stack) {
           return const StandingsDataText(text: '-');
@@ -875,7 +887,11 @@ class _CareerStatsState extends State<CareerStats> {
             color: tradedYears.contains(season['SEASON_ID']) &&
                     season['TEAM_ABBREVIATION'] != 'TOT'
                 ? Colors.grey.shade300
-                : null,
+                : season['DRTG_ON_OFF'] == 0.0
+                    ? Colors.white
+                    : season['DRTG_ON_OFF'] < 0.0
+                        ? const Color(0xFF55F86F)
+                        : const Color(0xFFFC3126),
           );
         } catch (stack) {
           return const StandingsDataText(text: '-');
@@ -892,7 +908,11 @@ class _CareerStatsState extends State<CareerStats> {
             color: tradedYears.contains(season['SEASON_ID']) &&
                     season['TEAM_ABBREVIATION'] != 'TOT'
                 ? Colors.grey.shade300
-                : null,
+                : season['DEF_IMPACT_EST'] == 0.0
+                    ? Colors.white
+                    : season['DEF_IMPACT_EST'] > 0.0
+                        ? const Color(0xFF55F86F)
+                        : const Color(0xFFFC3126),
           );
         } catch (stack) {
           return const StandingsDataText(text: '-');

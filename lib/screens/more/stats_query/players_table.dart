@@ -207,10 +207,10 @@ class _PlayersTableState extends State<PlayersTable> {
           position: DecorationPosition.foreground,
           decoration: BoxDecoration(
             color: Colors.grey.shade900.withOpacity(0.75),
-            border: const Border(
+            border: Border(
               bottom: BorderSide(
-                color: Colors.white,
-                width: 0.125,
+                color: Colors.grey.shade700,
+                width: 0.5,
               ),
             ),
           ),

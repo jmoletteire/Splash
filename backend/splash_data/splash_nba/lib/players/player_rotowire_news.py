@@ -9,6 +9,11 @@ import json
 from bs4 import BeautifulSoup
 
 
+def player_rotowires():
+    player_rotowire_news()
+    player_rotowire_injuries()
+
+
 def player_rotowire_ids():
     # Configure logging
     logging.basicConfig(level=logging.INFO)

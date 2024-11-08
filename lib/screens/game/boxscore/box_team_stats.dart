@@ -87,8 +87,8 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
               (homeTeam['reboundsOffensive'] ?? 0))
           .ceil();
 
-      minutes = (int.parse(awayTeam['minutesCalculated']
-                  .substring(2, awayTeam['minutesCalculated'].length - 1)) /
+      minutes = (int.parse((awayTeam['minutesCalculated'] ?? awayTeam['MIN']).substring(
+                  2, (awayTeam['minutesCalculated'] ?? awayTeam['MIN']).length - 1)) /
               5)
           .floor();
     }
@@ -138,10 +138,24 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                             homeTeamColor: homeTeamColor,
                           ),
                           SizedBox(height: 5.0.r),
+                          if (awayTeam.containsKey('SQ_TOTAL') &&
+                              homeTeam.containsKey('SQ_TOTAL'))
+                            ComparisonRow(
+                              statName: 'xPTS',
+                              awayTeam: roundToDecimalPlaces(awayTeam['SQ_TOTAL'] ?? 0.0, 1) +
+                                  (awayTeam['freeThrowsMade'] ?? 0.0),
+                              homeTeam: roundToDecimalPlaces(homeTeam['SQ_TOTAL'] ?? 0.0, 1) +
+                                  (homeTeam['freeThrowsMade'] ?? 0.0),
+                              awayTeamColor: awayTeamColor,
+                              homeTeamColor: homeTeamColor,
+                            ),
+                          if (awayTeam.containsKey('SQ_TOTAL') &&
+                              homeTeam.containsKey('SQ_TOTAL'))
+                            SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'PER POSS',
                             awayTeam: roundToDecimalPlaces(
-                                (awayTeam['points'] ?? 0) /
+                                (awayTeam['points'] ?? awayTeam['PTS'] ?? 0) /
                                     ((awayTeam?['POSS'] ??
                                                 (awayEstPoss == 0 ? 1 : awayEstPoss)) !=
                                             0
@@ -150,7 +164,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                                         : (awayEstPoss == 0 ? 1 : awayEstPoss)),
                                 2),
                             homeTeam: roundToDecimalPlaces(
-                                (homeTeam['points'] ?? 0) /
+                                (homeTeam['points'] ?? homeTeam['PTS'] ?? 0) /
                                     ((homeTeam?['POSS'] ??
                                                 (homeEstPoss == 0 ? 1 : homeEstPoss)) !=
                                             0
@@ -165,22 +179,48 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                           ComparisonRow(
                             statName: 'PER SHOT',
                             awayTeam: roundToDecimalPlaces(
-                                (awayTeam['points'] - awayTeam['freeThrowsMade']) /
-                                        (awayTeam['fieldGoalsAttempted'] == 0
+                                ((awayTeam['points'] ?? awayTeam['PTS'] ?? 0) -
+                                            (awayTeam['freeThrowsMade'] ??
+                                                awayTeam['FTM'] ??
+                                                0)) /
+                                        ((awayTeam['fieldGoalsAttempted'] ??
+                                                    awayTeam['FGA']) ==
+                                                0
                                             ? 1
-                                            : awayTeam['fieldGoalsAttempted']) ??
+                                            : awayTeam['fieldGoalsAttempted'] ??
+                                                awayTeam['FGA']) ??
                                     0.0,
                                 2),
                             homeTeam: roundToDecimalPlaces(
-                                (homeTeam['points'] - homeTeam['freeThrowsMade']) /
-                                        (homeTeam['fieldGoalsAttempted'] == 0
+                                ((homeTeam['points'] ?? homeTeam['PTS'] ?? 0) -
+                                            (homeTeam['freeThrowsMade'] ??
+                                                homeTeam['FTM'] ??
+                                                0)) /
+                                        ((homeTeam['fieldGoalsAttempted'] ??
+                                                    homeTeam['FGA']) ==
+                                                0
                                             ? 1
-                                            : homeTeam['fieldGoalsAttempted']) ??
+                                            : homeTeam['fieldGoalsAttempted'] ??
+                                                homeTeam['FGA']) ??
                                     0.0,
                                 2),
                             awayTeamColor: awayTeamColor,
                             homeTeamColor: homeTeamColor,
                           ),
+                          if (awayTeam.containsKey('SQ_TOTAL') &&
+                              homeTeam.containsKey('SQ_TOTAL'))
+                            SizedBox(height: 5.0.r),
+                          if (awayTeam.containsKey('SQ_TOTAL') &&
+                              homeTeam.containsKey('SQ_TOTAL'))
+                            ComparisonRow(
+                              statName: 'Shot Quality',
+                              awayTeam:
+                                  roundToDecimalPlaces((awayTeam['SQ_TOTAL'] ?? 0.0) / 100, 2),
+                              homeTeam:
+                                  roundToDecimalPlaces((homeTeam['SQ_TOTAL'] ?? 0.0) / 100, 2),
+                              awayTeamColor: awayTeamColor,
+                              homeTeamColor: homeTeamColor,
+                            ),
                           SizedBox(height: 15.0.r),
                           ComparisonRow(
                             statName: 'POSSESSIONS',

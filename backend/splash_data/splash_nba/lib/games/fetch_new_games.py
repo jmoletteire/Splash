@@ -92,6 +92,167 @@ def generate_points_of_emphasis(home_id, away_id):
         return None
 
 
+# File path to store the refresh token
+TOKEN_FILE = '../../util/refresh_token.txt'
+
+
+def read_refresh_token():
+    """Read the refresh token from a file."""
+    try:
+        with open(TOKEN_FILE, 'r') as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        logging.error("Refresh token file not found. Ensure you have a valid refresh token stored.")
+        return None
+
+
+def write_refresh_token(new_token):
+    """Write the new refresh token to a file."""
+    with open(TOKEN_FILE, 'w') as file:
+        file.write(new_token)
+
+
+def refresh_token(refresh_tok):
+    # URL for the token request
+    token_url = 'https://auth.synergysportstech.com/connect/token'
+
+    # Form data for the token refresh request
+    token_payload = {
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_tok,
+        'scope': 'openid offline_access api.config api.security api.basketball api.sport api.editor',
+        'client_id': 'client.basketball.teamsite'
+    }
+
+    # Headers for the token request
+    token_headers = {
+        'accept': 'application/json',
+        'content-type': 'application/x-www-form-urlencoded',
+        'origin': 'https://apps.synergysports.com',
+        'referer': 'https://apps.synergysports.com/',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
+    }
+
+    # Make the POST request to obtain a new token
+    return requests.post(token_url, data=token_payload, headers=token_headers)
+
+
+def synergy_game_ids():
+    teams_map = {
+        'Atlanta': 1610612737,
+        'Boston': 1610612738,
+        'Cleveland': 1610612739,
+        'NewOrleans': 1610612740,
+        'Chicago': 1610612741,
+        'Dallas': 1610612742,
+        'Denver': 1610612743,
+        'GoldenState': 1610612744,
+        'Houston': 1610612745,
+        'LAClippers': 1610612746,
+        'LALakers': 1610612747,
+        'Miami': 1610612748,
+        'Milwaukee': 1610612749,
+        'Minnesota': 1610612750,
+        'Brooklyn': 1610612751,
+        'NewYork': 1610612752,
+        'Orlando': 1610612753,
+        'Indiana': 1610612754,
+        'Philadelphia': 1610612755,
+        'Phoenix': 1610612756,
+        'Portland': 1610612757,
+        'Sacramento': 1610612758,
+        'SanAntonio': 1610612759,
+        'OklahomaCity': 1610612760,
+        'Toronto': 1610612761,
+        'Utah': 1610612762,
+        'Memphis': 1610612763,
+        'Washington': 1610612764,
+        'Detroit': 1610612765,
+        'Charlotte': 1610612766
+    }
+
+    access_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxMDk3MjIxLCJpYXQiOjE3MzEwOTcyMjEsImV4cCI6MTczMTA5NzgyMSwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.FpYKAK1hgBLjE7rHPyiicnHe3dNIM5IRJfsSRSxUNzNza5heRqA9t1W_Nkf-Vas3ygUufX0Xw3A-we92qRpYxYZ7m_q3BJZFFHTjnIk6-c8A3MyUlsagq54Mo_pDVq6LgG1gm6_s-bHqxr4TRwYap0xRaAHQM266OA5mknew7Au_3pvpMB8M9Xyzji2JpHNOHcz0gEZ3FXxZKHAmHcmqgOn6v7I5hbtspxmTOglvNlHUiGesXhoQbaspBbcKVtHSbfQaiHyjkapWFM-HvFfoe92M6Ssh9HNyTJWtWDEQT4sOGAu8X-aXmuyfJStfJL5yd2Cq_kYqX7tQ5dyyxgl9bA'
+
+    # URL for the data you want to access
+    url = 'https://basketball.synergysportstech.com/api/games'
+
+    # Headers from your browser request
+    headers = {
+        'accept': 'application/json, text/plain, */*',
+        'accept-encoding': 'gzip, deflate, br, zstd',
+        'accept-language': 'en-US,en;q=0.9',
+        'authorization': f'Bearer {access_token}',
+        'content-type': 'application/json; charset=UTF-8',
+        'origin': 'https://apps.synergysports.com',
+        'referer': 'https://apps.synergysports.com/',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+        'x-synergy-client': 'ProductVersion=2024.10.31.4116; ProductName=Basketball.TeamSite'
+    }
+
+    # Payload from your browser request
+    payload = {
+        "excludeGamesWithoutCompetition": True,
+        "seasonIds": [
+            "59af08c917120e9c9a9797ff",  # 2017-18
+            "5b6e102011ef0d11039af1e3",  # 2018-19
+            "5d51e0c6f52909811e13ee2d",  # 2019-20
+            "5fce72f5f68e52f827c39b4c",  # 2020-21
+            "6120261cea4488c9fd5c57c5",  # 2021-22
+            "62fe65fb2c6c3881c0cf66ba",  # 2022-23
+            "651b131d1507a2202c01094c",  # 2023-24
+            "66ec94cbd172189f95bf08b2"   # 2024-25
+        ],
+        "competitionIds": None,
+        "skip": 10240,
+        "statuses": [4, 1, 2, 3, 5],
+        "sort": "utc:desc"
+    }
+
+    # Make the POST request
+    response = requests.post(url, headers=headers, json=payload)
+
+    # Check response status and print data if successful
+    if response.status_code == 200:
+        data = response.json()
+        print(len(data['result']))
+
+        for game in data['result']:
+            teams = game['name'].split('@')
+
+            try:
+                home_id = teams_map[teams[1]]
+            except Exception as e:
+                logging.error(f'Unable to parse Home Team ID: {e}')
+                continue
+
+            try:
+                away_id = teams_map[teams[0]]
+            except Exception as e:
+                logging.error(f'Unable to parse Away Team ID: {e}')
+                continue
+
+            game_date = game['localDate'][0:10]
+            logging.info(f'{game_date} ({game["id"]})')
+
+            game_day = games_collection.find_one({'GAME_DATE': game_date}, {'GAMES': 1, '_id': 0})
+
+            if game_day:
+                for game_id, game_data in game_day['GAMES'].items():
+                    try:
+                        summary = game_data.get('SUMMARY', {}).get('GameSummary', {})[0]
+                    except Exception:
+                        logging.error('Could not parse game summary')
+                        continue
+
+                    if summary['HOME_TEAM_ID'] == home_id and summary['VISITOR_TEAM_ID'] == away_id:
+                        games_collection.update_one({'GAME_DATE': game_date}, {'$set': {f'GAMES.{game_id}.SR_ID': game['id']}})
+            else:
+                logging.info(f'Game not found for {game_date}')
+
+    else:
+        print(f'Failed to retrieve data. Status code: {response.status_code}')
+
+
 def update_game_data():
     # Connect to MongoDB
     try:
@@ -230,10 +391,13 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        start_date = datetime(2024, 10, 4)
-        end_date = datetime(2025, 4, 13)
+        # start_date = datetime(2024, 10, 4)
+        # end_date = datetime(2025, 4, 13)
 
         # Fetch games for each date in the range
-        fetch_games_for_date_range(start_date, end_date)
+        # fetch_games_for_date_range(start_date, end_date)
+
+        synergy_game_ids()
+
     except Exception as e:
         logging.error(f"Failed to fetch games for date range: {e.with_traceback()}")

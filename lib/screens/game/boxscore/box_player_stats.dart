@@ -12,6 +12,7 @@ import '../../player/player_home.dart';
 class BoxPlayerStats extends StatefulWidget {
   final List<dynamic> players;
   final String playerGroup;
+  final dynamic team;
   final bool inProgress;
   final ScrollController controller;
 
@@ -19,6 +20,7 @@ class BoxPlayerStats extends StatefulWidget {
     super.key,
     required this.players,
     required this.playerGroup,
+    required this.team,
     required this.inProgress,
     required this.controller,
   });
@@ -37,6 +39,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       widget.playerGroup,
       'POSS',
       'MIN',
+      'xPTS',
       'PTS',
       'REB',
       'AST',
@@ -55,7 +58,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       'USG%',
       'NRTG',
       'ORTG',
-      'DRTG',
+      'DRTG'
     ];
   }
 
@@ -102,6 +105,13 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           width: isLandscape
               ? MediaQuery.of(context).size.width * 0.05
               : MediaQuery.of(context).size.width * 0.125,
+        ),
+
+        /// xPTS
+        TableColumn(
+          width: isLandscape
+              ? MediaQuery.of(context).size.width * 0.05
+              : MediaQuery.of(context).size.width * 0.1,
         ),
 
         /// PTS
@@ -280,8 +290,8 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
             color: Colors.grey.shade900,
             border: Border(
               bottom: BorderSide(
-                color: Colors.grey.shade200,
-                width: 0.125,
+                color: Colors.grey.shade700,
+                width: 0.5,
               ),
             ),
           ),
@@ -336,7 +346,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       return input; // Return the original string if no match is found
     }
 
-    int played = int.parse(widget.players[row]?['played'] ?? '0');
+    int played = int.parse(widget.players[row]?['played'] ?? '1');
     int onCourt = widget.inProgress ? int.parse(widget.players[row]?['oncourt'] ?? '0') : 0;
     String position =
         widget.players[row]?['position'] ?? widget.players[row]['START_POSITION'] ?? '';
@@ -350,14 +360,15 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           alignment: Alignment.centerLeft,
           child: Row(
             children: [
-              SizedBox(
-                width: 12.0.r,
-                child: Text(
-                  widget.players[row]['jerseyNum'] ?? '',
-                  textAlign: TextAlign.center,
-                  style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
+              if (widget.players[row].containsKey('jerseyNum'))
+                SizedBox(
+                  width: 12.0.r,
+                  child: Text(
+                    widget.players[row]['jerseyNum'] ?? '',
+                    textAlign: TextAlign.center,
+                    style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
+                  ),
                 ),
-              ),
               SizedBox(width: 8.0.r),
               PlayerAvatar(
                 radius: 12.0.r,
@@ -444,7 +455,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['points'] ?? widget.players[row]['PTS']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['SQ_TOTAL'] + (widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]['FTM']) ?? 0.0 ?? '-').toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -455,7 +466,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['reboundsTotal'] ?? widget.players[row]['REB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['points'] ?? widget.players[row]['PTS']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -466,7 +477,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['assists'] ?? widget.players[row]['AST']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsTotal'] ?? widget.players[row]['REB']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -477,7 +488,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['turnovers'] ?? widget.players[row]['TO']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['assists'] ?? widget.players[row]['AST']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -488,7 +499,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['fieldGoalsMade'] ?? widget.players[row]['FGM']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['fieldGoalsAttempted'] ?? widget.players[row]['FGA']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['turnovers'] ?? widget.players[row]['TO']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -499,7 +510,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['threePointersMade'] ?? widget.players[row]['FG3M']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['threePointersAttempted'] ?? widget.players[row]['FG3A']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['fieldGoalsMade'] ?? widget.players[row]['FGM']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['fieldGoalsAttempted'] ?? widget.players[row]['FGA']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -510,7 +521,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]['FTM']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['freeThrowsAttempted'] ?? widget.players[row]['FTA']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['threePointersMade'] ?? widget.players[row]['FG3M']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['threePointersAttempted'] ?? widget.players[row]['FG3A']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -521,7 +532,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['steals'] ?? widget.players[row]['STL']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]['FTM']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['freeThrowsAttempted'] ?? widget.players[row]['FTA']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -532,7 +543,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['blocks'] ?? widget.players[row]['BLK']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['steals'] ?? widget.players[row]['STL']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -543,7 +554,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['reboundsOffensive'] ?? widget.players[row]['OREB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['blocks'] ?? widget.players[row]['BLK']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -554,7 +565,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['reboundsDefensive'] ?? widget.players[row]['DREB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsOffensive'] ?? widget.players[row]['OREB']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -565,7 +576,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['foulsPersonal'] ?? widget.players[row]['PF']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsDefensive'] ?? widget.players[row]['DREB']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -576,11 +587,22 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['plusMinusPoints'] ?? widget.players[row]['PLUS_MINUS']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['foulsPersonal'] ?? widget.players[row]['PF']).toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 16:
+        try {
+          if (played == 0) {
+            return const BoxscoreDataText(text: '-');
+          }
+          return BoxscoreDataText(
+              text:
+                  '${(widget.players[row]?['statistics']?['plusMinusPoints'] ?? widget.players[row]['PLUS_MINUS']).toStringAsFixed(0)}');
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 17:
         try {
           if (played == 0) {
             return const BoxscoreDataText(text: '-');
@@ -608,7 +630,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 17:
+      case 18:
         try {
           if (played == 0) {
             return const BoxscoreDataText(text: '-');
@@ -619,7 +641,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 18:
+      case 19:
         try {
           if (played == 0) {
             return const BoxscoreDataText(text: '-');
@@ -630,25 +652,46 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 19:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['NET_RATING'] ?? widget.players[row]['NET_RATING']).toStringAsFixed(1)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
       case 20:
         try {
           if (played == 0) {
             return const BoxscoreDataText(text: '-');
           }
+          int ptsOn = ((widget.players[row]?['statistics']?['OFF_RATING'] ??
+                      widget.players[row]['OFF_RATING']) *
+                  (widget.players[row]?['statistics']?['POSS'] ?? 0) /
+                  100)
+              .round();
+          double oRtgOff = 100 *
+              (widget.team['points'] - ptsOn) /
+              (widget.team['POSS'] - (widget.players[row]?['statistics']?['POSS'] ?? 0));
+          double offOnOff = (widget.players[row]?['statistics']?['OFF_RATING'] ??
+                  widget.players[row]['OFF_RATING']) -
+              oRtgOff;
+
+          int ptsAgainstOn = ((widget.players[row]?['statistics']?['DEF_RATING'] ??
+                      widget.players[row]['DEF_RATING']) *
+                  (widget.players[row]?['statistics']?['POSS'] ?? 0) /
+                  100)
+              .round();
+          double dRtgOff = 100 *
+              (widget.team['pointsAgainst'] - ptsAgainstOn) /
+              (widget.team['POSS'] - (widget.players[row]?['statistics']?['POSS'] ?? 0));
+          double defOnOff = (widget.players[row]?['statistics']?['DEF_RATING'] ??
+                  widget.players[row]['DEF_RATING']) -
+              dRtgOff;
+
+          double netOnOff = offOnOff - defOnOff;
           return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['OFF_RATING'] ?? widget.players[row]['OFF_RATING']).toStringAsFixed(1)}');
+            text: netOnOff > 0.0
+                ? '+${netOnOff.toStringAsFixed(1)}'
+                : netOnOff.toStringAsFixed(1),
+            color: netOnOff == 0.0
+                ? Colors.white
+                : netOnOff > 0.0
+                    ? const Color(0xFF55F86F)
+                    : const Color(0xFFFC3126),
+          );
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -657,9 +700,52 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           if (played == 0) {
             return const BoxscoreDataText(text: '-');
           }
+          int ptsOn = ((widget.players[row]?['statistics']?['OFF_RATING'] ??
+                      widget.players[row]['OFF_RATING']) *
+                  (widget.players[row]?['statistics']?['POSS'] ?? 0) /
+                  100)
+              .round();
+          double oRtgOff = 100 *
+              (widget.team['points'] - ptsOn) /
+              (widget.team['POSS'] - (widget.players[row]?['statistics']?['POSS'] ?? 0));
+          double onOff = (widget.players[row]?['statistics']?['OFF_RATING'] ??
+                  widget.players[row]['OFF_RATING']) -
+              oRtgOff;
           return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['DEF_RATING'] ?? widget.players[row]['DEF_RATING']).toStringAsFixed(1)}');
+            text: onOff > 0.0 ? '+${onOff.toStringAsFixed(1)}' : onOff.toStringAsFixed(1),
+            color: onOff == 0.0
+                ? Colors.white
+                : onOff > 0.0
+                    ? const Color(0xFF55F86F)
+                    : const Color(0xFFFC3126),
+          );
+        } catch (e) {
+          return const BoxscoreDataText(text: '-');
+        }
+      case 22:
+        try {
+          if (played == 0) {
+            return const BoxscoreDataText(text: '-');
+          }
+          int ptsOn = ((widget.players[row]?['statistics']?['DEF_RATING'] ??
+                      widget.players[row]['DEF_RATING']) *
+                  (widget.players[row]?['statistics']?['POSS'] ?? 0) /
+                  100)
+              .round();
+          double dRtgOff = 100 *
+              (widget.team['pointsAgainst'] - ptsOn) /
+              (widget.team['POSS'] - (widget.players[row]?['statistics']?['POSS'] ?? 0));
+          double onOff = (widget.players[row]?['statistics']?['DEF_RATING'] ??
+                  widget.players[row]['DEF_RATING']) -
+              dRtgOff;
+          return BoxscoreDataText(
+            text: onOff > 0.0 ? '+${onOff.toStringAsFixed(1)}' : onOff.toStringAsFixed(1),
+            color: onOff == 0.0
+                ? Colors.white
+                : onOff < 0.0
+                    ? const Color(0xFF55F86F)
+                    : const Color(0xFFFC3126),
+          );
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -670,9 +756,10 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 }
 
 class BoxscoreDataText extends StatelessWidget {
-  const BoxscoreDataText({super.key, required this.text, this.alignment});
+  const BoxscoreDataText({super.key, required this.text, this.color, this.alignment});
 
   final Alignment? alignment;
+  final Color? color;
   final String text;
 
   @override
@@ -682,7 +769,7 @@ class BoxscoreDataText extends StatelessWidget {
       child: AutoSizeText(
         text,
         maxLines: 1,
-        style: kBebasNormal.copyWith(fontSize: 15.0.r),
+        style: kBebasNormal.copyWith(fontSize: 15.0.r, color: color),
       ),
     );
   }

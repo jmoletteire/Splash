@@ -296,13 +296,31 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     ),
                   ),
                   Expanded(
-                    child: Text(
-                      'PTS',
-                      textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(
-                        fontSize: 15.0.r,
-                        color: Colors.grey.shade300,
-                      ),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 20.0.r,
+                          width: 1.0,
+                          decoration: const BoxDecoration(
+                              border: Border(right: BorderSide(color: Colors.white30))),
+                        ),
+                        SizedBox(height: 12.5.r),
+                        Text(
+                          'PTS',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(
+                            fontSize: 15.0.r,
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                        SizedBox(height: 12.5.r),
+                        Container(
+                          height: 20.0.r,
+                          width: 1.0,
+                          decoration: const BoxDecoration(
+                              border: Border(right: BorderSide(color: Colors.white30))),
+                        )
+                      ],
                     ),
                   ),
                   Expanded(
@@ -323,7 +341,14 @@ class _TeamLeadersState extends State<TeamLeaders> {
                   ),
                 ],
               ),
-              SizedBox(height: 20.0.r),
+              Container(
+                height: 15.0.r,
+                decoration: const BoxDecoration(
+                    border: Border(bottom: BorderSide(color: Colors.white10))),
+              ),
+              Container(
+                height: 15.0.r,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -344,13 +369,31 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     ),
                   ),
                   Expanded(
-                    child: Text(
-                      'REB',
-                      textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(
-                        fontSize: 15.0.r,
-                        color: Colors.grey.shade300,
-                      ),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 20.0.r,
+                          width: 1.0,
+                          decoration: const BoxDecoration(
+                              border: Border(right: BorderSide(color: Colors.white30))),
+                        ),
+                        SizedBox(height: 12.5.r),
+                        Text(
+                          'REB',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(
+                            fontSize: 15.0.r,
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                        SizedBox(height: 12.5.r),
+                        Container(
+                          height: 20.0.r,
+                          width: 1.0,
+                          decoration: const BoxDecoration(
+                              border: Border(right: BorderSide(color: Colors.white30))),
+                        )
+                      ],
                     ),
                   ),
                   Expanded(
@@ -371,7 +414,14 @@ class _TeamLeadersState extends State<TeamLeaders> {
                   ),
                 ],
               ),
-              SizedBox(height: 20.0.r),
+              Container(
+                height: 15.0.r,
+                decoration: const BoxDecoration(
+                    border: Border(bottom: BorderSide(color: Colors.white10))),
+              ),
+              Container(
+                height: 15.0.r,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -392,13 +442,31 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     ),
                   ),
                   Expanded(
-                    child: Text(
-                      'AST',
-                      textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(
-                        fontSize: 15.0.r,
-                        color: Colors.grey.shade300,
-                      ),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 20.0.r,
+                          width: 1.0,
+                          decoration: const BoxDecoration(
+                              border: Border(right: BorderSide(color: Colors.white30))),
+                        ),
+                        SizedBox(height: 12.5.r),
+                        Text(
+                          'AST',
+                          textAlign: TextAlign.center,
+                          style: kBebasNormal.copyWith(
+                            fontSize: 15.0.r,
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                        SizedBox(height: 12.5.r),
+                        Container(
+                          height: 20.0.r,
+                          width: 1.0,
+                          decoration: const BoxDecoration(
+                              border: Border(right: BorderSide(color: Colors.white30))),
+                        )
+                      ],
                     ),
                   ),
                   Expanded(
@@ -470,7 +538,7 @@ class PlayerCard extends StatelessWidget {
             name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: kBebasNormal.copyWith(fontSize: 15.0.r),
+            style: kBebasNormal.copyWith(fontSize: 15.0.r, color: Colors.grey.shade300),
           ),
           Text(
             '#$jersey | $position',

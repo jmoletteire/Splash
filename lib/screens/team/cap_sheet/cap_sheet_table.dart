@@ -428,8 +428,8 @@ class _CapSheetState extends State<CapSheet> {
                     ))
                 : Border(
                     bottom: BorderSide(
-                      color: Colors.grey.shade200,
-                      width: 0.125,
+                      color: Colors.grey.shade700,
+                      width: 0.5,
                     ),
                   ),
           ),

@@ -87,7 +87,7 @@ class _PlayerFantasyStatsState extends State<PlayerFantasyStats> {
     super.initState();
     teamCache = Provider.of<TeamCache>(context, listen: false);
     getGames();
-    getNextGames();
+    if (widget.player['ROSTERSTATUS'] == 'Active') getNextGames();
   }
 
   @override

@@ -584,8 +584,8 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
         color: Colors.grey.shade900,
         border: Border(
           bottom: BorderSide(
-            color: Colors.grey.shade200,
-            width: 0.125.r,
+            color: Colors.grey.shade700,
+            width: 0.5,
           ),
         ),
       ),
@@ -716,8 +716,8 @@ class _ExpandableAwardCardState extends State<ExpandableAwardCard>
                                                     players[i]['ALL_NBA_TEAM_NUMBER'] !=
                                                         players[i + 1]['ALL_NBA_TEAM_NUMBER']))
                                         ? Colors.transparent
-                                        : Colors.grey.shade200,
-                                    width: 0.125.r,
+                                        : Colors.grey.shade700,
+                                    width: 0.5.r,
                                   ),
                                 ),
                               ),

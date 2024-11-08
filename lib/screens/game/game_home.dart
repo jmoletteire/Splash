@@ -215,20 +215,20 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
     _tabController.addListener(() {
       // If app bar expanded
-      if (_scrollController.offset < (201 - kToolbarHeight)) {
+      if (_scrollController.offset < (201.r - kToolbarHeight)) {
         // Remain at current offset
         _scrollController.jumpTo(_scrollController.offset);
       }
       // Else, app bar collapsed and no collapsed position saved
       else {
         // Go to top collapsed position
-        _scrollController.jumpTo(201 - kToolbarHeight);
+        _scrollController.jumpTo(201.r - kToolbarHeight);
       }
     });
   }
 
   bool get _isSliverAppBarExpanded {
-    return _scrollController.hasClients && _scrollController.offset > (200 - kToolbarHeight);
+    return _scrollController.hasClients && _scrollController.offset > (200.r - kToolbarHeight);
   }
 
   @override
@@ -576,10 +576,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 indicatorWeight: 3.0,
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal.copyWith(fontSize: !_isUpcoming ? 17.0.r : 18.0.r),
+                labelStyle: kBebasNormal.copyWith(fontSize: !_isUpcoming ? 16.5.r : 18.0.r),
                 tabs: [
                   const Tab(text: 'Matchup'),
-                  if (!_isUpcoming) const Tab(text: 'Play-By-Play'),
+                  if (!_isUpcoming && game.containsKey('PBP')) const Tab(text: 'Play-By-Play'),
                   Tab(text: _isUpcoming ? 'Stats' : 'Box Score'),
                   if (odds.isNotEmpty) const Tab(text: 'Odds')
                 ],
@@ -602,6 +602,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           ];
         },
         pinnedHeaderSliverHeightBuilder: () {
+          if (_tabController.index == 1) {
+            return 104.0 + MediaQuery.of(context).padding.top;
+          }
           /*
             * The extra subtraction here is really just for the BoxScore so
             * that it pins the secondary tab after we scroll past the LineScore.
@@ -623,7 +626,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 awayId: widget.awayId,
                 isUpcoming: _isUpcoming,
               ),
-              if (!_isUpcoming)
+              if (!_isUpcoming && game.containsKey('PBP'))
                 PlayByPlay(
                   game: game,
                   homeId: widget.homeId,

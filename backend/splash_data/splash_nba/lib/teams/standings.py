@@ -368,6 +368,8 @@ def update_current_standings():
         determine_tiebreakers(k_current_season, standings)
 
         for i, team in enumerate(standings):
+            team['SOS'], team['rSOS'] = calculate_strength_of_schedule(team, k_current_season)
+
             # Update STANDINGS data for each team
             teams_collection.update_one(
                 {"TEAM_ID": team['TeamID']},
@@ -375,8 +377,102 @@ def update_current_standings():
                 upsert=True
             )
             logging.info(f"(Standings) Updated {i + 1} of {len(standings)}\n")
+
+        strength_of_schedule_rank()
     except Exception as e:
         logging.error(f"(Standings) Unable to update standings: {e}")
+
+
+def calculate_strength_of_schedule(team, season):
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"(Standings) Failed to connect to MongoDB: {e}")
+        exit(1)
+
+    if season < '2017-18':
+        return 0.000
+
+    team_season = teams_collection.find_one({'TEAM_ID': team['TeamID']}, {f'seasons.{season}.GAMES': 1})
+    team_games = team_season.get('seasons', {}).get(season, {}).get('GAMES', {})
+    opp_win_pct = 0.000
+    rem_opp_win_pct = 0.000
+    rem_games = 0
+
+    if team_games:
+        for game_id, game_data in team_games.items():
+            if game_id[2] == '2':
+                if game_data['RESULT'] == 'W' or game_data['RESULT'] == 'L':
+                    opp = teams_collection.find_one({'TEAM_ID': game_data['OPP']}, {f'seasons.{season}.STANDINGS.WinPCT': 1, '_id': 0})
+                    try:
+                        opp_seasons = opp.get('seasons', {})
+                        opp_season = opp_seasons.get(season, {})
+                        opp_standings = opp_season.get('STANDINGS', {})
+                        opp_win_pct += opp_standings.get('WinPCT', 0)
+                    except Exception:
+                        continue
+                else:
+                    opp = teams_collection.find_one({'TEAM_ID': game_data['OPP']}, {f'seasons.{season}.STANDINGS.WinPCT': 1, '_id': 0})
+                    try:
+                        opp_seasons = opp.get('seasons', {})
+                        opp_season = opp_seasons.get(season, {})
+                        opp_standings = opp_season.get('STANDINGS', {})
+                        rem_opp_win_pct += opp_standings.get('WinPCT', 0)
+                        rem_games += 1
+                    except Exception:
+                        continue
+
+    sos = opp_win_pct / (team['WINS'] + team['LOSSES'])
+    r_sos = rem_opp_win_pct / rem_games
+    return sos, r_sos
+
+
+def strength_of_schedule_rank():
+    # Connect to MongoDB
+    try:
+        client = MongoClient(uri)
+        db = client.splash
+        teams_collection = db.nba_teams
+    except Exception as e:
+        logging.error(f"(Standings) Failed to connect to MongoDB: {e}")
+        exit(1)
+
+    stats = ['SOS', 'rSOS']
+
+    for stat in stats:
+        pipeline = [
+            {
+                "$setWindowFields": {
+                    "sortBy": {
+                        f"seasons.{k_current_season}.STANDINGS.{stat}": 1
+                    },
+                    "output": {
+                        f"seasons.{k_current_season}.STANDINGS.{stat}_RANK": {
+                            "$documentNumber": {}
+                        }
+                    }
+                }
+            }
+        ]
+
+        # Execute the pipeline and get the results
+        results = list(teams_collection.aggregate(pipeline))
+
+        # Update each document with the new rank field
+        for result in results:
+            res = result['seasons'][k_current_season]['STANDINGS'][f'{stat}_RANK']
+
+            try:
+                teams_collection.update_one(
+                    {"_id": result["_id"]},
+                    {"$set": {f"seasons.{k_current_season}.STANDINGS.{stat}_RANK": res}}
+                )
+            except Exception as e:
+                logging.error(f"Failed to add SOS_RANK to database: {e}")
+                continue
 
 
 def fetch_all_standings():
@@ -422,7 +518,7 @@ def fetch_all_standings():
                 )
                 logging.info(f"Fetched {i + 1} of {len(standings)}\n")
         except Exception as e:
-            logging.error(f"Unable to fetch standings: {e.with_traceback()}")
+            logging.error(f"Unable to fetch standings: {e}")
 
 
 if __name__ == "__main__":

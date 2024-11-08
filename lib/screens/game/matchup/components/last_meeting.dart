@@ -78,10 +78,14 @@ class _LastMeetingState extends State<LastMeeting> {
     String lastHomeId = '';
     String lastAwayId = '';
     if (!_isLoading) {
-      lastHomeId = game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'].toString();
-      lastAwayId = game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'].toString();
-      if (!kTeamIdToName.containsKey(lastAwayId)) {
-        lastAwayId = '0';
+      if (game.isNotEmpty && game.containsKey('SUMMARY')) {
+        lastHomeId = game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'].toString();
+        lastAwayId = game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'].toString();
+        if (!kTeamIdToName.containsKey(lastAwayId)) {
+          lastAwayId = '0';
+        }
+      } else {
+        return Container();
       }
     }
     return Skeletonizer(

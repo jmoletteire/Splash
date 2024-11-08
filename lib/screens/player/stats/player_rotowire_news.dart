@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,8 +31,10 @@ class _PlayerRotowireNewsState extends State<PlayerRotowireNews> {
     } else if (difference.inDays < 7) {
       return '${difference.inDays} days ago';
     } else {
-      final outputFormat = DateFormat('MMM d');
-      return outputFormat.format(givenDateTime);
+      final String formattedDate = (givenDateTime.year == now.year)
+          ? DateFormat('MMM d').format(givenDateTime)
+          : DateFormat('MMM d, yyyy').format(givenDateTime);
+      return formattedDate;
     }
   }
 
@@ -48,9 +51,13 @@ class _PlayerRotowireNewsState extends State<PlayerRotowireNews> {
         children: [
           Row(
             children: [
-              Text(
-                '${widget.playerNews['FirstName']} ${widget.playerNews['LastName']} - ${widget.playerNews['ListItemCaption']}',
-                style: kBebasBold,
+              Flexible(
+                child: AutoSizeText(
+                  '${widget.playerNews['FirstName']} ${widget.playerNews['LastName']} - ${widget.playerNews['ListItemCaption']}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: kBebasBold,
+                ),
               ),
             ],
           ),
@@ -81,7 +88,7 @@ class _PlayerRotowireNewsState extends State<PlayerRotowireNews> {
               SizedBox(width: 5.0.r),
               Text(
                 timeAgo(widget.playerNews['ListItemPubDate']),
-                style: kBebasNormal.copyWith(fontSize: 12.0.r, color: Colors.grey),
+                style: kBebasNormal.copyWith(fontSize: 11.0.r, color: Colors.grey),
               ),
             ],
           ),

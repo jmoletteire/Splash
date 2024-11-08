@@ -358,8 +358,11 @@ class _TeamGamesState extends State<TeamGames> {
                           height: MediaQuery.sizeOf(context).height * 0.065,
                           decoration: BoxDecoration(
                             color: Colors.grey.shade900,
-                            border: const Border(
-                                bottom: BorderSide(color: Colors.white70, width: 0.125)),
+                            border: Border(
+                                bottom: BorderSide(
+                              color: Colors.grey.shade700,
+                              width: 0.5,
+                            )),
                           ),
                           child: Row(
                             children: [

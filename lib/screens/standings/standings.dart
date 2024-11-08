@@ -373,6 +373,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                     'ORTG',
                                     'DRTG',
                                     'PACE',
+                                    'SOS',
+                                    'R-SOS',
                                     'STREAK',
                                     'Last 10',
                                     'HOME',
@@ -408,6 +410,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                     'ORTG',
                                     'DRTG',
                                     'PACE',
+                                    'SOS',
+                                    'R-SOS',
                                     'STREAK',
                                     'Last 10',
                                     'HOME',
@@ -464,6 +468,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                     'ORTG',
                                     'DRTG',
                                     'PACE',
+                                    'SOS',
+                                    'R-SOS',
                                     'STREAK',
                                     'Last 10',
                                     'HOME',
@@ -653,6 +659,32 @@ class StandingsGlossary extends StatelessWidget {
                       ),
                       Text(
                         ' - Games Back',
+                        style: kBebasNormal.copyWith(
+                            fontSize: 14.0.r, color: Colors.grey.shade400),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'SOS',
+                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                      ),
+                      Text(
+                        ' - Strength of Schedule',
+                        style: kBebasNormal.copyWith(
+                            fontSize: 14.0.r, color: Colors.grey.shade400),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'R-SOS',
+                        style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                      ),
+                      Text(
+                        ' - Remaining S.O.S.',
                         style: kBebasNormal.copyWith(
                             fontSize: 14.0.r, color: Colors.grey.shade400),
                       ),

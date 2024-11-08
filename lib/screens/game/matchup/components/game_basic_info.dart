@@ -23,8 +23,17 @@ class GameBasicInfo extends StatelessWidget {
       for (Map<String, dynamic> official in game['SUMMARY']['Officials']) {
         officials.add('${official['FIRST_NAME']} ${official['LAST_NAME']}');
       }
-      arena =
-          '${game['BOXSCORE']['arena']['arenaName']} - ${game['BOXSCORE']['arena']['arenaCity']}, ${game['BOXSCORE']['arena']['arenaState']}';
+      if (game['BOXSCORE'].containsKey('arena')) {
+        arena =
+            '${game['BOXSCORE']['arena']['arenaName']} - ${game['BOXSCORE']['arena']['arenaCity']}, ${game['BOXSCORE']['arena']['arenaState']}';
+      } else {
+        if (kArenas.containsKey(game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '')) {
+          arena =
+              '${game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? ''} - ${kArenas[game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '']}';
+        } else {
+          arena = game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '';
+        }
+      }
     } else {
       officials.add('TBA');
       if (kArenas.containsKey(game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '')) {
