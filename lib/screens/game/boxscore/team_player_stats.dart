@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,6 +26,10 @@ class TeamPlayerStats extends StatefulWidget {
 
 class _TeamPlayerStatsState extends State<TeamPlayerStats> {
   List columnNames = [];
+  Timer? _debounceTimer;
+  late double availableWidth;
+  late double availableHeight;
+  late bool isLandscape;
 
   @override
   void initState() {
@@ -50,6 +56,13 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
       'DRTG',
     ];
 
+    widget.controller.addListener(() {
+      if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+      _debounceTimer = Timer(const Duration(seconds: 5), () {
+        setState(() {});
+      });
+    });
+
     // Sort players by MIN / GP for the current or previous season
     String season =
         widget.players[0]['STATS'].containsKey(kCurrentSeason) ? kCurrentSeason : kPrevSeason;
@@ -71,9 +84,15 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    availableWidth = MediaQuery.of(context).size.width;
+    availableHeight = MediaQuery.of(context).size.height;
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return SliverTableView.builder(
       horizontalScrollController: widget.controller,
       style: const TableViewStyle(
@@ -89,143 +108,105 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
           ),
         ),
       ),
-      headerHeight: MediaQuery.of(context).size.height * 0.045,
+      headerHeight: availableHeight * 0.045,
       rowCount: widget.players.length,
-      rowHeight: MediaQuery.of(context).size.height * 0.06,
-      minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
+      rowHeight: availableHeight * 0.06,
+      minScrollableWidth: availableWidth * 0.01,
       columns: [
         /// PLAYER
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.15
-              : MediaQuery.of(context).size.width * 0.43,
+          width: isLandscape ? availableWidth * 0.15 : availableWidth * 0.43,
           freezePriority: 1,
         ),
 
         /// GP
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.075,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.075,
         ),
 
         /// MIN
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.1,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1,
         ),
 
         /// PTS
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.1225,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1225,
         ),
 
         /// REB
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.03
-              : MediaQuery.of(context).size.width * 0.1,
+          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.1,
         ),
 
         /// AST
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.03
-              : MediaQuery.of(context).size.width * 0.1,
+          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.1,
         ),
 
         /// STL
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.03
-              : MediaQuery.of(context).size.width * 0.1,
+          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.1,
         ),
 
         /// BLK
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.03
-              : MediaQuery.of(context).size.width * 0.1,
+          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.1,
         ),
 
         /// TOV
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.03
-              : MediaQuery.of(context).size.width * 0.1,
+          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.1,
         ),
 
         /// FGM - FGA
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.15,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.15,
         ),
 
         /// 3PM - 3PA
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.135,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.135,
         ),
 
         /// FTM - FTA
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.135,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.135,
         ),
 
         /// EFG%
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.135,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.135,
         ),
 
         /// TS%
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.135,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.135,
         ),
 
         /// USG%
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.135,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.135,
         ),
 
         /// +/-
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.125,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.125,
         ),
 
         /// NRTG
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.125,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.125,
         ),
 
         /// ORTG
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.12,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.12,
         ),
 
         /// DRTG
         TableColumn(
-          width: isLandscape
-              ? MediaQuery.of(context).size.width * 0.05
-              : MediaQuery.of(context).size.width * 0.12,
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.12,
         ),
       ],
       rowBuilder: _rowBuilder,
@@ -245,7 +226,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
               child: Align(
                 alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
                 child: Text(
-                  columnNames[column],
+                  columnNames[column] ?? '',
                   style: kBebasNormal.copyWith(
                     fontSize: 14.0.r,
                   ),
@@ -299,7 +280,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => PlayerHome(
-                    playerId: widget.players[row]['PERSON_ID'].toString(),
+                    playerId: (widget.players[row]?['PERSON_ID'] ?? '0').toString(),
                   ),
                 ),
               );
@@ -308,9 +289,11 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
           splashColor: Colors.white10,
           highlightColor: Colors.white10,
           child: contentBuilder(context, (context, column) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: getContent(row, column, context),
+            return RepaintBoundary(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0.r),
+                child: getContent(row, column, context),
+              ),
             );
           }),
         ),
@@ -383,7 +366,7 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
                 SizedBox(width: 5.0.r),
                 Container(
                   margin: EdgeInsets.only(left: 8.0.r),
-                  child: AutoSizeText(
+                  child: Text(
                     status,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -415,112 +398,144 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         }
       case 2:
         try {
-          double minPerG = widget.players[row]['STATS'][season][seasonType]['BASIC']['MIN'] /
-              widget.players[row]['STATS'][season][seasonType]['BASIC']['GP'];
+          double min =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['MIN'] ?? 0);
+          int gp = (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['GP'] ?? 1);
+          double minPerG = min / (gp == 0 ? 1 : gp);
 
-          return Container(
-            alignment: Alignment.centerRight,
-            child: Text(
-              minPerG.toStringAsFixed(1),
-              style: kBebasNormal.copyWith(fontSize: 15.0.r, color: const Color(0xFFD0D0D0)),
-            ),
+          return BoxscoreDataText(
+            text: minPerG == 0.0 ? '-' : minPerG.toStringAsFixed(1),
+            color: const Color(0xFFD0D0D0),
           );
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 3:
         try {
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['PTS'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
+          int pts =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['PTS'] ?? 0);
+          int gp = (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['GP'] ?? 1);
+          double ptsPerG = pts / (gp == 0 ? 1 : gp);
+
+          return BoxscoreDataText(text: ptsPerG == 0.0 ? '-' : ptsPerG.toStringAsFixed(1));
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 4:
         try {
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['REB'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
+          int reb =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['REB'] ?? 0);
+          int gp = (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['GP'] ?? 1);
+          double rebPerG = reb / (gp == 0 ? 1 : gp);
+
+          return BoxscoreDataText(text: rebPerG == 0.0 ? '-' : rebPerG.toStringAsFixed(1));
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 5:
         try {
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['AST'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
+          int ast =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['AST'] ?? 0);
+          int gp = (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['GP'] ?? 1);
+          double astPerG = ast / (gp == 0 ? 1 : gp);
+
+          return BoxscoreDataText(text: astPerG == 0.0 ? '-' : astPerG.toStringAsFixed(1));
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 6:
         try {
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['STL'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
+          int stl =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['STL'] ?? 0);
+          int gp = (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['GP'] ?? 1);
+          double stlPerG = stl / (gp == 0 ? 1 : gp);
+
+          return BoxscoreDataText(text: stlPerG == 0.0 ? '-' : stlPerG.toStringAsFixed(1));
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 7:
         try {
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['BLK'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
+          int blk =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['BLK'] ?? 0);
+          int gp = (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['GP'] ?? 1);
+          double blkPerG = blk / (gp == 0 ? 1 : gp);
+
+          return BoxscoreDataText(text: blkPerG == 0.0 ? '-' : blkPerG.toStringAsFixed(1));
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 8:
         try {
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['BASIC']['TOV'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['GP']).toStringAsFixed(1)}');
+          int tov =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['TOV'] ?? 0);
+          int gp = (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['GP'] ?? 1);
+          double tovPerG = tov / (gp == 0 ? 1 : gp);
+
+          return BoxscoreDataText(text: tovPerG == 0.0 ? '-' : tovPerG.toStringAsFixed(1));
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 9:
         try {
+          int fgm =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['FGM'] ?? 0);
+          int fga =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['FGA'] ?? 1);
+          double fgPct = fgm / (fga == 0 ? 1 : fga);
           return BoxscoreDataText(
-              text:
-                  '${(100 * widget.players[row]['STATS'][season][seasonType]['BASIC']['FGM'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['FGA']).toStringAsFixed(1)}%');
+              text: fgPct == 0.0 ? '-' : '${(100 * fgPct).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 10:
         try {
+          int fg3m =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['FG3M'] ?? 0);
+          int fg3a =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['FG3A'] ?? 1);
+          double fg3Pct = fg3m / (fg3a == 0 ? 1 : fg3a);
           return BoxscoreDataText(
-              text:
-                  '${(100 * widget.players[row]['STATS'][season][seasonType]['BASIC']['FG3M'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['FG3A']).toStringAsFixed(1)}%');
+              text: fg3Pct == 0.0 ? '-' : '${(100 * fg3Pct).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 11:
         try {
+          int ftm =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['FTM'] ?? 0);
+          int fta =
+              (widget.players[row]?['STATS']?[season]?[seasonType]?['BASIC']?['FTA'] ?? 1);
+          double ftPct = ftm / (fta == 0 ? 1 : fta);
           return BoxscoreDataText(
-              text:
-                  '${(100 * widget.players[row]['STATS'][season][seasonType]['BASIC']['FTM'] / widget.players[row]['STATS'][season][seasonType]['BASIC']['FTA']).toStringAsFixed(1)}%');
+              text: ftPct == 0.0 ? '-' : '${(100 * ftPct).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 12:
         try {
+          double efgPct =
+              widget.players[row]?['STATS']?[season]?[seasonType]?['ADV']?['EFG_PCT'] ?? 0.0;
           return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['ADV']['EFG_PCT'] * 100).toStringAsFixed(1)}%');
+              text: efgPct == 0.0 ? '-' : '${(efgPct * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 13:
         try {
+          double tsPct =
+              widget.players[row]?['STATS']?[season]?[seasonType]?['ADV']?['TS_PCT'] ?? 0.0;
           return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['ADV']['TS_PCT'] * 100).toStringAsFixed(1)}%');
+              text: tsPct == 0.0 ? '-' : '${(tsPct * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
       case 14:
         try {
+          double usgPct =
+              widget.players[row]?['STATS']?[season]?[seasonType]?['ADV']?['USG_PCT'] ?? 0.0;
           return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]['STATS'][season][seasonType]['ADV']['USG_PCT'] * 100).toStringAsFixed(1)}%');
+              text: usgPct == 0.0 ? '-' : '${(usgPct * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }

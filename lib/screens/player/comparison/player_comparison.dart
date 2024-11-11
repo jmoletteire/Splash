@@ -359,8 +359,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                                           'https://cdn.nba.com/headshots/nba/latest/1040x760/${playerTwo['PERSON_ID']}.png',
                                     ),
                                   if (playerTwo.isEmpty)
-                                    SvgPicture.asset(
-                                      'images/NBA_Logos/0.svg',
+                                    Image.asset(
+                                      'images/NBA_Logos/0.png',
                                       height: 50.r,
                                     ),
                                   SizedBox(height: 5.0.r),

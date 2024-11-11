@@ -591,8 +591,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     left: -availableWidth * 0.5,
                     child: Opacity(
                       opacity: 0.97 - (kTeamColorOpacity[awayTeamAbbr]?['opacity'] ?? 0.94),
-                      child: SvgPicture.asset(
-                        'images/NBA_Logos/$awayTeamId.svg',
+                      child: Image.asset(
+                        'images/NBA_Logos/${awayTeamId}_full.png',
                         width: availableWidth / 1.1,
                         fit: BoxFit.cover,
                       ),
@@ -602,8 +602,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     right: -availableWidth * 0.5,
                     child: Opacity(
                       opacity: 0.97 - (kTeamColorOpacity[homeTeamAbbr]?['opacity'] ?? 0.94),
-                      child: SvgPicture.asset(
-                        'images/NBA_Logos/$homeTeamId.svg',
+                      child: Image.asset(
+                        'images/NBA_Logos/${homeTeamId}_full.png',
                         width: availableWidth / 1.1,
                         fit: BoxFit.cover,
                       ),

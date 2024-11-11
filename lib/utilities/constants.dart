@@ -3514,7 +3514,7 @@ const kTeamColorOpacity = {
   "SAC": {"opacity": 0.94}, // Sacramento Kings
   "SAS": {"opacity": 0.88}, // San Antonio Spurs
   "TOR": {"opacity": 0.84}, // Toronto Raptors
-  "UTA": {"opacity": 0.94}, // Utah Jazz
+  "UTA": {"opacity": 0.90}, // Utah Jazz
   "WAS": {"opacity": 0.94}, // Washington Wizards
 };
 

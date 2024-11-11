@@ -257,8 +257,8 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
                     flexibleSpace: Stack(
                       fit: StackFit.expand,
                       children: [
-                        SvgPicture.asset(
-                          'images/NBA_Logos/${_team['TEAM_ID']}.svg',
+                        Image.asset(
+                          'images/NBA_Logos/${_team['TEAM_ID']}_full.png',
                           fit: BoxFit.cover,
                         ),
                         // Gradient mask to fade out the image towards the bottom

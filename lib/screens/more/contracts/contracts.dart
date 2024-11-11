@@ -1,7 +1,6 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/screens/more/contracts/players/player_contracts.dart';
@@ -113,8 +112,8 @@ class _ContractsState extends State<Contracts> with TickerProviderStateMixin {
                       fit: StackFit.expand,
                       children: [
                         Positioned(
-                          child: SvgPicture.asset(
-                            'images/NBA_Logos/0.svg',
+                          child: Image.asset(
+                            'images/NBA_Logos/0.png',
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -146,8 +145,8 @@ class _ContractsState extends State<Contracts> with TickerProviderStateMixin {
                                     ConstrainedBox(
                                       constraints:
                                           BoxConstraints(minWidth: 110.0.r, maxWidth: 120.0.r),
-                                      child: SvgPicture.asset(
-                                        'images/NBA_Logos/0.svg',
+                                      child: Image.asset(
+                                        'images/NBA_Logos/0.png',
                                         width: isLandscape
                                             ? MediaQuery.of(context).size.width * 0.1
                                             : MediaQuery.of(context).size.width * 0.125,

@@ -28,9 +28,8 @@ from splash_nba.lib.players.player_rotowire_news import player_rotowire_news, pl
 from splash_nba.lib.players.stats.custom_player_stats_rank import current_season_custom_stats_rank
 from splash_nba.lib.players.stats.per75 import current_season_per_75
 from splash_nba.lib.players.stats.player_career_stats import update_player_career_stats
-from splash_nba.lib.players.stats.player_hustle_stats import update_player_hustle_stats, \
-    update_player_playoff_hustle_stats
-from splash_nba.lib.players.stats.player_stats import update_player_stats, update_player_playoff_stats
+from splash_nba.lib.players.stats.player_hustle_stats import update_player_hustle_stats
+from splash_nba.lib.players.stats.player_stats import update_player_stats
 from splash_nba.lib.players.stats.shooting_stat_rank import current_season_shooting_stat_ranks
 from splash_nba.lib.players.stats.shot_chart_data import get_shot_chart_data
 from splash_nba.lib.players.stats.update_custom_player_stats import update_player_on_off, update_poss_per_game, \
@@ -1319,15 +1318,11 @@ def update_players(team_ids):
         # Stats
         logging.info("Player Stats...")
 
-        # BASIC, ADV, HUSTLE
-        if k_current_season_type == 'REGULAR SEASON':
-            update_player_stats()
-            update_player_hustle_stats()
-        else:
-            update_player_playoff_stats()
-            update_player_playoff_hustle_stats()
-
         for team_id in team_ids:
+            # BASIC, ADV, HUSTLE
+            update_player_stats(k_current_season_type, team_id)
+            update_player_hustle_stats(k_current_season_type, team_id)
+
             # CUSTOM STATS (Calculated)
             update_player_on_off(k_current_season_type, team_id)  # ON/OFF
             update_poss_per_game(k_current_season_type, team_id)  # POSS PER G
@@ -1814,44 +1809,9 @@ except Exception as e:
 # games_daily_update()
 # teams_daily_update()
 # players_daily_update()
-# games_live_update()
-games_prev_day()
+games_live_update()
+# games_prev_day()
 # games_today()
-
-played_list = [
-    1610612737,  # ATL
-    # 1610612738,  # BOS
-    1610612739,  # CLE
-    1610612740,  # NOP
-    1610612741,  # CHI
-    # 1610612742,  # DAL
-    # 1610612743,  # DEN
-    1610612744,  # GSW
-    1610612745,  # HOU
-    1610612746,  # LAC
-    # 1610612747,  # LAL
-    1610612748,  # MIA
-    1610612749,  # MIL
-    # 1610612750,  # MIN
-    1610612751,  # BKN
-    # 1610612752,  # NYK
-    1610612753,  # ORL
-    1610612754,  # IND
-    1610612755,  # PHI
-    1610612756,  # PHX
-    1610612757,  # POR
-    # 1610612758,  # SAC
-    # 1610612759,  # SAS
-    # 1610612760,  # OKC
-    1610612761,  # TOR
-    1610612762,  # UTA
-    1610612763,  # MEM
-    # 1610612764,  # WAS
-    1610612765,  # DET
-    1610612766  # CHA
-]
-# update_teams(played_list)
-# update_players(played_list)
 
 while True:
     schedule.run_pending()

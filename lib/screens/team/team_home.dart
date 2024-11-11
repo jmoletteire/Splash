@@ -1,7 +1,6 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
@@ -168,8 +167,8 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                       fit: StackFit.expand,
                       children: [
                         Positioned(
-                          child: SvgPicture.asset(
-                            'images/NBA_Logos/${team['TEAM_ID']}.svg',
+                          child: Image.asset(
+                            'images/NBA_Logos/${team['TEAM_ID']}_full.png',
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -384,8 +383,8 @@ class TeamInfo extends StatelessWidget {
           children: [
             ConstrainedBox(
               constraints: BoxConstraints(minWidth: 110.0.r, maxWidth: 120.0.r),
-              child: SvgPicture.asset(
-                'images/NBA_Logos/${team['TEAM_ID']}.svg',
+              child: Image.asset(
+                'images/NBA_Logos/${team['TEAM_ID']}_full.png',
                 width: isLandscape
                     ? MediaQuery.of(context).size.width * 0.1
                     : MediaQuery.of(context).size.width * 0.15,

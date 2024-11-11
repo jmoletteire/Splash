@@ -71,10 +71,10 @@ class _MoreState extends State<More> {
           ...pages.keys.map(
             (pageName) => ListTile(
               tileColor: Colors.grey.shade900.withOpacity(0.75),
-              shape: const Border(
+              shape: Border(
                 bottom: BorderSide(
-                  color: Colors.grey, // Set the color of the border
-                  width: 0.125, // Set the width of the border
+                  color: Colors.grey.shade800, // Set the color of the border
+                  width: 0.5, // Set the width of the border
                 ),
               ),
               title: Row(

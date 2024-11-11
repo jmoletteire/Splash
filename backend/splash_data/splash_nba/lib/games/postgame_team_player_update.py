@@ -12,9 +12,8 @@ from splash_nba.lib.players.player_gamelogs import gamelogs
 from splash_nba.lib.players.stats.custom_player_stats_rank import current_season_custom_stats_rank
 from splash_nba.lib.players.stats.per75 import current_season_per_75
 from splash_nba.lib.players.stats.player_career_stats import update_player_career_stats
-from splash_nba.lib.players.stats.player_hustle_stats import update_player_hustle_stats, \
-    update_player_playoff_hustle_stats
-from splash_nba.lib.players.stats.player_stats import update_player_stats, update_player_playoff_stats
+from splash_nba.lib.players.stats.player_hustle_stats import update_player_hustle_stats
+from splash_nba.lib.players.stats.player_stats import update_player_stats
 from splash_nba.lib.players.stats.shooting_stat_rank import current_season_shooting_stat_ranks
 from splash_nba.lib.players.stats.shot_chart_data import get_shot_chart_data
 from splash_nba.lib.players.stats.similar_players import update_similar_players
@@ -436,8 +435,8 @@ teams_dict = {
 
 played_list = list(teams_dict.keys())
 
-update_teams(played_list)
-update_players(played_list)
+# update_teams(played_list)
+# update_players(played_list)
 check_games_final()
 
 while True:
