@@ -44,32 +44,86 @@ class GameHome extends StatefulWidget {
 }
 
 class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
+  late double availableWidth;
   late TabController _tabController;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
+  late Timer _timer;
+  late Image awayTeamPng;
+  late Image homeTeamPng;
+  late String awayTeamId;
+  late String homeTeamId;
+  late String awayTeamAbbr;
+  late String homeTeamAbbr;
+  late Map<String, dynamic> summary;
+  late List linescore;
+  late Map<String, dynamic> homeLinescore;
+  late Map<String, dynamic> awayLinescore;
   Map<int, double> _scrollPositions = {};
   Map<String, dynamic> game = {};
   bool _showImages = false;
   bool _isLoading = false;
   bool _isUpcoming = false;
-  late Timer _timer;
   Map<String, dynamic> odds = {};
   String moneyLine = '';
   String spread = '';
   String overUnder = '';
   String countdown = '';
 
-  int decimalToMoneyline(double decimalOdds) {
-    if (decimalOdds <= 1.0) {
-      throw ArgumentError('Decimal odds must be greater than 1.');
+  /// ******************************************************
+  ///                    Set Game Odds
+  /// ******************************************************
+
+  void calculateMoneyLineOdds(bool isLive) {
+    int decimalToMoneyline(double decimalOdds) {
+      if (decimalOdds <= 1.0) {
+        throw ArgumentError('Decimal odds must be greater than 1.');
+      }
+
+      if (decimalOdds >= 2.0) {
+        // Positive moneyline odds
+        return ((decimalOdds - 1.0) * 100).round();
+      } else {
+        // Negative moneyline odds
+        return (-100 / (decimalOdds - 1.0)).round();
+      }
     }
 
-    if (decimalOdds >= 2.0) {
-      // Positive moneyline odds
-      return ((decimalOdds - 1.0) * 100).round();
-    } else {
-      // Negative moneyline odds
-      return (-100 / (decimalOdds - 1.0)).round();
+    // MoneyLine
+    try {
+      int raw = decimalToMoneyline(
+          double.parse(odds['oddstypes'][isLive ? '19' : '1']['outcomes']['1']['odds']));
+      if (raw > 0) {
+        moneyLine = '+${raw.toString()}';
+      } else {
+        moneyLine = raw.toString();
+      }
+    } catch (e) {
+      moneyLine = '';
+    }
+  }
+
+  void calculateSpreadOdds(bool isLive) {
+    // Spread
+    try {
+      double raw = double.parse(odds['oddstypes'][isLive ? '168' : '4']['hcp']['value']);
+      if (raw > 0) {
+        spread = '+${raw.toStringAsFixed(1)}';
+      } else {
+        spread = raw.toStringAsFixed(1);
+      }
+    } catch (e) {
+      spread = '';
+    }
+  }
+
+  void calculateOverUnderOdds(bool isLive) {
+    // Over/Under
+    try {
+      double raw = double.parse(odds['oddstypes'][isLive ? '18' : '3']['hcp']['value']);
+      overUnder = raw.toStringAsFixed(1);
+    } catch (e) {
+      overUnder = '';
     }
   }
 
@@ -89,38 +143,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       return;
     }
 
-    // MoneyLine
-    try {
-      int raw = decimalToMoneyline(
-          double.parse(odds['oddstypes'][_isLive ? '19' : '1']['outcomes']['1']['odds']));
-      if (raw > 0) {
-        moneyLine = '+${raw.toString()}';
-      } else {
-        moneyLine = raw.toString();
-      }
-    } catch (e) {
-      moneyLine = '';
-    }
-
-    // Spread
-    try {
-      double raw = double.parse(odds['oddstypes'][_isLive ? '168' : '4']['hcp']['value']);
-      if (raw > 0) {
-        spread = '+${raw.toStringAsFixed(1)}';
-      } else {
-        spread = raw.toStringAsFixed(1);
-      }
-    } catch (e) {
-      spread = '';
-    }
-
-    // Over/Under
-    try {
-      double raw = double.parse(odds['oddstypes'][_isLive ? '18' : '3']['hcp']['value']);
-      overUnder = raw.toStringAsFixed(1);
-    } catch (e) {
-      overUnder = '';
-    }
+    calculateMoneyLineOdds(_isLive);
+    calculateSpreadOdds(_isLive);
+    calculateOverUnderOdds(_isLive);
 
     setState(() {
       odds = {
@@ -130,6 +155,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       };
     });
   }
+
+  /// ******************************************************
+  ///             Initialize Game Data & Timer
+  /// ******************************************************
 
   void startPolling(String gameId, String gameDate) {
     // Poll every 10 seconds
@@ -149,13 +178,21 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     setState(() {
       _isLoading = true;
     });
+
+    // Get Game Data
     await getGame(gameId, gameDate);
+
+    // Set Odds
     setOdds(game);
+
+    // Check if upcoming
     _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
+
     setState(() {
       _isLoading = false;
     });
 
+    // If upcoming and has pregame countdown, set clock
     if (_isUpcoming) {
       if (game.containsKey('BOXSCORE')) {
         if (game['BOXSCORE']['gameStatusText'] == 'pregame') {
@@ -172,29 +209,50 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   ///        --> Tab Controller length = # of Tabs
   /// ******************************************************
 
-  @override
-  void initState() {
-    super.initState();
+  void _initializeGameState() async {
+    setState(() {
+      _isLoading = true;
+    });
 
     if (widget.gameData == null) {
-      setValues(widget.gameId, widget.gameDate);
+      await getGame(widget.gameId, widget.gameDate);
     } else {
+      // Set game data
       game = widget.gameData!;
-      setOdds(game);
-      _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
-      if (_isUpcoming) {
-        if (game.containsKey('BOXSCORE')) {
-          if (game['BOXSCORE']['gameStatusText'] == 'pregame') {
-            setState(() {
-              countdown = game['BOXSCORE']['gameClock'];
-            });
-          }
+    }
+
+    // Set odds
+    setOdds(game);
+
+    // Check if upcoming
+    _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
+
+    if (_isUpcoming) {
+      if (game.containsKey('BOXSCORE')) {
+        if (game['BOXSCORE']['gameStatusText'] == 'pregame') {
+          setState(() {
+            countdown = game['BOXSCORE']['gameClock'];
+          });
         }
       }
-      _isLoading = false;
     }
-    startPolling(widget.gameId, widget.gameDate);
+    // Set all necessary variables
+    summary = game['SUMMARY']['GameSummary'][0];
+    linescore = game['SUMMARY']['LineScore'];
 
+    homeLinescore =
+        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+    awayLinescore =
+        linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    startPolling(widget.gameId, widget.gameDate);
+  }
+
+  void _initializeControllers() {
     int tabLength = 4;
 
     if (_isUpcoming) {
@@ -212,7 +270,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
         // Save the scroll position of the current tab
         _scrollPositions[_tabController.index] = _scrollController.offset;
       });
+  }
 
+  void _initializeTabListener() {
     _tabController.addListener(() {
       // If app bar expanded
       if (_scrollController.offset < (201.r - kToolbarHeight)) {
@@ -232,8 +292,26 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    _initializeGameState();
+    _initializeControllers();
+    _initializeTabListener();
+
+    awayTeamAbbr = kTeamIdToName[widget.awayId][1] ?? 'INT\'L';
+    homeTeamAbbr = kTeamIdToName[widget.homeId][1] ?? 'INT\'L';
+    awayTeamId = awayTeamAbbr == 'INT\'L' ? '0' : widget.awayId;
+    homeTeamId = homeTeamAbbr == 'INT\'L' ? '0' : widget.homeId;
+
+    awayTeamPng = Image.asset('images/NBA_Logos/$awayTeamId.png');
+    homeTeamPng = Image.asset('images/NBA_Logos/$homeTeamId.png');
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    availableWidth = MediaQuery.of(context).size.width;
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController()
       ..addListener(() {
@@ -319,50 +397,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   ///                   Build the page.
   /// ******************************************************
 
-  Widget getTitle(
-      int status, Map<String, dynamic> homeLinescore, Map<String, dynamic> awayLinescore) {
-    if (_isUpcoming) {
-      return Row(
-        children: [
-          SizedBox(width: 15.0.r),
-          if (countdown == '')
-            Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r)),
-          if (countdown != '') CountdownTimer(durationString: countdown),
-          SizedBox(width: 15.0.r),
-        ],
-      );
-    } else {
-      int homeScore = homeLinescore['PTS'];
-      int awayScore = awayLinescore['PTS'];
-      return Row(
-        children: [
-          Text(
-            awayScore.toString(),
-            style: kBebasBold.copyWith(
-                fontSize: 26.0.r,
-                color: awayScore > homeScore
-                    ? Colors.white
-                    : (status == 3 ? Colors.grey : Colors.white)),
-          ),
-          SizedBox(width: 20.0.r),
-          getStatus(status, game['SUMMARY']['GameSummary'][0]),
-          //Text('-', style: kBebasBold.copyWith(fontSize: 22.0.r)),
-          SizedBox(width: 20.0.r),
-          Text(
-            homeScore.toString(),
-            style: kBebasBold.copyWith(
-                fontSize: 26.0.r,
-                color: homeScore > awayScore
-                    ? Colors.white
-                    : (status == 3 ? Colors.grey : Colors.white)),
-          ),
-        ],
-      );
-    }
-  }
-
-  Widget getStatus(int status, Map<String, dynamic> summary) {
-    if (status == 3) {
+  Widget getStatus() {
+    if (summary['GAME_STATUS_ID'] == 3) {
       switch (summary['LIVE_PERIOD']) {
         case 4:
           return Text('FINAL',
@@ -375,7 +411,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
               style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
       }
     }
-    if (status == 2) {
+    if (summary['GAME_STATUS_ID'] == 2) {
       if (summary['LIVE_PC_TIME'] == ":0.0") {
         switch (summary['LIVE_PERIOD']) {
           case 1:
@@ -414,24 +450,114 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     }
   }
 
+  Widget getTitleDetails() {
+    if (_isUpcoming) {
+      return Row(
+        children: [
+          SizedBox(width: 15.0.r),
+          if (countdown == '')
+            Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r)),
+          if (countdown != '') CountdownTimer(durationString: countdown),
+          SizedBox(width: 15.0.r),
+        ],
+      );
+    } else {
+      int homeScore = homeLinescore['PTS'];
+      int awayScore = awayLinescore['PTS'];
+      return Row(
+        children: [
+          Text(
+            awayScore.toString(),
+            style: kBebasBold.copyWith(
+                fontSize: 26.0.r,
+                color: awayScore > homeScore
+                    ? Colors.white
+                    : (summary['GAME_STATUS_ID'] == 3 ? Colors.grey : Colors.white)),
+          ),
+          SizedBox(width: 20.0.r),
+          getStatus(),
+          SizedBox(width: 20.0.r),
+          Text(
+            homeScore.toString(),
+            style: kBebasBold.copyWith(
+                fontSize: 26.0.r,
+                color: homeScore > awayScore
+                    ? Colors.white
+                    : (summary['GAME_STATUS_ID'] == 3 ? Colors.grey : Colors.white)),
+          ),
+        ],
+      );
+    }
+  }
+
+  Widget getTitle() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (_showImages) ...[
+          if (awayTeamId == '0') SizedBox(width: availableWidth * 0.05),
+          GestureDetector(
+            onTap: () {
+              if (awayTeamId != '0') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TeamHome(
+                      teamId: widget.awayId,
+                    ),
+                  ),
+                );
+              }
+            },
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
+              child: Image.asset(
+                awayTeamId == '1610612761'
+                    ? 'images/NBA_Logos/${awayTeamId}_alt.png'
+                    : 'images/NBA_Logos/$awayTeamId.png',
+                width: awayTeamId == '0' ||
+                        MediaQuery.of(context).orientation == Orientation.landscape
+                    ? availableWidth * 0.0375
+                    : availableWidth * 0.09,
+              ),
+            ),
+          ),
+          SizedBox(width: 15.0.r),
+          getTitleDetails(),
+          SizedBox(width: 15.0.r),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TeamHome(
+                    teamId: widget.homeId,
+                  ),
+                ),
+              );
+            },
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
+              child: Image.asset(
+                widget.homeId == '1610612761'
+                    ? 'images/NBA_Logos/${widget.homeId}_alt.png'
+                    : 'images/NBA_Logos/${widget.homeId}.png',
+                width: widget.homeId == '0' ||
+                        MediaQuery.of(context).orientation == Orientation.landscape
+                    ? availableWidth * 0.0375
+                    : availableWidth * 0.09,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const SpinningIcon();
-    }
-
-    var summary = game['SUMMARY']['GameSummary'][0];
-    var linescore = game['SUMMARY']['LineScore'];
-
-    Map<String, dynamic> homeLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-    Map<String, dynamic> awayLinescore =
-        linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-
-    String awayTeamId = '0';
-
-    if (kTeamIdToName.containsKey(widget.awayId.toString())) {
-      awayTeamId = widget.awayId;
     }
 
     return Scaffold(
@@ -441,71 +567,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           return [
             SliverAppBar(
               backgroundColor: Colors.grey.shade900,
+              centerTitle: true,
               pinned: true,
               expandedHeight: MediaQuery.of(context).size.height * 0.28,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_showImages) ...[
-                    if (awayTeamId == '0')
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                    GestureDetector(
-                      onTap: () {
-                        if (awayTeamId != '0') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeamHome(
-                                teamId: widget.awayId,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
-                        child: Image.asset(
-                          awayTeamId == '1610612761'
-                              ? 'images/NBA_Logos/${awayTeamId}_alt.png'
-                              : 'images/NBA_Logos/$awayTeamId.png',
-                          width: awayTeamId == '0' ||
-                                  MediaQuery.of(context).orientation == Orientation.landscape
-                              ? MediaQuery.of(context).size.width * 0.0375
-                              : MediaQuery.of(context).size.width * 0.09,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 15.0.r),
-                    getTitle(summary['GAME_STATUS_ID'], homeLinescore, awayLinescore),
-                    SizedBox(width: 15.0.r),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TeamHome(
-                              teamId: widget.homeId,
-                            ),
-                          ),
-                        );
-                      },
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
-                        child: Image.asset(
-                          widget.homeId == '1610612761'
-                              ? 'images/NBA_Logos/${widget.homeId}_alt.png'
-                              : 'images/NBA_Logos/${widget.homeId}.png',
-                          width: widget.homeId == '0' ||
-                                  MediaQuery.of(context).orientation == Orientation.landscape
-                              ? MediaQuery.of(context).size.width * 0.0375
-                              : MediaQuery.of(context).size.width * 0.09,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              centerTitle: true,
+              title: getTitle(),
               flexibleSpace: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -516,36 +581,30 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                         colors: [
-                          kTeamIdToName[awayTeamId] == null
-                              ? Colors.grey
-                              : kTeamColors[kTeamIdToName[awayTeamId]![1]]![
-                                  'primaryColor']!, // Transparent at the top
-                          kTeamColors[kTeamIdToName[widget.homeId]?[1]]![
-                              'primaryColor']!, // Opaque at the bottom
+                          kTeamColors[awayTeamAbbr]?['primaryColor'] ?? Colors.grey,
+                          kTeamColors[homeTeamAbbr]?['primaryColor'] ?? Colors.grey,
                         ],
                       ),
                     ),
                   ),
                   Positioned(
-                    left: -MediaQuery.of(context).size.width * 0.5,
+                    left: -availableWidth * 0.5,
                     child: Opacity(
-                      opacity:
-                          0.97 - kTeamColorOpacity[kTeamIdToName[awayTeamId][1]]!['opacity']!,
+                      opacity: 0.97 - (kTeamColorOpacity[awayTeamAbbr]?['opacity'] ?? 0.94),
                       child: SvgPicture.asset(
                         'images/NBA_Logos/$awayTeamId.svg',
-                        width: MediaQuery.of(context).size.width / 1.1,
+                        width: availableWidth / 1.1,
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
                   Positioned(
-                    right: -MediaQuery.of(context).size.width * 0.5,
+                    right: -availableWidth * 0.5,
                     child: Opacity(
-                      opacity: 0.97 -
-                          kTeamColorOpacity[kTeamIdToName[widget.homeId][1]]!['opacity']!,
+                      opacity: 0.97 - (kTeamColorOpacity[homeTeamAbbr]?['opacity'] ?? 0.94),
                       child: SvgPicture.asset(
-                        'images/NBA_Logos/${widget.homeId}.svg',
-                        width: MediaQuery.of(context).size.width / 1.1,
+                        'images/NBA_Logos/$homeTeamId.svg',
+                        width: availableWidth / 1.1,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -602,8 +661,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           ];
         },
         pinnedHeaderSliverHeightBuilder: () {
+          double devicePadding = MediaQuery.of(context).padding.top;
+
           if (_tabController.index == 1) {
-            return 104.0 + MediaQuery.of(context).padding.top;
+            return 104.0 + devicePadding;
           }
           /*
             * The extra subtraction here is really just for the BoxScore so
@@ -612,7 +673,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
             * doesn't matter as much where we set the pin height.
             * */
           return 104.0 +
-              MediaQuery.of(context).padding.top -
+              devicePadding -
               ((kToolbarHeight - 15.0.r) + ((kToolbarHeight - 15.0.r) / 4.5.r) + 93.0.r);
         },
         onlyOneScrollInBody: true,
@@ -882,6 +943,8 @@ class GameInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    double availableWidth = MediaQuery.of(context).size.width;
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -897,10 +960,10 @@ class GameInfo extends StatelessWidget {
           child: Row(
             children: [
               if (awayId == '0')
-                if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.06),
+                if (isLandscape) SizedBox(width: availableWidth * 0.06),
               if (awayId == '0')
-                if (!isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1),
-              if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1),
+                if (!isLandscape) SizedBox(width: availableWidth * 0.1),
+              if (isLandscape) SizedBox(width: availableWidth * 0.1),
               GestureDetector(
                 onTap: () {
                   if (awayId != '0') {
@@ -920,9 +983,7 @@ class GameInfo extends StatelessWidget {
                     if (awayId == '0')
                       Image.asset(
                         'images/NBA_Logos/$awayId.png',
-                        width: isLandscape
-                            ? MediaQuery.of(context).size.width * 0.04
-                            : MediaQuery.of(context).size.width * 0.1,
+                        width: isLandscape ? availableWidth * 0.04 : availableWidth * 0.1,
                       ),
                     if (awayId != '0')
                       ConstrainedBox(
@@ -931,9 +992,7 @@ class GameInfo extends StatelessWidget {
                           awayId == '1610612761'
                               ? 'images/NBA_Logos/${awayId}_alt.png'
                               : 'images/NBA_Logos/$awayId.png',
-                          width: isLandscape
-                              ? MediaQuery.of(context).size.width * 0.1
-                              : MediaQuery.of(context).size.width * 0.2,
+                          width: isLandscape ? availableWidth * 0.1 : availableWidth * 0.2,
                         ),
                       ),
                     SizedBox(height: 8.0.r),
@@ -998,10 +1057,10 @@ class GameInfo extends StatelessWidget {
                             ? 'images/NBA_Logos/${homeId}_alt.png'
                             : 'images/NBA_Logos/$homeId.png',
                         width: homeId == '0'
-                            ? MediaQuery.of(context).size.width * 0.05
+                            ? availableWidth * 0.05
                             : isLandscape
-                                ? MediaQuery.of(context).size.width * 0.1
-                                : MediaQuery.of(context).size.width * 0.2,
+                                ? availableWidth * 0.1
+                                : availableWidth * 0.2,
                       ),
                     ),
                     SizedBox(height: 8.0.r),
@@ -1013,7 +1072,7 @@ class GameInfo extends StatelessWidget {
                   ],
                 ),
               ),
-              if (isLandscape) SizedBox(width: MediaQuery.of(context).size.width * 0.1)
+              if (isLandscape) SizedBox(width: availableWidth * 0.1)
             ],
           ),
         ),

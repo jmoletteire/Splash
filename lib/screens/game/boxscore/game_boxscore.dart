@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
@@ -26,10 +27,13 @@ class GameBoxScore extends StatefulWidget {
 
 class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMixin {
   late TabController _boxscoreTabController;
-  final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
+  final ValueNotifier<int> selectedTabIndex = ValueNotifier<int>(1); // Start at index 1
   late Map<String, dynamic> gameBoxscore;
   late Map<String, dynamic> gameAdv;
   late List<dynamic> gameOtherStats;
+  late List linescore;
+  late Map<String, dynamic> homeLinescore;
+  late Map<String, dynamic> awayLinescore;
   late LinkedScrollControllerGroup _awayControllers;
   late LinkedScrollControllerGroup _homeControllers;
   late ScrollController _awayStartersController;
@@ -39,120 +43,77 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
   Color awayContainerColor = const Color(0xFF111111);
   Color homeContainerColor = const Color(0xFF111111);
   Color teamContainerColor = const Color(0xFF111111);
+  List boxPlayerStats = [];
+  List<Map<String, dynamic>> advPlayerStats = [];
+  List playerStats = [];
+  List awayPlayerStats = [];
+  List homePlayerStats = [];
+  List teamStats = [];
+  List<Map<String, dynamic>> boxTeamStats = [];
+  List<Map<String, dynamic>> advTeamStats = [];
+  String topScorer = '';
+  String topRebounder = '';
+  String topAssistant = '';
+  int highestPTS = 0;
+  int highestREB = 0;
+  int highestAST = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    gameBoxscore = widget.game['BOXSCORE'] ?? {};
-    gameAdv = widget.game['ADV'] ?? {};
-    gameOtherStats = widget.game['SUMMARY']?['OtherStats'] ?? [];
+  // Function to safely cast and filter the list
+  List<Map<String, dynamic>> castToListOfMap(List<dynamic> dynamicList) {
+    return dynamicList
+        .where((element) => element is Map<String, dynamic>)
+        .map((element) => element as Map<String, dynamic>)
+        .toList();
+  }
 
-    _boxscoreTabController = TabController(length: 3, vsync: this);
-    _boxscoreTabController.addListener(() {
-      _selectedIndex.value = _boxscoreTabController.index;
-      switch (_boxscoreTabController.index) {
-        case 0:
-          setState(() {
-            awayContainerColor =
-                kTeamColors[kTeamIdToName[widget.awayId][1]]!['primaryColor']!;
-            homeContainerColor = const Color(0xFF1B1B1B);
-            teamContainerColor = const Color(0xFF1B1B1B);
-          });
-        case 2:
-          setState(() {
-            awayContainerColor = const Color(0xFF1B1B1B);
-            homeContainerColor =
-                kTeamColors[kTeamIdToName[widget.homeId][1]]!['primaryColor']!;
-            teamContainerColor = const Color(0xFF1B1B1B);
-          });
-        default:
-          setState(() {
-            awayContainerColor = const Color(0xFF1B1B1B);
-            homeContainerColor = const Color(0xFF1B1B1B);
-            teamContainerColor = const Color(0xFF1B1B1B);
-          });
+  void _initializeTeamStats() {
+    boxTeamStats = gameBoxscore.containsKey('PlayerStats')
+        ? castToListOfMap(gameBoxscore['TeamStats'])
+        : [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']];
+    advTeamStats = gameAdv.isEmpty ? [] : castToListOfMap(gameAdv['TeamStats']);
+
+    boxTeamStats[0]['teamId'] = widget.homeId;
+    boxTeamStats[1]['teamId'] = widget.awayId;
+
+    // Adv Stats NOT available, just use basic stats
+    teamStats = gameAdv.isEmpty
+        ? [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']]
+        : [];
+
+    if (gameBoxscore.containsKey('PlayerStats')) {
+      for (int i = 0; i < boxTeamStats.length; i++) {
+        int otherStatsIndex =
+            gameOtherStats.indexWhere((stat) => stat['TEAM_ID'] == boxTeamStats[i]['TEAM_ID']);
+        teamStats
+            .add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[otherStatsIndex]});
       }
-    });
-    _boxscoreTabController.index = 1;
+    } else {
+      if (advTeamStats.isNotEmpty) {
+        Map<String, dynamic> findAndCombineStats(String teamId,
+            List<Map<String, dynamic>> boxTeamStats, List<Map<String, dynamic>> advTeamStats) {
+          var boxStats = boxTeamStats.firstWhere((stat) => stat['teamId'].toString() == teamId,
+              orElse: () => {});
+          var advStats = advTeamStats
+              .firstWhere((stat) => stat['TEAM_ID'].toString() == teamId, orElse: () => {});
+          return {...boxStats, ...advStats};
+        }
 
-    _awayControllers = LinkedScrollControllerGroup();
-    _awayStartersController = _awayControllers.addAndGet();
-    _awayBenchController = _awayControllers.addAndGet();
-
-    _homeControllers = LinkedScrollControllerGroup();
-    _homeStartersController = _homeControllers.addAndGet();
-    _homeBenchController = _homeControllers.addAndGet();
-  }
-
-  @override
-  void didUpdateWidget(covariant GameBoxScore oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // Check if the game data has changed
-    if (oldWidget.game != widget.game) {
-      setState(() {
-        // Update the local state with the new game data
-        gameBoxscore = widget.game['BOXSCORE'] ?? {};
-        gameAdv = widget.game['ADV'] ?? {};
-        gameOtherStats = widget.game['SUMMARY']?['OtherStats'] ?? [];
-      });
+        teamStats.add(findAndCombineStats(widget.homeId, boxTeamStats, advTeamStats));
+        teamStats.add(findAndCombineStats(widget.awayId, boxTeamStats, advTeamStats));
+      }
     }
   }
 
-  @override
-  void dispose() {
-    _boxscoreTabController.dispose();
-
-    _homeStartersController.dispose();
-    _awayStartersController.dispose();
-    _homeBenchController.dispose();
-    _awayBenchController.dispose();
-
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    List reorderStarters(List starters) {
-      // Create a new list with the desired order of elements
-      List reorderedSublist = [
-        starters[4], // index 4
-        starters[3], // index 3
-        starters[0], // index 0
-        starters[1], // index 1
-        starters[2], // index 2
-      ];
-
-      // Return the reordered sublist
-      return reorderedSublist;
-    }
-
-    // Function to safely cast and filter the list
-    List<Map<String, dynamic>> castToListOfMap(List<dynamic> dynamicList) {
-      return dynamicList
-          .where((element) => element is Map<String, dynamic>)
-          .map((element) => element as Map<String, dynamic>)
-          .toList();
-    }
-
-    // PLAYER STATS
-    List boxPlayerStats = gameBoxscore.containsKey('PlayerStats')
+  void _initializePlayerStats() {
+    boxPlayerStats = gameBoxscore.containsKey('PlayerStats')
         ? castToListOfMap(gameBoxscore['PlayerStats'])
         : gameBoxscore['homeTeam']['players'] + gameBoxscore['awayTeam']['players'];
-    List<Map<String, dynamic>> advPlayerStats =
+    advPlayerStats =
         gameAdv['PlayerStats'] != null ? castToListOfMap(gameAdv['PlayerStats']) : [];
 
-    List<dynamic> playerStats = [];
-    List<dynamic> homePlayerStats = gameBoxscore['homeTeam']?['players'] ?? [];
-    List<dynamic> awayPlayerStats = gameBoxscore['awayTeam']?['players'] ?? [];
-
-    String topScorer = '';
-    String topRebounder = '';
-    String topAssistant = '';
-
-    int highestPTS = 0;
-    int highestREB = 0;
-    int highestAST = 0;
+    playerStats = [];
+    homePlayerStats = gameBoxscore['homeTeam']?['players'] ?? [];
+    awayPlayerStats = gameBoxscore['awayTeam']?['players'] ?? [];
 
     // OLDER DATA (PRE-2021) USES DIFFERENT FORMAT
     if (gameBoxscore.containsKey('PlayerStats')) {
@@ -247,52 +208,128 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         topAssistant = player['nameI'];
       }
     }
+  }
 
-    // TEAM STATS
-    List<Map<String, dynamic>> boxTeamStats = gameBoxscore.containsKey('PlayerStats')
-        ? castToListOfMap(gameBoxscore['TeamStats'])
-        : [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']];
-    List<Map<String, dynamic>> advTeamStats =
-        gameAdv.isEmpty ? [] : castToListOfMap(gameAdv['TeamStats']);
+  void _initializeTabController() {
+    _boxscoreTabController = TabController(length: 3, vsync: this);
+    _boxscoreTabController.index = 1;
 
-    boxTeamStats[0]['teamId'] = widget.homeId;
-    boxTeamStats[1]['teamId'] = widget.awayId;
+    // Update the ValueNotifier instead of calling setState
+    _boxscoreTabController.addListener(() {
+      selectedTabIndex.value = _boxscoreTabController.index;
+    });
 
-    // Adv Stats NOT available, just use basic stats
-    List<dynamic> teamStats = gameAdv.isEmpty
-        ? [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']]
-        : [];
+    awayContainerColor = kTeamColors[kTeamIdToName[widget.awayId][1]]?['primaryColor'] ??
+        const Color(0xFF00438C);
+    homeContainerColor = kTeamColors[kTeamIdToName[widget.homeId][1]]?['primaryColor'] ??
+        const Color(0xFF00438C);
+    teamContainerColor = const Color(0xFF1B1B1B);
+  }
 
-    if (gameBoxscore.containsKey('PlayerStats')) {
-      for (int i = 0; i < boxTeamStats.length; i++) {
-        int otherStatsIndex =
-            gameOtherStats.indexWhere((stat) => stat['TEAM_ID'] == boxTeamStats[i]['TEAM_ID']);
-        teamStats
-            .add({...boxTeamStats[i], ...advTeamStats[i], ...gameOtherStats[otherStatsIndex]});
-      }
+  @override
+  void initState() {
+    super.initState();
+
+    // Box Score
+    gameBoxscore = widget.game['BOXSCORE'] ?? {};
+    gameAdv = widget.game['ADV'] ?? {};
+    gameOtherStats = widget.game['SUMMARY']?['OtherStats'] ?? [];
+
+    // Line Score
+    linescore = widget.game['SUMMARY']['LineScore'] ?? [];
+
+    if (linescore.isEmpty) {
+      homeLinescore = {};
+      awayLinescore = {};
     } else {
-      if (advTeamStats.isNotEmpty) {
-        Map<String, dynamic> findAndCombineStats(String teamId,
-            List<Map<String, dynamic>> boxTeamStats, List<Map<String, dynamic>> advTeamStats) {
-          var boxStats = boxTeamStats.firstWhere((stat) => stat['teamId'].toString() == teamId,
-              orElse: () => {});
-          var advStats = advTeamStats
-              .firstWhere((stat) => stat['TEAM_ID'].toString() == teamId, orElse: () => {});
-          return {...boxStats, ...advStats};
-        }
-
-        teamStats.add(findAndCombineStats(widget.homeId, boxTeamStats, advTeamStats));
-        teamStats.add(findAndCombineStats(widget.awayId, boxTeamStats, advTeamStats));
-      }
+      homeLinescore =
+          linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+      awayLinescore =
+          linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
     }
 
-    // LINE SCORE
-    var linescore = widget.game['SUMMARY']['LineScore'];
+    // Tab Controller + Listeners
+    _initializeTabController();
 
-    Map<String, dynamic> homeLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-    Map<String, dynamic> awayLinescore =
-        linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+    // Player Stats
+    _initializePlayerStats();
+
+    // Team Stats
+    _initializeTeamStats();
+
+    // Linked Controllers for linked scrolling between Starters and Bench
+    _awayControllers = LinkedScrollControllerGroup();
+    _awayStartersController = _awayControllers.addAndGet();
+    _awayBenchController = _awayControllers.addAndGet();
+
+    _homeControllers = LinkedScrollControllerGroup();
+    _homeStartersController = _homeControllers.addAndGet();
+    _homeBenchController = _homeControllers.addAndGet();
+  }
+
+  @override
+  void didUpdateWidget(covariant GameBoxScore oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Check if the game data has changed
+    if (oldWidget.game != widget.game) {
+      setState(() {
+        // Update the local state with the new game data
+        // Box Score
+        gameBoxscore = widget.game['BOXSCORE'] ?? {};
+        gameAdv = widget.game['ADV'] ?? {};
+        gameOtherStats = widget.game['SUMMARY']?['OtherStats'] ?? [];
+
+        // Line Score
+        linescore = widget.game['SUMMARY']['LineScore'] ?? [];
+
+        if (linescore.isEmpty) {
+          homeLinescore = {};
+          awayLinescore = {};
+        } else {
+          homeLinescore = linescore[0]['TEAM_ID'].toString() == widget.homeId
+              ? linescore[0]
+              : linescore[1];
+          awayLinescore = linescore[1]['TEAM_ID'].toString() == widget.homeId
+              ? linescore[0]
+              : linescore[1];
+        }
+      });
+
+      // Only update if `widget.game` has changed
+      if (!mapEquals(oldWidget.game, widget.game)) {
+        // Re-calculate player and team stats
+        _initializePlayerStats();
+        _initializeTeamStats();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _boxscoreTabController.dispose();
+    _homeStartersController.dispose();
+    _awayStartersController.dispose();
+    _homeBenchController.dispose();
+    _awayBenchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List reorderStarters(List starters) {
+      // Create a new list with the desired order of elements
+      List reorderedSublist = [
+        starters[4], // index 4
+        starters[3], // index 3
+        starters[0], // index 0
+        starters[1], // index 1
+        starters[2], // index 2
+      ];
+
+      // Return the reordered sublist
+      return reorderedSublist;
+    }
 
     return Column(
       children: [
@@ -397,118 +434,142 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           labelColor: Colors.white,
           labelStyle: kBebasNormal.copyWith(fontSize: 16.5.r),
           tabs: <Widget>[
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 46.0.r,
-                    margin: EdgeInsets.only(bottom: 1.0.r),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [const Color(0xFF1B1B1B), awayContainerColor],
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft,
+            ValueListenableBuilder<int>(
+                valueListenable: selectedTabIndex,
+                builder: (context, index, _) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 46.0.r,
+                          margin: EdgeInsets.only(bottom: 1.0.r),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                const Color(0xFF1B1B1B),
+                                index == 0 ? awayContainerColor : const Color(0xFF1B1B1B)
+                              ],
+                              begin: Alignment.centerRight,
+                              end: Alignment.centerLeft,
+                            ),
+                          ),
+                          child: Tab(
+                            text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Tab(
-                      text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 1.0.r),
-                    color: const Color(0xFF1B1B1B),
-                    child: const Tab(
-                      text: "TEAM",
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 46.0.r,
-                    margin: EdgeInsets.only(bottom: 1.0.r),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [const Color(0xFF1B1B1B), homeContainerColor],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
+                    ],
+                  );
+                }),
+            ValueListenableBuilder<int>(
+                valueListenable: selectedTabIndex,
+                builder: (context, index, _) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 1.0.r),
+                          color: const Color(0xFF1B1B1B),
+                          child: const Tab(
+                            text: "TEAM",
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Tab(
-                      text: homeLinescore['TEAM_NAME'] ?? homeLinescore['TEAM_NICKNAME'],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                    ],
+                  );
+                }),
+            ValueListenableBuilder<int>(
+                valueListenable: selectedTabIndex,
+                builder: (context, index, _) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 46.0.r,
+                          margin: EdgeInsets.only(bottom: 1.0.r),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                const Color(0xFF1B1B1B),
+                                index == 2 ? homeContainerColor : const Color(0xFF1B1B1B)
+                              ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                          ),
+                          child: Tab(
+                            text: homeLinescore['TEAM_NAME'] ?? homeLinescore['TEAM_NICKNAME'],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
           ],
         ),
         Expanded(
           child: TabBarView(
             controller: _boxscoreTabController,
             children: [
-              CustomScrollView(
-                slivers: [
-                  BoxPlayerStats(
-                    players: reorderStarters(awayPlayerStats.sublist(0, 5)),
-                    playerGroup: 'STARTERS',
-                    team: teamStats[1],
-                    inProgress:
-                        widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
-                    controller: _awayStartersController,
-                  ),
-                  BoxPlayerStats(
-                    players: awayPlayerStats.sublist(5),
-                    playerGroup: 'BENCH',
-                    team: teamStats[1],
-                    inProgress:
-                        widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
-                    controller: _awayBenchController,
-                  ),
-                ],
-              ),
-              CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: EdgeInsets.only(top: 10.0.r),
-                    sliver: BoxTeamStats(
-                      teams: teamStats,
-                      homeId: widget.homeId,
-                      awayId: widget.awayId,
+              RepaintBoundary(
+                child: CustomScrollView(
+                  slivers: [
+                    BoxPlayerStats(
+                      players: reorderStarters(awayPlayerStats.sublist(0, 5)),
+                      playerGroup: 'STARTERS',
+                      team: teamStats[1],
                       inProgress:
                           widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
+                      controller: _awayStartersController,
                     ),
-                  )
-                ],
+                    BoxPlayerStats(
+                      players: awayPlayerStats.sublist(5),
+                      playerGroup: 'BENCH',
+                      team: teamStats[1],
+                      inProgress:
+                          widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
+                      controller: _awayBenchController,
+                    ),
+                  ],
+                ),
               ),
-              CustomScrollView(
-                slivers: [
-                  BoxPlayerStats(
-                    players: reorderStarters(homePlayerStats.sublist(0, 5)),
-                    playerGroup: 'STARTERS',
-                    team: teamStats[0],
-                    inProgress:
-                        widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
-                    controller: _homeStartersController,
-                  ),
-                  BoxPlayerStats(
-                    players: homePlayerStats.sublist(5),
-                    playerGroup: 'BENCH',
-                    team: teamStats[0],
-                    inProgress:
-                        widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
-                    controller: _homeBenchController,
-                  ),
-                ],
+              RepaintBoundary(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: EdgeInsets.only(top: 10.0.r),
+                      sliver: BoxTeamStats(
+                        teams: teamStats,
+                        homeId: widget.homeId,
+                        awayId: widget.awayId,
+                        inProgress:
+                            widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              RepaintBoundary(
+                child: CustomScrollView(
+                  slivers: [
+                    BoxPlayerStats(
+                      players: reorderStarters(homePlayerStats.sublist(0, 5)),
+                      playerGroup: 'STARTERS',
+                      team: teamStats[0],
+                      inProgress:
+                          widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
+                      controller: _homeStartersController,
+                    ),
+                    BoxPlayerStats(
+                      players: homePlayerStats.sublist(5),
+                      playerGroup: 'BENCH',
+                      team: teamStats[0],
+                      inProgress:
+                          widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
+                      controller: _homeBenchController,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -548,7 +609,6 @@ class _CustomPainter extends BoxPainter {
       paint.color = Colors.deepOrange;
     } else if (controller.index == 2) {
       paint.color = kTeamColors[homeTeam]?['secondaryColor'] ?? Colors.white;
-      ;
     } else {
       paint.color = Colors.transparent;
     }

@@ -68,15 +68,17 @@ class LineScore extends StatelessWidget {
                                     fontSize: 14.0.r, color: Colors.grey.shade400)),
                           ))),
               Expanded(
-                  child: Container(
-                      color: const Color(0xFF2A2A2A),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0.r),
-                        child: Text('F',
-                            textAlign: TextAlign.end,
-                            style: kBebasBold.copyWith(
-                                fontSize: 14.0.r, color: Colors.grey.shade400)),
-                      ))),
+                child: Container(
+                  color: const Color(0xFF2A2A2A),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0.r),
+                    child: Text('F',
+                        textAlign: TextAlign.end,
+                        style: kBebasBold.copyWith(
+                            fontSize: 14.0.r, color: Colors.grey.shade400)),
+                  ),
+                ),
+              ),
             ],
           ),
           Padding(

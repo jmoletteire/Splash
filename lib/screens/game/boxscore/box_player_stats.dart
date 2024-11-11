@@ -1,4 +1,5 @@
-import 'package:auto_size_text/auto_size_text.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/material_table_view.dart';
@@ -31,12 +32,21 @@ class BoxPlayerStats extends StatefulWidget {
 
 class _BoxPlayerStatsState extends State<BoxPlayerStats> {
   List columnNames = [];
+  Timer? _debounceTimer;
   late double availableWidth;
   late double availableHeight;
+  late bool isLandscape;
 
   @override
   void initState() {
     super.initState();
+
+    widget.controller.addListener(() {
+      if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+      _debounceTimer = Timer(const Duration(seconds: 5), () {
+        setState(() {});
+      });
+    });
 
     // Check if xPTS data is available for any player
     bool hasXPTS = widget.players.any(
@@ -70,10 +80,15 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     availableWidth = MediaQuery.of(context).size.width;
     availableHeight = MediaQuery.of(context).size.height;
-    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SliverTableView.builder(
       horizontalScrollController: widget.controller,
       style: const TableViewStyle(
@@ -102,7 +117,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 
         /// POSS
         TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
+          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.09,
         ),
 
         /// MIN
@@ -183,37 +198,37 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 
         /// EFG%
         TableColumn(
-          width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.12,
+          width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
         ),
 
         /// TS%
         if (!widget.inProgress)
           TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.12,
+            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
           ),
 
         /// USG%
         if (!widget.inProgress)
           TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.12,
-          ),
-
-        /// ORTG
-        if (!widget.inProgress)
-          TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.12,
-          ),
-
-        /// DRTG
-        if (!widget.inProgress)
-          TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.12,
+            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
           ),
 
         /// NRTG
         if (!widget.inProgress)
           TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.12,
+            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
+          ),
+
+        /// ORTG
+        if (!widget.inProgress)
+          TableColumn(
+            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
+          ),
+
+        /// DRTG
+        if (!widget.inProgress)
+          TableColumn(
+            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
           ),
       ],
       rowBuilder: _rowBuilder,
@@ -233,7 +248,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
               child: Align(
                 alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
                 child: Text(
-                  columnNames[column],
+                  columnNames[column] ?? '',
                   style: kBebasNormal.copyWith(
                     fontSize: 14.0.r,
                   ),
@@ -274,9 +289,9 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
               context,
               MaterialPageRoute(
                 builder: (context) => PlayerHome(
-                  playerId: (widget.players[row]['personId'] ??
-                          widget.players[row]['PLAYER_ID'] ??
-                          0)
+                  playerId: (widget.players[row]?['personId'] ??
+                          widget.players[row]?['PLAYER_ID'] ??
+                          '0')
                       .toString(),
                 ),
               ),
@@ -285,9 +300,11 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           splashColor: Colors.white,
           highlightColor: Colors.white,
           child: contentBuilder(context, (context, column) {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0.r),
-              child: getContent(row, column, context),
+            return RepaintBoundary(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0.r),
+                child: getContent(row, column, context),
+              ),
             );
           }),
         ),
@@ -301,7 +318,8 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       final match = regex.firstMatch(input);
 
       if (match != null) {
-        final minutes = int.parse(match.group(1)!); // Convert to int to remove leading zeros
+        final minutes =
+            int.parse(match.group(1) ?? '0'); // Convert to int to remove leading zeros
         final seconds = match.group(2);
 
         return '$minutes:$seconds';
@@ -319,10 +337,10 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
     int played = int.parse(widget.players[row]?['played'] ?? '1');
     int onCourt = widget.inProgress ? int.parse(widget.players[row]?['oncourt'] ?? '0') : 0;
     String position =
-        widget.players[row]?['position'] ?? widget.players[row]['START_POSITION'] ?? '';
+        widget.players[row]?['position'] ?? widget.players[row]?['START_POSITION'] ?? '';
     String minutes = widget.players[row]?['statistics']?['minutes'] != null
-        ? formatLiveDuration(widget.players[row]['statistics']['minutes'])
-        : '${widget.players[row]['MIN']?.replaceAll(RegExp(r'\..*?(?=:)'), '')}';
+        ? formatLiveDuration(widget.players[row]?['statistics']?['minutes'] ?? 'PT00M00.00S')
+        : '${(widget.players[row]?['MIN'] ?? '').replaceAll(RegExp(r'\..*?(?=:)'), '')}';
 
     switch (adj_column) {
       case 0:
@@ -335,7 +353,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                   SizedBox(
                     width: 12.0.r,
                     child: Text(
-                      widget.players[row]['jerseyNum'] ?? '',
+                      widget.players[row]?['jerseyNum'] ?? '',
                       textAlign: TextAlign.center,
                       style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
                     ),
@@ -345,7 +363,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                   radius: 12.0.r,
                   backgroundColor: Colors.white12,
                   playerImageUrl:
-                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['personId'] ?? widget.players[row]['PLAYER_ID'] ?? '0'}.png',
+                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]?['personId'] ?? widget.players[row]?['PLAYER_ID'] ?? '0'}.png',
                 ),
                 SizedBox(width: 5.0.r),
                 Flexible(
@@ -355,9 +373,10 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: widget.players[row]['nameI'] ??
-                              '${widget.players[row]['PLAYER_NAME'][0]}. ${widget.players[row]['PLAYER_NAME'].substring(widget.players[row]['PLAYER_NAME'].indexOf(' ') + 1)}' ??
-                              '',
+                          text: widget.players[row]?['nameI'] ??
+                              (widget.players[row]?['PLAYER_NAME'] != null
+                                  ? '${widget.players[row]['PLAYER_NAME'][0]}. ${(widget.players[row]['PLAYER_NAME']).substring((widget.players[row]['PLAYER_NAME']).indexOf(' ') + 1)}'
+                                  : ''),
                           style: kBebasNormal.copyWith(
                             color: Colors.white70,
                             fontSize: 14.0.r,
@@ -377,14 +396,12 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                 ),
                 if (onCourt == 1) SizedBox(width: 8.0.r),
                 if (onCourt == 1)
-                  RepaintBoundary(
-                    child: Container(
-                      width: 6.0.r, // Size of the dot
-                      height: 6.0.r,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF55F86F), // Green color for the dot
-                        shape: BoxShape.circle, // Circular shape
-                      ),
+                  Container(
+                    width: 6.0.r, // Size of the dot
+                    height: 6.0.r,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF55F86F), // Green color for the dot
+                      shape: BoxShape.circle, // Circular shape
                     ),
                   ),
               ],
@@ -399,14 +416,15 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                           0) ==
                       0) &&
               !widget.inProgress) {
-            return const BoxscoreDataText(text: 'DNP');
+            return BoxscoreDataText(text: 'DNP', size: 14.0.r);
           }
           return RepaintBoundary(
             child: Container(
               alignment: Alignment.centerRight,
-              child: AutoSizeText(
+              child: Text(
                 '${widget.players[row]?['statistics']?['POSS'] ?? widget.players[row]?['POSS'] ?? '-'}',
                 maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: kBebasNormal.copyWith(fontSize: 14.0.r),
               ),
             ),
@@ -438,7 +456,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['SQ_TOTAL'] + (widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]['FTM']) ?? 0.0).toStringAsFixed(1)}');
+                  '${((widget.players[row]?['statistics']?['SQ_TOTAL'] ?? 0.0) + (widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]['FTM'] ?? 0.0)).toStringAsFixed(1)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -449,7 +467,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['points'] ?? widget.players[row]['PTS']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['points'] ?? widget.players[row]?['PTS'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -460,7 +478,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['reboundsTotal'] ?? widget.players[row]['REB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsTotal'] ?? widget.players[row]?['REB'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -471,7 +489,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['assists'] ?? widget.players[row]['AST']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['assists'] ?? widget.players[row]?['AST'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -482,7 +500,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['turnovers'] ?? widget.players[row]['TO']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['turnovers'] ?? widget.players[row]?['TO'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -493,7 +511,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['fieldGoalsMade'] ?? widget.players[row]['FGM']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['fieldGoalsAttempted'] ?? widget.players[row]['FGA']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['fieldGoalsMade'] ?? widget.players[row]?['FGM'] ?? '').toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['fieldGoalsAttempted'] ?? widget.players[row]?['FGA'] ?? '').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -504,7 +522,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['threePointersMade'] ?? widget.players[row]['FG3M']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['threePointersAttempted'] ?? widget.players[row]['FG3A']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['threePointersMade'] ?? widget.players[row]?['FG3M'] ?? '').toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['threePointersAttempted'] ?? widget.players[row]?['FG3A'] ?? '').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -515,7 +533,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]['FTM']).toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['freeThrowsAttempted'] ?? widget.players[row]['FTA']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]?['FTM'] ?? '').toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['freeThrowsAttempted'] ?? widget.players[row]?['FTA'] ?? '').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -526,7 +544,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['steals'] ?? widget.players[row]['STL']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['steals'] ?? widget.players[row]?['STL'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -537,7 +555,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['blocks'] ?? widget.players[row]['BLK']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['blocks'] ?? widget.players[row]?['BLK'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -548,7 +566,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['reboundsOffensive'] ?? widget.players[row]['OREB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsOffensive'] ?? widget.players[row]?['OREB'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -559,7 +577,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['reboundsDefensive'] ?? widget.players[row]['DREB']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['reboundsDefensive'] ?? widget.players[row]?['DREB'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -570,7 +588,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['foulsPersonal'] ?? widget.players[row]['PF']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['foulsPersonal'] ?? widget.players[row]?['PF'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -581,7 +599,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${(widget.players[row]?['statistics']?['plusMinusPoints'] ?? widget.players[row]['PLUS_MINUS']).toStringAsFixed(0)}');
+                  '${(widget.players[row]?['statistics']?['plusMinusPoints'] ?? widget.players[row]?['PLUS_MINUS'] ?? '-').toStringAsFixed(0)}');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -598,14 +616,15 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
             try {
               return BoxscoreDataText(
                   text:
-                      '${((widget.players[row]?['statistics']?['EFG_PCT'] ?? widget.players[row]['EFG_PCT']) * 100).toStringAsFixed(1)}%');
+                      '${((widget.players[row]?['statistics']?['EFG_PCT'] ?? widget.players[row]?['EFG_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
             } catch (e) {
               return const BoxscoreDataText(text: '-');
             }
           }
 
-          double efgPct = ((widget.players[row]?['statistics']?['fieldGoalsMade'] +
-                      (0.5 * widget.players[row]?['statistics']?['threePointersMade'])) /
+          double efgPct = (((widget.players[row]?['statistics']?['fieldGoalsMade'] ?? 0) +
+                      (0.5 *
+                          (widget.players[row]?['statistics']?['threePointersMade'] ?? 0))) /
                   fieldGoalsAttempted) *
               100;
 
@@ -620,7 +639,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${((widget.players[row]?['statistics']?['TS_PCT'] ?? widget.players[row]['TS_PCT']) * 100).toStringAsFixed(1)}%');
+                  '${((widget.players[row]?['statistics']?['TS_PCT'] ?? widget.players[row]?['TS_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -635,7 +654,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           }
           return BoxscoreDataText(
               text:
-                  '${((widget.players[row]?['statistics']?['USG_PCT'] ?? widget.players[row]['USG_PCT']) * 100).toStringAsFixed(1)}%');
+                  '${((widget.players[row]?['statistics']?['USG_PCT'] ?? widget.players[row]?['USG_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
@@ -652,20 +671,23 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           int possOn = (widget.players[row]?['statistics']?['POSS'] ??
               widget.players[row]?['POSS'] ??
               0);
-          int possOff = (widget.team['POSS'] - possOn);
+          int possOff = ((widget.team['POSS'] ?? 0) - possOn);
 
           double oRtgOn = (widget.players[row]?['statistics']?['OFF_RATING'] ??
-              widget.players[row]['OFF_RATING']);
+              widget.players[row]?['OFF_RATING'] ??
+              0.0);
           int ptsOn = (possOn * oRtgOn / 100).round();
-          double ptsOff = ((widget.team['points'] ?? widget.team['PTS']) - ptsOn).toDouble();
+          double ptsOff =
+              ((widget.team['points'] ?? widget.team['PTS'] ?? 0) - ptsOn).toDouble();
           double oRtgOff = 100 * ptsOff / possOff;
           double offOnOff = oRtgOn - oRtgOff;
 
           double dRtgOn = (widget.players[row]?['statistics']?['DEF_RATING'] ??
-              widget.players[row]['DEF_RATING']);
+              widget.players[row]?['DEF_RATING'] ??
+              0.0);
           int ptsAgainstOn = (possOn * dRtgOn / 100).round();
           double ptsAgainstOff = ((widget.team['pointsAgainst'] ??
-                      (widget.team['PTS'] - widget.team['PLUS_MINUS'])) -
+                      ((widget.team['PTS'] ?? 0) - (widget.team['PLUS_MINUS'] ?? 0))) -
                   ptsAgainstOn)
               .toDouble();
           double dRtgOff = 100 * ptsAgainstOff / possOff;
@@ -698,12 +720,14 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           int possOn = (widget.players[row]?['statistics']?['POSS'] ??
               widget.players[row]?['POSS'] ??
               0);
-          int possOff = (widget.team['POSS'] - possOn);
+          int possOff = ((widget.team['POSS'] ?? 0) - possOn);
 
           double oRtgOn = (widget.players[row]?['statistics']?['OFF_RATING'] ??
-              widget.players[row]['OFF_RATING']);
+              widget.players[row]?['OFF_RATING'] ??
+              0.0);
           int ptsOn = (possOn * oRtgOn / 100).round();
-          double ptsOff = ((widget.team['points'] ?? widget.team['PTS']) - ptsOn).toDouble();
+          double ptsOff =
+              ((widget.team['points'] ?? widget.team['PTS'] ?? 0) - ptsOn).toDouble();
           double oRtgOff = 100 * ptsOff / possOff;
           double onOff = oRtgOn - oRtgOff;
 
@@ -731,13 +755,14 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
           int possOn = (widget.players[row]?['statistics']?['POSS'] ??
               widget.players[row]?['POSS'] ??
               0);
-          int possOff = (widget.team['POSS'] - possOn);
+          int possOff = ((widget.team['POSS'] ?? 0) - possOn);
 
           double dRtgOn = (widget.players[row]?['statistics']?['DEF_RATING'] ??
-              widget.players[row]['DEF_RATING']);
+              widget.players[row]?['DEF_RATING'] ??
+              0.0);
           int ptsAgainstOn = (possOn * dRtgOn / 100).round();
           double ptsAgainstOff = ((widget.team['pointsAgainst'] ??
-                      (widget.team['PTS'] - widget.team['PLUS_MINUS'])) -
+                      ((widget.team['PTS'] ?? 0) - (widget.team['PLUS_MINUS'] ?? 0))) -
                   ptsAgainstOn)
               .toDouble();
           double dRtgOff = 100 * ptsAgainstOff / possOff;
@@ -761,10 +786,12 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 }
 
 class BoxscoreDataText extends StatelessWidget {
-  const BoxscoreDataText({super.key, required this.text, this.color, this.alignment});
+  const BoxscoreDataText(
+      {super.key, required this.text, this.color, this.alignment, this.size});
 
   final Alignment? alignment;
   final Color? color;
+  final double? size;
   final String text;
 
   @override
@@ -776,7 +803,7 @@ class BoxscoreDataText extends StatelessWidget {
           text,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: kBebasNormal.copyWith(fontSize: 15.0.r, color: color),
+          style: kBebasNormal.copyWith(fontSize: size ?? 15.0.r, color: color),
         ),
       ),
     );

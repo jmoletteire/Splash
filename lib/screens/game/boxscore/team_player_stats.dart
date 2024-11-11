@@ -335,67 +335,69 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
         } catch (e) {
           status = '';
         }
-        return Container(
-          alignment: Alignment.centerLeft,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 12.0.r,
-                child: Text(
-                  widget.players[row]?['JERSEY'] ?? '',
-                  textAlign: TextAlign.center,
-                  style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
-                ),
-              ),
-              SizedBox(width: 8.0.r),
-              PlayerAvatar(
-                radius: 12.0,
-                backgroundColor: Colors.white12,
-                playerImageUrl:
-                    'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PERSON_ID']}.png',
-              ),
-              SizedBox(width: 5.0.r),
-              Flexible(
-                child: RichText(
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '${widget.players[row]?['DISPLAY_FI_LAST'] ?? ''}',
-                        style: kBebasNormal.copyWith(
-                          color: Colors.white70,
-                          fontSize: 14.0,
-                        ),
-                      ),
-                      TextSpan(
-                        text: ', ${kPositionMap[widget.players[row]?['POSITION']] ?? ''}',
-                        style: kBebasNormal.copyWith(
-                          color: Colors.white,
-                          fontSize: 13.0,
-                        ),
-                      ),
-                    ],
+        return RepaintBoundary(
+          child: Container(
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 12.0.r,
+                  child: Text(
+                    widget.players[row]?['JERSEY'] ?? '',
+                    textAlign: TextAlign.center,
+                    style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
                   ),
                 ),
-              ),
-              SizedBox(width: 5.0.r),
-              Container(
-                margin: EdgeInsets.only(left: 8.0.r),
-                child: AutoSizeText(
-                  status,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: kBebasNormal.copyWith(
-                      fontSize: 13.0.r,
-                      color: status == ''
-                          ? Colors.grey.shade900
-                          : status == 'OUT' || status == 'OFS'
-                              ? Colors.red
-                              : Colors.orangeAccent),
+                SizedBox(width: 8.0.r),
+                PlayerAvatar(
+                  radius: 12.0,
+                  backgroundColor: Colors.white12,
+                  playerImageUrl:
+                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]['PERSON_ID']}.png',
                 ),
-              )
-            ],
+                SizedBox(width: 5.0.r),
+                Flexible(
+                  child: RichText(
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: '${widget.players[row]?['DISPLAY_FI_LAST'] ?? ''}',
+                          style: kBebasNormal.copyWith(
+                            color: Colors.white70,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ', ${kPositionMap[widget.players[row]?['POSITION']] ?? ''}',
+                          style: kBebasNormal.copyWith(
+                            color: Colors.white,
+                            fontSize: 13.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 5.0.r),
+                Container(
+                  margin: EdgeInsets.only(left: 8.0.r),
+                  child: AutoSizeText(
+                    status,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: kBebasNormal.copyWith(
+                        fontSize: 13.0.r,
+                        color: status == ''
+                            ? Colors.grey.shade900
+                            : status == 'OUT' || status == 'OFS'
+                                ? Colors.red
+                                : Colors.orangeAccent),
+                  ),
+                )
+              ],
+            ),
           ),
         );
       case 1:

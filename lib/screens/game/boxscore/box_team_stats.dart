@@ -864,17 +864,19 @@ class StatValue extends StatelessWidget {
       const Color(0xFFE31837): const Color(0xFF002B5C),
     };
 
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.0.r),
-      decoration: BoxDecoration(
-        color: isHighlighted ? color : Colors.transparent,
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Text(
-        isPercentage ? '$value%' : '$value',
-        style: isHighlighted && lightColors.containsKey(color)
-            ? kBebasNormal.copyWith(fontSize: 16.0.r, color: lightColors[color])
-            : kBebasNormal.copyWith(fontSize: 16.0.r),
+    return RepaintBoundary(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.0.r),
+        decoration: BoxDecoration(
+          color: isHighlighted ? color : Colors.transparent,
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Text(
+          isPercentage ? '$value%' : '$value',
+          style: isHighlighted && lightColors.containsKey(color)
+              ? kBebasNormal.copyWith(fontSize: 16.0.r, color: lightColors[color])
+              : kBebasNormal.copyWith(fontSize: 16.0.r),
+        ),
       ),
     );
   }

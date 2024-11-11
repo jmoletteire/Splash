@@ -659,19 +659,21 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                           /// POSITION
                           NonComparisonRow(
                             statName: 'POSITION',
-                            playerOne: playerOne['POSITION'],
-                            playerTwo: playerTwo['POSITION'],
+                            playerOne: playerOne['POSITION'] ?? '-',
+                            playerTwo: playerTwo['POSITION'] ?? '-',
                           ),
 
                           /// AGE
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
                             statName: 'AGE',
-                            playerOne: playerOne['STATS'][selectedSeasonOne]
-                                    [selectedSeasonTypeOne]['BASIC']['AGE']
+                            playerOne: (playerOne['STATS']?[selectedSeasonOne]
+                                        ?[selectedSeasonTypeOne]?['BASIC']?['AGE'] ??
+                                    '-')
                                 .toStringAsFixed(0),
-                            playerTwo: playerTwo['STATS'][selectedSeasonTwo]
-                                    [selectedSeasonTypeTwo]['BASIC']['AGE']
+                            playerTwo: (playerTwo['STATS']?[selectedSeasonTwo]
+                                        ?[selectedSeasonTypeTwo]?['BASIC']?['AGE'] ??
+                                    '-')
                                 .toStringAsFixed(0),
                           ),
 
@@ -687,8 +689,8 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                           const SizedBox(height: 5.0),
                           NonComparisonRow(
                             statName: 'WEIGHT',
-                            playerOne: playerOne['WEIGHT'],
-                            playerTwo: playerTwo['WEIGHT'],
+                            playerOne: playerOne['WEIGHT'] ?? '-',
+                            playerTwo: playerTwo['WEIGHT'] ?? '-',
                           ),
 
                           /// EXP
@@ -696,16 +698,16 @@ class _PlayerComparisonState extends State<PlayerComparison> {
                           NonComparisonRow(
                             statName: 'EXP',
                             playerOne: int.parse(selectedSeasonOne.substring(0, 4)) ==
-                                    playerOne['FROM_YEAR']
+                                    (playerOne['FROM_YEAR'] ?? 0)
                                 ? 'R'
                                 : (int.parse(selectedSeasonOne.substring(0, 4)) -
-                                        playerOne['FROM_YEAR'])
+                                        (playerOne['FROM_YEAR'] ?? 0))
                                     .toString(),
                             playerTwo: int.parse(selectedSeasonTwo.substring(0, 4)) ==
-                                    playerTwo['FROM_YEAR']
+                                    (playerTwo['FROM_YEAR'] ?? 0)
                                 ? 'R'
                                 : (int.parse(selectedSeasonTwo.substring(0, 4)) -
-                                        playerTwo['FROM_YEAR'])
+                                        (playerTwo['FROM_YEAR'] ?? 0))
                                     .toString(),
                           ),
 

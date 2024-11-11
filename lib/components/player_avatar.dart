@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-
+/*
 class PlayerAvatar extends StatefulWidget {
   final double radius;
   final Color backgroundColor;
@@ -53,5 +52,48 @@ class _PlayerAvatarState extends State<PlayerAvatar> {
           ),
       ],
     );
+  }
+}
+*/
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+
+class PlayerAvatar extends StatelessWidget {
+  final double radius;
+  final Color backgroundColor;
+  final String playerImageUrl;
+
+  const PlayerAvatar({
+    Key? key,
+    required this.radius,
+    required this.backgroundColor,
+    required this.playerImageUrl,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    try {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: backgroundColor,
+        child: ClipOval(
+          child: CachedNetworkImage(
+            imageUrl: playerImageUrl,
+            errorWidget: (context, url, error) =>
+                Image.asset('images/default_player_image.png'),
+            fit: BoxFit.cover,
+            width: radius * 2,
+            height: radius * 2,
+          ),
+        ),
+      );
+    } catch (e) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: backgroundColor,
+        child: Image.asset('images/default_player_image.png'),
+      );
+    }
   }
 }

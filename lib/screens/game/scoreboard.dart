@@ -131,7 +131,10 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    final provider = ScrollControllerProvider.of(context);
+    if (provider != null) {
+      _notifier = provider.notifier;
+    }
     _scrollController = ScrollController();
     _notifier.addController('scoreboard', _scrollController);
   }
@@ -364,7 +367,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
         );
       } else if (gamesData[gameKey] is Map) {
         Map<String, dynamic> game = gamesData[gameKey];
-        if (!game["SEASON_ID"].toString().startsWith("3") &&
+        if (gameKey.substring(2, 3) != "3" &&
             (game['SUMMARY']?['LineScore'] ?? {}).isNotEmpty) {
           gameCards.add(
             GameCard(
