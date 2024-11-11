@@ -688,7 +688,8 @@ class _PlaysState extends State<Plays> {
                           ),
                         if (widget.actions[i]['personId'] != 0 &&
                                 widget.actions[i]['isFieldGoal'] == 1 ||
-                            widget.actions[i]['description'].contains('Free Throw'))
+                            (widget.actions[i]['description'] is String &&
+                                widget.actions[i]['description'].contains('Free Throw')))
                           Expanded(
                               flex: 2,
                               child: RichText(
@@ -697,7 +698,8 @@ class _PlaysState extends State<Plays> {
                                   children: [
                                     TextSpan(
                                       text: '${widget.actions[i]['scoreAway']}',
-                                      style: widget.actions[i]['description'].contains('PTS')
+                                      style: (widget.actions[i]['description'] is String &&
+                                              widget.actions[i]['description'].contains('PTS'))
                                           ? kBebasBold.copyWith(
                                               fontSize: 16.0.r,
                                               color:
@@ -710,7 +712,8 @@ class _PlaysState extends State<Plays> {
                                     ),
                                     TextSpan(
                                       text: '  -  ',
-                                      style: widget.actions[i]['description'].contains('PTS')
+                                      style: (widget.actions[i]['description'] is String &&
+                                              widget.actions[i]['description'].contains('PTS'))
                                           ? kBebasBold.copyWith(
                                               fontSize: 16.0.r, color: Colors.grey.shade400)
                                           : kBebasNormal.copyWith(
@@ -718,7 +721,8 @@ class _PlaysState extends State<Plays> {
                                     ),
                                     TextSpan(
                                       text: '${widget.actions[i]['scoreHome']}',
-                                      style: widget.actions[i]['description'].contains('PTS')
+                                      style: (widget.actions[i]['description'] is String &&
+                                              widget.actions[i]['description'].contains('PTS'))
                                           ? kBebasBold.copyWith(
                                               fontSize: 16.0.r,
                                               color:
@@ -734,22 +738,30 @@ class _PlaysState extends State<Plays> {
                               )),
                         if (widget.actions[i]['personId'] == 0 ||
                             widget.actions[i]['isFieldGoal'] != 1 &&
-                                !widget.actions[i]['description'].contains('Free Throw'))
+                                !(widget.actions[i]['description'] is String &&
+                                    widget.actions[i]['description'].contains('Free Throw')))
                           const Spacer(flex: 2),
                         Expanded(
                           flex: 5,
                           child: GestureDetector(
                             onTap: () {
                               if (widget.actions[i]['videoId'] != null &&
-                                  !widget.actions[i]['description'].contains('SUB') &&
-                                  !widget.actions[i]['description'].contains('Timeout') &&
-                                  !widget.actions[i]['description'].contains('Period Start')) {
+                                  !(widget.actions[i]['description'] is String &&
+                                      widget.actions[i]['description'].contains('SUB')) &&
+                                  !(widget.actions[i]['description'] is String &&
+                                      widget.actions[i]['description'].contains('Timeout')) &&
+                                  !(widget.actions[i]['description'] is String &&
+                                      widget.actions[i]['description']
+                                          .contains('Period Start'))) {
                                 int index = widget.allActions
                                     .where((e) =>
                                         e['videoId'] != null &&
-                                        !e['description'].contains('SUB') &&
-                                        !e['description'].contains('Timeout') &&
-                                        !e['description'].contains('Period Start'))
+                                        !(e['description'] is String &&
+                                            e['description'].contains('SUB')) &&
+                                        !(e['description'] is String &&
+                                            e['description'].contains('Timeout')) &&
+                                        !(e['description'] is String &&
+                                            e['description'].contains('Period Start')))
                                     .toList()
                                     .indexWhere(
                                         (e) => e['videoId'] == widget.actions[i]['videoId']);
@@ -773,9 +785,13 @@ class _PlaysState extends State<Plays> {
                                           pbpVideo: widget.allActions
                                               .where((e) =>
                                                   e['videoId'] != null &&
-                                                  !e['description'].contains('SUB') &&
-                                                  !e['description'].contains('Timeout') &&
-                                                  !e['description'].contains('Period Start'))
+                                                  !(e['description'] is String &&
+                                                      e['description'].contains('SUB')) &&
+                                                  !(e['description'] is String &&
+                                                      e['description'].contains('Timeout')) &&
+                                                  !(e['description'] is String &&
+                                                      e['description']
+                                                          .contains('Period Start')))
                                               .toList(),
                                           gameId: widget.gameId,
                                           gameDate: widget.gameDate,
@@ -791,29 +807,36 @@ class _PlaysState extends State<Plays> {
                               mainAxisAlignment: MainAxisAlignment
                                   .spaceBetween, // Ensures text stays left aligned and arrow on the right
                               children: [
-                                if (widget.actions[i]['description'].contains('Timeout'))
+                                if ((widget.actions[i]['description'] is String &&
+                                    widget.actions[i]['description'].contains('Timeout')))
                                   Icon(
                                     Icons.timer,
                                     size: 16.0.r,
                                   ),
-                                if (widget.actions[i]['description'].contains('Timeout'))
+                                if ((widget.actions[i]['description'] is String &&
+                                    widget.actions[i]['description'].contains('Timeout')))
                                   SizedBox(width: 5.0.r),
                                 Expanded(
                                   child: Text(
-                                    widget.actions[i]['description'].contains('TEAM')
-                                        ? '${widget.actions[i]['description']} (${kTeamIdToName[widget.actions[i]['teamId'].toString()]?[1] ?? 'INT\'L'})'
-                                        : widget.actions[i]['description'],
+                                    (widget.actions[i]['description'] is String &&
+                                            widget.actions[i]['description'].contains('TEAM'))
+                                        ? '${widget.actions[i]['description'].toString()} (${kTeamIdToName[widget.actions[i]['teamId'].toString()]?[1] ?? 'INT\'L'})'
+                                        : widget.actions[i]['description'].toString(),
                                     textAlign: TextAlign.left,
-                                    style: widget.actions[i]['description'].contains('PTS')
+                                    style: (widget.actions[i]['description'] is String &&
+                                            widget.actions[i]['description'].contains('PTS'))
                                         ? kBebasBold.copyWith(
                                             fontSize: 14.0.r, color: Colors.white)
-                                        : widget.actions[i]['description'].contains('SUB')
+                                        : (widget.actions[i]['description'] is String &&
+                                                widget.actions[i]['description']
+                                                    .contains('SUB'))
                                             ? kBebasBold.copyWith(
                                                 fontSize: 14.0.r,
                                                 color: Colors.grey.shade300,
                                                 fontStyle: FontStyle.italic)
-                                            : widget.actions[i]['description']
-                                                    .contains('Timeout')
+                                            : (widget.actions[i]['description'] is String &&
+                                                    widget.actions[i]['description']
+                                                        .contains('Timeout'))
                                                 ? kBebasNormal.copyWith(
                                                     fontSize: 15.0.r,
                                                     color: Colors.grey.shade300,
@@ -824,15 +847,17 @@ class _PlaysState extends State<Plays> {
                                     overflow: TextOverflow.visible, // Ensures text wraps
                                   ),
                                 ),
-                                if (widget.actions[i]['description']
-                                    .contains('SUB in')) // Check for 'SUB'
+                                if ((widget.actions[i]['description'] is String &&
+                                    widget.actions[i]['description']
+                                        .contains('SUB in'))) // Check for 'SUB'
                                   Icon(
                                     Icons.arrow_upward, // Up arrow icon
                                     color: Colors.green, // Green color for the arrow
                                     size: 16.0.r, // Adjust the size if needed
                                   ),
-                                if (widget.actions[i]['description']
-                                    .contains('SUB out')) // Check for 'SUB'
+                                if ((widget.actions[i]['description'] is String &&
+                                    widget.actions[i]['description']
+                                        .contains('SUB out'))) // Check for 'SUB'
                                   Icon(
                                     Icons.arrow_downward, // Up arrow icon
                                     color: Colors.red, // Green color for the arrow

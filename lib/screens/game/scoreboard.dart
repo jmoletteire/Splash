@@ -2,18 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
-import 'package:splash/screens/game/game_card.dart';
-import 'package:splash/screens/search_screen.dart';
+import 'package:splash/screens/game/scoreboard_app_bar.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/nba_api/library/network.dart';
 
-import '../../components/custom_icon_button.dart';
 import '../../utilities/game_dates.dart';
 import '../../utilities/scroll/scroll_controller_notifier.dart';
 import '../../utilities/scroll/scroll_controller_provider.dart';
+import '../search_screen.dart';
+import 'game_card.dart';
 
 class Scoreboard extends StatefulWidget {
   static const String id = 'scoreboard';
@@ -263,12 +262,129 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     }
   }
 
+  void _showDatePicker(BuildContext context) {
+    showModalBottomSheet(
+      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+      backgroundColor: Colors.grey.shade900,
+      context: context,
+      builder: (BuildContext context) {
+        void onDateChanged(DateTime date) async {
+          // Only update if the day or month has changed
+          if (date.day != selectedDate.day || date.month != selectedDate.month) {
+            selectedDate = date;
+            setDates(date);
+            _tabController.index = 7;
+
+            if (selectedDate != maxDate) {
+              _showFab = true;
+            } else {
+              _showFab = false;
+            }
+
+            Navigator.pop(context);
+            await fetchGames(date);
+            startPolling(selectedDate);
+          }
+        }
+
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: Colors.deepOrange,
+              onPrimary: Colors.white,
+              secondary: Colors.white,
+            ),
+          ),
+          child: Consumer<DatesProvider>(
+            builder: (ctx, datesProvider, child) {
+              String sanitizeDateTime(DateTime dateTime) {
+                String day = dateTime.day.toString().padLeft(2, '0');
+                String month = dateTime.month.toString().padLeft(2, '0');
+                String year = dateTime.year.toString();
+
+                return "$year-$month-$day";
+              }
+
+              bool selectableDayPredicate(DateTime val) {
+                String sanitized = sanitizeDateTime(val);
+                return datesProvider.dates.contains(sanitized);
+              }
+
+              DateTime findNearestValidDate(DateTime date) {
+                DateTime beforeDate = date;
+                DateTime afterDate = date;
+
+                while (!selectableDayPredicate(beforeDate) &&
+                    !selectableDayPredicate(afterDate)) {
+                  beforeDate = beforeDate.subtract(const Duration(days: 1));
+                  afterDate = afterDate.add(const Duration(days: 1));
+                }
+
+                if (selectableDayPredicate(beforeDate)) {
+                  return beforeDate;
+                } else {
+                  return afterDate;
+                }
+              }
+
+              return CalendarDatePicker(
+                initialDate: findNearestValidDate(selectedDate),
+                firstDate: DateTime(2017, 9, 30),
+                lastDate: DateTime(2025, 4, 13),
+                onDateChanged: onDateChanged,
+                selectableDayPredicate: selectableDayPredicate,
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  List<Widget> _buildGameCards(var gamesData) {
+    List<Widget> gameCards = [];
+    for (String gameKey in gamesData.keys) {
+      if (gameKey == 'error') {
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.sports_basketball,
+                color: Colors.white38,
+                size: 40.0.r,
+              ),
+              SizedBox(height: 15.0.r),
+              Text(
+                'No Games Today',
+                style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+              ),
+            ],
+          ),
+        );
+      } else if (gamesData[gameKey] is Map) {
+        Map<String, dynamic> game = gamesData[gameKey];
+        if (!game["SEASON_ID"].toString().startsWith("3") &&
+            (game['SUMMARY']?['LineScore'] ?? {}).isNotEmpty) {
+          gameCards.add(
+            GameCard(
+              game: game,
+              homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
+              awayTeam: game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'] ?? 0,
+            ),
+          );
+        }
+      }
+    }
+    return gameCards;
+  }
+
   @override
   Widget build(BuildContext context) {
     return _pageInitLoad
         ? const SpinningIcon()
         : Scaffold(
-            appBar: PreferredSize(
+            appBar: /*PreferredSize(
               preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
               child: AppBar(
                 backgroundColor: Colors.grey.shade900,
@@ -411,8 +527,27 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                   }).toList(),
                 ),
               ),
+            ),*/
+                ScoreboardAppBar(
+              tabController: _tabController,
+              dates: _dates,
+              onTabTap: (index) {
+                setState(() {
+                  selectedDate = _dates[index];
+                  _showFab = selectedDate != maxDate;
+                });
+              },
+              onSearchPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SearchScreen()),
+                );
+              },
+              onCalendarPressed: () {
+                _showDatePicker(context); // Call a method in your State class
+              },
             ),
-            body: _isLoading
+            body: /*_isLoading
                 ? const Center(
                     child: SpinningIcon(
                       color: Colors.deepOrange,
@@ -514,7 +649,27 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                         );
                       }
                     }).toList(),
-                  ),
+                  ),*/
+                _isLoading
+                    ? const Center(child: SpinningIcon(color: Colors.deepOrange))
+                    : TabBarView(
+                        controller: _tabController,
+                        children: _dates.map((date) {
+                          String formattedDate = date.toIso8601String().split('T').first;
+                          var gamesData = cachedGames[formattedDate];
+
+                          if (gamesData is Map && !gamesData.containsKey('error')) {
+                            List<Widget> gameCards = _buildGameCards(gamesData);
+                            return GameList(
+                              scrollController: _scrollController,
+                              gameCards: gameCards,
+                              onRefresh: () async => await fetchGames(selectedDate),
+                            );
+                          } else {
+                            return const NoGamesToday();
+                          }
+                        }).toList(),
+                      ),
             floatingActionButton: _showFab
                 ? FloatingActionButton(
                     onPressed: () {
@@ -529,5 +684,52 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                   )
                 : null,
           );
+  }
+}
+
+class GameList extends StatelessWidget {
+  final ScrollController scrollController;
+  final List<Widget> gameCards;
+  final Future<void> Function() onRefresh;
+
+  const GameList({
+    super.key,
+    required this.scrollController,
+    required this.gameCards,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      color: Colors.deepOrange,
+      onRefresh: onRefresh,
+      child: ListView.builder(
+        controller: scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: gameCards.length,
+        itemBuilder: (context, index) {
+          return gameCards[index];
+        },
+      ),
+    );
+  }
+}
+
+class NoGamesToday extends StatelessWidget {
+  const NoGamesToday({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.sports_basketball, color: Colors.white38, size: 40.0.r),
+          SizedBox(height: 15.0.r),
+          Text('No Games Today',
+              style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54)),
+        ],
+      ),
+    );
   }
 }

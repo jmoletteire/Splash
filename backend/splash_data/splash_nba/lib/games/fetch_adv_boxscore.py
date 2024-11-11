@@ -64,8 +64,47 @@ def update_players_and_teams(season, season_type):
         )
 
 
+def get_sr_ids(adv_boxscore, valid_ids):
+    for i, player_adv_stats in enumerate(adv_boxscore['PlayerStats']):
+        team = player_adv_stats['TEAM_ABBREVIATION']
+
+        # Query the database
+        results = players_collection.aggregate([
+            {
+                "$search": {
+                    "index": "person_id",
+                    "equals": {
+                        "value": player_adv_stats['PLAYER_ID'],
+                        "path": "PERSON_ID"
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "DISPLAY_FIRST_LAST": 1,
+                    "SR_ID": 1,
+                    "_id": 0,
+                }
+            }
+        ])
+
+        result = list(results)
+
+        if result:
+            # Filter the array to only include items present in valid_ids
+            final_sr_id = [sr_id for sr_id in result[0]['SR_ID'][team] if sr_id in valid_ids]
+            if len(final_sr_id) > 0:
+                adv_boxscore['PlayerStats'][i]['SR_ID'] = final_sr_id[0]
+            else:
+                adv_boxscore['PlayerStats'][i]['SR_ID'] = '0'
+        else:
+            continue
+
+    return adv_boxscore
+
+
 def synergy_shot_quality(sr_id, adv_boxscore):
-    # URL for the data you want to access
+    # URL for Synergy data
     url = f'https://basketball.synergysportstech.com/api/games/{sr_id}/playerboxscores/extended?take=1024'
 
     # Headers from your browser request
@@ -73,47 +112,49 @@ def synergy_shot_quality(sr_id, adv_boxscore):
         'accept': 'application/json, text/plain, */*',
         'accept-encoding': 'gzip, deflate, br, zstd',
         'accept-language': 'en-US,en;q=0.9',
-        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxMTA3MDU5LCJpYXQiOjE3MzExMDcwNTksImV4cCI6MTczMTEwNzY1OSwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.XJLVZLSoXW2wZiEKTn5fj5JOe8xEO8RWxdYKvrhRU_koVK6knQ5ZVJXmrxpUhH-V4lT76Bf7OAfoBR6ECNV-qJ1n5z9zLQtQzHJQonQPu-2B64e1CdBGyzp_C1ekaD2PyCBtQ1T308W0mXbMh8n_APlVPiD3YiRKydBqlUoJA0iIpG_BuZucLoOOZAvomJOYJygYQDeoQtp3YxAjWNOYVDJhR-PL0WVUg4mV3roctz2xzY5OyCdb2oJICH7gFkkLSvu7MN6Lm9KV9AEPEKqdvRTnAmNm18b8pggUYs5nvsg2fhC76tbg9wgIr42y6jyjlx1W02laxtS0QLACCV88-g',
+        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxMzM1MDU2LCJpYXQiOjE3MzEzMzUwNTYsImV4cCI6MTczMTMzNTY1NiwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.W7l3VMh0q49nHndnn9Q4yGrFLgAohZ7eGWzB3r8AN-RtJpC9d4wVSJ7rqBBk-rUp2PPVC8gzdYr6kwXHDeuwucIjL5bwkgZ91NKGQRo8dfVHJGarpXwgoe8Tbab-dA43KjZNlQql_cAzR9NIVzBe4ItaX4wAQpHfXQlRTkL48UjYsGG3x7XMkLGZOGngNq_fZKLStDxLeGjMDq4gvmgBU67Z1aww8OkM5LBy1oekIg3j2PPuzLKJFNA19LCAlNgqMXupl6Q8Ux4K6SI088BV1Q9NA_27UoOVqDtAGpLneOzn3YA8F2_f3pMoI_2NqFjebZYxBadlr7rkRjfAseo1IQ',
         'origin': 'https://apps.synergysports.com',
         'referer': 'https://apps.synergysports.com/',
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
         'sec-fetch-site': 'cross-site'
     }
 
-    def normalize_name(name):
-        # Remove diacritics, convert to lowercase, and remove non-alphabetic characters (e.g., periods)
-        name = unidecode(name).lower()
-        name = re.sub(r'[^a-z]', '', name)  # Keep only alphabetic characters
-        return name
-
     # Make the GET request
     response = requests.get(url, headers=headers)
     adv_boxscore['TeamStats'][0]['SQ_TOTAL'] = 0
     adv_boxscore['TeamStats'][1]['SQ_TOTAL'] = 0
 
+    # If GET request successful
     if response.status_code == 200:
         sr_data = response.json()
+        ids = []
+
+        for player in sr_data['result']:
+            if 'id' in player:
+                ids.append(player['player']['id'])
+
+        # Append SR_IDs to each player in box score
+        adv_boxscore = get_sr_ids(adv_boxscore, ids)
+
         for player in sr_data['result']:
             if 'player' not in player or 'team' not in player:
                 continue
 
             for i, player_adv_stats in enumerate(adv_boxscore['PlayerStats']):
-                # Normalize both names by removing accents and converting to lowercase
-                normalized_player_name = normalize_name(player_adv_stats['PLAYER_NAME'])
-                normalized_comparator_name = normalize_name(player['player']['name'])
+                if player_adv_stats['SR_ID']:
+                    if player_adv_stats['SR_ID'] == player['player']['id']:
+                        team_index = 0 if adv_boxscore['TeamStats'][0]['TEAM_ABBREVIATION'] == player['team']['abbr'] else 1
 
-                if normalized_player_name == normalized_comparator_name and player_adv_stats['TEAM_ABBREVIATION'] == \
-                        player['team']['abbr']:
-                    team_index = 0 if adv_boxscore['TeamStats'][0]['TEAM_ABBREVIATION'] == player['team']['abbr'] else 1
-
-                    if 'shotQualityTotal' not in player:
-                        pts = player.get('points', 0)
-                        ftm = player.get('freeThrowsMade', 0)
-                        adv_boxscore['PlayerStats'][i]['SQ_TOTAL'] = (pts - ftm)
-                        adv_boxscore['TeamStats'][team_index]['SQ_TOTAL'] += (pts - ftm)
-                    else:
-                        adv_boxscore['PlayerStats'][i]['SQ_TOTAL'] = player['shotQualityTotal']
-                        adv_boxscore['TeamStats'][team_index]['SQ_TOTAL'] += player['shotQualityTotal']
+                        if 'shotQualityTotal' not in player:
+                            pts = player.get('points', 0)
+                            ftm = player.get('freeThrowsMade', 0)
+                            adv_boxscore['PlayerStats'][i]['SQ_TOTAL'] = (pts - ftm)
+                            adv_boxscore['TeamStats'][team_index]['SQ_TOTAL'] += (pts - ftm)
+                        else:
+                            adv_boxscore['PlayerStats'][i]['SQ_TOTAL'] = player['shotQualityTotal']
+                            adv_boxscore['TeamStats'][team_index]['SQ_TOTAL'] += player['shotQualityTotal']
+                else:
+                    continue
 
         return adv_boxscore
     else:
@@ -135,16 +176,16 @@ if __name__ == "__main__":
     try:
         client = MongoClient(uri)
         db = client.splash
-        players_collection = db.nba_player
+        players_collection = db.nba_players
         teams_collection = db.nba_teams
         games_collection = db.nba_games
         logging.info("Connected to MongoDB")
 
         # Set batch size to process documents
-        filter = {"SEASON_YEAR": '2022'}  # {"GAME_DATE": '2024-11-07'} #
+        filter = {"GAME_DATE": '2024-11-10'}  # {"SEASON_YEAR": '2024'}  #
         batch_size = 100
         total_documents = games_collection.count_documents(filter)
-        processed_count = 122
+        processed_count = 0
 
         while processed_count < total_documents:
             with games_collection.find(filter).skip(processed_count).limit(batch_size).batch_size(batch_size) as cursor:
@@ -156,7 +197,7 @@ if __name__ == "__main__":
 
                 for document in documents:
                     processed_count += 1
-                    logging.info(f'Processing {processed_count} of {total_documents}...')
+                    logging.info(f'Processing {processed_count} of {total_documents} ({document["GAME_DATE"]})...')
 
                     year = document['SEASON_YEAR']
                     next_year = str(int(year) + 1)

@@ -1769,7 +1769,16 @@ def players_daily_update():
 # Schedule the tasks
 schedule.every(10).seconds.do(games_live_update)  # Update games
 schedule.every(10).seconds.do(fetch_odds)  # Update odds
-schedule.every(30).minutes.do(player_rotowires)  # Update odds
+
+
+# Run player_rotowires in a separate thread to avoid blocking
+def run_player_rotowires_in_thread():
+    thread = threading.Thread(target=player_rotowires)
+    thread.start()
+
+
+schedule.every(30).minutes.do(run_player_rotowires_in_thread)  # Update Rotowire news
+
 schedule.every().day.at("00:00").do(reset_flags)  # Reset the flag at midnight
 schedule.every().day.at("02:00").do(games_daily_update)  # Run every day at 2:00 AM
 schedule.every().day.at("03:00").do(teams_daily_update)  # Run every day at 3:00 AM
@@ -1805,8 +1814,8 @@ except Exception as e:
 # games_daily_update()
 # teams_daily_update()
 # players_daily_update()
-games_live_update()
-# games_prev_day()
+# games_live_update()
+games_prev_day()
 # games_today()
 
 played_list = [

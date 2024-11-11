@@ -113,8 +113,6 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    int season = int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON']);
-
     List reorderStarters(List starters) {
       // Create a new list with the desired order of elements
       List reorderedSublist = [
@@ -138,7 +136,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     }
 
     // PLAYER STATS
-    List boxPlayerStats = season < 2021
+    List boxPlayerStats = gameBoxscore.containsKey('PlayerStats')
         ? castToListOfMap(gameBoxscore['PlayerStats'])
         : gameBoxscore['homeTeam']['players'] + gameBoxscore['awayTeam']['players'];
     List<Map<String, dynamic>> advPlayerStats =
@@ -156,8 +154,8 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     int highestREB = 0;
     int highestAST = 0;
 
-    // PRE-2021 DATA USES DIFFERENT FORMAT
-    if (season < 2021) {
+    // OLDER DATA (PRE-2021) USES DIFFERENT FORMAT
+    if (gameBoxscore.containsKey('PlayerStats')) {
       for (int i = 0; i < boxPlayerStats.length; i++) {
         playerStats.add({...boxPlayerStats[i], ...advPlayerStats[i]});
       }
@@ -251,7 +249,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
     }
 
     // TEAM STATS
-    List<Map<String, dynamic>> boxTeamStats = season < 2021
+    List<Map<String, dynamic>> boxTeamStats = gameBoxscore.containsKey('PlayerStats')
         ? castToListOfMap(gameBoxscore['TeamStats'])
         : [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']];
     List<Map<String, dynamic>> advTeamStats =
@@ -265,7 +263,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         ? [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']]
         : [];
 
-    if (season < 2021) {
+    if (gameBoxscore.containsKey('PlayerStats')) {
       for (int i = 0; i < boxTeamStats.length; i++) {
         int otherStatsIndex =
             gameOtherStats.indexWhere((stat) => stat['TEAM_ID'] == boxTeamStats[i]['TEAM_ID']);
@@ -397,7 +395,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                   : 'FA'),
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
-          labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+          labelStyle: kBebasNormal.copyWith(fontSize: 16.5.r),
           tabs: <Widget>[
             Row(
               children: [

@@ -48,6 +48,22 @@ const kBebasNormal = TextStyle(
   textBaseline: TextBaseline.alphabetic,
 );
 
+const kAntonNormal = TextStyle(
+  color: Colors.white,
+  fontFamily: 'Anton',
+  fontSize: 20.0,
+  letterSpacing: 0.0,
+  textBaseline: TextBaseline.alphabetic,
+);
+
+const kRobotoNormal = TextStyle(
+  color: Colors.white,
+  fontFamily: 'Roboto',
+  fontSize: 20.0,
+  letterSpacing: -0.8,
+  textBaseline: TextBaseline.alphabetic,
+);
+
 /// ******************************************************
 ///                       LISTS
 /// ******************************************************

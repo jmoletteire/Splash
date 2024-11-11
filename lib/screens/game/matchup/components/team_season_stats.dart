@@ -475,7 +475,7 @@ class ComparisonRow extends StatelessWidget {
                 child: Text(
                   statName,
                   textAlign: TextAlign.center,
-                  style: kBebasNormal.copyWith(fontSize: 16.0.r),
+                  style: kBebasNormal.copyWith(fontSize: 14.0.r),
                 ),
               ),
               SizedBox(width: 15.0.r),
@@ -551,8 +551,8 @@ class StatValue extends StatelessWidget {
       child: Text(
         isPercentage ? '$value%' : '$value',
         style: isHighlighted && lightColors.containsKey(color)
-            ? kBebasNormal.copyWith(fontSize: 18.0.r, color: lightColors[color])
-            : kBebasNormal.copyWith(fontSize: 18.0.r),
+            ? kBebasNormal.copyWith(fontSize: 16.0.r, color: lightColors[color])
+            : kBebasNormal.copyWith(fontSize: 16.0.r),
       ),
     );
   }

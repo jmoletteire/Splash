@@ -4,7 +4,7 @@ from splash_nba.util.env import uri, k_current_season
 import logging
 
 
-def update_player_playoff_hustle_stats():
+def update_player_hustle_stats(season_type, team_id):
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -13,48 +13,27 @@ def update_player_playoff_hustle_stats():
     db = client.splash
     players_collection = db.nba_players
     logging.info("Connected to MongoDB")
+    player_hustle_stats = []
 
     logging.info(f'Processing HUSTLE stats for {k_current_season}...')
-    player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=k_current_season,
-                                                                          season_type_all_star='Playoffs').get_normalized_dict()[
-        'HustleStatsPlayer']
+    if season_type == 'REGULAR SEASON':
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(team_id_nullable=team_id, season=k_current_season).get_normalized_dict()[
+            'HustleStatsPlayer']
+    elif season_type == 'PLAYOFFS':
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(team_id_nullable=team_id, season=k_current_season, season_type_all_star='Playoffs').get_normalized_dict()[
+            'HustleStatsPlayer']
 
-    logging.info(f'Adding data for {len(player_hustle_stats)} players.')
-    for player in player_hustle_stats:
-        try:
-            players_collection.update_one(
-                {'PERSON_ID': player['PLAYER_ID']},
-                {'$set': {f'STATS.{k_current_season}.PLAYOFFS.HUSTLE': player}}
-            )
-        except Exception as e:
-            logging.error(f'Unable to add stats for {player}: {e}')
-            continue
-
-
-def update_player_hustle_stats():
-    # Configure logging
-    logging.basicConfig(level=logging.INFO)
-
-    # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    players_collection = db.nba_players
-    logging.info("Connected to MongoDB")
-
-    logging.info(f'Processing HUSTLE stats for {k_current_season}...')
-    player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=k_current_season).get_normalized_dict()[
-        'HustleStatsPlayer']
-
-    logging.info(f'Adding data for {len(player_hustle_stats)} players.')
-    for player in player_hustle_stats:
-        try:
-            players_collection.update_one(
-                {'PERSON_ID': player['PLAYER_ID']},
-                {'$set': {f'STATS.{k_current_season}.REGULAR SEASON.HUSTLE': player}}
-            )
-        except Exception as e:
-            logging.error(f'Unable to add stats for {player}: {e}')
-            continue
+    if len(player_hustle_stats) > 0:
+        logging.info(f'Adding data for {len(player_hustle_stats)} players.')
+        for player in player_hustle_stats:
+            try:
+                players_collection.update_one(
+                    {'PERSON_ID': player['PLAYER_ID']},
+                    {'$set': {f'STATS.{k_current_season}.{season_type}.HUSTLE': player}}
+                )
+            except Exception as e:
+                logging.error(f'Unable to add stats for player {player}: {e}')
+                continue
 
 
 def fetch_player_playoff_hustle_stats(seasons):

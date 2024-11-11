@@ -142,9 +142,11 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                               homeTeam.containsKey('SQ_TOTAL'))
                             ComparisonRow(
                               statName: 'xPTS',
-                              awayTeam: roundToDecimalPlaces(awayTeam['SQ_TOTAL'] ?? 0.0, 1) +
+                              awayTeam: roundToDecimalPlaces(
+                                      awayTeam['SQ_TOTAL'].toDouble() ?? 0.0, 1) +
                                   (awayTeam['freeThrowsMade'] ?? 0.0),
-                              homeTeam: roundToDecimalPlaces(homeTeam['SQ_TOTAL'] ?? 0.0, 1) +
+                              homeTeam: roundToDecimalPlaces(
+                                      homeTeam['SQ_TOTAL'].toDouble() ?? 0.0, 1) +
                                   (homeTeam['freeThrowsMade'] ?? 0.0),
                               awayTeamColor: awayTeamColor,
                               homeTeamColor: homeTeamColor,
@@ -214,10 +216,10 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                               homeTeam.containsKey('SQ_TOTAL'))
                             ComparisonRow(
                               statName: 'Shot Quality',
-                              awayTeam:
-                                  roundToDecimalPlaces((awayTeam['SQ_TOTAL'] ?? 0.0) / 100, 2),
-                              homeTeam:
-                                  roundToDecimalPlaces((homeTeam['SQ_TOTAL'] ?? 0.0) / 100, 2),
+                              awayTeam: roundToDecimalPlaces(
+                                  (awayTeam['SQ_TOTAL'].toDouble() ?? 0.0) / 100, 2),
+                              homeTeam: roundToDecimalPlaces(
+                                  (homeTeam['SQ_TOTAL'].toDouble() ?? 0.0) / 100, 2),
                               awayTeamColor: awayTeamColor,
                               homeTeamColor: homeTeamColor,
                             ),

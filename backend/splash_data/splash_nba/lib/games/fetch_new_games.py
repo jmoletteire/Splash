@@ -171,7 +171,7 @@ def synergy_game_ids():
         'Charlotte': 1610612766
     }
 
-    access_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxMDk3MjIxLCJpYXQiOjE3MzEwOTcyMjEsImV4cCI6MTczMTA5NzgyMSwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.FpYKAK1hgBLjE7rHPyiicnHe3dNIM5IRJfsSRSxUNzNza5heRqA9t1W_Nkf-Vas3ygUufX0Xw3A-we92qRpYxYZ7m_q3BJZFFHTjnIk6-c8A3MyUlsagq54Mo_pDVq6LgG1gm6_s-bHqxr4TRwYap0xRaAHQM266OA5mknew7Au_3pvpMB8M9Xyzji2JpHNOHcz0gEZ3FXxZKHAmHcmqgOn6v7I5hbtspxmTOglvNlHUiGesXhoQbaspBbcKVtHSbfQaiHyjkapWFM-HvFfoe92M6Ssh9HNyTJWtWDEQT4sOGAu8X-aXmuyfJStfJL5yd2Cq_kYqX7tQ5dyyxgl9bA'
+    access_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxMzM1MDU2LCJpYXQiOjE3MzEzMzUwNTYsImV4cCI6MTczMTMzNTY1NiwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.W7l3VMh0q49nHndnn9Q4yGrFLgAohZ7eGWzB3r8AN-RtJpC9d4wVSJ7rqBBk-rUp2PPVC8gzdYr6kwXHDeuwucIjL5bwkgZ91NKGQRo8dfVHJGarpXwgoe8Tbab-dA43KjZNlQql_cAzR9NIVzBe4ItaX4wAQpHfXQlRTkL48UjYsGG3x7XMkLGZOGngNq_fZKLStDxLeGjMDq4gvmgBU67Z1aww8OkM5LBy1oekIg3j2PPuzLKJFNA19LCAlNgqMXupl6Q8Ux4K6SI088BV1Q9NA_27UoOVqDtAGpLneOzn3YA8F2_f3pMoI_2NqFjebZYxBadlr7rkRjfAseo1IQ'
 
     # URL for the data you want to access
     url = 'https://basketball.synergysportstech.com/api/games'
@@ -193,17 +193,17 @@ def synergy_game_ids():
     payload = {
         "excludeGamesWithoutCompetition": True,
         "seasonIds": [
-            "59af08c917120e9c9a9797ff",  # 2017-18
-            "5b6e102011ef0d11039af1e3",  # 2018-19
-            "5d51e0c6f52909811e13ee2d",  # 2019-20
-            "5fce72f5f68e52f827c39b4c",  # 2020-21
-            "6120261cea4488c9fd5c57c5",  # 2021-22
-            "62fe65fb2c6c3881c0cf66ba",  # 2022-23
-            "651b131d1507a2202c01094c",  # 2023-24
+            #"59af08c917120e9c9a9797ff",  # 2017-18
+            #"5b6e102011ef0d11039af1e3",  # 2018-19
+            #"5d51e0c6f52909811e13ee2d",  # 2019-20
+            #"5fce72f5f68e52f827c39b4c",  # 2020-21
+            #"6120261cea4488c9fd5c57c5",  # 2021-22
+            #"62fe65fb2c6c3881c0cf66ba",  # 2022-23
+            #"651b131d1507a2202c01094c",  # 2023-24
             "66ec94cbd172189f95bf08b2"   # 2024-25
         ],
         "competitionIds": None,
-        "skip": 10240,
+        "skip": 0,
         "statuses": [4, 1, 2, 3, 5],
         "sort": "utc:desc"
     }
@@ -214,7 +214,6 @@ def synergy_game_ids():
     # Check response status and print data if successful
     if response.status_code == 200:
         data = response.json()
-        print(len(data['result']))
 
         for game in data['result']:
             teams = game['name'].split('@')
@@ -250,7 +249,7 @@ def synergy_game_ids():
                 logging.info(f'Game not found for {game_date}')
 
     else:
-        print(f'Failed to retrieve data. Status code: {response.status_code}')
+        logging.error(f'Failed to retrieve data. Status code: {response.status_code}')
 
 
 def update_game_data():
@@ -264,14 +263,6 @@ def update_game_data():
         exit(1)
 
     try:
-        # Fetch the data from the URL
-        url = "https://cdn.nba.com/static/json/liveData/odds/odds_todaysGames.json"
-        response = requests.get(url)
-
-        # Check if the request was successful
-        if response.status_code == 200:
-            odds_data = response.json()
-
         # Fetch only games that are from the current season and have occurred before today
         today = datetime.today().strftime('%Y-%m-%d')
         query = {
@@ -284,7 +275,6 @@ def update_game_data():
             for game_id, game_data in game_date['GAMES'].items():
                 game_data['SUMMARY'] = fetch_box_score_summary(game_id)
                 game_data['ADV'] = fetch_box_score_adv(game_id)
-                # game_data['ODDS'] = fetch_odds(odds_data, game_id)
 
     except Exception as e:
         logging.error(f"Error fetching scores: {e}")
@@ -299,6 +289,7 @@ def fetch_upcoming_games(game_date):
         client = MongoClient(uri)
         db = client.splash
         games_collection = db.nba_games
+        teams_collection = db.nba_teams
 
     except Exception as e:
         logging.error(f"(Upcoming Games) Failed to connect to MongoDB: {e}")
@@ -332,20 +323,17 @@ def fetch_upcoming_games(game_date):
                 }
             }
 
-        # Convert game_date to a datetime object
-        #game_date_str = datetime.strptime(game_date, '%Y-%m-%d').date()
-
-        # Get today's date
-        #today = datetime.today().date()
-
-        # Calculate the date 7 days from now
-        #seven_days_from_now = today + timedelta(days=7)
-
-        # Check if the game_date is within the next 7 days
-        #if today <= game_date_str <= seven_days_from_now:
-           #for game_id, game_data in games_map.items():
-                #game_data['SUMMARY']['PointsOfEmphasis'] = generate_points_of_emphasis(game_data['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'], game_data['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'])
-                #print(game_data['SUMMARY']['PointsOfEmphasis'])
+            if len(games_map[game_id]['SUMMARY']['LineScore']) > 0:
+                linescore = games_map[game_id]['SUMMARY']['LineScore']
+                for i, team in enumerate(linescore):
+                    team_data = teams_collection.find_one({'TEAM_ID': team['TEAM_ID']}, {f'seasons.{k_current_season}.WINS': 1, f'seasons.{k_current_season}.LOSSES': 1, '_id': 0})
+                    if team_data is None:
+                        continue
+                    else:
+                        try:
+                            games_map[game_id]['SUMMARY']['LineScore'][i]['TEAM_WINS_LOSSES'] = f"{team_data['seasons'][k_current_season]['WINS']}-{team_data['seasons'][k_current_season]['LOSSES']}"
+                        except Exception:
+                            continue
 
         games_collection.update_one(
             {'GAME_DATE': game_date},
@@ -368,7 +356,7 @@ def fetch_games_for_date_range(start_date, end_date):
         fetch_upcoming_games(current_date.strftime('%Y-%m-%d'))
 
         i += 1
-        current_date += timedelta(days=i)
+        current_date += timedelta(days=1)
 
         # Pause 15 seconds every 25 days processed
         if i % 25 == 0:
@@ -391,13 +379,13 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        # start_date = datetime(2024, 10, 4)
-        # end_date = datetime(2025, 4, 13)
+        start_date = datetime(2024, 11, 11)
+        end_date = datetime(2025, 4, 13)
 
         # Fetch games for each date in the range
-        # fetch_games_for_date_range(start_date, end_date)
+        fetch_games_for_date_range(start_date, end_date)
 
-        synergy_game_ids()
+        # synergy_game_ids()
 
     except Exception as e:
         logging.error(f"Failed to fetch games for date range: {e.with_traceback()}")

@@ -147,16 +147,20 @@ def update_players(team_ids):
         # Stats
         logging.info("Player Stats...")
 
-        # BASIC, ADV, HUSTLE
-        if k_current_season_type == 'REGULAR SEASON':
-            update_player_stats()
-            update_player_hustle_stats()
-        else:
-            update_player_playoff_stats()
-            update_player_playoff_hustle_stats()
-
         for team_id in team_ids:
             logging.info(f"\nProcessing team {team_id}\n")
+
+            # BASIC, ADV, HUSTLE
+            try:
+                update_player_stats(k_current_season_type, team_id)
+            except Exception as e:
+                logging.error(f"(Player Stats) Error updating BASIC/ADV stats for team {team_id}: {e}")
+
+            try:
+                update_player_hustle_stats(k_current_season_type, team_id)
+            except Exception as e:
+                logging.error(f"(Player Stats) Error updating Player Hustle Stats for team {team_id}: {e}")
+
             # CUSTOM STATS (Calculated)
             try:
                 update_player_on_off(k_current_season_type, team_id)  # ON/OFF
@@ -338,8 +342,8 @@ def update_players(team_ids):
 
     # STATS
     try:
-        # player_stats()
-        print('Skip Player Stats')
+        player_stats()
+        # print('Skip Player Stats')
     except Exception as e:
         logging.error(f"Error updating player stats: {e}")
 

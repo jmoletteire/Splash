@@ -15,6 +15,22 @@ def current_season_custom_stats_rank():
     # Stats to rank
     custom_stats = [
         # BASIC
+        ("FGM", f"{k_current_season_type}.BASIC", -1),
+        ("FGA", f"{k_current_season_type}.BASIC", -1),
+        ("FTM", f"{k_current_season_type}.BASIC", -1),
+        ("FTA", f"{k_current_season_type}.BASIC", -1),
+        ("FG3M", f"{k_current_season_type}.BASIC", -1),
+        ("FG3A", f"{k_current_season_type}.BASIC", -1),
+        ("STL", f"{k_current_season_type}.BASIC", -1),
+        ("BLK", f"{k_current_season_type}.BASIC", -1),
+        ("REB", f"{k_current_season_type}.BASIC", -1),
+        ("OREB", f"{k_current_season_type}.BASIC", -1),
+        ("DREB", f"{k_current_season_type}.BASIC", -1),
+        ("PF", f"{k_current_season_type}.BASIC", 1),
+        ("PFD", f"{k_current_season_type}.BASIC", -1),
+        ("PTS", f"{k_current_season_type}.BASIC", -1),
+        ("PLUS_MINUS", f"{k_current_season_type}.BASIC", -1),
+
         ("FGM_PER_75", f"{k_current_season_type}.BASIC", -1),
         ("FGA_PER_75", f"{k_current_season_type}.BASIC", -1),
         ("FTM_PER_75", f"{k_current_season_type}.BASIC", -1),
@@ -38,6 +54,24 @@ def current_season_custom_stats_rank():
         ("FT_PER_FGA", f"{k_current_season_type}.BASIC", -1),
 
         # ADV
+        ("GP", f"{k_current_season_type}.ADV", -1),
+        ("MIN", f"{k_current_season_type}.ADV", -1),
+        ("OFF_RATING", f"{k_current_season_type}.ADV", -1),
+        ("DEF_RATING", f"{k_current_season_type}.ADV", 1),
+        ("NET_RATING", f"{k_current_season_type}.ADV", -1),
+        ("AST_PCT", f"{k_current_season_type}.ADV", -1),
+        ("AST_TO", f"{k_current_season_type}.ADV", -1),
+        ("AST_RATIO", f"{k_current_season_type}.ADV", -1),
+        ("OREB_PCT", f"{k_current_season_type}.ADV", -1),
+        ("DREB_PCT", f"{k_current_season_type}.ADV", -1),
+        ("REB_PCT", f"{k_current_season_type}.ADV", -1),
+        ("TM_TOV_PCT", f"{k_current_season_type}.ADV", 1),
+        ("EFG_PCT", f"{k_current_season_type}.ADV", -1),
+        ("TS_PCT", f"{k_current_season_type}.ADV", -1),
+        ("USG_PCT", f"{k_current_season_type}.ADV", -1),
+        ("PACE", f"{k_current_season_type}.ADV", -1),
+        ("PIE", f"{k_current_season_type}.ADV", -1),
+
         ("OFF_RATING_ON_OFF", f"{k_current_season_type}.ADV", -1),
         ("DEF_RATING_ON_OFF", f"{k_current_season_type}.ADV", 1),
         ("NET_RATING_ON_OFF", f"{k_current_season_type}.ADV", -1),

@@ -2,6 +2,8 @@ import re
 from datetime import datetime
 
 from pymongo import MongoClient
+from unidecode import unidecode
+
 from splash_nba.util.env import uri
 import logging
 import requests
@@ -15,6 +17,12 @@ def player_rotowires():
 
 
 def player_rotowire_ids():
+    def normalize_name(name):
+        # Remove diacritics, convert to lowercase, and remove non-alphabetic characters (e.g., periods)
+        name = unidecode(name).lower()
+        name = re.sub(r'[^a-z]', '', name)  # Keep only alphabetic characters
+        return name
+
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -31,7 +39,7 @@ def player_rotowire_ids():
     if response.status_code == 200:
         for player in response.json():
             # Define the search criteria
-            player_name = player['player']
+            player_name = normalize_name(player['player'])
             team_abbreviation = player['team']
             roto_id = player['ID']
 
