@@ -19,46 +19,55 @@ def current_season_custom_team_stats_rank():
     # Stats to rank
     custom_stats = [
         # BASIC
-        ("FGM_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("FGA_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("FTM_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("FTA_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("FG3M_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("FG3A_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("STL_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("BLK_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("REB_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("OREB_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("DREB_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("TOV_PER_100", f"{k_current_season_type}.BASIC", 1),
-        ("PF_PER_100", f"{k_current_season_type}.BASIC", 1),
-        ("PFD_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("PTS_PER_100", f"{k_current_season_type}.BASIC", -1),
-        ("FT_PER_FGA", f"{k_current_season_type}.BASIC", -1),
+        # ("FGM_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("FGA_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("FTM_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("FTA_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("FG3M_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("FG3A_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("STL_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("BLK_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("REB_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("OREB_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("DREB_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("TOV_PER_100", f"{k_current_season_type}.BASIC", 1),
+        # ("PF_PER_100", f"{k_current_season_type}.BASIC", 1),
+        # ("PFD_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("PTS_PER_100", f"{k_current_season_type}.BASIC", -1),
+        # ("FT_PER_FGA", f"{k_current_season_type}.BASIC", -1),
 
-        ("3PAr", f"{k_current_season_type}.BASIC", -1),
-        ("FTAr", f"{k_current_season_type}.BASIC", -1),
+        # ("3PAr", f"{k_current_season_type}.BASIC", -1),
+        # ("FTAr", f"{k_current_season_type}.BASIC", -1),
+
+        # ADV
+        ("XPTS_DIFF", f"{k_current_season_type}.ADV", -1),
+        ("XPTS_FOR", f"{k_current_season_type}.ADV", -1),
+        ("XPTS_AGAINST", f"{k_current_season_type}.ADV", 1),
+
+        ("XPTS_DIFF_PER_100", f"{k_current_season_type}.ADV", -1),
+        ("XPTS_FOR_PER_100", f"{k_current_season_type}.ADV", -1),
+        ("XPTS_AGAINST_PER_100", f"{k_current_season_type}.ADV", 1),
 
         # HUSTLE
-        ("CONTESTED_SHOTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
-        ("SCREEN_ASSISTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
-        ("SCREEN_AST_PTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
-        ("BOX_OUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
-        ("OFF_BOXOUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
-        ("DEF_BOXOUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
-        ("DEFLECTIONS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
-        ("LOOSE_BALLS_RECOVERED_PER_100", f"{k_current_season_type}.HUSTLE", -1),
-        ("CHARGES_DRAWN_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("CONTESTED_SHOTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("SCREEN_ASSISTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("SCREEN_AST_PTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("BOX_OUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("OFF_BOXOUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("DEF_BOXOUTS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("DEFLECTIONS_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("LOOSE_BALLS_RECOVERED_PER_100", f"{k_current_season_type}.HUSTLE", -1),
+        # ("CHARGES_DRAWN_PER_100", f"{k_current_season_type}.HUSTLE", -1),
 
-        ("CONTESTED_SHOTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("SCREEN_ASSISTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("SCREEN_AST_PTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("BOX_OUTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("OFF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("DEF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("DEFLECTIONS", f"{k_current_season_type}.HUSTLE", -1),
-        ("LOOSE_BALLS_RECOVERED", f"{k_current_season_type}.HUSTLE", -1),
-        ("CHARGES_DRAWN", f"{k_current_season_type}.HUSTLE", -1),
+        # ("CONTESTED_SHOTS", f"{k_current_season_type}.HUSTLE", -1),
+        # ("SCREEN_ASSISTS", f"{k_current_season_type}.HUSTLE", -1),
+        # ("SCREEN_AST_PTS", f"{k_current_season_type}.HUSTLE", -1),
+        # ("BOX_OUTS", f"{k_current_season_type}.HUSTLE", -1),
+        # ("OFF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
+        # ("DEF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
+        # ("DEFLECTIONS", f"{k_current_season_type}.HUSTLE", -1),
+        # ("LOOSE_BALLS_RECOVERED", f"{k_current_season_type}.HUSTLE", -1),
+        # ("CHARGES_DRAWN", f"{k_current_season_type}.HUSTLE", -1),
     ]
 
     # Initialize the pipeline list
@@ -251,3 +260,7 @@ def custom_team_stats_rank():
                 except Exception as e:
                     logging.error(e)
                     continue
+
+
+if __name__ == "__main__":
+    current_season_custom_team_stats_rank()

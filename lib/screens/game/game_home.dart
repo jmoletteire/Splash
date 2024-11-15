@@ -61,7 +61,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   late Map<String, dynamic> awayLinescore;
   Map<int, double> _scrollPositions = {};
   Map<String, dynamic> game = {};
-  bool _showImages = false;
+  final ValueNotifier<bool> _showImagesNotifier = ValueNotifier<bool>(false);
   bool _isLoading = false;
   bool _isUpcoming = false;
   Map<String, dynamic> odds = {};
@@ -171,6 +171,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     var fetchedGame = await Game().getGame(gameId, gameDate);
     setState(() {
       game = fetchedGame;
+      setSummaryLinescore();
     });
   }
 
@@ -202,6 +203,19 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
         }
       }
     }
+  }
+
+  void setSummaryLinescore() {
+    // Set all necessary variables
+    setState(() {
+      summary = game['SUMMARY']['GameSummary'][0];
+      linescore = game['SUMMARY']['LineScore'];
+
+      homeLinescore =
+          linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+      awayLinescore =
+          linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+    });
   }
 
   /// ******************************************************
@@ -236,20 +250,12 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
         }
       }
     }
-    // Set all necessary variables
-    summary = game['SUMMARY']['GameSummary'][0];
-    linescore = game['SUMMARY']['LineScore'];
 
-    homeLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-    awayLinescore =
-        linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+    setSummaryLinescore();
 
     setState(() {
       _isLoading = false;
     });
-
-    startPolling(widget.gameId, widget.gameDate);
   }
 
   void _initializeControllers() {
@@ -263,12 +269,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
     _scrollController = ScrollController()
       ..addListener(() {
-        setState(() {
-          _showImages = _isSliverAppBarExpanded ? true : false;
-        });
-
-        // Save the scroll position of the current tab
-        _scrollPositions[_tabController.index] = _scrollController.offset;
+        _showImagesNotifier.value = _isSliverAppBarExpanded;
       });
   }
 
@@ -299,13 +300,12 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     _initializeControllers();
     _initializeTabListener();
 
+    startPolling(widget.gameId, widget.gameDate);
+
     awayTeamAbbr = kTeamIdToName[widget.awayId][1] ?? 'INT\'L';
     homeTeamAbbr = kTeamIdToName[widget.homeId][1] ?? 'INT\'L';
     awayTeamId = awayTeamAbbr == 'INT\'L' ? '0' : widget.awayId;
     homeTeamId = homeTeamAbbr == 'INT\'L' ? '0' : widget.homeId;
-
-    awayTeamPng = Image.asset('images/NBA_Logos/$awayTeamId.png');
-    homeTeamPng = Image.asset('images/NBA_Logos/$homeTeamId.png');
   }
 
   @override
@@ -315,9 +315,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     _notifier = ScrollControllerProvider.of(context)!.notifier;
     _scrollController = ScrollController()
       ..addListener(() {
-        setState(() {
-          _showImages = _isSliverAppBarExpanded ? true : false;
-        });
+        _showImagesNotifier.value = _isSliverAppBarExpanded;
       });
     _notifier.addController('game', _scrollController);
   }
@@ -491,67 +489,73 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   }
 
   Widget getTitle() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (_showImages) ...[
-          if (awayTeamId == '0') SizedBox(width: availableWidth * 0.05),
-          GestureDetector(
-            onTap: () {
-              if (awayTeamId != '0') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TeamHome(
-                      teamId: widget.awayId,
+    return ValueListenableBuilder<bool>(
+        valueListenable: _showImagesNotifier,
+        builder: (context, showImages, child) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (showImages) ...[
+                if (awayTeamId == '0') SizedBox(width: availableWidth * 0.05),
+                GestureDetector(
+                  onTap: () {
+                    if (awayTeamId != '0') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TeamHome(
+                            teamId: widget.awayId,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
+                    child: Image.asset(
+                      awayTeamId == '1610612761'
+                          ? 'images/NBA_Logos/${awayTeamId}_alt.png'
+                          : 'images/NBA_Logos/$awayTeamId.png',
+                      gaplessPlayback: true,
+                      width: awayTeamId == '0' ||
+                              MediaQuery.of(context).orientation == Orientation.landscape
+                          ? availableWidth * 0.0375
+                          : availableWidth * 0.09,
                     ),
                   ),
-                );
-              }
-            },
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
-              child: Image.asset(
-                awayTeamId == '1610612761'
-                    ? 'images/NBA_Logos/${awayTeamId}_alt.png'
-                    : 'images/NBA_Logos/$awayTeamId.png',
-                width: awayTeamId == '0' ||
-                        MediaQuery.of(context).orientation == Orientation.landscape
-                    ? availableWidth * 0.0375
-                    : availableWidth * 0.09,
-              ),
-            ),
-          ),
-          SizedBox(width: 15.0.r),
-          getTitleDetails(),
-          SizedBox(width: 15.0.r),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TeamHome(
-                    teamId: widget.homeId,
+                ),
+                SizedBox(width: 15.0.r),
+                getTitleDetails(),
+                SizedBox(width: 15.0.r),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TeamHome(
+                          teamId: widget.homeId,
+                        ),
+                      ),
+                    );
+                  },
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
+                    child: Image.asset(
+                      widget.homeId == '1610612761'
+                          ? 'images/NBA_Logos/${widget.homeId}_alt.png'
+                          : 'images/NBA_Logos/${widget.homeId}.png',
+                      gaplessPlayback: true,
+                      width: widget.homeId == '0' ||
+                              MediaQuery.of(context).orientation == Orientation.landscape
+                          ? availableWidth * 0.0375
+                          : availableWidth * 0.09,
+                    ),
                   ),
                 ),
-              );
-            },
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: 40.0.r, maxHeight: 40.0.r),
-              child: Image.asset(
-                widget.homeId == '1610612761'
-                    ? 'images/NBA_Logos/${widget.homeId}_alt.png'
-                    : 'images/NBA_Logos/${widget.homeId}.png',
-                width: widget.homeId == '0' ||
-                        MediaQuery.of(context).orientation == Orientation.landscape
-                    ? availableWidth * 0.0375
-                    : availableWidth * 0.09,
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
+              ],
+            ],
+          );
+        });
   }
 
   @override
@@ -594,6 +598,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                       child: Image.asset(
                         'images/NBA_Logos/${awayTeamId}_full.png',
                         width: availableWidth / 1.1,
+                        cacheWidth: (availableWidth / 1.1).round(),
+                        gaplessPlayback: true,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -605,6 +611,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                       child: Image.asset(
                         'images/NBA_Logos/${homeTeamId}_full.png',
                         width: availableWidth / 1.1,
+                        cacheWidth: (availableWidth / 1.1).round(),
+                        gaplessPlayback: true,
                         fit: BoxFit.cover,
                       ),
                     ),

@@ -71,6 +71,33 @@ def update_current_cup():
         )
 
 
+def flag_cup_games(season=None):
+
+    # Define the query inline, only adding 'SEASON' if a season is provided
+    query = {'SEASON': season} if season else {}
+
+    cups = list(cup_collection.find(query, {'SEASON': 1, 'GROUP': 1, 'KNOCKOUT': 1, '_id': 0}))
+    for cup in cups:
+        season_code = f"2{cup['SEASON'][:4]}"
+        logging.info(cup['SEASON'])
+        for conf, groups in cup['GROUP'].items():
+            logging.info(conf)
+            for group, teams in groups.items():
+                logging.info(group)
+                for team in teams:
+                    for i, game in enumerate(team['games']):
+                        logging.info(f'({team["teamAbbreviation"]}) {i + 1} of {len(team["games"])}')
+                        # Query to find & update the document
+                        games_collection.find_one_and_update({
+                            "SEASON_CODE": season_code,
+                            f"GAMES.{game['gameId']}": {"$exists": True}
+                        },
+                            {
+                                "$set": {f"GAMES.{game['gameId']}.SUMMARY.GameSummary.0.NBA_CUP": f'NBA Cup - {group}'}
+                            },
+                        )
+
+
 def fetch_all_cups():
     seasons = ['2023-24']
 
@@ -130,4 +157,6 @@ if __name__ == '__main__':
     client = MongoClient(uri)
     db = client.splash
     cup_collection = db.nba_cup_history
-    fetch_all_cups()
+    games_collection = db.nba_games
+    # fetch_all_cups()
+    flag_cup_games(season='2024-25')

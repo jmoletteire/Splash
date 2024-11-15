@@ -23,11 +23,13 @@ class Inactives extends StatefulWidget {
 }
 
 class _InactivesState extends State<Inactives> {
-  @override
-  Widget build(BuildContext context) {
-    List<String> homeInactive = [];
-    List<String> awayInactive = [];
+  List<String> homeInactive = [];
+  List<String> awayInactive = [];
+  late Widget inactiveCard;
 
+  @override
+  void initState() {
+    super.initState();
     for (var player in widget.inactivePlayers) {
       if (player['TEAM_ID'].toString() == widget.homeId) {
         homeInactive.add('${player['FIRST_NAME']} ${player['LAST_NAME']}');
@@ -36,6 +38,10 @@ class _InactivesState extends State<Inactives> {
       }
     }
 
+    inactiveCard = _buildInactiveCard();
+  }
+
+  Widget _buildInactiveCard() {
     return Card(
       margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
       color: Colors.grey.shade900,
@@ -93,5 +99,10 @@ class _InactivesState extends State<Inactives> {
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return inactiveCard;
   }
 }

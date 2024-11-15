@@ -142,13 +142,16 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         /// PACE
         TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
 
-        /// SOS
+        /// SOR
         TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
 
         /// R-SOS
         TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
 
         /// STREAK
+        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+        /// xPTS
         TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
 
         /// LAST 10
@@ -276,7 +279,7 @@ class _DivisionStandingsState extends State<DivisionStandings> {
           }),
           splashColor: Colors.white,
           child: contentBuilder(context, (context, column) {
-            List<String> noPadding = ['ORTG', 'DRTG', 'PACE', 'SOS', 'R-SOS'];
+            List<String> noPadding = ['ORTG', 'DRTG', 'PACE', 'SOR', 'R-SOS'];
             return Padding(
               padding: noPadding.contains(widget.columnNames[column])
                   ? EdgeInsets.only(right: 0.0.r)
@@ -641,123 +644,132 @@ class _DivisionStandingsState extends State<DivisionStandings> {
       case 12:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['L10']!);
+            text:
+                '${teams[row]['seasons']?[widget.season]?['xPTS_W'] ?? '0'} - ${teams[row]['seasons']?[widget.season]?['xPTS_L'] ?? '0'}',
+          );
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 13:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['HOME']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['L10']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 14:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['ROAD']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['HOME']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 15:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['OppOver500']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['ROAD']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 16:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsEast']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['OppOver500']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 17:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsWest']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsEast']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 18:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsWest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 19:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 20:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 21:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 22:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 23:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 24:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['Score100PTS']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 25:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtHalf']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['Score100PTS']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 26:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtThird']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtHalf']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 27:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInFGPCT']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtThird']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 28:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInReb']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInFGPCT']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 29:
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInReb']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
+      case 30:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['FewerTurnovers']!);

@@ -24,38 +24,124 @@ class BoxTeamStats extends StatefulWidget {
 }
 
 class _BoxTeamStatsState extends State<BoxTeamStats> {
+  final bool _isLoading = false;
   dynamic homeTeam = {};
   dynamic awayTeam = {};
   Color homeTeamColor = Colors.transparent;
   Color awayTeamColor = Colors.transparent;
-  bool _isLoading = false;
+  int awayEstPoss = 0;
+  int homeEstPoss = 0;
+  int minutes = 0;
+  late Widget efficiency;
+  late Widget shooting;
+  late Widget rebounding;
+  late Widget passing;
+  late Widget defense;
 
-  void setValues(String homeId, String awayId) {
-    if (widget.teams[0].containsKey('teamId')) {
-      // Use default order if no TEAM_ID key exists
-      homeTeam = widget.teams.firstWhere((team) => team['teamId'].toString() == homeId);
-      awayTeam = widget.teams.firstWhere((team) => team['teamId'].toString() == awayId);
-    } else {
-      // Assign based on the ID matching homeId
-      homeTeam = widget.teams.firstWhere((team) => team['TEAM_ID'].toString() == homeId);
-      awayTeam = widget.teams.firstWhere((team) => team['TEAM_ID'].toString() == awayId);
-    }
+  @override
+  void initState() {
+    super.initState();
+    setTeamValues(widget.homeId, widget.awayId);
+    calculatePossessionsAndMinutes();
 
-    if (homeTeam.isNotEmpty) {
-      homeTeam['TEAM_ABBREVIATION'] = kTeamIdToName[homeId][1];
-      homeTeamColor = kDarkPrimaryColors.contains(homeTeam['TEAM_ABBREVIATION'])
-          ? (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
-          : (kTeamColors[homeTeam['TEAM_ABBREVIATION']]!['primaryColor']!);
-    }
+    // Set stats
+    efficiency = buildStatsCard('Efficiency', buildEfficiencyRows());
+    shooting = buildStatsCard('Shooting', buildShootingRows());
+    rebounding = buildStatsCard('Rebounding', buildReboundingRows());
+    passing = buildStatsCard('Passing', buildPassingRows());
+    defense = buildStatsCard('Defense', buildDefenseRows());
+  }
 
-    if (awayTeam.isNotEmpty) {
-      awayTeam['TEAM_ABBREVIATION'] = kTeamIdToName[awayId]?[1] ?? 'FA';
-      awayTeamColor = kTeamColorOpacity.containsKey(awayTeam['TEAM_ABBREVIATION'])
-          ? kDarkPrimaryColors.contains(awayTeam['TEAM_ABBREVIATION'])
-              ? (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['secondaryColor']!)
-              : (kTeamColors[awayTeam['TEAM_ABBREVIATION']]!['primaryColor']!)
-          : kTeamColors['FA']!['primaryColor']!;
+  @override
+  void didUpdateWidget(covariant BoxTeamStats oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    bool existsUpdates = false;
+
+    // Check if the game data has changed
+    if (oldWidget.teams != widget.teams) {
+      // Loop through both lists of teams and compare each field
+      for (int i = 0; i < widget.teams.length; i++) {
+        if (i >= oldWidget.teams.length) break;
+
+        final newTeam = widget.teams[i];
+        final oldTeam = oldWidget.teams[i];
+
+        // Track which fields are different for this team
+        Map<String, dynamic> changes = {};
+
+        // Compare each key in the new team against the old team
+        newTeam.forEach((key, newValue) {
+          final oldValue = oldTeam[key];
+          if (newValue != oldValue) {
+            changes[key] = {'old': oldValue, 'new': newValue};
+          }
+        });
+
+        // Output the differences for this team if any fields changed
+        if (changes.isNotEmpty) {
+          existsUpdates = true;
+        } else {
+          print("No changes");
+        }
+      }
+
+      if (existsUpdates) {
+        // Re-calculate player and team stats
+        setTeamValues(widget.homeId, widget.awayId);
+        calculatePossessionsAndMinutes();
+
+        // Set stats
+        efficiency = buildStatsCard('Efficiency', buildEfficiencyRows());
+        shooting = buildStatsCard('Shooting', buildShootingRows());
+        rebounding = buildStatsCard('Rebounding', buildReboundingRows());
+        passing = buildStatsCard('Passing', buildPassingRows());
+        defense = buildStatsCard('Defense', buildDefenseRows());
+      }
     }
+  }
+
+  void setTeamValues(String homeId, String awayId) {
+    homeTeam = findTeam(homeId);
+    awayTeam = findTeam(awayId);
+
+    homeTeamColor = getTeamColor(homeTeam, homeId);
+    awayTeamColor = getTeamColor(awayTeam, awayId);
+  }
+
+  dynamic findTeam(String teamId) {
+    return widget.teams.firstWhere(
+      (team) => team['teamId']?.toString() == teamId || team['TEAM_ID']?.toString() == teamId,
+      orElse: () => {},
+    );
+  }
+
+  Color getTeamColor(dynamic team, String teamId) {
+    String abbreviation = kTeamIdToName[teamId]?[1] ?? 'FA';
+    team['TEAM_ABBREVIATION'] = abbreviation;
+    return kDarkPrimaryColors.contains(abbreviation)
+        ? (kTeamColors[abbreviation]?['secondaryColor'] ?? Colors.transparent)
+        : (kTeamColors[abbreviation]?['primaryColor'] ?? Colors.transparent);
+  }
+
+  void calculatePossessionsAndMinutes() {
+    if (homeTeam['POSS'] == null || homeTeam['POSS'] == 0) {
+      awayEstPoss = calculateEstimatedPossessions(awayTeam);
+      homeEstPoss = calculateEstimatedPossessions(homeTeam);
+      minutes = calculateMinutes(awayTeam);
+    }
+  }
+
+  int calculateEstimatedPossessions(dynamic team) {
+    return ((team['fieldGoalsAttempted'] ?? 0) +
+            (team['turnovers'] ?? 0) +
+            (0.44 * (team['freeThrowsAttempted'] ?? 0)) -
+            (team['reboundsOffensive'] ?? 0))
+        .ceil();
+  }
+
+  int calculateMinutes(dynamic team) {
+    String minutesString = team['minutesCalculated'] ?? team['MIN'] ?? '0:00';
+    return (int.parse(minutesString.substring(2, minutesString.length - 1)) / 5).floor();
   }
 
   double roundToDecimalPlaces(double value, int decimalPlaces) {
@@ -64,35 +150,7 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    setValues(widget.homeId, widget.awayId);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    int awayEstPoss = 0;
-    int homeEstPoss = 0;
-    int minutes = 0;
-
-    if (homeTeam['POSS'] == null || homeTeam['POSS'] == 0) {
-      awayEstPoss = ((awayTeam['fieldGoalsAttempted'] ?? 0) +
-              (awayTeam['turnovers'] ?? 0) +
-              (0.44 * (awayTeam['freeThrowsAttempted'] ?? 0)) -
-              (awayTeam['reboundsOffensive'] ?? 0))
-          .ceil();
-      homeEstPoss = ((homeTeam['fieldGoalsAttempted'] ?? 0) +
-              (homeTeam['turnovers'] ?? 0) +
-              (0.44 * (homeTeam['freeThrowsAttempted'] ?? 0)) -
-              (homeTeam['reboundsOffensive'] ?? 0))
-          .ceil();
-
-      minutes = (int.parse((awayTeam['minutesCalculated'] ?? awayTeam['MIN']).substring(
-                  2, (awayTeam['minutesCalculated'] ?? awayTeam['MIN']).length - 1)) /
-              5)
-          .floor();
-    }
-
     return SliverToBoxAdapter(
       child: Skeletonizer(
         enabled: _isLoading,
@@ -116,6 +174,12 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
               )
             : Column(
                 children: [
+                  efficiency,
+                  shooting,
+                  rebounding,
+                  passing,
+                  defense,
+                  /*
                   Card(
                     color: Colors.grey.shade900,
                     margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
@@ -694,9 +758,359 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
                     ),
                   ),
                   SizedBox(height: 5.0.r),
+                   */
                 ],
               ),
       ),
+    );
+  }
+
+  Widget buildNoStatsAvailable() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.sports_basketball,
+            color: Colors.white38,
+            size: 40.0.r,
+          ),
+          SizedBox(height: 15.0.r),
+          Text(
+            'No Stats Available',
+            style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildStatsCard(String title, List<Widget> rows) {
+    return Card(
+      color: Colors.grey.shade900,
+      margin: EdgeInsets.symmetric(horizontal: 11.0.r, vertical: 5.0.r),
+      child: Padding(
+        padding: EdgeInsets.all(15.0.r),
+        child: Column(
+          children: [
+            Center(child: Text(title, style: kBebasBold.copyWith(fontSize: 18.0.r))),
+            SizedBox(height: 15.0.r),
+            ...rows,
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> buildEfficiencyRows() {
+    return [
+      buildComparisonRow('PTS', awayTeam['points'] ?? 0, homeTeam['points'] ?? 0),
+      SizedBox(height: 5.0.r),
+      if (awayTeam.containsKey('SQ_TOTAL') && homeTeam.containsKey('SQ_TOTAL'))
+        ComparisonRow(
+          statName: 'xPTS',
+          awayTeam: roundToDecimalPlaces(
+              (awayTeam['SQ_TOTAL'] + (awayTeam['freeThrowsMade'] ?? awayTeam['FTM'] ?? 0))
+                      .toDouble() ??
+                  0.0,
+              1),
+          homeTeam: roundToDecimalPlaces(
+              (homeTeam['SQ_TOTAL'] + (homeTeam['freeThrowsMade'] ?? homeTeam['FTM'] ?? 0))
+                      .toDouble() ??
+                  0.0,
+              1),
+          awayTeamColor: awayTeamColor,
+          homeTeamColor: homeTeamColor,
+        ),
+      if (awayTeam.containsKey('SQ_TOTAL') && homeTeam.containsKey('SQ_TOTAL'))
+        SizedBox(height: 15.0.r),
+      buildComparisonRow(
+        'PER POSS',
+        calculatePointsPerPossession(awayTeam, awayEstPoss),
+        calculatePointsPerPossession(homeTeam, homeEstPoss),
+      ),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+        'PER SHOT',
+        calculatePointsPerShot(awayTeam),
+        calculatePointsPerShot(homeTeam),
+      ),
+      if (awayTeam.containsKey('SQ_TOTAL') && homeTeam.containsKey('SQ_TOTAL'))
+        SizedBox(height: 5.0.r),
+      if (awayTeam.containsKey('SQ_TOTAL') && homeTeam.containsKey('SQ_TOTAL'))
+        ComparisonRow(
+          statName: 'Shot Quality',
+          awayTeam: roundToDecimalPlaces((awayTeam['SQ_TOTAL'].toDouble() ?? 0.0) / 100, 2),
+          homeTeam: roundToDecimalPlaces((homeTeam['SQ_TOTAL'].toDouble() ?? 0.0) / 100, 2),
+          awayTeamColor: awayTeamColor,
+          homeTeamColor: homeTeamColor,
+        ),
+      SizedBox(height: 15.0.r),
+      ComparisonRow(
+        statName: 'POSSESSIONS',
+        awayTeam: awayTeam['POSS'] == null || awayTeam['POSS'] == 0
+            ? awayEstPoss
+            : awayTeam['POSS'] ?? 0.0,
+        homeTeam: homeTeam['POSS'] == null || homeTeam['POSS'] == 0
+            ? awayEstPoss
+            : homeTeam['POSS'] ?? 0.0,
+        awayTeamColor: awayTeamColor,
+        homeTeamColor: homeTeamColor,
+      ),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('PACE', awayTeam['PACE'] ?? calculatePace(awayTeam, awayEstPoss),
+          homeTeam['PACE'] ?? calculatePace(homeTeam, homeEstPoss)),
+      SizedBox(height: 15.0.r),
+      ComparisonRow(
+        statName: 'TOV',
+        awayTeam: awayTeam['turnoversTotal'] ?? awayTeam['TO'] ?? 0,
+        homeTeam: homeTeam['turnoversTotal'] ?? homeTeam['TO'] ?? 0,
+        awayTeamColor: awayTeamColor,
+        homeTeamColor: homeTeamColor,
+      ),
+      SizedBox(height: 5.0.r),
+      ComparisonRow(
+        statName: 'TOV%',
+        awayTeam: roundToDecimalPlaces(
+            awayTeam['TM_TOV_PCT'] ??
+                100 * awayTeam['turnovers'] / (awayEstPoss == 0 ? 1 : awayEstPoss) ??
+                0.0,
+            1),
+        homeTeam: roundToDecimalPlaces(
+            homeTeam['TM_TOV_PCT'] ??
+                100 * homeTeam['turnovers'] / (homeEstPoss == 0 ? 1 : homeEstPoss) ??
+                0.0,
+            1),
+        awayTeamColor: awayTeamColor,
+        homeTeamColor: homeTeamColor,
+      ),
+    ];
+  }
+
+  double calculatePointsPerPossession(dynamic team, int estPoss) {
+    int possessions = team['POSS'] ?? estPoss;
+    return roundToDecimalPlaces(
+        (team['points'] ?? 0) / (possessions == 0 ? 1 : possessions), 2);
+  }
+
+  double calculatePointsPerShot(dynamic team) {
+    int fga = team['fieldGoalsAttempted'] ?? team['FGA'] ?? 1;
+    return roundToDecimalPlaces((team['points'] ?? 0) / fga, 2);
+  }
+
+  double calculatePace(dynamic team, int estPoss) {
+    int possessions = (awayEstPoss + homeEstPoss) ~/ 2;
+    return roundToDecimalPlaces(48 * possessions / (minutes == 0 ? 1 : minutes), 1);
+  }
+
+  List<Widget> buildShootingRows() {
+    return [
+      NonComparisonRow(
+        statName: 'FG',
+        awayTeam:
+            '${awayTeam['fieldGoalsMade'] ?? awayTeam['FGM'] ?? 0}-${awayTeam['fieldGoalsAttempted'] ?? awayTeam['FGA'] ?? 0}',
+        homeTeam:
+            '${homeTeam['fieldGoalsMade'] ?? homeTeam['FGM'] ?? 0}-${homeTeam['fieldGoalsAttempted'] ?? homeTeam['FGA'] ?? 0}',
+      ),
+      buildComparisonRow(
+          'FG%',
+          roundToDecimalPlaces(
+              (awayTeam['fieldGoalsPercentage'] ?? awayTeam['FG_PCT'] ?? 0.0) * 100, 1),
+          roundToDecimalPlaces(
+              (homeTeam['fieldGoalsPercentage'] ?? homeTeam['FG_PCT'] ?? 0.0) * 100, 1)),
+      SizedBox(height: 15.0.r),
+      NonComparisonRow(
+        statName: '3P',
+        awayTeam:
+            '${awayTeam['threePointersMade'] ?? awayTeam['FG3M'] ?? 0}-${awayTeam['threePointersAttempted'] ?? awayTeam['FG3A'] ?? 0}',
+        homeTeam:
+            '${homeTeam['threePointersMade'] ?? homeTeam['FG3M'] ?? 0}-${homeTeam['threePointersAttempted'] ?? homeTeam['FG3A'] ?? 0}',
+      ),
+      buildComparisonRow(
+          '3P%',
+          roundToDecimalPlaces(
+              (awayTeam['threePointersPercentage'] ?? awayTeam['FG3_PCT'] ?? 0.0) * 100, 1),
+          roundToDecimalPlaces(
+              (homeTeam['threePointersPercentage'] ?? homeTeam['FG3_PCT'] ?? 0.0) * 100, 1)),
+      SizedBox(height: 15.0.r),
+      NonComparisonRow(
+        statName: 'FT',
+        awayTeam:
+            '${awayTeam['freeThrowsMade'] ?? awayTeam['FTM'] ?? 0}-${awayTeam['freeThrowsAttempted'] ?? awayTeam['FTA'] ?? 0}',
+        homeTeam:
+            '${homeTeam['freeThrowsMade'] ?? homeTeam['FTM'] ?? 0}-${homeTeam['freeThrowsAttempted'] ?? homeTeam['FTA'] ?? 0}',
+      ),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+          'FT%',
+          roundToDecimalPlaces(
+              (awayTeam['freeThrowsPercentage'] ?? awayTeam['FT_PCT'] ?? 0.0) * 100, 1),
+          roundToDecimalPlaces(
+              (homeTeam['freeThrowsPercentage'] ?? homeTeam['FT_PCT'] ?? 0.0) * 100, 1)),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+          'FT/FGA',
+          roundToDecimalPlaces(
+              (awayTeam['freeThrowsMade'] ?? awayTeam['FTM']) /
+                  ((awayTeam['fieldGoalsAttempted'] ?? awayTeam['FGA']) == 0
+                      ? 1
+                      : (awayTeam['fieldGoalsAttempted'] ?? awayTeam['FGA'])),
+              2),
+          roundToDecimalPlaces(
+              (homeTeam['freeThrowsMade'] ?? homeTeam['FTM']) /
+                  ((homeTeam['fieldGoalsAttempted'] ?? homeTeam['FGA']) == 0
+                      ? 1
+                      : (homeTeam['fieldGoalsAttempted'] ?? homeTeam['FGA'])),
+              2)),
+      SizedBox(height: 15.0.r),
+      buildComparisonRow(
+        'EFG%',
+        roundToDecimalPlaces(
+            (awayTeam['fieldGoalsEffectiveAdjusted'] ?? awayTeam['EFG_PCT'] ?? 0.0) * 100, 1),
+        roundToDecimalPlaces(
+            (homeTeam['fieldGoalsEffectiveAdjusted'] ?? homeTeam['EFG_PCT'] ?? 0.0) * 100, 1),
+      ),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+        'TS%',
+        roundToDecimalPlaces(
+            (awayTeam['trueShootingPercentage'] ?? awayTeam['TS_PCT'] ?? 0.0) * 100, 1),
+        roundToDecimalPlaces(
+            (homeTeam['trueShootingPercentage'] ?? homeTeam['TS_PCT'] ?? 0.0) * 100, 1),
+      ),
+      SizedBox(height: 15.0.r),
+      buildComparisonRow(
+        'PTS IN PAINT',
+        awayTeam['pointsInThePaint'] ?? awayTeam['PTS_PAINT'] ?? 0.0,
+        homeTeam['pointsInThePaint'] ?? homeTeam['PTS_PAINT'] ?? 0.0,
+      ),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+        'PTS OUTSIDE',
+        (awayTeam['points'] ?? awayTeam['PTS'] ?? 0.0) -
+            (awayTeam['freeThrowsMade'] ?? awayTeam['FTM'] ?? 0.0) -
+            (awayTeam['pointsInThePaint'] ?? awayTeam['PTS_PAINT'] ?? 0.0),
+        (homeTeam['points'] ?? homeTeam['PTS'] ?? 0.0) -
+            (homeTeam['freeThrowsMade'] ?? homeTeam['FTM'] ?? 0.0) -
+            (homeTeam['pointsInThePaint'] ?? homeTeam['PTS_PAINT'] ?? 0.0),
+      )
+    ];
+  }
+
+  List<Widget> buildReboundingRows() {
+    return [
+      buildComparisonRow(
+          'REB', awayTeam['reboundsTotal'] ?? 0, homeTeam['reboundsTotal'] ?? 0),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+          'OREB', awayTeam['reboundsOffensive'] ?? 0, homeTeam['reboundsOffensive'] ?? 0),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+          'DREB', awayTeam['reboundsDefensive'] ?? 0, homeTeam['reboundsDefensive'] ?? 0),
+      SizedBox(height: 15.0.r),
+      buildComparisonRow(
+        'OREB%',
+        roundToDecimalPlaces(
+            (awayTeam['OREB_PCT'] ??
+                    awayTeam['reboundsOffensive'] /
+                        ((awayTeam['fieldGoalsAttempted'] - awayTeam['fieldGoalsMade']) == 0
+                            ? 1
+                            : (awayTeam['fieldGoalsAttempted'] -
+                                awayTeam['fieldGoalsMade'])) ??
+                    0.0) *
+                100,
+            1),
+        roundToDecimalPlaces(
+            (homeTeam['OREB_PCT'] ??
+                    homeTeam['reboundsOffensive'] /
+                        ((homeTeam['fieldGoalsAttempted'] - homeTeam['fieldGoalsMade']) == 0
+                            ? 1
+                            : (homeTeam['fieldGoalsAttempted'] -
+                                homeTeam['fieldGoalsMade'])) ??
+                    0.0) *
+                100,
+            1),
+      ),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+        'DREB%',
+        roundToDecimalPlaces(
+            (awayTeam['DREB_PCT'] ??
+                    awayTeam['reboundsDefensive'] /
+                        ((awayTeam['fieldGoalsAttempted'] - awayTeam['fieldGoalsMade']) == 0
+                            ? 1
+                            : (awayTeam['fieldGoalsAttempted'] -
+                                awayTeam['fieldGoalsMade'])) ??
+                    0.0) *
+                100,
+            1),
+        roundToDecimalPlaces(
+            (homeTeam['DREB_PCT'] ??
+                    homeTeam['reboundsDefensive'] /
+                        ((homeTeam['fieldGoalsAttempted'] - homeTeam['fieldGoalsMade']) == 0
+                            ? 1
+                            : (homeTeam['fieldGoalsAttempted'] -
+                                homeTeam['fieldGoalsMade'])) ??
+                    0.0) *
+                100,
+            1),
+      ),
+      SizedBox(height: 15.0.r),
+      buildComparisonRow(
+        '2ND Chance PTS',
+        awayTeam['pointsSecondChance'] ?? awayTeam['PTS_2ND_CHANCE'] ?? 0.0,
+        homeTeam['pointsSecondChance'] ?? homeTeam['PTS_2ND_CHANCE'] ?? 0.0,
+      ),
+    ];
+  }
+
+  List<Widget> buildPassingRows() {
+    return [
+      buildComparisonRow('AST', awayTeam['assists'] ?? 0, homeTeam['assists'] ?? 0),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+          'AST%', calculateAssistPercentage(awayTeam), calculateAssistPercentage(homeTeam)),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('AST / TOV', awayTeam['AST_TOV'] ?? 0, homeTeam['AST_TOV'] ?? 0),
+    ];
+  }
+
+  double calculateAssistPercentage(dynamic team) {
+    int fgm = team['fieldGoalsMade'] ?? 1;
+    return roundToDecimalPlaces((team['assists'] ?? 0) / fgm * 100, 1);
+  }
+
+  List<Widget> buildDefenseRows() {
+    return [
+      buildComparisonRow('STL', awayTeam['steals'] ?? 0, homeTeam['steals'] ?? 0),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('BLK', awayTeam['blocks'] ?? 0, homeTeam['blocks'] ?? 0),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+        'FOULS',
+        awayTeam['foulsPersonal'] ?? 0,
+        homeTeam['foulsPersonal'] ?? 0,
+      ),
+      SizedBox(height: 15.0.r),
+      buildComparisonRow(
+          'PTS OFF TOV',
+          awayTeam['pointsFromTurnovers'] ?? awayTeam['PTS_OFF_TO'] ?? 0,
+          homeTeam['pointsFromTurnovers'] ?? homeTeam['PTS_OFF_TO'] ?? 0),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow(
+          'FASTBREAK PTS',
+          awayTeam['pointsFastbreak'] ?? awayTeam['PTS_FB'] ?? 0,
+          homeTeam['pointsFastbreak'] ?? homeTeam['PTS_FB'] ?? 0),
+    ];
+  }
+
+  Widget buildComparisonRow(String statName, dynamic awayValue, dynamic homeValue) {
+    return ComparisonRow(
+      statName: statName,
+      awayTeam: awayValue,
+      homeTeam: homeValue,
+      awayTeamColor: awayTeamColor,
+      homeTeamColor: homeTeamColor,
     );
   }
 }
@@ -761,7 +1175,7 @@ class NonComparisonRow extends StatelessWidget {
   }
 }
 
-class ComparisonRow extends StatelessWidget {
+class ComparisonRow extends StatefulWidget {
   const ComparisonRow({
     super.key,
     required this.statName,
@@ -778,19 +1192,32 @@ class ComparisonRow extends StatelessWidget {
   final Color homeTeamColor;
 
   @override
+  State<ComparisonRow> createState() => _ComparisonRowState();
+}
+
+class _ComparisonRowState extends State<ComparisonRow> {
+  bool oneIsBetter = false;
+  bool twoIsBetter = false;
+
+  @override
+  void initState() {
+    super.initState();
+    oneIsBetter = (widget.statName.contains('DRTG') ||
+            widget.statName == 'FOULS' ||
+            widget.statName == 'TOV' ||
+            widget.statName == 'TOV%')
+        ? widget.awayTeam < widget.homeTeam
+        : widget.awayTeam > widget.homeTeam;
+    twoIsBetter = (widget.statName.contains('DRTG') ||
+            widget.statName == 'FOULS' ||
+            widget.statName == 'TOV' ||
+            widget.statName == 'TOV%')
+        ? widget.homeTeam < widget.awayTeam
+        : widget.homeTeam > widget.awayTeam;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    bool oneIsBetter = (statName.contains('DRTG') ||
-            statName == 'FOULS' ||
-            statName == 'TOV' ||
-            statName == 'TOV%')
-        ? awayTeam < homeTeam
-        : awayTeam > homeTeam;
-    bool twoIsBetter = (statName.contains('DRTG') ||
-            statName == 'FOULS' ||
-            statName == 'TOV' ||
-            statName == 'TOV%')
-        ? homeTeam < awayTeam
-        : homeTeam > awayTeam;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -801,10 +1228,10 @@ class ComparisonRow extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               StatValue(
-                value: awayTeam,
+                value: widget.awayTeam,
                 isHighlighted: oneIsBetter ? true : false,
-                color: awayTeamColor,
-                isPercentage: statName.contains('%'),
+                color: widget.awayTeamColor,
+                isPercentage: widget.statName.contains('%'),
               ),
             ],
           ),
@@ -812,7 +1239,7 @@ class ComparisonRow extends StatelessWidget {
         Expanded(
           flex: 2,
           child: Text(
-            statName,
+            widget.statName,
             textAlign: TextAlign.center,
             style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
@@ -824,10 +1251,10 @@ class ComparisonRow extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               StatValue(
-                value: homeTeam,
+                value: widget.homeTeam,
                 isHighlighted: twoIsBetter ? true : false,
-                color: homeTeamColor,
-                isPercentage: statName.contains('%'),
+                color: widget.homeTeamColor,
+                isPercentage: widget.statName.contains('%'),
               ),
             ],
           ),
@@ -843,11 +1270,12 @@ class StatValue extends StatelessWidget {
   final Color color;
   final bool isPercentage;
 
-  StatValue(
-      {required this.value,
-      this.isHighlighted = false,
-      required this.color,
-      required this.isPercentage});
+  StatValue({
+    required this.value,
+    this.isHighlighted = false,
+    required this.color,
+    required this.isPercentage,
+  }) : super(key: ValueKey(value));
 
   @override
   Widget build(BuildContext context) {

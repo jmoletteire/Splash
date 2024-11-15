@@ -123,6 +123,16 @@ def current_season_custom_stats_rank():
         ("TIME_OF_POSS_PER_75", f"{k_current_season_type}.ADV.TOUCHES", -1),
 
         # HUSTLE
+        ("CONTESTED_SHOTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("SCREEN_ASSISTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("SCREEN_AST_PTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("BOX_OUTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("OFF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("DEF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
+        ("DEFLECTIONS", f"{k_current_season_type}.HUSTLE", -1),
+        ("LOOSE_BALLS_RECOVERED", f"{k_current_season_type}.HUSTLE", -1),
+        ("CHARGES_DRAWN", f"{k_current_season_type}.HUSTLE", -1),
+
         ("CONTESTED_SHOTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
         ("SCREEN_ASSISTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
         ("SCREEN_AST_PTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),

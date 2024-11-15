@@ -4,52 +4,36 @@ import 'package:intl/intl.dart';
 
 import '../../../../utilities/constants.dart';
 
-class GameBasicInfo extends StatelessWidget {
+class GameBasicInfo extends StatefulWidget {
   const GameBasicInfo({
     super.key,
     required this.game,
     required this.isUpcoming,
+    required this.homeLineScore,
+    required this.awayLineScore,
   });
 
   final Map<String, dynamic> game;
   final bool isUpcoming;
+  final Map<String, dynamic> homeLineScore;
+  final Map<String, dynamic> awayLineScore;
 
   @override
-  Widget build(BuildContext context) {
-    List<String> officials = [];
-    String arena = '';
+  State<GameBasicInfo> createState() => _GameBasicInfoState();
+}
 
-    if (!isUpcoming || (isUpcoming && game.containsKey('BOXSCORE'))) {
-      for (Map<String, dynamic> official in game['SUMMARY']['Officials']) {
-        officials.add('${official['FIRST_NAME']} ${official['LAST_NAME']}');
-      }
-      if (game['BOXSCORE'].containsKey('arena')) {
-        arena =
-            '${game['BOXSCORE']['arena']['arenaName']} - ${game['BOXSCORE']['arena']['arenaCity']}, ${game['BOXSCORE']['arena']['arenaState']}';
-      } else {
-        if (kArenas.containsKey(game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '')) {
-          arena =
-              '${game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? ''} - ${kArenas[game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '']}';
-        } else {
-          arena = game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '';
-        }
-      }
-    } else {
-      officials.add('TBA');
-      if (kArenas.containsKey(game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '')) {
-        arena =
-            '${game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? ''} - ${kArenas[game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '']}';
-      } else {
-        arena = game['SUMMARY']?['GameSummary']?[0]?['ARENA_NAME'] ?? '';
-      }
-    }
+class _GameBasicInfoState extends State<GameBasicInfo> {
+  late Map<String, dynamic> summary;
+  late int year;
+  late String formattedDate;
+  late String seasonType;
+  late String awayTeamName;
+  late String homeTeamName;
+  String broadcast = '';
+  String arena = '';
+  List<String> officials = [];
 
-    // Parse the input string into a DateTime object
-    DateTime parsedDate = DateTime.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST']);
-
-    // Format the DateTime object into the desired string format
-    String formattedDate = DateFormat('EEEE, MMMM d, y').format(parsedDate).toUpperCase();
-
+  void setSeasonType() {
     Map<String, String> seasonTypes = {
       '1': 'Pre-Season',
       '2': 'Regular Season',
@@ -59,25 +43,76 @@ class GameBasicInfo extends StatelessWidget {
       '6': 'NBA Cup Final'
     };
 
-    String broadcast =
-        game['SUMMARY']['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS';
-    if (game['SUMMARY']['GameSummary'][0]['HOME_TV_BROADCASTER_ABBREVIATION'] != null) {
-      broadcast +=
-          ', ${game['SUMMARY']['GameSummary'][0]['HOME_TV_BROADCASTER_ABBREVIATION']}';
+    seasonType = seasonTypes[summary['GAME_ID'].substring(2, 3)] ?? '-';
+
+    if (summary.containsKey('NBA_CUP')) {
+      seasonType = '${summary['NBA_CUP']}  (Regular Season)';
     }
-    if (game['SUMMARY']['GameSummary'][0]['AWAY_TV_BROADCASTER_ABBREVIATION'] != null) {
-      broadcast +=
-          ', ${game['SUMMARY']['GameSummary'][0]['AWAY_TV_BROADCASTER_ABBREVIATION']}';
+  }
+
+  void setArenaAndOfficials() {
+    String arenaName = summary['ARENA_NAME'] ?? '';
+
+    if (!widget.isUpcoming || (widget.isUpcoming && widget.game.containsKey('BOXSCORE'))) {
+      for (Map<String, dynamic> official in (widget.game['SUMMARY']?['Officials'] ?? [])) {
+        officials.add('${official['FIRST_NAME']} ${official['LAST_NAME']}');
+      }
+      if (widget.game['BOXSCORE'].containsKey('arena')) {
+        arena =
+            '${widget.game['BOXSCORE']?['arena']?['arenaName'] ?? ''} - ${widget.game['BOXSCORE']?['arena']?['arenaCity'] ?? ''}, ${widget.game['BOXSCORE']?['arena']?['arenaState'] ?? ''}';
+      } else {
+        if (kArenas.containsKey(arenaName)) {
+          arena = '$arenaName - ${kArenas[arenaName]}';
+        } else {
+          arena = arenaName;
+        }
+      }
+    } else {
+      officials.add('TBA');
+      if (kArenas.containsKey(arenaName)) {
+        arena = '$arenaName - ${kArenas[arenaName]}';
+      } else {
+        arena = arenaName;
+      }
     }
+  }
 
-    String homeId = game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'].toString();
-    var linescore = game['SUMMARY']['LineScore'];
+  void setBroadcast() {
+    broadcast = summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS';
+    if (summary['HOME_TV_BROADCASTER_ABBREVIATION'] != null) {
+      broadcast += ', ${summary['HOME_TV_BROADCASTER_ABBREVIATION']}';
+    }
+    if (summary['AWAY_TV_BROADCASTER_ABBREVIATION'] != null) {
+      broadcast += ', ${summary['AWAY_TV_BROADCASTER_ABBREVIATION']}';
+    }
+  }
 
-    Map<String, dynamic> homeLinescore =
-        linescore[0]['TEAM_ID'].toString() == homeId ? linescore[0] : linescore[1];
-    Map<String, dynamic> awayLinescore =
-        linescore[0]['TEAM_ID'].toString() == homeId ? linescore[1] : linescore[0];
+  @override
+  void initState() {
+    super.initState();
 
+    summary = widget.game['SUMMARY']?['GameSummary']?[0] ?? {};
+
+    year = int.parse((summary['GAME_DATE_EST'] ?? '1900-01-01').substring(0, 4));
+
+    // Parse the input string into a DateTime object
+    DateTime parsedDate = DateTime.parse(summary['GAME_DATE_EST'] ?? '1900-01-01');
+
+    // Format the DateTime object into the desired string format
+    formattedDate = DateFormat('EEEE, MMMM d, y').format(parsedDate).toUpperCase();
+
+    awayTeamName =
+        '${widget.awayLineScore['TEAM_CITY_NAME'] ?? ''} ${widget.awayLineScore['TEAM_NICKNAME'] ?? widget.awayLineScore['TEAM_NAME'] ?? ''}';
+    homeTeamName =
+        '${widget.homeLineScore['TEAM_CITY_NAME'] ?? ''} ${widget.homeLineScore['TEAM_NICKNAME'] ?? widget.homeLineScore['TEAM_NAME'] ?? ''}';
+
+    setSeasonType();
+    setArenaAndOfficials();
+    setBroadcast();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
       color: Colors.grey.shade900,
@@ -87,33 +122,29 @@ class GameBasicInfo extends StatelessWidget {
           children: [
             GameBasicInfoRow(
               icon: Icons.calendar_month,
-              data: [
-                seasonTypes[game['SUMMARY']['GameSummary'][0]['GAME_ID'].substring(2, 3)] ??
-                    '-'
-              ],
+              data: [seasonType],
             ),
             SizedBox(height: 10.0.r),
             GameBasicInfoRow(
               icon: Icons.sports_basketball,
-              data: [
-                '${awayLinescore['TEAM_CITY_NAME']} ${awayLinescore['TEAM_NICKNAME'] ?? awayLinescore['TEAM_NAME']} @ ${homeLinescore['TEAM_CITY_NAME']} ${homeLinescore['TEAM_NICKNAME'] ?? homeLinescore['TEAM_NAME']}'
-              ],
+              data: ['$awayTeamName @ $homeTeamName'],
             ),
             SizedBox(height: 10.0.r),
-            if (int.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'].substring(0, 4)) <
-                2021)
+
+            // ARENA DATA ONLY AVAILABLE SINCE 2021
+            if (year < 2021)
               // Date
               GameBasicInfoRow(
                 icon: Icons.calendar_month,
                 data: [formattedDate],
               ),
-            if (int.parse(game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'].substring(0, 4)) >
-                2021)
+            if (year >= 2021)
               // Date
               GameBasicInfoRow(
                 icon: Icons.stadium,
                 data: [arena],
               ),
+
             SizedBox(height: 10.0.r),
             // Broadcast
             GameBasicInfoRow(

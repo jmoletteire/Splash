@@ -31,19 +31,48 @@ class GameMatchup extends StatefulWidget {
 
 class _GameMatchupState extends State<GameMatchup> {
   late Map<String, dynamic> summary;
-  late List<dynamic> linescore;
-  late Map<String, dynamic> homeLinescore;
-  late Map<String, dynamic> awayLinescore;
+  late List<dynamic> lineScore;
+  late Map<String, dynamic> homeLineScore;
+  late Map<String, dynamic> awayLineScore;
+  late Inactives inactives;
 
   @override
   void initState() {
     super.initState();
     summary = widget.game['SUMMARY']['GameSummary'][0];
-    linescore = widget.game['SUMMARY']['LineScore'];
-    homeLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-    awayLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
+    lineScore = widget.game['SUMMARY']['LineScore'];
+    homeLineScore =
+        lineScore[0]['TEAM_ID'].toString() == widget.homeId ? lineScore[0] : lineScore[1];
+    awayLineScore =
+        lineScore[0]['TEAM_ID'].toString() == widget.homeId ? lineScore[1] : lineScore[0];
+
+    if (!widget.isUpcoming || (widget.isUpcoming && widget.game.containsKey('BOXSCORE'))) {
+      inactives = Inactives(
+        inactivePlayers: widget.game['SUMMARY']?['InactivePlayers'],
+        homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+        awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
+        homeAbbr: homeLineScore['TEAM_ABBREVIATION'],
+        awayAbbr: awayLineScore['TEAM_ABBREVIATION'],
+      );
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant GameMatchup oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.game['SUMMARY']?['InactivePlayers'] !=
+        widget.game['SUMMARY']?['InactivePlayers']) {
+      if (!widget.isUpcoming || (widget.isUpcoming && widget.game.containsKey('BOXSCORE'))) {
+        inactives = Inactives(
+          inactivePlayers: widget.game['SUMMARY']?['InactivePlayers'],
+          homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
+          awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
+          homeAbbr: homeLineScore['TEAM_ABBREVIATION'],
+          awayAbbr: awayLineScore['TEAM_ABBREVIATION'],
+        );
+      }
+    }
   }
 
   @override
@@ -57,7 +86,12 @@ class _GameMatchupState extends State<GameMatchup> {
               [
                 if (widget.game['SUMMARY'].containsKey('Highlights'))
                   YoutubeHighlights(videoId: widget.game['SUMMARY']['Highlights']),
-                GameBasicInfo(game: widget.game, isUpcoming: widget.isUpcoming),
+                GameBasicInfo(
+                  game: widget.game,
+                  isUpcoming: widget.isUpcoming,
+                  homeLineScore: homeLineScore,
+                  awayLineScore: awayLineScore,
+                ),
                 if (!widget.isUpcoming ||
                     (widget.isUpcoming && widget.game.containsKey('BOXSCORE')))
                   Lineups(
@@ -66,21 +100,15 @@ class _GameMatchupState extends State<GameMatchup> {
                       awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0'),
                 if (!widget.isUpcoming ||
                     (widget.isUpcoming && widget.game.containsKey('BOXSCORE')))
-                  Inactives(
-                    inactivePlayers: widget.game['SUMMARY']?['InactivePlayers'],
-                    homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
-                    awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
-                    homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
-                    awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
-                  ),
+                  inactives,
                 if (widget.game['SUMMARY'].keys.toList().contains('SeasonSeries') &&
                     widget.game['SUMMARY']['SeasonSeries'].isNotEmpty)
                   H2H(
                     game: widget.game,
                     homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
                     awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
-                    homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
-                    awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
+                    homeAbbr: homeLineScore['TEAM_ABBREVIATION'],
+                    awayAbbr: awayLineScore['TEAM_ABBREVIATION'],
                   ),
                 if (widget.game['SUMMARY'].keys.toList().contains('LastMeeting') &&
                     widget.game['SUMMARY']['LastMeeting'].isNotEmpty)

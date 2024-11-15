@@ -20,31 +20,36 @@ def current_season_per_100_possessions(team_doc, playoffs):
     # Example: [("PTS", "BASIC"), ("AST", "BASIC")]
     stats_to_calculate = [
         # BASIC
-        ("FGM", "BASIC"),
-        ("FGA", "BASIC"),
-        ("FTM", "BASIC"),
-        ("FTA", "BASIC"),
-        ("FG3M", "BASIC"),
-        ("FG3A", "BASIC"),
-        ("STL", "BASIC"),
-        ("BLK", "BASIC"),
-        ("REB", "BASIC"),
-        ("OREB", "BASIC"),
-        ("DREB", "BASIC"),
-        ("TOV", "BASIC"),
-        ("PF", "BASIC"),
-        ("PFD", "BASIC"),
-        ("PTS", "BASIC"),
+        # ("FGM", "BASIC"),
+        # ("FGA", "BASIC"),
+        # ("FTM", "BASIC"),
+        # ("FTA", "BASIC"),
+        # ("FG3M", "BASIC"),
+        # ("FG3A", "BASIC"),
+        # ("STL", "BASIC"),
+        # ("BLK", "BASIC"),
+        # ("REB", "BASIC"),
+        # ("OREB", "BASIC"),
+        # ("DREB", "BASIC"),
+        # ("TOV", "BASIC"),
+        # ("PF", "BASIC"),
+        # ("PFD", "BASIC"),
+        # ("PTS", "BASIC"),
+
+        # ADV
+        ("XPTS_DIFF", "ADV"),
+        ("XPTS_FOR", "ADV"),
+        ("XPTS_AGAINST", "ADV"),
 
         # HUSTLE
-        ("CONTESTED_SHOTS", "HUSTLE"),
-        ("SCREEN_ASSISTS", "HUSTLE"),
-        ("SCREEN_AST_PTS", "HUSTLE"),
-        ("BOX_OUTS", "HUSTLE"),
-        ("OFF_BOXOUTS", "HUSTLE"),
-        ("DEF_BOXOUTS", "HUSTLE"),
-        ("DEFLECTIONS", "HUSTLE"),
-        ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
+        # ("CONTESTED_SHOTS", "HUSTLE"),
+        # ("SCREEN_ASSISTS", "HUSTLE"),
+        # ("SCREEN_AST_PTS", "HUSTLE"),
+        # ("BOX_OUTS", "HUSTLE"),
+        # ("OFF_BOXOUTS", "HUSTLE"),
+        # ("DEF_BOXOUTS", "HUSTLE"),
+        # ("DEFLECTIONS", "HUSTLE"),
+        # ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
     ]
 
     seasons = team_doc.get("seasons", None)
@@ -229,7 +234,7 @@ if __name__ == "__main__":
 
         for i, team_doc in enumerate(batch_cursor):
             logging.info(f'Processing {i + 1} of {batch_size}')
-            calculate_and_update_per_100_possessions(team_doc, playoffs)
-            #current_season_per_100_possessions(team_doc, playoffs)
+            # calculate_and_update_per_100_possessions(team_doc, playoffs)
+            current_season_per_100_possessions(team_doc, playoffs)
 
     print("Per-100 possession values have been calculated and updated.")

@@ -1,13 +1,14 @@
 import random
 import re
 import time
+from datetime import datetime
 
 import requests
 from nba_api.stats.endpoints import boxscoreadvancedv2
 from pymongo import MongoClient
 
 from splash_nba.lib.games.fetch_boxscore_basic import fetch_box_score_stats
-from splash_nba.util.env import uri
+from splash_nba.util.env import uri, k_current_season
 import logging
 from unidecode import unidecode
 
@@ -64,6 +65,74 @@ def update_players_and_teams(season, season_type):
         )
 
 
+def team_xpts_record(team, season, season_type):
+    xpts_for = 0
+    xpts_against = 0
+    xpts_w = 0
+    xpts_l = 0
+
+    for game_id, game_data in team['seasons'][season]['GAMES'].items():
+        if game_id[2] == '2':
+            game = games_collection.find_one(
+                {
+                    "GAME_DATE": game_data['GAME_DATE'],
+                    f"GAMES.{game_id}": {"$exists": True}
+                },
+                {
+                    f"GAMES.{game_id}": 1,
+                    "_id": 0
+                }
+            )['GAMES'][game_id]
+
+            if 'ADV' in game.keys() and 'BOXSCORE' in game.keys():
+                if 'homeTeam' in game['BOXSCORE'].keys():
+                    team_ft = {
+                        game['BOXSCORE']['homeTeam']['teamId']: game['BOXSCORE']['homeTeam']['statistics']['freeThrowsMade'],
+                        game['BOXSCORE']['awayTeam']['teamId']: game['BOXSCORE']['awayTeam']['statistics']['freeThrowsMade']
+                    }
+                elif 'TeamStats' in game['BOXSCORE'].keys():
+                    team_ft = {
+                        game['BOXSCORE']['TeamStats'][0]['TEAM_ID']: game['BOXSCORE']['TeamStats'][0]['FTM'],
+                        game['BOXSCORE']['TeamStats'][1]['TEAM_ID']: game['BOXSCORE']['TeamStats'][1]['FTM']
+                    }
+                else:
+                    continue
+
+                # Increment xPTS W/L for each team based on result
+                teamOneFT = team_ft[game['ADV']['TeamStats'][0]['TEAM_ID']]
+                teamTwoFT = team_ft[game['ADV']['TeamStats'][1]['TEAM_ID']]
+                teamOnexPTS = game['ADV']['TeamStats'][0]['SQ_TOTAL'] + teamOneFT
+                teamTwoxPTS = game['ADV']['TeamStats'][1]['SQ_TOTAL'] + teamTwoFT
+                teamOneWins = teamOnexPTS > teamTwoxPTS
+                teamTwoWins = teamTwoxPTS > teamOnexPTS
+
+                if team['TEAM_ID'] == game['ADV']['TeamStats'][0]['TEAM_ID']:
+                    xpts_for += teamOnexPTS
+                    xpts_against += teamTwoxPTS
+                    if teamOneWins:
+                        xpts_w += 1
+                    else:
+                        xpts_l += 1
+                elif team['TEAM_ID'] == game['ADV']['TeamStats'][1]['TEAM_ID']:
+                    xpts_for += teamTwoxPTS
+                    xpts_against += teamOnexPTS
+                    if teamTwoWins:
+                        xpts_w += 1
+                    else:
+                        xpts_l += 1
+
+    teams_collection.update_one(
+        {'TEAM_ID': team['TEAM_ID']},
+        {'$set': {
+            f'seasons.{season}.STATS.{season_type}.ADV.XPTS_DIFF': xpts_for - xpts_against,
+            f'seasons.{season}.STATS.{season_type}.ADV.XPTS_FOR': xpts_for,
+            f'seasons.{season}.STATS.{season_type}.ADV.XPTS_AGAINST': xpts_against,
+            f'seasons.{season}.xPTS_W': xpts_w,
+            f'seasons.{season}.xPTS_L': xpts_l
+        }}
+    )
+
+
 def get_sr_ids(adv_boxscore, valid_ids):
     for i, player_adv_stats in enumerate(adv_boxscore['PlayerStats']):
         team = player_adv_stats['TEAM_ABBREVIATION']
@@ -112,7 +181,7 @@ def synergy_shot_quality(sr_id, adv_boxscore):
         'accept': 'application/json, text/plain, */*',
         'accept-encoding': 'gzip, deflate, br, zstd',
         'accept-language': 'en-US,en;q=0.9',
-        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxMzM1MDU2LCJpYXQiOjE3MzEzMzUwNTYsImV4cCI6MTczMTMzNTY1NiwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.W7l3VMh0q49nHndnn9Q4yGrFLgAohZ7eGWzB3r8AN-RtJpC9d4wVSJ7rqBBk-rUp2PPVC8gzdYr6kwXHDeuwucIjL5bwkgZ91NKGQRo8dfVHJGarpXwgoe8Tbab-dA43KjZNlQql_cAzR9NIVzBe4ItaX4wAQpHfXQlRTkL48UjYsGG3x7XMkLGZOGngNq_fZKLStDxLeGjMDq4gvmgBU67Z1aww8OkM5LBy1oekIg3j2PPuzLKJFNA19LCAlNgqMXupl6Q8Ux4K6SI088BV1Q9NA_27UoOVqDtAGpLneOzn3YA8F2_f3pMoI_2NqFjebZYxBadlr7rkRjfAseo1IQ',
+        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxNjAzOTc4LCJpYXQiOjE3MzE2MDM5NzgsImV4cCI6MTczMTYwNDU3OCwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.VHq153K4LOQq8T7zsx9pqv_BvAnRzFeqOvhD1cbChdrTM-cJ4cn2tjTKcJFkyKy_MC5PIeZBPNoRlG3RbINVY4jnsSwEsi-qfkG2TURmQTKfCnILeXpQb8obLhudqZGzhz_Ps1c-TvjCv1_KZktunwFU2h-yu3JWJ0uSec_EODoIp5xJng_0ClvaNX_ko5pYPCTkuwZlLBtykz1R5P7JhDsw1dN9EkQSZvDWKOYsWMRaL6uxNldqCW1LgS_xUViL_Bb07RxNoY41cFFXKP2eZIdauDbIy4x355OPsg7xgO01jdycY0N8fLgI9neZ0dJjH_AUZ67pZD8no3L5pTxV6Q',
         'origin': 'https://apps.synergysports.com',
         'referer': 'https://apps.synergysports.com/',
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
@@ -181,8 +250,11 @@ if __name__ == "__main__":
         games_collection = db.nba_games
         logging.info("Connected to MongoDB")
 
+        # Get today's date in "yyyy-mm-dd" format
+        today_date = datetime.today().strftime("%Y-%m-%d")
+
         # Set batch size to process documents
-        filter = {"GAME_DATE": '2024-11-10'}  # {"SEASON_YEAR": '2024'}  #
+        filter = {"GAME_DATE": '2024-11-13'}  # {"SEASON_CODE": '22024', "GAME_DATE": {"$lt": today_date}}  #
         batch_size = 100
         total_documents = games_collection.count_documents(filter)
         processed_count = 0
@@ -210,6 +282,20 @@ if __name__ == "__main__":
                             # Fetch box score summary for the game
                             try:
                                 stats = fetch_box_score_adv(game_id)
+
+                                if 'homeTeam' in game_data['BOXSCORE'].keys():
+                                    team_ft = {
+                                        game_data['BOXSCORE']['homeTeam']['teamId']: game_data['BOXSCORE']['homeTeam']['statistics']['freeThrowsMade'],
+                                        game_data['BOXSCORE']['awayTeam']['teamId']: game_data['BOXSCORE']['awayTeam']['statistics']['freeThrowsMade']
+                                    }
+                                elif 'TeamStats' in game_data['BOXSCORE'].keys():
+                                    team_ft = {
+                                        game_data['BOXSCORE']['TeamStats'][0]['TEAM_ID']: game_data['BOXSCORE']['TeamStats'][0]['FTM'],
+                                        game_data['BOXSCORE']['TeamStats'][1]['TEAM_ID']: game_data['BOXSCORE']['TeamStats'][1]['FTM']
+                                    }
+                                else:
+                                    continue
+
                                 stats = synergy_shot_quality(game_data['SR_ID'], stats)
                             except Exception as e:
                                 stats = None
@@ -237,6 +323,14 @@ if __name__ == "__main__":
                                 logging.info(f"Processed {game_counter} games. Pausing for 10 seconds...")
                                 time.sleep(10)
 
-        print("Box score stats update complete.")
+        logging.info("Box score stats update complete.")
+
+        logging.info("\nUpdating xPTS W-L...")
+        season = '2024-25'
+        season_type = 'REGULAR SEASON'
+        for i, team in enumerate(teams_collection.find({}, {'TEAM_ID': 1, f'seasons.{season}.GAMES': 1, '_id': 0})):
+            logging.info(f'Processing {i + 1} of 30')
+            team_xpts_record(team, season, season_type)
+
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

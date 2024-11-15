@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_table_view/material_table_view.dart';
@@ -31,30 +29,78 @@ class BoxPlayerStats extends StatefulWidget {
 }
 
 class _BoxPlayerStatsState extends State<BoxPlayerStats> {
-  List columnNames = [];
-  Timer? _debounceTimer;
   late double availableWidth;
   late double availableHeight;
   late bool isLandscape;
+  List<Map<String, dynamic>> _players = [];
+  List<String> columnNames = [];
+  List<TableColumn> tableColumns = [];
+  bool hasPoss = false;
+  bool hasXPTS = false;
+  Widget? _cachedHeader;
+  Map<int, Widget> _cachedRows = {};
 
   @override
   void initState() {
     super.initState();
 
-    widget.controller.addListener(() {
-      if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
-      _debounceTimer = Timer(const Duration(seconds: 5), () {
-        setState(() {});
-      });
-    });
+    for (int i = 0; i < widget.players.length; i++) {
+      setPlayer(i);
+    }
 
     // Check if xPTS data is available for any player
-    bool hasXPTS = widget.players.any(
-        (player) => player['statistics']?['SQ_TOTAL'] != null || player['SQ_TOTAL'] != null);
+    hasPoss = widget.players
+        .any((player) => player['statistics']?['POSS'] != null || player['POSS'] != null);
 
+    // Check if xPTS data is available for any player
+    hasXPTS = widget.players.any(
+        (player) => player['statistics']?['SQ_TOTAL'] != null || player['SQ_TOTAL'] != null);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    availableWidth = MediaQuery.of(context).size.width;
+    availableHeight = MediaQuery.of(context).size.height;
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    _initializeColumns();
+  }
+
+  @override
+  void didUpdateWidget(covariant BoxPlayerStats oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Check if the game data has changed
+    if (oldWidget.players != widget.players) {
+      // Loop through both lists of players and compare each field
+      for (int i = 0; i < widget.players.length; i++) {
+        if (i >= oldWidget.players.length) break;
+
+        final newPlayer = widget.players[i];
+        final oldPlayer = oldWidget.players[i];
+
+        // Compare each key in the new player against the old player
+        bool hasChanges = false;
+        newPlayer.forEach((key, newValue) {
+          final oldValue = oldPlayer[key];
+          if (newValue != oldValue) {
+            hasChanges = true;
+            // Call setPlayer() when a change is found and exit the forEach loop
+            setPlayer(i);
+            return;
+          }
+        });
+
+        // Move on to the next player if no changes were found
+        if (!hasChanges) continue;
+      }
+    }
+  }
+
+  void _initializeColumns() {
     columnNames = [
       widget.playerGroup,
-      'POSS',
+      if (hasPoss) 'POSS',
       'MIN',
       if (hasXPTS) 'xPTS', // Only add xPTS if data is available
       'PTS',
@@ -77,19 +123,182 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       'ORTG',
       'DRTG'
     ];
+    tableColumns = [
+      /// PLAYER
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.15 : availableWidth * 0.38,
+        freezePriority: 1,
+      ),
+
+      /// POSS
+      if (columnNames.contains('POSS'))
+        TableColumn(
+          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.09,
+        ),
+
+      /// MIN
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.125,
+      ),
+
+      /// xPTS
+      if (columnNames.contains('xPTS'))
+        TableColumn(
+          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1,
+        ),
+
+      /// PTS
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1,
+      ),
+
+      /// REB
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
+      ),
+
+      /// AST
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
+      ),
+
+      /// TOV
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
+      ),
+
+      /// FGM - FGA
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.11,
+      ),
+
+      /// 3PM - 3PA
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.11,
+      ),
+
+      /// FTM - FTA
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.11,
+      ),
+
+      /// STL
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.04 : availableWidth * 0.1,
+      ),
+
+      /// BLK
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
+      ),
+
+      /// OREB
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
+      ),
+
+      /// DREB
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
+      ),
+
+      /// PF
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
+      ),
+
+      /// +/-
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1,
+      ),
+
+      /// EFG%
+      TableColumn(
+        width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
+      ),
+
+      /// TS%
+      if (!widget.inProgress)
+        TableColumn(
+          width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
+        ),
+
+      /// USG%
+      if (!widget.inProgress)
+        TableColumn(
+          width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
+        ),
+
+      /// NRTG
+      if (!widget.inProgress)
+        TableColumn(
+          width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
+        ),
+
+      /// ORTG
+      if (!widget.inProgress)
+        TableColumn(
+          width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
+        ),
+
+      /// DRTG
+      if (!widget.inProgress)
+        TableColumn(
+          width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
+        ),
+    ];
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    availableWidth = MediaQuery.of(context).size.width;
-    availableHeight = MediaQuery.of(context).size.height;
-    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+  void setPlayer(int index) {
+    void ensureItemExists(List<Map<String, dynamic>> players, int index) {
+      // Check if the list is shorter than the desired index
+      if (players.length <= index) {
+        // Add empty maps until the desired index is reachable
+        players.addAll(List.generate(index + 1 - players.length, (_) => {}));
+      }
+      // Set the item at the desired index to an empty map
+      players[index] = {};
+    }
+
+    ensureItemExists(_players, index);
+
+    int played = int.parse(widget.players[index]?['played'] ?? '1');
+
+    _players[index]['nameWidget'] = playerNameWidget(index);
+    _players[index]['possWidget'] = possWidget(index, played);
+    _players[index]['minutesWidget'] = minutesWidget(index, played);
+    _players[index]['xPtsWidget'] = xPtsWidget(index, played);
+    _players[index]['ptsWidget'] = basicStatWidget(index, played, 'points', 'PTS');
+    _players[index]['rebWidget'] = basicStatWidget(index, played, 'reboundsTotal', 'REB');
+    _players[index]['astWidget'] = basicStatWidget(index, played, 'assists', 'AST');
+    _players[index]['tovWidget'] = basicStatWidget(index, played, 'turnovers', 'TO');
+    _players[index]['stlWidget'] = basicStatWidget(index, played, 'steals', 'STL');
+    _players[index]['blkWidget'] = basicStatWidget(index, played, 'blocks', 'BLK');
+    _players[index]['orebWidget'] =
+        basicStatWidget(index, played, 'reboundsOffensive', 'OREB');
+    _players[index]['drebWidget'] =
+        basicStatWidget(index, played, 'reboundsDefensive', 'DREB');
+    _players[index]['pfWidget'] = basicStatWidget(index, played, 'foulsPersonal', 'PF');
+    _players[index]['plusMinusWidget'] =
+        basicStatWidget(index, played, 'plusMinusPoints', 'PLUS_MINUS');
+    _players[index]['fgWidget'] = shootingAttemptsWidget(
+        index, played, 'fieldGoalsMade', 'fieldGoalsAttempted', 'FGM', 'FGA');
+    _players[index]['fg3Widget'] = shootingAttemptsWidget(
+        index, played, 'threePointersMade', 'threePointersAttempted', 'FG3M', 'FG3A');
+    _players[index]['ftWidget'] = shootingAttemptsWidget(
+        index, played, 'freeThrowsMade', 'freeThrowsAttempted', 'FTM', 'FTA');
+    _players[index]['efgWidget'] = efgWidget(index, played);
+    _players[index]['tsWidget'] = basicStatWidget(index, played, 'TS_PCT', 'TS_PCT');
+    _players[index]['usgWidget'] = basicStatWidget(index, played, 'USG_PCT', 'USG_PCT');
+    _players[index]['nRtgWidget'] = nRtgWidget(index, played);
+    _players[index]['oRtgWidget'] = oRtgWidget(index, played);
+    _players[index]['dRtgWidget'] = dRtgWidget(index, played);
   }
 
   @override
   Widget build(BuildContext context) {
     return SliverTableView.builder(
+      addAutomaticKeepAlives: true,
       horizontalScrollController: widget.controller,
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
@@ -108,156 +317,36 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       rowCount: widget.players.length,
       rowHeight: availableHeight * 0.06,
       minScrollableWidth: availableWidth * 0.01,
-      columns: [
-        /// PLAYER
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.15 : availableWidth * 0.38,
-          freezePriority: 1,
-        ),
-
-        /// POSS
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.09,
-        ),
-
-        /// MIN
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.125,
-        ),
-
-        /// xPTS
-        if (columnNames.contains('xPTS'))
-          TableColumn(
-            width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1,
-          ),
-
-        /// PTS
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1,
-        ),
-
-        /// REB
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
-        ),
-
-        /// AST
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
-        ),
-
-        /// TOV
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
-        ),
-
-        /// FGM - FGA
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.11,
-        ),
-
-        /// 3PM - 3PA
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.11,
-        ),
-
-        /// FTM - FTA
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.11,
-        ),
-
-        /// STL
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.04 : availableWidth * 0.1,
-        ),
-
-        /// BLK
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
-        ),
-
-        /// OREB
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
-        ),
-
-        /// DREB
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
-        ),
-
-        /// PF
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.03 : availableWidth * 0.08,
-        ),
-
-        /// +/-
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1,
-        ),
-
-        /// EFG%
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
-        ),
-
-        /// TS%
-        if (!widget.inProgress)
-          TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
-          ),
-
-        /// USG%
-        if (!widget.inProgress)
-          TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
-          ),
-
-        /// NRTG
-        if (!widget.inProgress)
-          TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
-          ),
-
-        /// ORTG
-        if (!widget.inProgress)
-          TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
-          ),
-
-        /// DRTG
-        if (!widget.inProgress)
-          TableColumn(
-            width: isLandscape ? availableWidth * 0.06 : availableWidth * 0.13,
-          ),
-      ],
+      columns: tableColumns,
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
     );
   }
 
-  Widget _headerBuilder(BuildContext context, TableRowContentBuilder contentBuilder) =>
-      contentBuilder(
-        context,
-        (context, column) {
-          return Material(
-            color: const Color(0xFF303030),
-            child: Padding(
-              padding:
-                  column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
-              child: Align(
-                alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
-                child: Text(
-                  columnNames[column] ?? '',
-                  style: kBebasNormal.copyWith(
-                    fontSize: 14.0.r,
-                  ),
+  Widget _headerBuilder(BuildContext context, TableRowContentBuilder contentBuilder) {
+    // Use the cached header if it exists; otherwise, build and cache it
+    return _cachedHeader ??= contentBuilder(
+      context,
+      (context, column) {
+        return Material(
+          color: const Color(0xFF303030),
+          child: Padding(
+            padding:
+                column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
+            child: Align(
+              alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
+              child: Text(
+                columnNames[column],
+                style: kBebasNormal.copyWith(
+                  fontSize: 14.0.r,
                 ),
               ),
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
+  }
 
   /// This is used to wrap both regular and placeholder rows to achieve fade
   /// transition between them and to insert optional row divider.
@@ -279,7 +368,12 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       );
 
   Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
-    return _wrapRow(
+    if (_cachedRows.containsKey(row)) {
+      return _cachedRows[row];
+    }
+
+    // Build and cache the row if not already cached
+    final rowWidget = _wrapRow(
       row,
       Material(
         type: MaterialType.transparency,
@@ -310,9 +404,187 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         ),
       ),
     );
+
+    _cachedRows[row] = rowWidget;
+    return rowWidget;
   }
 
   Widget getContent(int row, int column, BuildContext context) {
+    int adj_column = hasPoss && hasXPTS
+        ? column
+        : !hasPoss && hasXPTS
+            ? column >= 1
+                ? column + 1
+                : column
+            : hasPoss && !hasXPTS
+                ? column >= 3
+                    ? column + 1
+                    : column
+                : column == 0
+                    ? column
+                    : column == 1
+                        ? column + 1
+                        : column + 2;
+
+    switch (adj_column) {
+      case 0:
+        return _players[row]['nameWidget'];
+      case 1:
+        return _players[row]['possWidget'];
+      case 2:
+        return _players[row]['minutesWidget'];
+      case 3:
+        return _players[row]['xPtsWidget'];
+      case 4:
+        return _players[row]['ptsWidget'];
+      case 5:
+        return _players[row]['rebWidget'];
+      case 6:
+        return _players[row]['astWidget'];
+      case 7:
+        return _players[row]['tovWidget'];
+      case 8:
+        return _players[row]['fgWidget'];
+      case 9:
+        return _players[row]['fg3Widget'];
+      case 10:
+        return _players[row]['ftWidget'];
+      case 11:
+        return _players[row]['stlWidget'];
+      case 12:
+        return _players[row]['blkWidget'];
+      case 13:
+        return _players[row]['orebWidget'];
+      case 14:
+        return _players[row]['drebWidget'];
+      case 15:
+        return _players[row]['pfWidget'];
+      case 16:
+        return _players[row]['plusMinusWidget'];
+      case 17:
+        return _players[row]['efgWidget'];
+      case 18:
+        return _players[row]['tsWidget'];
+      case 19:
+        return _players[row]['usgWidget'];
+      case 20:
+        return _players[row]['nRtgWidget'];
+      case 21:
+        return _players[row]['oRtgWidget'];
+      case 22:
+        return _players[row]['dRtgWidget'];
+      default:
+        return const Text('-');
+    }
+  }
+
+  Widget playerNameWidget(int index) {
+    String jersey = widget.players[index]?['jerseyNum'].toString() ?? '';
+    String playerId = widget.players[index]?['personId'].toString() ??
+        widget.players[index]?['PLAYER_ID'].toString() ??
+        '0';
+    String name = widget.players[index]?['nameI'] ??
+        (widget.players[index]?['PLAYER_NAME'] != null
+            ? '${widget.players[index]['PLAYER_NAME'][0]}. ${(widget.players[index]['PLAYER_NAME']).substring((widget.players[index]['PLAYER_NAME']).indexOf(' ') + 1)}'
+            : '');
+    String position =
+        widget.players[index]?['position'] ?? widget.players[index]?['START_POSITION'] ?? '';
+    int onCourt = widget.inProgress ? int.parse(widget.players[index]?['oncourt'] ?? '0') : 0;
+
+    return RepaintBoundary(
+      key: ValueKey(onCourt),
+      child: Container(
+        alignment: Alignment.centerLeft,
+        child: Row(
+          children: [
+            if (jersey != '')
+              SizedBox(
+                width: 12.0.r,
+                child: Text(
+                  jersey,
+                  textAlign: TextAlign.center,
+                  style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
+                ),
+              ),
+            SizedBox(width: 8.0.r),
+            PlayerAvatar(
+              radius: 12.0.r,
+              backgroundColor: Colors.white12,
+              playerImageUrl:
+                  'https://cdn.nba.com/headshots/nba/latest/1040x760/$playerId.png',
+            ),
+            SizedBox(width: 5.0.r),
+            Flexible(
+              child: RichText(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: name,
+                      style: kBebasNormal.copyWith(
+                        color: Colors.white70,
+                        fontSize: 14.0.r,
+                      ),
+                    ),
+                    if (position != '')
+                      TextSpan(
+                        text: ', $position',
+                        style: kBebasNormal.copyWith(
+                          color: Colors.white,
+                          fontSize: 13.0.r,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            if (onCourt == 1) SizedBox(width: 8.0.r),
+            if (onCourt == 1)
+              Container(
+                width: 6.0.r, // Size of the dot
+                height: 6.0.r,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF55F86F), // Green color for the dot
+                  shape: BoxShape.circle, // Circular shape
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget possWidget(int index, int played) {
+    try {
+      if ((played == 0 ||
+              (widget.players[index]?['statistics']?['POSS'] ??
+                      widget.players[index]?['POSS'] ??
+                      0) ==
+                  0) &&
+          !widget.inProgress) {
+        return BoxscoreDataText(key: const ValueKey('DNP'), text: 'DNP', size: 14.0.r);
+      }
+      String text =
+          '${widget.players[index]?['statistics']?['POSS'] ?? widget.players[index]?['POSS'] ?? '-'}';
+      return RepaintBoundary(
+        key: ValueKey(text),
+        child: Container(
+          alignment: Alignment.centerRight,
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+          ),
+        ),
+      );
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+    }
+  }
+
+  Widget minutesWidget(int index, int played) {
     String formatLiveDuration(String input) {
       final regex = RegExp(r'PT(\d+)M(\d+).(\d+)S');
       final match = regex.firstMatch(input);
@@ -328,466 +600,242 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       return input; // Return the original string if no match is found
     }
 
-    int adj_column = columnNames.contains('xPTS')
-        ? column
-        : column >= 3
-            ? column + 1
-            : column;
+    String minutes = widget.players[index]?['statistics']?['minutes'] != null
+        ? formatLiveDuration(widget.players[index]?['statistics']?['minutes'] ?? 'PT00M00.00S')
+        : '${(widget.players[index]?['MIN'] ?? '').replaceAll(RegExp(r'\..*?(?=:)'), '')}';
 
-    int played = int.parse(widget.players[row]?['played'] ?? '1');
-    int onCourt = widget.inProgress ? int.parse(widget.players[row]?['oncourt'] ?? '0') : 0;
-    String position =
-        widget.players[row]?['position'] ?? widget.players[row]?['START_POSITION'] ?? '';
-    String minutes = widget.players[row]?['statistics']?['minutes'] != null
-        ? formatLiveDuration(widget.players[row]?['statistics']?['minutes'] ?? 'PT00M00.00S')
-        : '${(widget.players[row]?['MIN'] ?? '').replaceAll(RegExp(r'\..*?(?=:)'), '')}';
-
-    switch (adj_column) {
-      case 0:
-        return RepaintBoundary(
-          child: Container(
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: [
-                if (widget.players[row].containsKey('jerseyNum'))
-                  SizedBox(
-                    width: 12.0.r,
-                    child: Text(
-                      widget.players[row]?['jerseyNum'] ?? '',
-                      textAlign: TextAlign.center,
-                      style: kBebasNormal.copyWith(color: Colors.grey, fontSize: 12.0.r),
-                    ),
-                  ),
-                SizedBox(width: 8.0.r),
-                PlayerAvatar(
-                  radius: 12.0.r,
-                  backgroundColor: Colors.white12,
-                  playerImageUrl:
-                      'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.players[row]?['personId'] ?? widget.players[row]?['PLAYER_ID'] ?? '0'}.png',
-                ),
-                SizedBox(width: 5.0.r),
-                Flexible(
-                  child: RichText(
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: widget.players[row]?['nameI'] ??
-                              (widget.players[row]?['PLAYER_NAME'] != null
-                                  ? '${widget.players[row]['PLAYER_NAME'][0]}. ${(widget.players[row]['PLAYER_NAME']).substring((widget.players[row]['PLAYER_NAME']).indexOf(' ') + 1)}'
-                                  : ''),
-                          style: kBebasNormal.copyWith(
-                            color: Colors.white70,
-                            fontSize: 14.0.r,
-                          ),
-                        ),
-                        if (widget.playerGroup == 'STARTERS')
-                          TextSpan(
-                            text: ', $position',
-                            style: kBebasNormal.copyWith(
-                              color: Colors.white,
-                              fontSize: 13.0.r,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (onCourt == 1) SizedBox(width: 8.0.r),
-                if (onCourt == 1)
-                  Container(
-                    width: 6.0.r, // Size of the dot
-                    height: 6.0.r,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF55F86F), // Green color for the dot
-                      shape: BoxShape.circle, // Circular shape
-                    ),
-                  ),
-              ],
-            ),
+    try {
+      if (played == 0) {
+        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      }
+      return RepaintBoundary(
+        key: ValueKey(minutes),
+        child: Container(
+          alignment: Alignment.centerRight,
+          child: Text(
+            minutes == '0:00' || minutes == 'null' ? '-' : minutes,
+            style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
-        );
-      case 1:
-        try {
-          if ((played == 0 ||
-                  (widget.players[row]?['statistics']?['POSS'] ??
-                          widget.players[row]?['POSS'] ??
-                          0) ==
-                      0) &&
-              !widget.inProgress) {
-            return BoxscoreDataText(text: 'DNP', size: 14.0.r);
-          }
-          return RepaintBoundary(
-            child: Container(
-              alignment: Alignment.centerRight,
-              child: Text(
-                '${widget.players[row]?['statistics']?['POSS'] ?? widget.players[row]?['POSS'] ?? '-'}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: kBebasNormal.copyWith(fontSize: 14.0.r),
-              ),
-            ),
-          );
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 2:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return RepaintBoundary(
-            child: Container(
-              alignment: Alignment.centerRight,
-              child: Text(
-                minutes == '0:00' || minutes == 'null' ? '-' : minutes,
-                style: kBebasNormal.copyWith(fontSize: 14.0.r),
-              ),
-            ),
-          );
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 3:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${((widget.players[row]?['statistics']?['SQ_TOTAL'] ?? 0.0) + (widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]['FTM'] ?? 0.0)).toStringAsFixed(1)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 4:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['points'] ?? widget.players[row]?['PTS'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 5:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['reboundsTotal'] ?? widget.players[row]?['REB'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 6:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['assists'] ?? widget.players[row]?['AST'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 7:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['turnovers'] ?? widget.players[row]?['TO'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 8:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['fieldGoalsMade'] ?? widget.players[row]?['FGM'] ?? '').toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['fieldGoalsAttempted'] ?? widget.players[row]?['FGA'] ?? '').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 9:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['threePointersMade'] ?? widget.players[row]?['FG3M'] ?? '').toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['threePointersAttempted'] ?? widget.players[row]?['FG3A'] ?? '').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 10:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['freeThrowsMade'] ?? widget.players[row]?['FTM'] ?? '').toStringAsFixed(0)}-${(widget.players[row]?['statistics']?['freeThrowsAttempted'] ?? widget.players[row]?['FTA'] ?? '').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 11:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['steals'] ?? widget.players[row]?['STL'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 12:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['blocks'] ?? widget.players[row]?['BLK'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 13:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['reboundsOffensive'] ?? widget.players[row]?['OREB'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 14:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['reboundsDefensive'] ?? widget.players[row]?['DREB'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 15:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['foulsPersonal'] ?? widget.players[row]?['PF'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 16:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${(widget.players[row]?['statistics']?['plusMinusPoints'] ?? widget.players[row]?['PLUS_MINUS'] ?? '-').toStringAsFixed(0)}');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 17:
-        try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          int fieldGoalsAttempted =
-              widget.players[row]?['statistics']?['fieldGoalsAttempted'] ?? 0;
+        ),
+      );
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+    }
+  }
 
-          // Check for division by zero
-          if (fieldGoalsAttempted == 0) {
-            try {
-              return BoxscoreDataText(
-                  text:
-                      '${((widget.players[row]?['statistics']?['EFG_PCT'] ?? widget.players[row]?['EFG_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
-            } catch (e) {
-              return const BoxscoreDataText(text: '-');
-            }
-          }
+  Widget xPtsWidget(int index, int played) {
+    try {
+      if (played == 0) {
+        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      }
+      String text =
+          '${((widget.players[index]?['statistics']?['SQ_TOTAL'] ?? 0.0) + (widget.players[index]?['statistics']?['freeThrowsMade'] ?? widget.players[index]['FTM'] ?? 0.0)).toStringAsFixed(1)}';
+      return BoxscoreDataText(key: ValueKey(text), text: text);
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+    }
+  }
 
-          double efgPct = (((widget.players[row]?['statistics']?['fieldGoalsMade'] ?? 0) +
-                      (0.5 *
-                          (widget.players[row]?['statistics']?['threePointersMade'] ?? 0))) /
-                  fieldGoalsAttempted) *
-              100;
+  Widget basicStatWidget(int index, int played, String statName, String statAbbr) {
+    try {
+      if (played == 0) {
+        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      }
+      String text = statName == 'TS_PCT' || statName == 'USG_PCT'
+          ? '${((widget.players[index]?['statistics']?[statName] ?? widget.players[index]?[statAbbr] ?? '-') * 100).toStringAsFixed(1)}%'
+          : '${(widget.players[index]?['statistics']?[statName] ?? widget.players[index]?[statAbbr] ?? '-').toStringAsFixed(0)}';
+      return BoxscoreDataText(key: ValueKey(text), text: text);
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+    }
+  }
 
-          return BoxscoreDataText(text: '${efgPct.toStringAsFixed(1)}%');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 18:
+  Widget shootingAttemptsWidget(int index, int played, String madeName, String attName,
+      String madeAbbr, String attAbbr) {
+    try {
+      if (played == 0) {
+        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      }
+      String text =
+          '${(widget.players[index]?['statistics']?[madeName] ?? widget.players[index]?[madeAbbr] ?? '').toStringAsFixed(0)}-${(widget.players[index]?['statistics']?[attName] ?? widget.players[index]?[attAbbr] ?? '').toStringAsFixed(0)}';
+      return BoxscoreDataText(key: ValueKey(text), text: text);
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+    }
+  }
+
+  Widget efgWidget(int index, int played) {
+    try {
+      if (played == 0) {
+        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      }
+      int fieldGoalsAttempted =
+          widget.players[index]?['statistics']?['fieldGoalsAttempted'] ?? 0;
+
+      // Check for division by zero
+      if (fieldGoalsAttempted == 0) {
         try {
-          if (played == 0) {
-            return const BoxscoreDataText(text: '-');
-          }
           return BoxscoreDataText(
               text:
-                  '${((widget.players[row]?['statistics']?['TS_PCT'] ?? widget.players[row]?['TS_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
+                  '${((widget.players[index]?['statistics']?['EFG_PCT'] ?? widget.players[index]?['EFG_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxscoreDataText(text: '-');
         }
-      case 19:
-        try {
-          if (played == 0 ||
-              (widget.players[row]?['statistics']?['POSS'] ??
-                      widget.players[row]?['POSS'] ??
-                      0) ==
-                  0) {
-            return const BoxscoreDataText(text: '-');
-          }
-          return BoxscoreDataText(
-              text:
-                  '${((widget.players[row]?['statistics']?['USG_PCT'] ?? widget.players[row]?['USG_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 20:
-        try {
-          if (played == 0 ||
-              (widget.players[row]?['statistics']?['POSS'] ??
-                      widget.players[row]?['POSS'] ??
-                      0) ==
-                  0) {
-            return const BoxscoreDataText(text: '-');
-          }
+      }
 
-          int possOn = (widget.players[row]?['statistics']?['POSS'] ??
-              widget.players[row]?['POSS'] ??
-              0);
-          int possOff = ((widget.team['POSS'] ?? 0) - possOn);
+      double efgPct = (((widget.players[index]?['statistics']?['fieldGoalsMade'] ?? 0) +
+                  (0.5 * (widget.players[index]?['statistics']?['threePointersMade'] ?? 0))) /
+              fieldGoalsAttempted) *
+          100;
 
-          double oRtgOn = (widget.players[row]?['statistics']?['OFF_RATING'] ??
-              widget.players[row]?['OFF_RATING'] ??
-              0.0);
-          int ptsOn = (possOn * oRtgOn / 100).round();
-          double ptsOff =
-              ((widget.team['points'] ?? widget.team['PTS'] ?? 0) - ptsOn).toDouble();
-          double oRtgOff = 100 * ptsOff / possOff;
-          double offOnOff = oRtgOn - oRtgOff;
+      String text = '${efgPct.toStringAsFixed(1)}%';
 
-          double dRtgOn = (widget.players[row]?['statistics']?['DEF_RATING'] ??
-              widget.players[row]?['DEF_RATING'] ??
-              0.0);
-          int ptsAgainstOn = (possOn * dRtgOn / 100).round();
-          double ptsAgainstOff = ((widget.team['pointsAgainst'] ??
-                      ((widget.team['PTS'] ?? 0) - (widget.team['PLUS_MINUS'] ?? 0))) -
-                  ptsAgainstOn)
-              .toDouble();
-          double dRtgOff = 100 * ptsAgainstOff / possOff;
-          double defOnOff = dRtgOn - dRtgOff;
+      return BoxscoreDataText(key: ValueKey(text), text: text);
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+    }
+  }
 
-          double netOnOff = offOnOff - defOnOff;
-          return BoxscoreDataText(
-            text: netOnOff > 0.0
-                ? '+${netOnOff.toStringAsFixed(1)}'
-                : netOnOff.toStringAsFixed(1),
-            color: netOnOff == 0.0
-                ? Colors.white
-                : netOnOff > 0.0
-                    ? const Color(0xFF55F86F)
-                    : const Color(0xFFFC3126),
-          );
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 21:
-        try {
-          if (played == 0 ||
-              (widget.players[row]?['statistics']?['POSS'] ??
-                      widget.players[row]?['POSS'] ??
-                      0) ==
-                  0) {
-            return const BoxscoreDataText(text: '-');
-          }
+  Widget nRtgWidget(int index, int played) {
+    try {
+      if (played == 0 ||
+          (widget.players[index]?['statistics']?['POSS'] ??
+                  widget.players[index]?['POSS'] ??
+                  0) ==
+              0) {
+        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      }
 
-          int possOn = (widget.players[row]?['statistics']?['POSS'] ??
-              widget.players[row]?['POSS'] ??
-              0);
-          int possOff = ((widget.team['POSS'] ?? 0) - possOn);
+      int possOn = (widget.players[index]?['statistics']?['POSS'] ??
+          widget.players[index]?['POSS'] ??
+          0);
+      int possOff = ((widget.team['POSS'] ?? 0) - possOn);
 
-          double oRtgOn = (widget.players[row]?['statistics']?['OFF_RATING'] ??
-              widget.players[row]?['OFF_RATING'] ??
-              0.0);
-          int ptsOn = (possOn * oRtgOn / 100).round();
-          double ptsOff =
-              ((widget.team['points'] ?? widget.team['PTS'] ?? 0) - ptsOn).toDouble();
-          double oRtgOff = 100 * ptsOff / possOff;
-          double onOff = oRtgOn - oRtgOff;
+      double oRtgOn = (widget.players[index]?['statistics']?['OFF_RATING'] ??
+          widget.players[index]?['OFF_RATING'] ??
+          0.0);
+      int ptsOn = (possOn * oRtgOn / 100).round();
+      double ptsOff = ((widget.team['points'] ?? widget.team['PTS'] ?? 0) - ptsOn).toDouble();
+      double oRtgOff = 100 * ptsOff / possOff;
+      double offOnOff = oRtgOn - oRtgOff;
 
-          return BoxscoreDataText(
-            text: onOff > 0.0 ? '+${onOff.toStringAsFixed(1)}' : onOff.toStringAsFixed(1),
-            color: onOff == 0.0
-                ? Colors.white
-                : onOff > 0.0
-                    ? const Color(0xFF55F86F)
-                    : const Color(0xFFFC3126),
-          );
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      case 22:
-        try {
-          if (played == 0 ||
-              (widget.players[row]?['statistics']?['POSS'] ??
-                      widget.players[row]?['POSS'] ??
-                      0) ==
-                  0) {
-            return const BoxscoreDataText(text: '-');
-          }
+      double dRtgOn = (widget.players[index]?['statistics']?['DEF_RATING'] ??
+          widget.players[index]?['DEF_RATING'] ??
+          0.0);
+      int ptsAgainstOn = (possOn * dRtgOn / 100).round();
+      double ptsAgainstOff = ((widget.team['pointsAgainst'] ??
+                  ((widget.team['PTS'] ?? 0) - (widget.team['PLUS_MINUS'] ?? 0))) -
+              ptsAgainstOn)
+          .toDouble();
+      double dRtgOff = 100 * ptsAgainstOff / possOff;
+      double defOnOff = dRtgOn - dRtgOff;
 
-          int possOn = (widget.players[row]?['statistics']?['POSS'] ??
-              widget.players[row]?['POSS'] ??
-              0);
-          int possOff = ((widget.team['POSS'] ?? 0) - possOn);
+      double netOnOff = offOnOff - defOnOff;
+      String text =
+          netOnOff > 0.0 ? '+${netOnOff.toStringAsFixed(1)}' : netOnOff.toStringAsFixed(1);
+      return BoxscoreDataText(
+        key: ValueKey(text),
+        text: text,
+        color: netOnOff == 0.0
+            ? Colors.white
+            : netOnOff > 0.0
+                ? const Color(0xFF55F86F)
+                : const Color(0xFFFC3126),
+      );
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+    }
+  }
 
-          double dRtgOn = (widget.players[row]?['statistics']?['DEF_RATING'] ??
-              widget.players[row]?['DEF_RATING'] ??
-              0.0);
-          int ptsAgainstOn = (possOn * dRtgOn / 100).round();
-          double ptsAgainstOff = ((widget.team['pointsAgainst'] ??
-                      ((widget.team['PTS'] ?? 0) - (widget.team['PLUS_MINUS'] ?? 0))) -
-                  ptsAgainstOn)
-              .toDouble();
-          double dRtgOff = 100 * ptsAgainstOff / possOff;
-          double onOff = dRtgOn - dRtgOff;
+  Widget oRtgWidget(int index, int played) {
+    try {
+      if (played == 0 ||
+          (widget.players[index]?['statistics']?['POSS'] ??
+                  widget.players[index]?['POSS'] ??
+                  0) ==
+              0) {
+        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      }
 
-          return BoxscoreDataText(
-            text: onOff > 0.0 ? '+${onOff.toStringAsFixed(1)}' : onOff.toStringAsFixed(1),
-            color: onOff == 0.0
-                ? Colors.white
-                : onOff < 0.0
-                    ? const Color(0xFF55F86F)
-                    : const Color(0xFFFC3126),
-          );
-        } catch (e) {
-          return const BoxscoreDataText(text: '-');
-        }
-      default:
-        return const Text('-');
+      int possOn = (widget.players[index]?['statistics']?['POSS'] ??
+          widget.players[index]?['POSS'] ??
+          0);
+      int possOff = ((widget.team['POSS'] ?? 0) - possOn);
+
+      double oRtgOn = (widget.players[index]?['statistics']?['OFF_RATING'] ??
+          widget.players[index]?['OFF_RATING'] ??
+          0.0);
+      int ptsOn = (possOn * oRtgOn / 100).round();
+      double ptsOff = ((widget.team['points'] ?? widget.team['PTS'] ?? 0) - ptsOn).toDouble();
+      double oRtgOff = 100 * ptsOff / possOff;
+      double onOff = oRtgOn - oRtgOff;
+
+      String text = onOff > 0.0 ? '+${onOff.toStringAsFixed(1)}' : onOff.toStringAsFixed(1);
+
+      return BoxscoreDataText(
+        key: ValueKey(text),
+        text: text,
+        color: onOff == 0.0
+            ? Colors.white
+            : onOff > 0.0
+                ? const Color(0xFF55F86F)
+                : const Color(0xFFFC3126),
+      );
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+    }
+  }
+
+  Widget dRtgWidget(int index, int played) {
+    try {
+      if (played == 0 ||
+          (widget.players[index]?['statistics']?['POSS'] ??
+                  widget.players[index]?['POSS'] ??
+                  0) ==
+              0) {
+        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      }
+
+      int possOn = (widget.players[index]?['statistics']?['POSS'] ??
+          widget.players[index]?['POSS'] ??
+          0);
+      int possOff = ((widget.team['POSS'] ?? 0) - possOn);
+
+      double dRtgOn = (widget.players[index]?['statistics']?['DEF_RATING'] ??
+          widget.players[index]?['DEF_RATING'] ??
+          0.0);
+      int ptsAgainstOn = (possOn * dRtgOn / 100).round();
+      double ptsAgainstOff = ((widget.team['pointsAgainst'] ??
+                  ((widget.team['PTS'] ?? 0) - (widget.team['PLUS_MINUS'] ?? 0))) -
+              ptsAgainstOn)
+          .toDouble();
+      double dRtgOff = 100 * ptsAgainstOff / possOff;
+      double onOff = dRtgOn - dRtgOff;
+      String text = onOff > 0.0 ? '+${onOff.toStringAsFixed(1)}' : onOff.toStringAsFixed(1);
+
+      return BoxscoreDataText(
+        key: ValueKey(text),
+        text: text,
+        color: onOff == 0.0
+            ? Colors.white
+            : onOff < 0.0
+                ? const Color(0xFF55F86F)
+                : const Color(0xFFFC3126),
+      );
+    } catch (e) {
+      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 }
 
 class BoxscoreDataText extends StatelessWidget {
-  const BoxscoreDataText(
-      {super.key, required this.text, this.color, this.alignment, this.size});
+  const BoxscoreDataText({
+    Key? key,
+    required this.text,
+    this.color,
+    this.alignment,
+    this.size,
+  }) : super(key: key);
 
   final Alignment? alignment;
   final Color? color;

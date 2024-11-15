@@ -30,6 +30,8 @@ class _LastFiveGamesState extends State<LastFiveGames> {
   Map<String, dynamic> awayTeam = {};
   List homeLastFive = [];
   List awayLastFive = [];
+  List<Widget> homeGameRows = [];
+  List<Widget> awayGameRows = [];
   Color homeTeamColor = Colors.transparent;
   Color awayTeamColor = Colors.transparent;
   bool _isLoading = false;
@@ -119,6 +121,11 @@ class _LastFiveGamesState extends State<LastFiveGames> {
         awayLastFive = getLastFiveGames(awayTeam);
       }
 
+      for (int i = 0; i < 5; i++) {
+        homeGameRows.add(homeGameRow(i));
+        awayGameRows.add(awayGameRow(i));
+      }
+
       _isLoading = false;
     });
   }
@@ -142,85 +149,6 @@ class _LastFiveGamesState extends State<LastFiveGames> {
     String monthDate = monthDateFormat.format(dateTime);
 
     return [dayOfWeek, monthDate];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Skeletonizer(
-      enabled: _isLoading,
-      child: Card(
-        margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
-        color: Colors.grey.shade900,
-        child: Padding(
-          padding: EdgeInsets.all(15.0.r),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
-                      ),
-                    ),
-                    child: Text(
-                      'Last 5 Games',
-                      style: kBebasBold.copyWith(fontSize: 16.0.r),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10.0.r),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (awayLastFive.isNotEmpty) awayGameRow(0),
-                  SizedBox(width: 15.0.r),
-                  if (homeLastFive.isNotEmpty) homeGameRow(0)
-                ],
-              ),
-              SizedBox(height: 10.0.r),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (awayLastFive.isNotEmpty) awayGameRow(1),
-                  SizedBox(width: 15.0.r),
-                  if (homeLastFive.isNotEmpty) homeGameRow(1)
-                ],
-              ),
-              SizedBox(height: 10.0.r),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (awayLastFive.isNotEmpty) awayGameRow(2),
-                  SizedBox(width: 15.0.r),
-                  if (homeLastFive.isNotEmpty) homeGameRow(2)
-                ],
-              ),
-              SizedBox(height: 10.0.r),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (awayLastFive.isNotEmpty) awayGameRow(3),
-                  SizedBox(width: 15.0.r),
-                  if (homeLastFive.isNotEmpty) homeGameRow(3)
-                ],
-              ),
-              SizedBox(height: 10.0.r),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (awayLastFive.isNotEmpty) awayGameRow(4),
-                  SizedBox(width: 15.0.r),
-                  if (homeLastFive.isNotEmpty) homeGameRow(4)
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Expanded homeGameRow(int index) {
@@ -431,6 +359,85 @@ class _LastFiveGamesState extends State<LastFiveGames> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Skeletonizer(
+      enabled: _isLoading,
+      child: Card(
+        margin: EdgeInsets.fromLTRB(11.0.r, 11.0.r, 11.0.r, 0.0),
+        color: Colors.grey.shade900,
+        child: Padding(
+          padding: EdgeInsets.all(15.0.r),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
+                      ),
+                    ),
+                    child: Text(
+                      'Last 5 Games',
+                      style: kBebasBold.copyWith(fontSize: 16.0.r),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.0.r),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (awayLastFive.isNotEmpty) awayGameRows[0],
+                  SizedBox(width: 15.0.r),
+                  if (homeLastFive.isNotEmpty) homeGameRows[0]
+                ],
+              ),
+              SizedBox(height: 10.0.r),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (awayLastFive.isNotEmpty) awayGameRows[1],
+                  SizedBox(width: 15.0.r),
+                  if (homeLastFive.isNotEmpty) homeGameRows[1]
+                ],
+              ),
+              SizedBox(height: 10.0.r),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (awayLastFive.isNotEmpty) awayGameRows[2],
+                  SizedBox(width: 15.0.r),
+                  if (homeLastFive.isNotEmpty) homeGameRows[2]
+                ],
+              ),
+              SizedBox(height: 10.0.r),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (awayLastFive.isNotEmpty) awayGameRows[3],
+                  SizedBox(width: 15.0.r),
+                  if (homeLastFive.isNotEmpty) homeGameRows[3]
+                ],
+              ),
+              SizedBox(height: 10.0.r),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (awayLastFive.isNotEmpty) awayGameRows[4],
+                  SizedBox(width: 15.0.r),
+                  if (homeLastFive.isNotEmpty) homeGameRows[4]
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

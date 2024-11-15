@@ -421,6 +421,68 @@ const Map<String, dynamic> kTeamStatLabelMap = {
       'definition': 'A team\'s point differential per 100 possessions.',
       'formula': 'ORTG - DRTG'
     },
+    'fill': {'first_available': '2024'},
+    'xPTS': {
+      'location': ['ADV'],
+      'secondaryLocation': '',
+      'TOTAL': {
+        'nba_name': 'XPTS_FOR',
+        'rank_nba_name': 'XPTS_FOR_RANK',
+      },
+      'PER_100': {
+        'nba_name': 'XPTS_FOR_PER_100',
+        'rank_nba_name': 'XPTS_FOR_PER_100_RANK',
+      },
+      'splash_name': 'xPTS',
+      'full_name': 'Expected Points',
+      'first_available': '2024',
+      'convert': 'false',
+      'round': '1',
+      'definition':
+          'A team\'s expected points scored.\n\nExpected points based on SportRadar\'s Shot Quality model, which uses league averages to determine the expected value of a given shot attempt. For example, if a contested, spot-up, catch-and-shoot 3-pointer from the top of the key was converted about 30% the previous season, then this type of shot was worth about 1 expected point (3pts x 30%).',
+      'formula': '(xFG% * [FGA + 0.5 * FG3A]) + FTM'
+    },
+    'xPTS AGAINST': {
+      'location': ['ADV'],
+      'secondaryLocation': '',
+      'TOTAL': {
+        'nba_name': 'XPTS_AGAINST',
+        'rank_nba_name': 'XPTS_AGAINST_RANK',
+      },
+      'PER_100': {
+        'nba_name': 'XPTS_AGAINST_PER_100',
+        'rank_nba_name': 'XPTS_AGAINST_PER_100_RANK',
+      },
+      'splash_name': 'OPP xPTS',
+      'full_name': 'Expected Points Allowed',
+      'first_available': '2024',
+      'convert': 'false',
+      'round': '1',
+      'definition':
+          'A team\'s expected points allowed to opponents.\n\nExpected points based on SportRadar\'s Shot Quality model, which uses league averages to determine the expected value of a given shot attempt. For example, if a contested, spot-up, catch-and-shoot 3-pointer from the top of the key was converted about 30% the previous season, then this type of shot was worth about 1 expected point (3pts x 30%).',
+      'formula': '(xFG% * [FGA + 0.5 * FG3A]) + FTM'
+    },
+    'xPTS DIFF': {
+      'location': ['ADV'],
+      'secondaryLocation': '',
+      'TOTAL': {
+        'nba_name': 'XPTS_DIFF',
+        'rank_nba_name': 'XPTS_DIFF_RANK',
+      },
+      'PER_100': {
+        'nba_name': 'XPTS_DIFF_PER_100',
+        'rank_nba_name': 'XPTS_DIFF_PER_100_RANK',
+      },
+      'splash_name': 'NET xPTS',
+      'full_name': 'Expected Point Differential',
+      'first_available': '2024',
+      'convert': 'false',
+      'round': '1',
+      'definition':
+          'A team\'s expected point differential.\n\nExpected points based on SportRadar\'s Shot Quality model, which uses league averages to determine the expected value of a given shot attempt. For example, if a contested, spot-up, catch-and-shoot 3-pointer from the top of the key was converted about 30% the previous season, then this type of shot was worth about 1 expected point (3pts x 30%).',
+      'formula': '(xFG% * [FGA + 0.5 * FG3A]) + FTM'
+    },
+    'fill1': {'first_available': '2024'},
     'PACE': {
       'location': ['ADV'],
       'secondaryLocation': '',

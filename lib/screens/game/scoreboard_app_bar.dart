@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../../components/custom_icon_button.dart';
 import '../../utilities/constants.dart';
 
-class ScoreboardAppBar extends StatelessWidget implements PreferredSizeWidget {
+class ScoreboardAppBar extends StatefulWidget implements PreferredSizeWidget {
   final TabController tabController;
   final List<DateTime> dates;
   final Function(int) onTabTap;
@@ -22,7 +22,42 @@ class ScoreboardAppBar extends StatelessWidget implements PreferredSizeWidget {
   }) : super(key: key);
 
   @override
+  _ScoreboardAppBarState createState() => _ScoreboardAppBarState();
+
+  @override
   Size get preferredSize => Size.fromHeight(116.48.r);
+}
+
+class _ScoreboardAppBarState extends State<ScoreboardAppBar> {
+  late List<Widget> _tabs;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeTabs();
+  }
+
+  @override
+  void didUpdateWidget(covariant ScoreboardAppBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.dates != widget.dates) {
+      _initializeTabs(); // Rebuild tabs if dates have changed
+    }
+  }
+
+  void _initializeTabs() {
+    _tabs = widget.dates.map((date) {
+      return Tab(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(DateFormat('E').format(date)),
+            Text('${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}'),
+          ],
+        ),
+      );
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,18 +71,18 @@ class ScoreboardAppBar extends StatelessWidget implements PreferredSizeWidget {
         CustomIconButton(
           icon: Icons.search,
           size: 30.0.r,
-          onPressed: onSearchPressed,
+          onPressed: widget.onSearchPressed,
         ),
         CustomIconButton(
           icon: Icons.calendar_month,
           size: 30.0.r,
-          onPressed: onCalendarPressed,
+          onPressed: widget.onCalendarPressed,
         ),
       ],
       bottom: TabBar(
-        controller: tabController,
+        controller: widget.tabController,
         isScrollable: true,
-        onTap: onTabTap,
+        onTap: widget.onTabTap,
         tabAlignment: TabAlignment.center,
         indicatorSize: TabBarIndicatorSize.tab,
         indicatorWeight: 3.0,
@@ -56,17 +91,7 @@ class ScoreboardAppBar extends StatelessWidget implements PreferredSizeWidget {
         labelColor: Colors.deepOrangeAccent,
         labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
         labelPadding: EdgeInsets.symmetric(horizontal: 20.0.r),
-        tabs: dates.map((date) {
-          return Tab(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(DateFormat('E').format(date)),
-                Text('${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}'),
-              ],
-            ),
-          );
-        }).toList(),
+        tabs: _tabs, // Cached tabs to avoid rebuilds
       ),
     );
   }

@@ -24,6 +24,66 @@ class H2H extends StatefulWidget {
 }
 
 class _H2HState extends State<H2H> {
+  late final BoxDecoration awayTeamDecoration;
+  late final BoxDecoration homeTeamDecoration;
+  late final TextStyle awayTeamTextStyle;
+  late final TextStyle homeTeamTextStyle;
+  late final TextStyle percentageTextStyle;
+  late final TextStyle winTextStyle;
+  late final Image awayLogo;
+  late final Image homeLogo;
+  late final int awayTeamWins;
+  late final int homeTeamWins;
+  late final double awayTeamWinPct;
+  late final double homeTeamWinPct;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize text styles
+    awayTeamTextStyle = kBebasNormal.copyWith(fontSize: 18.0.r);
+    homeTeamTextStyle = kBebasNormal.copyWith(fontSize: 18.0.r);
+    percentageTextStyle = kBebasNormal.copyWith(fontSize: 13.0.r);
+    winTextStyle = kBebasNormal.copyWith(fontSize: 14.0.r);
+
+    awayTeamWins = widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_LOSSES'] ?? 0;
+    homeTeamWins = widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_WINS'] ?? 0;
+
+    int totalGames = awayTeamWins + homeTeamWins;
+    awayTeamWinPct = totalGames == 0 ? 50 : (awayTeamWins / totalGames) * 100;
+    homeTeamWinPct = totalGames == 0 ? 50 : (homeTeamWins / totalGames) * 100;
+
+    Color homeColor =
+        kTeamColors[kTeamIdToName[widget.homeId]?[1] ?? 'FA']?['primaryColor'] ?? Colors.blue;
+    Color awayColor =
+        kTeamColors[kTeamIdToName[widget.awayId]?[1] ?? 'FA']?['primaryColor'] ?? Colors.blue;
+
+    // Initialize decorations
+    awayTeamDecoration = BoxDecoration(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(20.0),
+        bottomLeft: Radius.circular(20.0),
+      ),
+      color: awayTeamWins == 0 ? homeColor : awayColor,
+    );
+
+    homeTeamDecoration = BoxDecoration(
+      borderRadius: const BorderRadius.only(
+        topRight: Radius.circular(20.0),
+        bottomRight: Radius.circular(20.0),
+      ),
+      color: homeTeamWins == 0 ? awayColor : homeColor,
+    );
+
+    awayLogo = Image.asset(
+        'images/NBA_Logos/${kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0'}.png',
+        width: (kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0') == '0'
+            ? 12.0.r
+            : 18.0.r);
+    homeLogo = Image.asset('images/NBA_Logos/${widget.homeId}.png', width: 18.0.r);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -34,17 +94,22 @@ class _H2HState extends State<H2H> {
         child: Column(
           children: [
             ComparisonBar(
-              awayTeamWins:
-                  widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_LOSSES'] ?? 0,
-              homeTeamWins:
-                  widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_WINS'] ?? 0,
+              awayTeamWins: awayTeamWins,
+              homeTeamWins: homeTeamWins,
+              awayTeamWinPct: awayTeamWinPct,
+              homeTeamWinPct: homeTeamWinPct,
               awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
               homeId: widget.homeId,
               awayTeam: widget.awayAbbr,
               homeTeam: widget.homeAbbr,
-              awayTeamColor:
-                  kTeamColors[kTeamIdToName[widget.awayId]?[1] ?? 'FA']!['primaryColor']!,
-              homeTeamColor: kTeamColors[kTeamIdToName[widget.homeId][1]]!['primaryColor']!,
+              awayLogo: awayLogo,
+              homeLogo: homeLogo,
+              awayTeamDecoration: awayTeamDecoration,
+              homeTeamDecoration: homeTeamDecoration,
+              awayTeamTextStyle: awayTeamTextStyle,
+              homeTeamTextStyle: homeTeamTextStyle,
+              percentageTextStyle: percentageTextStyle,
+              winTextStyle: winTextStyle,
             ),
           ],
         ),
@@ -56,38 +121,43 @@ class _H2HState extends State<H2H> {
 class ComparisonBar extends StatelessWidget {
   final int awayTeamWins;
   final int homeTeamWins;
+  final double awayTeamWinPct;
+  final double homeTeamWinPct;
   final String awayId;
   final String homeId;
   final String awayTeam;
   final String homeTeam;
-  final Color awayTeamColor;
-  final Color homeTeamColor;
+  final Image awayLogo;
+  final Image homeLogo;
+  final BoxDecoration awayTeamDecoration;
+  final BoxDecoration homeTeamDecoration;
+  final TextStyle awayTeamTextStyle;
+  final TextStyle homeTeamTextStyle;
+  final TextStyle percentageTextStyle;
+  final TextStyle winTextStyle;
 
   ComparisonBar({
     required this.awayTeamWins,
     required this.homeTeamWins,
+    required this.awayTeamWinPct,
+    required this.homeTeamWinPct,
     required this.awayId,
     required this.homeId,
     required this.awayTeam,
     required this.homeTeam,
-    required this.awayTeamColor,
-    required this.homeTeamColor,
+    required this.awayLogo,
+    required this.homeLogo,
+    required this.awayTeamDecoration,
+    required this.homeTeamDecoration,
+    required this.awayTeamTextStyle,
+    required this.homeTeamTextStyle,
+    required this.percentageTextStyle,
+    required this.winTextStyle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final int totalValue = awayTeamWins + homeTeamWins;
-    double awayTeamPercentage = 0;
-    double homeTeamPercentage = 0;
-
-    if (totalValue <= 0) {
-      awayTeamPercentage = 0.5;
-      homeTeamPercentage = 0.5;
-    } else {
-      awayTeamPercentage = awayTeamWins / totalValue;
-      homeTeamPercentage = homeTeamWins / totalValue;
-    }
-
+    // Now you can use the precomputed decorations and text styles directly
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -96,18 +166,17 @@ class ComparisonBar extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(awayTeam, style: kBebasNormal.copyWith(fontSize: 18.0.r)),
+                Text(awayTeam, style: awayTeamTextStyle),
                 SizedBox(width: 5.0.r),
-                Image.asset('images/NBA_Logos/$awayId.png',
-                    width: awayId == '0' ? 12.0.r : 18.0.r),
+                awayLogo,
               ],
             ),
             Text('SERIES', style: kBebasBold.copyWith(fontSize: 15.0.r)),
             Row(
               children: [
-                Image.asset('images/NBA_Logos/$homeId.png', width: 18.0.r),
+                homeLogo,
                 SizedBox(width: 5.0.r),
-                Text(homeTeam, style: kBebasNormal.copyWith(fontSize: 18.0.r)),
+                Text(homeTeam, style: homeTeamTextStyle),
               ],
             ),
           ],
@@ -119,43 +188,31 @@ class ComparisonBar extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    flex: (awayTeamPercentage * 100).toInt(),
+                    flex: awayTeamWinPct.toInt(),
                     child: Container(
                       height: 20.0.r,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          bottomLeft: Radius.circular(20.0),
-                        ),
-                        color: awayTeamPercentage > 0 ? awayTeamColor : homeTeamColor,
-                      ),
+                      decoration: awayTeamDecoration,
                       child: Center(
                         child: Text(
-                          awayTeamPercentage > 0
-                              ? '${(awayTeamPercentage * 100).toStringAsFixed(1)}%'
-                              : '    ',
-                          style: kBebasNormal.copyWith(fontSize: 13.0.r),
+                          awayTeamWinPct == 0
+                              ? '    '
+                              : '${awayTeamWinPct.toStringAsFixed(1)}%',
+                          style: percentageTextStyle,
                         ),
                       ),
                     ),
                   ),
                   Expanded(
-                    flex: (homeTeamPercentage * 100).toInt(),
+                    flex: homeTeamWinPct.toInt(),
                     child: Container(
                       height: 20.0.r,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                        ),
-                        color: homeTeamPercentage > 0 ? homeTeamColor : awayTeamColor,
-                      ),
+                      decoration: homeTeamDecoration,
                       child: Center(
                         child: Text(
-                          homeTeamPercentage > 0
-                              ? '${(homeTeamPercentage * 100).toStringAsFixed(1)}%'
-                              : '    ',
-                          style: kBebasNormal.copyWith(fontSize: 13.0.r),
+                          homeTeamWinPct == 0
+                              ? '    '
+                              : '${homeTeamWinPct.toStringAsFixed(1)}%',
+                          style: percentageTextStyle,
                         ),
                       ),
                     ),
@@ -169,16 +226,10 @@ class ComparisonBar extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-                awayTeamWins == 1
-                    ? '${awayTeamWins.toStringAsFixed(0)} WIN'
-                    : '${awayTeamWins.toStringAsFixed(0)} WINS',
-                style: kBebasNormal.copyWith(fontSize: 14.0.r)),
-            Text(
-                homeTeamWins == 1
-                    ? '${homeTeamWins.toStringAsFixed(0)} WIN'
-                    : '${homeTeamWins.toStringAsFixed(0)} WINS',
-                style: kBebasNormal.copyWith(fontSize: 14.0.r)),
+            Text(awayTeamWins == 1 ? '$awayTeamWins WIN' : '$awayTeamWins WINS',
+                style: winTextStyle),
+            Text(homeTeamWins == 1 ? '$homeTeamWins WIN' : '$homeTeamWins WINS',
+                style: winTextStyle),
           ],
         ),
       ],

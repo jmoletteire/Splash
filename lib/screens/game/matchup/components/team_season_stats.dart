@@ -26,6 +26,7 @@ class TeamSeasonStats extends StatefulWidget {
 }
 
 class _TeamSeasonStatsState extends State<TeamSeasonStats> {
+  List<Widget> statRows = [];
   Map<String, dynamic> homeTeam = {};
   Map<String, dynamic> awayTeam = {};
   Color homeTeamColor = Colors.transparent;
@@ -33,54 +34,91 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
   late String season;
   bool _isLoading = false;
 
-  Future<Map<String, dynamic>> getTeam(String teamId) async {
-    final teamCache = Provider.of<TeamCache>(context, listen: false);
-    if (teamCache.containsTeam(teamId)) {
-      return teamCache.getTeam(teamId)!;
-    } else {
-      var fetchedTeam = await Team().getTeam(teamId);
-      teamCache.addTeam(teamId, fetchedTeam);
-      return fetchedTeam;
+  @override
+  void initState() {
+    super.initState();
+    season = widget.season;
+    fetchTeams();
+  }
+
+  Future<void> fetchTeams() async {
+    setState(() => _isLoading = true);
+
+    try {
+      List<Map<String, dynamic>> teams = await Future.wait([
+        getTeam(widget.homeId),
+        getTeam(widget.awayId),
+      ]);
+
+      initializeTeamData(teams[0], teams[1]);
+      updateSeasonIfNeeded();
+    } catch (e) {
+      handleErrorState();
     }
   }
 
-  Future<void> setValues(String homeId, String awayId) async {
+  Future<Map<String, dynamic>> getTeam(String teamId) async {
+    final teamCache = Provider.of<TeamCache>(context, listen: false);
+    return teamCache.containsTeam(teamId)
+        ? teamCache.getTeam(teamId)!
+        : await fetchAndCacheTeam(teamCache, teamId);
+  }
+
+  Future<Map<String, dynamic>> fetchAndCacheTeam(TeamCache cache, String teamId) async {
+    try {
+      var teamData = await Team().getTeam(teamId);
+      cache.addTeam(teamId, teamData);
+      return teamData;
+    } catch (e) {
+      return {'error': 'not found'};
+    }
+  }
+
+  void initializeTeamData(Map<String, dynamic> home, Map<String, dynamic> away) {
     setState(() {
-      _isLoading = true;
-    });
-    List teams = await Future.wait([
-      getTeam(homeId),
-      getTeam(awayId),
-    ]);
-    setState(() {
-      homeTeam = teams[0];
-      awayTeam = teams[1];
-
-      if (awayTeam.isNotEmpty) {
-        awayTeamColor = kDarkPrimaryColors.contains(awayTeam['ABBREVIATION'])
-            ? (kTeamColors[awayTeam['ABBREVIATION']]!['secondaryColor']!)
-            : (kTeamColors[awayTeam['ABBREVIATION']]!['primaryColor']!);
-      }
-
-      if (homeTeam.isNotEmpty) {
-        homeTeamColor = kDarkPrimaryColors.contains(homeTeam['ABBREVIATION'])
-            ? (kTeamColors[homeTeam['ABBREVIATION']]!['secondaryColor']!)
-            : (kTeamColors[homeTeam['ABBREVIATION']]!['primaryColor']!);
-      }
-
+      homeTeam = home;
+      awayTeam = away;
+      homeTeamColor = getTeamColor(home);
+      awayTeamColor = getTeamColor(away);
+      statRows = buildStatRows();
       _isLoading = false;
     });
+  }
 
-    // If season has not started for either team, use previous season
-    if ((!awayTeam['seasons'].keys.toList().contains(widget.season) ||
-            !homeTeam['seasons'].keys.toList().contains(widget.season)) ||
-        (awayTeam['seasons'][widget.season]['GP'] == 0 ||
-            homeTeam['seasons'][widget.season]['GP'] == 0)) {
+  void updateSeasonIfNeeded() {
+    bool seasonNotStarted =
+        (awayTeam['seasons']?[season]?['GP'] == 0 || homeTeam['seasons']?[season]?['GP'] == 0);
+
+    if (!awayTeam['seasons'].containsKey(season) ||
+        !homeTeam['seasons'].containsKey(season) ||
+        seasonNotStarted) {
       setState(() {
-        season =
-            '${(int.parse(widget.season.substring(0, 4)) - 1).toString()}-${(int.parse(widget.season.substring(5)) - 1).toString()}';
+        season = getPreviousSeason(season);
       });
     }
+  }
+
+  String getPreviousSeason(String currentSeason) {
+    int startYear = int.parse(currentSeason.substring(0, 4)) - 1;
+    int endYear = int.parse(currentSeason.substring(5)) - 1;
+    return '$startYear-$endYear';
+  }
+
+  Color getTeamColor(Map<String, dynamic>? team) {
+    String abbreviation = team?['ABBREVIATION'] ?? 'FA';
+    return kDarkPrimaryColors.contains(abbreviation)
+        ? (kTeamColors[abbreviation]?['secondaryColor'] ?? Colors.blue)
+        : (kTeamColors[abbreviation]?['primaryColor'] ?? Colors.blue);
+  }
+
+  void handleErrorState() {
+    setState(() {
+      homeTeam = {};
+      awayTeam = {};
+      homeTeamColor = Colors.transparent;
+      awayTeamColor = Colors.transparent;
+      _isLoading = false;
+    });
   }
 
   double roundToDecimalPlaces(double value, int decimalPlaces) {
@@ -88,11 +126,70 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
     return (value * factor).round() / factor;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    season = widget.season;
-    setValues(widget.homeId, widget.awayId);
+  Widget buildHeaderRow() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
+        ),
+      ),
+      child: Text(
+        'Season Stats',
+        style: kBebasBold.copyWith(fontSize: 16.0.r),
+      ),
+    );
+  }
+
+  List<Widget> buildStatRows() {
+    return [
+      buildHeaderRow(),
+      SizedBox(height: 10.0.r),
+      buildComparisonRow('NRTG', 'NET_RATING', 'ADV'),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('ORTG', 'OFF_RATING', 'ADV'),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('DRTG', 'DEF_RATING', 'ADV'),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('PACE', 'PACE', 'ADV'),
+      SizedBox(height: 15.0.r),
+      buildComparisonRow('FG%', 'FG_PCT', 'BASIC', isPercentage: true),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('3P%', 'FG3_PCT', 'BASIC', isPercentage: true),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('FT%', 'FT_PCT', 'BASIC', isPercentage: true),
+      SizedBox(height: 15.0.r),
+      buildComparisonRow('EFG%', 'EFG_PCT', 'ADV', isPercentage: true),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('TS%', 'TS_PCT', 'ADV', isPercentage: true),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('OREB%', 'OREB_PCT', 'ADV', isPercentage: true),
+      SizedBox(height: 5.0.r),
+      buildComparisonRow('TOV%', 'TM_TOV_PCT', 'ADV', isPercentage: true),
+    ];
+  }
+
+  Widget buildComparisonRow(String statName, String statKey, String loc,
+      {bool isPercentage = false}) {
+    return ComparisonRow(
+      statName: statName,
+      awayTeam: roundToDecimalPlaces(
+          ((awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?[loc]?[statKey] ?? 0.0) *
+              (isPercentage ? 100 : 1)),
+          1),
+      homeTeam: roundToDecimalPlaces(
+          ((homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?[loc]?[statKey] ?? 0.0) *
+              (isPercentage ? 100 : 1)),
+          1),
+      awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?[loc]
+              ?['${statKey}_RANK'] ??
+          0,
+      homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?[loc]
+              ?['${statKey}_RANK'] ??
+          0,
+      awayTeamColor: awayTeamColor,
+      homeTeamColor: homeTeamColor,
+      isPercentage: isPercentage,
+    );
   }
 
   @override
@@ -105,275 +202,7 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
         child: Padding(
           padding: EdgeInsets.all(15.0.r),
           child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade700, width: 2.0),
-                  ),
-                ),
-                child: Text(
-                  'Season Stats',
-                  style: kBebasBold.copyWith(fontSize: 16.0.r),
-                ),
-              ),
-              SizedBox(height: 10.0.r),
-              ComparisonRow(
-                statName: 'NRTG',
-                awayTeam: roundToDecimalPlaces(
-                    awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ?['NET_RATING'] ??
-                        0.0,
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ?['NET_RATING'] ??
-                        0.0,
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['NET_RATING_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['NET_RATING_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: 'ORTG',
-                awayTeam: roundToDecimalPlaces(
-                    awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ?['OFF_RATING'] ??
-                        0.0,
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ?['OFF_RATING'] ??
-                        0.0,
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['OFF_RATING_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['OFF_RATING_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: 'DRTG',
-                awayTeam: roundToDecimalPlaces(
-                    awayTeam['seasons']?[season]?['STATS']['REGULAR SEASON']?['ADV']
-                            ?['DEF_RATING'] ??
-                        0.0,
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    homeTeam['seasons']?[season]?['STATS']['REGULAR SEASON']?['ADV']
-                            ?['DEF_RATING'] ??
-                        0.0,
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['DEF_RATING_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['DEF_RATING_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: 'PACE',
-                awayTeam: roundToDecimalPlaces(
-                    awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ?['PACE'] ??
-                        0.0,
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                            ?['PACE'] ??
-                        0.0,
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['PACE_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['PACE_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 15.0.r),
-              ComparisonRow(
-                statName: 'FG%',
-                awayTeam: roundToDecimalPlaces(
-                    ((awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                                ?['FG_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    ((homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                                ?['FG_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                        ?['FG_PCT_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                        ?['FG_PCT_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: '3P%',
-                awayTeam: roundToDecimalPlaces(
-                    ((awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                                ?['FG3_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    ((homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                                ?['FG3_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                        ?['FG3_PCT_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                        ?['FG3_PCT_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: 'FT%',
-                awayTeam: roundToDecimalPlaces(
-                    ((awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                                ?['FT_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    ((homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                                ?['FT_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                        ?['FT_PCT_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['BASIC']
-                        ?['FT_PCT_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 15.0.r),
-              ComparisonRow(
-                statName: 'EFG%',
-                awayTeam: roundToDecimalPlaces(
-                    ((awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                                ?['EFG_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    ((homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                                ?['EFG_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['EFG_PCT_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['EFG_PCT_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: 'TS%',
-                awayTeam: roundToDecimalPlaces(
-                    ((awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                                ?['TS_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    ((homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                                ?['TS_PCT'] ??
-                            0.0) *
-                        100),
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['TS_PCT_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['TS_PCT_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: 'OREB%',
-                awayTeam: roundToDecimalPlaces(
-                    (awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                                ?['OREB_PCT'] ??
-                            0.0) *
-                        100,
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    (homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                                ?['OREB_PCT'] ??
-                            0.0) *
-                        100,
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['OREB_PCT_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['OREB_PCT_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-              SizedBox(height: 5.0.r),
-              ComparisonRow(
-                statName: 'TOV%',
-                awayTeam: roundToDecimalPlaces(
-                    (awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                                ?['TM_TOV_PCT'] ??
-                            0.0) *
-                        100,
-                    1),
-                homeTeam: roundToDecimalPlaces(
-                    (homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                                ?['TM_TOV_PCT'] ??
-                            0.0) *
-                        100,
-                    1),
-                awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['TM_TOV_PCT_RANK'] ??
-                    0,
-                homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?['ADV']
-                        ?['TM_TOV_PCT_RANK'] ??
-                    0,
-                awayTeamColor: awayTeamColor,
-                homeTeamColor: homeTeamColor,
-              ),
-            ],
+            children: statRows,
           ),
         ),
       ),
@@ -389,6 +218,7 @@ class ComparisonRow extends StatelessWidget {
     required this.homeTeam,
     required this.awayRank,
     required this.homeRank,
+    required this.isPercentage,
     this.awayTeamColor = Colors.transparent,
     this.homeTeamColor = Colors.transparent,
   });
@@ -398,6 +228,7 @@ class ComparisonRow extends StatelessWidget {
   final dynamic homeTeam;
   final dynamic awayRank;
   final dynamic homeRank;
+  final bool isPercentage;
   final Color awayTeamColor;
   final Color homeTeamColor;
 
@@ -446,7 +277,7 @@ class ComparisonRow extends StatelessWidget {
                 value: awayTeam,
                 isHighlighted: oneIsBetter ? true : false,
                 color: awayTeamColor,
-                isPercentage: statName.contains('%'),
+                isPercentage: isPercentage,
               ),
             ],
           ),
@@ -505,7 +336,7 @@ class ComparisonRow extends StatelessWidget {
                 value: homeTeam,
                 isHighlighted: twoIsBetter ? true : false,
                 color: homeTeamColor,
-                isPercentage: statName.contains('%'),
+                isPercentage: isPercentage,
               ),
             ],
           ),

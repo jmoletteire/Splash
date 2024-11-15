@@ -387,151 +387,7 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
     return _pageInitLoad
         ? const SpinningIcon()
         : Scaffold(
-            appBar: /*PreferredSize(
-              preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.13),
-              child: AppBar(
-                backgroundColor: Colors.grey.shade900,
-                title: Text(
-                  'Splash',
-                  style: TextStyle(
-                      color: Colors.white, fontFamily: 'Bebas_Neue', fontSize: 32.0.r),
-                ),
-                actions: [
-                  CustomIconButton(
-                    icon: Icons.search,
-                    size: 30.0.r,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SearchScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  CustomIconButton(
-                    icon: Icons.calendar_month,
-                    size: 30.0.r,
-                    onPressed: () {
-                      showModalBottomSheet(
-                        constraints:
-                            BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-                        backgroundColor: Colors.grey.shade900,
-                        context: context,
-                        builder: (BuildContext context) {
-                          void onDateChanged(DateTime date) async {
-                            // Only update if the day or month has changed
-                            if (date.day != selectedDate.day ||
-                                date.month != selectedDate.month) {
-                              selectedDate = date;
-                              setDates(date);
-                              _tabController.index = 7;
-
-                              if (selectedDate != maxDate) {
-                                _showFab = true;
-                              } else {
-                                _showFab = false;
-                              }
-
-                              Navigator.pop(context);
-                              await fetchGames(date);
-                              startPolling(selectedDate);
-                            }
-                          }
-
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: const ColorScheme.dark(
-                                primary: Colors.deepOrange,
-                                onPrimary: Colors.white,
-                                secondary: Colors.white,
-                              ),
-                            ),
-                            child: Consumer<DatesProvider>(
-                              builder: (ctx, datesProvider, child) {
-                                String sanitizeDateTime(DateTime dateTime) {
-                                  String day = dateTime.day.toString().padLeft(2, '0');
-                                  String month = dateTime.month.toString().padLeft(2, '0');
-                                  String year = dateTime.year.toString();
-
-                                  return "$year-$month-$day";
-                                }
-
-                                bool selectableDayPredicate(DateTime val) {
-                                  String sanitized = sanitizeDateTime(val);
-                                  return datesProvider.dates.contains(sanitized);
-                                }
-
-                                DateTime findNearestValidDate(DateTime date) {
-                                  DateTime beforeDate = date;
-                                  DateTime afterDate = date;
-
-                                  while (!selectableDayPredicate(beforeDate) &&
-                                      !selectableDayPredicate(afterDate)) {
-                                    beforeDate = beforeDate.subtract(const Duration(days: 1));
-                                    afterDate = afterDate.add(const Duration(days: 1));
-                                  }
-
-                                  if (selectableDayPredicate(beforeDate)) {
-                                    return beforeDate;
-                                  } else {
-                                    return afterDate;
-                                  }
-                                }
-
-                                return CalendarDatePicker(
-                                  initialDate: findNearestValidDate(selectedDate),
-                                  firstDate: DateTime(2017, 9, 30),
-                                  lastDate: DateTime(2025, 4, 13),
-                                  onDateChanged: onDateChanged,
-                                  selectableDayPredicate: selectableDayPredicate,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ],
-                bottom: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  tabAlignment: TabAlignment.center,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicatorWeight: 3.0,
-                  indicatorColor: Colors.deepOrange,
-                  unselectedLabelColor: Colors.white70,
-                  labelColor: Colors.deepOrangeAccent,
-                  labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
-                  labelPadding: EdgeInsets.symmetric(horizontal: 20.0.r),
-                  onTap: (index) {
-                    setState(() {
-                      selectedDate = _dates[index];
-                      if (selectedDate != maxDate) {
-                        _showFab = true;
-                      } else {
-                        _showFab = false;
-                      }
-                    });
-                  },
-                  tabs: _dates.map((date) {
-                    return Tab(
-                      height: 50.0.r,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(DateFormat('E').format(date)),
-                          Text(
-                              '${DateFormat.d().format(date)} ${DateFormat.MMM().format(date)}'),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),*/
-                ScoreboardAppBar(
+            appBar: ScoreboardAppBar(
               tabController: _tabController,
               dates: _dates,
               onTabTap: (index) {
@@ -550,12 +406,8 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                 _showDatePicker(context); // Call a method in your State class
               },
             ),
-            body: /*_isLoading
-                ? const Center(
-                    child: SpinningIcon(
-                      color: Colors.deepOrange,
-                    ),
-                  )
+            body: _isLoading
+                ? const Center(child: SpinningIcon(color: Colors.deepOrange))
                 : TabBarView(
                     controller: _tabController,
                     children: _dates.map((date) {
@@ -563,116 +415,17 @@ class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateM
                       var gamesData = cachedGames[formattedDate];
 
                       if (gamesData is Map && !gamesData.containsKey('error')) {
-                        List<Widget> gameCards = [];
-
-                        for (String gameKey in gamesData.keys) {
-                          if (gameKey == 'error') {
-                            Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.sports_basketball,
-                                    color: Colors.white38,
-                                    size: 40.0.r,
-                                  ),
-                                  SizedBox(height: 15.0.r),
-                                  Text(
-                                    'No Games Today',
-                                    style: kBebasNormal.copyWith(
-                                        fontSize: 18.0.r, color: Colors.white54),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else if (gamesData[gameKey] is Map) {
-                            Map<String, dynamic> game = gamesData[gameKey];
-                            if (!game["SEASON_ID"].toString().startsWith("3") &&
-                                (game['SUMMARY']?['LineScore'] ?? {}).isNotEmpty) {
-                              gameCards.add(
-                                GameCard(
-                                  game: game,
-                                  homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
-                                  awayTeam: game['SUMMARY']['GameSummary'][0]
-                                          ['VISITOR_TEAM_ID'] ??
-                                      0,
-                                ),
-                              );
-                            }
-                          }
-                        }
-
-                        gameCards.add(
-                          Column(
-                            children: [
-                              SizedBox(height: MediaQuery.sizeOf(context).height / 10),
-                              Icon(
-                                Icons.sports_basketball,
-                                color: Colors.white38,
-                                size: 40.0.r,
-                              ),
-                              SizedBox(height: MediaQuery.sizeOf(context).height / 10),
-                            ],
-                          ),
-                        );
-
-                        return RefreshIndicator(
-                          color: Colors.deepOrange,
-                          onRefresh: () async {
-                            await fetchGames(selectedDate);
-                          },
-                          child: ListView.builder(
-                            controller: _scrollController,
-                            physics:
-                                const AlwaysScrollableScrollPhysics(), // Allows pull to refresh
-                            itemCount: gameCards.length,
-                            itemBuilder: (context, index) {
-                              return gameCards[index];
-                            },
-                          ),
+                        List<Widget> gameCards = _buildGameCards(gamesData);
+                        return GameList(
+                          scrollController: _scrollController,
+                          gameCards: gameCards,
+                          onRefresh: () async => await fetchGames(selectedDate),
                         );
                       } else {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.sports_basketball,
-                                color: Colors.white38,
-                                size: 40.0.r,
-                              ),
-                              SizedBox(height: 15.0.r),
-                              Text(
-                                'No Games Today',
-                                style: kBebasNormal.copyWith(
-                                    fontSize: 18.0.r, color: Colors.white54),
-                              ),
-                            ],
-                          ),
-                        );
+                        return const NoGamesToday();
                       }
                     }).toList(),
-                  ),*/
-                _isLoading
-                    ? const Center(child: SpinningIcon(color: Colors.deepOrange))
-                    : TabBarView(
-                        controller: _tabController,
-                        children: _dates.map((date) {
-                          String formattedDate = date.toIso8601String().split('T').first;
-                          var gamesData = cachedGames[formattedDate];
-
-                          if (gamesData is Map && !gamesData.containsKey('error')) {
-                            List<Widget> gameCards = _buildGameCards(gamesData);
-                            return GameList(
-                              scrollController: _scrollController,
-                              gameCards: gameCards,
-                              onRefresh: () async => await fetchGames(selectedDate),
-                            );
-                          } else {
-                            return const NoGamesToday();
-                          }
-                        }).toList(),
-                      ),
+                  ),
             floatingActionButton: _showFab
                 ? FloatingActionButton(
                     onPressed: () {
@@ -710,9 +463,19 @@ class GameList extends StatelessWidget {
       child: ListView.builder(
         controller: scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: gameCards.length,
+        itemCount: gameCards.length + 1, // Add 1 for the icon at the end
         itemBuilder: (context, index) {
-          return gameCards[index];
+          if (index < gameCards.length) {
+            return gameCards[index];
+          } else {
+            // Add a basketball icon as a separator at the end
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 50.0.r),
+              child: Center(
+                child: Icon(Icons.sports_basketball, color: Colors.white38, size: 40.0.r),
+              ),
+            );
+          }
         },
       ),
     );

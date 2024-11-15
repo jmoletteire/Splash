@@ -157,7 +157,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                 ),
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
-                labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+                labelStyle: kBebasNormal.copyWith(fontSize: 16.5.r),
                 tabs: <Widget>[
                   Row(
                     children: [

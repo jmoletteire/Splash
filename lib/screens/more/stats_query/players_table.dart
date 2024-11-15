@@ -318,7 +318,7 @@ class _PlayersTableState extends State<PlayersTable> {
         return PlayerStatsTableText(text: value);
       case 3:
         return PlayerStatsTableText(text: positionsMap[widget.players[row]['POSITION']!]!);
-      case 8:
+      case 9:
         String value = '';
         try {
           value =
@@ -327,7 +327,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 9:
+      case 10:
         String value = '';
         try {
           value =
@@ -336,7 +336,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 10:
+      case 11:
         String value = '';
         try {
           value =
@@ -345,7 +345,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 11:
+      case 12:
         String value = '';
         try {
           value =
@@ -354,7 +354,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 12:
+      case 13:
         String value = '';
         try {
           value =
@@ -363,7 +363,7 @@ class _PlayersTableState extends State<PlayersTable> {
           value = '-';
         }
         return PlayerStatsTableText(text: value);
-      case 13:
+      case 14:
         String value = '';
         try {
           value =

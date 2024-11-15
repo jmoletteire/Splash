@@ -28,7 +28,14 @@ class ConferenceStandings extends StatefulWidget {
 class _ConferenceStandingsState extends State<ConferenceStandings>
     with AutomaticKeepAliveClientMixin {
   late ScrollController scrollController;
+  late double logicalImageSize;
+  late double devicePixelRatio;
+  late int cacheImageSize;
+  bool isLandscape = false;
   List<Map<String, dynamic>> teams = [];
+  List<TableColumn> tableColumns = [];
+  Widget? _cachedHeader;
+  Map<int, Widget> _cachedRows = {};
 
   @override
   bool get wantKeepAlive => true;
@@ -70,10 +77,130 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
     }
   }
 
+  void _initializeTableColumns() {
+    tableColumns = [
+      TableColumn(
+        width: MediaQuery.of(context).size.width * (isLandscape ? 0.12 : 0.3),
+        freezePriority: 1,
+      ),
+
+      /// W
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.05 : 0.08)),
+
+      /// L
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.05 : 0.08)),
+
+      /// PCT
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.165)),
+
+      /// GB
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.125)),
+
+      /// NRTG
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// ORTG
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// DRTG
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// PACE
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// SOS
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// rSOS
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// STREAK
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// xPTS
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// LAST 10
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// HOME
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// ROAD
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// Opp .500+
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// EAST
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// WEST
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// VS ATLANTIC
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.135)),
+
+      /// VS CENTRAL
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+
+      /// VS SOUTHEAST
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+
+      /// VS NORTHWEST
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+
+      /// VS PACIFIC
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+
+      /// VS SOUTHWEST
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+
+      /// SCORE 100+ PTS
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.165)),
+
+      /// LEAD AT HALF
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// LEAD THRU 3Q
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// WIN FG%
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// WIN REB
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+
+      /// WIN TO
+      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+    ];
+  }
+
   @override
   void initState() {
     super.initState();
     scrollController = ScrollController();
+    _checkSeasons();
+
+    teams.sort((a, b) {
+      return a['seasons'][widget.season]['STANDINGS']['PlayoffRank']
+          .compareTo(b['seasons'][widget.season]['STANDINGS']['PlayoffRank']);
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Set image size
+    logicalImageSize = 24.0.r;
+    devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    cacheImageSize = (logicalImageSize * devicePixelRatio).toInt();
+
+    // Check device orientation
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    // Initialize table columns
+    _initializeTableColumns();
   }
 
   @override
@@ -84,16 +211,10 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
 
   @override
   Widget build(BuildContext context) {
-    _checkSeasons();
-
-    teams.sort((a, b) {
-      return a['seasons'][widget.season]['STANDINGS']['PlayoffRank']
-          .compareTo(b['seasons'][widget.season]['STANDINGS']['PlayoffRank']);
-    });
-
-    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    super.build(context);
 
     return SliverTableView.builder(
+      addAutomaticKeepAlives: true,
       horizontalScrollController: widget.scrollController,
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
@@ -112,125 +233,35 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
       rowCount: teams.length,
       rowHeight: MediaQuery.of(context).size.height * 0.055,
       minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
-      columns: [
-        TableColumn(
-          width: MediaQuery.of(context).size.width * (isLandscape ? 0.12 : 0.3),
-          freezePriority: 1,
-        ),
-
-        /// W
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.05 : 0.08)),
-
-        /// L
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.05 : 0.08)),
-
-        /// PCT
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.165)),
-
-        /// GB
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.125)),
-
-        /// NRTG
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// ORTG
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// DRTG
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// PACE
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// SOS
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// rSOS
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// STREAK
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// LAST 10
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// HOME
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// ROAD
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// Opp .500+
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// EAST
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// WEST
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// VS ATLANTIC
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.135)),
-
-        /// VS CENTRAL
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
-
-        /// VS SOUTHEAST
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
-
-        /// VS NORTHWEST
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
-
-        /// VS PACIFIC
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
-
-        /// VS SOUTHWEST
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
-
-        /// SCORE 100+ PTS
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.165)),
-
-        /// LEAD AT HALF
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// LEAD THRU 3Q
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// WIN FG%
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// WIN REB
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-
-        /// WIN TO
-        TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
-      ],
+      columns: tableColumns,
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
     );
   }
 
-  Widget _headerBuilder(BuildContext context, TableRowContentBuilder contentBuilder) =>
-      contentBuilder(
-        context,
-        (context, column) {
-          return Material(
-            color: Colors.grey.shade800,
-            child: Padding(
-              padding:
-                  column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
-              child: Align(
-                alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
-                child: AutoSizeText('${widget.columnNames[column]}',
-                    maxLines: 1,
-                    style: kBebasNormal.copyWith(
-                      fontSize: 16.0.r,
-                    )),
-              ),
+  Widget _headerBuilder(BuildContext context, TableRowContentBuilder contentBuilder) {
+    // Use the cached header if it exists; otherwise, build and cache it
+    return _cachedHeader ??= contentBuilder(
+      context,
+      (context, column) {
+        return Material(
+          color: Colors.grey.shade800,
+          child: Padding(
+            padding:
+                column == 0 ? EdgeInsets.only(left: 20.0.r) : EdgeInsets.only(right: 8.0.r),
+            child: Align(
+              alignment: column == 0 ? Alignment.centerLeft : Alignment.centerRight,
+              child: AutoSizeText('${widget.columnNames[column]}',
+                  maxLines: 1,
+                  style: kBebasNormal.copyWith(
+                    fontSize: 16.0.r,
+                  )),
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
+  }
 
   /// This is used to wrap both regular and placeholder rows to achieve fade
   /// transition between them and to insert optional row divider.
@@ -290,12 +321,13 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         ),
       );
 
-  Widget? _rowBuilder(
-    BuildContext context,
-    int row,
-    TableRowContentBuilder contentBuilder,
-  ) {
-    return _wrapRow(
+  Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
+    if (_cachedRows.containsKey(row)) {
+      return _cachedRows[row];
+    }
+
+    // Build and cache the row if not already cached
+    final rowWidget = _wrapRow(
       row,
       Material(
         type: MaterialType.transparency,
@@ -312,7 +344,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
           }),
           splashColor: Colors.white,
           child: contentBuilder(context, (context, column) {
-            List<String> noPadding = ['ORTG', 'DRTG', 'PACE', 'SOS', 'R-SOS'];
+            List<String> noPadding = ['ORTG', 'DRTG', 'PACE', 'SOR', 'R-SOS'];
             return Padding(
               padding: noPadding.contains(widget.columnNames[column])
                   ? EdgeInsets.only(right: 0.0.r)
@@ -323,6 +355,9 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         ),
       ),
     );
+
+    _cachedRows[row] = rowWidget;
+    return rowWidget;
   }
 
   Widget getContent(
@@ -351,8 +386,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                   child: Image.asset(
                     'images/NBA_Logos/${teams[row]['TEAM_ID']}.png',
                     fit: BoxFit.contain,
-                    width: 24.0.r,
-                    height: 24.0.r,
+                    width: logicalImageSize,
+                    height: logicalImageSize,
                   ),
                 ),
               ),
@@ -677,123 +712,132 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
       case 12:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['L10']!);
+            text:
+                '${teams[row]['seasons']?[widget.season]?['xPTS_W'] ?? '0'} - ${teams[row]['seasons']?[widget.season]?['xPTS_L'] ?? '0'}',
+          );
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 13:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['HOME']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['L10']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 14:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['ROAD']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['HOME']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 15:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['OppOver500']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['ROAD']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 16:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsEast']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['OppOver500']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 17:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsWest']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsEast']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 18:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsWest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 19:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 20:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 21:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 22:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 23:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 24:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['Score100PTS']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 25:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtHalf']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['Score100PTS']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 26:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtThird']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtHalf']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 27:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInFGPCT']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtThird']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 28:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInReb']!);
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInFGPCT']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 29:
+        try {
+          return StandingsDataText(
+              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInReb']!);
+        } catch (e) {
+          return const StandingsDataText(text: '-');
+        }
+      case 30:
         try {
           return StandingsDataText(
               text: teams[row]['seasons'][widget.season]['STANDINGS']['FewerTurnovers']!);
@@ -815,12 +859,14 @@ class StandingsDataText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: color?.withOpacity(0.1) ?? Colors.transparent,
-      alignment: alignment ?? Alignment.centerRight,
-      child: Text(
-        text,
-        style: kBebasNormal.copyWith(fontSize: 17.0.r, color: color),
+    return RepaintBoundary(
+      child: Container(
+        color: color?.withOpacity(0.1) ?? Colors.transparent,
+        alignment: alignment ?? Alignment.centerRight,
+        child: Text(
+          text,
+          style: kBebasNormal.copyWith(fontSize: 17.0.r, color: color),
+        ),
       ),
     );
   }

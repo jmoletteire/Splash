@@ -866,7 +866,11 @@ def games_live_update():
 
     today = datetime.today().strftime('%Y-%m-%d')
     yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-    scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard().get_dict()
+
+    try:
+        scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard().get_dict()
+    except Exception:
+        return
 
     try:
         games_today = scoreboard['scoreboard']['games']
@@ -914,7 +918,11 @@ def games_live_update():
         return
 
     # Else if games today + within 1 hour of first tip-off
-    linescore = scoreboardv2.ScoreboardV2(game_date=first_game_date, day_offset=0).get_normalized_dict()
+    try:
+        linescore = scoreboardv2.ScoreboardV2(game_date=first_game_date, day_offset=0).get_normalized_dict()
+    except Exception:
+        return
+
     line_scores = linescore['LineScore']
 
     for game in games_today:

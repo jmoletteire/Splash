@@ -105,23 +105,13 @@ if __name__ == "__main__":
 
         # Set batch size to process documents
         batch_size = 100
-        total_documents = games_collection.count_documents({
-            "$and": [
-                {"GAME_DATE": {"$lt": "2024-03-01"}},
-                {"SEASON_CODE": '22023'}
-            ]
-        })
+        total_documents = games_collection.count_documents({"GAME_DATE": "2024-11-11"})
         game_counter = 0
         processed_count = 0
         i = 0
 
         while processed_count < total_documents:
-            with games_collection.find({
-                "$and": [
-                    {"GAME_DATE": {"$lt": "2023-11-04"}},
-                    {"SEASON_CODE": '22023'}
-                ]
-            }, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
+            with games_collection.find({"GAME_DATE": "2024-11-11"}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
                     batch_size).batch_size(batch_size) as cursor:
                 documents = list(cursor)
                 if not documents:
