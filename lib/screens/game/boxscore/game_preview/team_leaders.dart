@@ -275,7 +275,7 @@ class _TeamLeadersState extends State<TeamLeaders> {
                   style: kBebasBold.copyWith(fontSize: 16.0.r),
                 ),
               ),
-              SizedBox(height: 10.0.r),
+              SizedBox(height: 12.5.r),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -299,12 +299,12 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Column(
                       children: [
                         Container(
-                          height: 20.0.r,
+                          height: 12.5.r,
                           width: 1.0,
                           decoration: const BoxDecoration(
-                              border: Border(right: BorderSide(color: Colors.white30))),
+                              border: Border(right: BorderSide(color: Colors.white24))),
                         ),
-                        SizedBox(height: 12.5.r),
+                        SizedBox(height: 15.r),
                         Text(
                           'PTS',
                           textAlign: TextAlign.center,
@@ -313,12 +313,12 @@ class _TeamLeadersState extends State<TeamLeaders> {
                             color: Colors.grey.shade300,
                           ),
                         ),
-                        SizedBox(height: 12.5.r),
+                        SizedBox(height: 15.r),
                         Container(
-                          height: 20.0.r,
+                          height: 12.5.r,
                           width: 1.0,
                           decoration: const BoxDecoration(
-                              border: Border(right: BorderSide(color: Colors.white30))),
+                              border: Border(right: BorderSide(color: Colors.white24))),
                         )
                       ],
                     ),
@@ -372,12 +372,12 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Column(
                       children: [
                         Container(
-                          height: 20.0.r,
+                          height: 12.5.r,
                           width: 1.0,
                           decoration: const BoxDecoration(
-                              border: Border(right: BorderSide(color: Colors.white30))),
+                              border: Border(right: BorderSide(color: Colors.white24))),
                         ),
-                        SizedBox(height: 12.5.r),
+                        SizedBox(height: 15.r),
                         Text(
                           'REB',
                           textAlign: TextAlign.center,
@@ -386,12 +386,12 @@ class _TeamLeadersState extends State<TeamLeaders> {
                             color: Colors.grey.shade300,
                           ),
                         ),
-                        SizedBox(height: 12.5.r),
+                        SizedBox(height: 15.r),
                         Container(
-                          height: 20.0.r,
+                          height: 12.5.r,
                           width: 1.0,
                           decoration: const BoxDecoration(
-                              border: Border(right: BorderSide(color: Colors.white30))),
+                              border: Border(right: BorderSide(color: Colors.white24))),
                         )
                       ],
                     ),
@@ -445,12 +445,12 @@ class _TeamLeadersState extends State<TeamLeaders> {
                     child: Column(
                       children: [
                         Container(
-                          height: 20.0.r,
+                          height: 12.5.r,
                           width: 1.0,
                           decoration: const BoxDecoration(
-                              border: Border(right: BorderSide(color: Colors.white30))),
+                              border: Border(right: BorderSide(color: Colors.white24))),
                         ),
-                        SizedBox(height: 12.5.r),
+                        SizedBox(height: 15.r),
                         Text(
                           'AST',
                           textAlign: TextAlign.center,
@@ -459,12 +459,12 @@ class _TeamLeadersState extends State<TeamLeaders> {
                             color: Colors.grey.shade300,
                           ),
                         ),
-                        SizedBox(height: 12.5.r),
+                        SizedBox(height: 15.r),
                         Container(
-                          height: 20.0.r,
+                          height: 12.5.r,
                           width: 1.0,
                           decoration: const BoxDecoration(
-                              border: Border(right: BorderSide(color: Colors.white30))),
+                              border: Border(right: BorderSide(color: Colors.white24))),
                         )
                       ],
                     ),

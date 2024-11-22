@@ -19,7 +19,7 @@ from splash_nba.lib.games.fetch_new_games import update_game_data, fetch_games_f
 from splash_nba.lib.games.fetch_play_by_play import fetch_play_by_play, update_play_by_play
 from splash_nba.lib.games.game_odds import fetch_odds
 from splash_nba.lib.games.live_scores import fetch_boxscore, fetch_live_scores
-from splash_nba.lib.games.nba_cup import update_current_cup
+from splash_nba.lib.games.nba_cup import update_current_cup, flag_cup_games
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
 from splash_nba.lib.games.youtube_highlights import search_youtube_highlights
 from splash_nba.lib.misc.update_transactions import update_transactions
@@ -1523,22 +1523,29 @@ def games_daily_update():
         # Fetch games for each date in the range
         fetch_games_for_date_range(start_date, end_date)
     except Exception as e:
-        logging.error(f"(Games Daily) Failed to fetch upcoming games: {e}")
+        logging.error(f"(Games Daily) Failed to fetch upcoming games: {e}", exc_info=True)
 
     # NBA Cup
     logging.info("NBA Cup...")
-    update_current_cup()
+    try:
+        update_current_cup()
+        flag_cup_games(season=k_current_season)
+    except Exception as e:
+        logging.error(f"(Games Daily) Failed to update NBA Cup: {e}", exc_info=True)
 
     # Playoffs
     logging.info("Playoffs...")
-    playoff_games = commonplayoffseries.CommonPlayoffSeries(season=k_current_season).get_normalized_dict()[
-        'PlayoffSeries']
-    if not playoff_games:
-        logging.info("(Games Daily) No playoff games found.")
-        return
-    else:
-        series_data = reformat_series_data(playoff_games)
-        get_playoff_bracket_data(k_current_season, series_data)
+    try:
+        playoff_games = commonplayoffseries.CommonPlayoffSeries(season=k_current_season).get_normalized_dict()[
+            'PlayoffSeries']
+        if not playoff_games:
+            logging.info("(Games Daily) No playoff games found.")
+            return
+        else:
+            series_data = reformat_series_data(playoff_games)
+            get_playoff_bracket_data(k_current_season, series_data)
+    except Exception as e:
+        logging.error(f"(Games Daily) Failed to update playoff data: {e}", exc_info=True)
 
 
 def teams_daily_update():
@@ -1560,16 +1567,24 @@ def teams_daily_update():
         for i, game_day in enumerate(sorted_games_cursor):
             logging.info(f"Processing {game_day['GAME_DATE']}...")
             update_team_games(game_day)
+    except Exception as e:
+        logging.error(f"(Teams Daily) Error updating team game logs: {e}", exc_info=True)
 
+    try:
         # News & Transactions (NATSTAT - 60 API calls)'
         logging.info("News & Transactions (0 API calls)...")
         fetch_team_transactions()
         fetch_team_news()
         update_transactions()
+    except Exception as e:
+        logging.error(f"(Teams Daily) Error updating team news & transactions: {e}", exc_info=True)
 
+    try:
         # Cap Sheet (0 API calls)
         logging.info("Cap Sheet (0 API calls)...")
         update_team_contract_data()
+    except Exception as e:
+        logging.error(f"(Teams Daily) Error updating team contracts: {e}", exc_info=True)
 
         # Loop through all documents in the collection
         batch_size = 10
@@ -1593,52 +1608,80 @@ def teams_daily_update():
 
                     logging.info(f"Processing team {team} ({i} of 30)...")
 
-                    # Team History (30 API calls)
-                    logging.info("History (30 API calls)...")
-                    update_team_history(team_id=team)
-                    time.sleep(15)
+                    try:
+                        # Team History (30 API calls)
+                        logging.info("History (30 API calls)...")
+                        update_team_history(team_id=team)
+                        time.sleep(15)
+                    except Exception as e:
+                        logging.error(f"(Teams Daily) Error updating team {team} history: {e}", exc_info=True)
 
                     # Season Stats (120 API calls)
-                    logging.info("Stats (120 API calls)...")
-                    update_current_season(team_id=team)
-                    # Filter seasons to only include the current season key
-                    filtered_doc = doc.copy()
-                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
-                                               key == k_current_season}
-                    current_season_per_100_possessions(team_doc=filtered_doc,
-                                                       playoffs=k_current_season_type == 'PLAYOFFS')
-                    time.sleep(15)
+                    try:
+                        logging.info("Stats (120 API calls)...")
+                        update_current_season(team_id=team)
+                        # Filter seasons to only include the current season key
+                        filtered_doc = doc.copy()
+                        filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
+                                                   key == k_current_season}
+                        current_season_per_100_possessions(team_doc=filtered_doc,
+                                                           playoffs=k_current_season_type == 'PLAYOFFS')
+                        time.sleep(15)
+                    except Exception as e:
+                        logging.error(f"(Teams Daily) Error updating team {team} stats: {e}", exc_info=True)
 
-                    # Current Roster & Coaches (~400-500 API calls)
-                    logging.info("Roster & Coaches (~400-500 API calls)...")
-                    season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
-                    update_current_roster(team_id=team, season_not_started=season_not_started)
-                    time.sleep(30)
+                    try:
+                        # Current Roster & Coaches (~400-500 API calls)
+                        logging.info("Roster & Coaches (~400-500 API calls)...")
+                        season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
+                        update_current_roster(team_id=team, season_not_started=season_not_started)
+                        time.sleep(30)
+                    except Exception as e:
+                        logging.error(f"(Teams Daily) Error updating team {team} roster: {e}", exc_info=True)
 
-                    # Last Starting Lineup (0 API Calls)
-                    logging.info("Last Starting Lineup (0 API calls)...")
-                    # Get most recent game by date
-                    game_id, game_date = get_last_game(doc['seasons'])
-                    # Get starting lineup for most recent game
-                    last_starting_lineup = get_last_lineup(team, game_id, game_date)
-                    # Update document
-                    teams_collection.update_one(
-                        {"TEAM_ID": team},
-                        {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
-                    )
+                    try:
+                        # Last Starting Lineup (0 API Calls)
+                        logging.info("Last Starting Lineup (0 API calls)...")
+                        # Get most recent game by date
+                        game_id, game_date = get_last_game(doc['seasons'])
+                        # Get starting lineup for most recent game
+                        last_starting_lineup = get_last_lineup(team, game_id, game_date)
+                        # Update document
+                        teams_collection.update_one(
+                            {"TEAM_ID": team},
+                            {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
+                        )
+                    except Exception as e:
+                        logging.error(f"(Teams Daily) Error updating team {team} last lineup: {e}", exc_info=True)
 
                     # Pause 15 seconds between teams
                     time.sleep(15)
 
-        rank_hustle_stats_current_season()
-        three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
-        current_season_custom_team_stats_rank()
+        # Hustle Stat Rank
+        try:
+            rank_hustle_stats_current_season()
+        except Exception as e:
+            logging.error(f"(Teams Daily) Error updating hustle stat ranks: {e}", exc_info=True)
 
-        # Standings (min. 30 API calls [more if tiebreakers])
-        logging.info("Standings (min. 30 API calls)...")
-        update_current_standings()
-    except Exception as e:
-        logging.error(f"(Teams Daily) Error updating teams: {e}")
+        # 3PAr + FTr
+        try:
+            three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
+        except Exception as e:
+            logging.error(f"(Teams Daily) Error updating 3PAr + FTr: {e}", exc_info=True)
+
+        # Custom Stat Ranks
+        try:
+            current_season_custom_team_stats_rank()
+        except Exception as e:
+            logging.error(f"(Teams Daily) Error updating custom team stat ranks: {e}", exc_info=True)
+
+        # Standings
+        try:
+            # Standings (min. 30 API calls [more if tiebreakers])
+            logging.info("Standings (min. 30 API calls)...")
+            update_current_standings()
+        except Exception as e:
+            logging.error(f"(Teams Daily) Error updating standings: {e}", exc_info=True)
 
 
 def players_daily_update():
@@ -1656,7 +1699,7 @@ def players_daily_update():
             restructure_new_docs()
             update_player_info()
         except Exception as e:
-            logging.error(f"(Player Info) Error adding players: {e}")
+            logging.error(f"(Player Info) Error adding players: {e}", exc_info=True)
 
     def player_contracts_and_trans():
         # Contracts & Transactions
@@ -1692,7 +1735,7 @@ def players_daily_update():
                 )
             except Exception as e:
                 logging.error(
-                    f'(Player Contracts) Could not process contract data for Player {player["PERSON_ID"]}: {e}')
+                    f'(Player Contracts) Could not process contract data for Player {player["PERSON_ID"]}: {e}', exc_info=True)
                 continue
 
     def player_awards():
@@ -1736,7 +1779,7 @@ def players_daily_update():
                 logging.info(f"(Player Awards) Updated {i + 1} of {players}")
 
             except Exception as e:
-                logging.error(f"(Player Awards) Unable to process player {player['PERSON_ID']}: {e}")
+                logging.error(f"(Player Awards) Unable to process player {player['PERSON_ID']}: {e}", exc_info=True)
 
             # Pause for a random time between 0.5 and 2 seconds
             time.sleep(random.uniform(0.5, 2.0))
@@ -1752,21 +1795,21 @@ def players_daily_update():
         player_info()
         #print('Skip Player Info')
     except Exception as e:
-        logging.error(f"Error updating player info: {e}")
+        logging.error(f"Error updating player info: {e}", exc_info=True)
 
     # CONTRACT & TRANSACTIONS
     try:
         player_contracts_and_trans()
         #print('Skip Player Contracts')
     except Exception as e:
-        logging.error(f"Error updating player contracts & transactions: {e}")
+        logging.error(f"Error updating player contracts & transactions: {e}", exc_info=True)
 
     # AWARDS
     try:
         player_awards()
         #print('Skip Player Awards')
     except Exception as e:
-        logging.error(f"Error updating player awards: {e}")
+        logging.error(f"Error updating player awards: {e}", exc_info=True)
 
 
 # Schedule the tasks

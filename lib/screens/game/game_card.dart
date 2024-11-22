@@ -21,10 +21,10 @@ class GameCard extends StatefulWidget {
   });
 
   @override
-  _GameCardState createState() => _GameCardState();
+  GameCardState createState() => GameCardState();
 }
 
-class _GameCardState extends State<GameCard> {
+class GameCardState extends State<GameCard> {
   int statusCode = 0;
   String spread = '';
   String overUnder = '';
@@ -36,8 +36,8 @@ class _GameCardState extends State<GameCard> {
   late Map<String, dynamic> awayLineScore;
   late Image homeLogo;
   late Image awayLogo;
-  late _TeamRow homeRow;
-  late _TeamRow awayRow;
+  late TeamRow homeRow;
+  late TeamRow awayRow;
 
   @override
   void initState() {
@@ -78,7 +78,7 @@ class _GameCardState extends State<GameCard> {
     );
 
     headerRow = _buildHeaderRow();
-    awayRow = _TeamRow(
+    awayRow = TeamRow(
       teamId: widget.awayTeam,
       teamLogo: awayLogo,
       lineScore: awayLineScore,
@@ -87,7 +87,7 @@ class _GameCardState extends State<GameCard> {
           statusCode != 3 ? Colors.white : _getScoreColor(awayLineScore, homeLineScore),
     );
 
-    homeRow = _TeamRow(
+    homeRow = TeamRow(
       teamId: widget.homeTeam,
       teamLogo: homeLogo,
       lineScore: homeLineScore,
@@ -114,13 +114,26 @@ class _GameCardState extends State<GameCard> {
       homeLineScore = lineScore[0]['TEAM_ID'] == widget.homeTeam ? lineScore[0] : lineScore[1];
       awayLineScore = lineScore[1]['TEAM_ID'] == widget.homeTeam ? lineScore[0] : lineScore[1];
 
+      final logicalSize = 24.0.r;
+      //final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+      awayLogo = Image.asset(
+        'images/NBA_Logos/${widget.awayTeam}.png',
+        width: logicalSize,
+        height: logicalSize,
+      );
+
+      homeLogo = Image.asset(
+        'images/NBA_Logos/${widget.homeTeam}.png',
+        width: logicalSize,
+        height: logicalSize,
+      );
+
       spread = _parseOdds(widget.game, 'hcp', live: false, type: '168', fallbackType: '4');
       overUnder = _parseOdds(widget.game, 'hcp', live: false, type: '18', fallbackType: '3');
 
       headerRow = _buildHeaderRow();
 
-      awayRow = _TeamRow(
-        key: ValueKey(widget.awayTeam), // Use teamId as the key
+      awayRow = TeamRow(
         teamId: widget.awayTeam,
         teamLogo: awayLogo,
         lineScore: awayLineScore,
@@ -129,8 +142,7 @@ class _GameCardState extends State<GameCard> {
             statusCode != 3 ? Colors.white : _getScoreColor(awayLineScore, homeLineScore),
       );
 
-      homeRow = _TeamRow(
-        key: ValueKey(widget.homeTeam), // Use teamId as the key
+      homeRow = TeamRow(
         teamId: widget.homeTeam,
         teamLogo: homeLogo,
         lineScore: homeLineScore,
@@ -211,8 +223,8 @@ class _GameCardState extends State<GameCard> {
       '6': 'In-Season Tournament',
     };
 
-    String gameId = summary['GAME_ID'].toString().substring(2, 3);
-    String seasonType = seasonTypes[gameId] ?? 'Regular Season';
+    String gameId = summary['GAME_ID'].toString();
+    String seasonType = seasonTypes[gameId.substring(2, 3)] ?? 'Regular Season';
 
     switch (seasonType) {
       case 'Playoffs':
@@ -362,6 +374,10 @@ class _GameCardState extends State<GameCard> {
   }
 
   String _adjustTimezone(String dateString, String timeString) {
+    if (timeString == 'Final') {
+      return timeString;
+    }
+
     // Parse the base date
     DateTime baseDate = DateTime.parse(dateString);
 
@@ -454,14 +470,14 @@ class _GameCardState extends State<GameCard> {
   }
 }
 
-class _TeamRow extends StatelessWidget {
+class TeamRow extends StatelessWidget {
   final int teamId;
   final Image teamLogo;
   final Map<String, dynamic> lineScore;
   final String odds;
   final Color scoreColor;
 
-  const _TeamRow({
+  const TeamRow({
     super.key,
     required this.teamId,
     required this.teamLogo,

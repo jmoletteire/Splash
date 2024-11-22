@@ -20,10 +20,10 @@ class Scoreboard extends StatefulWidget {
   const Scoreboard({super.key});
 
   @override
-  _ScoreboardState createState() => _ScoreboardState();
+  ScoreboardState createState() => ScoreboardState();
 }
 
-class _ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMixin {
+class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;

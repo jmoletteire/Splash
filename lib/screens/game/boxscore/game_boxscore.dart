@@ -468,6 +468,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                     children: [
                       Expanded(
                         child: Container(
+                          height: 46.0.r,
                           margin: EdgeInsets.only(bottom: 1.0.r),
                           color: const Color(0xFF1B1B1B),
                           child: const Tab(

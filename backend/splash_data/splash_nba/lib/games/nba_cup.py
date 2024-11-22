@@ -72,6 +72,15 @@ def update_current_cup():
 
 
 def flag_cup_games(season=None):
+    try:
+        logging.basicConfig(level=logging.INFO)
+        client = MongoClient(uri)
+        db = client.splash
+        cup_collection = db.nba_cup_history
+        games_collection = db.nba_games
+    except Exception as e:
+        logging.error(f"Failed to connect to MongoDB: {e}")
+        return
 
     # Define the query inline, only adding 'SEASON' if a season is provided
     query = {'SEASON': season} if season else {}

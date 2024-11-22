@@ -355,8 +355,8 @@ class _StandingsState extends State<Standings> with TickerProviderStateMixin {
                                   await getTeamsRefresh(kWestConfTeamIds);
 
                               setState(() {
-                                eastTeams = [];
-                                westTeams = [];
+                                eastTeams = fetchedEastTeams;
+                                westTeams = fetchedWestTeams;
                               });
                             },
                             child: CustomScrollView(
@@ -670,7 +670,7 @@ class StandingsGlossary extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'SOS',
+                        'SOR',
                         style: kBebasNormal.copyWith(fontSize: 14.0.r),
                       ),
                       Text(
@@ -687,7 +687,7 @@ class StandingsGlossary extends StatelessWidget {
                         style: kBebasNormal.copyWith(fontSize: 14.0.r),
                       ),
                       Text(
-                        ' - Remaining S.O.S.',
+                        ' - Rem. Strength of Schedule',
                         style: kBebasNormal.copyWith(
                             fontSize: 14.0.r, color: Colors.grey.shade400),
                       ),
@@ -768,6 +768,19 @@ class StandingsGlossary extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'xPTS',
+                                    style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                                  ),
+                                  Text(
+                                    ' - Expected Points Record',
+                                    style: kBebasNormal.copyWith(
+                                        fontSize: 14.0.r, color: Colors.grey.shade400),
+                                  ),
+                                ],
+                              ),
                               Row(
                                 children: [
                                   Text(
@@ -1095,6 +1108,19 @@ class StandingsGlossary extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 5.0.r),
+                      Row(
+                        children: [
+                          Text(
+                            'xPTS',
+                            style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                          ),
+                          Text(
+                            ' - Expected Points Record',
+                            style: kBebasNormal.copyWith(
+                                fontSize: 14.0.r, color: Colors.grey.shade400),
+                          ),
+                        ],
+                      ),
                       Row(
                         children: [
                           Text(

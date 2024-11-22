@@ -32,13 +32,12 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
   late double availableWidth;
   late double availableHeight;
   late bool isLandscape;
-  List<Map<String, dynamic>> _players = [];
+  final List<Map<String, dynamic>> _players = [];
   List<String> columnNames = [];
   List<TableColumn> tableColumns = [];
   bool hasPoss = false;
-  bool hasXPTS = false;
+  bool hasXPts = false;
   Widget? _cachedHeader;
-  Map<int, Widget> _cachedRows = {};
 
   @override
   void initState() {
@@ -53,7 +52,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         .any((player) => player['statistics']?['POSS'] != null || player['POSS'] != null);
 
     // Check if xPTS data is available for any player
-    hasXPTS = widget.players.any(
+    hasXPts = widget.players.any(
         (player) => player['statistics']?['SQ_TOTAL'] != null || player['SQ_TOTAL'] != null);
   }
 
@@ -102,7 +101,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       widget.playerGroup,
       if (hasPoss) 'POSS',
       'MIN',
-      if (hasXPTS) 'xPTS', // Only add xPTS if data is available
+      if (hasXPts) 'xPTS', // Only add xPTS if data is available
       'PTS',
       'REB',
       'AST',
@@ -368,12 +367,8 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       );
 
   Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
-    if (_cachedRows.containsKey(row)) {
-      return _cachedRows[row];
-    }
-
     // Build and cache the row if not already cached
-    final rowWidget = _wrapRow(
+    return _wrapRow(
       row,
       Material(
         type: MaterialType.transparency,
@@ -404,19 +399,16 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         ),
       ),
     );
-
-    _cachedRows[row] = rowWidget;
-    return rowWidget;
   }
 
   Widget getContent(int row, int column, BuildContext context) {
-    int adj_column = hasPoss && hasXPTS
+    int adjColumn = hasPoss && hasXPts
         ? column
-        : !hasPoss && hasXPTS
+        : !hasPoss && hasXPts
             ? column >= 1
                 ? column + 1
                 : column
-            : hasPoss && !hasXPTS
+            : hasPoss && !hasXPts
                 ? column >= 3
                     ? column + 1
                     : column
@@ -426,7 +418,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                         ? column + 1
                         : column + 2;
 
-    switch (adj_column) {
+    switch (adjColumn) {
       case 0:
         return _players[row]['nameWidget'];
       case 1:
@@ -557,13 +549,13 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 
   Widget possWidget(int index, int played) {
     try {
-      if ((played == 0 ||
-              (widget.players[index]?['statistics']?['POSS'] ??
-                      widget.players[index]?['POSS'] ??
-                      0) ==
-                  0) &&
-          !widget.inProgress) {
-        return BoxscoreDataText(key: const ValueKey('DNP'), text: 'DNP', size: 14.0.r);
+      if (played == 0 && !widget.inProgress) {
+        return BoxScoreDataText(key: const ValueKey('DNP'), text: 'DNP', size: 14.0.r);
+      } else if ((widget.players[index]?['statistics']?['POSS'] ??
+              widget.players[index]?['POSS'] ??
+              0) ==
+          0) {
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
       String text =
           '${widget.players[index]?['statistics']?['POSS'] ?? widget.players[index]?['POSS'] ?? '-'}';
@@ -580,7 +572,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         ),
       );
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 
@@ -606,7 +598,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 
     try {
       if (played == 0) {
-        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
       return RepaintBoundary(
         key: ValueKey(minutes),
@@ -619,34 +611,34 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         ),
       );
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 
   Widget xPtsWidget(int index, int played) {
     try {
       if (played == 0) {
-        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
       String text =
           '${((widget.players[index]?['statistics']?['SQ_TOTAL'] ?? 0.0) + (widget.players[index]?['statistics']?['freeThrowsMade'] ?? widget.players[index]['FTM'] ?? 0.0)).toStringAsFixed(1)}';
-      return BoxscoreDataText(key: ValueKey(text), text: text);
+      return BoxScoreDataText(key: ValueKey(text), text: text);
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 
   Widget basicStatWidget(int index, int played, String statName, String statAbbr) {
     try {
       if (played == 0) {
-        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
       String text = statName == 'TS_PCT' || statName == 'USG_PCT'
           ? '${((widget.players[index]?['statistics']?[statName] ?? widget.players[index]?[statAbbr] ?? '-') * 100).toStringAsFixed(1)}%'
           : '${(widget.players[index]?['statistics']?[statName] ?? widget.players[index]?[statAbbr] ?? '-').toStringAsFixed(0)}';
-      return BoxscoreDataText(key: ValueKey(text), text: text);
+      return BoxScoreDataText(key: ValueKey(text), text: text);
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 
@@ -654,20 +646,20 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       String madeAbbr, String attAbbr) {
     try {
       if (played == 0) {
-        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
       String text =
           '${(widget.players[index]?['statistics']?[madeName] ?? widget.players[index]?[madeAbbr] ?? '').toStringAsFixed(0)}-${(widget.players[index]?['statistics']?[attName] ?? widget.players[index]?[attAbbr] ?? '').toStringAsFixed(0)}';
-      return BoxscoreDataText(key: ValueKey(text), text: text);
+      return BoxScoreDataText(key: ValueKey(text), text: text);
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 
   Widget efgWidget(int index, int played) {
     try {
       if (played == 0) {
-        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
       int fieldGoalsAttempted =
           widget.players[index]?['statistics']?['fieldGoalsAttempted'] ?? 0;
@@ -675,11 +667,11 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       // Check for division by zero
       if (fieldGoalsAttempted == 0) {
         try {
-          return BoxscoreDataText(
+          return BoxScoreDataText(
               text:
                   '${((widget.players[index]?['statistics']?['EFG_PCT'] ?? widget.players[index]?['EFG_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
         } catch (e) {
-          return const BoxscoreDataText(text: '-');
+          return const BoxScoreDataText(text: '-');
         }
       }
 
@@ -690,9 +682,9 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 
       String text = '${efgPct.toStringAsFixed(1)}%';
 
-      return BoxscoreDataText(key: ValueKey(text), text: text);
+      return BoxScoreDataText(key: ValueKey(text), text: text);
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 
@@ -703,7 +695,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                   widget.players[index]?['POSS'] ??
                   0) ==
               0) {
-        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
 
       int possOn = (widget.players[index]?['statistics']?['POSS'] ??
@@ -733,7 +725,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       double netOnOff = offOnOff - defOnOff;
       String text =
           netOnOff > 0.0 ? '+${netOnOff.toStringAsFixed(1)}' : netOnOff.toStringAsFixed(1);
-      return BoxscoreDataText(
+      return BoxScoreDataText(
         key: ValueKey(text),
         text: text,
         color: netOnOff == 0.0
@@ -743,7 +735,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                 : const Color(0xFFFC3126),
       );
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 
@@ -754,7 +746,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                   widget.players[index]?['POSS'] ??
                   0) ==
               0) {
-        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
 
       int possOn = (widget.players[index]?['statistics']?['POSS'] ??
@@ -772,7 +764,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
 
       String text = onOff > 0.0 ? '+${onOff.toStringAsFixed(1)}' : onOff.toStringAsFixed(1);
 
-      return BoxscoreDataText(
+      return BoxScoreDataText(
         key: ValueKey(text),
         text: text,
         color: onOff == 0.0
@@ -782,7 +774,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                 : const Color(0xFFFC3126),
       );
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 
@@ -793,7 +785,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                   widget.players[index]?['POSS'] ??
                   0) ==
               0) {
-        return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
 
       int possOn = (widget.players[index]?['statistics']?['POSS'] ??
@@ -813,7 +805,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       double onOff = dRtgOn - dRtgOff;
       String text = onOff > 0.0 ? '+${onOff.toStringAsFixed(1)}' : onOff.toStringAsFixed(1);
 
-      return BoxscoreDataText(
+      return BoxScoreDataText(
         key: ValueKey(text),
         text: text,
         color: onOff == 0.0
@@ -823,19 +815,19 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
                 : const Color(0xFFFC3126),
       );
     } catch (e) {
-      return const BoxscoreDataText(key: ValueKey('-'), text: '-');
+      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
   }
 }
 
-class BoxscoreDataText extends StatelessWidget {
-  const BoxscoreDataText({
-    Key? key,
+class BoxScoreDataText extends StatelessWidget {
+  const BoxScoreDataText({
+    super.key,
     required this.text,
     this.color,
     this.alignment,
     this.size,
-  }) : super(key: key);
+  });
 
   final Alignment? alignment;
   final Color? color;

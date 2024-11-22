@@ -51,7 +51,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
           {required Map<String, dynamic> team,
           required Map<String, dynamic> player})> _playerPages;
 
-  Map<int, double> _scrollPositions = {};
+  final Map<int, double> _scrollPositions = {};
 
   Future<void> getTeam(String teamId) async {
     final teamCache = Provider.of<TeamCache>(context, listen: false);
@@ -97,7 +97,7 @@ class _PlayerHomeState extends State<PlayerHome> with SingleTickerProviderStateM
       setState(() {
         _player = fetchedPlayer;
       });
-      if (_player.containsKey('error')) {
+      if (_player.containsKey('error') && mounted) {
         Navigator.pop(context);
         _showErrorSnackBar(context, 'Player not found');
       } else {

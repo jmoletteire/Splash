@@ -7,6 +7,19 @@ class TeamCache extends ChangeNotifier {
     return _cache[teamId];
   }
 
+  /*
+  void addTeam(String teamId, Map<String, dynamic> teamData) {
+    if (_cache.length >= 5) {
+      // Remove the oldest entry when the cache exceeds 5 entries
+      String oldestTeamId = _cache.keys.first;
+      _cache.remove(oldestTeamId);
+    }
+    _cache[teamId] = teamData;
+    notifyListeners();
+  }
+
+   */
+
   void addTeam(String teamId, Map<String, dynamic> teamData) {
     _cache[teamId] = teamData;
     notifyListeners();

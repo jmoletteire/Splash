@@ -65,11 +65,11 @@ class PlayerAvatar extends StatelessWidget {
   final String playerImageUrl;
 
   const PlayerAvatar({
-    Key? key,
+    super.key,
     required this.radius,
     required this.backgroundColor,
     required this.playerImageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

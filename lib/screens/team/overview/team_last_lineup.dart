@@ -119,9 +119,14 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
               color: Colors.white10,
               child: Stack(
                 children: [
-                  CustomPaint(
-                    size: Size(368.r, 346.r),
-                    painter: HalfCourtPainter(courtColor: Colors.grey.shade800),
+                  Column(
+                    children: [
+                      CustomPaint(
+                        size: Size(368.r, 346.r),
+                        painter: HalfCourtPainter(courtColor: Colors.grey.shade800),
+                      ),
+                      SizedBox(height: 10.r),
+                    ],
                   ),
                   LayoutBuilder(builder: (context, constraints) {
                     if (isLandscape) {
@@ -195,7 +200,7 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                     } else {
                       return Column(
                         children: [
-                          SizedBox(height: 60.0.r),
+                          SizedBox(height: 65.0.r),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -268,12 +273,12 @@ class PlayerCard extends StatelessWidget {
   final Map<String, dynamic> team;
 
   const PlayerCard({
-    Key? key,
+    super.key,
     required this.playerId,
     required this.name,
     required this.position,
     required this.team,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

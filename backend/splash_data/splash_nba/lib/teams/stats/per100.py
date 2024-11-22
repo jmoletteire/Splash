@@ -20,21 +20,21 @@ def current_season_per_100_possessions(team_doc, playoffs):
     # Example: [("PTS", "BASIC"), ("AST", "BASIC")]
     stats_to_calculate = [
         # BASIC
-        # ("FGM", "BASIC"),
-        # ("FGA", "BASIC"),
-        # ("FTM", "BASIC"),
-        # ("FTA", "BASIC"),
-        # ("FG3M", "BASIC"),
-        # ("FG3A", "BASIC"),
-        # ("STL", "BASIC"),
-        # ("BLK", "BASIC"),
-        # ("REB", "BASIC"),
-        # ("OREB", "BASIC"),
-        # ("DREB", "BASIC"),
-        # ("TOV", "BASIC"),
-        # ("PF", "BASIC"),
-        # ("PFD", "BASIC"),
-        # ("PTS", "BASIC"),
+        ("FGM", "BASIC"),
+        ("FGA", "BASIC"),
+        ("FTM", "BASIC"),
+        ("FTA", "BASIC"),
+        ("FG3M", "BASIC"),
+        ("FG3A", "BASIC"),
+        ("STL", "BASIC"),
+        ("BLK", "BASIC"),
+        ("REB", "BASIC"),
+        ("OREB", "BASIC"),
+        ("DREB", "BASIC"),
+        ("TOV", "BASIC"),
+        ("PF", "BASIC"),
+        ("PFD", "BASIC"),
+        ("PTS", "BASIC"),
 
         # ADV
         ("XPTS_DIFF", "ADV"),
@@ -42,14 +42,14 @@ def current_season_per_100_possessions(team_doc, playoffs):
         ("XPTS_AGAINST", "ADV"),
 
         # HUSTLE
-        # ("CONTESTED_SHOTS", "HUSTLE"),
-        # ("SCREEN_ASSISTS", "HUSTLE"),
-        # ("SCREEN_AST_PTS", "HUSTLE"),
-        # ("BOX_OUTS", "HUSTLE"),
-        # ("OFF_BOXOUTS", "HUSTLE"),
-        # ("DEF_BOXOUTS", "HUSTLE"),
-        # ("DEFLECTIONS", "HUSTLE"),
-        # ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
+        ("CONTESTED_SHOTS", "HUSTLE"),
+        ("SCREEN_ASSISTS", "HUSTLE"),
+        ("SCREEN_AST_PTS", "HUSTLE"),
+        ("BOX_OUTS", "HUSTLE"),
+        ("OFF_BOXOUTS", "HUSTLE"),
+        ("DEF_BOXOUTS", "HUSTLE"),
+        ("DEFLECTIONS", "HUSTLE"),
+        ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
     ]
 
     seasons = team_doc.get("seasons", None)

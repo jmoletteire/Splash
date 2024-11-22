@@ -70,7 +70,7 @@ class _TeamOverviewState extends State<TeamOverview> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Owner',
+                        'Governor',
                         style: kBebasNormal.copyWith(
                           fontSize: 15.0.r,
                           fontStyle: FontStyle.italic,

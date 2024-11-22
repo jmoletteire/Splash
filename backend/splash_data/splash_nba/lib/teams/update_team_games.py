@@ -30,8 +30,8 @@ def update_team_games(game_day):
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
-        logging.error(f"(Team Games) Failed to connect to MongoDB: {e}")
-        exit(1)
+        logging.error(f"(Team Games) Failed to connect to MongoDB: {e}", exc_info=True)
+        return
 
     # Iterate through each game on that date
     for game_id, game in game_day["GAMES"].items():
@@ -39,6 +39,7 @@ def update_team_games(game_day):
             season = convert_year_to_season(game["SUMMARY"]["GameSummary"][0]["SEASON"])
             game_date = game["SUMMARY"]["GameSummary"][0]["GAME_DATE_EST"][:10]
             season_id = game["SUMMARY"]["GameSummary"][0]["GAME_ID"][2] + game["SUMMARY"]["GameSummary"][0]["SEASON"]
+            is_nba_cup = 'NBA_CUP' in game["SUMMARY"]["GameSummary"][0].keys()
 
             line_scores = game["SUMMARY"]["LineScore"]
             home_team_id = game["SUMMARY"]["GameSummary"][0]['HOME_TEAM_ID']
@@ -68,6 +69,7 @@ def update_team_games(game_day):
             game_data_home = {
                 "SEASON_ID": season_id,
                 "GAME_DATE": game_date,
+                "NBA_CUP": is_nba_cup,
                 "HOME_AWAY": "vs",
                 "OPP": visitor_team_id,
                 "TEAM_PTS": home_team_pts,
@@ -79,6 +81,7 @@ def update_team_games(game_day):
             game_data_visitor = {
                 "SEASON_ID": season_id,
                 "GAME_DATE": game_date,
+                "NBA_CUP": is_nba_cup,
                 "HOME_AWAY": "@",
                 "OPP": home_team_id,
                 "TEAM_PTS": visitor_team_pts,
@@ -99,7 +102,7 @@ def update_team_games(game_day):
                 {"$set": {f"seasons.{season}.GAMES.{game_id}": game_data_visitor}},
             )
         except Exception as e:
-            logging.error(f"(Team Games) Could not process games for {game_day['GAME_DATE']}: {e}")
+            logging.error(f"(Team Games) Could not process games for {game_day['GAME_DATE']}: {e}", exc_info=True)
             continue
 
 

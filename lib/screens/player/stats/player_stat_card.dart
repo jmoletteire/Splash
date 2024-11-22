@@ -145,7 +145,7 @@ class _PlayerStatCardState extends State<PlayerStatCard> {
                             ),
                             numPlayers: widget.playerStats[widget.selectedSeasonType]['BASIC']
                                     ?['NUM_PLAYERS'] ??
-                                0,
+                                450,
                           ),
                       ],
                     ],

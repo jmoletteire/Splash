@@ -171,7 +171,7 @@ def synergy_game_ids():
         'Charlotte': 1610612766
     }
 
-    access_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxNTk5MTE0LCJpYXQiOjE3MzE1OTkxMTQsImV4cCI6MTczMTU5OTcxNCwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.B0Hb3Wh-a0AggS92_5Bb-H2mZzj6CJFgp5wTYKEKr_VDYcfqSiYAfCN_In3aBvs4M0Omy5zXNciLrgOW73y6udQw-xfYhGUirIDOAJSL040H1YEiLR_GILQFmM4CREXKn-8LhuS_H5r95XFzc3mQgVL9Jh7wcYTJWWBVNt3-lc4gn_hOH8uL1-U1-uwqyTshyJie3XqYEDRuxBGau-qwz7zdT_iBrlYztVKIpzIUiIPOXbK-DxIHL4wTkWLOgLQ_c-gdTsf3zi_baNZvoGI7LaDrHajquc1EUBlJYSYJ0dfbDyoOp8uB14y-ng1gfarIHR9J1BwMUCh-wQclQYJkJQ'
+    access_token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMyMTk5ODkzLCJpYXQiOjE3MzIxOTk4OTMsImV4cCI6MTczMjIwMDQ5MywiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.jtUfoJYvwYXHd9_jURSHZcaNxxjMOdabMT5sc3B48tweOey-v2LvWJP4SKtp0KGROcW3fF_A_DzcNCAGXn86hwiiPEZEQq1EKOzNoT2h2s_4-sKZcZSh0GWqRnWXv0cFuJt9_hqj2qAF3sEicR6sefBmaMEAOoccYaBDc0n_4T2UN-m93TFi9HRIXpe5658p6yYSwF8gT5Z-UiJxPJE83D9t0JtPjYt5aXj5yR_M2ny6lCCgi3Z772DolX-L9LBlxQ8Z0BSwRaCvL8w42Q1xkTFvoyPDxwkIpnoLX43QGjI_L8UfHolqIrWLVlj7pnm1IuQ7aE_5qfCG5lNRFfq0rg'
 
     # URL for the data you want to access
     url = 'https://basketball.synergysportstech.com/api/games'
@@ -203,7 +203,7 @@ def synergy_game_ids():
             "66ec94cbd172189f95bf08b2"   # 2024-25
         ],
         "competitionIds": None,
-        "skip": 1024,
+        "skip": 512,
         "statuses": [4, 1, 2, 3, 5],
         "sort": "utc:desc"
     }
@@ -379,8 +379,8 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        start_date = datetime(2024, 11, 13)
-        end_date = datetime(2024, 11, 13)
+        start_date = datetime(2024, 11, 15)
+        end_date = datetime(2024, 11, 15)
 
         # Fetch games for each date in the range
         #fetch_games_for_date_range(start_date, end_date)

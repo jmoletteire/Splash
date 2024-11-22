@@ -30,6 +30,7 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Column(
       children: [
         TabBar.secondary(
@@ -44,7 +45,7 @@ class _TeamPlayersHomeState extends State<TeamPlayersHome>
             indicatorWeight: 3.0,
             unselectedLabelColor: Colors.grey,
             labelColor: Colors.white,
-            labelStyle: kBebasNormal.copyWith(fontSize: 16.0.r),
+            labelStyle: kBebasNormal.copyWith(fontSize: 15.0.r),
             labelPadding: EdgeInsets.symmetric(horizontal: 16.0.r, vertical: 0.0.r),
             tabs: const [
               Tab(text: 'Roster'),

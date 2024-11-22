@@ -14,9 +14,9 @@ def update_player_stats(season_type, team_id):
     client = MongoClient(uri)
     db = client.splash
     players_collection = db.nba_players
-    logging.info("Connected to MongoDB")
     basic_stats = []
     adv_stats = []
+    num_players = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
 
     # Fetch basic and advanced stats for the given season
     if season_type == 'REGULAR SEASON':
@@ -56,7 +56,6 @@ def update_player_stats(season_type, team_id):
                 player_stats[player_id]['ADV'] = {}
 
         logging.info(f'Processing BASIC & ADV stats for {k_current_season}...')
-        num_players = len(player_stats)
 
         logging.info(f'Adding data for {len(player_stats)} players.')
         for player_id, player_data in player_stats.items():

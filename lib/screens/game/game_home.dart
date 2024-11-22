@@ -56,19 +56,18 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   late String awayTeamAbbr;
   late String homeTeamAbbr;
   late Map<String, dynamic> summary;
-  late List linescore;
-  late Map<String, dynamic> homeLinescore;
-  late Map<String, dynamic> awayLinescore;
-  Map<int, double> _scrollPositions = {};
-  Map<String, dynamic> game = {};
+  late List lineScore;
+  late Map<String, dynamic> homeLineScore;
+  late Map<String, dynamic> awayLineScore;
   final ValueNotifier<bool> _showImagesNotifier = ValueNotifier<bool>(false);
+  Map<String, dynamic> game = {};
   bool _isLoading = false;
   bool _isUpcoming = false;
+  bool pregame = false;
   Map<String, dynamic> odds = {};
   String moneyLine = '';
   String spread = '';
   String overUnder = '';
-  String countdown = '';
 
   /// ******************************************************
   ///                    Set Game Odds
@@ -128,13 +127,13 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   }
 
   void setOdds(Map<String, dynamic> game) {
-    bool _isLive = false;
+    bool isLive = false;
 
     try {
       if (game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] != 1 &&
           game['ODDS']?['LIVE'].containsKey('26338')) {
         odds = game['ODDS']?['LIVE']?['26338'];
-        _isLive = true;
+        isLive = true;
       } else {
         odds = game['ODDS']?['BOOK']?['18186'];
       }
@@ -143,17 +142,24 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       return;
     }
 
-    calculateMoneyLineOdds(_isLive);
-    calculateSpreadOdds(_isLive);
-    calculateOverUnderOdds(_isLive);
+    calculateMoneyLineOdds(isLive);
+    calculateSpreadOdds(isLive);
+    calculateOverUnderOdds(isLive);
 
-    setState(() {
-      odds = {
-        'ML': moneyLine,
-        'SPREAD': spread,
-        'OU': overUnder,
-      };
-    });
+    if (odds !=
+        {
+          'ML': moneyLine,
+          'SPREAD': spread,
+          'OU': overUnder,
+        }) {
+      setState(() {
+        odds = {
+          'ML': moneyLine,
+          'SPREAD': spread,
+          'OU': overUnder,
+        };
+      });
+    }
   }
 
   /// ******************************************************
@@ -169,52 +175,20 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
   Future<void> getGame(String gameId, String gameDate) async {
     var fetchedGame = await Game().getGame(gameId, gameDate);
-    setState(() {
-      game = fetchedGame;
-      setSummaryLinescore();
-    });
+    game = fetchedGame;
+    setSummaryLineScore();
   }
 
-  Future<void> setValues(String gameId, String gameDate) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Get Game Data
-    await getGame(gameId, gameDate);
-
-    // Set Odds
-    setOdds(game);
-
-    // Check if upcoming
-    _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    // If upcoming and has pregame countdown, set clock
-    if (_isUpcoming) {
-      if (game.containsKey('BOXSCORE')) {
-        if (game['BOXSCORE']['gameStatusText'] == 'pregame') {
-          setState(() {
-            countdown = game['BOXSCORE']['gameClock'];
-          });
-        }
-      }
-    }
-  }
-
-  void setSummaryLinescore() {
-    // Set all necessary variables
+  void setSummaryLineScore() {
+    // Set all necessary variables and set state to update UI
     setState(() {
       summary = game['SUMMARY']['GameSummary'][0];
-      linescore = game['SUMMARY']['LineScore'];
+      lineScore = game['SUMMARY']['LineScore'];
 
-      homeLinescore =
-          linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-      awayLinescore =
-          linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+      homeLineScore =
+          lineScore[0]['TEAM_ID'].toString() == widget.homeId ? lineScore[0] : lineScore[1];
+      awayLineScore =
+          lineScore[1]['TEAM_ID'].toString() == widget.homeId ? lineScore[0] : lineScore[1];
     });
   }
 
@@ -244,14 +218,12 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     if (_isUpcoming) {
       if (game.containsKey('BOXSCORE')) {
         if (game['BOXSCORE']['gameStatusText'] == 'pregame') {
-          setState(() {
-            countdown = game['BOXSCORE']['gameClock'];
-          });
+          pregame = true;
         }
       }
     }
 
-    setSummaryLinescore();
+    setSummaryLineScore();
 
     setState(() {
       _isLoading = false;
@@ -262,6 +234,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     int tabLength = 4;
 
     if (_isUpcoming) {
+      tabLength -= 1;
+    }
+    if (!game.containsKey('ODDS')) {
       tabLength -= 1;
     }
 
@@ -335,63 +310,6 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   }
 
   /// ******************************************************
-  ///      Initialize each tab via anonymous function.
-  /// ******************************************************
-
-  final List<
-      Widget Function({
-        required Map<String, dynamic> game,
-        required String homeId,
-        required String awayId,
-        required bool isUpcoming,
-      })> _gamePages = [
-    ({
-      required Map<String, dynamic> game,
-      required String homeId,
-      required String awayId,
-      required bool isUpcoming,
-    }) =>
-        GameMatchup(
-          game: game,
-          homeId: homeId,
-          awayId: awayId,
-          isUpcoming: isUpcoming,
-        ),
-    ({
-      required Map<String, dynamic> game,
-      required String homeId,
-      required String awayId,
-      required bool isUpcoming,
-    }) =>
-        PlayByPlay(
-          game: game,
-          homeId: homeId,
-          awayId: awayId,
-        ),
-    ({
-      required Map<String, dynamic> game,
-      required String homeId,
-      required String awayId,
-      required bool isUpcoming,
-    }) {
-      if (isUpcoming) {
-        return GamePreviewStats(
-          game: game,
-          homeId: homeId,
-          awayId: awayId,
-        );
-      } else {
-        return GameBoxScore(
-          game: game,
-          homeId: homeId,
-          awayId: awayId,
-          inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
-        );
-      }
-    }
-  ];
-
-  /// ******************************************************
   ///                   Build the page.
   /// ******************************************************
 
@@ -453,15 +371,14 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       return Row(
         children: [
           SizedBox(width: 15.0.r),
-          if (countdown == '')
-            Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r)),
-          if (countdown != '') CountdownTimer(durationString: countdown),
+          Text(pregame ? 'PREGAME' : widget.gameTime!,
+              style: kBebasBold.copyWith(fontSize: 22.0.r)),
           SizedBox(width: 15.0.r),
         ],
       );
     } else {
-      int homeScore = homeLinescore['PTS'];
-      int awayScore = awayLinescore['PTS'];
+      int homeScore = homeLineScore['PTS'];
+      int awayScore = awayLineScore['PTS'];
       return Row(
         children: [
           Text(
@@ -621,10 +538,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     padding: const EdgeInsets.only(top: 15.0),
                     child: FlexibleSpaceBar(
                       background: GameInfo(
-                        countdown: countdown == '' ? null : countdown,
+                        pregame: pregame,
                         gameSummary: summary,
-                        homeLinescore: homeLinescore,
-                        awayLinescore: awayLinescore,
+                        homeLinescore: homeLineScore,
+                        awayLinescore: awayLineScore,
                         homeId: widget.homeId,
                         awayId: awayTeamId,
                         isUpcoming: _isUpcoming,
@@ -682,40 +599,42 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
             * */
           return 104.0 +
               devicePadding -
-              ((kToolbarHeight - 15.0.r) + ((kToolbarHeight - 15.0.r) / 4.5.r) + 93.0.r);
+              ((kToolbarHeight - 15.0.r) + ((kToolbarHeight - 15.0.r) / 4.5.r) + 90.0.r);
         },
         onlyOneScrollInBody: true,
-        body: TabBarView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: _tabController,
-            children: [
-              GameMatchup(
-                game: game,
-                homeId: widget.homeId,
-                awayId: widget.awayId,
-                isUpcoming: _isUpcoming,
-              ),
-              if (!_isUpcoming && game.containsKey('PBP'))
-                PlayByPlay(
-                  game: game,
-                  homeId: widget.homeId,
-                  awayId: widget.awayId,
-                ),
-              if (_isUpcoming)
-                GamePreviewStats(
-                  game: game,
-                  homeId: widget.homeId,
-                  awayId: awayTeamId,
-                ),
-              if (!_isUpcoming)
-                GameBoxScore(
-                  game: game,
-                  homeId: widget.homeId,
-                  awayId: awayTeamId,
-                  inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
-                ),
-              if (odds.isNotEmpty) Odds(odds: game['ODDS']?['BOOK']),
-            ]),
+        body: TabBarView(controller: _tabController, children: [
+          GameMatchup(
+            key: const PageStorageKey('GameMatchup'),
+            game: game,
+            homeId: widget.homeId,
+            awayId: widget.awayId,
+            isUpcoming: _isUpcoming,
+          ),
+          if (!_isUpcoming && game.containsKey('PBP'))
+            PlayByPlay(
+              key: const PageStorageKey('PlayByPlay'),
+              game: game,
+              homeId: widget.homeId,
+              awayId: widget.awayId,
+            ),
+          if (_isUpcoming)
+            GamePreviewStats(
+              key: const PageStorageKey('GamePreviewStats'),
+              game: game,
+              homeId: widget.homeId,
+              awayId: awayTeamId,
+            ),
+          if (!_isUpcoming)
+            GameBoxScore(
+              key: const PageStorageKey('GameBoxScore'),
+              game: game,
+              homeId: widget.homeId,
+              awayId: awayTeamId,
+              inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
+            ),
+          if (odds.isNotEmpty)
+            Odds(key: const PageStorageKey('GameOdds'), odds: game['ODDS']?['BOOK']),
+        ]),
       ),
     );
   }
@@ -724,7 +643,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 class GameInfo extends StatelessWidget {
   const GameInfo({
     super.key,
-    this.countdown,
+    required this.pregame,
     required this.gameSummary,
     required this.homeLinescore,
     required this.awayLinescore,
@@ -735,7 +654,7 @@ class GameInfo extends StatelessWidget {
     this.gameTime,
   });
 
-  final String? countdown;
+  final bool pregame;
   final Map<String, dynamic> gameSummary;
   final Map<String, dynamic> homeLinescore;
   final Map<String, dynamic> awayLinescore;
@@ -883,9 +802,8 @@ class GameInfo extends StatelessWidget {
               ),
             SizedBox(height: 8.0.r),
           ],
-          if (countdown == '' || countdown == null)
-            Text(gameTime ?? '', style: kBebasBold.copyWith(fontSize: 19.0.r)),
-          if (countdown != '' && countdown != null) CountdownTimer(durationString: countdown!),
+          Text(pregame ? 'PREGAME' : gameTime ?? '',
+              style: kBebasBold.copyWith(fontSize: 19.0.r)),
         ],
       );
     }
@@ -1159,79 +1077,6 @@ class GameInfo extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class CountdownTimer extends StatefulWidget {
-  final String durationString;
-
-  CountdownTimer({required this.durationString});
-
-  @override
-  _CountdownTimerState createState() => _CountdownTimerState();
-}
-
-class _CountdownTimerState extends State<CountdownTimer> {
-  late Duration _duration;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _duration = _parseIso8601Duration(widget.durationString);
-    _startTimer();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  // Function to parse the ISO 8601 duration string
-  Duration _parseIso8601Duration(String isoDuration) {
-    final regex = RegExp(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(\.\d+)?)S)?');
-    final match = regex.firstMatch(isoDuration);
-
-    if (match == null) {
-      throw FormatException("Invalid ISO 8601 duration format: $isoDuration");
-    }
-
-    final hours = int.tryParse(match.group(1) ?? '0') ?? 0;
-    final minutes = int.tryParse(match.group(2) ?? '0') ?? 0;
-    final seconds = double.tryParse(match.group(3) ?? '0') ?? 0;
-
-    return Duration(
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds.toInt(),
-      milliseconds: ((seconds - seconds.toInt()) * 1000).round(),
-    );
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_duration.inSeconds <= 0) {
-          _timer?.cancel();
-        } else {
-          _duration -= Duration(seconds: 1);
-        }
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final minutes = _duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = _duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-
-    return Center(
-      child: Text(
-        '$minutes:$seconds',
-        style: kBebasBold.copyWith(fontSize: 22.0.r),
-      ),
     );
   }
 }

@@ -80,8 +80,6 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
         // Output the differences for this team if any fields changed
         if (changes.isNotEmpty) {
           existsUpdates = true;
-        } else {
-          print("No changes");
         }
       }
 
@@ -1012,21 +1010,21 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
         'OREB%',
         roundToDecimalPlaces(
             (awayTeam['OREB_PCT'] ??
-                    awayTeam['reboundsOffensive'] /
-                        ((awayTeam['fieldGoalsAttempted'] - awayTeam['fieldGoalsMade']) == 0
+                    (awayTeam['reboundsOffensive'] /
+                        ((awayTeam['reboundsOffensive'] + homeTeam['reboundsDefensive']) == 0
                             ? 1
-                            : (awayTeam['fieldGoalsAttempted'] -
-                                awayTeam['fieldGoalsMade'])) ??
+                            : (awayTeam['reboundsOffensive'] +
+                                homeTeam['reboundsDefensive']))) ??
                     0.0) *
                 100,
             1),
         roundToDecimalPlaces(
             (homeTeam['OREB_PCT'] ??
-                    homeTeam['reboundsOffensive'] /
-                        ((homeTeam['fieldGoalsAttempted'] - homeTeam['fieldGoalsMade']) == 0
+                    (homeTeam['reboundsOffensive'] /
+                        ((homeTeam['reboundsOffensive'] + awayTeam['reboundsDefensive']) == 0
                             ? 1
-                            : (homeTeam['fieldGoalsAttempted'] -
-                                homeTeam['fieldGoalsMade'])) ??
+                            : (homeTeam['reboundsOffensive'] +
+                                awayTeam['reboundsDefensive']))) ??
                     0.0) *
                 100,
             1),
@@ -1036,21 +1034,21 @@ class _BoxTeamStatsState extends State<BoxTeamStats> {
         'DREB%',
         roundToDecimalPlaces(
             (awayTeam['DREB_PCT'] ??
-                    awayTeam['reboundsDefensive'] /
-                        ((awayTeam['fieldGoalsAttempted'] - awayTeam['fieldGoalsMade']) == 0
+                    (awayTeam['reboundsDefensive'] /
+                        ((homeTeam['reboundsOffensive'] + awayTeam['reboundsDefensive']) == 0
                             ? 1
-                            : (awayTeam['fieldGoalsAttempted'] -
-                                awayTeam['fieldGoalsMade'])) ??
+                            : (homeTeam['reboundsOffensive'] +
+                                awayTeam['reboundsDefensive']))) ??
                     0.0) *
                 100,
             1),
         roundToDecimalPlaces(
             (homeTeam['DREB_PCT'] ??
-                    homeTeam['reboundsDefensive'] /
-                        ((homeTeam['fieldGoalsAttempted'] - homeTeam['fieldGoalsMade']) == 0
+                    (homeTeam['reboundsDefensive'] /
+                        ((awayTeam['reboundsOffensive'] + homeTeam['reboundsDefensive']) == 0
                             ? 1
-                            : (homeTeam['fieldGoalsAttempted'] -
-                                homeTeam['fieldGoalsMade'])) ??
+                            : (awayTeam['reboundsOffensive'] +
+                                homeTeam['reboundsDefensive']))) ??
                     0.0) *
                 100,
             1),

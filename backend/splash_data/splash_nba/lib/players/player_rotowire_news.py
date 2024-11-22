@@ -18,9 +18,18 @@ def player_rotowires():
 
 def player_rotowire_ids():
     def normalize_name(name):
-        # Remove diacritics, convert to lowercase, and remove non-alphabetic characters (e.g., periods)
+        # Remove diacritics and convert to lowercase
         name = unidecode(name).lower()
-        name = re.sub(r'[^a-z]', '', name)  # Keep only alphabetic characters
+
+        # Remove titles like "jr", "sr", roman numerals, etc.
+        name = re.sub(r'\b(jr|sr|i{1,3}|iv|v)\b', '', name)
+
+        # Remove non-alphabetic characters (e.g., periods, commas)
+        name = re.sub(r'[^a-z\s]', '', name)
+
+        # Remove extra spaces
+        name = re.sub(r'\s+', ' ', name).strip()
+
         return name
 
     # Configure logging
@@ -222,6 +231,6 @@ def player_rotowire_news():
 
 
 if __name__ == "__main__":
-    #player_rotowire_ids()
-    player_rotowire_news()
-    player_rotowire_injuries()
+    player_rotowire_ids()
+    #player_rotowire_news()
+    #player_rotowire_injuries()

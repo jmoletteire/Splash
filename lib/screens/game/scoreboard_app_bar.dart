@@ -22,13 +22,13 @@ class ScoreboardAppBar extends StatefulWidget implements PreferredSizeWidget {
   }) : super(key: key);
 
   @override
-  _ScoreboardAppBarState createState() => _ScoreboardAppBarState();
+  ScoreboardAppBarState createState() => ScoreboardAppBarState();
 
   @override
   Size get preferredSize => Size.fromHeight(116.48.r);
 }
 
-class _ScoreboardAppBarState extends State<ScoreboardAppBar> {
+class ScoreboardAppBarState extends State<ScoreboardAppBar> {
   late List<Widget> _tabs;
 
   @override
@@ -48,7 +48,9 @@ class _ScoreboardAppBarState extends State<ScoreboardAppBar> {
   void _initializeTabs() {
     _tabs = widget.dates.map((date) {
       return Tab(
+        height: 50.0.r,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(DateFormat('E').format(date)),
@@ -89,7 +91,7 @@ class _ScoreboardAppBarState extends State<ScoreboardAppBar> {
         indicatorColor: Colors.deepOrange,
         unselectedLabelColor: Colors.white70,
         labelColor: Colors.deepOrangeAccent,
-        labelStyle: kBebasNormal.copyWith(fontSize: 20.0.r),
+        labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
         labelPadding: EdgeInsets.symmetric(horizontal: 20.0.r),
         tabs: _tabs, // Cached tabs to avoid rebuilds
       ),

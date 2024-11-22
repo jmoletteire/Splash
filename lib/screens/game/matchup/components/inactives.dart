@@ -57,7 +57,7 @@ class _InactivesState extends State<Inactives> {
                 ),
               ),
               child: Text(
-                'INACTIVES',
+                'INACTIVE',
                 style: kBebasBold.copyWith(fontSize: 16.0.r),
               ),
             ),

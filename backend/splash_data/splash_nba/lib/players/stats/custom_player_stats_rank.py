@@ -15,12 +15,17 @@ def current_season_custom_stats_rank():
     # Stats to rank
     custom_stats = [
         # BASIC
+        ("GP", f"{k_current_season_type}.BASIC", -1),
+        ("MIN", f"{k_current_season_type}.BASIC", -1),
         ("FGM", f"{k_current_season_type}.BASIC", -1),
         ("FGA", f"{k_current_season_type}.BASIC", -1),
+        ("FG_PCT", f"{k_current_season_type}.BASIC", -1),
         ("FTM", f"{k_current_season_type}.BASIC", -1),
         ("FTA", f"{k_current_season_type}.BASIC", -1),
+        ("FT_PCT", f"{k_current_season_type}.BASIC", -1),
         ("FG3M", f"{k_current_season_type}.BASIC", -1),
         ("FG3A", f"{k_current_season_type}.BASIC", -1),
+        ("FG3_PCT", f"{k_current_season_type}.BASIC", -1),
         ("STL", f"{k_current_season_type}.BASIC", -1),
         ("BLK", f"{k_current_season_type}.BASIC", -1),
         ("REB", f"{k_current_season_type}.BASIC", -1),
@@ -54,7 +59,6 @@ def current_season_custom_stats_rank():
         ("FT_PER_FGA", f"{k_current_season_type}.BASIC", -1),
 
         # ADV
-        ("GP", f"{k_current_season_type}.ADV", -1),
         ("MIN", f"{k_current_season_type}.ADV", -1),
         ("OFF_RATING", f"{k_current_season_type}.ADV", -1),
         ("DEF_RATING", f"{k_current_season_type}.ADV", 1),
@@ -562,3 +566,7 @@ def custom_stats_rank():
                 )
 
     logging.info("Ranking calculation completed.")
+
+
+if __name__ == "__main__":
+    current_season_custom_stats_rank()

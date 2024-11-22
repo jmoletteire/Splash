@@ -34,7 +34,7 @@ class _GameMatchupState extends State<GameMatchup> {
   late List<dynamic> lineScore;
   late Map<String, dynamic> homeLineScore;
   late Map<String, dynamic> awayLineScore;
-  late Inactives inactives;
+  late Inactives inactive;
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _GameMatchupState extends State<GameMatchup> {
         lineScore[0]['TEAM_ID'].toString() == widget.homeId ? lineScore[1] : lineScore[0];
 
     if (!widget.isUpcoming || (widget.isUpcoming && widget.game.containsKey('BOXSCORE'))) {
-      inactives = Inactives(
+      inactive = Inactives(
         inactivePlayers: widget.game['SUMMARY']?['InactivePlayers'],
         homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
         awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
@@ -64,7 +64,7 @@ class _GameMatchupState extends State<GameMatchup> {
     if (oldWidget.game['SUMMARY']?['InactivePlayers'] !=
         widget.game['SUMMARY']?['InactivePlayers']) {
       if (!widget.isUpcoming || (widget.isUpcoming && widget.game.containsKey('BOXSCORE'))) {
-        inactives = Inactives(
+        inactive = Inactives(
           inactivePlayers: widget.game['SUMMARY']?['InactivePlayers'],
           homeId: kTeamIdToName.containsKey(widget.homeId) ? widget.homeId : '0',
           awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
@@ -100,7 +100,7 @@ class _GameMatchupState extends State<GameMatchup> {
                       awayId: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0'),
                 if (!widget.isUpcoming ||
                     (widget.isUpcoming && widget.game.containsKey('BOXSCORE')))
-                  inactives,
+                  inactive,
                 if (widget.game['SUMMARY'].keys.toList().contains('SeasonSeries') &&
                     widget.game['SUMMARY']['SeasonSeries'].isNotEmpty)
                   H2H(

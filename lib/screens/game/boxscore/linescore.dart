@@ -197,7 +197,7 @@ class _LineScoreRowState extends State<LineScoreRow> with AutomaticKeepAliveClie
                   Image.asset(
                     'images/NBA_Logos/${widget.teamId}.png',
                     width: widget.teamId == '0' ? 11.0.r : 22.0.r,
-                    cacheWidth: widget.teamId == '0' ? 11 : 22,
+                    cacheWidth: widget.teamId == '0' ? 33 : 66,
                   ),
                   if (widget.teamId == '0') SizedBox(width: 5.5.r),
                   SizedBox(width: 5.0.r),

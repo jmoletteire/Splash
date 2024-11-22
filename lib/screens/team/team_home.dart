@@ -35,255 +35,36 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
   late ScrollController _scrollController;
   late ScrollControllerNotifier _notifier;
   late Map<String, dynamic> team;
+  late double availableWidth;
+  late double availableHeight;
+  late Image teamLogo;
+  Color teamPrimaryColor = Colors.blue;
+  double teamColorOpacity = 0.94;
+  Map<String, dynamic> lastGame = {};
+  Map<String, dynamic> nextGame = {};
   bool _title = false;
   bool _isLoading = true;
-
-  Map<int, double> _scrollPositions = {};
+  bool isLandscape = false;
+  final Map<int, double> _scrollPositions = {};
 
   Future<void> getTeam(String teamId) async {
     final teamCache = Provider.of<TeamCache>(context, listen: false);
     if (teamCache.containsTeam(teamId)) {
-      setState(() {
-        team = teamCache.getTeam(teamId)!;
-        _isLoading = false;
-      });
+      team = teamCache.getTeam(teamId)!;
+      teamPrimaryColor = kTeamColors[team['ABBREVIATION']]!['primaryColor']!;
+      teamColorOpacity = kTeamColorOpacity[team['ABBREVIATION']]!['opacity']!;
+      lastGame = getLastGame();
+      nextGame = getNextGame();
+      _isLoading = false;
     } else {
       var fetchedTeam = await Team().getTeam(teamId);
-      setState(() {
-        team = fetchedTeam;
-        _isLoading = false;
-      });
+      team = fetchedTeam;
+      teamPrimaryColor = kTeamColors[team['ABBREVIATION']]!['primaryColor']!;
+      teamColorOpacity = kTeamColorOpacity[team['ABBREVIATION']]!['opacity']!;
+      lastGame = getLastGame();
+      nextGame = getNextGame();
+      _isLoading = false;
       teamCache.addTeam(teamId, team);
-    }
-  }
-
-  /// ******************************************************
-  ///                 Initialize page
-  ///        --> Tab Controller length = # of Tabs
-  /// ******************************************************
-
-  @override
-  void initState() {
-    super.initState();
-    getTeam(widget.teamId);
-    _tabController = TabController(length: _teamPages.length, vsync: this);
-
-    _scrollController = ScrollController()
-      ..addListener(() {
-        setState(() {
-          _title = _isSliverAppBarExpanded;
-          // Save the scroll position of the current tab
-          _scrollPositions[_tabController.index] = _scrollController.offset;
-        });
-      });
-
-    _tabController.addListener(() {
-      // If app bar expanded
-      if (_scrollController.offset < ((MediaQuery.of(context).size.height * 0.28) - 105.0)) {
-        // Remain at current offset
-        _scrollController.jumpTo(_scrollController.offset);
-      }
-      // Else, app bar collapsed and no collapsed position saved
-      else {
-        // Go to top collapsed position
-        _scrollController.jumpTo((MediaQuery.of(context).size.height * 0.28) - 105.0);
-      }
-    });
-  }
-
-  bool get _isSliverAppBarExpanded {
-    return _scrollController.hasClients &&
-        _scrollController.offset >= ((MediaQuery.of(context).size.height * 0.28) - 105.0);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _notifier = ScrollControllerProvider.of(context)!.notifier;
-    _notifier.addController('team', _scrollController);
-  }
-
-  /// ******************************************************
-  ///    Dispose of Tab Controller with page to conserve
-  ///    memory & improve performance.
-  /// ******************************************************
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _notifier.removeController('team');
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  /// ******************************************************
-  ///      Initialize each tab via anonymous function.
-  /// ******************************************************
-
-  final List<Widget Function({required Map<String, dynamic> team})> _teamPages = [
-    ({required Map<String, dynamic> team}) => TeamOverview(team: team),
-    ({required Map<String, dynamic> team}) => TeamSchedule(team: team),
-    ({required Map<String, dynamic> team}) => TeamStats(team: team),
-    ({required Map<String, dynamic> team}) => TeamPlayersHome(team: team),
-    ({required Map<String, dynamic> team}) => TeamCapSheet(team: team),
-    ({required Map<String, dynamic> team}) => TeamHistory(team: team),
-  ];
-
-  /// ******************************************************
-  ///                   Build the page.
-  /// ******************************************************
-
-  @override
-  Widget build(BuildContext context) {
-    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-    return _isLoading
-        ? const SpinningIcon(
-            color: Colors.deepOrange,
-          )
-        : Scaffold(
-            body: ExtendedNestedScrollView(
-              controller: _scrollController,
-              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                return [
-                  SliverAppBar(
-                    backgroundColor: kTeamColors[team['ABBREVIATION']]!['primaryColor']!,
-                    pinned: true,
-                    expandedHeight: MediaQuery.of(context).size.height * 0.28,
-                    title: _title
-                        ? ConstrainedBox(
-                            constraints: const BoxConstraints(maxHeight: 40.0),
-                            child: Image.asset(
-                              team['TEAM_ID'] == 1610612761
-                                  ? 'images/NBA_Logos/${team['TEAM_ID']}_alt3.png'
-                                  : 'images/NBA_Logos/${team['TEAM_ID']}.png',
-                              width: isLandscape
-                                  ? MediaQuery.of(context).size.width * 0.0375
-                                  : MediaQuery.of(context).size.width * 0.15,
-                            ),
-                          )
-                        : null,
-                    centerTitle: true,
-                    flexibleSpace: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Positioned(
-                          child: Image.asset(
-                            'images/NBA_Logos/${team['TEAM_ID']}_full.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        // Gradient mask to fade out the image towards the bottom
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                kTeamColors[team['ABBREVIATION']]!['primaryColor']!
-                                    .withOpacity(kTeamColorOpacity[team['ABBREVIATION']]![
-                                        'opacity']!), // Transparent at the top
-                                kTeamColors[team['ABBREVIATION']]!['primaryColor']!
-                                    .withOpacity(1.0), // Opaque at the bottom
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
-                          child: FlexibleSpaceBar(
-                            background: TeamInfo(team: team),
-                            collapseMode: CollapseMode.pin,
-                          ),
-                        ),
-                      ],
-                    ),
-                    bottom: TabBar(
-                      controller: _tabController,
-                      isScrollable: !isLandscape,
-                      tabAlignment: !isLandscape ? TabAlignment.start : null,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicatorColor: kTeamColors[team['ABBREVIATION']]!['secondaryColor']!,
-                      indicatorWeight: 3.0,
-                      unselectedLabelColor: Colors.grey,
-                      labelColor: Colors.white,
-                      labelStyle: kBebasNormal.copyWith(fontSize: 19.0.r),
-                      tabs: const [
-                        Tab(text: 'Overview'),
-                        Tab(text: 'Schedule'),
-                        Tab(text: 'Stats'),
-                        Tab(text: 'Players'),
-                        Tab(text: 'Cap Sheet'),
-                        Tab(text: 'History'),
-                      ],
-                    ),
-                    actions: [
-                      CustomIconButton(
-                        icon: Icons.search,
-                        size: 30.0.r,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SearchScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CustomIconButton(
-                        icon: Icons.people_alt_outlined,
-                        size: 30.0.r,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeamComparison(team: team),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ];
-              },
-              pinnedHeaderSliverHeightBuilder: () {
-                return 104.0 + MediaQuery.of(context).padding.top; // 56 + 49 = 105
-              },
-              onlyOneScrollInBody: false,
-              body: TabBarView(
-                controller: _tabController,
-                children: _teamPages.map((page) {
-                  return page(team: team); // Pass team object to each page
-                }).toList(),
-              ),
-            ),
-          );
-  }
-}
-
-class TeamInfo extends StatelessWidget {
-  const TeamInfo({
-    super.key,
-    required this.team,
-  });
-
-  final Map<String, dynamic> team;
-
-  String getStanding(int confRank) {
-    switch (confRank) {
-      case 1:
-        return '${confRank}st';
-      case 2:
-        return '${confRank}nd';
-      case 3:
-        return '${confRank}rd';
-      case 21:
-        return '${confRank}st';
-      case 22:
-        return '${confRank}nd';
-      case 23:
-        return '${confRank}rd';
-      default:
-        return '${confRank}th';
     }
   }
 
@@ -355,27 +136,366 @@ class TeamInfo extends StatelessWidget {
     return {};
   }
 
+  String getStanding(int confRank) {
+    switch (confRank) {
+      case 1:
+        return '${confRank}st';
+      case 2:
+        return '${confRank}nd';
+      case 3:
+        return '${confRank}rd';
+      case 21:
+        return '${confRank}st';
+      case 22:
+        return '${confRank}nd';
+      case 23:
+        return '${confRank}rd';
+      default:
+        return '${confRank}th';
+    }
+  }
+
+  /// ******************************************************
+  ///                 Initialize page
+  ///        --> Tab Controller length = # of Tabs
+  /// ******************************************************
+
+  @override
+  void initState() {
+    super.initState();
+    getTeam(widget.teamId);
+    _tabController = TabController(length: _teamPages.length, vsync: this);
+
+    _scrollController = ScrollController()
+      ..addListener(() {
+        setState(() {
+          _title = _isSliverAppBarExpanded;
+          // Save the scroll position of the current tab
+          _scrollPositions[_tabController.index] = _scrollController.offset;
+        });
+      });
+
+    _tabController.addListener(() {
+      // If app bar expanded
+      if (_scrollController.offset < ((MediaQuery.of(context).size.height * 0.28) - 105.0)) {
+        // Remain at current offset
+        _scrollController.jumpTo(_scrollController.offset);
+      }
+      // Else, app bar collapsed and no collapsed position saved
+      else {
+        // Go to top collapsed position
+        _scrollController.jumpTo((MediaQuery.of(context).size.height * 0.28) - 105.0);
+      }
+    });
+  }
+
+  bool get _isSliverAppBarExpanded {
+    return _scrollController.hasClients &&
+        _scrollController.offset >= ((availableHeight * 0.28) - 105.0);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    availableWidth = MediaQuery.of(context).size.width;
+    availableHeight = MediaQuery.of(context).size.height;
+    teamLogo = Image.asset(
+      'images/NBA_Logos/${team['TEAM_ID']}_full.png',
+      width: isLandscape ? availableWidth * 0.1 : availableWidth * 0.15,
+      height: isLandscape ? availableWidth * 0.1 : availableHeight * 0.15,
+    );
+
+    _notifier = ScrollControllerProvider.of(context)!.notifier;
+    _notifier.addController('team', _scrollController);
+  }
+
+  /// ******************************************************
+  ///    Dispose of Tab Controller with page to conserve
+  ///    memory & improve performance.
+  /// ******************************************************
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _notifier.removeController('team');
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// ******************************************************
+  ///      Initialize each tab via anonymous function.
+  /// ******************************************************
+
+  final List<Widget Function({required Map<String, dynamic> team})> _teamPages = [
+    ({required Map<String, dynamic> team}) => TeamOverview(team: team),
+    ({required Map<String, dynamic> team}) => TeamSchedule(team: team),
+    ({required Map<String, dynamic> team}) => TeamStats(team: team),
+    ({required Map<String, dynamic> team}) => TeamPlayersHome(team: team),
+    ({required Map<String, dynamic> team}) => TeamCapSheet(team: team),
+    ({required Map<String, dynamic> team}) => TeamHistory(team: team),
+  ];
+
+  /// ******************************************************
+  ///                   Build the page.
+  /// ******************************************************
+
   @override
   Widget build(BuildContext context) {
-    bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-    var lastGame = getLastGame();
-    var nextGame = getNextGame();
+    return _isLoading
+        ? const SpinningIcon(
+            color: Colors.deepOrange,
+          )
+        : Scaffold(
+            body: ExtendedNestedScrollView(
+              controller: _scrollController,
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    backgroundColor: teamPrimaryColor,
+                    pinned: true,
+                    expandedHeight: availableHeight * 0.28,
+                    title: _title
+                        ? Column(
+                            children: [
+                              ConstrainedBox(
+                                constraints: BoxConstraints(maxHeight: 35.0.r),
+                                child: Image.asset(
+                                  team['TEAM_ID'] == 1610612761
+                                      ? 'images/NBA_Logos/${team['TEAM_ID']}_alt3.png'
+                                      : 'images/NBA_Logos/${team['TEAM_ID']}.png',
+                                  width: isLandscape
+                                      ? availableWidth * 0.0375
+                                      : availableWidth * 0.15,
+                                ),
+                              ),
+                              SizedBox(height: 5.0.r),
+                              RichText(
+                                text: TextSpan(
+                                  text:
+                                      "${team['seasons'][kCurrentSeason]['WINS']!.toInt()}-${team['seasons'][kCurrentSeason]['LOSSES']!.toInt()}",
+                                  style: kBebasNormal.copyWith(
+                                      fontSize: 16.0.r, color: Colors.grey.shade300),
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          '  (${getStanding(team['seasons'][kCurrentSeason]['STANDINGS']['PlayoffRank'])} ${team['seasons'][kCurrentSeason]['STANDINGS']['Conference'].substring(0, 4)})',
+                                      style: kBebasNormal.copyWith(
+                                          fontSize: 14.5.r, color: Colors.grey.shade300),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        : null,
+                    centerTitle: true,
+                    flexibleSpace: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Positioned(
+                          child: Image.asset(
+                            'images/NBA_Logos/${team['TEAM_ID']}_full.png',
+                            gaplessPlayback: true,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        // Gradient mask to fade out the image towards the bottom
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                teamPrimaryColor
+                                    .withOpacity(teamColorOpacity), // Transparent at the top
+                                teamPrimaryColor.withOpacity(1.0), // Opaque at the bottom
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: FlexibleSpaceBar(
+                            background: _AppBarBackground(
+                              teamPrimaryColor: teamPrimaryColor,
+                              teamColorOpacity: teamColorOpacity,
+                              team: team,
+                              teamLogo: teamLogo,
+                              lastGame: lastGame,
+                              nextGame: nextGame,
+                            ),
+                            collapseMode: CollapseMode.pin,
+                          ),
+                        ),
+                      ],
+                    ),
+                    bottom: TabBar(
+                      controller: _tabController,
+                      isScrollable: !isLandscape,
+                      tabAlignment: !isLandscape ? TabAlignment.start : null,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicatorColor: kTeamColors[team['ABBREVIATION']]!['secondaryColor']!,
+                      indicatorWeight: 3.0,
+                      unselectedLabelColor: Colors.grey,
+                      labelColor: Colors.white,
+                      labelStyle: kBebasNormal.copyWith(fontSize: 18.0.r),
+                      tabs: const [
+                        Tab(text: 'Overview'),
+                        Tab(text: 'Schedule'),
+                        Tab(text: 'Stats'),
+                        Tab(text: 'Players'),
+                        Tab(text: 'Cap Sheet'),
+                        Tab(text: 'History'),
+                      ],
+                    ),
+                    actions: [
+                      CustomIconButton(
+                        icon: Icons.search,
+                        size: 30.0.r,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      CustomIconButton(
+                        icon: Icons.people_alt_outlined,
+                        size: 30.0.r,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeamComparison(team: team),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ];
+              },
+              pinnedHeaderSliverHeightBuilder: () {
+                return 104.0 + MediaQuery.of(context).padding.top; // 56 + 49 = 105
+              },
+              onlyOneScrollInBody: false,
+              body: TabBarView(
+                controller: _tabController,
+                children: _teamPages.map((page) {
+                  return page(team: team); // Pass team object to each page
+                }).toList(),
+              ),
+            ),
+          );
+  }
+}
 
-    List<String> formatDate(String date) {
-      // Parse the string to a DateTime object
-      DateTime dateTime = DateTime.parse(date);
+class _AppBarBackground extends StatelessWidget {
+  final Color teamPrimaryColor;
+  final double teamColorOpacity;
+  final Map<String, dynamic> team;
+  final Image teamLogo;
+  final Map<String, dynamic> lastGame;
+  final Map<String, dynamic> nextGame;
 
-      // Create a DateFormat for the abbreviated day of the week
-      DateFormat dayOfWeekFormat = DateFormat('E');
-      String dayOfWeek = dayOfWeekFormat.format(dateTime);
+  const _AppBarBackground({
+    required this.teamPrimaryColor,
+    required this.teamColorOpacity,
+    required this.team,
+    required this.teamLogo,
+    required this.lastGame,
+    required this.nextGame,
+  });
 
-      // Create a DateFormat for the month and date
-      DateFormat monthDateFormat = DateFormat('M/d');
-      String monthDate = monthDateFormat.format(dateTime);
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          'images/NBA_Logos/${team['TEAM_ID']}_full.png',
+          gaplessPlayback: true,
+          fit: BoxFit.cover,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                teamPrimaryColor.withOpacity(teamColorOpacity),
+                teamPrimaryColor,
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0),
+          child: TeamInfo(
+            team: team,
+            teamLogo: teamLogo,
+            lastGame: lastGame,
+            nextGame: nextGame,
+          ),
+        ),
+      ],
+    );
+  }
+}
 
-      return [dayOfWeek, monthDate];
+class TeamInfo extends StatelessWidget {
+  const TeamInfo({
+    super.key,
+    required this.team,
+    required this.teamLogo,
+    required this.lastGame,
+    required this.nextGame,
+  });
+
+  final Map<String, dynamic> team;
+  final Image teamLogo;
+  final Map<String, dynamic> lastGame;
+  final Map<String, dynamic> nextGame;
+
+  String getStanding(int confRank) {
+    switch (confRank) {
+      case 1:
+        return '${confRank}st';
+      case 2:
+        return '${confRank}nd';
+      case 3:
+        return '${confRank}rd';
+      case 21:
+        return '${confRank}st';
+      case 22:
+        return '${confRank}nd';
+      case 23:
+        return '${confRank}rd';
+      default:
+        return '${confRank}th';
     }
+  }
 
+  List<String> formatDate(String date) {
+    // Parse the string to a DateTime object
+    DateTime dateTime = DateTime.parse(date);
+
+    // Create a DateFormat for the abbreviated day of the week
+    DateFormat dayOfWeekFormat = DateFormat('E');
+    String dayOfWeek = dayOfWeekFormat.format(dateTime);
+
+    // Create a DateFormat for the month and date
+    DateFormat monthDateFormat = DateFormat('M/d');
+    String monthDate = monthDateFormat.format(dateTime);
+
+    return [dayOfWeek, monthDate];
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Stack(
       children: [
         Row(
@@ -383,15 +503,7 @@ class TeamInfo extends StatelessWidget {
           children: [
             ConstrainedBox(
               constraints: BoxConstraints(minWidth: 110.0.r, maxWidth: 120.0.r),
-              child: Image.asset(
-                'images/NBA_Logos/${team['TEAM_ID']}_full.png',
-                width: isLandscape
-                    ? MediaQuery.of(context).size.width * 0.1
-                    : MediaQuery.of(context).size.width * 0.15,
-                height: isLandscape
-                    ? MediaQuery.of(context).size.width * 0.1
-                    : MediaQuery.of(context).size.height * 0.15,
-              ),
+              child: teamLogo,
             ),
             SizedBox(width: 20.0.r),
             Column(

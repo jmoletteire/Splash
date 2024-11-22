@@ -14,7 +14,8 @@ class ConferenceStandings extends StatefulWidget {
   final String season;
   final ScrollController scrollController;
 
-  ConferenceStandings({
+  const ConferenceStandings({
+    super.key,
     required this.columnNames,
     required this.standings,
     required this.season,
@@ -28,14 +29,17 @@ class ConferenceStandings extends StatefulWidget {
 class _ConferenceStandingsState extends State<ConferenceStandings>
     with AutomaticKeepAliveClientMixin {
   late ScrollController scrollController;
+  late double availableWidth;
+  late double availableHeight;
   late double logicalImageSize;
   late double devicePixelRatio;
   late int cacheImageSize;
   bool isLandscape = false;
   List<Map<String, dynamic>> teams = [];
+  List<Image> teamLogos = [];
   List<TableColumn> tableColumns = [];
   Widget? _cachedHeader;
-  Map<int, Widget> _cachedRows = {};
+  final Map<int, Map<int, Widget>> _cachedContent = {};
 
   @override
   bool get wantKeepAlive => true;
@@ -80,99 +84,99 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
   void _initializeTableColumns() {
     tableColumns = [
       TableColumn(
-        width: MediaQuery.of(context).size.width * (isLandscape ? 0.12 : 0.3),
+        width: availableWidth * (isLandscape ? 0.12 : 0.3),
         freezePriority: 1,
       ),
 
       /// W
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.05 : 0.08)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.05 : 0.08)),
 
       /// L
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.05 : 0.08)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.05 : 0.08)),
 
       /// PCT
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.165)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.165)),
 
       /// GB
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.125)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.125)),
 
       /// NRTG
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// ORTG
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// DRTG
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// PACE
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// SOS
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// rSOS
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// STREAK
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// xPTS
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// LAST 10
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// HOME
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// ROAD
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// Opp .500+
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// EAST
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// WEST
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// VS ATLANTIC
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.135)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.135)),
 
       /// VS CENTRAL
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.115)),
 
       /// VS SOUTHEAST
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.115)),
 
       /// VS NORTHWEST
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.115)),
 
       /// VS PACIFIC
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.115)),
 
       /// VS SOUTHWEST
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.115)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.115)),
 
       /// SCORE 100+ PTS
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.165)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.165)),
 
       /// LEAD AT HALF
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// LEAD THRU 3Q
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// WIN FG%
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// WIN REB
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
 
       /// WIN TO
-      TableColumn(width: MediaQuery.of(context).size.width * (isLandscape ? 0.08 : 0.15)),
+      TableColumn(width: availableWidth * (isLandscape ? 0.08 : 0.15)),
     ];
   }
 
@@ -198,6 +202,17 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
 
     // Check device orientation
     isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    availableWidth = MediaQuery.of(context).size.width;
+    availableHeight = MediaQuery.of(context).size.height;
+
+    for (var team in teams) {
+      teamLogos.add(Image.asset(
+        'images/NBA_Logos/${team['TEAM_ID']}.png',
+        fit: BoxFit.contain,
+        width: logicalImageSize,
+        height: logicalImageSize,
+      ));
+    }
 
     // Initialize table columns
     _initializeTableColumns();
@@ -229,10 +244,10 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
           ),
         ),
       ),
-      headerHeight: MediaQuery.of(context).size.height * 0.045,
+      headerHeight: availableHeight * 0.045,
       rowCount: teams.length,
-      rowHeight: MediaQuery.of(context).size.height * 0.055,
-      minScrollableWidth: MediaQuery.of(context).size.width * 0.01,
+      rowHeight: availableHeight * 0.055,
+      minScrollableWidth: availableWidth * 0.01,
       columns: tableColumns,
       rowBuilder: _rowBuilder,
       headerBuilder: _headerBuilder,
@@ -273,32 +288,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
               position: DecorationPosition.foreground,
               decoration: BoxDecoration(
                 color: Colors.grey.shade900.withOpacity(0.75),
-                border: int.parse(widget.season.substring(0, 4)) < 2019 || index != 5
-                    ? Border(
-                        bottom: BorderSide(
-                          color: (int.parse(widget.season.substring(0, 4)) >= 2019 &&
-                                      index == 9) ||
-                                  (int.parse(widget.season.substring(0, 4)) < 2019 &&
-                                      int.parse(widget.season.substring(0, 4)) > 1983 &&
-                                      index == 7) ||
-                                  (int.parse(widget.season.substring(0, 4)) <= 1983 &&
-                                      index == 5)
-                              ? Colors.white
-                              : Colors.grey.shade700,
-                          width: int.parse(widget.season.substring(0, 4)) >= 2019 && index == 9
-                              ? 3.0
-                              : int.parse(widget.season.substring(0, 4)) < 2019 &&
-                                      int.parse(widget.season.substring(0, 4)) > 1983 &&
-                                      index == 7
-                                  ? 3.0
-                                  : int.parse(widget.season.substring(0, 4)) <= 1983 &&
-                                          index == 5
-                                      ? 3.0
-                                      : 0.5,
-                          style: BorderStyle.solid,
-                        ),
-                      )
-                    : null,
+                border: _getRowBorder(index),
               ),
               child: child,
             ),
@@ -322,49 +312,71 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
       );
 
   Widget? _rowBuilder(BuildContext context, int row, TableRowContentBuilder contentBuilder) {
-    if (_cachedRows.containsKey(row)) {
-      return _cachedRows[row];
-    }
-
-    // Build and cache the row if not already cached
-    final rowWidget = _wrapRow(
+    return _wrapRow(
       row,
       Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: () => setState(() {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TeamHome(
-                  teamId: teams[row]['TEAM_ID'].toString(),
-                ),
-              ),
-            );
-          }),
-          splashColor: Colors.white,
-          child: contentBuilder(context, (context, column) {
-            List<String> noPadding = ['ORTG', 'DRTG', 'PACE', 'SOR', 'R-SOS'];
-            return Padding(
-              padding: noPadding.contains(widget.columnNames[column])
-                  ? EdgeInsets.only(right: 0.0.r)
-                  : EdgeInsets.only(right: 8.0.r),
-              child: getContent(teams, row, column, context),
-            );
-          }),
-        ),
-      ),
+          type: MaterialType.transparency,
+          child: TeamRow(
+            teamId: teams[row]['TEAM_ID'].toString(),
+            child: contentBuilder(context, (context, column) {
+              return Padding(
+                padding: _getPaddingForColumn(column),
+                child: getContent(row, column, context),
+              );
+            }),
+          )),
     );
-
-    _cachedRows[row] = rowWidget;
-    return rowWidget;
   }
 
-  Widget getContent(
-      List<Map<String, dynamic>> eastTeams, int row, int column, BuildContext context) {
+  BoxBorder? _getRowBorder(int index) {
+    if (int.parse(widget.season.substring(0, 4)) < 2019 || index != 5) {
+      return Border(
+        bottom: BorderSide(
+          color: (int.parse(widget.season.substring(0, 4)) >= 2019 && index == 9) ||
+                  (int.parse(widget.season.substring(0, 4)) < 2019 &&
+                      int.parse(widget.season.substring(0, 4)) > 1983 &&
+                      index == 7) ||
+                  (int.parse(widget.season.substring(0, 4)) <= 1983 && index == 5)
+              ? Colors.white
+              : Colors.grey.shade700,
+          width: int.parse(widget.season.substring(0, 4)) >= 2019 && index == 9
+              ? 3.0
+              : int.parse(widget.season.substring(0, 4)) < 2019 &&
+                      int.parse(widget.season.substring(0, 4)) > 1983 &&
+                      index == 7
+                  ? 3.0
+                  : int.parse(widget.season.substring(0, 4)) <= 1983 && index == 5
+                      ? 3.0
+                      : 0.5,
+          style: BorderStyle.solid,
+        ),
+      );
+    } else {
+      return null;
+    }
+  }
+
+  EdgeInsets _getPaddingForColumn(int column) {
+    List<String> noPadding = ['ORTG', 'DRTG', 'PACE', 'SOR', 'R-SOS'];
+    if (noPadding.contains(widget.columnNames[column])) {
+      return EdgeInsets.only(right: 0.0.r);
+    } else {
+      return EdgeInsets.only(right: 8.0.r);
+    }
+  }
+
+  Widget getContent(int row, int column, BuildContext context) {
+    if (_cachedContent.containsKey(row)) {
+      if (_cachedContent[row]!.containsKey(column)) {
+        return _cachedContent[row]![column]!;
+      }
+    } else {
+      _cachedContent[row] = {};
+    }
+
     switch (column) {
       case 0:
-        return Padding(
+        return _cachedContent[row]![column] ??= Padding(
           padding: EdgeInsets.fromLTRB(8.0.r, 8.0.r, 3.0.r, 8.0.r),
           child: Row(
             children: [
@@ -383,12 +395,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                 flex: 2,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: 24.0.r),
-                  child: Image.asset(
-                    'images/NBA_Logos/${teams[row]['TEAM_ID']}.png',
-                    fit: BoxFit.contain,
-                    width: logicalImageSize,
-                    height: logicalImageSize,
-                  ),
+                  child: teamLogos[row],
                 ),
               ),
               Expanded(
@@ -414,35 +421,39 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         );
       case 1:
         try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['WINS']!.toStringAsFixed(0));
+          String wins = teams[row]['seasons'][widget.season]['WINS']!.toStringAsFixed(0);
+          return _cachedContent[row]![column] ??=
+              StandingsDataText(key: ValueKey(wins), text: wins);
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 2:
         try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['LOSSES']!.toStringAsFixed(0));
+          String losses = teams[row]['seasons'][widget.season]['LOSSES']!.toStringAsFixed(0);
+          return _cachedContent[row]![column] ??=
+              StandingsDataText(key: ValueKey(losses), text: losses);
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 3:
         try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3));
+          String winPct = teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3);
+          return _cachedContent[row]![column] ??=
+              StandingsDataText(key: ValueKey(winPct), text: winPct);
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 4:
         String gb = teams[row]['seasons'][widget.season]['STANDINGS']['ConferenceGamesBack']!
             .toString();
-        return StandingsDataText(text: gb == '0.0' ? '-' : gb);
+        return _cachedContent[row]![column] ??=
+            StandingsDataText(key: ValueKey(gb), text: gb == '0.0' ? '-' : gb);
       case 5:
         try {
           double netRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
               ['ADV']['NET_RATING'];
           String positive = netRating > 0.0 ? '+' : '';
-          return Container(
+          return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
             child: Text('$positive${netRating.toStringAsFixed(1)}',
                 style: kBebasNormal.copyWith(
@@ -451,7 +462,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                 )),
           );
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 6:
         try {
@@ -487,7 +498,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
             color = Color.lerp(orange, red, factor) ?? red;
           }
 
-          return Container(
+          return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
             color: color.withOpacity(0.1), // background with lighter opacity
             padding: EdgeInsets.only(right: 5.0.r),
@@ -497,7 +508,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
             ),
           );
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 7:
         try {
@@ -533,7 +544,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
             color = Color.lerp(orange, red, factor) ?? red;
           }
 
-          return Container(
+          return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
             color: color.withOpacity(0.1), // background with lighter opacity
             padding: EdgeInsets.only(right: 5.0.r),
@@ -543,7 +554,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
             ),
           );
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 8:
         try {
@@ -579,7 +590,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
             color = Color.lerp(orange, red, factor) ?? red;
           }
 
-          return Container(
+          return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
             color: color.withOpacity(0.1), // background with lighter opacity
             padding: EdgeInsets.only(right: 5.0.r),
@@ -588,15 +599,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
               style: kBebasNormal.copyWith(fontSize: 16.0.r, color: color),
             ),
           );
-          /*
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-                      ['PACE']!
-                  .toStringAsFixed(1));
-
-           */
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 9:
         try {
@@ -630,7 +634,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
             color = Color.lerp(orange, red, factor) ?? red;
           }
 
-          return Container(
+          return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
             color: color.withOpacity(0.1),
             padding: EdgeInsets.only(right: 5.0.r),
@@ -641,7 +645,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                 )),
           );
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 10:
         try {
@@ -675,7 +679,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
             color = Color.lerp(orange, red, factor) ?? red;
           }
 
-          return Container(
+          return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
             color: color.withOpacity(0.1),
             padding: EdgeInsets.only(right: 5.0.r),
@@ -686,13 +690,13 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                 )),
           );
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 11:
         try {
           String streak =
               teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak'];
-          return Container(
+          return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
             child: Text(
               teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!,
@@ -707,145 +711,64 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
             ),
           );
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 12:
         try {
-          return StandingsDataText(
-            text:
-                '${teams[row]['seasons']?[widget.season]?['xPTS_W'] ?? '0'} - ${teams[row]['seasons']?[widget.season]?['xPTS_L'] ?? '0'}',
-          );
+          String xPts =
+              '${teams[row]['seasons']?[widget.season]?['xPTS_W'] ?? '0'} - ${teams[row]['seasons']?[widget.season]?['xPTS_L'] ?? '0'}';
+          return _cachedContent[row]![column] ??=
+              StandingsDataText(key: ValueKey(xPts), text: xPts);
         } catch (e) {
-          return const StandingsDataText(text: '-');
+          return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 13:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['L10']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'L10');
       case 14:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['HOME']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'HOME');
       case 15:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['ROAD']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'ROAD');
       case 16:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['OppOver500']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'OppOver500');
       case 17:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsEast']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'vsEast');
       case 18:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsWest']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'vsWest');
       case 19:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'vsAtlantic');
       case 20:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'vsCentral');
       case 21:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'vsSoutheast');
       case 22:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'vsNorthwest');
       case 23:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'vsPacific');
       case 24:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'vsSouthwest');
       case 25:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['Score100PTS']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'Score100PTS');
       case 26:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtHalf']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'AheadAtHalf');
       case 27:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtThird']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'AheadAtThird');
       case 28:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInFGPCT']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'LeadInFGPCT');
       case 29:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInReb']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'LeadInReb');
       case 30:
-        try {
-          return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['FewerTurnovers']!);
-        } catch (e) {
-          return const StandingsDataText(text: '-');
-        }
+        return _cachedContent[row]![column] ??= getStandingsData(row, 'FewerTurnovers');
       default:
         return const Text('');
+    }
+  }
+
+  Widget getStandingsData(int row, String name) {
+    try {
+      String stat = teams[row]['seasons'][widget.season]['STANDINGS'][name]!;
+      return StandingsDataText(key: ValueKey(stat), text: stat);
+    } catch (e) {
+      return const StandingsDataText(key: ValueKey('-'), text: '-');
     }
   }
 }
@@ -868,6 +791,27 @@ class StandingsDataText extends StatelessWidget {
           style: kBebasNormal.copyWith(fontSize: 17.0.r, color: color),
         ),
       ),
+    );
+  }
+}
+
+class TeamRow extends StatelessWidget {
+  final String teamId;
+  final Widget child;
+
+  const TeamRow({super.key, required this.teamId, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TeamHome(teamId: teamId),
+        ),
+      ),
+      splashColor: Colors.white,
+      child: child,
     );
   }
 }

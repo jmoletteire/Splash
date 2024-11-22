@@ -161,7 +161,10 @@ def get_sr_ids(adv_boxscore, valid_ids):
 
         if result:
             # Filter the array to only include items present in valid_ids
-            final_sr_id = [sr_id for sr_id in result[0]['SR_ID'][team] if sr_id in valid_ids]
+            try:
+                final_sr_id = [sr_id for sr_id in result[0]['SR_ID'][team] if sr_id in valid_ids]
+            except Exception:
+                final_sr_id = []
             if len(final_sr_id) > 0:
                 adv_boxscore['PlayerStats'][i]['SR_ID'] = final_sr_id[0]
             else:
@@ -181,7 +184,7 @@ def synergy_shot_quality(sr_id, adv_boxscore):
         'accept': 'application/json, text/plain, */*',
         'accept-encoding': 'gzip, deflate, br, zstd',
         'accept-language': 'en-US,en;q=0.9',
-        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMxNjAzOTc4LCJpYXQiOjE3MzE2MDM5NzgsImV4cCI6MTczMTYwNDU3OCwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.VHq153K4LOQq8T7zsx9pqv_BvAnRzFeqOvhD1cbChdrTM-cJ4cn2tjTKcJFkyKy_MC5PIeZBPNoRlG3RbINVY4jnsSwEsi-qfkG2TURmQTKfCnILeXpQb8obLhudqZGzhz_Ps1c-TvjCv1_KZktunwFU2h-yu3JWJ0uSec_EODoIp5xJng_0ClvaNX_ko5pYPCTkuwZlLBtykz1R5P7JhDsw1dN9EkQSZvDWKOYsWMRaL6uxNldqCW1LgS_xUViL_Bb07RxNoY41cFFXKP2eZIdauDbIy4x355OPsg7xgO01jdycY0N8fLgI9neZ0dJjH_AUZ67pZD8no3L5pTxV6Q',
+        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMyMTk5ODkzLCJpYXQiOjE3MzIxOTk4OTMsImV4cCI6MTczMjIwMDQ5MywiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.jtUfoJYvwYXHd9_jURSHZcaNxxjMOdabMT5sc3B48tweOey-v2LvWJP4SKtp0KGROcW3fF_A_DzcNCAGXn86hwiiPEZEQq1EKOzNoT2h2s_4-sKZcZSh0GWqRnWXv0cFuJt9_hqj2qAF3sEicR6sefBmaMEAOoccYaBDc0n_4T2UN-m93TFi9HRIXpe5658p6yYSwF8gT5Z-UiJxPJE83D9t0JtPjYt5aXj5yR_M2ny6lCCgi3Z772DolX-L9LBlxQ8Z0BSwRaCvL8w42Q1xkTFvoyPDxwkIpnoLX43QGjI_L8UfHolqIrWLVlj7pnm1IuQ7aE_5qfCG5lNRFfq0rg',
         'origin': 'https://apps.synergysports.com',
         'referer': 'https://apps.synergysports.com/',
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
@@ -242,95 +245,91 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    try:
-        client = MongoClient(uri)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
-        games_collection = db.nba_games
-        logging.info("Connected to MongoDB")
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    teams_collection = db.nba_teams
+    games_collection = db.nba_games
+    logging.info("Connected to MongoDB")
 
-        # Get today's date in "yyyy-mm-dd" format
-        today_date = datetime.today().strftime("%Y-%m-%d")
+    # Get today's date in "yyyy-mm-dd" format
+    today_date = datetime.today().strftime("%Y-%m-%d")
 
-        # Set batch size to process documents
-        filter = {"GAME_DATE": '2024-11-13'}  # {"SEASON_CODE": '22024', "GAME_DATE": {"$lt": today_date}}  #
-        batch_size = 100
-        total_documents = games_collection.count_documents(filter)
-        processed_count = 0
+    # Set batch size to process documents
+    filter = {"GAME_DATE": '2024-11-20'}  # {"SEASON_CODE": '22024', "GAME_DATE": {"$lt": today_date}}  #
+    batch_size = 100
+    total_documents = games_collection.count_documents(filter)
+    processed_count = 0
 
-        while processed_count < total_documents:
-            with games_collection.find(filter).skip(processed_count).limit(batch_size).batch_size(batch_size) as cursor:
-                documents = list(cursor)
-                if not documents:
-                    break
+    while processed_count < total_documents:
+        with games_collection.find(filter).skip(processed_count).limit(batch_size).batch_size(batch_size) as cursor:
+            documents = list(cursor)
+            if not documents:
+                break
 
-                game_counter = 0
+            game_counter = 0
 
-                for document in documents:
-                    processed_count += 1
-                    logging.info(f'Processing {processed_count} of {total_documents} ({document["GAME_DATE"]})...')
+            for document in documents:
+                processed_count += 1
+                logging.info(f'Processing {processed_count} of {total_documents} ({document["GAME_DATE"]})...')
 
-                    year = document['SEASON_YEAR']
-                    next_year = str(int(year) + 1)
-                    season = f"{year}-{next_year[-2:]}"
-                    season_type = document['SEASON_TYPE'] if document['SEASON_TYPE'] != 'REGULAR_SEASON' else 'REGULAR SEASON'
+                year = document['SEASON_YEAR']
+                next_year = str(int(year) + 1)
+                season = f"{year}-{next_year[-2:]}"
+                season_type = document['SEASON_TYPE'] if document['SEASON_TYPE'] != 'REGULAR_SEASON' else 'REGULAR SEASON'
 
-                    for game_id, game_data in document['GAMES'].items():
-                        # Check if ADV already exists for the game
-                        if "ADV" in game_data:
-                            # Fetch box score summary for the game
-                            try:
-                                stats = fetch_box_score_adv(game_id)
+                for game_id, game_data in document['GAMES'].items():
+                    # Check if ADV already exists for the game
+                    if "ADV" in game_data:
+                        # Fetch box score summary for the game
+                        try:
+                            stats = fetch_box_score_adv(game_id)
 
-                                if 'homeTeam' in game_data['BOXSCORE'].keys():
-                                    team_ft = {
-                                        game_data['BOXSCORE']['homeTeam']['teamId']: game_data['BOXSCORE']['homeTeam']['statistics']['freeThrowsMade'],
-                                        game_data['BOXSCORE']['awayTeam']['teamId']: game_data['BOXSCORE']['awayTeam']['statistics']['freeThrowsMade']
-                                    }
-                                elif 'TeamStats' in game_data['BOXSCORE'].keys():
-                                    team_ft = {
-                                        game_data['BOXSCORE']['TeamStats'][0]['TEAM_ID']: game_data['BOXSCORE']['TeamStats'][0]['FTM'],
-                                        game_data['BOXSCORE']['TeamStats'][1]['TEAM_ID']: game_data['BOXSCORE']['TeamStats'][1]['FTM']
-                                    }
-                                else:
-                                    continue
+                            if 'homeTeam' in game_data['BOXSCORE'].keys():
+                                team_ft = {
+                                    game_data['BOXSCORE']['homeTeam']['teamId']: game_data['BOXSCORE']['homeTeam']['statistics']['freeThrowsMade'],
+                                    game_data['BOXSCORE']['awayTeam']['teamId']: game_data['BOXSCORE']['awayTeam']['statistics']['freeThrowsMade']
+                                }
+                            elif 'TeamStats' in game_data['BOXSCORE'].keys():
+                                team_ft = {
+                                    game_data['BOXSCORE']['TeamStats'][0]['TEAM_ID']: game_data['BOXSCORE']['TeamStats'][0]['FTM'],
+                                    game_data['BOXSCORE']['TeamStats'][1]['TEAM_ID']: game_data['BOXSCORE']['TeamStats'][1]['FTM']
+                                }
+                            else:
+                                continue
 
-                                stats = synergy_shot_quality(game_data['SR_ID'], stats)
-                            except Exception as e:
-                                stats = None
-                                logging.error(f"Error fetching box score for game_id {game_id}: {e}")
+                            stats = synergy_shot_quality(game_data['SR_ID'], stats)
+                        except Exception as e:
+                            stats = None
+                            logging.error(f"Error fetching box score for game_id {game_id}: {e.with_traceback()}")
 
-                            # Update the game data with the fetched summary
-                            try:
-                                # Update the MongoDB document with the fetched stats under the "SUMMARY" key
-                                games_collection.update_one(
-                                    {'_id': document['_id'], f"GAMES.{game_id}": {"$exists": True}},
-                                    {"$set": {f"GAMES.{game_id}.ADV": stats}}
-                                )
+                        # Update the game data with the fetched summary
+                        try:
+                            # Update the MongoDB document with the fetched stats under the "SUMMARY" key
+                            games_collection.update_one(
+                                {'_id': document['_id'], f"GAMES.{game_id}": {"$exists": True}},
+                                {"$set": {f"GAMES.{game_id}.ADV": stats}}
+                            )
 
-                                # print(f"Processed {document['GAME_DATE']} {game_id}")
-                            except Exception as e:
-                                logging.error(f"Error updating advanced stats for game_id {game_id}: {e}")
+                            # print(f"Processed {document['GAME_DATE']} {game_id}")
+                        except Exception as e:
+                            logging.error(f"Error updating advanced stats for game_id {game_id}: {e}")
 
-                            game_counter += 1
+                        game_counter += 1
 
-                            # Pause for a random time between 0.5 and 1 second
-                            time.sleep(random.uniform(0.5, 1.0))
+                        # Pause for a random time between 0.5 and 1 second
+                        time.sleep(random.uniform(0.5, 1.0))
 
-                            # Pause for 10 seconds every 100 games processed
-                            if game_counter % 100 == 0:
-                                logging.info(f"Processed {game_counter} games. Pausing for 10 seconds...")
-                                time.sleep(10)
+                        # Pause for 10 seconds every 100 games processed
+                        if game_counter % 100 == 0:
+                            logging.info(f"Processed {game_counter} games. Pausing for 10 seconds...")
+                            time.sleep(10)
 
-        logging.info("Box score stats update complete.")
+    logging.info("Box score stats update complete.")
 
-        logging.info("\nUpdating xPTS W-L...")
-        season = '2024-25'
-        season_type = 'REGULAR SEASON'
-        for i, team in enumerate(teams_collection.find({}, {'TEAM_ID': 1, f'seasons.{season}.GAMES': 1, '_id': 0})):
-            logging.info(f'Processing {i + 1} of 30')
-            team_xpts_record(team, season, season_type)
-
-    except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+    logging.info("\nUpdating xPTS W-L...")
+    season = '2024-25'
+    season_type = 'REGULAR SEASON'
+    for i, team in enumerate(teams_collection.find({}, {'TEAM_ID': 1, f'seasons.{season}.GAMES': 1, '_id': 0})):
+        logging.info(f'Processing {i + 1} of 30')
+        team_xpts_record(team, season, season_type)
