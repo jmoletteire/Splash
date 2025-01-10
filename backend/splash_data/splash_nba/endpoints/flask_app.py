@@ -28,6 +28,7 @@ try:
     cup_collection = db.nba_cup_history
     draft_collection = db.nba_draft_history
     transactions_collection = db.nba_transactions
+    latest_news_collection = db.latest_news_articles
 
     logging.info("Connected to MongoDB")
 except Exception as e:

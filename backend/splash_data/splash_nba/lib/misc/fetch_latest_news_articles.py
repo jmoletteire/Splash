@@ -59,4 +59,9 @@ def fetch_latest_news_articles():
 
 
 if __name__ == '__main__':
+    client = MongoClient(uri)
+    latest_news_collection = client.splash.latest_news_articles
+
     fetch_latest_news_articles()
+    news = latest_news_collection.find()
+    print(list(news))
