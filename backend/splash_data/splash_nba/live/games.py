@@ -1,60 +1,52 @@
-import concurrent.futures
 import logging
-import random
-import threading
+import re
 from datetime import datetime, timedelta, timezone
 
 import nba_api
-import schedule
-import time
-
-from nba_api.live.nba.endpoints import scoreboard, boxscore, playbyplay
-from nba_api.stats.endpoints import commonplayoffseries, playerawards, scoreboardv2
-from pymongo import MongoClient
-
+from nba_api.live.nba.endpoints import boxscore, playbyplay
+from nba_api.stats.endpoints import commonplayoffseries, scoreboardv2
 from splash_nba.lib.games.fetch_adv_boxscore import fetch_box_score_adv
-from splash_nba.lib.games.fetch_boxscore_basic import fetch_box_score_stats
 from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
-from splash_nba.lib.games.fetch_new_games import update_game_data, fetch_games_for_date_range
-from splash_nba.lib.games.fetch_play_by_play import fetch_play_by_play, update_play_by_play
-from splash_nba.lib.games.game_odds import fetch_odds
-from splash_nba.lib.games.live_scores import fetch_boxscore, fetch_live_scores
+from splash_nba.lib.games.fetch_new_games import fetch_games_for_date_range
+from splash_nba.lib.games.fetch_play_by_play import update_play_by_play, fetch_play_by_play
 from splash_nba.lib.games.nba_cup import update_current_cup, flag_cup_games
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
-from splash_nba.lib.games.youtube_highlights import search_youtube_highlights
-from splash_nba.lib.misc.update_transactions import update_transactions
-from splash_nba.lib.players.player_gamelogs import gamelogs
-from splash_nba.lib.players.player_rotowire_news import player_rotowire_news, player_rotowire_injuries, player_rotowires
-from splash_nba.lib.players.stats.custom_player_stats_rank import current_season_custom_stats_rank
-from splash_nba.lib.players.stats.per75 import current_season_per_75
-from splash_nba.lib.players.stats.player_career_stats import update_player_career_stats
-from splash_nba.lib.players.stats.player_hustle_stats import update_player_hustle_stats
-from splash_nba.lib.players.stats.player_stats import update_player_stats
-from splash_nba.lib.players.stats.shooting_stat_rank import current_season_shooting_stat_ranks
-from splash_nba.lib.players.stats.shot_chart_data import get_shot_chart_data
-from splash_nba.lib.players.stats.update_custom_player_stats import update_player_on_off, update_poss_per_game, \
-    update_three_and_ft_rate, update_player_tracking_stats, update_shot_distribution, update_touches_breakdown, \
-    update_drive_stats, update_scoring_breakdown_and_pct_unassisted, update_box_creation, update_offensive_load, \
-    update_adj_turnover_pct, update_versatility_score, update_matchup_difficulty_and_dps
-from splash_nba.lib.players.update_all_players import add_players, restructure_new_docs, update_player_info
-from splash_nba.lib.players.update_player_contracts import fetch_player_contract_data, keep_most_informative
-from splash_nba.lib.teams.stats.custom_team_stats import three_and_ft_rate
-from splash_nba.lib.teams.stats.custom_team_stats_rank import custom_team_stats_rank, \
-    current_season_custom_team_stats_rank
-from splash_nba.lib.teams.stats.per100 import calculate_and_update_per_100_possessions, \
-    current_season_per_100_possessions
-from splash_nba.lib.teams.team_cap_sheet import update_team_contract_data
-from splash_nba.lib.teams.team_history import update_team_history
 from splash_nba.lib.teams.update_team_games import update_team_games
-from splash_nba.lib.teams.standings import update_current_standings
-from splash_nba.lib.teams.update_news_and_transactions import fetch_team_transactions, fetch_team_news
-from splash_nba.lib.teams.team_seasons import update_current_season
-from splash_nba.lib.teams.stats.team_hustle_stats_rank import rank_hustle_stats_current_season
-from splash_nba.lib.teams.team_rosters import update_current_roster
-from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_lineup
-from splash_nba.util.env import uri, k_current_season, k_current_season_type, youtube_api_key
+from splash_nba.util.env import k_current_season
+from splash_nba.util.mongo_connect import get_mongo_collection
 
-import re
+teams = {
+    1610612737: 'Atlanta Hawks',
+    1610612738: 'Boston Celtics',
+    1610612739: 'Cleveland Cavaliers',
+    1610612740: 'New Orleans Pelicans',
+    1610612741: 'Chicago Bulls',
+    1610612742: 'Dallas Mavericks',
+    1610612743: 'Denver Nuggets',
+    1610612744: 'Golden State Warriors',
+    1610612745: 'Houston Rockets',
+    1610612746: 'Los Angeles Clippers',
+    1610612747: 'Los Angeles Lakers',
+    1610612748: 'Miami Heat',
+    1610612749: 'Milwaukee Bucks',
+    1610612750: 'Minnesota Timberwolves',
+    1610612751: 'Brooklyn Nets',
+    1610612752: 'New York Knicks',
+    1610612753: 'Orlando Magic',
+    1610612754: 'Indiana Pacers',
+    1610612755: 'Philadelphia 76ers',
+    1610612756: 'Phoenix Suns',
+    1610612757: 'Portland Trail Blazers',
+    1610612758: 'Sacramento Kings',
+    1610612759: 'San Antonio Spurs',
+    1610612760: 'Oklahoma City Thunder',
+    1610612761: 'Toronto Raptors',
+    1610612762: 'Utah Jazz',
+    1610612763: 'Memphis Grizzlies',
+    1610612764: 'Washington Wizards',
+    1610612765: 'Detroit Pistons',
+    1610612766: 'Charlotte Hornets',
+}
 
 # Global flag to prevent further updates for the day
 skip_updates = False
@@ -67,67 +59,37 @@ def reset_flags():
     logging.info("(Flag Reset) Daily reset complete, live updates will resume.")
 
 
+def format_duration(input_str):
+    # Regular expression to match 'PT' followed by minutes and seconds
+    match = re.match(r'PT(\d+)M(\d+)\.(\d+)S', input_str)
+
+    if match:
+        minutes = int(match.group(1))  # Convert minutes to int
+        seconds = int(match.group(2))  # Convert seconds to int
+        tenths = match.group(3)[0]  # Take only the first digit of the fraction for tenths
+
+        if minutes == 0:  # Less than a minute left, show seconds and tenths
+            return f":{seconds}.{tenths}"
+        else:  # Regular minutes and seconds format
+            return f"{minutes}:{seconds:02d}"  # Format seconds with leading zero if necessary
+
+    return input_str  # Return original string if no match is found
+
+
 def games_today():
-    teams = {
-        1610612737: 'Atlanta Hawks',
-        1610612738: 'Boston Celtics',
-        1610612739: 'Cleveland Cavaliers',
-        1610612740: 'New Orleans Pelicans',
-        1610612741: 'Chicago Bulls',
-        1610612742: 'Dallas Mavericks',
-        1610612743: 'Denver Nuggets',
-        1610612744: 'Golden State Warriors',
-        1610612745: 'Houston Rockets',
-        1610612746: 'Los Angeles Clippers',
-        1610612747: 'Los Angeles Lakers',
-        1610612748: 'Miami Heat',
-        1610612749: 'Milwaukee Bucks',
-        1610612750: 'Minnesota Timberwolves',
-        1610612751: 'Brooklyn Nets',
-        1610612752: 'New York Knicks',
-        1610612753: 'Orlando Magic',
-        1610612754: 'Indiana Pacers',
-        1610612755: 'Philadelphia 76ers',
-        1610612756: 'Phoenix Suns',
-        1610612757: 'Portland Trail Blazers',
-        1610612758: 'Sacramento Kings',
-        1610612759: 'San Antonio Spurs',
-        1610612760: 'Oklahoma City Thunder',
-        1610612761: 'Toronto Raptors',
-        1610612762: 'Utah Jazz',
-        1610612763: 'Memphis Grizzlies',
-        1610612764: 'Washington Wizards',
-        1610612765: 'Detroit Pistons',
-        1610612766: 'Charlotte Hornets',
-    }
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
     global skip_updates
     if skip_updates:
         logging.info(f"(Games Live) No games today, skipping further updates. [{datetime.now()}]")
         return  # Skip the update if there are no games today
 
     try:
-        client = MongoClient(uri)
-        db = client.splash
-        games_collection = db.nba_games
+        games_collection = get_mongo_collection('nba_games')
     except Exception as e:
         logging.error(f'(Games Live) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
-
-    def format_duration(input_str):
-        # Regular expression to match 'PT' followed by minutes and seconds
-        match = re.match(r'PT(\d+)M(\d+)\.(\d+)S', input_str)
-
-        if match:
-            minutes = int(match.group(1))  # Convert minutes to int
-            seconds = int(match.group(2))  # Convert seconds to int
-            tenths = match.group(3)[0]  # Take only the first digit of the fraction for tenths
-
-            if minutes == 0:  # Less than a minute left, show seconds and tenths
-                return f":{seconds}.{tenths}"
-            else:  # Regular minutes and seconds format
-                return f"{minutes}:{seconds:02d}"  # Format seconds with leading zero if necessary
-
-        return input_str  # Return original string if no match is found
 
     today = datetime.today().strftime('%Y-%m-%d')
     yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
@@ -429,66 +391,19 @@ def games_today():
 
 
 def games_prev_day():
-    teams = {
-        1610612737: 'Atlanta Hawks',
-        1610612738: 'Boston Celtics',
-        1610612739: 'Cleveland Cavaliers',
-        1610612740: 'New Orleans Pelicans',
-        1610612741: 'Chicago Bulls',
-        1610612742: 'Dallas Mavericks',
-        1610612743: 'Denver Nuggets',
-        1610612744: 'Golden State Warriors',
-        1610612745: 'Houston Rockets',
-        1610612746: 'Los Angeles Clippers',
-        1610612747: 'Los Angeles Lakers',
-        1610612748: 'Miami Heat',
-        1610612749: 'Milwaukee Bucks',
-        1610612750: 'Minnesota Timberwolves',
-        1610612751: 'Brooklyn Nets',
-        1610612752: 'New York Knicks',
-        1610612753: 'Orlando Magic',
-        1610612754: 'Indiana Pacers',
-        1610612755: 'Philadelphia 76ers',
-        1610612756: 'Phoenix Suns',
-        1610612757: 'Portland Trail Blazers',
-        1610612758: 'Sacramento Kings',
-        1610612759: 'San Antonio Spurs',
-        1610612760: 'Oklahoma City Thunder',
-        1610612761: 'Toronto Raptors',
-        1610612762: 'Utah Jazz',
-        1610612763: 'Memphis Grizzlies',
-        1610612764: 'Washington Wizards',
-        1610612765: 'Detroit Pistons',
-        1610612766: 'Charlotte Hornets',
-    }
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
     global skip_updates
     if skip_updates:
         logging.info(f"(Games Live) No games today, skipping further updates. [{datetime.now()}]")
         return  # Skip the update if there are no games today
 
     try:
-        client = MongoClient(uri)
-        db = client.splash
-        games_collection = db.nba_games
+        games_collection = get_mongo_collection('nba_games')
     except Exception as e:
         logging.error(f'(Games Live) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
-
-    def format_duration(input_str):
-        # Regular expression to match 'PT' followed by minutes and seconds
-        match = re.match(r'PT(\d+)M(\d+)\.(\d+)S', input_str)
-
-        if match:
-            minutes = int(match.group(1))  # Convert minutes to int
-            seconds = int(match.group(2))  # Convert seconds to int
-            tenths = match.group(3)[0]  # Take only the first digit of the fraction for tenths
-
-            if minutes == 0:  # Less than a minute left, show seconds and tenths
-                return f":{seconds}.{tenths}"
-            else:  # Regular minutes and seconds format
-                return f"{minutes}:{seconds:02d}"  # Format seconds with leading zero if necessary
-
-        return input_str  # Return original string if no match is found
 
     yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
 
@@ -587,7 +502,7 @@ def games_prev_day():
                 logging.info(f'(Games Live) Upcoming game {game["GAME_ID"]} is up to date.')
 
         # IN-PROGRESS
-        elif in_progress:
+        elif is_final:
             # Summary, Box Score, PBP
             summary = fetch_box_score_summary(game['GAME_ID'])
             box_score = boxscore.BoxScore(game_id=game['GAME_ID']).get_dict()['game']
@@ -793,68 +708,19 @@ def games_prev_day():
 
 
 def games_live_update():
-    teams = {
-        1610612737: 'Atlanta Hawks',
-        1610612738: 'Boston Celtics',
-        1610612739: 'Cleveland Cavaliers',
-        1610612740: 'New Orleans Pelicans',
-        1610612741: 'Chicago Bulls',
-        1610612742: 'Dallas Mavericks',
-        1610612743: 'Denver Nuggets',
-        1610612744: 'Golden State Warriors',
-        1610612745: 'Houston Rockets',
-        1610612746: 'Los Angeles Clippers',
-        1610612747: 'Los Angeles Lakers',
-        1610612748: 'Miami Heat',
-        1610612749: 'Milwaukee Bucks',
-        1610612750: 'Minnesota Timberwolves',
-        1610612751: 'Brooklyn Nets',
-        1610612752: 'New York Knicks',
-        1610612753: 'Orlando Magic',
-        1610612754: 'Indiana Pacers',
-        1610612755: 'Philadelphia 76ers',
-        1610612756: 'Phoenix Suns',
-        1610612757: 'Portland Trail Blazers',
-        1610612758: 'Sacramento Kings',
-        1610612759: 'San Antonio Spurs',
-        1610612760: 'Oklahoma City Thunder',
-        1610612761: 'Toronto Raptors',
-        1610612762: 'Utah Jazz',
-        1610612763: 'Memphis Grizzlies',
-        1610612764: 'Washington Wizards',
-        1610612765: 'Detroit Pistons',
-        1610612766: 'Charlotte Hornets',
-    }
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
     global skip_updates
     if skip_updates:
         logging.info(f"(Games Live) No games today, skipping further updates. [{datetime.now()}]")
         return  # Skip the update if there are no games today
 
     try:
-        client = MongoClient(uri)
-        db = client.splash
-        games_collection = db.nba_games
+        games_collection = get_mongo_collection('nba_games')
     except Exception as e:
         logging.error(f'(Games Live) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
-
-    import re
-
-    def format_duration(input_str):
-        # Regular expression to match 'PT' followed by minutes and seconds
-        match = re.match(r'PT(\d+)M(\d+)\.(\d+)S', input_str)
-
-        if match:
-            minutes = int(match.group(1))  # Convert minutes to int
-            seconds = int(match.group(2))  # Convert seconds to int
-            tenths = match.group(3)[0]  # Take only the first digit of the fraction for tenths
-
-            if minutes == 0:  # Less than a minute left, show seconds and tenths
-                return f":{seconds}.{tenths}"
-            else:  # Regular minutes and seconds format
-                return f"{minutes}:{seconds:02d}"  # Format seconds with leading zero if necessary
-
-        return input_str  # Return original string if no match is found
 
     def parse_game_time(game_time_str):
         try:
@@ -1250,265 +1116,13 @@ def games_live_update():
             logging.info(f'(Games Live) Finalizing game {game["gameId"]}.')
 
 
-def update_teams(team_ids):
-    """
-    Runs every day at 3AM.\n
-    Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
-    for each team.
-    """
-
-    logging.info("Updating team (post-game)...")
-    try:
-        for team_id in team_ids:
-            with teams_collection.find({"TEAM_ID": team_id}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0}) as cursor:
-                documents = list(cursor)
-                if not documents:
-                    return
-
-                for doc in documents:
-                    team = doc['TEAM_ID']
-
-                    if team == 0:
-                        continue
-
-                    logging.info(f"Processing team {team}")
-
-                    # Team History (30 API calls)
-                    logging.info("History...")
-                    update_team_history(team_id=team)
-                    time.sleep(15)
-
-                    # Season Stats (120 API calls)
-                    logging.info("Stats...")
-                    update_current_season(team_id=team)
-                    # Filter seasons to only include the current season key
-                    filtered_doc = doc.copy()
-                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
-                                               key == k_current_season}
-                    current_season_per_100_possessions(team_doc=filtered_doc, playoffs=k_current_season_type == 'PLAYOFFS')
-                    time.sleep(15)
-
-                    # Current Roster/Rotation & Coaches (~400-500 API calls)
-                    logging.info("Roster & Coaches...")
-                    season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
-                    update_current_roster(team_id=team, season_not_started=season_not_started)
-                    time.sleep(30)
-
-                    # Last Starting Lineup (0 API Calls)
-                    logging.info("Last Starting Lineup...")
-                    # Get most recent game by date
-                    game_id, game_date = get_last_game(doc['seasons'])
-                    # Get starting lineup for most recent game
-                    last_starting_lineup = get_last_lineup(team, game_id, game_date)
-                    # Update document
-                    teams_collection.update_one(
-                        {"TEAM_ID": team},
-                        {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
-                    )
-                    logging.info(f"\t(Team Last Lineup) Updated last starting lineup for team {team_id}")
-
-                    # Pause 15 seconds between teams
-                    time.sleep(15)
-
-        rank_hustle_stats_current_season()
-        three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
-        current_season_custom_team_stats_rank()
-
-        # Standings (min. 30 API calls [more if tiebreakers])
-        logging.info("Standings (min. 30 API calls)...")
-        update_current_standings()
-    except Exception as e:
-        logging.error(f"(Teams Daily) Error updating teams: {e}")
-
-
-def update_players(team_ids):
-    def player_stats():
-        # Stats
-        logging.info("Player Stats...")
-
-        for team_id in team_ids:
-            # BASIC, ADV, HUSTLE
-            update_player_stats(k_current_season_type, team_id)
-            update_player_hustle_stats(k_current_season_type, team_id)
-
-            # CUSTOM STATS (Calculated)
-            update_player_on_off(k_current_season_type, team_id)  # ON/OFF
-            update_poss_per_game(k_current_season_type, team_id)  # POSS PER G
-            update_three_and_ft_rate(k_current_season_type, team_id)  # 3PAr, FTAr, FT/FGA
-            update_player_tracking_stats(k_current_season_type, team_id)  # TOUCHES, PASSING, DRIVES, REBOUNDING, SPEED/DISTANCE
-            update_touches_breakdown(k_current_season_type, team_id)  # % PASS, % SHOOT, % TOV, % FOULED
-            update_shot_distribution(k_current_season_type, team_id)  # SHOT TYPE, CLOSEST DEFENDER
-            update_drive_stats(k_current_season_type, team_id)  # DRIVE %, DRIVE TS%, DRIVE FT/FGA
-            update_scoring_breakdown_and_pct_unassisted(k_current_season_type, team_id)  # % UAST
-            update_versatility_score(k_current_season_type, team_id)  # VERSATILITY
-
-            # PER POSS STATS
-            current_season_per_75(k_current_season_type == 'PLAYOFFS', team_id)
-            update_box_creation(k_current_season_type, team_id)  # BOX CREATION
-            update_offensive_load(k_current_season_type, team_id)  # OFF LOAD
-            update_adj_turnover_pct(k_current_season_type, team_id)  # cTOV
-
-        for team_id in team_ids:
-            update_matchup_difficulty_and_dps(k_current_season_type, team_id)  # MATCHUP DIFF & DIE
-
-        # Rank
-        current_season_custom_stats_rank()
-        current_season_shooting_stat_ranks(k_current_season_type)
-
-    def player_career_stats(team_id):
-        # Stats
-        logging.info("Player Career Stats...")
-
-        # Set batch size to process documents
-        batch_size = 25
-        total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
-        processed_count = 0
-        i = 0
-
-        while processed_count < total_documents:
-            with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id},
-                                         {'PERSON_ID': 1, 'STATS': 1, 'CAREER': 1, '_id': 0}).skip(processed_count).limit(batch_size).batch_size(batch_size) as cursor:
-                documents = list(cursor)
-                if not documents:
-                    break
-                processed_count += len(documents)
-
-                for player in documents:
-                    i += 1
-                    logging.info(f'(Career Stats) Processing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
-
-                    try:
-                        update_player_career_stats(player['PERSON_ID'])
-                    except Exception as e:
-                        logging.error(
-                            f'(Career Stats) Could not update career stats for player {player["PERSON_ID"]}: {e}')
-                        continue
-
-                    # Pause for a random time between 0.5 and 1 second
-                    time.sleep(random.uniform(0.5, 1.0))
-
-                # Pause 15 seconds every 25 players
-                time.sleep(15)
-
-    def player_game_logs(team_id):
-        # Game Logs
-        logging.info("Player Game Logs...")
-
-        # Set batch size to process documents
-        batch_size = 25
-        total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
-        processed_count = 0
-        i = 0
-
-        # Loop through all ACTIVE players
-        while processed_count < total_documents:
-            with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'STATS': 1, '_id': 0}).skip(processed_count).limit(batch_size).batch_size(batch_size) as cursor:
-                documents = list(cursor)
-                if not documents:
-                    break
-                processed_count += len(documents)
-
-                for player in documents:
-                    i += 1
-                    logging.info(
-                        f'\n(Player Game Logs) Processing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
-
-                    try:
-                        # Pass player, current season, and current season type
-                        gamelogs(player['PERSON_ID'], k_current_season, k_current_season_type)
-                    except Exception as e:
-                        logging.error(
-                            f'(Player Game Logs) Could not add game logs for player {player["PERSON_ID"]}: {e}')
-                        continue
-                    # Pause for a random time between 0.5 and 1 second between each player
-                    time.sleep(random.uniform(0.5, 1.0))
-
-                # Pause 10 seconds every 25 players
-                time.sleep(10)
-
-    def player_shot_charts(team_id):
-        # Shot Charts
-        logging.info("Player Shot Charts...")
-
-        # Set batch size to process documents
-        batch_size = 25
-        total_documents = players_collection.count_documents({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id})
-        processed_count = 0
-        i = 0
-        keep_league_avg = True
-
-        # Loop through all ACTIVE players
-        while processed_count < total_documents:
-            with players_collection.find({'ROSTERSTATUS': 'Active', 'TEAM_ID': team_id}, {'PERSON_ID': 1, 'TEAM_ID': 1, '_id': 0}).skip(processed_count).limit(batch_size).batch_size(batch_size) as cursor:
-                documents = list(cursor)
-                if not documents:
-                    break
-                processed_count += len(documents)
-
-                for player in documents:
-                    i += 1
-                    logging.info(
-                        f'\n(Player Shot Charts) Processing {i} of {total_documents} (ID: {player["PERSON_ID"]})')
-
-                    try:
-                        get_shot_chart_data(
-                            player['PERSON_ID'],
-                            player['TEAM_ID'],
-                            k_current_season,
-                            'Regular Season' if k_current_season_type == 'REGULAR SEASON' else 'Playoffs',
-                            keep_league_avg
-                        )
-                        keep_league_avg = False
-                    except Exception as e:
-                        logging.error(
-                            f'(Player Shot Charts) Could not process shot chart for Player {player["PERSON_ID"]}: {e}')
-                        continue
-
-                    # Pause for a random time between 0.5 and 1 second between players
-                    time.sleep(random.uniform(0.5, 1.0))
-
-                # Pause 30 seconds every 25 players
-                time.sleep(30)
-
-    logging.info("Updating players...")
-
-    # STATS
-    try:
-        player_stats()
-        # print('Skip Player Stats')
-    except Exception as e:
-        logging.error(f"Error updating player stats: {e}")
-
-    # CAREER
-    try:
-        for team_id in team_ids:
-            player_career_stats(team_id)
-        # print('Skip Player Career')
-    except Exception as e:
-        logging.error(f"Error updating player career stats: {e}")
-
-    # GAME LOGS
-    try:
-        for team_id in team_ids:
-            player_game_logs(team_id)
-        # print('Skip Player Game Logs')
-    except Exception as e:
-        logging.error(f"Error updating player game logs: {e}")
-
-    # SHOT CHART
-    try:
-        for team_id in team_ids:
-            player_shot_charts(team_id)
-        # print('Skip Player Shot Charts')
-    except Exception as e:
-        logging.error(f"Error updating player shot charts: {e}")
-
-
 def games_daily_update():
     """
     Runs every day at 2:00AM.\n
     Updates games, NBA Cup, and playoff data for each team.
     """
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
 
     logging.info("Video PBP..")
     update_play_by_play()
@@ -1548,322 +1162,6 @@ def games_daily_update():
         logging.error(f"(Games Daily) Failed to update playoff data: {e}", exc_info=True)
 
 
-def teams_daily_update():
-    """
-    Runs every day at 3AM.\n
-    Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
-    for each team.
-    """
-    logging.info("Updating teams (daily)...")
-    try:
-        # Games (0 API calls)
-        logging.info("Team Games (0 API calls)...")
-        # Sort the documents in nba_games collection by GAME_DATE in descending order
-        sorted_games_cursor = games_collection.find(
-            {"SEASON_YEAR": k_current_season[0:4]},
-            {"GAME_DATE": 1, "GAMES": 1, "_id": 0}
-        ).sort("GAME_DATE", -1)
-        # Process the games in batches
-        for i, game_day in enumerate(sorted_games_cursor):
-            logging.info(f"Processing {game_day['GAME_DATE']}...")
-            update_team_games(game_day)
-    except Exception as e:
-        logging.error(f"(Teams Daily) Error updating team game logs: {e}", exc_info=True)
-
-    try:
-        # News & Transactions (NATSTAT - 60 API calls)'
-        logging.info("News & Transactions (0 API calls)...")
-        fetch_team_transactions()
-        fetch_team_news()
-        update_transactions()
-    except Exception as e:
-        logging.error(f"(Teams Daily) Error updating team news & transactions: {e}", exc_info=True)
-
-    try:
-        # Cap Sheet (0 API calls)
-        logging.info("Cap Sheet (0 API calls)...")
-        update_team_contract_data()
-    except Exception as e:
-        logging.error(f"(Teams Daily) Error updating team contracts: {e}", exc_info=True)
-
-        # Loop through all documents in the collection
-        batch_size = 10
-        total_documents = teams_collection.count_documents({})
-        processed_count = 0
-        i = 0
-        while processed_count < total_documents:
-            with teams_collection.find({}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0}).skip(processed_count).limit(
-                    batch_size).batch_size(batch_size) as cursor:
-                documents = list(cursor)
-                if not documents:
-                    break
-                processed_count += len(documents)
-
-                for doc in documents:
-                    team = doc['TEAM_ID']
-                    i += 1
-
-                    if team == 0:
-                        continue
-
-                    logging.info(f"Processing team {team} ({i} of 30)...")
-
-                    try:
-                        # Team History (30 API calls)
-                        logging.info("History (30 API calls)...")
-                        update_team_history(team_id=team)
-                        time.sleep(15)
-                    except Exception as e:
-                        logging.error(f"(Teams Daily) Error updating team {team} history: {e}", exc_info=True)
-
-                    # Season Stats (120 API calls)
-                    try:
-                        logging.info("Stats (120 API calls)...")
-                        update_current_season(team_id=team)
-                        # Filter seasons to only include the current season key
-                        filtered_doc = doc.copy()
-                        filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
-                                                   key == k_current_season}
-                        current_season_per_100_possessions(team_doc=filtered_doc,
-                                                           playoffs=k_current_season_type == 'PLAYOFFS')
-                        time.sleep(15)
-                    except Exception as e:
-                        logging.error(f"(Teams Daily) Error updating team {team} stats: {e}", exc_info=True)
-
-                    try:
-                        # Current Roster & Coaches (~400-500 API calls)
-                        logging.info("Roster & Coaches (~400-500 API calls)...")
-                        season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
-                        update_current_roster(team_id=team, season_not_started=season_not_started)
-                        time.sleep(30)
-                    except Exception as e:
-                        logging.error(f"(Teams Daily) Error updating team {team} roster: {e}", exc_info=True)
-
-                    try:
-                        # Last Starting Lineup (0 API Calls)
-                        logging.info("Last Starting Lineup (0 API calls)...")
-                        # Get most recent game by date
-                        game_id, game_date = get_last_game(doc['seasons'])
-                        # Get starting lineup for most recent game
-                        last_starting_lineup = get_last_lineup(team, game_id, game_date)
-                        # Update document
-                        teams_collection.update_one(
-                            {"TEAM_ID": team},
-                            {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
-                        )
-                    except Exception as e:
-                        logging.error(f"(Teams Daily) Error updating team {team} last lineup: {e}", exc_info=True)
-
-                    # Pause 15 seconds between teams
-                    time.sleep(15)
-
-        # Hustle Stat Rank
-        try:
-            rank_hustle_stats_current_season()
-        except Exception as e:
-            logging.error(f"(Teams Daily) Error updating hustle stat ranks: {e}", exc_info=True)
-
-        # 3PAr + FTr
-        try:
-            three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
-        except Exception as e:
-            logging.error(f"(Teams Daily) Error updating 3PAr + FTr: {e}", exc_info=True)
-
-        # Custom Stat Ranks
-        try:
-            current_season_custom_team_stats_rank()
-        except Exception as e:
-            logging.error(f"(Teams Daily) Error updating custom team stat ranks: {e}", exc_info=True)
-
-        # Standings
-        try:
-            # Standings (min. 30 API calls [more if tiebreakers])
-            logging.info("Standings (min. 30 API calls)...")
-            update_current_standings()
-        except Exception as e:
-            logging.error(f"(Teams Daily) Error updating standings: {e}", exc_info=True)
-
-
-def players_daily_update():
-    """
-    Runs every day at 3:30AM.\n
-    Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
-    for each team.
-    """
-
-    def player_info():
-        # Player Info
-        logging.info("Player Info...")
-        try:
-            add_players()
-            restructure_new_docs()
-            update_player_info()
-        except Exception as e:
-            logging.error(f"(Player Info) Error adding players: {e}", exc_info=True)
-
-    def player_contracts_and_trans():
-        # Contracts & Transactions
-        logging.info("Player Contracts & Transactions...")
-
-        # Update all ACTIVE players
-        for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, '_id': 0})):
-            logging.info(f'Processing {i + 1} of {players_collection.count_documents({"ROSTERSTATUS": "Active"})}...')
-
-            try:
-                player_id = str(player['PERSON_ID'])
-
-                # Define the GraphQL endpoint
-                url = "https://fanspo.com/api/graphql"
-
-                # Define the headers
-                headers = {
-                    "Content-Type": "application/json"
-                }
-
-                # Define the initial query variables
-                variables = {
-                    "playerId": player_id
-                }
-
-                # Fetch all paginated data
-                contracts, transactions = fetch_player_contract_data(url, variables, headers)
-                transactions = keep_most_informative(transactions)
-
-                players_collection.update_one(
-                    {"PERSON_ID": int(player_id)},
-                    {"$set": {'CONTRACTS': contracts, 'TRANSACTIONS': transactions}},
-                )
-            except Exception as e:
-                logging.error(
-                    f'(Player Contracts) Could not process contract data for Player {player["PERSON_ID"]}: {e}', exc_info=True)
-                continue
-
-    def player_awards():
-        # Configure logging
-        logging.basicConfig(level=logging.INFO)
-
-        # Connect to MongoDB
-        client = MongoClient(uri)
-        db = client.splash
-        players_collection = db.nba_players
-
-        logging.info("Player Awards...")
-
-        keys = [
-            'DESCRIPTION',
-            'ALL_NBA_TEAM_NUMBER',
-            'SEASON',
-            'CONFERENCE',
-            'TYPE'
-        ]
-        players = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
-
-        # Update awards for all ACTIVE players
-        for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'}, {"PERSON_ID": 1, "_id": 0})):
-            try:
-                player_awards = playerawards.PlayerAwards(player["PERSON_ID"]).get_normalized_dict()['PlayerAwards']
-
-                awards = {}
-
-                for award in player_awards:
-                    if award['DESCRIPTION'] not in awards.keys():
-                        awards[award['DESCRIPTION']] = [{key: award[key] for key in keys}]
-                    else:
-                        awards[award['DESCRIPTION']].append({key: award[key] for key in keys})
-
-                players_collection.update_one(
-                    {"PERSON_ID": player["PERSON_ID"]},
-                    {"$set": {"AWARDS": awards}},
-                )
-
-                logging.info(f"(Player Awards) Updated {i + 1} of {players}")
-
-            except Exception as e:
-                logging.error(f"(Player Awards) Unable to process player {player['PERSON_ID']}: {e}", exc_info=True)
-
-            # Pause for a random time between 0.5 and 2 seconds
-            time.sleep(random.uniform(0.5, 2.0))
-
-            # Pause 15 seconds for every 50 players
-            if i % 50 == 0:
-                time.sleep(15)
-
-    logging.info("Updating players (daily)...")
-
-    # INFO
-    try:
-        player_info()
-        #print('Skip Player Info')
-    except Exception as e:
-        logging.error(f"Error updating player info: {e}", exc_info=True)
-
-    # CONTRACT & TRANSACTIONS
-    try:
-        player_contracts_and_trans()
-        #print('Skip Player Contracts')
-    except Exception as e:
-        logging.error(f"Error updating player contracts & transactions: {e}", exc_info=True)
-
-    # AWARDS
-    try:
-        player_awards()
-        #print('Skip Player Awards')
-    except Exception as e:
-        logging.error(f"Error updating player awards: {e}", exc_info=True)
-
-
-# Schedule the tasks
-schedule.every(10).seconds.do(games_live_update)  # Update games
-schedule.every(10).seconds.do(fetch_odds)  # Update odds
-
-
-# Run player_rotowires in a separate thread to avoid blocking
-def run_player_rotowires_in_thread():
-    thread = threading.Thread(target=player_rotowires)
-    thread.start()
-
-
-schedule.every(30).minutes.do(run_player_rotowires_in_thread)  # Update Rotowire news
-
-schedule.every().day.at("00:00").do(reset_flags)  # Reset the flag at midnight
-schedule.every().day.at("02:00").do(games_daily_update)  # Run every day at 2:00 AM
-schedule.every().day.at("03:00").do(teams_daily_update)  # Run every day at 3:00 AM
-schedule.every().day.at("04:00").do(players_daily_update)  # Run every day at 4:00 AM
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-
-# Connect to MongoDB
-try:
-    client = MongoClient(uri)
-    db = client.splash
-
-    games_collection = db.nba_games
-
-    teams_collection = db.nba_teams
-
-    players_collection = db.nba_players
-    player_shots_collection = db.nba_player_shot_data
-
-    playoff_collection = db.nba_playoff_history
-    cup_collection = db.nba_cup_history
-
-    draft_collection = db.nba_draft_history
-
-    transactions_collection = db.nba_transactions
-
-    logging.info("Connected to MongoDB")
-except Exception as e:
-    logging.error(f"Failed to connect to MongoDB: {e}")
-    exit(1)
-
-# games_daily_update()
-# teams_daily_update()
-# players_daily_update()
-games_live_update()
-# games_prev_day()
-# games_today()
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)  # Wait for 1 second between checking the schedule
+if __name__ == '__main__':
+    games_prev_day()
+    # games_live_update()

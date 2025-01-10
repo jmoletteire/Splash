@@ -373,7 +373,15 @@ def update_current_standings():
             # Update STANDINGS data for each team
             teams_collection.update_one(
                 {"TEAM_ID": team['TeamID']},
-                {"$set": {f"seasons.{k_current_season}.STANDINGS": team}},
+                {"$set": {
+                    f"seasons.{k_current_season}.STANDINGS": team,
+                    f"seasons.{k_current_season}.GP": (team["WINS"] + team["LOSSES"]),
+                    f"seasons.{k_current_season}.WINS": team["WINS"],
+                    f"seasons.{k_current_season}.LOSSES": team["LOSSES"],
+                    f"seasons.{k_current_season}.WIN_PCT": team["WinPCT"],
+                    f"seasons.{k_current_season}.CONF_RANK": team["PlayoffRank"],
+                    f"seasons.{k_current_season}.DIV_RANK": team["DivisionRank"],
+                }},
                 upsert=True
             )
             logging.info(f"(Standings) Updated {i + 1} of {len(standings)}\n")

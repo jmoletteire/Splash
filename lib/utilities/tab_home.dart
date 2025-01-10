@@ -39,14 +39,14 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   void _onItemTapped(int index) {
     if (_selectedIndex != index) {
       setState(() {
-        /// Switch to selected tab (index).
+        // Switch to selected tab (index).
         _selectedIndex = index;
       });
     } else {
       // If already at the root of the stack, scroll to top
       if (_navigatorKeys[index].currentState?.canPop() == false) {
-        ScrollControllerNotifier _notifier = ScrollControllerProvider.of(context)!.notifier;
-        _notifier.scrollToTop();
+        ScrollControllerNotifier notifier = ScrollControllerProvider.of(context)!.notifier;
+        notifier.scrollToTop();
       } else {
         _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
       }
@@ -119,18 +119,16 @@ class _TabHomeScreenState extends State<TabHomeScreen> {
   Widget _buildScreen(String screen) {
     switch (screen) {
       case "Scoreboard":
-        return Scoreboard();
+        return const Scoreboard();
       case "Standings":
-        return Standings();
+        return const Standings();
       case "More":
-        return More();
+        return const More();
       default:
-        return Container(
-          child: Center(
-            child: Text(
-              'S',
-              style: kBebasNormal.copyWith(fontSize: 100.0),
-            ),
+        return Center(
+          child: Text(
+            'S',
+            style: kBebasNormal.copyWith(fontSize: 100.0),
           ),
         );
     }

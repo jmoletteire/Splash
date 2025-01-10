@@ -34,6 +34,28 @@ except Exception as e:
     logging.error(f"Failed to connect to MongoDB: {e}")
 
 
+@app.route("/latest_news", methods=['GET'])
+def latest_news():
+    try:
+        # Query the database
+        news_articles = latest_news_collection.find(
+            {},
+            {"_id": 0}
+        )
+
+        articles = list(news_articles)
+
+        if articles:
+            return articles
+        else:
+            logging.warning("(latest_news) No news articles found in MongoDB")
+            return jsonify({"error": "No articles found"})
+
+    except Exception as e:
+        logging.error(f"(latest_news) Error retrieving transactions: {e}")
+        return jsonify({"error": "Failed to retrieve articles"}), 500
+
+
 @app.route('/team_schedule_query', methods=['POST'])
 def query_schedules_database():
     data = request.json
@@ -1024,6 +1046,8 @@ if __name__ == '__main__':
         draft_collection = db.nba_draft_history
 
         transactions_collection = db.nba_transactions
+
+        latest_news_collection = db.latest_news_articles
 
         logging.info("Connected to MongoDB")
     except Exception as e:

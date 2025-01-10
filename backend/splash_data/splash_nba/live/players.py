@@ -1,12 +1,9 @@
 import logging
-import random
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
-import nba_api
-import schedule
-from nba_api.stats.endpoints import scoreboardv2
-from pymongo import MongoClient
+from nba_api.stats.endpoints import playerawards
+from numpy import random
 
 from splash_nba.lib.players.player_gamelogs import gamelogs
 from splash_nba.lib.players.stats.custom_player_stats_rank import current_season_custom_stats_rank
@@ -18,130 +15,25 @@ from splash_nba.lib.players.stats.shooting_stat_rank import current_season_shoot
 from splash_nba.lib.players.stats.shot_chart_data import get_shot_chart_data
 from splash_nba.lib.players.stats.similar_players import update_similar_players
 from splash_nba.lib.players.stats.update_custom_player_stats import update_player_on_off, update_poss_per_game, \
-    update_three_and_ft_rate, update_player_tracking_stats, update_touches_breakdown, update_shot_distribution, \
-    update_drive_stats, update_scoring_breakdown_and_pct_unassisted, update_versatility_score, update_box_creation, \
-    update_offensive_load, update_adj_turnover_pct, update_matchup_difficulty_and_dps
-from splash_nba.lib.teams.standings import update_current_standings
-from splash_nba.lib.teams.stats.custom_team_stats import three_and_ft_rate
-from splash_nba.lib.teams.stats.custom_team_stats_rank import current_season_custom_team_stats_rank
-from splash_nba.lib.teams.stats.per100 import current_season_per_100_possessions
-from splash_nba.lib.teams.stats.team_hustle_stats_rank import rank_hustle_stats_current_season
-from splash_nba.lib.teams.team_history import update_team_history
-from splash_nba.lib.teams.team_rosters import update_current_roster
-from splash_nba.lib.teams.team_seasons import update_current_season
-from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_lineup
-from splash_nba.util.env import uri, k_current_season, k_current_season_type
-import threading
-
-# Global flag to indicate if update_teams or update_players are running
-is_updating = False
-update_lock = threading.Lock()
-
-
-def check_games_final():
-    logging.info(f'Checking games final... [{datetime.now()}]')
-    global is_updating
-    today = datetime.today().strftime('%Y-%m-%d')
-
-    game_doc = games_collection.find_one({'GAME_DATE': today}, {f'GAMES': 1})
-    games = game_doc['GAMES']
-    if games:
-        for game_id, game_data in games.items():
-            if game_data.get('FINAL', False):
-                if game_data.get('UPDATED', False):
-                    logging.info(f'Game {game_id} already finalized & updated.')
-                    continue
-                logging.info(f'Game {game_id} is final, updating teams/players...')
-                teams = [game_data['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'], game_data['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID']]
-
-                # Acquire the lock to set is_updating to True
-                with update_lock:
-                    is_updating = True
-                try:
-                    update_teams(teams)
-                    update_players(teams)
-                    games_collection.update_one({'GAME_DATE': today}, {'$set': {f'GAMES.{game_id}.UPDATED': True}})
-                finally:
-                    # Release the lock and set is_updating to False
-                    with update_lock:
-                        is_updating = False
-            else:
-                logging.info(f'Game {game_id} not final, skipping...')
-
-
-def update_teams(team_ids):
-    """
-    Runs every day at 3AM.\n
-    Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
-    for each team.
-    """
-
-    logging.info("Updating team (post-game)...")
-    try:
-        for team_id in team_ids:
-            with teams_collection.find({"TEAM_ID": team_id}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0}) as cursor:
-                documents = list(cursor)
-                if not documents:
-                    return
-
-                for doc in documents:
-                    team = doc['TEAM_ID']
-
-                    if team == 0:
-                        continue
-
-                    logging.info(f"Processing team {team}")
-
-                    # Team History (30 API calls)
-                    logging.info("History...")
-                    update_team_history(team_id=team)
-                    time.sleep(15)
-
-                    # Season Stats (120 API calls)
-                    logging.info("Stats...")
-                    update_current_season(team_id=team)
-                    # Filter seasons to only include the current season key
-                    filtered_doc = doc.copy()
-                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
-                                               key == k_current_season}
-                    current_season_per_100_possessions(team_doc=filtered_doc, playoffs=k_current_season_type == 'PLAYOFFS')
-                    time.sleep(15)
-
-                    # Current Roster/Rotation & Coaches (~400-500 API calls)
-                    logging.info("Roster & Coaches...")
-                    season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
-                    update_current_roster(team_id=team, season_not_started=season_not_started)
-                    time.sleep(30)
-
-                    # Last Starting Lineup (0 API Calls)
-                    logging.info("Last Starting Lineup...")
-                    # Get most recent game by date
-                    game_id, game_date = get_last_game(doc['seasons'])
-                    # Get starting lineup for most recent game
-                    last_starting_lineup = get_last_lineup(team, game_id, game_date)
-                    # Update document
-                    teams_collection.update_one(
-                        {"TEAM_ID": team},
-                        {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
-                    )
-                    logging.info(f"\t(Team Last Lineup) Updated last starting lineup for team {team_id}")
-
-                    # Pause 15 seconds between teams
-                    time.sleep(15)
-
-        # After looping through all teams, calculate ranks/standings
-        rank_hustle_stats_current_season()
-        three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
-        current_season_custom_team_stats_rank()
-
-        # Standings (min. 30 API calls [more if tiebreakers])
-        logging.info("Standings (min. 30 API calls)...")
-        update_current_standings()
-    except Exception as e:
-        logging.error(f"(Teams Daily) Error updating teams: {e}")
+    update_three_and_ft_rate, update_player_tracking_stats, update_shot_distribution, update_touches_breakdown, \
+    update_drive_stats, update_scoring_breakdown_and_pct_unassisted, update_box_creation, update_offensive_load, \
+    update_adj_turnover_pct, update_versatility_score, update_matchup_difficulty_and_dps
+from splash_nba.lib.players.update_all_players import add_players, restructure_new_docs, update_player_info
+from splash_nba.lib.players.update_player_contracts import fetch_player_contract_data, keep_most_informative
+from splash_nba.util.env import k_current_season_type, k_current_season
+from splash_nba.util.mongo_connect import get_mongo_collection
 
 
 def update_players(team_ids):
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+
+    try:
+        players_collection = get_mongo_collection('nba_players')
+    except Exception as e:
+        logging.error(f'(Players Daily) Failed to connect to MongoDB [{datetime.now()}]: {e}')
+        return
+
     def player_stats():
         # Stats
         logging.info("Player Stats...")
@@ -371,74 +263,130 @@ def update_players(team_ids):
         logging.error(f"Error updating player shot charts: {e}")
 
 
-# Schedule the tasks
-schedule.every(10).seconds.do(check_games_final)  # Update games
-
-try:
+def players_daily_update():
+    """
+    Runs every day at 3:30AM.\n
+    Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
+    for each team.
+    """
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
-    client = MongoClient(uri)
-    db = client.splash
+    try:
+        players_collection = get_mongo_collection('nba_players')
+    except Exception as e:
+        logging.error(f'(Players Daily) Failed to connect to MongoDB [{datetime.now()}]: {e}')
+        return
 
-    games_collection = db.nba_games
+    def player_info():
+        # Player Info
+        logging.info("Player Info...")
 
-    teams_collection = db.nba_teams
+        try:
+            add_players()
+            restructure_new_docs()
+            update_player_info()
+        except Exception as e:
+            logging.error(f"(Player Info) Error adding players: {e}", exc_info=True)
 
-    players_collection = db.nba_players
-    player_shots_collection = db.nba_player_shot_data
+    def player_contracts_and_trans():
+        # Contracts & Transactions
+        logging.info("Player Contracts & Transactions...")
 
-    playoff_collection = db.nba_playoff_history
-    cup_collection = db.nba_cup_history
+        # Update all ACTIVE players
+        for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'}, {'PERSON_ID': 1, '_id': 0})):
+            logging.info(f'Processing {i + 1} of {players_collection.count_documents({"ROSTERSTATUS": "Active"})}...')
 
-    draft_collection = db.nba_draft_history
+            try:
+                player_id = str(player['PERSON_ID'])
 
-    transactions_collection = db.nba_transactions
+                # Define the GraphQL endpoint
+                url = "https://fanspo.com/api/graphql"
 
-    logging.info("Connected to MongoDB")
-except Exception as e:
-    logging.error(f"Failed to connect to MongoDB: {e}")
-    exit(1)
+                # Define the headers
+                headers = {
+                    "Content-Type": "application/json"
+                }
 
-teams_dict = {
-    1610612737: 'ATL',
-    1610612738: 'BOS',
-    1610612751: 'BKN',
-    1610612739: 'CLE',
-    1610612766: 'CHA',
-    1610612741: 'CHI',
-    1610612742: 'DAL',
-    1610612743: 'DEN',
-    1610612765: 'DET',
-    1610612744: 'GSW',
-    1610612745: 'HOU',
-    1610612754: 'IND',
-    1610612746: 'LAC',
-    1610612747: 'LAL',
-    1610612763: 'MEM',
-    1610612748: 'MIA',
-    1610612749: 'MIL',
-    1610612750: 'MIN',
-    1610612740: 'NOP',
-    1610612752: 'NYK',
-    1610612760: 'OKC',
-    1610612753: 'ORL',
-    1610612755: 'PHI',
-    1610612756: 'PHX',
-    1610612757: 'POR',
-    1610612758: 'SAC',
-    1610612759: 'SAS',
-    1610612761: 'TOR',
-    1610612762: 'UTA',
-    1610612764: 'WAS'
-}
+                # Define the initial query variables
+                variables = {
+                    "playerId": player_id
+                }
 
-played_list = list(teams_dict.keys())
+                # Fetch all paginated data
+                contracts, transactions = fetch_player_contract_data(url, variables, headers)
+                transactions = keep_most_informative(transactions)
 
-update_teams(played_list)
-update_players(played_list)
-check_games_final()
+                players_collection.update_one(
+                    {"PERSON_ID": int(player_id)},
+                    {"$set": {'CONTRACTS': contracts, 'TRANSACTIONS': transactions}},
+                )
+            except Exception as e:
+                logging.error(
+                    f'(Player Contracts) Could not process contract data for Player {player["PERSON_ID"]}: {e}', exc_info=True)
+                continue
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)  # Wait for 1 second between checking the schedule
+    def player_awards():
+        logging.info("Player Awards...")
+
+        keys = [
+            'DESCRIPTION',
+            'ALL_NBA_TEAM_NUMBER',
+            'SEASON',
+            'CONFERENCE',
+            'TYPE'
+        ]
+        players = players_collection.count_documents({'ROSTERSTATUS': 'Active'})
+
+        # Update awards for all ACTIVE players
+        for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'}, {"PERSON_ID": 1, "_id": 0})):
+            try:
+                player_awards = playerawards.PlayerAwards(player["PERSON_ID"]).get_normalized_dict()['PlayerAwards']
+
+                awards = {}
+
+                for award in player_awards:
+                    if award['DESCRIPTION'] not in awards.keys():
+                        awards[award['DESCRIPTION']] = [{key: award[key] for key in keys}]
+                    else:
+                        awards[award['DESCRIPTION']].append({key: award[key] for key in keys})
+
+                players_collection.update_one(
+                    {"PERSON_ID": player["PERSON_ID"]},
+                    {"$set": {"AWARDS": awards}},
+                )
+
+                logging.info(f"(Player Awards) Updated {i + 1} of {players}")
+
+            except Exception as e:
+                logging.error(f"(Player Awards) Unable to process player {player['PERSON_ID']}: {e}", exc_info=True)
+
+            # Pause for a random time between 0.5 and 2 seconds
+            time.sleep(random.uniform(0.5, 2.0))
+
+            # Pause 15 seconds for every 50 players
+            if i % 50 == 0:
+                time.sleep(15)
+
+    logging.info("Updating players (daily)...")
+
+    # INFO
+    try:
+        player_info()
+        # print('Skip Player Info')
+    except Exception as e:
+        logging.error(f"Error updating player info: {e}", exc_info=True)
+
+    # CONTRACT & TRANSACTIONS
+    try:
+        player_contracts_and_trans()
+        # print('Skip Player Contracts')
+    except Exception as e:
+        logging.error(f"Error updating player contracts & transactions: {e}", exc_info=True)
+
+    # AWARDS
+    try:
+        player_awards()
+        # print('Skip Player Awards')
+    except Exception as e:
+        logging.error(f"Error updating player awards: {e}", exc_info=True)

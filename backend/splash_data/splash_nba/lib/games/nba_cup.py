@@ -168,4 +168,5 @@ if __name__ == '__main__':
     cup_collection = db.nba_cup_history
     games_collection = db.nba_games
     # fetch_all_cups()
-    flag_cup_games(season='2024-25')
+    update_current_cup()
+    # flag_cup_games(season='2024-25')

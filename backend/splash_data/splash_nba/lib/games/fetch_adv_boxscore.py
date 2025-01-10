@@ -184,7 +184,7 @@ def synergy_shot_quality(sr_id, adv_boxscore):
         'accept': 'application/json, text/plain, */*',
         'accept-encoding': 'gzip, deflate, br, zstd',
         'accept-language': 'en-US,en;q=0.9',
-        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjhDRjI4QTUzNTUzOURFMDU3ODFEOEFCRkQ5QUY4QUY1IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzMyMTk5ODkzLCJpYXQiOjE3MzIxOTk4OTMsImV4cCI6MTczMjIwMDQ5MywiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMTAyMDQ5OSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkVCQzgzNTA3NkEzQzdBQzdGQTM1N0Q5QTQwRUZENzFFIn0.jtUfoJYvwYXHd9_jURSHZcaNxxjMOdabMT5sc3B48tweOey-v2LvWJP4SKtp0KGROcW3fF_A_DzcNCAGXn86hwiiPEZEQq1EKOzNoT2h2s_4-sKZcZSh0GWqRnWXv0cFuJt9_hqj2qAF3sEicR6sefBmaMEAOoccYaBDc0n_4T2UN-m93TFi9HRIXpe5658p6yYSwF8gT5Z-UiJxPJE83D9t0JtPjYt5aXj5yR_M2ny6lCCgi3Z772DolX-L9LBlxQ8Z0BSwRaCvL8w42Q1xkTFvoyPDxwkIpnoLX43QGjI_L8UfHolqIrWLVlj7pnm1IuQ7aE_5qfCG5lNRFfq0rg',
+        'authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkJGMDlBOEMwNjBGMDdFMDU0QjhBRTg0OTE5REQyMUQ0IiwidHlwIjoiYXQrand0In0.eyJpc3MiOiJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tIiwibmJmIjoxNzM0MTk1NDM0LCJpYXQiOjE3MzQxOTU0MzQsImV4cCI6MTczNDE5NjAzNCwiYXVkIjpbImFwaS5jb25maWciLCJhcGkuc2VjdXJpdHkiLCJhcGkuYmFza2V0YmFsbCIsImFwaS5zcG9ydCIsImFwaS5lZGl0b3IiLCJodHRwczovL2F1dGguc3luZXJneXNwb3J0c3RlY2guY29tL3Jlc291cmNlcyJdLCJzY29wZSI6WyJvcGVuaWQiLCJhcGkuY29uZmlnIiwiYXBpLnNlY3VyaXR5IiwiYXBpLmJhc2tldGJhbGwiLCJhcGkuc3BvcnQiLCJhcGkuZWRpdG9yIiwib2ZmbGluZV9hY2Nlc3MiXSwiYW1yIjpbInB3ZCJdLCJjbGllbnRfaWQiOiJjbGllbnQuYmFza2V0YmFsbC50ZWFtc2l0ZSIsInN1YiI6IjY1OGIyMTNlYjE0YzE3OGRmYzgzOWExZiIsImF1dGhfdGltZSI6MTczMzg2MTMzOSwiaWRwIjoibG9jYWwiLCJlbWFpbCI6ImphY2ttb2xlQG91dGxvb2suY29tIiwibmFtZSI6IkphY2sgTW9sZXR0ZWlyZSIsInNpZCI6IkIwNjJERTBENzU1M0Y3MkFGNDU3MTIzQ0YyODgyN0RCIn0.RLRSYm4H0XmitFITJ2vouZmttEA0ZOT91UXjw6PUxmo8ipn9z7Lm8UHgFFyhgIGhLlURc-YMYMIbTi3wWdBQEIjQIgz9ESEUAUw5AQffe9_v6ckaoqe0siOm_Qd5WVGUoj7qYEqFir98Yxua9TMSxB0HSGy0V9B3cS4xwVon-4tmNEhPd1KlI_TugAPd10mHkTmU0WukMIwSpEM7Ww2eY3_cVMwbaenq89AJx4t8F2w7dW6iooQ8Ijs3zbWKOD9UmgZ01GbnirNvE4tXQSTVWcufhGltzfNMcpvenaZTqioCLH3GhHX7IBg4x4FQdNp4iXqG98gya6ciWvyO9S2tyQ',
         'origin': 'https://apps.synergysports.com',
         'referer': 'https://apps.synergysports.com/',
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
@@ -256,7 +256,7 @@ if __name__ == "__main__":
     today_date = datetime.today().strftime("%Y-%m-%d")
 
     # Set batch size to process documents
-    filter = {"GAME_DATE": '2024-11-20'}  # {"SEASON_CODE": '22024', "GAME_DATE": {"$lt": today_date}}  #
+    filter = {"SEASON_CODE": '22024', "GAME_DATE": {"$lt": today_date}}  # {"GAME_DATE": '2024-11-21'}  #
     batch_size = 100
     total_documents = games_collection.count_documents(filter)
     processed_count = 0

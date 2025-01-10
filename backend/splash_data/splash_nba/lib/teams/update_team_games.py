@@ -1,7 +1,6 @@
-import inspect
-
 from pymongo import MongoClient
 from splash_nba.util.env import uri
+from splash_nba.util.mongo_connect import get_mongo_collection
 import logging
 
 
@@ -26,9 +25,7 @@ def update_team_games(game_day):
     """
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"(Team Games) Failed to connect to MongoDB: {e}", exc_info=True)
         return
