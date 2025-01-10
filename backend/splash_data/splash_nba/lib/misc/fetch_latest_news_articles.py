@@ -32,7 +32,7 @@ def format_articles(articles):
             'description': article['description'],
             'url': article['url'],
             'date': article['publishedAt'],
-            'image_url': article['urlToImage']
+            'imageUrl': article['urlToImage']
         }
 
         formatted_articles.append(cleaned_article)
