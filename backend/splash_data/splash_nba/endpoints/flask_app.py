@@ -39,12 +39,10 @@ except Exception as e:
 def latest_news():
     try:
         # Query the database
-        # news_articles = latest_news_collection.find(
-        #     {},
-        #     {"_id": 0}
-        # )
-
-        news_articles = latest_news_collection.find()
+        news_articles = latest_news_collection.find(
+            {},
+            {"_id": 0}
+        )
 
         articles = list(news_articles)
 
