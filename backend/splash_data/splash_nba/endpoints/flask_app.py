@@ -953,14 +953,15 @@ def get_teams():
     try:
         # Query the database
         teams = teams_collection.find(
-            {},
+            {"TEAM_ID": {"$exists": True, "$ne": 0}},
             {
                 "_id": 0,
                 "SPORT_ID": 1,
                 "TEAM_ID": 1,
                 "ABBREVIATION": 1,
                 "NICKNAME": 1,
-                "CITY": 1
+                "CITY": 1,
+                "seasons": 1
             },
         )
 
@@ -972,6 +973,13 @@ def get_teams():
                 "abbv": team["ABBREVIATION"],
                 "city": team["CITY"],
                 "name": team["NICKNAME"],
+                "seasons": [{
+                    "year": 2025,
+                    "wins": team["seasons"]["2024-25"]["WINS"],
+                    "losses": team["seasons"]["2024-25"]["LOSSES"],
+                    "pointsFor": team["seasons"]["2024-25"]["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"],
+                    "pointsAgainst": team["seasons"]["2024-25"]["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] - team["seasons"]["2024-25"]["STATS"]["REGULAR SEASON"]["BASIC"]["PLUS_MINUS"]
+                }]
             }
             for team in teams
         ]
