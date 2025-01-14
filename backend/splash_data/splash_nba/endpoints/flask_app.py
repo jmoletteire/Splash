@@ -699,7 +699,7 @@ def get_player():
         return jsonify({"error": "Failed to retrieve player"}), 500
 
 
-@app.route('/teams/roster/player-stats', methods=['GET'])
+@app.route('/team/roster/player-stats', methods=['GET'])
 def get_team_player_stats():
     try:
         # logging.info(f"(get_team_player_stats) {request.args}")
@@ -845,7 +845,7 @@ def get_team_player_stats():
         return jsonify({"error": "Failed to retrieve players"}), 500
 
 
-@app.route('/teams/seasons', methods=['GET'])
+@app.route('/team/seasons', methods=['GET'])
 def get_team_seasons():
     try:
         # logging.info(f"(get_team) {request.args}")
@@ -897,7 +897,7 @@ def get_team_seasons():
         return jsonify({"error": "Failed to retrieve team"}), 500
 
 
-@app.route('/teams', methods=['GET'])
+@app.route('/team', methods=['GET'])
 def get_team():
     try:
         # logging.info(f"(get_team) {request.args}")
@@ -948,6 +948,46 @@ def get_team():
         return jsonify({"error": "Failed to retrieve team"}), 500
 
 
+@app.route('/teams/metadata', methods=['GET'])
+def get_teams():
+    try:
+        # Query the database
+        teams = teams_collection.find(
+            {},
+            {
+                "_id": 0,
+                "SPORT_ID": 1,
+                "TEAM_ID": 1,
+                "ABBREVIATION": 1,
+                "NICKNAME": 1,
+                "CITY": 1
+            },
+        )
+
+        # Transform the keys
+        teams = [
+            {
+                "sportId": team["SPORT_ID"],
+                "teamId": team["TEAM_ID"],
+                "abbv": team["ABBREVIATION"],
+                "city": team["CITY"],
+                "name": team["NICKNAME"],
+            }
+            for team in teams
+        ]
+
+        if teams:
+            # logging.info(f"(get_teams) Retrieved teams from MongoDB")
+            return teams
+        else:
+            logging.warning("(get_teams) No teams data found in MongoDB")
+            return jsonify({"error": "No teams found"})
+
+    except Exception as e:
+        logging.error(f"(get_teams) Error retrieving teams: {e}")
+        return jsonify({"error": "Failed to retrieve teams"}), 500
+
+
 @app.route('/sports', methods=['GET'])
 def get_sports():
     try:
@@ -963,7 +1003,7 @@ def get_sports():
             # logging.info(f"(get_sports) Retrieved sports from MongoDB")
             return sports
         else:
-            logging.warning("(get_sports) No transactions data found in MongoDB")
+            logging.warning("(get_sports) No sports found in MongoDB")
             return jsonify({"error": "No sports found"})
 
     except Exception as e:
