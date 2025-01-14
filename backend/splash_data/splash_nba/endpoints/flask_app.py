@@ -973,13 +973,16 @@ def get_teams():
                 "abbv": team["ABBREVIATION"],
                 "city": team["CITY"],
                 "name": team["NICKNAME"],
-                "seasons": [{
-                    "year": 2025,
-                    "wins": team["seasons"]["2024-25"]["WINS"],
-                    "losses": team["seasons"]["2024-25"]["LOSSES"],
-                    "pointsFor": team["seasons"]["2024-25"]["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"],
-                    "pointsAgainst": team["seasons"]["2024-25"]["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] - team["seasons"]["2024-25"]["STATS"]["REGULAR SEASON"]["BASIC"]["PLUS_MINUS"]
-                }]
+                "seasons": [
+                    {
+                        "year": int(season["YEAR"][:2] + season["YEAR"][-2:]),
+                        "wins": season["WINS"],
+                        "losses": season["LOSSES"],
+                        "pointsFor": season["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"],
+                        "pointsAgainst": season["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] - season["STATS"]["REGULAR SEASON"]["BASIC"]["PLUS_MINUS"]
+                    }
+                    for season in team["seasons"]
+                ]
             }
             for team in teams
         ]
