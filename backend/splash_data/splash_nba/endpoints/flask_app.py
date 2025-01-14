@@ -977,6 +977,7 @@ def get_teams():
                     [
                         {
                             "year": season_key,
+                            "rank": season_data["STANDINGS"]["PlayoffRank"],
                             "wins": season_data["WINS"],
                             "losses": season_data["LOSSES"],
                             "pointsFor": season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] if season_key >= '1996-97' else 0,
