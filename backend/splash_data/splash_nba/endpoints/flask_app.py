@@ -978,8 +978,8 @@ def get_teams():
                         "year": int(season_key[:2] + season_key[-2:]),
                         "wins": season_data["WINS"],
                         "losses": season_data["LOSSES"],
-                        "pointsFor": season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"],
-                        "pointsAgainst": season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] - season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PLUS_MINUS"]
+                        "pointsFor": season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] if season_key >= '1996-97' else 0,
+                        "pointsAgainst": (season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] - season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PLUS_MINUS"]) if season_key >= '1996-97' else 0
                     }
                     for season_key, season_data in team["seasons"].items()
                 ]
