@@ -975,13 +975,13 @@ def get_teams():
                 "name": team["NICKNAME"],
                 "seasons": [
                     {
-                        "year": int(season["YEAR"][:2] + season["YEAR"][-2:]),
-                        "wins": season["WINS"],
-                        "losses": season["LOSSES"],
-                        "pointsFor": season["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"],
-                        "pointsAgainst": season["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] - season["STATS"]["REGULAR SEASON"]["BASIC"]["PLUS_MINUS"]
+                        "year": int(season_key[:2] + season_key[-2:]),
+                        "wins": season_data["WINS"],
+                        "losses": season_data["LOSSES"],
+                        "pointsFor": season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"],
+                        "pointsAgainst": season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] - season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PLUS_MINUS"]
                     }
-                    for season in team["seasons"]
+                    for season_key, season_data in team["seasons"].items()
                 ]
             }
             for team in teams
