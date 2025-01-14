@@ -951,16 +951,6 @@ def get_team():
 @app.route('/teams/metadata', methods=['GET'])
 def get_teams():
     try:
-        def year_converter(year_str):
-            start_year = int(year_str[:4])  # Get the starting year
-            end_year_suffix = int(year_str[-2:])  # Get the ending year's last two digits
-
-            # Adjust for cases where the end year rolls over to a new century
-            end_year = start_year + 1 if end_year_suffix < int(year_str[2:4]) else start_year
-
-            return end_year  # This will give the correct end year
-
-
         # Query the database
         teams = teams_collection.find(
             {"TEAM_ID": {"$exists": True, "$ne": 0}},
@@ -986,7 +976,7 @@ def get_teams():
                 "seasons": sorted(
                     [
                         {
-                            "year": year_converter(season_key),
+                            "year": season_key,
                             "wins": season_data["WINS"],
                             "losses": season_data["LOSSES"],
                             "pointsFor": season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] if season_key >= '1996-97' else 0,
@@ -994,7 +984,8 @@ def get_teams():
                         }
                         for season_key, season_data in team["seasons"].items()
                     ],
-                    key=lambda x: x["year"]  # Sorting key is the year
+                    key=lambda x: x["year"],  # Sorting key is the year
+                    reverse=True
                 )
             }
             for team in teams
