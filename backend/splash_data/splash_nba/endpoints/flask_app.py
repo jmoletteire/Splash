@@ -1,5 +1,7 @@
 import os
 import time
+from datetime import datetime
+
 from flask import Flask, jsonify, request, Response
 from flask_compress import Compress
 from pymongo import MongoClient
@@ -19,6 +21,7 @@ try:
     db = client.splash
 
     # Define all collections at the top level, so they're accessible across routes
+    sports_collection = db.sports
     games_collection = db.nba_games
     teams_collection = db.nba_teams
     players_collection = db.nba_players
@@ -35,7 +38,7 @@ except Exception as e:
     logging.error(f"Failed to connect to MongoDB: {e}")
 
 
-@app.route("/latest_news", methods=['GET'])
+@app.route("/latest-news", methods=['GET'])
 def latest_news():
     try:
         # Query the database
@@ -57,83 +60,7 @@ def latest_news():
         return jsonify({"error": "Failed to retrieve articles"}), 500
 
 
-@app.route('/team_schedule_query', methods=['POST'])
-def query_schedules_database():
-    data = request.json
-    selected_season = data.get('selectedSeason')
-    selected_season_type = data.get('selectedSeasonType')
-
-    filters = data.get('filters')
-
-    if filters:
-        results = apply_team_schedule_filters(selected_season, selected_season_type, filters)
-    else:
-        query = {f"seasons.{selected_season}": {"$exists": True}}
-        results = list(teams_collection.find(
-            query,
-            {'TEAM_ID': 1, f'seasons.{selected_season}.GAMES': 1, '_id': 0}
-        ))
-
-    return jsonify(results)
-
-
-def apply_team_schedule_filters(season, season_type, filters):
-    initial_match_stage = {"$match": {}}
-
-    results = None
-    for stat_filter in filters:
-        operator = stat_filter['operation']
-        value = stat_filter['value']
-        location = stat_filter['location']
-
-        path = f"STATS.{season}.{season_type}.{location}"
-
-        try:
-            value = float(value)  # Try to convert value to a float for numerical comparisons
-        except ValueError:
-            pass  # Keep value as a string for non-numerical comparisons
-
-        pipeline = [initial_match_stage]
-
-        if operator == 'greater than':
-            pipeline.append({"$match": {path: {"$gt": value}}})
-        elif operator == 'less than':
-            pipeline.append({"$match": {path: {"$lt": value}}})
-        elif operator == 'equals':
-            pipeline.append({"$match": {path: value}})
-        elif operator == 'contains':
-            pipeline.append({"$match": {path: {"$regex": value, "$options": "i"}}})
-        elif operator == 'top':
-            pipeline.append({"$sort": {path: -1}})
-            pipeline.append({"$limit": int(value)})
-        elif operator == 'bottom':
-            pipeline.append({"$sort": {path: 1}})
-            pipeline.append({"$limit": int(value)})
-
-        pipeline.append({"$project": {'GAME_ID': 1}})
-
-        current_results = list(players_collection.aggregate(pipeline))
-
-        if results is None:
-            results = current_results
-        else:
-            # Intersect current results with previous results
-            current_ids = {game['GAME_ID'] for game in current_results}
-            results = [game for game in results if game['GAME_ID'] in current_ids]
-
-    if results:
-        game_ids = [game['GAME_ID'] for game in results]
-        final_results = list(players_collection.find(
-            {'GAME_ID': {'$in': game_ids}},
-            {'GAME_ID': 1, 'DISPLAY_FI_LAST': 1, 'TEAM_ID': 1, 'POSITION': 1, f'STATS.{season}.{season_type}': 1, '_id': 0}
-        ))
-    else:
-        final_results = []
-
-    return final_results
-
-
-@app.route('/get_awards/by_award', methods=['GET'])
+@app.route('/awards/by-award', methods=['GET'])
 def get_awards_by_award():
     try:
         # logging.info(f"(get_awards_by_award) {request.args}")
@@ -163,8 +90,8 @@ def get_awards_by_award():
         return jsonify({"error": "Failed to retrieve award"}), 500
 
 
-@app.route('/get_awards', methods=['GET'])
-def get_awards():
+@app.route('/awards/by-year', methods=['GET'])
+def get_awards_by_year():
     try:
         # logging.info(f"(get_awards) {request.args}")
         query_params = request.args.to_dict()
@@ -179,18 +106,18 @@ def get_awards():
         )
 
         if year:
-            # logging.info(f"(get_awards) Retrieved {season} from MongoDB")
+            # logging.info(f"(Awards) Retrieved {season} from MongoDB")
             return jsonify(year)
         else:
-            logging.warning("(get_awards) No award data found in MongoDB")
+            logging.warning("(Awards) No award data found in MongoDB")
             return jsonify({"error": "No award found"})
 
     except Exception as e:
-        logging.error(f"(get_awards) Error retrieving season: {e}")
+        logging.error(f"(Awards) Error retrieving season: {e}")
         return jsonify({"error": "Failed to retrieve season"}), 500
 
 
-@app.route('/get_draft/by_pick', methods=['GET'])
+@app.route('/draft/by-pick', methods=['GET'])
 def get_draft_by_pick():
     try:
         query_params = request.args.to_dict()
@@ -218,8 +145,8 @@ def get_draft_by_pick():
         return jsonify({"error": "Failed to retrieve draft picks"}), 500
 
 
-@app.route('/get_draft', methods=['GET'])
-def get_draft():
+@app.route('/draft/by-year', methods=['GET'])
+def get_draft_by_year():
     try:
         # logging.info(f"(get_draft) {request.args}")
         query_params = request.args.to_dict()
@@ -245,7 +172,7 @@ def get_draft():
         return jsonify({"error": "Failed to retrieve draft"}), 500
 
 
-@app.route('/get_transactions', methods=['GET'])
+@app.route('/trans', methods=['GET'])
 def get_transactions():
     try:
         # Query the database
@@ -268,7 +195,7 @@ def get_transactions():
         return jsonify({"error": "Failed to retrieve transactions"}), 500
 
 
-@app.route('/stats_query', methods=['POST'])
+@app.route('/stats-query', methods=['POST'])
 def query_database():
     data = request.json
     selected_season = data.get('selectedSeason')
@@ -549,7 +476,7 @@ def search():
         return jsonify({"error": "Search failed"}), 500
 
 
-@app.route('/get_nba_cup', methods=['GET'])
+@app.route('/nba-cup', methods=['GET'])
 def get_nba_cup():
     try:
         query_params = request.args.to_dict()
@@ -573,7 +500,7 @@ def get_nba_cup():
         return jsonify({"error": "Failed to retrieve cup data"}), 500
 
 
-@app.route('/get_playoffs', methods=['GET'])
+@app.route('/playoff-bracket', methods=['GET'])
 def get_playoff_bracket():
     try:
         # logging.info(f"(get_playoffs) {request.args}")
@@ -599,43 +526,21 @@ def get_playoff_bracket():
         return jsonify({"error": "Failed to retrieve playoff data"}), 500
 
 
-@app.route('/game_dates', methods=['GET'])
-def get_dates():
+@app.route('/games/all-game-dates', methods=['GET'])
+def get_game_dates():
     dates = games_collection.distinct('GAME_DATE')
     return jsonify(dates)
 
 
-@app.route('/live_scores')
-def stream_scores():
-    def generate():
-        while True:
-            # Replace this with your NBA score-fetching logic
-            updated_scores = fetch_latest_nba_scores()  # Custom function to fetch scores
-            yield f"data: {jsonify(updated_scores)}\n\n"
-            time.sleep(5)  # Interval for sending updates (e.g., every 5 seconds)
-
-    return Response(generate(), content_type='text/event-stream')
-
-
-def fetch_latest_nba_scores():
-    # This is your logic to retrieve updated NBA scores from the backend.
-    return {
-        'game_1': {'home_team': 'Lakers', 'away_team': 'Warriors', 'score': '102-98'},
-        'game_2': {'home_team': 'Celtics', 'away_team': 'Heat', 'score': '110-105'}
-    }
-
-
-@app.route('/get_games', methods=['GET'])
+@app.route('/games', methods=['GET'])
 def get_games():
     try:
-        # logging.info(f"(get_games) {request.args}")
         query_params = request.args.to_dict()
-        # logging.info(f"(get_games) {query_params}")
+        game_date = query_params.get('date', datetime.utcnow().strftime('%Y-%m-%d'))  # Default to today's date
+        game_id = query_params.get('gameId')  # `gameId` is optional
 
-        game_date = query_params['date']
-
-        # Query the database
-        games = games_collection.aggregate([
+        # Base query to search games by date
+        pipeline = [
             {
                 "$search": {
                     "index": "game_index",
@@ -644,73 +549,157 @@ def get_games():
                         "path": "GAME_DATE"
                     }
                 }
-            },
-            {
+            }
+        ]
+
+        # Add a projection step depending on whether a specific game is requested
+        if game_id:
+            pipeline.append({
+                "$project": {
+                    "_id": 0,
+                    f"GAMES.{game_id}": 1
+                }
+            })
+        else:
+            pipeline.append({
                 "$project": {
                     "_id": 0,
                     "GAMES": 1
                 }
-            }
-        ])
+            })
 
-        games = list(games)
+        # Execute the query
+        results = list(games_collection.aggregate(pipeline))
 
-        if len(games) > 0:
-            # logging.info(f"(get_games) Retrieved games for {game_date} from MongoDB")
-            return jsonify(games[0]['GAMES'])
+        if not results:
+            logging.warning(f"(get_games) No games found in MongoDB for date {game_date}")
+            return jsonify({"error": f"No games found for date {game_date}"}), 404
+
+        if game_id:
+            # If `gameId` is provided, return the specific game
+            game = results[0].get("GAMES", {}).get(game_id)
+            if not game:
+                return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
+            return jsonify(game)
         else:
-            logging.warning("(get_games) No games found in MongoDB")
-            return jsonify({"error": "No games found"})
+            # Otherwise, return all games for the date
+            return jsonify(results[0].get('GAMES', {}))
 
     except Exception as e:
         logging.error(f"(get_games) Error retrieving games: {e}")
         return jsonify({"error": "Failed to retrieve games"}), 500
 
 
-@app.route('/get_game', methods=['GET'])
-def get_game():
+@app.route('/players/stats/shot-chart', methods=['GET'])
+def get_player_shot_chart():
     try:
-        # logging.info(f"(get_game) {request.args}")
+        # logging.info(f"(get_player_shot_chart) {request.args}")
         query_params = request.args.to_dict()
-        # logging.info(f"(get_game) {query_params}")
+        # logging.info(f"(get_player_shot_chart) {query_params}")
 
-        game_id = query_params['gameId']
-        game_date = query_params['date']
+        # Retrieve the required parameters
+        person_id = query_params.get('personId')
+        if not person_id:
+            return jsonify({"error": "personId is required"}), 400
 
-        # Query the database
-        game = games_collection.aggregate([
+        season = query_params.get('season')
+        if not season:
+            return jsonify({"error": "season is required"}), 400
+
+        season_type = query_params.get('seasonType')
+        if not season:
+            return jsonify({"error": "seasonType is required"}), 400
+
+        # Convert the person_id to an integer
+        try:
+            player_id = int(person_id)
+        except ValueError:
+            return jsonify({"error": "could not convert personId to integer"}), 400
+
+        # Query the database to find the player by PERSON_ID
+        player = player_shots_collection.aggregate([
             {
                 "$search": {
-                    "index": "game_index",
-                    "phrase": {
-                        "query": game_date,
-                        "path": "GAME_DATE"
+                    "index": "player_id",
+                    "equals": {
+                        "value": player_id,
+                        "path": "PLAYER_ID"
                     }
                 }
             },
             {
                 "$project": {
                     "_id": 0,
-                    f"GAMES.{game_id}": 1
+                    f"SEASON.{season}.{season_type}": 1
                 }
             }
         ])
 
-        game = list(game)
+        player = list(player)
 
-        if game:
-            # logging.info(f"(get_game) Retrieved game {game_id} from MongoDB")
-            return jsonify(game[0]["GAMES"][game_id])
+        if len(player) > 0:
+            # logging.info(f"(get_player_shot_chart) Retrieved player {person_id} from MongoDB")
+            return jsonify(player[0])
         else:
-            logging.warning("(get_game) No games found in MongoDB")
-            return jsonify({"error": "No games found"})
+            logging.warning("(get_player_shot_chart) No player found in MongoDB")
+            return jsonify({"error": "No player found"}), 404
 
     except Exception as e:
-        logging.error(f"(get_game) Error retrieving games: {e}")
-        return jsonify({"error": "Failed to retrieve games"}), 500
+        logging.error(f"(get_player_shot_chart) Error retrieving player: {e}")
+        return jsonify({"error": "Failed to retrieve player"}), 500
 
 
-@app.route('/get_team_player_stats', methods=['GET'])
+@app.route('/players', methods=['GET'])
+def get_player():
+    try:
+        # logging.info(f"(get_player) {request.args}")
+        query_params = request.args.to_dict()
+        # logging.info(f"(get_player) {query_params}")
+
+        # Retrieve the required parameter
+        person_id = query_params.get('personId')
+        if not person_id:
+            return jsonify({"error": "personId is required"}), 400
+
+        # Convert the person_id to an integer
+        try:
+            query = int(person_id)
+        except ValueError:
+            return jsonify({"error": "could not convert personId to integer"}), 400
+
+        # Query the database
+        player = players_collection.aggregate([
+            {
+                "$search": {
+                    "index": "person_id",
+                    "equals": {
+                        "value": query,
+                        "path": "PERSON_ID"
+                    }
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                }
+            }
+        ])
+
+        player = list(player)
+
+        if len(player) > 0:
+            # logging.info(f"(get_player) Retrieved player {person_id} from MongoDB")
+            return jsonify(player[0])
+        else:
+            logging.warning("(get_player) No player found in MongoDB")
+            return jsonify({"error": "No player found"}), 404
+
+    except Exception as e:
+        logging.error(f"(get_player) Error retrieving player: {e}")
+        return jsonify({"error": "Failed to retrieve player"}), 500
+
+
+@app.route('/teams/roster/player-stats', methods=['GET'])
 def get_team_player_stats():
     try:
         # logging.info(f"(get_team_player_stats) {request.args}")
@@ -718,15 +707,15 @@ def get_team_player_stats():
         # logging.info(f"(get_team_player_stats) {query_params}")
 
         # Retrieve the required parameter
-        team_id_str = query_params.get('team_id')
+        team_id_str = query_params.get('teamId')
         if not team_id_str:
-            return jsonify({"error": "team_id is required"}), 400
+            return jsonify({"error": "teamId is required"}), 400
 
         # Convert the person_id to an integer
         try:
             team_id = int(team_id_str)
         except ValueError:
-            return jsonify({"error": "team_id must be an integer"}), 400
+            return jsonify({"error": "could not convert teamId to integer"}), 400
 
         # Query the database
         players = players_collection.aggregate([
@@ -856,116 +845,59 @@ def get_team_player_stats():
         return jsonify({"error": "Failed to retrieve players"}), 500
 
 
-@app.route('/get_player_shot_chart', methods=['GET'])
-def get_player_shot_chart():
+@app.route('/teams/seasons', methods=['GET'])
+def get_team_seasons():
     try:
-        # logging.info(f"(get_player_shot_chart) {request.args}")
+        # logging.info(f"(get_team) {request.args}")
         query_params = request.args.to_dict()
-        # logging.info(f"(get_player_shot_chart) {query_params}")
-
-        # Retrieve the required parameters
-        person_id = query_params.get('person_id')
-        if not person_id:
-            return jsonify({"error": "person_id is required"}), 400
-
-        season = query_params.get('season')
-        if not season:
-            return jsonify({"error": "season is required"}), 400
-
-        season_type = query_params.get('season_type')
-        if not season:
-            return jsonify({"error": "season_type is required"}), 400
-
-        # Convert the person_id to an integer
-        try:
-            player_id = int(person_id)
-        except ValueError:
-            return jsonify({"error": "person_id must be an integer"}), 400
-
-        # Query the database to find the player by PERSON_ID
-        player = player_shots_collection.aggregate([
-            {
-                "$search": {
-                    "index": "player_id",
-                    "equals": {
-                        "value": player_id,
-                        "path": "PLAYER_ID"
-                    }
-                }
-            },
-            {
-                "$project": {
-                    "_id": 0,
-                    f"SEASON.{season}.{season_type}": 1
-                }
-            }
-        ])
-
-        player = list(player)
-
-        if len(player) > 0:
-            # logging.info(f"(get_player_shot_chart) Retrieved player {person_id} from MongoDB")
-            return jsonify(player[0])
-        else:
-            logging.warning("(get_player_shot_chart) No player found in MongoDB")
-            return jsonify({"error": "No player found"}), 404
-
-    except Exception as e:
-        logging.error(f"(get_player_shot_chart) Error retrieving player: {e}")
-        return jsonify({"error": "Failed to retrieve player"}), 500
-
-
-@app.route('/get_player', methods=['GET'])
-def get_player():
-    try:
-        # logging.info(f"(get_player) {request.args}")
-        query_params = request.args.to_dict()
-        # logging.info(f"(get_player) {query_params}")
+        # logging.info(f"(get_team) {query_params}")
 
         # Retrieve the required parameter
-        person_id = query_params.get('person_id')
-        if not person_id:
-            return jsonify({"error": "person_id is required"}), 400
+        team_id = query_params.get('teamId')
+        if not team_id:
+            return jsonify({"error": "teamId is required"}), 400
 
-        # Convert the person_id to an integer
+        # Convert the team_id to an integer
         try:
-            query = int(person_id)
+            query = int(team_id)
         except ValueError:
-            return jsonify({"error": "person_id must be an integer"}), 400
+            return jsonify({"error": "could not convert teamId to integer"}), 400
 
-        # Query the database
-        player = players_collection.aggregate([
+        # Perform the search query using the $search stage with the equals operator for numbers
+        team_cursor = teams_collection.aggregate([
             {
                 "$search": {
-                    "index": "person_id",
+                    "index": "team_name",
                     "equals": {
                         "value": query,
-                        "path": "PERSON_ID"
+                        "path": "TEAM_ID"
                     }
                 }
             },
             {
                 "$project": {
                     "_id": 0,
+                    "seasons": 1
                 }
             }
         ])
 
-        player = list(player)
+        # Convert the cursor to a list and get the first result
+        team = list(team_cursor)
 
-        if len(player) > 0:
-            # logging.info(f"(get_player) Retrieved player {person_id} from MongoDB")
-            return jsonify(player[0])
+        if len(team) > 0:
+            # logging.info(f"(get_team) Retrieved team {team_id} from MongoDB")
+            return jsonify(team[0])
         else:
-            logging.warning("(get_player) No player found in MongoDB")
-            return jsonify({"error": "No player found"}), 404
+            logging.warning("(get_team) No team found in MongoDB")
+            return jsonify({"error": "No team found"}), 404
 
     except Exception as e:
-        logging.error(f"(get_player) Error retrieving player: {e}")
-        return jsonify({"error": "Failed to retrieve player"}), 500
+        logging.error(f"(get_team) Error retrieving team: {e}")
+        return jsonify({"error": "Failed to retrieve team"}), 500
 
 
-@app.route('/get_team', methods=['GET'])
+@app.route('/teams', methods=['GET'])
 def get_team():
     try:
         # logging.info(f"(get_team) {request.args}")
@@ -973,15 +905,15 @@ def get_team():
         # logging.info(f"(get_team) {query_params}")
 
         # Retrieve the required parameter
-        team_id = query_params.get('team_id')
+        team_id = query_params.get('teamId')
         if not team_id:
-            return jsonify({"error": "team_id is required"}), 400
+            return jsonify({"error": "teamId is required"}), 400
 
         # Convert the team_id to an integer
         try:
             query = int(team_id)
         except ValueError:
-            return jsonify({"error": "team_id must be an integer"}), 400
+            return jsonify({"error": "could not convert teamId to integer"}), 400
 
         # Perform the search query using the $search stage with the equals operator for numbers
         team_cursor = teams_collection.aggregate([
@@ -1014,6 +946,29 @@ def get_team():
     except Exception as e:
         logging.error(f"(get_team) Error retrieving team: {e}")
         return jsonify({"error": "Failed to retrieve team"}), 500
+
+
+@app.route('/sports', methods=['GET'])
+def get_sports():
+    try:
+        # Query the database
+        sports = sports_collection.find(
+            {},
+            {"_id": 0}
+        )
+
+        sports = list(sports)
+
+        if sports:
+            # logging.info(f"(get_sports) Retrieved sports from MongoDB")
+            return sports
+        else:
+            logging.warning("(get_sports) No transactions data found in MongoDB")
+            return jsonify({"error": "No sports found"})
+
+    except Exception as e:
+        logging.error(f"(get_sports) Error retrieving sports: {e}")
+        return jsonify({"error": "Failed to retrieve sports"}), 500
 
 
 @app.after_request

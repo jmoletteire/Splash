@@ -39,8 +39,8 @@ def daily_update():
 schedule.every(20).seconds.do(create_thread, games_live_update)  # Update games
 schedule.every(1).minutes.do(create_thread, fetch_odds)  # Update odds
 schedule.every(30).minutes.do(create_thread, player_rotowires)  # Update Rotowire news
-schedule.every().day.at("00:00").do(reset_flags)  # Reset the flag at midnight
-schedule.every().day.at("02:00").do(daily_update)  # Run every day at 2:00 AM
+schedule.every().day.at("00:00").do(create_thread, reset_flags)  # Reset the flag at midnight
+schedule.every().day.at("02:00").do(create_thread, daily_update)  # Run every day at 2:00 AM
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
