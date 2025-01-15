@@ -1047,6 +1047,7 @@ def team_sse():
                         continue
 
                     # Send only the relevant fields
+                    print(change)
                     event_data = {
                         "eventId": str(change["_id"]),  # Unique event ID
                         "teamId": change["documentKey"]["TEAM_ID"],
