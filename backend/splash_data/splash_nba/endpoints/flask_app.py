@@ -1047,10 +1047,10 @@ def team_sse():
                         continue
 
                     # Send only the relevant fields
-                    print(change)
+                    logging.info(change)
                     event_data = {
                         "eventId": str(change["_id"]),  # Unique event ID
-                        "teamId": change["documentKey"]["TEAM_ID"],
+                        "teamId": change["documentKey"], #["TEAM_ID"],
                         "updatedFields": change["updateDescription"]["updatedFields"]
                     }
                     # Log the event before sending it to clients
