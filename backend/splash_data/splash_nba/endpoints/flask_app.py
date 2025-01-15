@@ -1053,6 +1053,8 @@ def team_sse():
                         "teamId": change["documentKey"]["TEAM_ID"],
                         "updatedFields": change["updateDescription"]["updatedFields"]
                     }
+                    # Log the event before sending it to clients
+                    logging.info(f"Streaming SSE Event: {event_data}")
                     yield f"id: {event_data['eventId']}\ndata: {json.dumps(event_data)}\n\n"
                 elif change["operationType"] in ["insert", "replace"]:
                     # Handle full record replacement
