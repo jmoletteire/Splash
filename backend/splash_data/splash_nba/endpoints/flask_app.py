@@ -1039,23 +1039,28 @@ def team_sse():
         """
         Watches MongoDB for changes in the `teams` collection and streams incremental updates as SSE.
         """
-        with teams_collection.watch() as stream:
+        with teams_collection.watch(full_document="updateLookup") as stream:
             for change in stream:
                 if change["operationType"] == "update":
                     # Skip events older than the last processed event ID
                     if last_event_id and str(change["_id"]) <= last_event_id:
                         continue
 
-                    # Send only the relevant fields
-                    logging.info(change)
+                    # Access TEAM_ID from the fullDocument
+                    full_document = change.get("fullDocument", {})
+                    team_id = full_document.get("TEAM_ID")  # Safely retrieve TEAM_ID
+
+                    # Prepare the event data
                     event_data = {
                         "eventId": str(change["_id"]),  # Unique event ID
-                        "teamId": change["documentKey"], #["TEAM_ID"],
+                        "teamId": team_id,  # Now correctly includes TEAM_ID
                         "updatedFields": change["updateDescription"]["updatedFields"]
                     }
+
                     # Log the event before sending it to clients
                     logging.info(f"Streaming SSE Event: {event_data}")
                     yield f"id: {event_data['eventId']}\ndata: {json.dumps(event_data)}\n\n"
+
                 elif change["operationType"] in ["insert", "replace"]:
                     # Handle full record replacement
                     full_document = change["fullDocument"]
