@@ -1065,6 +1065,9 @@ def team_sse():
                         # Handle full record replacement
                         full_document = change.get("fullDocument", {})
                         yield f"data: {json.dumps(full_document)}\n\n"
+
+                    # Periodic heartbeat to keep the connection alive
+                    yield "event: ping\n\n"
         except Exception as e:
             logging.error(f"Error in watch_team_changes: {e}")
             yield f"data: Error: {str(e)}\n\n"
