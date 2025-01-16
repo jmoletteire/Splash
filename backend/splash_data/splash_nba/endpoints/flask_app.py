@@ -2,7 +2,7 @@ import json
 import os
 import time
 from datetime import datetime
-
+from collections import deque
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_compress import Compress
 from pymongo import MongoClient
@@ -1030,49 +1030,48 @@ def get_sports():
 
 @app.route('/api/events', methods=['GET'])
 def team_sse():
-    """
-    SSE endpoint for team updates.
-    """
     last_event_id = request.args.get('lastEventId')
 
-    # def watch_team_changes():
-    #     for i in range(5):
-    #         yield f"data: {i}\n\n"
-    #         time.sleep(1)
-
     def watch_team_changes():
+        event_queue = deque()
+
         try:
-            # Send an initial ping to keep the connection alive
+            # Send an initial ping to establish the connection
             yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
 
             with teams_collection.watch(full_document="updateLookup") as stream:
-                for change in stream:
-                    if change["operationType"] == "update":
-                        # Skip events older than the last processed event ID
-                        if last_event_id and str(change["_id"]) <= last_event_id:
-                            continue
+                while True:
+                    # Handle MongoDB changes
+                    try:
+                        change = next(stream, None)
+                        if change:
+                            # Skip events based on last_event_id
+                            if last_event_id and str(change["_id"]) <= last_event_id:
+                                continue
 
-                        # Access fullDocument and updateDescription
-                        full_document = change.get("fullDocument", {})
-                        updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
+                            # Prepare the event data
+                            full_document = change.get("fullDocument", {})
+                            updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
 
-                        # Prepare the event data
-                        event_data = {
-                            "eventId": str(change["_id"]),
-                            "teamId": full_document.get("TEAM_ID"),  # Use fullDocument for TEAM_ID
-                            "updatedFields": updated_fields
-                        }
+                            event_data = {
+                                "eventId": str(change["_id"]),
+                                "teamId": full_document.get("TEAM_ID"),
+                                "updatedFields": updated_fields
+                            }
 
-                        logging.info(f"Streaming SSE Event: {event_data}")
-                        yield f"id: {event_data['eventId']}\ndata: {json.dumps(event_data)}\n\n"
+                            logging.info(f"Streaming SSE Event: {event_data}")
+                            event_queue.append(f"id: {event_data['eventId']}\ndata: {json.dumps(event_data)}\n\n")
 
-                    elif change["operationType"] in ["insert", "replace"]:
-                        # Handle full record replacement
-                        full_document = change.get("fullDocument", {})
-                        yield f"data: {json.dumps(full_document)}\n\n"
+                    except StopIteration:
+                        pass
 
-                    # Periodic heartbeat to keep the connection alive
+                    # Send buffered events
+                    while event_queue:
+                        yield event_queue.popleft()
+
+                    # Send periodic heartbeat
                     yield "event: ping\n\n"
+                    time.sleep(1)  # Prevent tight loops
         except Exception as e:
             logging.error(f"Error in watch_team_changes: {e}")
             yield f"data: Error: {str(e)}\n\n"
