@@ -1040,7 +1040,6 @@ def team_sse():
             with teams_collection.watch(full_document="updateLookup") as stream:
                 logging.info("stream open")
                 while stream.alive:
-                    logging.info("stream alive")
                     try:
                         change = stream.try_next()
                         if change is not None:
