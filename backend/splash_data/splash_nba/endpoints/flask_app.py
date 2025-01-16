@@ -6,6 +6,7 @@ from datetime import datetime
 from pymongo.errors import PyMongoError
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_compress import Compress
+from flask_sse import sse
 from pymongo import MongoClient
 import logging
 
@@ -1033,42 +1034,39 @@ def get_sports():
 def team_sse():
     def watch_team_changes():
         logging.info("watching changes")
-    # Send an initial ping
-    yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
-    sys.stdout.flush()  # Force flush
 
-    try:
-        with teams_collection.watch(full_document="updateLookup") as stream:
-            logging.info("stream open")
-            while stream.alive:
-                try:
-                    change = stream.try_next()
-                    if change is not None:
-                        # Process change
-                        full_document = change.get("fullDocument", {})
-                        updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
-                        event_data = {
-                            "eventId": str(change["_id"]),
-                            "teamId": full_document.get("TEAM_ID"),
-                            "updatedFields": updated_fields
-                        }
-                        logging.info(f"Streaming SSE Event: {event_data}")
-                        yield f"data: {json.dumps(event_data)}\n\n"
-                        sys.stdout.flush()  # Force flush
-                except StopIteration:
-                    logging.info(f"(team_sse) StopIteration")
-                    pass
+        # Send an initial ping
+        yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
 
-                # No changes, send a heartbeat
-                yield "event: ping\n\n"
-                sys.stdout.flush()  # Force flush
-                time.sleep(1)
-    except PyMongoError as e:
-        logging.error(f"MongoDB watch error: {e}")
-        yield f"data: Error: {str(e)}\n\n"
-        sys.stdout.flush()  # Force flush
+        try:
+            with teams_collection.watch(full_document="updateLookup") as stream:
+                logging.info("stream open")
+                while stream.alive:
+                    try:
+                        change = stream.try_next()
+                        if change is not None:
+                            # Process change
+                            full_document = change.get("fullDocument", {})
+                            updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
+                            event_data = {
+                                "eventId": str(change["_id"]),
+                                "teamId": full_document.get("TEAM_ID"),
+                                "updatedFields": updated_fields
+                            }
+                            logging.info(f"Streaming SSE Event: {event_data}")
+                            yield f"data: {json.dumps(event_data)}\n\n"
+                    except StopIteration:
+                        logging.info(f"(team_sse) StopIteration")
+                        pass
 
-    return Response(stream_with_context(watch_team_changes()), content_type="text/event-stream")
+                    # No changes, send a heartbeat
+                    yield "event: ping\n\n"
+                    time.sleep(1)
+        except PyMongoError as e:
+            logging.error(f"MongoDB watch error: {e}")
+            yield f"data: Error: {str(e)}\n\n"
+
+    return Response(stream_with_context(watch_team_changes()), mimetype="text/event-stream")
 
 
 @app.after_request
