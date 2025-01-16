@@ -1031,6 +1031,7 @@ def get_sports():
 @app.route('/api/events', methods=['GET'])
 def team_sse():
     def watch_team_changes():
+        logging.info("watching changes")
         try:
             # Send an initial ping
             yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
