@@ -1044,7 +1044,7 @@ def team_sse():
         logging.info("watching changes")
 
         # Initial connection ping
-        yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
+        yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n".encode('utf-8')
         sys.stdout.flush()  # Ensure the buffer is flushed
 
         try:
@@ -1064,7 +1064,7 @@ def team_sse():
                                 "updatedFields": updated_fields
                             }
                             logging.info(f"Streaming SSE Event: {event_data}")
-                            yield f"data: {json.dumps(event_data)}\n\n"
+                            yield f"data: {json.dumps(event_data)}\n\n".encode('utf-8')
                             sys.stdout.flush()  # Ensure the buffer is flushed
                             logging.info("Yielded event data")
                     except StopIteration:
@@ -1072,13 +1072,13 @@ def team_sse():
                         pass
 
                     # Send a periodic heartbeat
-                    yield "event: ping\n\n"
+                    yield "event: ping\n\n".encode('utf-8')
                     sys.stdout.flush()  # Ensure the buffer is flushed
                     logging.info("Sent heartbeat")
                     time.sleep(1)
         except PyMongoError as e:
             logging.error(f"MongoDB watch error: {e}")
-            yield f"data: Error: {str(e)}\n\n"
+            yield f"data: Error: {str(e)}\n\n".encode('utf-8')
             sys.stdout.flush()  # Ensure the buffer is flushed
 
     return Response(stream_with_context(watch_team_changes()), content_type="text/event-stream", direct_passthrough=True)
