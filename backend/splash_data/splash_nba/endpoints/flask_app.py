@@ -1051,13 +1051,12 @@ def team_sse():
                             }
                             logging.info(f"Streaming SSE Event: {event_data}")
                             yield f"data: {json.dumps(event_data)}\n\n"
-                        else:
-                            # No changes, send a heartbeat
-                            yield "event: ping\n\n"
                     except StopIteration:
                         logging.info(f"(team_sse) StopIteration")
                         pass
 
+                    # No changes, send a heartbeat
+                    yield "event: ping\n\n"
                     time.sleep(1)  # Adjust delay to balance responsiveness
         except PyMongoError as e:
             logging.error(f"MongoDB watch error: {e}")
