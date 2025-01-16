@@ -1032,12 +1032,15 @@ def get_sports():
 def team_sse():
     def watch_team_changes():
         logging.info("watching changes")
-        try:
-            # Send an initial ping
-            yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
 
+        # Send an initial ping
+        yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
+
+        try:
             with teams_collection.watch(full_document="updateLookup") as stream:
+                logging.info("stream open")
                 while stream.alive:
+                    logging.info("stream alive")
                     try:
                         change = stream.try_next()
                         if change is not None:
@@ -1057,7 +1060,7 @@ def team_sse():
 
                     # No changes, send a heartbeat
                     yield "event: ping\n\n"
-                    time.sleep(10)  # Adjust delay to balance responsiveness
+                    time.sleep(1)  # Adjust delay to balance responsiveness
         except PyMongoError as e:
             logging.error(f"MongoDB watch error: {e}")
             yield f"data: Error: {str(e)}\n\n"
