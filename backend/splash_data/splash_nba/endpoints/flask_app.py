@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import time
 from datetime import datetime
 from pymongo.errors import PyMongoError
@@ -1035,6 +1036,7 @@ def team_sse():
 
         # Send an initial ping
         yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
+        sys.stdout.flush()  # Force flush
 
         try:
             with teams_collection.watch(full_document="updateLookup") as stream:
@@ -1053,16 +1055,19 @@ def team_sse():
                             }
                             logging.info(f"Streaming SSE Event: {event_data}")
                             yield f"data: {json.dumps(event_data)}\n\n"
+                            sys.stdout.flush()  # Force flush
                     except StopIteration:
                         logging.info(f"(team_sse) StopIteration")
                         pass
 
                     # No changes, send a heartbeat
-                    yield "event: ping\n\n"
+                    yield "event: ping\ndata: {\"ping\": \"pong\"}\n\n"
+                    sys.stdout.flush()  # Force flush
                     time.sleep(1)
         except PyMongoError as e:
             logging.error(f"MongoDB watch error: {e}")
             yield f"data: Error: {str(e)}\n\n"
+            sys.stdout.flush()  # Force flush
 
     return Response(stream_with_context(watch_team_changes()), mimetype="text/event-stream")
 
