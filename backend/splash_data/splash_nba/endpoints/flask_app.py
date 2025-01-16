@@ -1037,10 +1037,9 @@ def team_sse():
             yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
 
             with teams_collection.watch(full_document="updateLookup") as stream:
-                while True:
+                while stream.alive:
                     try:
-                        change = next(stream, None)
-                        logging.info(change)
+                        change = stream.try_next()
                         if change:
                             # Process change
                             full_document = change.get("fullDocument", {})
