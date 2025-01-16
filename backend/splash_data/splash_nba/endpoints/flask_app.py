@@ -1029,56 +1029,59 @@ def get_sports():
         return jsonify({"error": "Failed to retrieve sports"}), 500
 
 
-@app.route('/api/events', methods=['GET'])
-def simple_sse():
-    def generate():
-        for i in range(10):
-            yield f"data: {{\"message\": \"Mock Event {i}\"}}\n\n".encode('utf-8')
-            sys.stdout.flush()  # Ensure the buffer is flushed
-            time.sleep(1)
-    return Response(stream_with_context(generate()), content_type="text/event-stream", direct_passthrough=True)
-
 # @app.route('/api/events', methods=['GET'])
-# def team_sse():
-#     def watch_team_changes():
-#         logging.info("watching changes")
-#
-#         # Initial connection ping
-#         yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
-#         logging.info("Sent connection established message")
-#
-#         try:
-#             with teams_collection.watch(full_document="updateLookup") as stream:
-#                 logging.info("stream open")
-#                 while stream.alive:
-#                     try:
-#                         # Fetch the next change
-#                         change = stream.try_next()
-#                         if change is not None:
-#                             # Prepare and send the event data
-#                             full_document = change.get("fullDocument", {})
-#                             updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
-#                             event_data = {
-#                                 "eventId": str(change["_id"]),
-#                                 "teamId": full_document.get("TEAM_ID"),
-#                                 "updatedFields": updated_fields
-#                             }
-#                             logging.info(f"Streaming SSE Event: {event_data}")
-#                             yield f"data: {json.dumps(event_data)}\n\n"
-#                             logging.info("Yielded event data")
-#                     except StopIteration:
-#                         logging.info(f"(team_sse) StopIteration")
-#                         pass
-#
-#                     # Send a periodic heartbeat
-#                     yield "event: ping\n\n"
-#                     logging.info("Sent heartbeat")
-#                     time.sleep(1)
-#         except PyMongoError as e:
-#             logging.error(f"MongoDB watch error: {e}")
-#             yield f"data: Error: {str(e)}\n\n"
-#
-#     return Response(stream_with_context(watch_team_changes()), mimetype="text/event-stream")
+# def simple_sse():
+#     def generate():
+#         for i in range(10):
+#             yield f"data: {{\"message\": \"Mock Event {i}\"}}\n\n".encode('utf-8')
+#             sys.stdout.flush()  # Ensure the buffer is flushed
+#             time.sleep(1)
+#     return Response(stream_with_context(generate()), content_type="text/event-stream", direct_passthrough=True)
+
+@app.route('/api/events', methods=['GET'])
+def team_sse():
+    def watch_team_changes():
+        logging.info("watching changes")
+
+        # Initial connection ping
+        yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
+        sys.stdout.flush()  # Ensure the buffer is flushed
+
+        try:
+            with teams_collection.watch(full_document="updateLookup") as stream:
+                logging.info("stream open")
+                while stream.alive:
+                    try:
+                        # Fetch the next change
+                        change = stream.try_next()
+                        if change is not None:
+                            # Prepare and send the event data
+                            full_document = change.get("fullDocument", {})
+                            updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
+                            event_data = {
+                                "eventId": str(change["_id"]),
+                                "teamId": full_document.get("TEAM_ID"),
+                                "updatedFields": updated_fields
+                            }
+                            logging.info(f"Streaming SSE Event: {event_data}")
+                            yield f"data: {json.dumps(event_data)}\n\n"
+                            sys.stdout.flush()  # Ensure the buffer is flushed
+                            logging.info("Yielded event data")
+                    except StopIteration:
+                        logging.info(f"(team_sse) StopIteration")
+                        pass
+
+                    # Send a periodic heartbeat
+                    yield "event: ping\n\n"
+                    sys.stdout.flush()  # Ensure the buffer is flushed
+                    logging.info("Sent heartbeat")
+                    time.sleep(1)
+        except PyMongoError as e:
+            logging.error(f"MongoDB watch error: {e}")
+            yield f"data: Error: {str(e)}\n\n"
+            sys.stdout.flush()  # Ensure the buffer is flushed
+
+    return Response(stream_with_context(watch_team_changes()), content_type="text/event-stream", direct_passthrough=True)
 
 
 @app.after_request
