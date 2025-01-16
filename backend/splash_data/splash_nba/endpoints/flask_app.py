@@ -1039,6 +1039,7 @@ def team_sse():
                 while True:
                     try:
                         change = next(stream, None)
+                        logging.info(change)
                         if change:
                             # Process change
                             full_document = change.get("fullDocument", {})
@@ -1054,6 +1055,7 @@ def team_sse():
                             # No changes, send a heartbeat
                             yield "event: ping\n\n"
                     except StopIteration:
+                        logging.info(f"(team_sse) StopIteration")
                         pass
 
                     time.sleep(1)  # Adjust delay to balance responsiveness
