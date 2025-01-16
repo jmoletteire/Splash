@@ -1029,8 +1029,10 @@ def get_sports():
         return jsonify({"error": "Failed to retrieve sports"}), 500
 
 
-def watch_team_changes():
-    logging.info("watching changes")
+@app.route('/api/events', methods=['GET'])
+def team_sse():
+    def watch_team_changes():
+        logging.info("watching changes")
     # Send an initial ping
     yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
     sys.stdout.flush()  # Force flush
