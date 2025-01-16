@@ -1033,10 +1033,9 @@ def get_sports():
 def simple_sse():
     def generate():
         for i in range(10):
-            yield f"data: {{\"message\": \"Mock Event {i}\"}}\n\n"
-            sys.stdout.flush()  # Force immediate flush
-            time.sleep(1)  # Simulate delay
-    return Response(stream_with_context(generate()), content_type="text/event-stream", direct_passthrough=True)
+            yield f"data: {{\"message\": \"Mock Event {i}\"}}\n\n".encode('utf-8')
+            time.sleep(1)
+    return Response(stream_with_context(generate()), content_type="text/event-stream")
 
 # @app.route('/api/events', methods=['GET'])
 # def team_sse():
