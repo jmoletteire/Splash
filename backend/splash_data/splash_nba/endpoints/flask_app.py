@@ -979,11 +979,13 @@ def get_teams():
                     [
                         {
                             "year": season_key,
+                            "conference": season_data.get("STANDINGS", {}).get("Conference", None),
+                            "division": season_data.get("STANDINGS", {}).get("Conference", None),
                             "rank": season_data["CONF_RANK"],
                             "wins": season_data["WINS"],
                             "losses": season_data["LOSSES"],
-                            "pointsFor": season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] if season_key >= '1996-97' else 0,
-                            "pointsAgainst": int(season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PTS"] - season_data["STATS"]["REGULAR SEASON"]["BASIC"]["PLUS_MINUS"]) if season_key >= '1996-97' else 0
+                            "pointsFor": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PTS", 0),
+                            "pointsAgainst": int(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PTS", 0) - season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PLUS_MINUS", 0))
                         }
                         for season_key, season_data in team["seasons"].items()
                     ],
@@ -1041,15 +1043,12 @@ def get_sports():
 @app.route('/api/events', methods=['GET'])
 def team_sse():
     def watch_team_changes():
-        logging.info("watching changes")
-
         # Initial connection ping
         yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n".encode('utf-8')
         sys.stdout.flush()  # Ensure the buffer is flushed
 
         try:
             with teams_collection.watch(full_document="updateLookup") as stream:
-                logging.info("stream open")
                 while stream.alive:
                     try:
                         # Fetch the next change
