@@ -1083,10 +1083,16 @@ def simple_sse():
 
 @app.after_request
 def log_response_size(response):
-    global bytes_transferred
-    response_size = len(response.get_data())
-    bytes_transferred += response_size
-    logging.info(f"Endpoint: {request.path}, Response Size: {response_size} bytes, Session: {bytes_transferred} bytes, {round(bytes_transferred / 1000000000, 2)} GB")
+    if response.direct_passthrough:  # Skip streamed responses
+        logging.info(f"Streamed response for {request.path}, headers: {response.headers}")
+    else:
+        response_size = len(response.get_data())
+        global bytes_transferred
+        bytes_transferred += response_size
+        logging.info(
+            f"Endpoint: {request.path}, Response Size: {response_size} bytes, "
+            f"Session: {bytes_transferred} bytes, {round(bytes_transferred / 1e9, 2)} GB"
+        )
     return response
 
 
