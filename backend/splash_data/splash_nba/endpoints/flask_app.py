@@ -1074,7 +1074,6 @@ def team_sse():
                     # Send a periodic heartbeat
                     yield "event: ping\n\n".encode('utf-8')
                     sys.stdout.flush()  # Ensure the buffer is flushed
-                    logging.info("Sent heartbeat")
                     time.sleep(1)
         except PyMongoError as e:
             logging.error(f"MongoDB watch error: {e}")
