@@ -1040,7 +1040,7 @@ def team_sse():
                 while stream.alive:
                     try:
                         change = stream.try_next()
-                        if change:
+                        if change is not None:
                             # Process change
                             full_document = change.get("fullDocument", {})
                             updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
@@ -1057,7 +1057,7 @@ def team_sse():
 
                     # No changes, send a heartbeat
                     yield "event: ping\n\n"
-                    time.sleep(1)  # Adjust delay to balance responsiveness
+                    time.sleep(10)  # Adjust delay to balance responsiveness
         except PyMongoError as e:
             logging.error(f"MongoDB watch error: {e}")
             yield f"data: Error: {str(e)}\n\n"
