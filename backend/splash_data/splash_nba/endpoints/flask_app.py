@@ -1031,38 +1031,44 @@ def get_sports():
 @app.route('/api/events', methods=['GET'])
 def team_sse():
     def watch_team_changes():
-        logging.info("watching changes")
+        for i in range(10):
+            logging.info(f"Yielding mock event {i}")
+            yield f"data: {{\"message\": \"Mock Event {i}\"}}\n\n"
+            time.sleep(1)
 
-        # Send an initial ping
-        yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
-
-        try:
-            with teams_collection.watch(full_document="updateLookup") as stream:
-                logging.info("stream open")
-                while stream.alive:
-                    try:
-                        change = stream.try_next()
-                        if change is not None:
-                            # Process change
-                            full_document = change.get("fullDocument", {})
-                            updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
-                            event_data = {
-                                "eventId": str(change["_id"]),
-                                "teamId": full_document.get("TEAM_ID"),
-                                "updatedFields": updated_fields
-                            }
-                            logging.info(f"Streaming SSE Event: {event_data}")
-                            yield f"data: {json.dumps(event_data)}\n\n"
-                    except StopIteration:
-                        logging.info(f"(team_sse) StopIteration")
-                        pass
-
-                    # No changes, send a heartbeat
-                    yield "event: ping\n\n"
-                    time.sleep(1)  # Adjust delay to balance responsiveness
-        except PyMongoError as e:
-            logging.error(f"MongoDB watch error: {e}")
-            yield f"data: Error: {str(e)}\n\n"
+    # def watch_team_changes():
+    #     logging.info("watching changes")
+    #
+    #     # Send an initial ping
+    #     yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
+    #
+    #     try:
+    #         with teams_collection.watch(full_document="updateLookup") as stream:
+    #             logging.info("stream open")
+    #             while stream.alive:
+    #                 try:
+    #                     change = stream.try_next()
+    #                     if change is not None:
+    #                         # Process change
+    #                         full_document = change.get("fullDocument", {})
+    #                         updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
+    #                         event_data = {
+    #                             "eventId": str(change["_id"]),
+    #                             "teamId": full_document.get("TEAM_ID"),
+    #                             "updatedFields": updated_fields
+    #                         }
+    #                         logging.info(f"Streaming SSE Event: {event_data}")
+    #                         yield f"data: {json.dumps(event_data)}\n\n"
+    #                 except StopIteration:
+    #                     logging.info(f"(team_sse) StopIteration")
+    #                     pass
+    #
+    #                 # No changes, send a heartbeat
+    #                 yield "event: ping\n\n"
+    #                 time.sleep(1)  # Adjust delay to balance responsiveness
+    #     except PyMongoError as e:
+    #         logging.error(f"MongoDB watch error: {e}")
+    #         yield f"data: Error: {str(e)}\n\n"
 
     return Response(stream_with_context(watch_team_changes()), content_type="text/event-stream")
 
