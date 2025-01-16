@@ -1,12 +1,10 @@
 import json
 import os
-import sys
 import time
 from datetime import datetime
 from pymongo.errors import PyMongoError
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_compress import Compress
-from flask_sse import sse
 from pymongo import MongoClient
 import logging
 
