@@ -1037,6 +1037,9 @@ def team_sse():
 
     def watch_team_changes():
         try:
+            # Send an initial ping to keep the connection alive
+            yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n"
+
             with teams_collection.watch(full_document="updateLookup") as stream:
                 for change in stream:
                     if change["operationType"] == "update":
