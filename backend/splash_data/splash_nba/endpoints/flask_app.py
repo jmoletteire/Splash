@@ -982,8 +982,17 @@ def get_teams():
                             "divRank": season_data.get("STANDINGS", {}).get("DivisionRank", 0),
                             "wins": season_data.get("WINS", 0),
                             "losses": season_data.get("LOSSES", 0),
-                            "pointsFor": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PTS", 0),
-                            "pointsAgainst": int(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PTS", 0) - season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PLUS_MINUS", 0))
+                            "ties": season_data.get("ties", 0),
+                            "stats": {
+                                "NRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("NET_RATING", 0),
+                                "ORTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("DEF_RATING", 0),
+                                "DRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OFF_RATING", 0)
+                            },
+                            "standings": {
+                                "HOME": season_data.get("STANDINGS", {}).get("HOME", "-"),
+                                "ROAD": season_data.get("STANDINGS", {}).get("ROAD", "-"),
+                                "L10": season_data.get("STANDINGS", {}).get("L10", "-"),
+                            }
                         }
                         for season_key, season_data in team["seasons"].items()
                     ],
