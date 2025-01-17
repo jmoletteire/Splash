@@ -902,9 +902,7 @@ def get_team_seasons():
 @app.route('/team', methods=['GET'])
 def get_team():
     try:
-        # logging.info(f"(get_team) {request.args}")
         query_params = request.args.to_dict()
-        # logging.info(f"(get_team) {query_params}")
 
         # Retrieve the required parameter
         team_id = query_params.get('teamId')
@@ -939,7 +937,6 @@ def get_team():
         team = list(team_cursor)
 
         if len(team) > 0:
-            # logging.info(f"(get_team) Retrieved team {team_id} from MongoDB")
             return jsonify(team[0])
         else:
             logging.warning("(get_team) No team found in MongoDB")
@@ -980,10 +977,11 @@ def get_teams():
                         {
                             "year": season_key,
                             "conference": season_data.get("STANDINGS", {}).get("Conference", None),
-                            "division": season_data.get("STANDINGS", {}).get("Conference", None),
-                            "rank": season_data["CONF_RANK"],
-                            "wins": season_data["WINS"],
-                            "losses": season_data["LOSSES"],
+                            "division": season_data.get("STANDINGS", {}).get("Division", None),
+                            "confRank": season_data.get("STANDINGS", {}).get("PlayoffRank", None),
+                            "divRank": season_data.get("STANDINGS", {}).get("DivisionRank", None),
+                            "wins": season_data.get("WINS", 0),
+                            "losses": season_data.get("LOSSES", 0),
                             "pointsFor": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PTS", 0),
                             "pointsAgainst": int(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PTS", 0) - season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("PLUS_MINUS", 0))
                         }
@@ -997,7 +995,6 @@ def get_teams():
         ]
 
         if teams:
-            # logging.info(f"(get_teams) Retrieved teams from MongoDB")
             return teams
         else:
             logging.warning("(get_teams) No teams data found in MongoDB")
