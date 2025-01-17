@@ -990,7 +990,8 @@ def get_teams():
                             },
                             "standings": {
                                 "PCT": season_data.get("STANDINGS", {}).get("WinPCT", 0.000),
-                                "GB": season_data.get("STANDINGS", {}).get("GB", 0),
+                                "ConfGB": str(season_data.get("STANDINGS", {}).get("ConferenceGamesBack", 0)),
+                                "DivGB": str(season_data.get("STANDINGS", {}).get("DivisionGamesBack", 0)),
                                 "HOME": season_data.get("STANDINGS", {}).get("HOME", "-"),
                                 "ROAD": season_data.get("STANDINGS", {}).get("ROAD", "-"),
                                 "L10": season_data.get("STANDINGS", {}).get("L10", "-"),
