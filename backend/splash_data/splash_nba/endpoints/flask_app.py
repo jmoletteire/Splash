@@ -989,7 +989,7 @@ def get_teams():
                                 "DRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OFF_RATING", 0.0)
                             },
                             "standings": {
-                                "PCT": season_data.get("STANDINGS", {}).get("WinPCT", 0.000),
+                                "PCT": str(season_data.get("STANDINGS", {}).get("WinPCT", 0.000)),
                                 "ConfGB": str(season_data.get("STANDINGS", {}).get("ConferenceGamesBack", 0)),
                                 "DivGB": str(season_data.get("STANDINGS", {}).get("DivisionGamesBack", 0)),
                                 "HOME": season_data.get("STANDINGS", {}).get("HOME", "-"),
