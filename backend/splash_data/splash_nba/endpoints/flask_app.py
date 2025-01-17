@@ -984,11 +984,13 @@ def get_teams():
                             "losses": season_data.get("LOSSES", 0),
                             "ties": season_data.get("ties", 0),
                             "stats": {
-                                "NRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("NET_RATING", 0),
-                                "ORTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("DEF_RATING", 0),
-                                "DRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OFF_RATING", 0)
+                                "NRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("NET_RATING", 0.0),
+                                "ORTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("DEF_RATING", 0.0),
+                                "DRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OFF_RATING", 0.0)
                             },
                             "standings": {
+                                "PCT": season_data.get("STANDINGS", {}).get("WinPCT", 0.000),
+                                "GB": season_data.get("STANDINGS", {}).get("GB", 0),
                                 "HOME": season_data.get("STANDINGS", {}).get("HOME", "-"),
                                 "ROAD": season_data.get("STANDINGS", {}).get("ROAD", "-"),
                                 "L10": season_data.get("STANDINGS", {}).get("L10", "-"),
