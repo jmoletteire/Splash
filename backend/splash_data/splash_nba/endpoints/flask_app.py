@@ -989,12 +989,12 @@ def get_teams():
                                 "DRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OFF_RATING", 0.0)
                             },
                             "standings": {
-                                "PCT": str(season_data.get("STANDINGS", {}).get("WinPCT", 0.000)),
-                                "ConfGB": str(season_data.get("STANDINGS", {}).get("ConferenceGamesBack", 0)),
-                                "DivGB": str(season_data.get("STANDINGS", {}).get("DivisionGamesBack", 0)),
-                                "HOME": season_data.get("STANDINGS", {}).get("HOME", "-"),
-                                "ROAD": season_data.get("STANDINGS", {}).get("ROAD", "-"),
-                                "L10": season_data.get("STANDINGS", {}).get("L10", "-"),
+                                "PCT": str(season_data.get("STANDINGS", {}).get("WinPCT", 0.000)) if season_data.get("STANDINGS", {}).get("WinPCT", "-") is not None else "-",
+                                "ConfGB": str(season_data.get("STANDINGS", {}).get("ConferenceGamesBack", 0)) if season_data.get("STANDINGS", {}).get("ConferenceGamesBack", "-") is not None else "-",
+                                "DivGB": str(season_data.get("STANDINGS", {}).get("DivisionGamesBack", 0)) if season_data.get("STANDINGS", {}).get("DivisionGamesBack", "-") is not None else "-",
+                                "HOME": season_data.get("STANDINGS", {}).get("HOME", "-") if season_data.get("STANDINGS", {}).get("HOME", "-") is not None else "-",
+                                "ROAD": season_data.get("STANDINGS", {}).get("ROAD", "-") if season_data.get("STANDINGS", {}).get("ROAD", "-") is not None else "-",
+                                "L10": season_data.get("STANDINGS", {}).get("L10", "-") if season_data.get("STANDINGS", {}).get("L10", "-") is not None else "-",
                             }
                         }
                         for season_key, season_data in team["seasons"].items()
