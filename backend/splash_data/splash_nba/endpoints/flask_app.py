@@ -965,28 +965,32 @@ def get_teams():
         )
 
         def get_standings(season_data):
-            clinch_conf = season_data.get("STANDINGS", {}).get("ClinchedConferenceTitle", 0) if season_data.get("STANDINGS", {}).get("ClinchedConferenceTitle", 0) is not None else 0
-            clinch_div = season_data.get("STANDINGS", {}).get("ClinchedDivisionTitle", 0) if season_data.get("STANDINGS", {}).get("ClinchedDivisionTitle", 0) is not None else 0
-            clinch_playoffs = season_data.get("STANDINGS", {}).get("ClinchedPlayoffBirth", 0) if season_data.get("STANDINGS", {}).get("ClinchedPlayoffBirth", 0) is not None else 0
-            eliminated_conf = season_data.get("STANDINGS", {}).get("EliminatedConference", 0) if season_data.get("STANDINGS", {}).get("EliminatedConference", 0) is not None else 0
-            eliminated_div = season_data.get("STANDINGS", {}).get("EliminatedDivision", 0) if season_data.get("STANDINGS", {}).get("EliminatedDivision", 0) is not None else 0
-            win_pct = f'{season_data.get("STANDINGS", {}).get("WinPCT", 0.000):.3f}' if season_data.get("STANDINGS", {}).get("WinPCT", "-") is not None else "-"
-            conf_gb = str(season_data.get("STANDINGS", {}).get("ConferenceGamesBack", 0)) if season_data.get("STANDINGS", {}).get("ConferenceGamesBack", "-") not in [None, 0] else "-"
-            div_gb = str(season_data.get("STANDINGS", {}).get("DivisionGamesBack", 0)) if season_data.get("STANDINGS", {}).get("DivisionGamesBack", "-") not in [None, 0] else "-"
-            home_record = season_data.get("STANDINGS", {}).get("HOME", "-") if season_data.get("STANDINGS", {}).get("HOME", "-") is not None else "-"
-            road_record = season_data.get("STANDINGS", {}).get("ROAD", "-") if season_data.get("STANDINGS", {}).get("ROAD", "-") is not None else "-"
-            conf_record = season_data.get("STANDINGS", {}).get("ConferenceRecord", "-") if season_data.get("STANDINGS", {}).get("ConferenceRecord", "-") is not None else "-"
-            div_record = season_data.get("STANDINGS", {}).get("DivisionRecord", "-") if season_data.get("STANDINGS", {}).get("DivisionRecord", "-") is not None else "-"
-            last_10 = season_data.get("STANDINGS", {}).get("L10", "-") if season_data.get("STANDINGS", {}).get("L10", "-") is not None else "-"
-            streak = season_data.get("STANDINGS", {}).get("strCurrentStreak", "-") if season_data.get("STANDINGS", {}).get("strCurrentStreak", "-") is not None else "-"
-            vs_over_500 = season_data.get("STANDINGS", {}).get("OppOver500", "-") if season_data.get("STANDINGS", {}).get("OppOver500", "-") is not None else "-"
+            standings = season_data.get("STANDINGS", {})
+
+            if standings.get("ClinchedConferenceTitle", "-") == 1:
+                clinched = "-z"
+            elif standings.get("ClinchedDivisionTitle", "-") == 1:
+                clinched = "-y"
+            elif standings.get("ClinchedPlayoffBirth", "-") == 1:
+                clinched = "-x"
+            elif standings.get("EliminatedConference", "-") == 1:
+                clinched = "-e"
+            else:
+                clinched = ""
+
+            win_pct = f'{standings.get("WinPCT", 0.000):.3f}' if standings.get("WinPCT", "-") is not None else "-"
+            conf_gb = str(standings.get("ConferenceGamesBack", "-")) if standings.get("ConferenceGamesBack", "-") not in [None, 0] else "-"
+            div_gb = str(standings.get("DivisionGamesBack", "-")) if standings.get("DivisionGamesBack", "-") not in [None, 0] else "-"
+            home_record = standings.get("HOME", "-") if standings.get("HOME", "-") is not None else "-"
+            road_record = standings.get("ROAD", "-") if standings.get("ROAD", "-") is not None else "-"
+            conf_record = standings.get("ConferenceRecord", "-") if standings.get("ConferenceRecord", "-") is not None else "-"
+            div_record = standings.get("DivisionRecord", "-") if standings.get("DivisionRecord", "-") is not None else "-"
+            last_10 = standings.get("L10", "-") if standings.get("L10", "-") is not None else "-"
+            streak = standings.get("strCurrentStreak", "-") if standings.get("strCurrentStreak", "-") is not None else "-"
+            vs_over_500 = standings.get("OppOver500", "-") if standings.get("OppOver500", "-") is not None else "-"
 
             return {
-                "ClinchConf": clinch_conf,
-                "ClinchDiv": clinch_div,
-                "ClinchPlayoffs": clinch_playoffs,
-                "EliminatedConf": eliminated_conf,
-                "EliminatedDiv": eliminated_div,
+                "Clinched": clinched,
                 "PCT": win_pct,
                 "ConfGB": conf_gb,
                 "DivGB": div_gb,
@@ -994,9 +998,9 @@ def get_teams():
                 "ROAD": road_record,
                 "CONF": conf_record,
                 "DIV": div_record,
+                ".500+": vs_over_500,
                 "L10": last_10,
-                "STRK": streak,
-                ".500+": vs_over_500
+                "STRK": streak
             }
 
         # Transform the keys
@@ -1019,9 +1023,12 @@ def get_teams():
                             "losses": season_data.get("LOSSES", 0),
                             "ties": season_data.get("TIES", 0),
                             "stats": {
-                                "NRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("NET_RATING", 0.0),
-                                "ORTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OFF_RATING", 0.0),
-                                "DRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("DEF_RATING", 0.0)
+                                "NRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get(
+                                    "NET_RATING", 0.0),
+                                "ORTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get(
+                                    "OFF_RATING", 0.0),
+                                "DRTG": season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get(
+                                    "DEF_RATING", 0.0)
                             },
                             "standings": get_standings(season_data=season_data)
                         }
@@ -1116,7 +1123,8 @@ def team_sse():
             yield f"data: Error: {str(e)}\n\n".encode('utf-8')
             sys.stdout.flush()  # Ensure the buffer is flushed
 
-    return Response(stream_with_context(watch_team_changes()), content_type="text/event-stream", direct_passthrough=True)
+    return Response(stream_with_context(watch_team_changes()), content_type="text/event-stream",
+                    direct_passthrough=True)
 
 
 @app.after_request
