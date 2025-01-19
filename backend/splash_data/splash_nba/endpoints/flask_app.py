@@ -968,13 +968,13 @@ def get_teams():
             standings = season_data.get("STANDINGS", {})
 
             if standings.get("ClinchedConferenceTitle", "-") == 1:
-                clinched = "-z"
+                clinched = " -z"
             elif standings.get("ClinchedDivisionTitle", "-") == 1:
-                clinched = "-y"
+                clinched = " -y"
             elif standings.get("ClinchedPlayoffBirth", "-") == 1:
-                clinched = "-x"
+                clinched = " -x"
             elif standings.get("EliminatedConference", "-") == 1:
-                clinched = "-e"
+                clinched = " -e"
             else:
                 clinched = ""
 
