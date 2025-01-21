@@ -630,9 +630,10 @@ def get_scoreboard():
             line_score = game["SUMMARY"]["LineScore"]
             return {
                 "sportId": 0,
-                "gameId": str(game_id),
-                "homeTeamId": str(summary["HOME_TEAM_ID"]),
-                "awayTeamId": str(summary["VISITOR_TEAM_ID"]),
+                "season": summary["SEASON"],
+                "gameId": str(game_id) if not isinstance(game_id, str) else game_id,
+                "homeTeamId": str(summary["HOME_TEAM_ID"]) if not isinstance(summary["HOME_TEAM_ID"], str) else summary["HOME_TEAM_ID"],
+                "awayTeamId": str(summary["VISITOR_TEAM_ID"]) if not isinstance(summary["VISITOR_TEAM_ID"], str) else summary["VISITOR_TEAM_ID"],
                 "homeScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["PTS"],
                 "awayScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["VISITOR_TEAM_ID"] else line_score[1]["PTS"],
                 "broadcast": summary["NATL_TV_BROADCASTER_ABBREVIATION"],
