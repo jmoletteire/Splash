@@ -620,6 +620,7 @@ def get_scoreboard():
                 return ''
 
         def summarize_game(game):
+            print(game)
             summary = game["SUMMARY"]["GameSummary"][0]
             line_score = game["SUMMARY"]["LineScore"]
             return {
