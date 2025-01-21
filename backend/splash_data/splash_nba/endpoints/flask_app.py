@@ -571,7 +571,7 @@ def get_scoreboard():
             })
 
         # Execute the query
-        games = games_collection.aggregate(pipeline)
+        games = list(games_collection.aggregate(pipeline))[0]
 
         def get_game_status(game):
             if game.containsKey('BOXSCORE'):
