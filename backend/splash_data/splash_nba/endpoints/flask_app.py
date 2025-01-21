@@ -571,7 +571,7 @@ def get_scoreboard():
             })
 
         # Execute the query
-        games = list(games_collection.aggregate(pipeline))
+        games = games_collection.aggregate(pipeline)
 
         def get_game_status(game):
             if game.containsKey('BOXSCORE'):
@@ -602,7 +602,7 @@ def get_scoreboard():
                     else:
                         # Game in-progress
                         if summary['LIVE_PERIOD'] <= 4:
-                            return f'${summary["LIVE_PC_TIME"].toString()} ${summary["LIVE_PERIOD"].toString()}Q ';
+                            return f'${summary["LIVE_PC_TIME"].toString()} ${summary["LIVE_PERIOD"].toString()}Q '
                         elif summary['LIVE_PERIOD'] == 5:
                             return f'${summary["LIVE_PC_TIME"].toString()} OT'
                         else:
@@ -619,13 +619,12 @@ def get_scoreboard():
             else:
                 return ''
 
-        def summarize_game(game):
-            print(game)
+        def summarize_game(game_id, game):
             summary = game["SUMMARY"]["GameSummary"][0]
             line_score = game["SUMMARY"]["LineScore"]
             return {
                 "sportId": 0,
-                "gameId": summary["GAME_ID"],
+                "gameId": game_id,
                 "homeTeamId": summary["HOME_TEAM_ID"],
                 "awayTeamId": summary["VISITOR_TEAM_ID"],
                 "homeScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["PTS"],
@@ -635,7 +634,7 @@ def get_scoreboard():
                 "date": summary["GAME_DATE_EST"][0:10]
             }
 
-        games = [summarize_game(game) for game in games]
+        games = [summarize_game(game_id, game) for game_id, game in games.items()]
 
         if not games:
             logging.warning(f"(get_scoreboard) No games found in MongoDB for date {game_date}")
