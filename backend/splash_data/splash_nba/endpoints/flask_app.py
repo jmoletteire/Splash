@@ -631,8 +631,8 @@ def get_scoreboard():
             return {
                 "sportId": 0,
                 "gameId": str(game_id),
-                "homeTeamId": summary["HOME_TEAM_ID"],
-                "awayTeamId": summary["VISITOR_TEAM_ID"],
+                "homeTeamId": str(summary["HOME_TEAM_ID"]),
+                "awayTeamId": str(summary["VISITOR_TEAM_ID"]),
                 "homeScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["PTS"],
                 "awayScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["VISITOR_TEAM_ID"] else line_score[1]["PTS"],
                 "broadcast": summary["NATL_TV_BROADCASTER_ABBREVIATION"],
