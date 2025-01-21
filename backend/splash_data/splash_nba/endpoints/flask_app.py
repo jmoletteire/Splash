@@ -635,7 +635,7 @@ def get_scoreboard():
                 "date": summary["GAME_DATE_EST"][0:10]
             }
 
-        games = [summarize_game(game_id, game) for game_id, game in games[0]]
+        games = [summarize_game(game_id, game) for game_id, game in games[0]['GAMES'].items()]
 
         if not games:
             logging.warning(f"(get_scoreboard) No games found in MongoDB for date {game_date}")
