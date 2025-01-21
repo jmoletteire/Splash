@@ -1134,7 +1134,7 @@ def get_teams():
         teams = [
             {
                 "sportId": team["SPORT_ID"],
-                "teamId": team["TEAM_ID"],
+                "teamId": str(team["TEAM_ID"]),
                 "abbv": team["ABBREVIATION"],
                 "city": team["CITY"],
                 "name": team["NICKNAME"],
