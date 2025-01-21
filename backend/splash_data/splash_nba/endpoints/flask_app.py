@@ -574,13 +574,17 @@ def get_scoreboard():
         games = list(games_collection.aggregate(pipeline))
 
         def get_game_status(game):
-            if game.containsKey('BOXSCORE'):
+            if 'BOXSCORE' in game:
                 if game['BOXSCORE']['gameStatusText'] == 'pregame':
                     return 'Pregame'
 
-            if game.containsKey('SUMMARY'):
+            if 'SUMMARY' in game:
+                if 'GameSummary' not in game['SUMMARY']:
+                    return ''
+
                 summary = game['SUMMARY']['GameSummary'][0]
-                status = summary['GAME_STATUS_ID']
+                status = summary.get('GAME_STATUS_ID', 0)
+
                 if status == 1:
                     # Upcoming
                     return summary['GAME_STATUS_TEXT']
@@ -616,11 +620,12 @@ def get_scoreboard():
                         return 'Final/OT'
                     else:
                         return f'Final/${summary["LIVE_PERIOD"] - 4}OT'
+                else:
+                    return ''
             else:
                 return ''
 
         def summarize_game(game_id, game):
-            print(game)
             summary = game["SUMMARY"]["GameSummary"][0]
             line_score = game["SUMMARY"]["LineScore"]
             return {
