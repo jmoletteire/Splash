@@ -571,7 +571,7 @@ def get_scoreboard():
             })
 
         # Execute the query
-        games = list(games_collection.aggregate(pipeline))[0]
+        games = list(games_collection.aggregate(pipeline))
 
         def get_game_status(game):
             if game.containsKey('BOXSCORE'):
@@ -620,6 +620,7 @@ def get_scoreboard():
                 return ''
 
         def summarize_game(game_id, game):
+            print(game)
             summary = game["SUMMARY"]["GameSummary"][0]
             line_score = game["SUMMARY"]["LineScore"]
             return {
@@ -634,7 +635,7 @@ def get_scoreboard():
                 "date": summary["GAME_DATE_EST"][0:10]
             }
 
-        games = [summarize_game(game_id, game) for game_id, game in games.items()]
+        games = [summarize_game(game_id, game) for game_id, game in games[0]]
 
         if not games:
             logging.warning(f"(get_scoreboard) No games found in MongoDB for date {game_date}")
