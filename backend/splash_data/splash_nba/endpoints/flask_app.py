@@ -534,6 +534,127 @@ def get_game_dates():
     return jsonify(dates)
 
 
+@app.route('/games/scoreboard', methods=['GET'])
+def get_scoreboard():
+    try:
+        query_params = request.args.to_dict()
+        game_date = query_params.get('date', datetime.utcnow().strftime('%Y-%m-%d'))  # Default to today's date
+        game_id = query_params.get('gameId')  # `gameId` is optional
+
+        # Base query to search games by date
+        pipeline = [
+            {
+                "$search": {
+                    "index": "game_index",
+                    "phrase": {
+                        "query": game_date,
+                        "path": "GAME_DATE"
+                    }
+                }
+            }
+        ]
+
+        # Add a projection step depending on whether a specific game is requested
+        if game_id:
+            pipeline.append({
+                "$project": {
+                    "_id": 0,
+                    f"GAMES.{game_id}": 1
+                }
+            })
+        else:
+            pipeline.append({
+                "$project": {
+                    "_id": 0,
+                    "GAMES": 1
+                }
+            })
+
+        # Execute the query
+        games = list(games_collection.aggregate(pipeline))
+
+        def get_game_status(game):
+            if game.containsKey('BOXSCORE'):
+                if game['BOXSCORE']['gameStatusText'] == 'pregame':
+                    return 'Pregame'
+
+            if game.containsKey('SUMMARY'):
+                summary = game['SUMMARY']['GameSummary'][0]
+                status = summary['GAME_STATUS_ID']
+                if status == 1:
+                    # Upcoming
+                    return summary['GAME_STATUS_TEXT']
+                elif status == 2:
+                    # End Quarter
+                    if summary['LIVE_PC_TIME'] == ":0.0" or summary['LIVE_PC_TIME'] == "     ":
+                        if summary['LIVE_PERIOD'] == 1:
+                            return 'End 1Q'
+                        elif summary['LIVE_PERIOD'] == 2:
+                            return 'HALF'
+                        elif summary['LIVE_PERIOD'] == 3:
+                            return 'End 3Q'
+                        elif summary['LIVE_PERIOD'] == 4:
+                            return 'Final'
+                        elif summary['LIVE_PERIOD'] == 5:
+                            return 'Final/OT'
+                        else:
+                            return f'Final/${summary["LIVE_PERIOD"] - 4}OT'
+                    else:
+                        # Game in-progress
+                        if summary['LIVE_PERIOD'] <= 4:
+                            return f'${summary["LIVE_PC_TIME"].toString()} ${summary["LIVE_PERIOD"].toString()}Q ';
+                        elif summary['LIVE_PERIOD'] == 5:
+                            return f'${summary["LIVE_PC_TIME"].toString()} OT'
+                        else:
+                            return f'${summary["LIVE_PC_TIME"].toString()} ${summary["LIVE_PERIOD"] - 4}OT'
+
+                elif status == 3:
+                    # Game Final
+                    if summary['LIVE_PERIOD'] == 4:
+                        return 'Final'
+                    elif summary['LIVE_PERIOD'] == 5:
+                        return 'Final/OT'
+                    else:
+                        return f'Final/${summary["LIVE_PERIOD"] - 4}OT'
+            else:
+                return ''
+
+        def summarize_game(game):
+            summary = game["SUMMARY"]["GameSummary"][0]
+            line_score = game["SUMMARY"]["LineScore"]
+            return {
+                "sportId": 0,
+                "gameId": summary["GAME_ID"],
+                "homeTeamId": summary["HOME_TEAM_ID"],
+                "awayTeamId": summary["VISITOR_TEAM_ID"],
+                "homeScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["PTS"],
+                "awayScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["VISITOR_TEAM_ID"] else line_score[1]["PTS"],
+                "broadcast": summary["NATL_TV_BROADCASTER_ABBREVIATION"],
+                "gameClock": get_game_status(game),
+                "date": summary["GAME_DATE_EST"][0:10]
+            }
+
+        games = [summarize_game(game) for game in games]
+
+        if not games:
+            logging.warning(f"(get_scoreboard) No games found in MongoDB for date {game_date}")
+            return jsonify({"error": f"No games found for date {game_date}"}), 404
+
+        if game_id:
+            # If `gameId` is provided, return the specific game
+            game = games[0].get("GAMES", {}).get(game_id)
+            if not game:
+                return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
+            return jsonify(game)
+        else:
+            # Otherwise, return all games for the date
+            return jsonify(games[0].get('GAMES', {}))
+
+    except Exception as e:
+        logging.error(f"(get_scoreboard) Error retrieving games: {e}")
+        return jsonify({"error": "Failed to retrieve games"}), 500
+
+
 @app.route('/games', methods=['GET'])
 def get_games():
     try:
