@@ -654,7 +654,7 @@ def get_scoreboard():
             return jsonify(game)
         else:
             # Otherwise, return all games for the date
-            return jsonify(games[0].get('GAMES', {}))
+            return jsonify(games)
 
     except Exception as e:
         logging.error(f"(get_scoreboard) Error retrieving games: {e}")
