@@ -587,7 +587,7 @@ def get_scoreboard():
 
                 if status == 1:
                     # Upcoming
-                    return summary['GAME_STATUS_TEXT']
+                    return summary['GAME_STATUS_TEXT'].replace(" ET", "").replace(" ", "")
                 elif status == 2:
                     # End Quarter
                     if summary['LIVE_PC_TIME'] == ":0.0" or summary['LIVE_PC_TIME'] == "     ":
