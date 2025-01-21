@@ -630,7 +630,7 @@ def get_scoreboard():
             line_score = game["SUMMARY"]["LineScore"]
             return {
                 "sportId": 0,
-                "gameId": game_id,
+                "gameId": str(game_id),
                 "homeTeamId": summary["HOME_TEAM_ID"],
                 "awayTeamId": summary["VISITOR_TEAM_ID"],
                 "homeScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["PTS"],
