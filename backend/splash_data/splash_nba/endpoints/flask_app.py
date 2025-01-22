@@ -592,11 +592,11 @@ def get_scoreboard():
                     # End Quarter
                     if summary['LIVE_PC_TIME'] == ":0.0" or summary['LIVE_PC_TIME'] == "     ":
                         if summary['LIVE_PERIOD'] == 1:
-                            return 'End 1Q'
+                            return 'End 1st'
                         elif summary['LIVE_PERIOD'] == 2:
                             return 'HALF'
                         elif summary['LIVE_PERIOD'] == 3:
-                            return 'End 3Q'
+                            return 'End 3rd'
                         elif summary['LIVE_PERIOD'] == 4:
                             return 'Final'
                         elif summary['LIVE_PERIOD'] == 5:
@@ -606,11 +606,20 @@ def get_scoreboard():
                     else:
                         # Game in-progress
                         if summary['LIVE_PERIOD'] <= 4:
-                            return f'{summary["LIVE_PC_TIME"]} {summary["LIVE_PERIOD"]}Q '
+                            if summary['LIVE_PERIOD'] == 1:
+                                return f'{summary["LIVE_PERIOD"]}st {summary["LIVE_PC_TIME"]}'
+                            elif summary['LIVE_PERIOD'] == 2:
+                                return f'{summary["LIVE_PERIOD"]}nd {summary["LIVE_PC_TIME"]}'
+                            elif summary['LIVE_PERIOD'] == 3:
+                                return f'{summary["LIVE_PERIOD"]}rd {summary["LIVE_PC_TIME"]}'
+                            elif summary['LIVE_PERIOD'] == 4:
+                                return f'{summary["LIVE_PERIOD"]}th {summary["LIVE_PC_TIME"]}'
+                            else:
+                                return ''
                         elif summary['LIVE_PERIOD'] == 5:
-                            return f'{summary["LIVE_PC_TIME"]} OT'
+                            return f'OT {summary["LIVE_PC_TIME"]}'
                         else:
-                            return f'{summary["LIVE_PC_TIME"]} {summary["LIVE_PERIOD"] - 4}OT'
+                            return f'{summary["LIVE_PERIOD"] - 4}OT {summary["LIVE_PC_TIME"]}'
 
                 elif status == 3:
                     # Game Final
