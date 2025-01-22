@@ -12,7 +12,7 @@ is_updating = False
 update_lock = threading.Lock()
 
 
-def check_games_final():
+async def check_games_final():
     logging.info(f'Checking games final... [{datetime.now()}]')
 
     try:

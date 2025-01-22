@@ -24,7 +24,7 @@ from splash_nba.util.env import k_current_season_type, k_current_season
 from splash_nba.util.mongo_connect import get_mongo_collection
 
 
-def update_players(team_ids):
+async def update_players(team_ids):
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -263,7 +263,7 @@ def update_players(team_ids):
         logging.error(f"Error updating player shot charts: {e}")
 
 
-def players_daily_update():
+async def players_daily_update():
     """
     Runs every day at 3:30AM.\n
     Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data

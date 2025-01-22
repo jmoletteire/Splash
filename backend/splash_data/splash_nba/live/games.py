@@ -507,7 +507,8 @@ def games_prev_day():
             summary = fetch_box_score_summary(game['GAME_ID'])
             box_score = boxscore.BoxScore(game_id=game['GAME_ID']).get_dict()['game']
 
-            keys = [
+            # PBP fields to keep
+            pbp_keys = [
                 'actionNumber',
                 'clock',
                 'period',
@@ -526,7 +527,7 @@ def games_prev_day():
 
             try:
                 actions = playbyplay.PlayByPlay(game_id=game['GAME_ID']).get_dict()['game']['actions']
-                pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
+                pbp = [{key: action.get(key, 0) for key in pbp_keys} for action in actions]
             except Exception:
                 pbp = []
 
@@ -707,7 +708,7 @@ def games_prev_day():
             logging.info(f'(Games Live) Finalizing game {game["GAME_ID"]}.')
 
 
-def games_live_update():
+async def games_live_update():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -899,7 +900,7 @@ def games_live_update():
                 logging.info(f'(Games Live) Upcoming game {game["gameId"]} is up to date.')
 
         # IN-PROGRESS
-        elif in_progress:
+        elif is_final:
             # Summary, Box Score, PBP
             summary = fetch_box_score_summary(game['gameId'])
             box_score = boxscore.BoxScore(game_id=game['gameId']).get_dict()['game']

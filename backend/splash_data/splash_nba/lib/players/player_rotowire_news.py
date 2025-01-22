@@ -11,7 +11,7 @@ import json
 from bs4 import BeautifulSoup
 
 
-def player_rotowires():
+async def player_rotowires():
     player_rotowire_news()
     player_rotowire_injuries()
 

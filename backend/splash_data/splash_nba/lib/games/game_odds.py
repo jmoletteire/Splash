@@ -38,7 +38,7 @@ def draft_kings_odds():
         games[market['eventId']]['marketId'] = market['id']
 
 
-def fetch_odds():
+async def fetch_odds():
     # Connect to MongoDB
     try:
         client = MongoClient(uri)

@@ -19,7 +19,7 @@ from splash_nba.util.env import k_current_season, k_current_season_type
 from splash_nba.util.mongo_connect import get_mongo_collection
 
 
-def update_teams(team_ids):
+async def update_teams(team_ids):
     """
     Runs every day at 3AM.\n
     Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
@@ -100,7 +100,7 @@ def update_teams(team_ids):
         logging.error(f"(Teams Daily) Error updating teams: {e}")
 
 
-def teams_daily_update():
+async def teams_daily_update():
     """
     Runs every day at 3AM.\n
     Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
