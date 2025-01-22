@@ -606,11 +606,11 @@ def get_scoreboard():
                     else:
                         # Game in-progress
                         if summary['LIVE_PERIOD'] <= 4:
-                            return f'${summary["LIVE_PC_TIME"].toString()} ${summary["LIVE_PERIOD"].toString()}Q '
+                            return f'${summary["LIVE_PC_TIME"]} ${summary["LIVE_PERIOD"]}Q '
                         elif summary['LIVE_PERIOD'] == 5:
-                            return f'${summary["LIVE_PC_TIME"].toString()} OT'
+                            return f'${summary["LIVE_PC_TIME"]} OT'
                         else:
-                            return f'${summary["LIVE_PC_TIME"].toString()} ${summary["LIVE_PERIOD"] - 4}OT'
+                            return f'${summary["LIVE_PC_TIME"]} ${summary["LIVE_PERIOD"] - 4}OT'
 
                 elif status == 3:
                     # Game Final
@@ -631,7 +631,7 @@ def get_scoreboard():
             return {
                 "sportId": 0,
                 "season": summary["SEASON"],
-                "gameId": game_id,
+                "gameId": str(game_id) if not isinstance(game_id, str) else game_id,
                 "homeTeamId": str(summary["HOME_TEAM_ID"]) if not isinstance(summary["HOME_TEAM_ID"], str) else summary["HOME_TEAM_ID"],
                 "awayTeamId": str(summary["VISITOR_TEAM_ID"]) if not isinstance(summary["VISITOR_TEAM_ID"], str) else summary["VISITOR_TEAM_ID"],
                 "homeScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["PTS"],
