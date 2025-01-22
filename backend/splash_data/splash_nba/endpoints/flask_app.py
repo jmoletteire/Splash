@@ -602,15 +602,15 @@ def get_scoreboard():
                         elif summary['LIVE_PERIOD'] == 5:
                             return 'Final/OT'
                         else:
-                            return f'Final/${summary["LIVE_PERIOD"] - 4}OT'
+                            return f'Final/{summary["LIVE_PERIOD"] - 4}OT'
                     else:
                         # Game in-progress
                         if summary['LIVE_PERIOD'] <= 4:
-                            return f'${summary["LIVE_PC_TIME"]} ${summary["LIVE_PERIOD"]}Q '
+                            return f'{summary["LIVE_PC_TIME"]} {summary["LIVE_PERIOD"]}Q '
                         elif summary['LIVE_PERIOD'] == 5:
-                            return f'${summary["LIVE_PC_TIME"]} OT'
+                            return f'{summary["LIVE_PC_TIME"]} OT'
                         else:
-                            return f'${summary["LIVE_PC_TIME"]} ${summary["LIVE_PERIOD"] - 4}OT'
+                            return f'{summary["LIVE_PC_TIME"]} {summary["LIVE_PERIOD"] - 4}OT'
 
                 elif status == 3:
                     # Game Final
@@ -619,7 +619,7 @@ def get_scoreboard():
                     elif summary['LIVE_PERIOD'] == 5:
                         return 'Final/OT'
                     else:
-                        return f'Final/${summary["LIVE_PERIOD"] - 4}OT'
+                        return f'Final/{summary["LIVE_PERIOD"] - 4}OT'
                 else:
                     return ''
             else:
