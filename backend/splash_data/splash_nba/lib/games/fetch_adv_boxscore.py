@@ -1,16 +1,27 @@
 import random
-import re
 import time
-from datetime import datetime
-
 import requests
+import logging
+from datetime import datetime
 from nba_api.stats.endpoints import boxscoreadvancedv2
 from pymongo import MongoClient
 
-from splash_nba.lib.games.fetch_boxscore_basic import fetch_box_score_stats
-from splash_nba.util.env import uri, k_current_season
-import logging
-from unidecode import unidecode
+try:
+    # Try to import the local env.py file
+    from splash_nba.util.env import uri, k_current_season
+except ImportError:
+    # Fallback to the remote env.py path
+    import sys
+    import os
+
+    env_path = "/home/ubuntu"
+    if env_path not in sys.path:
+        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+    try:
+        from env import uri, k_current_season
+    except ImportError:
+        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 
 def update_players_and_teams(season, season_type):

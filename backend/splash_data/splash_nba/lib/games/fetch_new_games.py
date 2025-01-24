@@ -1,17 +1,29 @@
 import time
-from datetime import datetime, timedelta
-
 import openai
 import requests
-from nba_api.stats.endpoints import leaguegamefinder, ScoreboardV2
-from openai import OpenAI
-from pymongo import MongoClient
-
-from splash_nba.lib.games.fetch_adv_boxscore import fetch_box_score_adv
-from splash_nba.lib.games.fetch_boxscore_basic import fetch_box_score_stats
-from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
-from splash_nba.util.env import uri, k_current_season, openai_api_key, k_prev_season, k_current_season_type
 import logging
+from pymongo import MongoClient
+from datetime import datetime, timedelta
+from nba_api.stats.endpoints import ScoreboardV2
+from splash_nba.lib.games.fetch_adv_boxscore import fetch_box_score_adv
+from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
+
+try:
+    # Try to import the local env.py file
+    from splash_nba.util.env import uri, k_current_season, openai_api_key, k_prev_season
+except ImportError:
+    # Fallback to the remote env.py path
+    import sys
+    import os
+
+    env_path = "/home/ubuntu"
+    if env_path not in sys.path:
+        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+    try:
+        from env import uri, k_current_season, openai_api_key, k_prev_season
+    except ImportError:
+        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 
 # Function to generate points of emphasis for each team
