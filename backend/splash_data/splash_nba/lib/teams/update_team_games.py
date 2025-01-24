@@ -1,10 +1,10 @@
 import logging
 from pymongo import MongoClient
-from splash_nba.util.mongo_connect import get_mongo_collection
 
 try:
     # Try to import the local env.py file
     from splash_nba.util.env import uri
+    from splash_nba.util.mongo_connect import get_mongo_collection
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -16,6 +16,7 @@ except ImportError:
 
     try:
         from env import uri
+        from mongo_connect import get_mongo_collection
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 

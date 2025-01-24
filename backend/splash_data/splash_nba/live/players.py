@@ -20,8 +20,25 @@ from splash_nba.lib.players.stats.update_custom_player_stats import update_playe
     update_adj_turnover_pct, update_versatility_score, update_matchup_difficulty_and_dps
 from splash_nba.lib.players.update_all_players import add_players, restructure_new_docs, update_player_info
 from splash_nba.lib.players.update_player_contracts import fetch_player_contract_data, keep_most_informative
-from splash_nba.util.env import k_current_season_type, k_current_season
-from splash_nba.util.mongo_connect import get_mongo_collection
+
+try:
+    # Try to import the local env.py file
+    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.mongo_connect import get_mongo_collection
+except ImportError:
+    # Fallback to the remote env.py path
+    import sys
+    import os
+
+    env_path = "/home/ubuntu"
+    if env_path not in sys.path:
+        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+    try:
+        from env import uri, k_current_season, k_current_season_type
+        from mongo_connect import get_mongo_collection
+    except ImportError:
+        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 
 async def update_players(team_ids):

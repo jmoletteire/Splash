@@ -16,7 +16,25 @@ from splash_nba.lib.teams.stats.team_hustle_stats_rank import rank_hustle_stats_
 from splash_nba.lib.teams.team_rosters import update_current_roster
 from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_lineup
 from splash_nba.util.env import k_current_season, k_current_season_type
-from splash_nba.util.mongo_connect import get_mongo_collection
+
+try:
+    # Try to import the local env.py file
+    from splash_nba.util.env import uri
+    from splash_nba.util.mongo_connect import get_mongo_collection
+except ImportError:
+    # Fallback to the remote env.py path
+    import sys
+    import os
+
+    env_path = "/home/ubuntu"
+    if env_path not in sys.path:
+        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+    try:
+        from env import uri
+        from mongo_connect import get_mongo_collection
+    except ImportError:
+        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 
 async def update_teams(team_ids):
