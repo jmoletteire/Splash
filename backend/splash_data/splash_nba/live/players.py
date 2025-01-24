@@ -1,10 +1,8 @@
 import logging
 import time
-from datetime import datetime
-
-from nba_api.stats.endpoints import playerawards
 from numpy import random
-
+from datetime import datetime
+from nba_api.stats.endpoints import playerawards
 from splash_nba.lib.players.player_gamelogs import gamelogs
 from splash_nba.lib.players.stats.custom_player_stats_rank import current_season_custom_stats_rank
 from splash_nba.lib.players.stats.per75 import current_season_per_75
