@@ -21,7 +21,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        import env
+        from env import URI, PREV_SEASON, CURR_SEASON, PROXY
         from mongo_connect import get_mongo_collection
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
@@ -35,7 +35,6 @@ try:
     # Configure logging
     logging.basicConfig(level=logging.INFO)
     client = MongoClient(URI)
-    logging.info(URI)
     db = client.splash
 
     # Define all collections at the top level, so they're accessible across routes
