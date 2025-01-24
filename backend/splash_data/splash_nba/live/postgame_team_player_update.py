@@ -60,8 +60,8 @@ async def check_games_final():
                 with update_lock:
                     is_updating = True
                 try:
-                    update_teams(teams)
-                    update_players(teams)
+                    await update_teams(teams)
+                    await update_players(teams)
                     games_collection.update_one({'GAME_DATE': today}, {'$set': {f'GAMES.{game_id}.UPDATED': True}})
                 finally:
                     # Release the lock and set is_updating to False

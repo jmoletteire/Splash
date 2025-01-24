@@ -9,7 +9,7 @@ from apscheduler.triggers.cron import CronTrigger
 # Import your task functions
 from splash_nba.lib.games.game_odds import fetch_odds
 from splash_nba.live.games import games_daily_update, games_live_update, reset_flags
-from splash_nba.live.postgame_team_player_update import check_games_final
+# from splash_nba.live.postgame_team_player_update import check_games_final
 from splash_nba.live.teams import teams_daily_update
 from splash_nba.live.players import players_daily_update
 from splash_nba.lib.players.player_rotowire_news import player_rotowires
@@ -49,12 +49,12 @@ async def games_live_update_task():
     logging.info(f"\ngames_live_update_task completed in {elapsed_time:.2f} seconds\n")
 
 
-async def check_games_final_task():
-    start_time = time.time()
-    await safe_task(check_games_final, "check_games_final", timeout=600)
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    logging.info(f"\ncheck_games_final_task completed in {elapsed_time:.2f} seconds\n")
+# async def check_games_final_task():
+#     start_time = time.time()
+#     await safe_task(check_games_final, "check_games_final", timeout=600)
+#     end_time = time.time()
+#     elapsed_time = end_time - start_time
+#     logging.info(f"\ncheck_games_final_task completed in {elapsed_time:.2f} seconds\n")
 
 
 async def fetch_odds_task():
