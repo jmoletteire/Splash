@@ -6,7 +6,8 @@ from splash_nba.lib.teams.team_history import update_team_history
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -40,7 +41,7 @@ def fetch_teams():
 
         # Insert teams into the collection
         for team_id in team_ids:
-            team_details = teamdetails.TeamDetails(team_id)
+            team_details = teamdetails.TeamDetails(team_id, proxy=PROXY)
             team_info = team_details.get_normalized_dict()['TeamBackground'][0]
             teams_collection.insert_one(team_info)
 

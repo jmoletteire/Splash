@@ -5,7 +5,8 @@ from nba_api.stats.endpoints import commonteamroster, playercareerstats
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, PREV_SEASON
+    from splash_nba.util.env import URI, CURR_SEASON, PREV_SEASON
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -33,7 +34,7 @@ def update_current_roster(team_id, season_not_started):
         exit(1)
 
     try:
-        team_data = commonteamroster.CommonTeamRoster(team_id, season=CURR_SEASON).get_normalized_dict()
+        team_data = commonteamroster.CommonTeamRoster(team_id, season=CURR_SEASON, proxy=PROXY).get_normalized_dict()
         team_roster = team_data['CommonTeamRoster']
         team_coaches = team_data['Coaches']
     except Exception as e:
@@ -50,7 +51,7 @@ def update_current_roster(team_id, season_not_started):
 
         # Get player stats
         for player in team_roster:
-            player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID']).get_normalized_dict()['SeasonTotalsRegularSeason']
+            player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID'], proxy=PROXY).get_normalized_dict()['SeasonTotalsRegularSeason']
             player_season_stats = [season_stats for season_stats in player_stats if season_stats['SEASON_ID'] == player_season and season_stats['TEAM_ID'] == team_id]
             try:
                 if len(player_season_stats) > 0:
@@ -128,7 +129,7 @@ def fetch_roster(team_id, season):
         exit(1)
 
     try:
-        team_data = commonteamroster.CommonTeamRoster(team_id, season=season).get_normalized_dict()
+        team_data = commonteamroster.CommonTeamRoster(team_id, season=season, proxy=PROXY).get_normalized_dict()
         team_roster = team_data['CommonTeamRoster']
         team_coaches = team_data['Coaches']
     except Exception as e:
@@ -138,7 +139,7 @@ def fetch_roster(team_id, season):
         team_roster_dict = {}
 
         for player in team_roster:
-            player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID']).get_normalized_dict()['SeasonTotalsRegularSeason']
+            player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID'], proxy=PROXY).get_normalized_dict()['SeasonTotalsRegularSeason']
             player_season_stats = [season_stats for season_stats in player_stats if season_stats['SEASON_ID'] == season and season_stats['TEAM_ID'] == team_id]
             try:
                 if len(player_season_stats) > 0:

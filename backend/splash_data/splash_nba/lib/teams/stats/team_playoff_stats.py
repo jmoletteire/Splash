@@ -4,7 +4,8 @@ from nba_api.stats.endpoints import leaguedashteamstats, leaguehustlestatsteam
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -57,7 +58,7 @@ def fetch_team_playoff_stats(season):
     try:
         # Get basic stats
         basic_stats = leaguedashteamstats.LeagueDashTeamStats(
-            season=season, season_type_all_star='Playoffs', timeout=30
+            season=season, season_type_all_star='Playoffs', timeout=30, proxy=PROXY
         ).get_normalized_dict()['LeagueDashTeamStats']
 
         for team in basic_stats:
@@ -76,7 +77,7 @@ def fetch_team_playoff_stats(season):
     if season >= '1996-97':
         try:
             adv_stats = leaguedashteamstats.LeagueDashTeamStats(
-                season=season, season_type_all_star='Playoffs', measure_type_detailed_defense='Advanced', timeout=30
+                season=season, season_type_all_star='Playoffs', measure_type_detailed_defense='Advanced', timeout=30, proxy=PROXY
             ).get_normalized_dict()['LeagueDashTeamStats']
 
             for team in adv_stats:
@@ -95,7 +96,7 @@ def fetch_team_playoff_stats(season):
     if season >= '2015-16':
         try:
             hustle_stats = leaguehustlestatsteam.LeagueHustleStatsTeam(
-                season=season, season_type_all_star='Playoffs', timeout=30
+                season=season, season_type_all_star='Playoffs', timeout=30, proxy=PROXY
             ).get_normalized_dict()['HustleStatsTeam']
 
             for team in hustle_stats:

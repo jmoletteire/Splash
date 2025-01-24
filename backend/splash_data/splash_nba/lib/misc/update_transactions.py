@@ -4,7 +4,8 @@ from pymongo import MongoClient
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -45,7 +46,7 @@ def update_transactions():
 
     # Fetch the data from the URL
     url = "https://stats.nba.com/js/data/playermovement/NBA_Player_Movement.json"
-    response = requests.get(url)
+    response = requests.get(url, proxies=PROXY)
 
     # Check if the request was successful
     if response.status_code == 200:

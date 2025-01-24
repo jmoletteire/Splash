@@ -1,11 +1,12 @@
-import requests
 import logging
+import requests
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -59,7 +60,7 @@ async def fetch_odds():
 
     # Fetch the data from the URL
     url = "https://cdn.nba.com/static/json/liveData/odds/odds_todaysGames.json"
-    response = requests.get(url)
+    response = requests.get(url, proxies=PROXY)
 
     # Check if the request was successful
     if response.status_code == 200:

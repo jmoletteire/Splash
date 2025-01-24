@@ -1,7 +1,6 @@
 import logging
 import time
 from datetime import datetime
-
 from splash_nba.lib.misc.update_transactions import update_transactions
 from splash_nba.lib.teams.stats.custom_team_stats import three_and_ft_rate
 from splash_nba.lib.teams.stats.custom_team_stats_rank import current_season_custom_team_stats_rank
@@ -18,8 +17,9 @@ from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_line
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
     from splash_nba.util.mongo_connect import get_mongo_collection
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys

@@ -5,7 +5,8 @@ from nba_api.live.nba.endpoints import scoreboard
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -23,7 +24,7 @@ except ImportError:
 
 # Function to fetch box score stats for a game
 def fetch_live_scores():
-    scores = scoreboard.ScoreBoard().get_dict()['scoreboard']['games']
+    scores = scoreboard.ScoreBoard(proxy=PROXY).get_dict()['scoreboard']['games']
     return scores
 
 

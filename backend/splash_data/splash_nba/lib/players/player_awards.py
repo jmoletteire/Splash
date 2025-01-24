@@ -6,7 +6,8 @@ from nba_api.stats.endpoints import playerawards
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -41,7 +42,7 @@ players = players_collection.count_documents({})
 
 for i, player in enumerate(players_collection.find({}, {"PERSON_ID": 1, "_id": 0})):
     try:
-        player_awards = playerawards.PlayerAwards(player["PERSON_ID"]).get_normalized_dict()['PlayerAwards']
+        player_awards = playerawards.PlayerAwards(player["PERSON_ID"], proxy=PROXY).get_normalized_dict()['PlayerAwards']
 
         awards = {}
 

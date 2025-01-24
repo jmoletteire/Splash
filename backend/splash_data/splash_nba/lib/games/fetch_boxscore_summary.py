@@ -1,12 +1,13 @@
-import random
 import time
-from nba_api.stats.endpoints import boxscoresummaryv2
-from pymongo import MongoClient
+import random
 import logging
+from pymongo import MongoClient
+from nba_api.stats.endpoints import boxscoresummaryv2
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys

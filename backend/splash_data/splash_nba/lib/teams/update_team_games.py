@@ -3,8 +3,9 @@ from pymongo import MongoClient
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
     from splash_nba.util.mongo_connect import get_mongo_collection
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys

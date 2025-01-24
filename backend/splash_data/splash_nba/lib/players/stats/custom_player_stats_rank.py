@@ -1,9 +1,9 @@
-from pymongo import MongoClient
 import logging
+from pymongo import MongoClient
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -14,7 +14,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+        from env import URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 

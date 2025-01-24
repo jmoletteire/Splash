@@ -1,7 +1,7 @@
 import time
 import openai
-import requests
 import logging
+import requests
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from nba_api.stats.endpoints import ScoreboardV2
@@ -10,7 +10,8 @@ from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, OPENAI_API_KEY, PREV_SEASON
+    from splash_nba.util.env import URI, CURR_SEASON, OPENAI_API_KEY, PREV_SEASON
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -317,7 +318,7 @@ def fetch_upcoming_games(game_date):
         '6': 'IST_FINAL'
     }
 
-    scoreboard = ScoreboardV2(game_date=game_date, day_offset=0)
+    scoreboard = ScoreboardV2(proxy=PROXY, game_date=game_date, day_offset=0)
     games = scoreboard.get_normalized_dict()
 
     if len(games['GameHeader']) > 0:

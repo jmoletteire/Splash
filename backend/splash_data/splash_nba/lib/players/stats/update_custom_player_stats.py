@@ -1,16 +1,16 @@
 import math
-import random
 import time
-
+import random
+import logging
+from pymongo import MongoClient
+from collections import defaultdict
 from nba_api.stats.endpoints import teamplayeronoffdetails, leaguedashptstats, playerdashptshots, leagueseasonmatchups, \
     leaguedashplayerstats, matchupsrollup
-from pymongo import MongoClient
-import logging
-from collections import defaultdict
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -74,12 +74,12 @@ def update_scoring_breakdown_and_pct_unassisted(season_type, team_id):
         exit(1)
 
     if season_type == 'PLAYOFFS':
-        player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
+        player_uast = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, measure_type_detailed_defense='Scoring',
                                                                   season=CURR_SEASON,
                                                                   season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPlayerStats']
     else:
-        player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
+        player_uast = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, measure_type_detailed_defense='Scoring',
                                                                   season=CURR_SEASON).get_normalized_dict()[
             'LeagueDashPlayerStats']
 
@@ -148,10 +148,10 @@ def update_matchup_difficulty_and_dps(season_type, team_id):
 
                 try:
                     if season_type == 'REGULAR SEASON':
-                        data = leagueseasonmatchups.LeagueSeasonMatchups(season=CURR_SEASON,
+                        data = leagueseasonmatchups.LeagueSeasonMatchups(proxy=PROXY, season=CURR_SEASON,
                                                                          def_player_id_nullable=player['PERSON_ID'])
                     else:
-                        data = leagueseasonmatchups.LeagueSeasonMatchups(season=CURR_SEASON,
+                        data = leagueseasonmatchups.LeagueSeasonMatchups(proxy=PROXY, season=CURR_SEASON,
                                                                          season_type_playoffs='Playoffs',
                                                                          def_player_id_nullable=player['PERSON_ID'])
 
@@ -263,9 +263,9 @@ def update_versatility_score(season_type, team_id):
 
                 try:
                     if season_type == 'PLAYOFFS':
-                        matchups = matchupsrollup.MatchupsRollup(def_player_id_nullable=player['PERSON_ID'], season=CURR_SEASON, season_type_playoffs='Playoffs').get_normalized_dict()
+                        matchups = matchupsrollup.MatchupsRollup(proxy=PROXY, def_player_id_nullable=player['PERSON_ID'], season=CURR_SEASON, season_type_playoffs='Playoffs').get_normalized_dict()
                     else:
-                        matchups = matchupsrollup.MatchupsRollup(def_player_id_nullable=player['PERSON_ID'], season=CURR_SEASON).get_normalized_dict()
+                        matchups = matchupsrollup.MatchupsRollup(proxy=PROXY, def_player_id_nullable=player['PERSON_ID'], season=CURR_SEASON).get_normalized_dict()
 
                     try:
                         t_G = matchups['MatchupsRollup'][0]['PERCENT_OF_TIME']
@@ -712,14 +712,14 @@ def update_shot_distribution(season_type, team_id):
                 continue
 
             if season_type == 'PLAYOFFS':
-                player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
+                player_shooting = playerdashptshots.PlayerDashPtShots(proxy=PROXY, team_id=team_id,
                                                                       player_id=player_id,
                                                                       season=CURR_SEASON,
                                                                       season_type_all_star='Playoffs'
                                                                       ).get_normalized_dict()
             else:
                 try:
-                    player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
+                    player_shooting = playerdashptshots.PlayerDashPtShots(proxy=PROXY, team_id=team_id,
                                                                           player_id=player_id,
                                                                           season=CURR_SEASON
                                                                           ).get_normalized_dict()
@@ -775,44 +775,44 @@ def update_player_tracking_stats(season_type, team_id):
         exit(1)
 
     if season_type == 'PLAYOFFS':
-        player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
+        player_touches = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
                                                              season=CURR_SEASON,
                                                              season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
-        player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
+        player_passing = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
                                                              season=CURR_SEASON,
                                                              season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
-        player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
+        player_drives = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
                                                             season=CURR_SEASON,
                                                             season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
         player_rebounding = \
-            leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
+            leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
                                                 season=CURR_SEASON,
                                                 season_type_all_star='Playoffs').get_normalized_dict()[
                 'LeagueDashPtStats']
-        player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
+        player_speed_dist = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
                                                                 season=CURR_SEASON,
                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
     else:
         try:
-            player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
+            player_touches = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
                                                                  season=CURR_SEASON).get_normalized_dict()[
                 'LeagueDashPtStats']
         except Exception:
             player_touches = []
 
         try:
-            player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
+            player_passing = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
                                                                  season=CURR_SEASON).get_normalized_dict()[
                 'LeagueDashPtStats']
         except Exception:
             player_passing = []
 
         try:
-            player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
+            player_drives = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
                                                                 season=CURR_SEASON).get_normalized_dict()[
                 'LeagueDashPtStats']
         except Exception:
@@ -820,14 +820,14 @@ def update_player_tracking_stats(season_type, team_id):
 
         try:
             player_rebounding = \
-                leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
+                leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
                                                     season=CURR_SEASON).get_normalized_dict()[
                     'LeagueDashPtStats']
         except Exception:
             player_rebounding = []
 
         try:
-            player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
+            player_speed_dist = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
                                                                     season=CURR_SEASON).get_normalized_dict()[
                 'LeagueDashPtStats']
         except Exception:
@@ -1042,7 +1042,7 @@ def update_player_on_off(season_type, team_id):
 
         # PLAYOFFS
         if season_type == 'PLAYOFFS':
-            player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=CURR_SEASON,
+            player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(proxy=PROXY, team_id=team['TEAM_ID'], season=CURR_SEASON,
                                                                           season_type_all_star='Playoffs',
                                                                           measure_type_detailed_defense='Advanced').get_normalized_dict()
 
@@ -1075,7 +1075,7 @@ def update_player_on_off(season_type, team_id):
 
         # REGULAR SEASON
         else:
-            player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=CURR_SEASON,
+            player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(proxy=PROXY, team_id=team['TEAM_ID'], season=CURR_SEASON,
                                                                           measure_type_detailed_defense='Advanced').get_normalized_dict()
 
             player_on = player_on_off['PlayersOnCourtTeamPlayerOnOffDetails']

@@ -5,7 +5,8 @@ from nba_api.stats.endpoints import commonteamroster
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -46,7 +47,7 @@ def fetch_roster(team_id):
             exit(1)
 
     try:
-        team_roster = commonteamroster.CommonTeamRoster(team_id, season=CURR_SEASON).get_normalized_dict()
+        team_roster = commonteamroster.CommonTeamRoster(team_id, season=CURR_SEASON, proxy=PROXY).get_normalized_dict()
         players = team_roster['CommonTeamRoster']
         coaches = team_roster['Coaches']
 

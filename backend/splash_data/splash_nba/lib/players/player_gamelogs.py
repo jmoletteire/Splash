@@ -6,7 +6,8 @@ from nba_api.stats.endpoints import playergamelogs
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -32,13 +33,13 @@ def gamelogs(player_id, season, season_type):
         exit(1)
 
     if season_type == 'PLAYOFFS':
-        gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs').get_normalized_dict()['PlayerGameLogs']
+        gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs').get_normalized_dict()['PlayerGameLogs']
         if season >= '1996-97':
-            adv_gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs', measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
+            adv_gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs', measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
     else:
-        gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season).get_normalized_dict()['PlayerGameLogs']
+        gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, player_id_nullable=player_id, season_nullable=season).get_normalized_dict()['PlayerGameLogs']
         if season >= '1996-97':
-            adv_gamelog = playergamelogs.PlayerGameLogs(player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
+            adv_gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
 
     base_keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:34]
     if season >= '1996-97':

@@ -1,12 +1,13 @@
 import requests
 import logging
+from pymongo import MongoClient
 from collections import defaultdict
 from nba_api.stats.endpoints import iststandings
-from pymongo import MongoClient
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON
+    from splash_nba.util.env import URI, CURR_SEASON
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -33,7 +34,7 @@ def update_current_cup():
         exit(1)
 
     try:
-        teams = iststandings.ISTStandings(season=CURR_SEASON).get_dict()['teams']
+        teams = iststandings.ISTStandings(proxy=PROXY, season=CURR_SEASON).get_dict()['teams']
     except Exception as e:
         logging.error(f"NBA Cup data unavailable: {e}")
         return
@@ -125,7 +126,7 @@ def fetch_all_cups():
     seasons = ['2023-24']
 
     for season in seasons:
-        teams = iststandings.ISTStandings(season=season).get_dict()['teams']
+        teams = iststandings.ISTStandings(proxy=PROXY, season=season).get_dict()['teams']
 
         # Initialize a dictionary to group teams by istGroup
         grouped_teams = defaultdict(list)

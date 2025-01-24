@@ -1,4 +1,3 @@
-import inspect
 import logging
 from pymongo import MongoClient
 from nba_api.stats.endpoints import commonplayoffseries, boxscoresummaryv2
@@ -6,6 +5,7 @@ from nba_api.stats.endpoints import commonplayoffseries, boxscoresummaryv2
 try:
     # Try to import the local env.py file
     from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -16,7 +16,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import URI
+        from env import PROXY, URI
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -173,7 +173,7 @@ def get_playoff_bracket_data(season, playoff_data):
             else:
                 logging.info(f"Game ID {game_id} not found in the collection, gathering data...")
 
-                summary = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id).get_normalized_dict()
+                summary = boxscoresummaryv2.BoxScoreSummaryV2(proxy=PROXY, game_id=game_id).get_normalized_dict()
 
                 series['TEAM_ONE_WINS'] = summary['SeasonSeries'][0]['HOME_TEAM_WINS'] if game['HOME_TEAM_ID'] == \
                                                                                           series['TEAM_ONE'] else \
@@ -350,7 +350,7 @@ if __name__ == '__main__':
     logging.info("Connected to MongoDB")
 
     for season in seasons:
-        playoff_games = commonplayoffseries.CommonPlayoffSeries(season=season).get_normalized_dict()['PlayoffSeries']
+        playoff_games = commonplayoffseries.CommonPlayoffSeries(proxy=PROXY, season=season).get_normalized_dict()['PlayoffSeries']
 
         if season <= '2000-01':
             series_data = reformat_pre2002_series_data(season, playoff_games)

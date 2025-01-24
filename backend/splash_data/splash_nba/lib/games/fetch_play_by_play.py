@@ -1,5 +1,5 @@
-import random
 import time
+import random
 import logging
 from pymongo import MongoClient
 from datetime import datetime, timedelta
@@ -8,7 +8,8 @@ from nba_api.stats.endpoints import videoeventsasset
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -86,7 +87,7 @@ def fetch_play_by_play(game_id):
         'yLegacy'
     ]
 
-    actions = playbyplay.PlayByPlay(game_id=game_id).get_dict()['game']['actions']
+    actions = playbyplay.PlayByPlay(proxy=PROXY, game_id=game_id).get_dict()['game']['actions']
     pbp = []
 
     for i, action in enumerate(actions):
@@ -94,7 +95,7 @@ def fetch_play_by_play(game_id):
         play_info = {key: action.get(key, 0) for key in keys}
 
         try:
-            play_info['videoId'] = videoeventsasset.VideoEventsAsset(game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
+            play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=PROXY, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
             time.sleep(random.uniform(0.5, 1.0))
         except Exception:
             play_info['videoId'] = None

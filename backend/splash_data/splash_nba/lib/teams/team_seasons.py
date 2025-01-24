@@ -6,7 +6,8 @@ from splash_nba.lib.teams.stats.team_stats import fetch_team_stats
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -33,7 +34,7 @@ def update_current_season(team_id):
         exit(1)
 
     try:
-        team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id).get_normalized_dict()['TeamStats']
+        team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id, proxy=PROXY).get_normalized_dict()['TeamStats']
 
         # Only for current season
         # EXAMPLE: season_stats_dict = {"2024-25": { data }}
@@ -93,7 +94,7 @@ def update_current_season(team_id):
 
 
 def fetch_all_seasons(team_id):
-    team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id).get_normalized_dict()['TeamStats']
+    team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id, proxy=PROXY).get_normalized_dict()['TeamStats']
 
     # All seasons since 1980-81
     season_stats_dict = {

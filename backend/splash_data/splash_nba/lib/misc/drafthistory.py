@@ -6,6 +6,7 @@ from nba_api.stats.endpoints import drafthistory, commonplayerinfo, playerawards
 try:
     # Try to import the local env.py file
     from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -16,7 +17,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import URI
+        from env import PROXY, URI
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -112,7 +113,7 @@ def get_awards(player):
     result = players_collection.find_one({'PERSON_ID': player}, {'AWARDS': 1, '_id': 0})
 
     if result is None:
-        awards = playerawards.PlayerAwards(player_id=player).get_normalized_dict()['PlayerAwards']
+        awards = playerawards.PlayerAwards(proxy=PROXY, player_id=player).get_normalized_dict()['PlayerAwards']
         for award in awards:
             if award['DESCRIPTION'] == 'Hall of Fame Inductee':
                 award_checks['hof'] = 1
@@ -148,7 +149,7 @@ def get_additional_info():
         all_star = 0
         for player in draft['SELECTIONS']:
             try:
-                player_data = commonplayerinfo.CommonPlayerInfo(player['PERSON_ID']).get_normalized_dict()['CommonPlayerInfo'][0]
+                player_data = commonplayerinfo.CommonPlayerInfo(player['PERSON_ID'], proxy=PROXY).get_normalized_dict()['CommonPlayerInfo'][0]
                 player['POSITION'] = player_data['POSITION']
                 player['AGE'] = age_at_draft(year, player_data['BIRTHDATE'])
                 player['HEIGHT'] = player_data['HEIGHT']
@@ -184,7 +185,7 @@ def get_additional_info():
 
 
 def draft_history():
-    draft_hist = drafthistory.DraftHistory().get_normalized_dict()['DraftHistory']
+    draft_hist = drafthistory.DraftHistory(proxy=PROXY).get_normalized_dict()['DraftHistory']
 
     # Organize the data into the desired format
     organized_data = {}

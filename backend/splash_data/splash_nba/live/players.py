@@ -21,8 +21,9 @@ from splash_nba.lib.players.update_player_contracts import fetch_player_contract
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
     from splash_nba.util.mongo_connect import get_mongo_collection
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -356,7 +357,7 @@ async def players_daily_update():
         # Update awards for all ACTIVE players
         for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'}, {"PERSON_ID": 1, "_id": 0})):
             try:
-                player_awards = playerawards.PlayerAwards(player["PERSON_ID"]).get_normalized_dict()['PlayerAwards']
+                player_awards = playerawards.PlayerAwards(player["PERSON_ID"], proxy=PROXY).get_normalized_dict()['PlayerAwards']
 
                 awards = {}
 

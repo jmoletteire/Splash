@@ -1,14 +1,15 @@
-import random
 import time
-import requests
+import random
 import logging
+import requests
 from datetime import datetime
-from nba_api.stats.endpoints import boxscoreadvancedv2
 from pymongo import MongoClient
+from nba_api.stats.endpoints import boxscoreadvancedv2
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON
+    from splash_nba.util.env import URI, CURR_SEASON
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -247,7 +248,7 @@ def synergy_shot_quality(sr_id, adv_boxscore):
 
 # Function to fetch box score stats for a game
 def fetch_box_score_adv(game_id):
-    boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id, proxy=PROXY).get_normalized_dict()
+    boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(proxy=PROXY, game_id=game_id, proxy=PROXY).get_normalized_dict()
     return boxscore
 
 

@@ -1,16 +1,16 @@
 import re
 import logging
 import requests
-import json
 from datetime import datetime
+from bs4 import BeautifulSoup
 from pymongo import MongoClient
 from unidecode import unidecode
-from bs4 import BeautifulSoup
 
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys

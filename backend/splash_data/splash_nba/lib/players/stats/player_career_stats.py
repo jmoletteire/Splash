@@ -1,12 +1,13 @@
-import random
 import time
-from nba_api.stats.endpoints import playercareerstats
-from pymongo import MongoClient
+import random
 import logging
+from pymongo import MongoClient
+from nba_api.stats.endpoints import playercareerstats
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON
+    from splash_nba.util.env import URI, CURR_SEASON
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -32,8 +33,8 @@ def update_player_career_stats(player):
     players_collection = db.nba_players
     teams_collection = db.nba_teams
 
-    player_totals = playercareerstats.PlayerCareerStats(player_id=player).get_normalized_dict()
-    player_per_game = playercareerstats.PlayerCareerStats(player_id=player, per_mode36='PerGame').get_normalized_dict()
+    player_totals = playercareerstats.PlayerCareerStats(proxy=PROXY, player_id=player).get_normalized_dict()
+    player_per_game = playercareerstats.PlayerCareerStats(proxy=PROXY, player_id=player, per_mode36='PerGame').get_normalized_dict()
 
     reg_totals = player_totals['CareerTotalsRegularSeason']
     reg_totals_by_season = player_totals['SeasonTotalsRegularSeason']
@@ -243,8 +244,8 @@ def update_player_career_stats(player):
 
 
 def player_career_stats(player):
-    player_totals = playercareerstats.PlayerCareerStats(player_id=player).get_normalized_dict()
-    player_per_game = playercareerstats.PlayerCareerStats(player_id=player, per_mode36='PerGame').get_normalized_dict()
+    player_totals = playercareerstats.PlayerCareerStats(proxy=PROXY, player_id=player).get_normalized_dict()
+    player_per_game = playercareerstats.PlayerCareerStats(proxy=PROXY, player_id=player, per_mode36='PerGame').get_normalized_dict()
 
     reg_totals = player_totals['CareerTotalsRegularSeason']
     reg_totals_by_season = player_totals['SeasonTotalsRegularSeason']

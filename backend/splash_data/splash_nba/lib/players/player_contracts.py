@@ -5,7 +5,7 @@ import json
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -16,7 +16,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import PROXY, URI
+        from env import URI
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 

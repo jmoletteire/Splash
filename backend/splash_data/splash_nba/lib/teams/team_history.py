@@ -4,7 +4,8 @@ from nba_api.stats.endpoints import franchisehistory
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI
+    from splash_nba.util.env import URI
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -32,7 +33,7 @@ def update_team_history(team_id):
 
     try:
         # Fetch the franchise history data
-        history_list = franchisehistory.FranchiseHistory().get_normalized_dict()['FranchiseHistory']
+        history_list = franchisehistory.FranchiseHistory(proxy=PROXY).get_normalized_dict()['FranchiseHistory']
 
         # Organize the data into the desired format
         organized_data = {}

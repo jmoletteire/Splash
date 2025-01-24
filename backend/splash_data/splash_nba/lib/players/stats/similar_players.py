@@ -1,12 +1,12 @@
+import logging
 import numpy as np
+import pandas as pd
 from pymongo import MongoClient
 from sklearn.metrics.pairwise import euclidean_distances
-import pandas as pd
-import logging
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -17,9 +17,10 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+        from env import URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+
 
 def get_nested_value(data, path):
     """Fetch nested values from a dictionary given a path with dot notation."""

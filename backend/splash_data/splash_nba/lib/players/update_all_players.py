@@ -6,7 +6,8 @@ from nba_api.stats.endpoints import commonallplayers, commonplayerinfo
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
+    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
+    PROXY = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -31,7 +32,7 @@ def add_historic_players():
         logging.error(f"Error connecting to MongoDB: {e}")
         exit(1)
 
-    all_players = commonallplayers.CommonAllPlayers().get_normalized_dict()['CommonAllPlayers']
+    all_players = commonallplayers.CommonAllPlayers(proxy=PROXY).get_normalized_dict()['CommonAllPlayers']
 
     # Filter players to only add those that don't exist in the collection
     new_players = [player for player in all_players if not players_collection.find_one({"PERSON_ID": player["PERSON_ID"]})]
@@ -56,7 +57,7 @@ def add_players():
         logging.error(f"Error connecting to MongoDB: {e}")
         exit(1)
 
-    all_players = commonallplayers.CommonAllPlayers(season=CURR_SEASON).get_normalized_dict()['CommonAllPlayers']
+    all_players = commonallplayers.CommonAllPlayers(season=CURR_SEASON, proxy=PROXY).get_normalized_dict()['CommonAllPlayers']
 
     # Filter players to only add those that don't exist in the collection
     new_players = [player for player in all_players if not players_collection.find_one({"PERSON_ID": player["PERSON_ID"]}) and player["ROSTERSTATUS"] == 1]
@@ -82,7 +83,7 @@ def new_player_info(player):
         exit(1)
 
     try:
-        player_data = commonplayerinfo.CommonPlayerInfo(player).get_normalized_dict()['CommonPlayerInfo']
+        player_data = commonplayerinfo.CommonPlayerInfo(player, proxy=PROXY).get_normalized_dict()['CommonPlayerInfo']
 
         players_collection.update_one(
             {"PERSON_ID": player},
@@ -128,7 +129,7 @@ def restructure_new_docs():
 # Function to get the latest player info
 def get_player_info(person_id):
     try:
-        latest_info = commonplayerinfo.CommonPlayerInfo(player_id=person_id).get_normalized_dict()['CommonPlayerInfo']
+        latest_info = commonplayerinfo.CommonPlayerInfo(player_id=person_id, proxy=PROXY).get_normalized_dict()['CommonPlayerInfo']
         return latest_info
     except Exception as e:
         print(f"Error fetching data for player ID {person_id}: {e}")

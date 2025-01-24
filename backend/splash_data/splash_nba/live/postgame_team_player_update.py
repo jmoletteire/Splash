@@ -1,10 +1,10 @@
-import logging
 import time
-import threading
+import logging
 import schedule
-from datetime import datetime, timedelta, timezone
-from splash_nba.live.players import update_players
+import threading
+from datetime import datetime
 from splash_nba.live.teams import update_teams
+from splash_nba.live.players import update_players
 
 try:
     # Try to import the local env.py file
@@ -20,7 +20,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri
+        from env import PROXY, URI
         from mongo_connect import get_mongo_collection
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
