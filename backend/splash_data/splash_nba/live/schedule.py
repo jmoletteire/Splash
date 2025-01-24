@@ -115,5 +115,5 @@ async def main():
         if scheduler:
             scheduler.shutdown()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# if __name__ == "__main__":
+asyncio.run(main())
