@@ -5,9 +5,25 @@ import time
 from nba_api.stats.endpoints import teamplayeronoffdetails, leaguedashptstats, playerdashptshots, leagueseasonmatchups, \
     leaguedashplayerstats, matchupsrollup
 from pymongo import MongoClient
-from splash_nba.util.env import uri, k_current_season
 import logging
 from collections import defaultdict
+
+try:
+    # Try to import the local env.py file
+    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+except ImportError:
+    # Fallback to the remote env.py path
+    import sys
+    import os
+
+    env_path = "/home/ubuntu"
+    if env_path not in sys.path:
+        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+    try:
+        from env import uri, k_current_season, k_current_season_type
+    except ImportError:
+        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 seasons = [
     '2023-24',

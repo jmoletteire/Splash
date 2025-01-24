@@ -4,11 +4,27 @@ from datetime import datetime
 from pymongo import MongoClient
 from unidecode import unidecode
 
-from splash_nba.util.env import uri
 import logging
 import requests
 import json
 from bs4 import BeautifulSoup
+
+try:
+    # Try to import the local env.py file
+    from splash_nba.util.env import uri
+except ImportError:
+    # Fallback to the remote env.py path
+    import sys
+    import os
+
+    env_path = "/home/ubuntu"
+    if env_path not in sys.path:
+        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+    try:
+        from env import uri
+    except ImportError:
+        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 
 def player_synergy_ids(team, team_sr_id):

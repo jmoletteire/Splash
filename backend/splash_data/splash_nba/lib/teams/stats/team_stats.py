@@ -1,5 +1,5 @@
-from nba_api.stats.endpoints import leaguedashteamstats, leaguehustlestatsteam
 import logging
+from nba_api.stats.endpoints import leaguedashteamstats, leaguehustlestatsteam
 
 
 def fetch_team_stats(team_id, season, season_type):

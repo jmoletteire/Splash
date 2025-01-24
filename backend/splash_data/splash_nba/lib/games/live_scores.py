@@ -1,7 +1,7 @@
 import nba_api
-from nba_api.live.nba.endpoints import scoreboard
-from pymongo import MongoClient
 import logging
+from pymongo import MongoClient
+from nba_api.live.nba.endpoints import scoreboard
 
 try:
     # Try to import the local env.py file

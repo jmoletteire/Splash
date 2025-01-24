@@ -1,7 +1,23 @@
-from pymongo import MongoClient
-from splash_nba.util.env import uri
-from splash_nba.util.mongo_connect import get_mongo_collection
 import logging
+from pymongo import MongoClient
+from splash_nba.util.mongo_connect import get_mongo_collection
+
+try:
+    # Try to import the local env.py file
+    from splash_nba.util.env import uri
+except ImportError:
+    # Fallback to the remote env.py path
+    import sys
+    import os
+
+    env_path = "/home/ubuntu"
+    if env_path not in sys.path:
+        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+    try:
+        from env import uri
+    except ImportError:
+        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 
 def convert_year_to_season(year):

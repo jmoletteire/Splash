@@ -1,7 +1,7 @@
 import requests
 import logging
-from datetime import datetime, timedelta
 from pymongo import MongoClient
+from datetime import datetime, timedelta
 
 try:
     # Try to import the local env.py file

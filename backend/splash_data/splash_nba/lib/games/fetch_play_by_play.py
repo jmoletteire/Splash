@@ -1,11 +1,10 @@
 import random
 import time
-from datetime import datetime, timedelta
-
-from nba_api.stats.endpoints import videoeventsasset
-from nba_api.live.nba.endpoints import playbyplay
-from pymongo import MongoClient
 import logging
+from pymongo import MongoClient
+from datetime import datetime, timedelta
+from nba_api.live.nba.endpoints import playbyplay
+from nba_api.stats.endpoints import videoeventsasset
 
 try:
     # Try to import the local env.py file

@@ -1,5 +1,5 @@
-import requests
 import logging
+import requests
 from pymongo import MongoClient
 
 try:
