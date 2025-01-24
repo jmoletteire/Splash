@@ -35,5 +35,7 @@ jobs:
           git pull origin main  # Pull the latest code
           source venv/bin/activate
           pip install -r requirements.txt  # Install any new dependencies
+          cat /usr/local/share/ca-certificates/BrightData\ SSL\ certificate\ \(port\ 33335\).crt >> /home/ubuntu/Splash/backend/splash_data/venv/lib/python3.12/site-packages/certifi/cacert.pem
           sudo systemctl restart flaskapp  # Restart the Flask app
+          sudo supervisorctl restart schedule # Restart live updates
           EOF
