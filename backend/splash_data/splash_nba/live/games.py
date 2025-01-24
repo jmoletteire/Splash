@@ -900,7 +900,7 @@ async def games_live_update():
                 logging.info(f'(Games Live) Upcoming game {game["gameId"]} is up to date.')
 
         # IN-PROGRESS
-        elif is_final:
+        elif in_progress:
             # Summary, Box Score, PBP
             summary = fetch_box_score_summary(game['gameId'])
             box_score = boxscore.BoxScore(game_id=game['gameId']).get_dict()['game']
@@ -1164,5 +1164,5 @@ def games_daily_update():
 
 
 if __name__ == '__main__':
-    games_prev_day()
-    # games_live_update()
+    # games_prev_day()
+    games_live_update()
