@@ -16,7 +16,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri
+        from env import URI
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
