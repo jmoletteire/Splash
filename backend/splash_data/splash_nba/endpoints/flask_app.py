@@ -1,5 +1,5 @@
-import json
 import sys
+import json
 import time
 import logging
 from datetime import datetime
@@ -35,6 +35,7 @@ try:
     # Configure logging
     logging.basicConfig(level=logging.INFO)
     client = MongoClient(URI)
+    logging.info(URI)
     db = client.splash
 
     # Define all collections at the top level, so they're accessible across routes

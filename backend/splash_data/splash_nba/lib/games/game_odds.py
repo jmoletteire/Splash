@@ -60,7 +60,7 @@ async def fetch_odds():
 
     # Fetch the data from the URL
     url = "https://cdn.nba.com/static/json/liveData/odds/odds_todaysGames.json"
-    response = requests.get(url, proxies=PROXY)
+    response = requests.get(url)
 
     # Check if the request was successful
     if response.status_code == 200:
