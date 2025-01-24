@@ -3,7 +3,7 @@ import logging
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -14,7 +14,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season
+        from env import PROXY, URI, CURR_SEASON
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -24,7 +24,7 @@ def current_season_per_75(playoffs, team_id):
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     players_collection = db.nba_players
 
@@ -128,7 +128,7 @@ def current_season_per_75(playoffs, team_id):
 
             if playoffs:
                 try:
-                    playoff_stats = player_doc['STATS'][k_current_season].get("PLAYOFFS", None)
+                    playoff_stats = player_doc['STATS'][CURR_SEASON].get("PLAYOFFS", None)
                 except KeyError:
                     continue
 
@@ -138,7 +138,7 @@ def current_season_per_75(playoffs, team_id):
                 adv_stats = playoff_stats.get("ADV", {})
             else:
                 try:
-                    reg_season_stats = player_doc['STATS'][k_current_season].get("REGULAR SEASON", None)
+                    reg_season_stats = player_doc['STATS'][CURR_SEASON].get("REGULAR SEASON", None)
                 except KeyError:
                     continue
 
@@ -159,11 +159,11 @@ def current_season_per_75(playoffs, team_id):
                     loc = location.split('.')
 
                     if len(loc) == 2:
-                        stat_value = stats[k_current_season][loc[0]].get(loc[1], {}).get(stat_key, None)
+                        stat_value = stats[CURR_SEASON][loc[0]].get(loc[1], {}).get(stat_key, None)
                     elif len(loc) == 3:
-                        stat_value = stats[k_current_season][loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
+                        stat_value = stats[CURR_SEASON][loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
                     else:
-                        stat_value = stats[k_current_season].get(location, {}).get(stat_key, None)
+                        stat_value = stats[CURR_SEASON].get(location, {}).get(stat_key, None)
 
                     if stat_value is not None:
                         try:
@@ -177,10 +177,10 @@ def current_season_per_75(playoffs, team_id):
                             # Update the player document with the new per-75 possession value
                             players_collection.update_one(
                                 {"_id": player_doc["_id"]},
-                                {"$set": {f"STATS.{k_current_season}.{location}.{per_75_key}": per_75_value}}
+                                {"$set": {f"STATS.{CURR_SEASON}.{location}.{per_75_key}": per_75_value}}
                             )
                         except Exception as e:
-                            logging.error(f'Unable to add {stat_key} for {player_doc["PLAYER_ID"]} for {k_current_season}: {e}')
+                            logging.error(f'Unable to add {stat_key} for {player_doc["PLAYER_ID"]} for {CURR_SEASON}: {e}')
             else:
                 continue
 
@@ -246,7 +246,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     players_collection = db.nba_players
     logging.info("Connected to MongoDB")

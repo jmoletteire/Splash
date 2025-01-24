@@ -5,7 +5,7 @@ from nba_api.stats.endpoints import commonteamroster, playercareerstats
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_prev_season
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, PREV_SEASON
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -16,7 +16,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_prev_season
+        from env import PROXY, URI, CURR_SEASON, PREV_SEASON
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -24,7 +24,7 @@ except ImportError:
 def update_current_roster(team_id, season_not_started):
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
         players_collection = db.nba_players
@@ -33,20 +33,20 @@ def update_current_roster(team_id, season_not_started):
         exit(1)
 
     try:
-        team_data = commonteamroster.CommonTeamRoster(team_id, season=k_current_season).get_normalized_dict()
+        team_data = commonteamroster.CommonTeamRoster(team_id, season=CURR_SEASON).get_normalized_dict()
         team_roster = team_data['CommonTeamRoster']
         team_coaches = team_data['Coaches']
     except Exception as e:
-        logging.error(f"\t(Team Rosters) Unable to fetch {k_current_season} roster for team {team_id}: {e}")
+        logging.error(f"\t(Team Rosters) Unable to fetch {CURR_SEASON} roster for team {team_id}: {e}")
 
     try:
         team_roster_dict = {}
 
         # If team has no games played, use previous season player stats
         if season_not_started:
-            player_season = k_prev_season
+            player_season = PREV_SEASON
         else:
-            player_season = k_current_season
+            player_season = CURR_SEASON
 
         # Get player stats
         for player in team_roster:
@@ -90,7 +90,7 @@ def update_current_roster(team_id, season_not_started):
                 team_roster_dict[str(player['PLAYER_ID'])] = player
 
             except Exception as e:
-                logging.error(f"\t(Team Rosters) Unable to fetch {player['PLAYER']} for team {team_id} for {k_current_season}: {e}")
+                logging.error(f"\t(Team Rosters) Unable to fetch {player['PLAYER']} for team {team_id} for {CURR_SEASON}: {e}")
                 player['GP'] = 0
                 player['GS'] = 0
                 player['MIN'] = 0
@@ -108,18 +108,18 @@ def update_current_roster(team_id, season_not_started):
         # Update document
         teams_collection.update_one(
             {"TEAM_ID": team_id},
-            {"$set": {f"seasons.{k_current_season}.ROSTER": team_roster_dict, f"seasons.{k_current_season}.COACHES": team_coaches}},
+            {"$set": {f"seasons.{CURR_SEASON}.ROSTER": team_roster_dict, f"seasons.{CURR_SEASON}.COACHES": team_coaches}},
             upsert=True
         )
-        logging.info(f"\t(Team Rosters) Updated {k_current_season} roster/coaches for team {team_id}")
+        logging.info(f"\t(Team Rosters) Updated {CURR_SEASON} roster/coaches for team {team_id}")
     except Exception as e:
-        logging.error(f"\t(Team Rosters) Unable to update {k_current_season} roster for team {team_id}: {e}")
+        logging.error(f"\t(Team Rosters) Unable to update {CURR_SEASON} roster for team {team_id}: {e}")
 
 
 def fetch_roster(team_id, season):
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
         players_collection = db.nba_players
@@ -183,7 +183,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
         players_collection = db.nba_players
@@ -196,7 +196,7 @@ if __name__ == "__main__":
         # All Teams
         for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, "seasons": 1, "_id": 0})):
             team = doc['TEAM_ID']
-            season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
+            season_not_started = True if doc['seasons'][CURR_SEASON]['GP'] == 0 else False
             update_current_roster(team_id=team, season_not_started=season_not_started)
             #seasons = doc['seasons']
             #for season in seasons.keys():

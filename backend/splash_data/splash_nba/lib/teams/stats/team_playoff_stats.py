@@ -4,7 +4,7 @@ from nba_api.stats.endpoints import leaguedashteamstats, leaguehustlestatsteam
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -15,7 +15,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
         logging.info("Connected to MongoDB")

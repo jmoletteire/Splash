@@ -6,7 +6,7 @@ import logging
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -17,7 +17,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -27,7 +27,7 @@ def update_player_stats(season_type, team_id):
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     players_collection = db.nba_players
     basic_stats = []
@@ -36,11 +36,11 @@ def update_player_stats(season_type, team_id):
 
     # Fetch basic and advanced stats for the given season
     if season_type == 'REGULAR SEASON':
-        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=k_current_season, team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
-        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=k_current_season, team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
+        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=CURR_SEASON, team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
+        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=CURR_SEASON, team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
     elif season_type == 'PLAYOFFS':
-        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=k_current_season, season_type_all_star='Playoffs', team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
-        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=k_current_season, season_type_all_star='Playoffs', team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
+        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=CURR_SEASON, season_type_all_star='Playoffs', team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
+        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Advanced', season=CURR_SEASON, season_type_all_star='Playoffs', team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
 
     if len(basic_stats) > 0 and len(adv_stats) > 0:
         basic_keys = list(basic_stats[0].keys())[:35] if len(basic_stats) > 0 else []
@@ -71,7 +71,7 @@ def update_player_stats(season_type, team_id):
             for player_id in player_stats.keys():
                 player_stats[player_id]['ADV'] = {}
 
-        logging.info(f'Processing BASIC & ADV stats for {k_current_season}...')
+        logging.info(f'Processing BASIC & ADV stats for {CURR_SEASON}...')
 
         logging.info(f'Adding data for {len(player_stats)} players.')
         for player_id, player_data in player_stats.items():
@@ -84,8 +84,8 @@ def update_player_stats(season_type, team_id):
                     {'PERSON_ID': player_id},
                     {
                         '$set': {
-                            f'STATS.{k_current_season}.{season_type}.BASIC': player_data['BASIC'],
-                            f'STATS.{k_current_season}.{season_type}.ADV': player_data['ADV']
+                            f'STATS.{CURR_SEASON}.{season_type}.BASIC': player_data['BASIC'],
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV': player_data['ADV']
                         }
                     }
                 )
@@ -167,7 +167,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     players_collection = db.nba_players
     logging.info("Connected to MongoDB")

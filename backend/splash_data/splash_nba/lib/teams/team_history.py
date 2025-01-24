@@ -4,7 +4,7 @@ from nba_api.stats.endpoints import franchisehistory
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri
+    from splash_nba.util.env import PROXY, URI
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -23,7 +23,7 @@ except ImportError:
 def update_team_history(team_id):
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB, then fetch teams
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
         logging.info("Connected to MongoDB")

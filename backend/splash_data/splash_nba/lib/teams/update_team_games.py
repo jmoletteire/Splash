@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri
+    from splash_nba.util.env import PROXY, URI
     from splash_nba.util.mongo_connect import get_mongo_collection
 except ImportError:
     # Fallback to the remote env.py path
@@ -15,7 +15,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri
+        from env import PROXY, URI
         from mongo_connect import get_mongo_collection
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Connect to your MongoDB cluster
-    client = MongoClient(uri)
+    client = MongoClient(URI)
 
     # Access your database and collections
     db = client.splash

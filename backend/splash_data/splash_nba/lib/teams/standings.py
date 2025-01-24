@@ -6,7 +6,7 @@ from nba_api.stats.endpoints import leaguestandings, leaguedashteamstats
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -17,7 +17,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -369,7 +369,7 @@ def calculate_playoff_win_pct(team, standings, season, own_conference=True):
 def update_current_standings():
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
@@ -377,24 +377,24 @@ def update_current_standings():
         exit(1)
 
     try:
-        logging.info(f"(Standings) Updating standings for Season: {k_current_season}")
-        standings = leaguestandings.LeagueStandings(season=k_current_season).get_normalized_dict()['Standings']
-        determine_tiebreakers(k_current_season, standings)
+        logging.info(f"(Standings) Updating standings for Season: {CURR_SEASON}")
+        standings = leaguestandings.LeagueStandings(season=CURR_SEASON).get_normalized_dict()['Standings']
+        determine_tiebreakers(CURR_SEASON, standings)
 
         for i, team in enumerate(standings):
-            team['SOS'], team['rSOS'] = calculate_strength_of_schedule(team, k_current_season)
+            team['SOS'], team['rSOS'] = calculate_strength_of_schedule(team, CURR_SEASON)
 
             # Update STANDINGS data for each team
             teams_collection.update_one(
                 {"TEAM_ID": team['TeamID']},
                 {"$set": {
-                    f"seasons.{k_current_season}.STANDINGS": team,
-                    f"seasons.{k_current_season}.GP": (team["WINS"] + team["LOSSES"]),
-                    f"seasons.{k_current_season}.WINS": team["WINS"],
-                    f"seasons.{k_current_season}.LOSSES": team["LOSSES"],
-                    f"seasons.{k_current_season}.WIN_PCT": team["WinPCT"],
-                    f"seasons.{k_current_season}.CONF_RANK": team["PlayoffRank"],
-                    f"seasons.{k_current_season}.DIV_RANK": team["DivisionRank"],
+                    f"seasons.{CURR_SEASON}.STANDINGS": team,
+                    f"seasons.{CURR_SEASON}.GP": (team["WINS"] + team["LOSSES"]),
+                    f"seasons.{CURR_SEASON}.WINS": team["WINS"],
+                    f"seasons.{CURR_SEASON}.LOSSES": team["LOSSES"],
+                    f"seasons.{CURR_SEASON}.WIN_PCT": team["WinPCT"],
+                    f"seasons.{CURR_SEASON}.CONF_RANK": team["PlayoffRank"],
+                    f"seasons.{CURR_SEASON}.DIV_RANK": team["DivisionRank"],
                 }},
                 upsert=True
             )
@@ -408,7 +408,7 @@ def update_current_standings():
 def calculate_strength_of_schedule(team, season):
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
@@ -455,7 +455,7 @@ def calculate_strength_of_schedule(team, season):
 def strength_of_schedule_rank():
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
@@ -469,10 +469,10 @@ def strength_of_schedule_rank():
             {
                 "$setWindowFields": {
                     "sortBy": {
-                        f"seasons.{k_current_season}.STANDINGS.{stat}": 1
+                        f"seasons.{CURR_SEASON}.STANDINGS.{stat}": 1
                     },
                     "output": {
-                        f"seasons.{k_current_season}.STANDINGS.{stat}_RANK": {
+                        f"seasons.{CURR_SEASON}.STANDINGS.{stat}_RANK": {
                             "$documentNumber": {}
                         }
                     }
@@ -485,12 +485,12 @@ def strength_of_schedule_rank():
 
         # Update each document with the new rank field
         for result in results:
-            res = result['seasons'][k_current_season]['STANDINGS'][f'{stat}_RANK']
+            res = result['seasons'][CURR_SEASON]['STANDINGS'][f'{stat}_RANK']
 
             try:
                 teams_collection.update_one(
                     {"_id": result["_id"]},
-                    {"$set": {f"seasons.{k_current_season}.STANDINGS.{stat}_RANK": res}}
+                    {"$set": {f"seasons.{CURR_SEASON}.STANDINGS.{stat}_RANK": res}}
                 )
             except Exception as e:
                 logging.error(f"Failed to add SOS_RANK to database: {e}")
@@ -549,7 +549,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
         logging.info("Connected to MongoDB")

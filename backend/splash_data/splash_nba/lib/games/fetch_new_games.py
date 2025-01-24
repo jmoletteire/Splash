@@ -10,7 +10,7 @@ from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, openai_api_key, k_prev_season
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, OPENAI_API_KEY, PREV_SEASON
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -21,7 +21,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, openai_api_key, k_prev_season
+        from env import PROXY, URI, CURR_SEASON, OPENAI_API_KEY, PREV_SEASON
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -32,15 +32,15 @@ def generate_points_of_emphasis(home_id, away_id):
     logging.basicConfig(level=logging.INFO)
 
     # Set your OpenAI API key
-    if not openai_api_key:
+    if not OPENAI_API_KEY:
         logging.error("OpenAI API key not found. Set the API key properly.")
         return
 
-    openai.api_key = openai_api_key
+    openai.api_key = OPENAI_API_KEY
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         games_collection = db.nba_games
         teams_collection = db.nba_teams
@@ -49,11 +49,11 @@ def generate_points_of_emphasis(home_id, away_id):
         logging.error(f"(Upcoming Games) Failed to connect to MongoDB: {e}")
         return
 
-    home_team = teams_collection.find_one({"TEAM_ID": home_id}, {f'seasons.{k_current_season}': 1, f'seasons.{k_prev_season}': 1})
-    away_team = teams_collection.find_one({"TEAM_ID": away_id}, {f'seasons.{k_current_season}': 1, f'seasons.{k_prev_season}': 1})
+    home_team = teams_collection.find_one({"TEAM_ID": home_id}, {f'seasons.{CURR_SEASON}': 1, f'seasons.{PREV_SEASON}': 1})
+    away_team = teams_collection.find_one({"TEAM_ID": away_id}, {f'seasons.{CURR_SEASON}': 1, f'seasons.{PREV_SEASON}': 1})
 
-    home_season = k_current_season if home_team['seasons'][k_current_season]['GP'] > 0 else k_prev_season
-    away_season = k_current_season if away_team['seasons'][k_current_season]['GP'] > 0 else k_prev_season
+    home_season = CURR_SEASON if home_team['seasons'][CURR_SEASON]['GP'] > 0 else PREV_SEASON
+    away_season = CURR_SEASON if away_team['seasons'][CURR_SEASON]['GP'] > 0 else PREV_SEASON
 
     home_team_name = f'{home_team["seasons"][home_season]["TEAM_CITY"]} {home_team["seasons"][home_season]["TEAM_NAME"]}'
     away_team_name = f'{away_team["seasons"][away_season]["TEAM_CITY"]} {away_team["seasons"][away_season]["TEAM_NAME"]}'
@@ -267,7 +267,7 @@ def synergy_game_ids():
 def update_game_data():
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         games_collection = db.nba_games
     except Exception as e:
@@ -278,7 +278,7 @@ def update_game_data():
         # Fetch only games that are from the current season and have occurred before today
         today = datetime.today().strftime('%Y-%m-%d')
         query = {
-            'SEASON_YEAR': k_current_season[:4],
+            'SEASON_YEAR': CURR_SEASON[:4],
             'GAME_DATE': {'$lt': today}
         }
 
@@ -298,7 +298,7 @@ def fetch_upcoming_games(game_date):
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         games_collection = db.nba_games
         teams_collection = db.nba_teams
@@ -338,12 +338,12 @@ def fetch_upcoming_games(game_date):
             if len(games_map[game_id]['SUMMARY']['LineScore']) > 0:
                 linescore = games_map[game_id]['SUMMARY']['LineScore']
                 for i, team in enumerate(linescore):
-                    team_data = teams_collection.find_one({'TEAM_ID': team['TEAM_ID']}, {f'seasons.{k_current_season}.WINS': 1, f'seasons.{k_current_season}.LOSSES': 1, '_id': 0})
+                    team_data = teams_collection.find_one({'TEAM_ID': team['TEAM_ID']}, {f'seasons.{CURR_SEASON}.WINS': 1, f'seasons.{CURR_SEASON}.LOSSES': 1, '_id': 0})
                     if team_data is None:
                         continue
                     else:
                         try:
-                            games_map[game_id]['SUMMARY']['LineScore'][i]['TEAM_WINS_LOSSES'] = f"{team_data['seasons'][k_current_season]['WINS']}-{team_data['seasons'][k_current_season]['LOSSES']}"
+                            games_map[game_id]['SUMMARY']['LineScore'][i]['TEAM_WINS_LOSSES'] = f"{team_data['seasons'][CURR_SEASON]['WINS']}-{team_data['seasons'][CURR_SEASON]['LOSSES']}"
                         except Exception:
                             continue
 
@@ -381,7 +381,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         games_collection = db.nba_games
         logging.info("Connected to MongoDB")

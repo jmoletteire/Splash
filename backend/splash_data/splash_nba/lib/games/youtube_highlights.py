@@ -3,7 +3,7 @@ import datetime
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import youtube_api_key
+    from splash_nba.util.env import YOUTUBE_API_KEY
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -14,7 +14,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import youtube_api_key
+        from env import YOUTUBE_API_KEY
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     today = datetime.datetime.now().strftime('%Y-%m-%d')
 
     # Search for highlights
-    results = search_youtube_highlights(youtube_api_key, team_one, team_two, today)
+    results = search_youtube_highlights(YOUTUBE_API_KEY, team_one, team_two, today)
 
     if results:
         print(results)

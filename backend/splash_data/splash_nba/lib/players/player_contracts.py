@@ -5,7 +5,7 @@ import json
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri
+    from splash_nba.util.env import PROXY, URI
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -16,7 +16,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri
+        from env import PROXY, URI
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -223,7 +223,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     players_collection = db.nba_players
     logging.info("Connected to MongoDB")

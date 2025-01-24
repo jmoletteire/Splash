@@ -6,7 +6,7 @@ from nba_api.stats.endpoints import teamdetails, commonallplayers, playerawards
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri
+    from splash_nba.util.env import URI
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -17,7 +17,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri
+        from env import URI
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -163,7 +163,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         lg_history_collection = db.nba_league_history
         teams_collection = db.nba_teams

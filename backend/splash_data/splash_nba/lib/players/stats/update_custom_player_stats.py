@@ -10,7 +10,7 @@ from collections import defaultdict
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -21,7 +21,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -66,7 +66,7 @@ def update_scoring_breakdown_and_pct_unassisted(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -75,17 +75,17 @@ def update_scoring_breakdown_and_pct_unassisted(season_type, team_id):
 
     if season_type == 'PLAYOFFS':
         player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
-                                                                  season=k_current_season,
+                                                                  season=CURR_SEASON,
                                                                   season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPlayerStats']
     else:
         player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
-                                                                  season=k_current_season).get_normalized_dict()[
+                                                                  season=CURR_SEASON).get_normalized_dict()[
             'LeagueDashPlayerStats']
 
     num_players = len(player_uast)
 
-    logging.info(f'(Scoring Breakdown) Processing {num_players} for season {k_current_season} {season_type}...')
+    logging.info(f'(Scoring Breakdown) Processing {num_players} for season {CURR_SEASON} {season_type}...')
 
     uast_keys = list(player_uast[0].keys())[11:26] + list(player_uast[0].keys())[34:49]
 
@@ -103,7 +103,7 @@ def update_scoring_breakdown_and_pct_unassisted(season_type, team_id):
             players_collection.update_one(
                 {'PERSON_ID': player_id, 'TEAM_ID': team_id},
                 {'$set': {
-                    f'STATS.{k_current_season}.{season_type}.ADV.SCORING_BREAKDOWN': data['scoring'],
+                    f'STATS.{CURR_SEASON}.{season_type}.ADV.SCORING_BREAKDOWN': data['scoring'],
                 }},
             )
         except Exception as e:
@@ -119,7 +119,7 @@ def update_matchup_difficulty_and_dps(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
@@ -148,10 +148,10 @@ def update_matchup_difficulty_and_dps(season_type, team_id):
 
                 try:
                     if season_type == 'REGULAR SEASON':
-                        data = leagueseasonmatchups.LeagueSeasonMatchups(season=k_current_season,
+                        data = leagueseasonmatchups.LeagueSeasonMatchups(season=CURR_SEASON,
                                                                          def_player_id_nullable=player['PERSON_ID'])
                     else:
-                        data = leagueseasonmatchups.LeagueSeasonMatchups(season=k_current_season,
+                        data = leagueseasonmatchups.LeagueSeasonMatchups(season=CURR_SEASON,
                                                                          season_type_playoffs='Playoffs',
                                                                          def_player_id_nullable=player['PERSON_ID'])
 
@@ -171,8 +171,8 @@ def update_matchup_difficulty_and_dps(season_type, team_id):
                         off_player = players_collection.find_one(
                             {'PERSON_ID': matchup['OFF_PLAYER_ID']},
                             {
-                                f'STATS.{k_current_season}.{season_type}.ADV.OFFENSIVE_LOAD': 1,
-                                f'STATS.{k_current_season}.{season_type}.ADV.OFF_RATING': 1,
+                                f'STATS.{CURR_SEASON}.{season_type}.ADV.OFFENSIVE_LOAD': 1,
+                                f'STATS.{CURR_SEASON}.{season_type}.ADV.OFF_RATING': 1,
                                 '_id': 0
                             }
                         )
@@ -184,7 +184,7 @@ def update_matchup_difficulty_and_dps(season_type, team_id):
 
                         # Matchup Difficulty
                         try:
-                            player_off_load = off_player['STATS'][k_current_season][season_type]['ADV']['OFFENSIVE_LOAD']
+                            player_off_load = off_player['STATS'][CURR_SEASON][season_type]['ADV']['OFFENSIVE_LOAD']
                         except KeyError:
                             player_off_load = 0
 
@@ -197,7 +197,7 @@ def update_matchup_difficulty_and_dps(season_type, team_id):
 
                         # DPS
                         try:
-                            x_team_ppp = off_player['STATS'][k_current_season][season_type]['ADV']['OFF_RATING'] / 100
+                            x_team_ppp = off_player['STATS'][CURR_SEASON][season_type]['ADV']['OFF_RATING'] / 100
                         except KeyError:
                             x_team_ppp = 0
 
@@ -209,21 +209,21 @@ def update_matchup_difficulty_and_dps(season_type, team_id):
                             total_x_ortg = 0
 
                         try:
-                            net_saved = total_x_ortg - player['STATS'][k_current_season][season_type]['ADV']['DEF_RATING']
+                            net_saved = total_x_ortg - player['STATS'][CURR_SEASON][season_type]['ADV']['DEF_RATING']
                         except KeyError:
                             net_saved = 0
 
                     players_collection.update_one(
                         {'PERSON_ID': player['PERSON_ID']},
                         {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.MATCHUP_DIFFICULTY': avg_load,
-                            f'STATS.{k_current_season}.{season_type}.ADV.DEF_IMPACT_EST': net_saved,
-                            f'STATS.{k_current_season}.{season_type}.ADV.PARTIAL_POSS': partial_poss,
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.MATCHUP_DIFFICULTY': avg_load,
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.DEF_IMPACT_EST': net_saved,
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.PARTIAL_POSS': partial_poss,
                         }
                         },
                     )
                 except Exception as e:
-                    logging.error(f'(Matchup Diff & DIE) Could not process {k_current_season} for player {player["PERSON_ID"]}: {e}')
+                    logging.error(f'(Matchup Diff & DIE) Could not process {CURR_SEASON} for player {player["PERSON_ID"]}: {e}')
                     continue
 
 
@@ -235,7 +235,7 @@ def update_versatility_score(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -263,9 +263,9 @@ def update_versatility_score(season_type, team_id):
 
                 try:
                     if season_type == 'PLAYOFFS':
-                        matchups = matchupsrollup.MatchupsRollup(def_player_id_nullable=player['PERSON_ID'], season=k_current_season, season_type_playoffs='Playoffs').get_normalized_dict()
+                        matchups = matchupsrollup.MatchupsRollup(def_player_id_nullable=player['PERSON_ID'], season=CURR_SEASON, season_type_playoffs='Playoffs').get_normalized_dict()
                     else:
-                        matchups = matchupsrollup.MatchupsRollup(def_player_id_nullable=player['PERSON_ID'], season=k_current_season).get_normalized_dict()
+                        matchups = matchupsrollup.MatchupsRollup(def_player_id_nullable=player['PERSON_ID'], season=CURR_SEASON).get_normalized_dict()
 
                     try:
                         t_G = matchups['MatchupsRollup'][0]['PERCENT_OF_TIME']
@@ -285,7 +285,7 @@ def update_versatility_score(season_type, team_id):
                     players_collection.update_one(
                         {'PERSON_ID': player['PERSON_ID']},
                         {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.VERSATILITY_SCORE': score
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.VERSATILITY_SCORE': score
                         }
                         },
                     )
@@ -304,7 +304,7 @@ def update_adj_turnover_pct(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
@@ -333,11 +333,11 @@ def update_adj_turnover_pct(season_type, team_id):
 
                 try:
                     try:
-                        tov = (player['STATS'][k_current_season][season_type]['BASIC']['TOV_PER_75'] / 75) * 100
+                        tov = (player['STATS'][CURR_SEASON][season_type]['BASIC']['TOV_PER_75'] / 75) * 100
                     except KeyError:
                         tov = 0
                     try:
-                        off_load = player['STATS'][k_current_season][season_type]['ADV']['OFFENSIVE_LOAD']
+                        off_load = player['STATS'][CURR_SEASON][season_type]['ADV']['OFFENSIVE_LOAD']
                     except KeyError:
                         off_load = 0
 
@@ -349,12 +349,12 @@ def update_adj_turnover_pct(season_type, team_id):
                     players_collection.update_one(
                         {'PERSON_ID': player['PERSON_ID']},
                         {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.ADJ_TOV_PCT': adj_tov_pct
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.ADJ_TOV_PCT': adj_tov_pct
                         }
                         },
                     )
                 except Exception as e:
-                    logging.error(f'(cTOV) Could not process {k_current_season} for player {player["PERSON_ID"]}: {e}')
+                    logging.error(f'(cTOV) Could not process {CURR_SEASON} for player {player["PERSON_ID"]}: {e}')
                     continue
 
 
@@ -366,7 +366,7 @@ def update_offensive_load(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
@@ -395,23 +395,23 @@ def update_offensive_load(season_type, team_id):
 
                 try:
                     try:
-                        ast = (player['STATS'][k_current_season][season_type]['BASIC']['AST_PER_75'] / 75) * 100
+                        ast = (player['STATS'][CURR_SEASON][season_type]['BASIC']['AST_PER_75'] / 75) * 100
                     except KeyError:
                         ast = 0
                     try:
-                        tov = (player['STATS'][k_current_season][season_type]['BASIC']['TOV_PER_75'] / 75) * 100
+                        tov = (player['STATS'][CURR_SEASON][season_type]['BASIC']['TOV_PER_75'] / 75) * 100
                     except KeyError:
                         tov = 0
                     try:
-                        fga = (player['STATS'][k_current_season][season_type]['BASIC']['FGA_PER_75'] / 75) * 100
+                        fga = (player['STATS'][CURR_SEASON][season_type]['BASIC']['FGA_PER_75'] / 75) * 100
                     except KeyError:
                         fga = 0
                     try:
-                        fta = (player['STATS'][k_current_season][season_type]['BASIC']['FTA_PER_75'] / 75) * 100
+                        fta = (player['STATS'][CURR_SEASON][season_type]['BASIC']['FTA_PER_75'] / 75) * 100
                     except KeyError:
                         fta = 0
                     try:
-                        box_create = (player['STATS'][k_current_season][season_type]['ADV']['BOX_CREATION'] / 75) * 100
+                        box_create = (player['STATS'][CURR_SEASON][season_type]['ADV']['BOX_CREATION'] / 75) * 100
                     except KeyError:
                         box_create = 0
 
@@ -420,12 +420,12 @@ def update_offensive_load(season_type, team_id):
                     players_collection.update_one(
                         {'PERSON_ID': player['PERSON_ID']},
                         {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.OFFENSIVE_LOAD': off_load
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.OFFENSIVE_LOAD': off_load
                         }
                         },
                     )
                 except Exception as e:
-                    logging.error(f'(Offensive Load) Could not process {k_current_season} for player {player["PERSON_ID"]}: {e}')
+                    logging.error(f'(Offensive Load) Could not process {CURR_SEASON} for player {player["PERSON_ID"]}: {e}')
                     continue
 
 
@@ -437,7 +437,7 @@ def update_box_creation(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
@@ -475,23 +475,23 @@ def update_box_creation(season_type, team_id):
 
                 try:
                     try:
-                        ast = (player['STATS'][k_current_season][season_type]['BASIC']['AST_PER_75'] / 75) * 100
+                        ast = (player['STATS'][CURR_SEASON][season_type]['BASIC']['AST_PER_75'] / 75) * 100
                     except KeyError:
                         ast = 0
                     try:
-                        pts = (player['STATS'][k_current_season][season_type]['BASIC']['PTS_PER_75'] / 75) * 100
+                        pts = (player['STATS'][CURR_SEASON][season_type]['BASIC']['PTS_PER_75'] / 75) * 100
                     except KeyError:
                         pts = 0
                     try:
-                        tov = (player['STATS'][k_current_season][season_type]['BASIC']['TOV_PER_75'] / 75) * 100
+                        tov = (player['STATS'][CURR_SEASON][season_type]['BASIC']['TOV_PER_75'] / 75) * 100
                     except KeyError:
                         tov = 0
                     try:
-                        fg3a = (player['STATS'][k_current_season][season_type]['BASIC']['FG3A_PER_75'] / 75) * 100
+                        fg3a = (player['STATS'][CURR_SEASON][season_type]['BASIC']['FG3A_PER_75'] / 75) * 100
                     except KeyError:
                         fg3a = 0
                     try:
-                        fg3_pct = player['STATS'][k_current_season][season_type]['BASIC']['FG3_PCT']
+                        fg3_pct = player['STATS'][CURR_SEASON][season_type]['BASIC']['FG3_PCT']
                     except KeyError:
                         fg3_pct = 0
 
@@ -503,12 +503,12 @@ def update_box_creation(season_type, team_id):
                     players_collection.update_one(
                         {'PERSON_ID': player['PERSON_ID']},
                         {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.BOX_CREATION': box_create
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.BOX_CREATION': box_create
                         }
                         },
                     )
                 except Exception as e:
-                    logging.error(f'(Box Creation) Could not process {k_current_season} for player {player["PERSON_ID"]}: {e}')
+                    logging.error(f'(Box Creation) Could not process {CURR_SEASON} for player {player["PERSON_ID"]}: {e}')
                     continue
 
 
@@ -520,7 +520,7 @@ def update_drive_stats(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
@@ -549,27 +549,27 @@ def update_drive_stats(season_type, team_id):
 
                 try:
                     try:
-                        touches = player['STATS'][k_current_season][season_type]['ADV']['TOUCHES']['TOUCHES']
+                        touches = player['STATS'][CURR_SEASON][season_type]['ADV']['TOUCHES']['TOUCHES']
                     except KeyError:
                         touches = 0
                     try:
-                        drives = player['STATS'][k_current_season][season_type]['ADV']['DRIVES']['DRIVES']
+                        drives = player['STATS'][CURR_SEASON][season_type]['ADV']['DRIVES']['DRIVES']
                     except KeyError:
                         drives = 0
                     try:
-                        drive_pts = player['STATS'][k_current_season][season_type]['ADV']['DRIVES']['DRIVE_PTS']
+                        drive_pts = player['STATS'][CURR_SEASON][season_type]['ADV']['DRIVES']['DRIVE_PTS']
                     except KeyError:
                         drive_pts = 0
                     try:
-                        drive_fga = player['STATS'][k_current_season][season_type]['ADV']['DRIVES']['DRIVE_FGA']
+                        drive_fga = player['STATS'][CURR_SEASON][season_type]['ADV']['DRIVES']['DRIVE_FGA']
                     except KeyError:
                         drive_fga = 0
                     try:
-                        drive_fta = player['STATS'][k_current_season][season_type]['ADV']['DRIVES']['DRIVE_FTA']
+                        drive_fta = player['STATS'][CURR_SEASON][season_type]['ADV']['DRIVES']['DRIVE_FTA']
                     except KeyError:
                         drive_fta = 0
                     try:
-                        drive_ftm = player['STATS'][k_current_season][season_type]['ADV']['DRIVES']['DRIVE_FTM']
+                        drive_ftm = player['STATS'][CURR_SEASON][season_type]['ADV']['DRIVES']['DRIVE_FTM']
                     except KeyError:
                         drive_ftm = 0
 
@@ -594,14 +594,14 @@ def update_drive_stats(season_type, team_id):
                     players_collection.update_one(
                         {'PERSON_ID': player['PERSON_ID']},
                         {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.DRIVES.DRIVE_TS_PCT': drive_ts,
-                            f'STATS.{k_current_season}.{season_type}.ADV.DRIVES.DRIVE_FT_PER_FGA': drive_ft_per_fga,
-                            f'STATS.{k_current_season}.{season_type}.ADV.DRIVES.DRIVES_PER_TOUCH': drives_per_touch
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.DRIVES.DRIVE_TS_PCT': drive_ts,
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.DRIVES.DRIVE_FT_PER_FGA': drive_ft_per_fga,
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.DRIVES.DRIVES_PER_TOUCH': drives_per_touch
                         }
                         },
                     )
                 except Exception as e:
-                    logging.error(f'(Drives) Could not process {k_current_season} for player {player["PERSON_ID"]}: {e}')
+                    logging.error(f'(Drives) Could not process {CURR_SEASON} for player {player["PERSON_ID"]}: {e}')
                     continue
 
 
@@ -613,7 +613,7 @@ def update_touches_breakdown(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
@@ -629,23 +629,23 @@ def update_touches_breakdown(season_type, team_id):
         try:
             # Extract the values needed for calculation
             try:
-                fga = player['STATS'][k_current_season][season_type]['BASIC'].get('FGA', 0)
+                fga = player['STATS'][CURR_SEASON][season_type]['BASIC'].get('FGA', 0)
             except KeyError:
                 fga = 0
             try:
-                passes = player['STATS'][k_current_season][season_type]['ADV']['PASSING'].get('PASSES_MADE', 0)
+                passes = player['STATS'][CURR_SEASON][season_type]['ADV']['PASSING'].get('PASSES_MADE', 0)
             except KeyError:
                 passes = 0
             try:
-                turnovers = player['STATS'][k_current_season][season_type]['BASIC'].get('TOV', 0)
+                turnovers = player['STATS'][CURR_SEASON][season_type]['BASIC'].get('TOV', 0)
             except KeyError:
                 turnovers = 0
             try:
-                fouled = player['STATS'][k_current_season][season_type]['BASIC'].get('PFD', 0)
+                fouled = player['STATS'][CURR_SEASON][season_type]['BASIC'].get('PFD', 0)
             except KeyError:
                 fouled = 0
             try:
-                touches = player['STATS'][k_current_season][season_type]['ADV']['TOUCHES'].get('TOUCHES', 1)
+                touches = player['STATS'][CURR_SEASON][season_type]['ADV']['TOUCHES'].get('TOUCHES', 1)
             except KeyError:
                 touches = 0
 
@@ -664,10 +664,10 @@ def update_touches_breakdown(season_type, team_id):
             # Update the document with the new field
             players_collection.update_one(
                 {'PERSON_ID': player['PERSON_ID']},
-                {'$set': {f'STATS.{k_current_season}.{season_type}.ADV.TOUCHES.FGA_PER_TOUCH': percent_shot,
-                          f'STATS.{k_current_season}.{season_type}.ADV.TOUCHES.PASSES_PER_TOUCH': percent_pass,
-                          f'STATS.{k_current_season}.{season_type}.ADV.TOUCHES.TOV_PER_TOUCH': percent_turnover,
-                          f'STATS.{k_current_season}.{season_type}.ADV.TOUCHES.PFD_PER_TOUCH': percent_fouled,
+                {'$set': {f'STATS.{CURR_SEASON}.{season_type}.ADV.TOUCHES.FGA_PER_TOUCH': percent_shot,
+                          f'STATS.{CURR_SEASON}.{season_type}.ADV.TOUCHES.PASSES_PER_TOUCH': percent_pass,
+                          f'STATS.{CURR_SEASON}.{season_type}.ADV.TOUCHES.TOV_PER_TOUCH': percent_turnover,
+                          f'STATS.{CURR_SEASON}.{season_type}.ADV.TOUCHES.PFD_PER_TOUCH': percent_fouled,
                           }
                  }
             )
@@ -684,7 +684,7 @@ def update_shot_distribution(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
@@ -714,14 +714,14 @@ def update_shot_distribution(season_type, team_id):
             if season_type == 'PLAYOFFS':
                 player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
                                                                       player_id=player_id,
-                                                                      season=k_current_season,
+                                                                      season=CURR_SEASON,
                                                                       season_type_all_star='Playoffs'
                                                                       ).get_normalized_dict()
             else:
                 try:
                     player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
                                                                           player_id=player_id,
-                                                                          season=k_current_season
+                                                                          season=CURR_SEASON
                                                                           ).get_normalized_dict()
                 except Exception:
                     player_shooting = {'GeneralShooting': [], 'ClosestDefenderShooting': []}
@@ -737,7 +737,7 @@ def update_shot_distribution(season_type, team_id):
                         players_collection.update_one(
                             {'PERSON_ID': player_id},
                             {'$set': {
-                                f'STATS.{k_current_season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type[j]["SHOT_TYPE"]}': {
+                                f'STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type[j]["SHOT_TYPE"]}': {
                                     key: shot_type[j][key] for key in shot_type_keys}
                             }
                             },
@@ -749,7 +749,7 @@ def update_shot_distribution(season_type, team_id):
                         players_collection.update_one(
                             {'PERSON_ID': player_id},
                             {'$set': {
-                                f'STATS.{k_current_season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender[j]["CLOSE_DEF_DIST_RANGE"]}': {
+                                f'STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender[j]["CLOSE_DEF_DIST_RANGE"]}': {
                                     key: closest_defender[j][key] for key in closest_defender_keys}
                             }
                             },
@@ -767,7 +767,7 @@ def update_player_tracking_stats(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -776,44 +776,44 @@ def update_player_tracking_stats(season_type, team_id):
 
     if season_type == 'PLAYOFFS':
         player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
-                                                             season=k_current_season,
+                                                             season=CURR_SEASON,
                                                              season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
         player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
-                                                             season=k_current_season,
+                                                             season=CURR_SEASON,
                                                              season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
         player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
-                                                            season=k_current_season,
+                                                            season=CURR_SEASON,
                                                             season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
         player_rebounding = \
             leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
-                                                season=k_current_season,
+                                                season=CURR_SEASON,
                                                 season_type_all_star='Playoffs').get_normalized_dict()[
                 'LeagueDashPtStats']
         player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
-                                                                season=k_current_season,
+                                                                season=CURR_SEASON,
                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
             'LeagueDashPtStats']
     else:
         try:
             player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
-                                                                 season=k_current_season).get_normalized_dict()[
+                                                                 season=CURR_SEASON).get_normalized_dict()[
                 'LeagueDashPtStats']
         except Exception:
             player_touches = []
 
         try:
             player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Passing',
-                                                                 season=k_current_season).get_normalized_dict()[
+                                                                 season=CURR_SEASON).get_normalized_dict()[
                 'LeagueDashPtStats']
         except Exception:
             player_passing = []
 
         try:
             player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Drives',
-                                                                season=k_current_season).get_normalized_dict()[
+                                                                season=CURR_SEASON).get_normalized_dict()[
                 'LeagueDashPtStats']
         except Exception:
             player_drives = []
@@ -821,21 +821,21 @@ def update_player_tracking_stats(season_type, team_id):
         try:
             player_rebounding = \
                 leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Rebounding',
-                                                    season=k_current_season).get_normalized_dict()[
+                                                    season=CURR_SEASON).get_normalized_dict()[
                     'LeagueDashPtStats']
         except Exception:
             player_rebounding = []
 
         try:
             player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', team_id_nullable=team_id, pt_measure_type='SpeedDistance',
-                                                                    season=k_current_season).get_normalized_dict()[
+                                                                    season=CURR_SEASON).get_normalized_dict()[
                 'LeagueDashPtStats']
         except Exception:
             player_speed_dist = []
 
     num_players = len(player_speed_dist)
 
-    logging.info(f'(Player Tracking) Processing {num_players} for season {k_current_season} {season_type}...')
+    logging.info(f'(Player Tracking) Processing {num_players} for season {CURR_SEASON} {season_type}...')
 
     touch_keys = list(player_touches[0].keys())[9:15] if len(player_touches) > 0 else []
     passing_keys = list(player_passing[0].keys())[8:] if len(player_passing) > 0 else []
@@ -893,11 +893,11 @@ def update_player_tracking_stats(season_type, team_id):
             players_collection.update_one(
                 {'PERSON_ID': player_id},
                 {'$set': {
-                    f'STATS.{k_current_season}.{season_type}.ADV.TOUCHES': data['touches'],
-                    f'STATS.{k_current_season}.{season_type}.ADV.PASSING': data['passing'],
-                    f'STATS.{k_current_season}.{season_type}.ADV.DRIVES': data['drives'],
-                    f'STATS.{k_current_season}.{season_type}.ADV.REBOUNDING': data['rebounding'],
-                    f'STATS.{k_current_season}.{season_type}.HUSTLE.SPEED': data['speed_dist'],
+                    f'STATS.{CURR_SEASON}.{season_type}.ADV.TOUCHES': data['touches'],
+                    f'STATS.{CURR_SEASON}.{season_type}.ADV.PASSING': data['passing'],
+                    f'STATS.{CURR_SEASON}.{season_type}.ADV.DRIVES': data['drives'],
+                    f'STATS.{CURR_SEASON}.{season_type}.ADV.REBOUNDING': data['rebounding'],
+                    f'STATS.{CURR_SEASON}.{season_type}.HUSTLE.SPEED': data['speed_dist'],
                 }},
             )
         except Exception as e:
@@ -913,7 +913,7 @@ def update_three_and_ft_rate(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -928,19 +928,19 @@ def update_three_and_ft_rate(season_type, team_id):
         try:
             # Extract the values needed for calculation
             try:
-                fg3a = player['STATS'][k_current_season][season_type]['BASIC'].get('FG3A', 0)
+                fg3a = player['STATS'][CURR_SEASON][season_type]['BASIC'].get('FG3A', 0)
             except KeyError:
                 fg3a = 0
             try:
-                fta = player['STATS'][k_current_season][season_type]['BASIC'].get('FTA', 0)
+                fta = player['STATS'][CURR_SEASON][season_type]['BASIC'].get('FTA', 0)
             except KeyError:
                 fta = 0
             try:
-                ftm = player['STATS'][k_current_season][season_type]['BASIC'].get('FTM', 0)
+                ftm = player['STATS'][CURR_SEASON][season_type]['BASIC'].get('FTM', 0)
             except KeyError:
                 ftm = 0
             try:
-                fga = player['STATS'][k_current_season][season_type]['BASIC'].get('FGA', 0)
+                fga = player['STATS'][CURR_SEASON][season_type]['BASIC'].get('FGA', 0)
             except KeyError:
                 fga = 0
 
@@ -957,9 +957,9 @@ def update_three_and_ft_rate(season_type, team_id):
             # Update the document with the new field
             players_collection.update_one(
                 {'PERSON_ID': player['PERSON_ID']},
-                {'$set': {f'STATS.{k_current_season}.{season_type}.BASIC.3PAr': three_pt_rate,
-                          f'STATS.{k_current_season}.{season_type}.BASIC.FTAr': fta_rate,
-                          f'STATS.{k_current_season}.{season_type}.BASIC.FT_PER_FGA': ft_per_fga}
+                {'$set': {f'STATS.{CURR_SEASON}.{season_type}.BASIC.3PAr': three_pt_rate,
+                          f'STATS.{CURR_SEASON}.{season_type}.BASIC.FTAr': fta_rate,
+                          f'STATS.{CURR_SEASON}.{season_type}.BASIC.FT_PER_FGA': ft_per_fga}
                  }
             )
 
@@ -976,7 +976,7 @@ def update_poss_per_game(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -991,11 +991,11 @@ def update_poss_per_game(season_type, team_id):
         try:
             # Extract the values needed for calculation
             try:
-                poss = player['STATS'][k_current_season][season_type]['ADV'].get('POSS', 0)
+                poss = player['STATS'][CURR_SEASON][season_type]['ADV'].get('POSS', 0)
             except KeyError:
                 poss = 0
             try:
-                gp = player['STATS'][k_current_season][season_type]['ADV'].get('GP', 0)
+                gp = player['STATS'][CURR_SEASON][season_type]['ADV'].get('GP', 0)
             except KeyError:
                 gp = 0
 
@@ -1008,7 +1008,7 @@ def update_poss_per_game(season_type, team_id):
             # Update the document with the new field
             players_collection.update_one(
                 {'PERSON_ID': player['PERSON_ID']},
-                {'$set': {f'STATS.{k_current_season}.{season_type}.ADV.POSS_PER_GM': poss_per_game}
+                {'$set': {f'STATS.{CURR_SEASON}.{season_type}.ADV.POSS_PER_GM': poss_per_game}
                  }
             )
 
@@ -1025,7 +1025,7 @@ def update_player_on_off(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         teams_collection = db.nba_teams
@@ -1033,7 +1033,7 @@ def update_player_on_off(season_type, team_id):
         logging.error(f'(Player On/Off) Unable to connect to MongoDB: {e}')
         exit(1)
 
-    logging.info(f'(Player On/Off) Processing season {k_current_season}...')
+    logging.info(f'(Player On/Off) Processing season {CURR_SEASON}...')
     for team in teams_collection.find({'TEAM_ID': team_id}, {'TEAM_ID': 1, '_id': 0}):
         if team['TEAM_ID'] == 0:
             continue
@@ -1042,7 +1042,7 @@ def update_player_on_off(season_type, team_id):
 
         # PLAYOFFS
         if season_type == 'PLAYOFFS':
-            player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=k_current_season,
+            player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=CURR_SEASON,
                                                                           season_type_all_star='Playoffs',
                                                                           measure_type_detailed_defense='Advanced').get_normalized_dict()
 
@@ -1069,13 +1069,13 @@ def update_player_on_off(season_type, team_id):
                     # Update the document with the new field
                     players_collection.update_one(
                         {'PERSON_ID': player_id},
-                        {'$set': {f'STATS.{k_current_season}.PLAYOFFS.ADV.{key}_ON_OFF': on_off_value}}
+                        {'$set': {f'STATS.{CURR_SEASON}.PLAYOFFS.ADV.{key}_ON_OFF': on_off_value}}
                     )
-            logging.info(f'(Player On/Off) Added data for {len(player_on)} players for {k_current_season}.')
+            logging.info(f'(Player On/Off) Added data for {len(player_on)} players for {CURR_SEASON}.')
 
         # REGULAR SEASON
         else:
-            player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=k_current_season,
+            player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=CURR_SEASON,
                                                                           measure_type_detailed_defense='Advanced').get_normalized_dict()
 
             player_on = player_on_off['PlayersOnCourtTeamPlayerOnOffDetails']
@@ -1108,14 +1108,14 @@ def update_player_on_off(season_type, team_id):
                     # Check player's existing stats for this season
                     existing_stats = players_collection.find_one(
                         {'PERSON_ID': player_id},
-                        {'_id': 0, f'STATS.{k_current_season}.{season_type}.ADV.{key}_ON_OFF': 1,
-                         f'STATS.{k_current_season}.{season_type}.ADV.{stat_name}_POSS': 1}
+                        {'_id': 0, f'STATS.{CURR_SEASON}.{season_type}.ADV.{key}_ON_OFF': 1,
+                         f'STATS.{CURR_SEASON}.{season_type}.ADV.{stat_name}_POSS': 1}
                     )
 
                     # If existing, calculate weighted average on/off by possessions played for each team.
-                    if existing_stats and stat_name in existing_stats['STATS'][k_current_season][season_type]['ADV']:
-                        existing_on_off = existing_stats['STATS'][k_current_season][season_type]['ADV'][stat_name]
-                        existing_poss = existing_stats['STATS'][k_current_season][season_type]['ADV'][f'{stat_name}_POSS']
+                    if existing_stats and stat_name in existing_stats['STATS'][CURR_SEASON][season_type]['ADV']:
+                        existing_on_off = existing_stats['STATS'][CURR_SEASON][season_type]['ADV'][stat_name]
+                        existing_poss = existing_stats['STATS'][CURR_SEASON][season_type]['ADV'][f'{stat_name}_POSS']
 
                         # Calculate weighted average
                         try:
@@ -1133,13 +1133,13 @@ def update_player_on_off(season_type, team_id):
                     players_collection.update_one(
                         {'PERSON_ID': player_id},
                         {'$set': {
-                            f'STATS.{k_current_season}.{season_type}.ADV.{stat_name}_POSS': new_poss,
-                            f'STATS.{k_current_season}.{season_type}.ADV.{stat_name}': new_on_off_value
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.{stat_name}_POSS': new_poss,
+                            f'STATS.{CURR_SEASON}.{season_type}.ADV.{stat_name}': new_on_off_value
                         }
                         }
                     )
 
-        logging.info(f'(Player On/Off) Added data for {len(player_on)} players for {k_current_season} {season_type}.')
+        logging.info(f'(Player On/Off) Added data for {len(player_on)} players for {CURR_SEASON} {season_type}.')
 
 
 if __name__ == "__main__":
@@ -1147,7 +1147,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     players_collection = db.nba_players
     teams_collection = db.nba_teams

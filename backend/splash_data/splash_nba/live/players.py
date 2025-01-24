@@ -21,7 +21,7 @@ from splash_nba.lib.players.update_player_contracts import fetch_player_contract
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     from splash_nba.util.mongo_connect import get_mongo_collection
 except ImportError:
     # Fallback to the remote env.py path
@@ -33,7 +33,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
         from mongo_connect import get_mongo_collection
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
@@ -58,73 +58,73 @@ async def update_players(team_ids):
 
             # BASIC, ADV, HUSTLE
             try:
-                update_player_stats(k_current_season_type, team_id)
+                update_player_stats(CURR_SEASON_TYPE, team_id)
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating BASIC/ADV stats for team {team_id}: {e}")
 
             try:
-                update_player_hustle_stats(k_current_season_type, team_id)
+                update_player_hustle_stats(CURR_SEASON_TYPE, team_id)
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Player Hustle Stats for team {team_id}: {e}")
 
             # CUSTOM STATS (Calculated)
             try:
-                update_player_on_off(k_current_season_type, team_id)  # ON/OFF
+                update_player_on_off(CURR_SEASON_TYPE, team_id)  # ON/OFF
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Player On/Off for team {team_id}: {e}")
 
             try:
-                update_poss_per_game(k_current_season_type, team_id)  # POSS PER G
+                update_poss_per_game(CURR_SEASON_TYPE, team_id)  # POSS PER G
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Poss Per Game for team {team_id}: {e}")
 
             try:
-                update_three_and_ft_rate(k_current_season_type, team_id)  # 3PAr, FTAr, FT/FGA
+                update_three_and_ft_rate(CURR_SEASON_TYPE, team_id)  # 3PAr, FTAr, FT/FGA
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating 3PAr & FTr for team {team_id}: {e}")
 
             try:
-                update_player_tracking_stats(k_current_season_type, team_id)  # TOUCHES, PASSING, DRIVES, REBOUNDING, SPEED/DISTANCE
+                update_player_tracking_stats(CURR_SEASON_TYPE, team_id)  # TOUCHES, PASSING, DRIVES, REBOUNDING, SPEED/DISTANCE
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Player Tracking for team {team_id}: {e}")
 
             try:
-                update_touches_breakdown(k_current_season_type, team_id)  # % PASS, % SHOOT, % TOV, % FOULED
+                update_touches_breakdown(CURR_SEASON_TYPE, team_id)  # % PASS, % SHOOT, % TOV, % FOULED
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Touches Breakdown for team {team_id}: {e}")
 
             try:
-                update_shot_distribution(k_current_season_type, team_id)  # SHOT TYPE, CLOSEST DEFENDER
+                update_shot_distribution(CURR_SEASON_TYPE, team_id)  # SHOT TYPE, CLOSEST DEFENDER
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Shot Distribution for team {team_id}: {e}")
 
             try:
-                update_drive_stats(k_current_season_type, team_id)  # DRIVE %, DRIVE TS%, DRIVE FT/FGA
+                update_drive_stats(CURR_SEASON_TYPE, team_id)  # DRIVE %, DRIVE TS%, DRIVE FT/FGA
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Drives for team {team_id}: {e}")
 
             try:
-                update_scoring_breakdown_and_pct_unassisted(k_current_season_type, team_id)  # % UAST
+                update_scoring_breakdown_and_pct_unassisted(CURR_SEASON_TYPE, team_id)  # % UAST
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Scoring Breakdown for team {team_id}: {e}")
 
             try:
-                update_versatility_score(k_current_season_type, team_id)  # VERSATILITY
+                update_versatility_score(CURR_SEASON_TYPE, team_id)  # VERSATILITY
             except Exception as e:
                 logging.error(f"(Player Stats) Error updating Versatility for team {team_id}: {e}")
 
             # PER POSS STATS
-            current_season_per_75(k_current_season_type == 'PLAYOFFS', team_id)
-            update_box_creation(k_current_season_type, team_id)  # BOX CREATION
-            update_offensive_load(k_current_season_type, team_id)  # OFF LOAD
-            update_adj_turnover_pct(k_current_season_type, team_id)  # cTOV
+            current_season_per_75(CURR_SEASON_TYPE == 'PLAYOFFS', team_id)
+            update_box_creation(CURR_SEASON_TYPE, team_id)  # BOX CREATION
+            update_offensive_load(CURR_SEASON_TYPE, team_id)  # OFF LOAD
+            update_adj_turnover_pct(CURR_SEASON_TYPE, team_id)  # cTOV
 
         for team_id in team_ids:
-            update_matchup_difficulty_and_dps(k_current_season_type, team_id)  # MATCHUP DIFF & DIE
+            update_matchup_difficulty_and_dps(CURR_SEASON_TYPE, team_id)  # MATCHUP DIFF & DIE
 
         # Rank
         current_season_custom_stats_rank()
-        current_season_shooting_stat_ranks(k_current_season_type)
+        current_season_shooting_stat_ranks(CURR_SEASON_TYPE)
 
         # Similar Players
         update_similar_players()
@@ -189,7 +189,7 @@ async def update_players(team_ids):
 
                     try:
                         # Pass player, current season, and current season type
-                        gamelogs(player['PERSON_ID'], k_current_season, k_current_season_type)
+                        gamelogs(player['PERSON_ID'], CURR_SEASON, CURR_SEASON_TYPE)
                     except Exception as e:
                         logging.error(
                             f'(Player Game Logs) Could not add game logs for player {player["PERSON_ID"]}: {e}')
@@ -228,8 +228,8 @@ async def update_players(team_ids):
                         get_shot_chart_data(
                             player['PERSON_ID'],
                             player['TEAM_ID'],
-                            k_current_season,
-                            'Regular Season' if k_current_season_type == 'REGULAR SEASON' else 'Playoffs',
+                            CURR_SEASON,
+                            'Regular Season' if CURR_SEASON_TYPE == 'REGULAR SEASON' else 'Playoffs',
                             keep_league_avg
                         )
                         keep_league_avg = False

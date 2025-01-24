@@ -1,5 +1,4 @@
 import json
-import os
 import sys
 import time
 from datetime import datetime
@@ -9,17 +8,33 @@ from flask_compress import Compress
 from pymongo import MongoClient
 import logging
 
+try:
+    # Try to import the local env.py file
+    from splash_nba.util.env import URI, PREV_SEASON, CURR_SEASON, CURR_SEASON_TYPE, PROXY
+    from splash_nba.util.mongo_connect import get_mongo_collection
+except ImportError:
+    # Fallback to the remote env.py path
+    import os
+
+    env_path = "/home/ubuntu"
+    if env_path not in sys.path:
+        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+    try:
+        import env
+        from mongo_connect import get_mongo_collection
+    except ImportError:
+        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+
 app = Flask(__name__)
 Compress(app)
 bytes_transferred = 0
-k_prev_season = '2023-24'
-k_current_season = '2024-25'
 
 # MongoDB connection setup
 try:
     # Configure logging
     logging.basicConfig(level=logging.INFO)
-    client = MongoClient('mongodb+srv://jmoletteire:J%40ckpa%24%245225@splash.p0xumnu.mongodb.net/')
+    client = MongoClient(URI)
     db = client.splash
 
     # Define all collections at the top level, so they're accessible across routes
@@ -889,83 +904,83 @@ def get_team_player_stats():
                     "POSITION": 1,
                     "JERSEY": 1,
                     "PlayerRotowires": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.POSS": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.GP": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.MIN": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.PTS": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.REB": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.AST": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.STL": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.BLK": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.TOV": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FGM": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FGA": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FG3M": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FG3A": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FTM": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.FTA": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.OREB": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.DREB": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.PF": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.BASIC.PLUS_MINUS": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.EFG_PCT": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.TS_PCT": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.USG_PCT": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.OFF_RATING": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.DEF_RATING": 1,
-                    f"STATS.{k_prev_season}.REGULAR SEASON.ADV.NET_RATING": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.ADV.POSS": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.GP": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.MIN": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.PTS": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.REB": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.AST": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.STL": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.BLK": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.TOV": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.FGM": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.FGA": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.FG3M": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.FG3A": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.FTM": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.FTA": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.OREB": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.DREB": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.PF": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.BASIC.PLUS_MINUS": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.ADV.EFG_PCT": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.ADV.TS_PCT": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.ADV.USG_PCT": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.ADV.OFF_RATING": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.ADV.DEF_RATING": 1,
+                    f"STATS.{PREV_SEASON}.REGULAR SEASON.ADV.NET_RATING": 1,
 
-                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.POSS": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.GP": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.MIN": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.PTS": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.REB": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.AST": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.STL": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.BLK": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.TOV": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FGM": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FGA": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FG3M": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FG3A": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FTM": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.FTA": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.OREB": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.DREB": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.PF": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.BASIC.PLUS_MINUS": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.EFG_PCT": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.TS_PCT": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.USG_PCT": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.OFF_RATING": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.DEF_RATING": 1,
-                    f"STATS.{k_current_season}.REGULAR SEASON.ADV.NET_RATING": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.ADV.POSS": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.GP": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.MIN": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.PTS": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.REB": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.AST": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.STL": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.BLK": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.TOV": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.FGM": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.FGA": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.FG3M": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.FG3A": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.FTM": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.FTA": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.OREB": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.DREB": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.PF": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.BASIC.PLUS_MINUS": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.ADV.EFG_PCT": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.ADV.TS_PCT": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.ADV.USG_PCT": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.ADV.OFF_RATING": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.ADV.DEF_RATING": 1,
+                    f"STATS.{CURR_SEASON}.REGULAR SEASON.ADV.NET_RATING": 1,
 
-                    f"STATS.{k_current_season}.PLAYOFFS.ADV.POSS": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.GP": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.MIN": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.PTS": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.REB": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.AST": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.STL": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.BLK": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.TOV": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FGM": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FGA": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FG3M": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FG3A": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FTM": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.FTA": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.OREB": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.DREB": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.PF": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.BASIC.PLUS_MINUS": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.ADV.EFG_PCT": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.ADV.TS_PCT": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.ADV.USG_PCT": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.ADV.OFF_RATING": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.ADV.DEF_RATING": 1,
-                    f"STATS.{k_current_season}.PLAYOFFS.ADV.NET_RATING": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.ADV.POSS": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.GP": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.MIN": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.PTS": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.REB": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.AST": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.STL": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.BLK": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.TOV": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.FGM": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.FGA": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.FG3M": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.FG3A": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.FTM": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.FTA": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.OREB": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.DREB": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.PF": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.BASIC.PLUS_MINUS": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.ADV.EFG_PCT": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.ADV.TS_PCT": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.ADV.USG_PCT": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.ADV.OFF_RATING": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.ADV.DEF_RATING": 1,
+                    f"STATS.{CURR_SEASON}.PLAYOFFS.ADV.NET_RATING": 1,
                 }
             }
         ])

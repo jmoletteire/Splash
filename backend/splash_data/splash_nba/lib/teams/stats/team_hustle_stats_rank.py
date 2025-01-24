@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -14,7 +14,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -25,7 +25,7 @@ def rank_hustle_stats_current_season():
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
@@ -53,10 +53,10 @@ def rank_hustle_stats_current_season():
                 {
                     "$setWindowFields": {
                         "sortBy": {
-                            f"seasons.{k_current_season}.STATS.{k_current_season_type}.HUSTLE.{stat}": -1
+                            f"seasons.{CURR_SEASON}.STATS.{CURR_SEASON_TYPE}.HUSTLE.{stat}": -1
                         },
                         "output": {
-                            f"seasons.{k_current_season}.STATS.{k_current_season_type}.HUSTLE.{stat}_RANK": {
+                            f"seasons.{CURR_SEASON}.STATS.{CURR_SEASON_TYPE}.HUSTLE.{stat}_RANK": {
                                 "$documentNumber": {}
                             }
                         }
@@ -73,7 +73,7 @@ def rank_hustle_stats_current_season():
             for result in results:
                 teams_collection.update_one(
                     {"_id": result["_id"]},
-                    {"$set": {f"seasons.{k_current_season}.STATS.{k_current_season_type}.HUSTLE.{stat}_RANK": result['seasons'][k_current_season]['STATS'][k_current_season_type]['HUSTLE'][f'{stat}_RANK']}}
+                    {"$set": {f"seasons.{CURR_SEASON}.STATS.{CURR_SEASON_TYPE}.HUSTLE.{stat}_RANK": result['seasons'][CURR_SEASON]['STATS'][CURR_SEASON_TYPE]['HUSTLE'][f'{stat}_RANK']}}
                 )
         except Exception as e:
             logging.error(f"(Team Hustle Rank) Failed to add {stat} to database: {e}")
@@ -86,7 +86,7 @@ def rank_hustle_stats_all_seasons():
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:

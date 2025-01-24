@@ -18,7 +18,7 @@ from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_line
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     from splash_nba.util.mongo_connect import get_mongo_collection
 except ImportError:
     # Fallback to the remote env.py path
@@ -30,7 +30,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
         from mongo_connect import get_mongo_collection
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
@@ -79,13 +79,13 @@ async def update_teams(team_ids):
                     # Filter seasons to only include the current season key
                     filtered_doc = doc.copy()
                     filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
-                                               key == k_current_season}
-                    current_season_per_100_possessions(team_doc=filtered_doc, playoffs=k_current_season_type == 'PLAYOFFS')
+                                               key == CURR_SEASON}
+                    current_season_per_100_possessions(team_doc=filtered_doc, playoffs=CURR_SEASON_TYPE == 'PLAYOFFS')
                     time.sleep(15)
 
                     # Current Roster/Rotation & Coaches (~400-500 API calls)
                     logging.info("Roster & Coaches...")
-                    season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
+                    season_not_started = True if doc['seasons'][CURR_SEASON]['GP'] == 0 else False
                     update_current_roster(team_id=team, season_not_started=season_not_started)
                     time.sleep(30)
 
@@ -107,7 +107,7 @@ async def update_teams(team_ids):
 
         # After looping through all teams, calculate ranks/standings
         rank_hustle_stats_current_season()
-        three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
+        three_and_ft_rate(seasons=[CURR_SEASON], season_type=CURR_SEASON_TYPE)
         current_season_custom_team_stats_rank()
 
         # Standings (min. 30 API calls [more if tiebreakers])
@@ -137,7 +137,7 @@ async def teams_daily_update():
 
         # Sort the documents in nba_games collection by GAME_DATE in descending order
         sorted_games_cursor = games_collection.find(
-            {"SEASON_YEAR": k_current_season[0:4]},
+            {"SEASON_YEAR": CURR_SEASON[0:4]},
             {"GAME_DATE": 1, "GAMES": 1, "_id": 0}
         ).sort("GAME_DATE", -1)
 
@@ -201,9 +201,9 @@ async def teams_daily_update():
                         # Filter seasons to only include the current season key
                         filtered_doc = doc.copy()
                         filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
-                                                   key == k_current_season}
+                                                   key == CURR_SEASON}
                         current_season_per_100_possessions(team_doc=filtered_doc,
-                                                           playoffs=k_current_season_type == 'PLAYOFFS')
+                                                           playoffs=CURR_SEASON_TYPE == 'PLAYOFFS')
                         time.sleep(15)
                     except Exception as e:
                         logging.error(f"(Teams Daily) Error updating team {team} stats: {e}", exc_info=True)
@@ -211,7 +211,7 @@ async def teams_daily_update():
                     try:
                         # Current Roster & Coaches (~400-500 API calls)
                         logging.info("Roster & Coaches (~400-500 API calls)...")
-                        season_not_started = True if doc['seasons'][k_current_season]['GP'] == 0 else False
+                        season_not_started = True if doc['seasons'][CURR_SEASON]['GP'] == 0 else False
                         update_current_roster(team_id=team, season_not_started=season_not_started)
                         time.sleep(30)
                     except Exception as e:
@@ -246,7 +246,7 @@ async def teams_daily_update():
 
         # 3PAr + FTr
         try:
-            three_and_ft_rate(seasons=[k_current_season], season_type=k_current_season_type)
+            three_and_ft_rate(seasons=[CURR_SEASON], season_type=CURR_SEASON_TYPE)
         except Exception as e:
             logging.error(f"(Teams Daily) Error updating 3PAr + FTr: {e}", exc_info=True)
 

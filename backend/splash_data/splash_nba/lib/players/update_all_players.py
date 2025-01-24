@@ -6,7 +6,7 @@ from nba_api.stats.endpoints import commonallplayers, commonplayerinfo
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -17,14 +17,14 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 
 def add_historic_players():
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -49,14 +49,14 @@ def add_historic_players():
 
 def add_players():
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
         exit(1)
 
-    all_players = commonallplayers.CommonAllPlayers(season=k_current_season).get_normalized_dict()['CommonAllPlayers']
+    all_players = commonallplayers.CommonAllPlayers(season=CURR_SEASON).get_normalized_dict()['CommonAllPlayers']
 
     # Filter players to only add those that don't exist in the collection
     new_players = [player for player in all_players if not players_collection.find_one({"PERSON_ID": player["PERSON_ID"]}) and player["ROSTERSTATUS"] == 1]
@@ -74,7 +74,7 @@ def add_players():
 
 def new_player_info(player):
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -96,7 +96,7 @@ def new_player_info(player):
 
 def restructure_new_docs():
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -137,7 +137,7 @@ def get_player_info(person_id):
 
 def update_player_info():
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
     except Exception as e:
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         players_collection = db.nba_players
         logging.info("Connected to MongoDB")

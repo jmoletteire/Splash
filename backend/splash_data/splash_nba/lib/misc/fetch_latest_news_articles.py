@@ -4,7 +4,7 @@ from pymongo import MongoClient
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, news_api_key
+    from splash_nba.util.env import URI, NEWS_API_KEY
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -15,14 +15,14 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, news_api_key
+        from env import URI, NEWS_API_KEY
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
 
 def add_article_to_mongo(article):
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         latest_news_articles = client.splash.latest_news_articles
 
         # Check if an article with the same URL already exists
@@ -59,7 +59,7 @@ def fetch_latest_news_articles():
     logging.basicConfig(level=logging.INFO)
 
     news_api = 'https://newsapi.org/v2/top-headlines?'
-    parameters = f'country=us&category=sports&pageSize=100&apiKey={news_api_key}'
+    parameters = f'country=us&category=sports&pageSize=100&apiKey={NEWS_API_KEY}'
     url = news_api + parameters
 
     response = requests.get(url)
@@ -75,7 +75,7 @@ def fetch_latest_news_articles():
 
 
 if __name__ == '__main__':
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     latest_news_collection = client.splash.latest_news_articles
 
     fetch_latest_news_articles()

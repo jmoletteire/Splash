@@ -3,7 +3,7 @@ import logging
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -14,7 +14,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -24,7 +24,7 @@ def current_season_shooting_stat_ranks(season_type):
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     players_collection = db.nba_players
 
@@ -68,21 +68,21 @@ def current_season_shooting_stat_ranks(season_type):
             pipeline = [
                 {
                     "$match": {
-                        f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": {"$exists": True}
+                        f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": {"$exists": True}
                     }
                 },
                 {
                     "$project": {
-                        f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": 1
+                        f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": 1
                     }
                 },
                 {
                     "$setWindowFields": {
                         "sortBy": {
-                            f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": -1
+                            f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}": -1
                         },
                         "output": {
-                            f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}_RANK": {
+                            f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}_RANK": {
                                 "$documentNumber": {}
                             }
                         }
@@ -98,14 +98,14 @@ def current_season_shooting_stat_ranks(season_type):
             # Update each document with the new rank field
             for result in results:
                 try:
-                    res = result['STATS'][k_current_season][season_type]['ADV']['SHOOTING']['SHOT_TYPE'][shot_type][f'{stat}_RANK']
+                    res = result['STATS'][CURR_SEASON][season_type]['ADV']['SHOOTING']['SHOT_TYPE'][shot_type][f'{stat}_RANK']
                 except KeyError:
                     res = 0
 
                 players_collection.update_one(
                     {"_id": result["_id"]},
                     {"$set": {
-                        f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}_RANK": res
+                        f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.SHOT_TYPE.{shot_type}.{stat}_RANK": res
                         }
                     }
                 )
@@ -120,21 +120,21 @@ def current_season_shooting_stat_ranks(season_type):
             pipeline = [
                 {
                     "$match": {
-                        f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": {"$exists": True}
+                        f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": {"$exists": True}
                     }
                 },
                 {
                     "$project": {
-                        f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": 1
+                        f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": 1
                     }
                 },
                 {
                     "$setWindowFields": {
                         "sortBy": {
-                            f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": -1
+                            f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}": -1
                         },
                         "output": {
-                            f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}_RANK": {
+                            f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}_RANK": {
                                 "$documentNumber": {}
                             }
                         }
@@ -149,12 +149,12 @@ def current_season_shooting_stat_ranks(season_type):
 
             # Update each document with the new rank field
             for result in results:
-                res = result['STATS'][k_current_season][season_type]['ADV']['SHOOTING']['CLOSEST_DEFENDER'][closest_defender][f'{stat}_RANK']
+                res = result['STATS'][CURR_SEASON][season_type]['ADV']['SHOOTING']['CLOSEST_DEFENDER'][closest_defender][f'{stat}_RANK']
 
                 players_collection.update_one(
                     {"_id": result["_id"]},
                     {"$set": {
-                        f"STATS.{k_current_season}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}_RANK": res
+                        f"STATS.{CURR_SEASON}.{season_type}.ADV.SHOOTING.CLOSEST_DEFENDER.{closest_defender}.{stat}_RANK": res
                     }
                     }
                 )
@@ -165,7 +165,7 @@ def shooting_stat_rank():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     players_collection = db.nba_players
     logging.info("Connected to MongoDB")

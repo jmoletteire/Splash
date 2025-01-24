@@ -6,7 +6,7 @@ from pymongo import MongoClient
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -17,7 +17,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season
+        from env import PROXY, URI, CURR_SEASON
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -25,7 +25,7 @@ except ImportError:
 def update_current_cup():
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         cup_collection = db.nba_cup_history
     except Exception as e:
@@ -33,7 +33,7 @@ def update_current_cup():
         exit(1)
 
     try:
-        teams = iststandings.ISTStandings(season=k_current_season).get_dict()['teams']
+        teams = iststandings.ISTStandings(season=CURR_SEASON).get_dict()['teams']
     except Exception as e:
         logging.error(f"NBA Cup data unavailable: {e}")
         return
@@ -56,7 +56,7 @@ def update_current_cup():
 
         # Update the database with the sorted array of teams
         cup_collection.update_one(
-            {'SEASON': k_current_season},
+            {'SEASON': CURR_SEASON},
             {'$set': {f'GROUP.{group_standings[0]["conference"]}.{group}': group_standings}},
             upsert=True
         )
@@ -66,20 +66,20 @@ def update_current_cup():
 
         # Update the database with the sorted array of teams
         cup_collection.update_one(
-            {'SEASON': k_current_season},
+            {'SEASON': CURR_SEASON},
             {'$set': {f'WILD CARD.{wildcard_standings[0]["conference"]}': wildcard_standings}},
             upsert=True
         )
 
     # Fetching the JSON data from the URL
-    url = f"https://cdn.nba.com/static/json/staticData/brackets/{k_current_season[0:4]}/ISTBracket.json"
+    url = f"https://cdn.nba.com/static/json/staticData/brackets/{CURR_SEASON[0:4]}/ISTBracket.json"
     response = requests.get(url)
 
     # Check if the request was successful
     if response.status_code == 200:
         json_data = response.json()
         cup_collection.update_one(
-            {'SEASON': k_current_season},
+            {'SEASON': CURR_SEASON},
             {'$set': {f'KNOCKOUT': json_data['bracket']['istBracketSeries']}},
             upsert=True
         )
@@ -88,7 +88,7 @@ def update_current_cup():
 def flag_cup_games(season=None):
     try:
         logging.basicConfig(level=logging.INFO)
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         cup_collection = db.nba_cup_history
         games_collection = db.nba_games
@@ -177,7 +177,7 @@ def fetch_all_cups():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
-    client = MongoClient(uri)
+    client = MongoClient(URI)
     db = client.splash
     cup_collection = db.nba_cup_history
     games_collection = db.nba_games

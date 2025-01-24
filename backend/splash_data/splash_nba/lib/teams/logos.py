@@ -1,10 +1,10 @@
 import logging
 from pymongo import MongoClient
-from splash_nba.util.env import uri
+from splash_nba.util.env import URI
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri
+    from splash_nba.util.env import URI
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
         logging.info("Connected to MongoDB")

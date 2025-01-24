@@ -14,7 +14,7 @@ from splash_nba.lib.teams.update_team_games import update_team_games
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON
     from splash_nba.util.mongo_connect import get_mongo_collection
 except ImportError:
     # Fallback to the remote env.py path
@@ -26,7 +26,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season
+        from env import PROXY, URI, CURR_SEASON
         from mongo_connect import get_mongo_collection
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
@@ -367,7 +367,7 @@ def games_today():
             update_team_games(games_collection.find_one({'GAME_DATE': today}, {'GAMES': 1}))
             summary = fetch_box_score_summary(game['GAME_ID'])
             adv = fetch_box_score_adv(game['GAME_ID'])
-            highlights = 'No highlights found'  # search_youtube_highlights(youtube_api_key, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
+            highlights = 'No highlights found'  # search_youtube_highlights(YOUTUBE_API_KEY, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
 
             home_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['HOME_TEAM_ID'] else 1
             away_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['VISITOR_TEAM_ID'] else 1
@@ -425,7 +425,7 @@ def games_prev_day():
     yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
 
     # Else if games today + within 1 hour of first tip-off
-    linescore = scoreboardv2.ScoreboardV2(game_date=yesterday, day_offset=0).get_normalized_dict()
+    linescore = scoreboardv2.ScoreboardV2(game_date=yesterday, day_offset=0, proxy=PROXY).get_normalized_dict()
     line_scores = linescore['LineScore']
     games_yesterday = linescore['GameHeader']
 
@@ -439,7 +439,7 @@ def games_prev_day():
         if is_upcoming:
             summary = fetch_box_score_summary(game['GAME_ID'])
             try:
-                box_score = boxscore.BoxScore(game_id=game['GAME_ID']).get_dict()['game']
+                box_score = boxscore.BoxScore(game_id=game['GAME_ID'], proxy=PROXY).get_dict()['game']
                 games_collection.update_one(
                     {'GAME_DATE': yesterday},
                     {'$set': {
@@ -522,7 +522,7 @@ def games_prev_day():
         elif is_final:
             # Summary, Box Score, PBP
             summary = fetch_box_score_summary(game['GAME_ID'])
-            box_score = boxscore.BoxScore(game_id=game['GAME_ID']).get_dict()['game']
+            box_score = boxscore.BoxScore(game_id=game['GAME_ID'], proxy=PROXY).get_dict()['game']
 
             # PBP fields to keep
             pbp_keys = [
@@ -543,7 +543,7 @@ def games_prev_day():
             ]
 
             try:
-                actions = playbyplay.PlayByPlay(game_id=game['GAME_ID']).get_dict()['game']['actions']
+                actions = playbyplay.PlayByPlay(game_id=game['GAME_ID'], proxy=PROXY).get_dict()['game']['actions']
                 pbp = [{key: action.get(key, 0) for key in pbp_keys} for action in actions]
             except Exception:
                 pbp = []
@@ -685,7 +685,7 @@ def games_prev_day():
             update_team_games(games_collection.find_one({'GAME_DATE': yesterday}, {'GAMES': 1}))
             summary = fetch_box_score_summary(game['GAME_ID'])
             adv = fetch_box_score_adv(game['GAME_ID'])
-            highlights = 'No highlights found'  # search_youtube_highlights(youtube_api_key, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
+            highlights = 'No highlights found'  # search_youtube_highlights(YOUTUBE_API_KEY, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
 
             home_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['HOME_TEAM_ID'] else 1
             away_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['VISITOR_TEAM_ID'] else 1
@@ -1092,7 +1092,7 @@ async def games_live_update():
             # Finalize Box Score, Adv Stats, and Summary
             summary = fetch_box_score_summary(game['gameId'])
             adv = fetch_box_score_adv(game['gameId'])
-            highlights = 'No highlights found'  # search_youtube_highlights(youtube_api_key, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
+            highlights = 'No highlights found'  # search_youtube_highlights(YOUTUBE_API_KEY, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
 
             home_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['HOME_TEAM_ID'] else 1
             away_line_index = 0 if line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['VISITOR_TEAM_ID'] else 1
@@ -1161,25 +1161,25 @@ def games_daily_update():
     logging.info("NBA Cup...")
     try:
         update_current_cup()
-        flag_cup_games(season=k_current_season)
+        flag_cup_games(season=CURR_SEASON)
     except Exception as e:
         logging.error(f"(Games Daily) Failed to update NBA Cup: {e}", exc_info=True)
 
     # Playoffs
     logging.info("Playoffs...")
     try:
-        playoff_games = commonplayoffseries.CommonPlayoffSeries(season=k_current_season).get_normalized_dict()[
+        playoff_games = commonplayoffseries.CommonPlayoffSeries(season=CURR_SEASON).get_normalized_dict()[
             'PlayoffSeries']
         if not playoff_games:
             logging.info("(Games Daily) No playoff games found.")
             return
         else:
             series_data = reformat_series_data(playoff_games)
-            get_playoff_bracket_data(k_current_season, series_data)
+            get_playoff_bracket_data(CURR_SEASON, series_data)
     except Exception as e:
         logging.error(f"(Games Daily) Failed to update playoff data: {e}", exc_info=True)
 
 
 if __name__ == '__main__':
-    # games_prev_day()
-    games_live_update()
+    games_prev_day()
+    # games_live_update()

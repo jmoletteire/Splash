@@ -5,7 +5,7 @@ from nba_api.stats.endpoints import commonteamroster
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -16,7 +16,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -38,7 +38,7 @@ def fetch_roster(team_id):
     else:
         # Connect to MongoDB
         try:
-            client = MongoClient(uri)
+            client = MongoClient(URI)
             db = client.splash
             teams_collection = db.nba_teams
         except Exception as e:
@@ -46,7 +46,7 @@ def fetch_roster(team_id):
             exit(1)
 
     try:
-        team_roster = commonteamroster.CommonTeamRoster(team_id, season=k_current_season).get_normalized_dict()
+        team_roster = commonteamroster.CommonTeamRoster(team_id, season=CURR_SEASON).get_normalized_dict()
         players = team_roster['CommonTeamRoster']
         coaches = team_roster['Coaches']
 
@@ -60,13 +60,13 @@ def fetch_roster(team_id):
         if caller_function == '<module>':
             main_teams_collection.update_one(
                 {"TEAM_ID": team_id},
-                {"$set": {f"seasons.{k_current_season}.ROSTER": team_roster_dict, f"seasons.{k_current_season}.COACHES": coaches}},
+                {"$set": {f"seasons.{CURR_SEASON}.ROSTER": team_roster_dict, f"seasons.{CURR_SEASON}.COACHES": coaches}},
                 upsert=True
             )
         else:
             teams_collection.update_one(
                 {"TEAM_ID": team_id},
-                {"$set": {f"seasons.{k_current_season}.ROSTER": team_roster_dict, f"seasons.{k_current_season}.COACHES": coaches}},
+                {"$set": {f"seasons.{CURR_SEASON}.ROSTER": team_roster_dict, f"seasons.{CURR_SEASON}.COACHES": coaches}},
                 upsert=True
             )
         logging.info(f"Updated roster for team {team_id}")
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         main_teams_collection = db.nba_teams
         logging.info("Connected to MongoDB")

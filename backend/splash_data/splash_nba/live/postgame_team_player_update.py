@@ -8,7 +8,7 @@ from splash_nba.live.teams import update_teams
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri
+    from splash_nba.util.env import URI
     from splash_nba.util.mongo_connect import get_mongo_collection
 except ImportError:
     # Fallback to the remote env.py path

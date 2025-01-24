@@ -6,7 +6,7 @@ from splash_nba.lib.teams.stats.team_stats import fetch_team_stats
 
 try:
     # Try to import the local env.py file
-    from splash_nba.util.env import uri, k_current_season, k_current_season_type
+    from splash_nba.util.env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -17,7 +17,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import uri, k_current_season, k_current_season_type
+        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 
@@ -25,7 +25,7 @@ except ImportError:
 def update_current_season(team_id):
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
     except Exception as e:
@@ -40,54 +40,54 @@ def update_current_season(team_id):
         season_stats_dict = {
             season_dict['YEAR']: dict(list(season_dict.items())[:15])
             for season_dict in team_seasons_list
-            if season_dict['YEAR'] == k_current_season
+            if season_dict['YEAR'] == CURR_SEASON
         }
 
         try:
             # Fetch team stats for this team in given season
-            season_stats_dict[k_current_season]['STATS'] = {k_current_season_type: fetch_team_stats(team_id=team_id, season=k_current_season, season_type='Regular Season' if k_current_season_type == 'REGULAR SEASON' else 'PLAYOFFS')}
+            season_stats_dict[CURR_SEASON]['STATS'] = {CURR_SEASON_TYPE: fetch_team_stats(team_id=team_id, season=CURR_SEASON, season_type='Regular Season' if CURR_SEASON_TYPE == 'REGULAR SEASON' else 'PLAYOFFS')}
 
             # Update SEASONS for this team
             teams_collection.update_one(
                 {"TEAM_ID": team_id},
                 {"$set": {
-                    f"seasons.{k_current_season}.TEAM_ID": season_stats_dict[k_current_season]['TEAM_ID'],
-                    f"seasons.{k_current_season}.TEAM_CITY": season_stats_dict[k_current_season]['TEAM_CITY'],
-                    f"seasons.{k_current_season}.TEAM_NAME": season_stats_dict[k_current_season]['TEAM_NAME'],
-                    f"seasons.{k_current_season}.YEAR": season_stats_dict[k_current_season]['YEAR'],
-                    f"seasons.{k_current_season}.GP": season_stats_dict[k_current_season]['GP'],
-                    f"seasons.{k_current_season}.WINS": season_stats_dict[k_current_season]['WINS'],
-                    f"seasons.{k_current_season}.LOSSES": season_stats_dict[k_current_season]['LOSSES'],
-                    f"seasons.{k_current_season}.WIN_PCT": season_stats_dict[k_current_season]['WIN_PCT'],
-                    f"seasons.{k_current_season}.CONF_RANK": season_stats_dict[k_current_season]['CONF_RANK'],
-                    f"seasons.{k_current_season}.DIV_RANK": season_stats_dict[k_current_season]['DIV_RANK'],
-                    f"seasons.{k_current_season}.PO_WINS": season_stats_dict[k_current_season]['PO_WINS'],
-                    f"seasons.{k_current_season}.PO_LOSSES": season_stats_dict[k_current_season]['PO_LOSSES'],
-                    f"seasons.{k_current_season}.STATS.{k_current_season_type}": season_stats_dict[k_current_season]['STATS'][k_current_season_type]
+                    f"seasons.{CURR_SEASON}.TEAM_ID": season_stats_dict[CURR_SEASON]['TEAM_ID'],
+                    f"seasons.{CURR_SEASON}.TEAM_CITY": season_stats_dict[CURR_SEASON]['TEAM_CITY'],
+                    f"seasons.{CURR_SEASON}.TEAM_NAME": season_stats_dict[CURR_SEASON]['TEAM_NAME'],
+                    f"seasons.{CURR_SEASON}.YEAR": season_stats_dict[CURR_SEASON]['YEAR'],
+                    f"seasons.{CURR_SEASON}.GP": season_stats_dict[CURR_SEASON]['GP'],
+                    f"seasons.{CURR_SEASON}.WINS": season_stats_dict[CURR_SEASON]['WINS'],
+                    f"seasons.{CURR_SEASON}.LOSSES": season_stats_dict[CURR_SEASON]['LOSSES'],
+                    f"seasons.{CURR_SEASON}.WIN_PCT": season_stats_dict[CURR_SEASON]['WIN_PCT'],
+                    f"seasons.{CURR_SEASON}.CONF_RANK": season_stats_dict[CURR_SEASON]['CONF_RANK'],
+                    f"seasons.{CURR_SEASON}.DIV_RANK": season_stats_dict[CURR_SEASON]['DIV_RANK'],
+                    f"seasons.{CURR_SEASON}.PO_WINS": season_stats_dict[CURR_SEASON]['PO_WINS'],
+                    f"seasons.{CURR_SEASON}.PO_LOSSES": season_stats_dict[CURR_SEASON]['PO_LOSSES'],
+                    f"seasons.{CURR_SEASON}.STATS.{CURR_SEASON_TYPE}": season_stats_dict[CURR_SEASON]['STATS'][CURR_SEASON_TYPE]
                 }},
                 upsert=True
             )
         except Exception as e:
-            logging.error(f"\t(Team Seasons) {k_current_season} season stats unavailable for {team_id}: {e}")
+            logging.error(f"\t(Team Seasons) {CURR_SEASON} season stats unavailable for {team_id}: {e}")
             teams_collection.update_one(
                 {"TEAM_ID": team_id},
                 {"$set": {
-                    f"seasons.{k_current_season}.TEAM_ID": team_id,
-                    f"seasons.{k_current_season}.YEAR": k_current_season,
-                    f"seasons.{k_current_season}.GP": 0,
-                    f"seasons.{k_current_season}.WINS": 0,
-                    f"seasons.{k_current_season}.LOSSES": 0,
-                    f"seasons.{k_current_season}.WIN_PCT": 0.000,
-                    f"seasons.{k_current_season}.CONF_RANK": 0,
-                    f"seasons.{k_current_season}.DIV_RANK": 0,
-                    f"seasons.{k_current_season}.PO_WINS": 0,
-                    f"seasons.{k_current_season}.PO_LOSSES": 0,
-                    f"seasons.{k_current_season}.STATS.{k_current_season_type}": {'BASIC': {}, 'ADV': {}, 'HUSTLE': {}}
+                    f"seasons.{CURR_SEASON}.TEAM_ID": team_id,
+                    f"seasons.{CURR_SEASON}.YEAR": CURR_SEASON,
+                    f"seasons.{CURR_SEASON}.GP": 0,
+                    f"seasons.{CURR_SEASON}.WINS": 0,
+                    f"seasons.{CURR_SEASON}.LOSSES": 0,
+                    f"seasons.{CURR_SEASON}.WIN_PCT": 0.000,
+                    f"seasons.{CURR_SEASON}.CONF_RANK": 0,
+                    f"seasons.{CURR_SEASON}.DIV_RANK": 0,
+                    f"seasons.{CURR_SEASON}.PO_WINS": 0,
+                    f"seasons.{CURR_SEASON}.PO_LOSSES": 0,
+                    f"seasons.{CURR_SEASON}.STATS.{CURR_SEASON_TYPE}": {'BASIC': {}, 'ADV': {}, 'HUSTLE': {}}
                 }},
                 upsert=True
             )
 
-            logging.info(f"\t(Team Seasons) Updated {k_current_season} stats for {team_id}.")
+            logging.info(f"\t(Team Seasons) Updated {CURR_SEASON} stats for {team_id}.")
     except Exception as e:
         logging.error(f"\t(Team Seasons) Failed to update current season for team {team_id}: {e}")
 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
+        client = MongoClient(URI)
         db = client.splash
         teams_collection = db.nba_teams
         logging.info("Connected to MongoDB")
