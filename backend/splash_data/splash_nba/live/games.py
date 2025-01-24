@@ -20,6 +20,13 @@ except ImportError:
     # Fallback to the remote env.py path
     import sys
     import os
+    import requests
+
+    # Path to Bright Data's SSL certificate
+    cert_path = "/home/ubuntu/bright_data_certificate.pem"
+
+    # Set global certificate verification
+    requests.packages.urllib3.util.ssl_.DEFAULT_CA_BUNDLE_PATH = cert_path
 
     env_path = "/home/ubuntu"
     if env_path not in sys.path:
