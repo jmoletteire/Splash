@@ -752,7 +752,7 @@ async def games_live_update():
     yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
 
     try:
-        scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard().get_dict()
+        scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard(proxy=PROXY).get_dict()
     except Exception:
         return
 
@@ -803,7 +803,7 @@ async def games_live_update():
 
     # Else if games today + within 1 hour of first tip-off
     try:
-        linescore = scoreboardv2.ScoreboardV2(game_date=first_game_date, day_offset=0).get_normalized_dict()
+        linescore = scoreboardv2.ScoreboardV2(game_date=first_game_date, day_offset=0, proxy=PROXY).get_normalized_dict()
     except Exception:
         return
 
@@ -837,7 +837,7 @@ async def games_live_update():
         if is_upcoming:
             summary = fetch_box_score_summary(game['gameId'])
             try:
-                box_score = boxscore.BoxScore(game_id=game['gameId']).get_dict()['game']
+                box_score = boxscore.BoxScore(game_id=game['gameId'], proxy=PROXY).get_dict()['game']
                 games_collection.update_one(
                     {'GAME_DATE': game_et_date},
                     {'$set': {
@@ -920,7 +920,7 @@ async def games_live_update():
         elif in_progress:
             # Summary, Box Score, PBP
             summary = fetch_box_score_summary(game['gameId'])
-            box_score = boxscore.BoxScore(game_id=game['gameId']).get_dict()['game']
+            box_score = boxscore.BoxScore(game_id=game['gameId'], proxy=PROXY).get_dict()['game']
 
             keys = [
                 'actionNumber',
@@ -940,7 +940,7 @@ async def games_live_update():
             ]
 
             try:
-                actions = playbyplay.PlayByPlay(game_id=game['gameId']).get_dict()['game']['actions']
+                actions = playbyplay.PlayByPlay(game_id=game['gameId'], proxy=PROXY).get_dict()['game']['actions']
                 pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
             except Exception:
                 pbp = []

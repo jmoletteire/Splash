@@ -247,7 +247,7 @@ def synergy_shot_quality(sr_id, adv_boxscore):
 
 # Function to fetch box score stats for a game
 def fetch_box_score_adv(game_id):
-    boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id).get_normalized_dict()
+    boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game_id, proxy=PROXY).get_normalized_dict()
     return boxscore
 
 

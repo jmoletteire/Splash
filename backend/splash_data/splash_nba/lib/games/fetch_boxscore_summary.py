@@ -24,7 +24,7 @@ except ImportError:
 
 # Function to fetch box score stats for a game
 def fetch_box_score_summary(game_id):
-    boxscore = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id).get_normalized_dict()
+    boxscore = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id, proxy=PROXY).get_normalized_dict()
     return boxscore
 
 
