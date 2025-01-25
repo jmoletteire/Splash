@@ -8,7 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 # Import your task functions
 from splash_nba.lib.games.game_odds import fetch_odds
-from splash_nba.live.games import games_daily_update, games_live_update, reset_flags
+from splash_nba.live.games import games_daily_update, games_live_update
 # from splash_nba.live.postgame_team_player_update import check_games_final
 from splash_nba.live.teams import teams_daily_update
 from splash_nba.live.players import players_daily_update
@@ -89,10 +89,6 @@ async def daily_update_task():
     logging.info(f"\ndaily_update_task completed in {elapsed_time:.2f} seconds\n")
 
 
-async def reset_flags_task():
-    await safe_task(reset_flags, "reset_flags", timeout=60)
-
-
 # APScheduler setup
 def setup_scheduler():
     scheduler = AsyncIOScheduler()
@@ -101,7 +97,6 @@ def setup_scheduler():
     scheduler.add_job(games_live_update_task, IntervalTrigger(seconds=20), coalesce=True)
     scheduler.add_job(fetch_odds_task, IntervalTrigger(minutes=1), coalesce=True)
     scheduler.add_job(player_rotowires_task, IntervalTrigger(minutes=30), coalesce=True)
-    scheduler.add_job(reset_flags_task, CronTrigger(hour=0, minute=0), coalesce=True)
     scheduler.add_job(daily_update_task, CronTrigger(hour=2, minute=0), coalesce=True)
 
     scheduler.start()

@@ -7,7 +7,7 @@ from nba_api.stats.endpoints import commonplayoffseries, scoreboardv2
 from splash_nba.lib.games.fetch_adv_boxscore import fetch_box_score_adv
 from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
 from splash_nba.lib.games.fetch_new_games import fetch_games_for_date_range
-from splash_nba.lib.games.fetch_play_by_play import update_play_by_play, fetch_play_by_play
+from splash_nba.lib.games.fetch_play_by_play import update_play_by_play
 from splash_nba.lib.games.nba_cup import update_current_cup, flag_cup_games
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
 from splash_nba.lib.teams.update_team_games import update_team_games
