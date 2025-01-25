@@ -66,16 +66,6 @@ teams = {
     1610612766: 'Charlotte Hornets',
 }
 
-# Global flag to prevent further updates for the day
-skip_updates = False
-
-
-# Function to reset the skip_updates flag daily
-def reset_flags():
-    global skip_updates
-    skip_updates = False
-    logging.info("(Flag Reset) Daily reset complete, live updates will resume.")
-
 
 def format_duration(input_str):
     # Regular expression to match 'PT' followed by minutes and seconds
@@ -97,11 +87,6 @@ def format_duration(input_str):
 def games_prev_day():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
-
-    global skip_updates
-    if skip_updates:
-        logging.info(f"(Games Live) No games today, skipping further updates. [{datetime.now()}]")
-        return  # Skip the update if there are no games today
 
     try:
         games_collection = get_mongo_collection('nba_games')
@@ -415,11 +400,6 @@ def games_prev_day():
 async def games_live_update():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
-
-    global skip_updates
-    if skip_updates:
-        logging.info(f"(Games Live) No games today, skipping further updates. [{datetime.now()}]")
-        return  # Skip the update if there are no games today
 
     try:
         games_collection = get_mongo_collection('nba_games')
