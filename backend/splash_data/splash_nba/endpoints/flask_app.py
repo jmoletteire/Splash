@@ -665,7 +665,28 @@ def get_scoreboard():
                 "date": summary["GAME_DATE_EST"][0:10]
             }
 
-        games = [summarize_game(game_id, game) for game_id, game in games[0]['GAMES'].items()]
+        def specific_game(game_id, game):
+            boxscore = game.get("BOXSCORE", {})
+
+            if boxscore is None:
+                return
+
+            officials = ""
+            arena = ""
+
+            if "officials" in boxscore:
+                officials = ", ".join([ref["name"] for ref in boxscore["officials"]])
+            if "arena" in boxscore:
+                arena = f'{boxscore["arena"]["arenaName"]}, {boxscore["arena"]["arenaCity"]}, {boxscore["arena"]["arenaState"]}'
+
+            return {
+                "matchup": {
+                    "officials": officials,
+                    "arena": arena
+                }
+            }
+
+        summarized_games = [summarize_game(game_id, game) for game_id, game in games[0]['GAMES'].items()]
 
         if not games:
             logging.warning(f"(get_scoreboard) No games found in MongoDB for date {game_date}")
@@ -673,13 +694,13 @@ def get_scoreboard():
 
         if game_id:
             # If `gameId` is provided, return the specific game
-            game = games[0].get("GAMES", {}).get(game_id)
-            if not game:
+            game_data = specific_game(game_id, games[0]['GAMES'].items())
+            if not game_data:
                 return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
-            return jsonify(game)
+            return jsonify(game_data)
         else:
             # Otherwise, return all games for the date
-            return jsonify(games)
+            return jsonify(summarized_games)
 
     except Exception as e:
         logging.error(f"(get_scoreboard) Error retrieving games: {e}")

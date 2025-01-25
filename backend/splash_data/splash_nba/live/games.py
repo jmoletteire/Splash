@@ -584,7 +584,7 @@ async def games_live_update():
                 logging.info(f'(Games Live) Upcoming game {game["gameId"]} is up to date.')
 
         # IN-PROGRESS
-        elif is_final:
+        elif in_progress:
             # Summary, Box Score, PBP
             summary = fetch_box_score_summary(game['gameId'])
             box_score = boxscore.BoxScore(proxy=PROXY, game_id=game['gameId']).get_dict()['game']
