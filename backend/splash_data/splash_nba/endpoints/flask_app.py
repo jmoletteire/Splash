@@ -685,6 +685,9 @@ def get_scoreboard():
                     for key, value in player.items():
                         player[key] = str(value)
 
+                # Return updated dictionary
+                return stats
+
             if "officials" in boxscore:
                 officials = ", ".join([ref["name"] for ref in boxscore["officials"]])
             if "arena" in boxscore:
