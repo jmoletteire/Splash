@@ -704,6 +704,7 @@ def get_scoreboard():
                 return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
 
             game_data = summarized_games[0].update(specific_game(game))
+            logging.info(game_data)
             return jsonify(game_data)
         else:
             # Otherwise, return all games for the date

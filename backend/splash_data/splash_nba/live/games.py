@@ -397,7 +397,7 @@ def games_prev_day():
             logging.info(f'(Games Live) Finalizing game {game["GAME_ID"]}.')
 
 
-async def games_live_update():
+def games_live_update():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -848,5 +848,5 @@ def games_daily_update():
 
 
 if __name__ == '__main__':
-    # games_prev_day()
-    games_live_update()
+    games_prev_day()
+    # games_live_update()
