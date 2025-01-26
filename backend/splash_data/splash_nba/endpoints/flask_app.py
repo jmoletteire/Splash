@@ -665,22 +665,27 @@ def get_scoreboard():
                 "date": summary["GAME_DATE_EST"][0:10]
             }
 
-        def specific_game(game_id, game):
+        def specific_game(game):
             boxscore = game.get("BOXSCORE", {})
 
             if boxscore is None:
-                return
+                return {"matchup": {}}
 
+            matchup = f'{boxscore.get("awayTeam", {}).get("teamName", "")} @ {boxscore.get("homeTeam", {}).get("teamName", "")}'
             officials = ""
             arena = ""
 
             if "officials" in boxscore:
                 officials = ", ".join([ref["name"] for ref in boxscore["officials"]])
             if "arena" in boxscore:
-                arena = f'{boxscore["arena"]["arenaName"]}, {boxscore["arena"]["arenaCity"]}, {boxscore["arena"]["arenaState"]}'
+                name = boxscore["arena"]["arenaName"] if "arenaName" in boxscore["arena"] else ""
+                city = boxscore["arena"]["arenaCity"] if "arenaCity" in boxscore["arena"] else ""
+                state = boxscore["arena"]["arenaState"] if "arenaState" in boxscore["arena"] else ""
+                arena = f'{name}, {city}, {state}'
 
             return {
                 "matchup": {
+                    "matchup": matchup,
                     "officials": officials,
                     "arena": arena
                 }
@@ -694,9 +699,11 @@ def get_scoreboard():
 
         if game_id:
             # If `gameId` is provided, return the specific game
-            game_data = specific_game(game_id, games[0]['GAMES'].items())
-            if not game_data:
+            game = games[0]['GAMES'].get(game_id, {})
+            if not game:
                 return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
+
+            game_data = summarized_games[0].update(specific_game(game))
             return jsonify(game_data)
         else:
             # Otherwise, return all games for the date

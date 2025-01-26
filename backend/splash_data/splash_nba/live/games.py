@@ -848,5 +848,5 @@ def games_daily_update():
 
 
 if __name__ == '__main__':
-    games_prev_day()
-    # games_live_update()
+    # games_prev_day()
+    games_live_update()
