@@ -571,6 +571,7 @@ def get_scoreboard():
 
         # Add a projection step depending on whether a specific game is requested
         if game_id:
+            game_id = int(game_id)
             pipeline.append({
                 "$project": {
                     "_id": 0,
@@ -711,64 +712,6 @@ def get_scoreboard():
 
     except Exception as e:
         logging.error(f"(get_scoreboard) Error retrieving games: {e}")
-        return jsonify({"error": "Failed to retrieve games"}), 500
-
-
-@app.route('/games', methods=['GET'])
-def get_games():
-    try:
-        query_params = request.args.to_dict()
-        game_date = query_params.get('date', datetime.utcnow().strftime('%Y-%m-%d'))  # Default to today's date
-        game_id = query_params.get('gameId')  # `gameId` is optional
-
-        # Base query to search games by date
-        pipeline = [
-            {
-                "$search": {
-                    "index": "game_index",
-                    "phrase": {
-                        "query": game_date,
-                        "path": "GAME_DATE"
-                    }
-                }
-            }
-        ]
-
-        # Add a projection step depending on whether a specific game is requested
-        if game_id:
-            pipeline.append({
-                "$project": {
-                    "_id": 0,
-                    f"GAMES.{game_id}": 1
-                }
-            })
-        else:
-            pipeline.append({
-                "$project": {
-                    "_id": 0,
-                    "GAMES": 1
-                }
-            })
-
-        # Execute the query
-        results = list(games_collection.aggregate(pipeline))
-
-        if not results:
-            logging.warning(f"(get_games) No games found in MongoDB for date {game_date}")
-            return jsonify({"error": f"No games found for date {game_date}"}), 404
-
-        if game_id:
-            # If `gameId` is provided, return the specific game
-            game = results[0].get("GAMES", {}).get(game_id)
-            if not game:
-                return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
-            return jsonify(game)
-        else:
-            # Otherwise, return all games for the date
-            return jsonify(results[0].get('GAMES', {}))
-
-    except Exception as e:
-        logging.error(f"(get_games) Error retrieving games: {e}")
         return jsonify({"error": "Failed to retrieve games"}), 500
 
 
