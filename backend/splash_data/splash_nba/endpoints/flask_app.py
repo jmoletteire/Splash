@@ -680,6 +680,7 @@ def get_scoreboard():
 
         if game_id:
             summarized_games = [summarize_game(id, game) for id, game in games[0]['GAMES'].items() if id == game_id]
+            logging.info(summarized_games)
         else:
             summarized_games = [summarize_game(id, game) for id, game in games[0]['GAMES'].items()]
 
