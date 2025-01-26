@@ -573,33 +573,26 @@ def get_scoreboard():
         if game_id:
             pipeline.append({
                 "$addFields": {
-                    "filtered_games": {
-                        "$arrayElemAt": [
+                    "GAMES": {
+                        "$arrayToObject": [
                             {
                                 "$filter": {
                                     "input": {"$objectToArray": "$GAMES"},
                                     "as": "game",
-                                    "cond": {"$eq": ["$$game.k", game_id]}  # Match key with game_id
+                                    "cond": {"$eq": ["$$game.k", game_id]}
                                 }
-                            },
-                            0
+                            }
                         ]
                     }
                 }
             })
-            pipeline.append({
-                "$project": {
-                    "_id": 0,
-                    "filtered_games": 1
-                }
-            })
-        else:
-            pipeline.append({
-                "$project": {
-                    "_id": 0,
-                    "GAMES": 1
-                }
-            })
+
+        pipeline.append({
+            "$project": {
+                "_id": 0,
+                "GAMES": 1
+            }
+        })
 
         # Execute the query
         games = list(games_collection.aggregate(pipeline))
