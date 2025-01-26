@@ -675,6 +675,16 @@ def get_scoreboard():
                     "position": player["position"] if "position" in player else None
                 }
 
+            def convert_to_strings(stats):
+                # Convert team statistics to strings
+                for key, value in stats["team"].items():
+                    stats["team"][key] = str(value)
+
+                # Convert player statistics to strings
+                for player in stats["players"]:
+                    for key, value in player.items():
+                        player[key] = str(value)
+
             if "officials" in boxscore:
                 officials = ", ".join([ref["name"] for ref in boxscore["officials"]])
             if "arena" in boxscore:
@@ -689,6 +699,18 @@ def get_scoreboard():
                 if "players" in boxscore["awayTeam"]:
                     lineups["away"] = [lineup_player_data(player) for player in boxscore["awayTeam"]["players"] if player["starter"] == "1"]
 
+            # Create stats dictionary
+            stats = {
+                "home": {
+                    "team": boxscore.get("homeTeam", {}).get("statistics", {}),
+                    "players": boxscore.get("homeTeam", {}).get("players", []),
+                },
+                "away": {
+                    "team": boxscore.get("awayTeam", {}).get("statistics", {}),
+                    "players": boxscore.get("awayTeam", {}).get("players", []),
+                },
+            }
+
             return {
                 "matchup": {
                     "matchup": matchup,
@@ -697,14 +719,8 @@ def get_scoreboard():
                     "lineups": lineups
                 },
                 "stats": {
-                    "home": {
-                        "team": boxscore.get("homeTeam", {}).get("statistics", {}),
-                        "players": boxscore.get("homeTeam", {}).get("players", []),
-                    },
-                    "away": {
-                        "team": boxscore.get("awayTeam", {}).get("statistics", {}),
-                        "players": boxscore.get("awayTeam", {}).get("players", []),
-                    },
+                    "home": convert_to_strings(stats["home"]),
+                    "away": convert_to_strings(stats["away"]),
                 }
             }
 
