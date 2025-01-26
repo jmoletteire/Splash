@@ -571,11 +571,26 @@ def get_scoreboard():
 
         # Add a projection step depending on whether a specific game is requested
         if game_id:
-            game_id = str(game_id)
+            pipeline.append({
+                "$addFields": {
+                    "filtered_games": {
+                        "$arrayElemAt": [
+                            {
+                                "$filter": {
+                                    "input": {"$objectToArray": "$GAMES"},
+                                    "as": "game",
+                                    "cond": {"$eq": ["$$game.k", game_id]}  # Match key with game_id
+                                }
+                            },
+                            0
+                        ]
+                    }
+                }
+            })
             pipeline.append({
                 "$project": {
                     "_id": 0,
-                    f"GAMES.{game_id}": 1
+                    "filtered_games": 1
                 }
             })
         else:
