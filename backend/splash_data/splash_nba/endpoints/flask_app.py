@@ -557,42 +557,20 @@ def get_scoreboard():
         game_id = query_params.get('gameId')  # `gameId` is optional
 
         # Base query to search games by date
-        pipeline = [
-            {
-                "$search": {
-                    "index": "game_index",
-                    "phrase": {
-                        "query": game_date,
-                        "path": "GAME_DATE"
-                    }
+        pipeline = [{
+            "$search": {
+                "index": "game_index",
+                "phrase": {
+                    "query": game_date,
+                    "path": "GAME_DATE"
                 }
             }
-        ]
-
-        # Add a projection step depending on whether a specific game is requested
-        if game_id:
-            pipeline.append({
-                "$addFields": {
-                    "GAMES": {
-                        "$arrayToObject": [
-                            {
-                                "$filter": {
-                                    "input": {"$objectToArray": "$GAMES"},
-                                    "as": "game",
-                                    "cond": {"$eq": ["$$game.k", game_id]}
-                                }
-                            }
-                        ]
-                    }
-                }
-            })
-
-        pipeline.append({
+        }, {
             "$project": {
                 "_id": 0,
                 "GAMES": 1
             }
-        })
+        }]
 
         # Execute the query
         games = list(games_collection.aggregate(pipeline))
