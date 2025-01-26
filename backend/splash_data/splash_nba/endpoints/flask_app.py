@@ -680,7 +680,6 @@ def get_scoreboard():
 
         if game_id:
             summarized_games = [summarize_game(id, game) for id, game in games[0]['GAMES'].items() if id == game_id]
-            logging.info(summarized_games)
         else:
             summarized_games = [summarize_game(id, game) for id, game in games[0]['GAMES'].items()]
 
@@ -695,9 +694,8 @@ def get_scoreboard():
             if not game:
                 return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
 
-            game_data = summarized_games[0].update(specific_game(game))
-            logging.info(game_data)
-            return jsonify(game_data)
+            summarized_games[0].update(specific_game(game))
+            return jsonify(summarized_games[0])
         else:
             # Otherwise, return all games for the date
             return jsonify(summarized_games)
