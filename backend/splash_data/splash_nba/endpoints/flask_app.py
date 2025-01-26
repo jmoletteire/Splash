@@ -697,11 +697,11 @@ def get_scoreboard():
                     "lineups": lineups
                 },
                 "stats": {
-                    "homeTeam": {
+                    "home": {
                         "team": boxscore.get("homeTeam", {}).get("statistics", {}),
                         "players": boxscore.get("homeTeam", {}).get("players", []),
                     },
-                    "awayTeam": {
+                    "away": {
                         "team": boxscore.get("awayTeam", {}).get("statistics", {}),
                         "players": boxscore.get("awayTeam", {}).get("players", []),
                     },
