@@ -687,6 +687,7 @@ def get_scoreboard():
         if game_id:
             # If `gameId` is provided, return the specific game
             game = games[0]['GAMES'].get(game_id, {})
+            logging.info(game)
             if not game:
                 return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
 
