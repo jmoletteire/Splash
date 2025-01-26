@@ -636,13 +636,13 @@ def get_scoreboard():
             else:
                 return ''
 
-        def summarize_game(game_id, game):
+        def summarize_game(id, game):
             summary = game["SUMMARY"]["GameSummary"][0]
             line_score = game["SUMMARY"]["LineScore"]
             return {
                 "sportId": 0,
                 "season": summary["SEASON"],
-                "gameId": str(game_id) if not isinstance(game_id, str) else game_id,
+                "gameId": str(id) if not isinstance(id, str) else id,
                 "homeTeamId": str(summary["HOME_TEAM_ID"]) if not isinstance(summary["HOME_TEAM_ID"], str) else summary["HOME_TEAM_ID"],
                 "awayTeamId": str(summary["VISITOR_TEAM_ID"]) if not isinstance(summary["VISITOR_TEAM_ID"], str) else summary["VISITOR_TEAM_ID"],
                 "homeScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["PTS"],
@@ -678,7 +678,10 @@ def get_scoreboard():
                 }
             }
 
-        summarized_games = [summarize_game(game_id, game) for game_id, game in games[0]['GAMES'].items()]
+        if game_id:
+            summarized_games = [summarize_game(id, game) for id, game in games[0]['GAMES'].items() if id == game_id]
+        else:
+            summarized_games = [summarize_game(id, game) for id, game in games[0]['GAMES'].items()]
 
         if not games:
             logging.warning(f"(get_scoreboard) No games found in MongoDB for date {game_date}")
@@ -687,11 +690,12 @@ def get_scoreboard():
         if game_id:
             # If `gameId` is provided, return the specific game
             game = games[0]['GAMES'].get(game_id, {})
-            logging.info(game)
+
             if not game:
                 return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
 
             game_data = summarized_games[0].update(specific_game(game))
+            logging.info(game_data)
             return jsonify(game_data)
         else:
             # Otherwise, return all games for the date
