@@ -656,11 +656,24 @@ def get_scoreboard():
             boxscore = game.get("BOXSCORE", {})
 
             if boxscore is None:
-                return {"matchup": {}}
+                summary = game["SUMMARY"]["GameSummary"][0]
+                line_score = game["SUMMARY"]["LineScore"]
+                awayName = line_score[1]["NICKNAME"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[0]["NICKNAME"]
+                homeName = line_score[0]["NICKNAME"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["NICKNAME"]
+                return {"matchup": {f"{awayName} @ {homeName}"}, "stats": {}}
 
             matchup = f'{boxscore.get("awayTeam", {}).get("teamName", "")} @ {boxscore.get("homeTeam", {}).get("teamName", "")}'
             officials = ""
             arena = ""
+            lineups = {"home": [], "away": []}
+
+            def lineup_player_data(player):
+                return {
+                    "playerId": player["playerId"] if "playerId" in player else None,
+                    "name": player["nameI"] if "nameI" in player else None,
+                    "number": player["jerseyNum"] if "jerseyNum" in player else None,
+                    "position": player["position"] if "position" in player else None
+                }
 
             if "officials" in boxscore:
                 officials = ", ".join([ref["name"] for ref in boxscore["officials"]])
@@ -669,12 +682,29 @@ def get_scoreboard():
                 city = boxscore["arena"]["arenaCity"] if "arenaCity" in boxscore["arena"] else ""
                 state = boxscore["arena"]["arenaState"] if "arenaState" in boxscore["arena"] else ""
                 arena = f'{name}, {city}, {state}'
+            if "homeTeam" in boxscore:
+                if "players" in boxscore["homeTeam"]:
+                    lineups["home"] = [lineup_player_data(player) for player in boxscore["homeTeam"]["players"] if player["starter"] == "1"]
+            if "awayTeam" in boxscore:
+                if "players" in boxscore["awayTeam"]:
+                    lineups["away"] = [lineup_player_data(player) for player in boxscore["awayTeam"]["players"] if player["starter"] == "1"]
 
             return {
                 "matchup": {
                     "matchup": matchup,
                     "officials": officials,
-                    "arena": arena
+                    "arena": arena,
+                    "lineups": lineups
+                },
+                "stats": {
+                    "homeTeam": {
+                        "team": boxscore.get("homeTeam", {}).get("statistics", {}),
+                        "players": boxscore.get("homeTeam", {}).get("players", []),
+                    },
+                    "awayTeam": {
+                        "team": boxscore.get("awayTeam", {}).get("statistics", {}),
+                        "players": boxscore.get("awayTeam", {}).get("players", []),
+                    },
                 }
             }
 
@@ -690,7 +720,6 @@ def get_scoreboard():
         if game_id:
             # If `gameId` is provided, return the specific game
             game = games[0]['GAMES'].get(game_id, {})
-
             if not game:
                 return jsonify({"error": f"No game found with id {game_id} on {game_date}"}), 404
 
