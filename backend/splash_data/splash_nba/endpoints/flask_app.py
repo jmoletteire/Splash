@@ -571,7 +571,7 @@ def get_scoreboard():
 
         # Add a projection step depending on whether a specific game is requested
         if game_id:
-            game_id = int(game_id)
+            game_id = str(game_id)
             pipeline.append({
                 "$project": {
                     "_id": 0,
