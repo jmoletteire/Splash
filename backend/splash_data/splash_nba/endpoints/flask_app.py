@@ -683,7 +683,11 @@ def get_scoreboard():
                 # Convert player statistics to strings
                 for player in stats["players"]:
                     for key, value in player.items():
-                        player[key] = str(value)
+                        if key == "statistics":
+                            for key, stat in value.items():
+                                value[key] = str(stat)
+                        else:
+                            player[key] = str(value)
 
                 # Return updated dictionary
                 return stats
