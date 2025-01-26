@@ -669,7 +669,7 @@ def get_scoreboard():
 
             def lineup_player_data(player):
                 return {
-                    "personId": player["personId"] if "personId" in player else None,
+                    "personId": str(player["personId"]) if "personId" in player else None,
                     "name": player["nameI"] if "nameI" in player else None,
                     "number": player["jerseyNum"] if "jerseyNum" in player else None,
                     "position": player["position"] if "position" in player else None
