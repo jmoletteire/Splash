@@ -587,7 +587,6 @@ def get_scoreboard():
 
         # Execute the query
         games = list(games_collection.aggregate(pipeline))
-        logging.info(games)
 
         def get_game_status(game):
             if 'BOXSCORE' in game:
