@@ -740,11 +740,11 @@ def get_scoreboard():
                 },
                 "stats": {
                     "home": {
-                        "team": stats["team"],
+                        "team": stats["home"]["team"],
                         "players": [select_fields(player) for player in stats["home"]["players"]]
                     },
                     "away": {
-                        "team": stats["team"],
+                        "team": stats["away"]["team"],
                         "players": [select_fields(player) for player in stats["away"]["players"]]
                     },
                 }
