@@ -699,6 +699,7 @@ def get_scoreboard():
                     "number": player["jerseyNum"] if "jerseyNum" in player else None,
                     "position": player["position"] if "position" in player else None,
                     "inGame": player["oncourt"] if "oncourt" in player else None,
+                    "starter": player["starter"] if "starter" in player else None,
                     "statistics": player["statistics"] if "statistics" in player else None,
                 }
 
