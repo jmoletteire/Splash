@@ -692,6 +692,16 @@ def get_scoreboard():
                 # Return updated dictionary
                 return stats
 
+            def select_fields(player):
+                return {
+                    "personId": str(player["personId"]) if "personId" in player else None,
+                    "name": player["nameI"] if "nameI" in player else None,
+                    "number": player["number"] if "number" in player else None,
+                    "position": player["position"] if "position" in player else None,
+                    "inGame": player["oncourt"] if "oncourt" in player else None,
+                    "statistics": player["statistics"] if "statistics" in player else None,
+                }
+
             if "officials" in boxscore:
                 officials = ", ".join([ref["name"] for ref in boxscore["officials"]])
             if "arena" in boxscore:
@@ -718,6 +728,9 @@ def get_scoreboard():
                 },
             }
 
+            stats["home"] = convert_to_strings(stats["home"])
+            stats["away"] = convert_to_strings(stats["away"])
+
             return {
                 "matchup": {
                     "matchup": matchup,
@@ -726,8 +739,14 @@ def get_scoreboard():
                     "lineups": lineups
                 },
                 "stats": {
-                    "home": convert_to_strings(stats["home"]),
-                    "away": convert_to_strings(stats["away"]),
+                    "home": {
+                        "team": stats["team"],
+                        "players": [select_fields(player) for player in stats["home"]["players"]]
+                    },
+                    "away": {
+                        "team": stats["team"],
+                        "players": [select_fields(player) for player in stats["away"]["players"]]
+                    },
                 }
             }
 
