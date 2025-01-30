@@ -1,3 +1,4 @@
+import re
 import sys
 import json
 import time
@@ -676,6 +677,14 @@ def get_scoreboard():
                 }
 
             def convert_to_strings(stats):
+                def convert_playtime(duration_str):
+                    match = re.match(r"PT(\d+)M([\d.]+)S", duration_str)
+                    if match:
+                        minutes = int(match.group(1))
+                        seconds = round(float(match.group(2)))  # Handle potential float values
+                        return f"{minutes}:{seconds:02d}"
+                    return None  # Return None if the format is incorrect
+
                 # Convert team statistics to strings
                 for key, value in stats["team"].items():
                     stats["team"][key] = str(value)
@@ -685,6 +694,8 @@ def get_scoreboard():
                     for key, value in player.items():
                         if key == "statistics":
                             for key, stat in value.items():
+                                if key == "minutes":
+                                    stat = convert_playtime(stat)
                                 value[key] = str(stat)
                         else:
                             player[key] = str(value)
