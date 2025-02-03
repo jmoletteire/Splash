@@ -708,7 +708,7 @@ def games_prev_day():
             logging.info(f'(Games Live) Finalizing game {game["GAME_ID"]}.')
 
 
-def games_live_update():
+async def games_live_update():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -718,16 +718,15 @@ def games_live_update():
         logging.error(f'(Games Live) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
 
-    def parse_game_time(game_time_str):
+    def parse_game_time(game_time_string):
         try:
             # Try parsing with microseconds
-            return datetime.strptime(game_time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(game_time_string, "%Y-%m-%dT%H:%M:%S.%fZ")
         except ValueError:
             # If microseconds are not present, try parsing without them
-            return datetime.strptime(game_time_str, "%Y-%m-%dT%H:%M:%S%z")
+            return datetime.strptime(game_time_string, "%Y-%m-%dT%H:%M:%S%z")
 
     today = datetime.today().strftime('%Y-%m-%d')
-    # yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
 
     try:
         scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard(proxy=PROXY).get_dict()
@@ -744,7 +743,6 @@ def games_live_update():
     if not games_today:
         logging.info(
             f"(Games Live) No games found for today: {today}. Skipping updates for the rest of the day. [{datetime.now()}]")
-        skip_updates = True
         return
 
     # Check if all games are final
@@ -758,11 +756,9 @@ def games_live_update():
             all_final = False
             break
 
-    # all_final = all(game['gameStatus'] == 3 for game in games_today)
     if all_final:
         logging.info(
             f"(Games Live) All games are final for today: {today}. Skipping updates for the rest of the day. [{datetime.now()}]")
-        skip_updates = True
         return
 
     # Check if the first game is more than 1 hour away from start time
@@ -806,10 +802,6 @@ def games_live_update():
         game_et_str = game_et_str.replace('Z', '+00:00')  # Replace 'Z' with '+00:00' for UTC
         game_et = datetime.strptime(game_et_str, '%Y-%m-%dT%H:%M:%S%z')  # Parse with timezone information
         game_et_date = game_et.strftime('%Y-%m-%d')  # Extract only the date part
-
-        # if game_et_date == yesterday and not in_progress:
-        #     logging.info(f"(Games Live) Game {game['gameId']} occurred yesterday. Skipping game. [{datetime.now()}]")
-        #     continue
 
         # If game upcoming or in-progress, check for updates
         if is_upcoming:
