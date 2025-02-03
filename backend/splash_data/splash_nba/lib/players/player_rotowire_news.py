@@ -3,27 +3,8 @@ import logging
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
-from pymongo import MongoClient
 from unidecode import unidecode
-
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection
 
 
 async def player_rotowires():
@@ -51,9 +32,7 @@ def player_rotowire_ids():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
 
     # URL template for fetching player news
     url = "https://www.rotowire.com/basketball/tables/injury-report.php?team=ALL&pos=ALL"
@@ -129,9 +108,7 @@ def player_rotowire_injuries():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
 
     # Base URL for the initial JSON data and the player page
     injury_report_url = "https://www.rotowire.com/basketball/tables/injury-report.php?team=ALL&pos=ALL"
@@ -200,9 +177,7 @@ def player_rotowire_news():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
     logging.info("Connected to MongoDB")
 
     # URL template for fetching player news

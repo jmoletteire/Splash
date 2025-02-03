@@ -3,78 +3,8 @@ import random
 import logging
 import requests
 from datetime import datetime
-from pymongo import MongoClient
 from nba_api.stats.endpoints import boxscoreadvancedv2
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
-
-
-def update_players_and_teams(season, season_type):
-    if season_type == 'REGULAR SEASON' or season_type == 'PLAYOFFS':
-        players_collection.update_one(
-            {'PERSON_ID': player_adv_stats['PLAYER_ID']},
-            {
-                '$set': {f'STATS.{season}.GAMELOGS.{season_type}.{game_id}.SQ_TOTAL': adv_boxscore['PlayerStats'][i]['SQ_TOTAL']},
-                '$inc': {f'STATS.{season}.{season_type}.ADV.SQ_TOTAL': adv_boxscore['PlayerStats'][i]['SQ_TOTAL']}
-            }
-        )
-
-        # Update Team's offensive SQ
-        teams_collection.update_one(
-            {'TEAM_ID': adv_boxscore['TeamStats'][team_adv_index]['TEAM_ID']},
-            {
-                '$inc': {f'seasons.{season}.STATS.{season_type}.ADV.SQ_TOTAL': adv_boxscore['PlayerStats'][i]['SQ_TOTAL']}
-            }
-        )
-
-        # Update Opponent's defensive SQ
-        teams_collection.update_one(
-            {'TEAM_ID': adv_boxscore['TeamStats'][opp_adv_index]['TEAM_ID']},
-            {
-                '$inc': {
-                    f'seasons.{season}.STATS.{season_type}.ADV.OPP_SQ_TOTAL': adv_boxscore['PlayerStats'][i]['SQ_TOTAL'],
-                }
-            }
-        )
-
-    if season_type == 'REGULAR SEASON' or season_type == 'PLAYOFFS':
-        home_ftm = basic_boxscore['homeTeam']['statistics']['freeThrowsMade']
-        away_ftm = basic_boxscore['awayTeam']['statistics']['freeThrowsMade']
-
-        # Update Home Opp FTM
-        teams_collection.update_one(
-            {'TEAM_ID': basic_boxscore['homeTeam']['teamId']},
-            {
-                '$inc': {
-                    f'seasons.{season}.STATS.{season_type}.ADV.OPP_FTM': away_ftm
-                }
-            }
-        )
-        # Update Away Opp FTM
-        teams_collection.update_one(
-            {'TEAM_ID': basic_boxscore['awayTeam']['teamId']},
-            {
-                '$inc': {
-                    f'seasons.{season}.STATS.{season_type}.ADV.OPP_FTM': home_ftm
-                }
-            }
-        )
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def team_xpts_record(team, season, season_type):
@@ -257,11 +187,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
-    teams_collection = db.nba_teams
-    games_collection = db.nba_games
+    players_collection = get_mongo_collection('nba_players')
+    teams_collection = get_mongo_collection('nba_teams')
+    games_collection = get_mongo_collection('nba_games')
     logging.info("Connected to MongoDB")
 
     # Get today's date in "yyyy-mm-dd" format

@@ -1,34 +1,14 @@
 import random
 import time
 import logging
-from pymongo import MongoClient
 from nba_api.stats.endpoints import playerawards
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
 # Connect to MongoDB
-client = MongoClient(URI)
-db = client.splash
-players_collection = db.nba_players
+players_collection = get_mongo_collection('nba_players')
 logging.info("Connected to MongoDB")
 
 keys = [

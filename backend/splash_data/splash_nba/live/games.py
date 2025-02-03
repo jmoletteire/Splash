@@ -11,27 +11,7 @@ from splash_nba.lib.games.fetch_play_by_play import update_play_by_play
 from splash_nba.lib.games.nba_cup import update_current_cup, flag_cup_games
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
 from splash_nba.lib.teams.update_team_games import update_team_games
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON
-    from splash_nba.util.mongo_connect import get_mongo_collection
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON
-        from mongo_connect import get_mongo_collection
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
-
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
 
 teams = {
     1610612737: 'Atlanta Hawks',

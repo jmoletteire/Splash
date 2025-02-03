@@ -1,34 +1,14 @@
 import requests
 import logging
-from pymongo import MongoClient
 from collections import defaultdict
 from nba_api.stats.endpoints import iststandings
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
 
 
 def update_current_cup():
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        cup_collection = db.nba_cup_history
+        cup_collection = get_mongo_collection('nba_cup_history')
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
         exit(1)
@@ -89,10 +69,8 @@ def update_current_cup():
 def flag_cup_games(season=None):
     try:
         logging.basicConfig(level=logging.INFO)
-        client = MongoClient(URI)
-        db = client.splash
-        cup_collection = db.nba_cup_history
-        games_collection = db.nba_games
+        cup_collection = get_mongo_collection('nba_cup_history')
+        games_collection = get_mongo_collection('nba_games')
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
         return
@@ -178,10 +156,8 @@ def fetch_all_cups():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
-    client = MongoClient(URI)
-    db = client.splash
-    cup_collection = db.nba_cup_history
-    games_collection = db.nba_games
+    cup_collection = get_mongo_collection('nba_cup_history')
+    games_collection = get_mongo_collection('nba_games')
     # fetch_all_cups()
     update_current_cup()
     # flag_cup_games(season='2024-25')

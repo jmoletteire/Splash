@@ -1,36 +1,16 @@
 import random
 import time
 import logging
-from pymongo import MongoClient
 from nba_api.stats.endpoints import commonallplayers, commonplayerinfo
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def add_historic_players():
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        exit(1)
+        return
 
     all_players = commonallplayers.CommonAllPlayers(proxy=PROXY).get_normalized_dict()['CommonAllPlayers']
 
@@ -50,12 +30,10 @@ def add_historic_players():
 
 def add_players():
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        exit(1)
+        return
 
     all_players = commonallplayers.CommonAllPlayers(season=CURR_SEASON, proxy=PROXY).get_normalized_dict()['CommonAllPlayers']
 
@@ -75,12 +53,10 @@ def add_players():
 
 def new_player_info(player):
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        exit(1)
+        return
 
     try:
         player_data = commonplayerinfo.CommonPlayerInfo(player, proxy=PROXY).get_normalized_dict()['CommonPlayerInfo']
@@ -97,12 +73,10 @@ def new_player_info(player):
 
 def restructure_new_docs():
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        exit(1)
+        return
 
     # Loop through each document in the collection
     for i, player in enumerate(players_collection.find({"player_info": {"$exists": True}})):
@@ -138,12 +112,10 @@ def get_player_info(person_id):
 
 def update_player_info():
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        exit(1)
+        return
 
     # Loop through each document in the collection
     for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active"}, {"PERSON_ID": 1, "_id": 1})):
@@ -192,9 +164,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
         logging.info("Connected to MongoDB")
 
         try:

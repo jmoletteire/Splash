@@ -2,28 +2,10 @@ import math
 import time
 import random
 import logging
-from pymongo import MongoClient
 from collections import defaultdict
 from nba_api.stats.endpoints import teamplayeronoffdetails, leaguedashptstats, playerdashptshots, leagueseasonmatchups, \
     leaguedashplayerstats, matchupsrollup
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY
 
 seasons = [
     '2023-24',
@@ -1001,10 +983,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
-    teams_collection = db.nba_teams
+    players_collection = get_mongo_collection('nba_players')
+    teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB")
 
     # logging.info("\nAdding Player On/Off data...\n")

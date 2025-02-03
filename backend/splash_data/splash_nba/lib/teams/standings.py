@@ -1,26 +1,8 @@
 import logging
 from itertools import groupby
-from pymongo import MongoClient
 from collections import defaultdict
 from nba_api.stats.endpoints import leaguestandings, leaguedashteamstats
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
 
 
 def determine_tiebreakers(season, standings):
@@ -375,12 +357,10 @@ def calculate_playoff_win_pct(team, standings, season, own_conference=True):
 def update_current_standings():
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"(Standings) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     try:
         logging.info(f"(Standings) Updating standings for Season: {CURR_SEASON}")
@@ -414,12 +394,10 @@ def update_current_standings():
 def calculate_strength_of_schedule(team, season):
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"(Standings) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     if season < '2017-18':
         return 0.000
@@ -461,12 +439,10 @@ def calculate_strength_of_schedule(team, season):
 def strength_of_schedule_rank():
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"(Standings) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     stats = ['SOS', 'rSOS']
 
@@ -555,9 +531,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

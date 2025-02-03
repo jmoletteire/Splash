@@ -1,37 +1,17 @@
 import time
 import logging
-from pymongo import MongoClient
 from nba_api.stats.endpoints import commonteamroster, playercareerstats
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, PREV_SEASON
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON, PREV_SEASON
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, PREV_SEASON
 
 
 def update_current_roster(team_id, season_not_started):
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
-        players_collection = db.nba_players
+        teams_collection = get_mongo_collection('nba_teams')
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f"\t(Team Rosters) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     try:
         team_data = commonteamroster.CommonTeamRoster(team_id, season=CURR_SEASON, proxy=PROXY).get_normalized_dict()
@@ -39,6 +19,7 @@ def update_current_roster(team_id, season_not_started):
         team_coaches = team_data['Coaches']
     except Exception as e:
         logging.error(f"\t(Team Rosters) Unable to fetch {CURR_SEASON} roster for team {team_id}: {e}")
+        return
 
     try:
         team_roster_dict = {}
@@ -120,13 +101,10 @@ def update_current_roster(team_id, season_not_started):
 def fetch_roster(team_id, season):
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
-        players_collection = db.nba_players
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     try:
         team_data = commonteamroster.CommonTeamRoster(team_id, season=season, proxy=PROXY).get_normalized_dict()
@@ -134,6 +112,7 @@ def fetch_roster(team_id, season):
         team_coaches = team_data['Coaches']
     except Exception as e:
         logging.error(f"Unable to fetch {season} roster for team {team_id}: {e}")
+        return
 
     try:
         team_roster_dict = {}
@@ -184,10 +163,8 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
-        players_collection = db.nba_players
+        teams_collection = get_mongo_collection('nba_teams')
+        players_collection = get_mongo_collection('nba_players')
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

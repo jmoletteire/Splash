@@ -1,22 +1,5 @@
 import logging
-from pymongo import MongoClient
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import URI, CURR_SEASON, CURR_SEASON_TYPE
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def current_season_custom_team_stats_rank():
@@ -25,12 +8,10 @@ def current_season_custom_team_stats_rank():
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     # Stats to rank
     custom_stats = [
@@ -86,9 +67,6 @@ def current_season_custom_team_stats_rank():
         ("CHARGES_DRAWN", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
     ]
 
-    # Initialize the pipeline list
-    pipeline = []
-
     # Loop over each season to build the pipeline
     for stat in custom_stats:
         logging.info(f"\n(Team Custom Stats Rank) Calculating {stat[0]} rank...")
@@ -140,9 +118,7 @@ def custom_team_stats_rank():
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}")
         exit(1)
@@ -224,9 +200,6 @@ def custom_team_stats_rank():
         '1997-98',
         '1996-97'
     ]
-
-    # Initialize the pipeline list
-    pipeline = []
 
     # Loop over each season to build the pipeline
     for season in seasons:

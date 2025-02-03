@@ -1,26 +1,8 @@
 import time
 import logging
-from pymongo import MongoClient
 from collections import defaultdict
 from nba_api.stats.endpoints import shotchartdetail, videodetailsasset, shotchartleaguewide
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
@@ -28,9 +10,7 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    player_shots_collection = db.nba_player_shot_data
+    player_shots_collection = get_mongo_collection('nba_player_shot_data')
 
     shot_data = shotchartdetail.ShotChartDetail(proxy=PROXY, player_id=player, team_id=team, season_nullable=season,
                                                 season_type_all_star=season_type,
@@ -145,10 +125,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
-    player_shots_collection = db.nba_player_shot_data
+    players_collection = get_mongo_collection('nba_players')
+    player_shots_collection = get_mongo_collection('nba_player_shot_data')
     logging.info("Connected to MongoDB")
 
     league_averages = player_shots_collection.find_one(

@@ -1,37 +1,17 @@
 import time
 import logging
-from pymongo import MongoClient
 from nba_api.stats.endpoints import teamyearbyyearstats
 from splash_nba.lib.teams.stats.team_stats import fetch_team_stats
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def update_current_season(team_id):
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"\t(Team Seasons) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     try:
         team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id, proxy=PROXY).get_normalized_dict()['TeamStats']
@@ -127,9 +107,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

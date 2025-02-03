@@ -2,28 +2,10 @@ import math
 import time
 import random
 import logging
-from pymongo import MongoClient
 from collections import defaultdict
 from nba_api.stats.endpoints import teamplayeronoffdetails, leaguedashptstats, playerdashptshots, leagueseasonmatchups, \
     leaguedashplayerstats, matchupsrollup
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
 
 seasons = [
     '2023-24',
@@ -66,12 +48,10 @@ def update_scoring_breakdown_and_pct_unassisted(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Scoring Breakdown) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     if season_type == 'PLAYOFFS':
         player_uast = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, measure_type_detailed_defense='Scoring',
@@ -119,13 +99,11 @@ def update_matchup_difficulty_and_dps(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
+        players_collection = get_mongo_collection('nba_players')
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f'(Matchup Diff & DIE) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     # Set batch size to process documents
     batch_size = 25
@@ -235,12 +213,10 @@ def update_versatility_score(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Versatility) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     # Set batch size to process documents
     batch_size = 25
@@ -304,13 +280,10 @@ def update_adj_turnover_pct(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(cTOV) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     # Set batch size to process documents
     batch_size = 25
@@ -366,13 +339,10 @@ def update_offensive_load(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Offensive Load) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     # Set batch size to process documents
     batch_size = 25
@@ -437,13 +407,10 @@ def update_box_creation(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Box Creation) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     def calculate_3pt_proficiency(three_pa, three_p_percent):
         # Calculate the sigmoid part of the formula
@@ -520,13 +487,10 @@ def update_drive_stats(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Drives) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     # Set batch size to process documents
     batch_size = 25
@@ -613,13 +577,10 @@ def update_touches_breakdown(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Touches Breakdown) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     docs = players_collection.count_documents({"ROSTERSTATUS": "Active", "TEAM_ID": team_id})
 
@@ -684,13 +645,10 @@ def update_shot_distribution(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Shot Distribution) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     # Set the batch size
     batch_size = 25
@@ -767,12 +725,10 @@ def update_player_tracking_stats(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Player Tracking) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     if season_type == 'PLAYOFFS':
         player_touches = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, player_or_team='Player', team_id_nullable=team_id, pt_measure_type='Possessions',
@@ -913,12 +869,10 @@ def update_three_and_ft_rate(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(3PAr & FTAr) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     docs = players_collection.count_documents({"ROSTERSTATUS": "Active", "TEAM_ID": team_id})
 
@@ -976,12 +930,10 @@ def update_poss_per_game(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
+        players_collection = get_mongo_collection('nba_players')
     except Exception as e:
         logging.error(f'(Poss Per Game) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     docs = players_collection.count_documents({"ROSTERSTATUS": "Active", "TEAM_ID": team_id})
 
@@ -1025,13 +977,11 @@ def update_player_on_off(season_type, team_id):
         logging.basicConfig(level=logging.INFO)
 
         # Replace with your MongoDB connection string
-        client = MongoClient(URI)
-        db = client.splash
-        players_collection = db.nba_players
-        teams_collection = db.nba_teams
+        players_collection = get_mongo_collection('nba_players')
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f'(Player On/Off) Unable to connect to MongoDB: {e}')
-        exit(1)
+        return
 
     logging.info(f'(Player On/Off) Processing season {CURR_SEASON}...')
     for team in teams_collection.find({'TEAM_ID': team_id}, {'TEAM_ID': 1, '_id': 0}):
@@ -1147,10 +1097,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
-    teams_collection = db.nba_teams
+    players_collection = get_mongo_collection('nba_players')
+    teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB")
 
     # logging.info("\nAdding Player On/Off data...\n")

@@ -1,22 +1,6 @@
 import logging
 from nba_api.stats.endpoints import leaguedashteamstats, leaguehustlestatsteam
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import PROXY
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import PROXY
 
 
 def fetch_team_stats(team_id, season, season_type):

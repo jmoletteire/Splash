@@ -1,25 +1,7 @@
 import json
 import logging
 import requests
-from pymongo import MongoClient
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection
 
 
 def merge_contracts(contracts):
@@ -110,10 +92,8 @@ def update_team_contract_data():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    teams_collection = db.nba_teams
-    players_collection = db.nba_players
+    teams_collection = get_mongo_collection('nba_teams')
+    players_collection = get_mongo_collection('nba_players')
 
     # Define the GraphQL endpoint
     url = "https://fanspo.com/api/graphql"
@@ -267,10 +247,8 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    teams_collection = db.nba_teams
-    players_collection = db.nba_players
+    teams_collection = get_mongo_collection('nba_teams')
+    players_collection = get_mongo_collection('nba_players')
     logging.info("Connected to MongoDB")
 
     # Define the GraphQL endpoint

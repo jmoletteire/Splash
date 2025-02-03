@@ -14,26 +14,7 @@ from splash_nba.lib.teams.team_seasons import update_current_season
 from splash_nba.lib.teams.stats.team_hustle_stats_rank import rank_hustle_stats_current_season
 from splash_nba.lib.teams.team_rosters import update_current_roster
 from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_lineup
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
-    from splash_nba.util.mongo_connect import get_mongo_collection
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
-        from mongo_connect import get_mongo_collection
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, CURR_SEASON, CURR_SEASON_TYPE
 
 
 async def update_teams(team_ids):
@@ -78,8 +59,7 @@ async def update_teams(team_ids):
                     update_current_season(team_id=team)
                     # Filter seasons to only include the current season key
                     filtered_doc = doc.copy()
-                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
-                                               key == CURR_SEASON}
+                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if key == CURR_SEASON}
                     current_season_per_100_possessions(team_doc=filtered_doc, playoffs=CURR_SEASON_TYPE == 'PLAYOFFS')
                     time.sleep(15)
 

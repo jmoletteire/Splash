@@ -1,25 +1,8 @@
 import logging
 import numpy as np
 import pandas as pd
-from pymongo import MongoClient
 from sklearn.metrics.pairwise import euclidean_distances
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import URI, CURR_SEASON, CURR_SEASON_TYPE
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def get_nested_value(data, path):
@@ -36,9 +19,7 @@ def update_similar_players():
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
 
     # Define the rank stats to use for similarity comparison
     rank_stat_paths = [
@@ -154,9 +135,7 @@ def find_similar_players():
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
 
     # Define the rank stats to use for similarity comparison
     rank_stat_paths = [

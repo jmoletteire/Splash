@@ -1,24 +1,6 @@
 import logging
-from pymongo import MongoClient
 from nba_api.stats.endpoints import leaguehustlestatsplayer
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON, CURR_SEASON_TYPE
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI, CURR_SEASON, CURR_SEASON_TYPE
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
 
 
 def update_player_hustle_stats(season_type, team_id):
@@ -26,9 +8,7 @@ def update_player_hustle_stats(season_type, team_id):
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
     logging.info("Connected to MongoDB")
     player_hustle_stats = []
 
@@ -101,9 +81,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
     logging.info("Connected to MongoDB")
 
     # List of seasons

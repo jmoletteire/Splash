@@ -1,22 +1,5 @@
 import logging
-from pymongo import MongoClient
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import URI
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection
 
 
 def get_avg_ranks(season, category, stats):
@@ -105,9 +88,7 @@ def avg_category_rankings():
 def three_and_ft_rate(seasons, season_type):
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"(Team 3PAr & FTAr) Failed to connect to MongoDB: {e}")
         exit(1)
@@ -151,9 +132,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(URI)
-    db = client.splash
-    teams_collection = db.nba_teams
+    teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB")
 
     seasons = [

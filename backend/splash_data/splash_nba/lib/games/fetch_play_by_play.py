@@ -1,37 +1,16 @@
 import time
 import random
 import logging
-from pymongo import MongoClient
 from datetime import datetime, timedelta
 from nba_api.live.nba.endpoints import playbyplay
 from nba_api.stats.endpoints import videoeventsasset
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
-
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
 
 def update_play_by_play():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
-    client = MongoClient(URI)
-    db = client.splash
-    games_collection = db.nba_games
+    games_collection = get_mongo_collection('nba_games')
 
     # Video PBP
     yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
@@ -111,9 +90,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        games_collection = db.nba_games
+        games_collection = get_mongo_collection('nba_games')
         logging.info("Connected to MongoDB")
 
         # Retrieve all documents from the collection

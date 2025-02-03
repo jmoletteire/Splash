@@ -1,33 +1,14 @@
 import logging
-from pymongo import MongoClient
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI, CURR_SEASON
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import URI, CURR_SEASON
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection, CURR_SEASON
 
 
 def current_season_per_100_possessions(team_doc, playoffs):
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"\t(Team Per-100) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     # List of tuples specifying the stats to calculate per-75 possession values for
     # Each tuple should be in the format ("stat_key", "location")
@@ -137,12 +118,10 @@ def current_season_per_100_possessions(team_doc, playoffs):
 def calculate_and_update_per_100_possessions(team_doc, playoffs):
     # Connect to MongoDB
     try:
-        client = MongoClient(URI)
-        db = client.splash
-        teams_collection = db.nba_teams
+        teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     # List of tuples specifying the stats to calculate per-75 possession values for
     # Each tuple should be in the format ("stat_key", "location")
@@ -227,9 +206,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    client = MongoClient(URI)
-    db = client.splash
-    teams_collection = db.nba_teams
+    teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB")
 
     playoffs = False

@@ -1,25 +1,5 @@
 import logging
-from pymongo import MongoClient
-
-try:
-    # Try to import the local env.py file
-    from splash_nba.util.env import URI
-    from splash_nba.util.mongo_connect import get_mongo_collection
-    PROXY = None
-except ImportError:
-    # Fallback to the remote env.py path
-    import sys
-    import os
-
-    env_path = "/home/ubuntu"
-    if env_path not in sys.path:
-        sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
-
-    try:
-        from env import PROXY, URI
-        from mongo_connect import get_mongo_collection
-    except ImportError:
-        raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+from splash_nba.imports import get_mongo_collection
 
 
 def convert_year_to_season(year):
@@ -125,13 +105,9 @@ if __name__ == "__main__":
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
-    # Connect to your MongoDB cluster
-    client = MongoClient(URI)
-
     # Access your database and collections
-    db = client.splash
-    games_collection = db.nba_games
-    teams_collection = db.nba_teams
+    games_collection = get_mongo_collection('nba_games')
+    teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB.")
 
     # Set the batch size
