@@ -89,15 +89,21 @@ async def daily_update_task():
     logging.info(f"\ndaily_update_task completed in {elapsed_time:.2f} seconds\n")
 
 
+async def daily_update():
+    await games_daily_update()
+    await teams_daily_update()
+    await players_daily_update()
+
+
 # APScheduler setup
 def setup_scheduler():
     scheduler = AsyncIOScheduler()
 
     # Schedule tasks
-    scheduler.add_job(games_live_update_task, IntervalTrigger(seconds=20), coalesce=True)
-    scheduler.add_job(fetch_odds_task, IntervalTrigger(minutes=1), coalesce=True)
-    # scheduler.add_job(player_rotowires_task, IntervalTrigger(minutes=30), coalesce=True)
-    scheduler.add_job(daily_update_task, CronTrigger(hour=2, minute=0, timezone='America/Chicago'), coalesce=True, misfire_grace_time=18000)
+    scheduler.add_job(games_live_update, IntervalTrigger(seconds=20), coalesce=True)
+    scheduler.add_job(fetch_odds, IntervalTrigger(minutes=1), coalesce=True)
+    scheduler.add_job(player_rotowires, IntervalTrigger(minutes=30), coalesce=True)
+    scheduler.add_job(daily_update, CronTrigger(hour=2, minute=0, timezone='America/Chicago'), coalesce=True, misfire_grace_time=18000)
 
     scheduler.start()
     logging.info("Scheduler started...")
