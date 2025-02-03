@@ -82,7 +82,7 @@ async def daily_update_task():
             players_daily_update(),
         ),
         "daily_update",
-        timeout=10800,  # 3 hours
+        timeout=18000,  # 5 hours
     )
     end_time = time.time()
     elapsed_time = end_time - start_time
@@ -97,7 +97,7 @@ def setup_scheduler():
     scheduler.add_job(games_live_update_task, IntervalTrigger(seconds=20), coalesce=True)
     scheduler.add_job(fetch_odds_task, IntervalTrigger(minutes=1), coalesce=True)
     # scheduler.add_job(player_rotowires_task, IntervalTrigger(minutes=30), coalesce=True)
-    scheduler.add_job(daily_update_task, CronTrigger(hour=2, minute=0), coalesce=True)
+    scheduler.add_job(daily_update_task, CronTrigger(hour=2, minute=0, timezone='America/Chicago', jitter=18000), coalesce=True)
 
     scheduler.start()
     logging.info("Scheduler started...")
