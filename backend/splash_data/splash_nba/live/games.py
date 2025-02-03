@@ -727,7 +727,7 @@ def games_live_update():
             return datetime.strptime(game_time_str, "%Y-%m-%dT%H:%M:%S%z")
 
     today = datetime.today().strftime('%Y-%m-%d')
-    yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    # yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
 
     try:
         scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard(proxy=PROXY).get_dict()
@@ -807,9 +807,9 @@ def games_live_update():
         game_et = datetime.strptime(game_et_str, '%Y-%m-%dT%H:%M:%S%z')  # Parse with timezone information
         game_et_date = game_et.strftime('%Y-%m-%d')  # Extract only the date part
 
-        if game_et_date == yesterday and not in_progress:
-            logging.info(f"(Games Live) Game {game['gameId']} occurred yesterday. Skipping game. [{datetime.now()}]")
-            continue
+        # if game_et_date == yesterday and not in_progress:
+        #     logging.info(f"(Games Live) Game {game['gameId']} occurred yesterday. Skipping game. [{datetime.now()}]")
+        #     continue
 
         # If game upcoming or in-progress, check for updates
         if is_upcoming:

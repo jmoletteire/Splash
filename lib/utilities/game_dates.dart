@@ -15,7 +15,7 @@ class DatesProvider with ChangeNotifier {
   Future<Set<String>> fetchDates() async {
     var url = Uri.http(
       kFlaskUrl,
-      '/game_dates',
+      '/games/all-game-dates',
     );
 
     // Fetch the data from the network

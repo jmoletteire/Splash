@@ -11,7 +11,7 @@ class PlayoffsNetworkHelper {
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_playoffs',
+      '/playoff-bracket',
       queryParams,
     );
 

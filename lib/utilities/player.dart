@@ -7,20 +7,20 @@ class Player {
   Future<Map<String, dynamic>> getPlayer(String personId,
       {String? rosterStatus, String? teamId}) async {
     // Create the query parameters map
-    Map<String, String> queryParams = {'person_id': personId};
+    Map<String, String> queryParams = {'personId': personId};
 
     // Add optional parameters if provided
     if (rosterStatus != null) {
-      queryParams['rosterstatus'] = rosterStatus;
+      queryParams['rosterStatus'] = rosterStatus;
     }
     if (teamId != null) {
-      queryParams['teamid'] = teamId;
+      queryParams['teamId'] = teamId;
     }
 
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_player',
+      '/players',
       queryParams,
     );
 
@@ -38,15 +38,15 @@ class Player {
       String personId, String season, String seasonType) async {
     // Create the query parameters map
     Map<String, String> queryParams = {
-      'person_id': personId,
+      'personId': personId,
       'season': season,
-      'season_type': seasonType
+      'seasonType': seasonType
     };
 
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_player_shot_chart',
+      '/players/stats/shot-chart',
       queryParams,
     );
 

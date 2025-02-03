@@ -165,7 +165,7 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
         Network network = Network();
         var url = Uri.http(
           kFlaskUrl,
-          '/get_games',
+          '/games/scoreboard',
           {'date': formattedDate},
         );
         dynamic jsonData = await network.getData(url);

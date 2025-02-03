@@ -5,14 +5,14 @@ class Team {
   Network network = Network();
 
   Future<Map<String, dynamic>> getTeam(String teamId, [List<String>? fields]) async {
-    Map<String, String> queryParams = {'team_id': teamId};
+    Map<String, String> queryParams = {'teamId': teamId};
     if (fields != null && fields.isNotEmpty) {
       queryParams['fields'] = fields.join(',');
     }
 
     var url = Uri.http(
       kFlaskUrl,
-      '/get_team',
+      '/team',
       queryParams,
     );
 
