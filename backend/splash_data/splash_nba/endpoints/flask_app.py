@@ -1187,8 +1187,8 @@ def get_teams_metadata():
             last_10 = standings.get("L10", "-") if standings.get("L10", "-") is not None else "-"
             streak = standings.get("strCurrentStreak", "-") if standings.get("strCurrentStreak", "-") is not None else "-"
             vs_over_500 = standings.get("OppOver500", "-") if standings.get("OppOver500", "-") is not None else "-"
-            sos = standings.get("SOS", "-") if standings.get("SOS", "-") is not None else "-"
-            r_sos = standings.get("rSOS", "-") if standings.get("rSOS", "-") is not None else "-"
+            sos = f'{standings.get("SOS", 0.000):.3f}' if standings.get("SOS", "-") is not None else "-"
+            r_sos = f'{standings.get("rSOS", 0.000):.3f}' if standings.get("rSOS", "-") is not None else "-"
 
             return {
                 "Clinched": clinched,
