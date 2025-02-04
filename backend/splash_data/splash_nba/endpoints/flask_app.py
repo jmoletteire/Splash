@@ -1147,7 +1147,7 @@ def get_team():
 
 
 @app.route('/teams/metadata', methods=['GET'])
-def get_teams():
+def get_teams_metadata():
     try:
         # Query the database
         teams = teams_collection.find(
@@ -1187,12 +1187,16 @@ def get_teams():
             last_10 = standings.get("L10", "-") if standings.get("L10", "-") is not None else "-"
             streak = standings.get("strCurrentStreak", "-") if standings.get("strCurrentStreak", "-") is not None else "-"
             vs_over_500 = standings.get("OppOver500", "-") if standings.get("OppOver500", "-") is not None else "-"
+            sos = standings.get("SOS", "-") if standings.get("SOS", "-") is not None else "-"
+            r_sos = standings.get("rSOS", "-") if standings.get("rSOS", "-") is not None else "-"
 
             return {
                 "Clinched": clinched,
                 "PCT": win_pct,
                 "ConfGB": conf_gb,
                 "DivGB": div_gb,
+                "SOS": sos,
+                "rSOS": r_sos,
                 "HOME": home_record,
                 "ROAD": road_record,
                 "CONF": conf_record,
