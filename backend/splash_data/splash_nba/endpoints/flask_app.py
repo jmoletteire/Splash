@@ -699,7 +699,7 @@ def get_scoreboard():
                                 if stat in [0, "0", "0-0", "0:00"]:
                                     value[key] = None
                                 else:
-                                    value[key] = str(stat)
+                                    value[key] = str(int(stat))
                         else:
                             player[key] = str(value)
 
