@@ -698,7 +698,9 @@ def get_scoreboard():
                                     stat = convert_playtime(stat)
                                 if stat_key == "plusMinusPoints":
                                     stat = int(stat)
-                                if stat in [0, "0", "0-0", "0:00"] and stat_key not in ["fieldGoalsMade", "threePointersMade", "freeThrowsMade"]:
+                                if stat in [0, "0", "0-0", "0:00"]:
+                                    if stat_key not in ["fieldGoalsMade", "threePointersMade", "freeThrowsMade", "fieldGoalsAttempted", "threePointersAttempted", "freeThrowsAttempted"]:
+
                                     value[stat_key] = None
                                 else:
                                     value[stat_key] = str(stat)
