@@ -260,7 +260,7 @@ async def update_players(team_ids):
         logging.error(f"Error updating player shot charts: {e}")
 
 
-def players_daily_update():
+async def players_daily_update():
     """
     Runs every day at 3:30AM.\n
     Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data

@@ -97,7 +97,7 @@ async def update_teams(team_ids):
         logging.error(f"(Teams Daily) Error updating teams: {e}")
 
 
-def teams_daily_update():
+async def teams_daily_update():
     """
     Runs every day at 3AM.\n
     Updates STATS, STANDINGS, ROSTER, COACHES, GAMES, and miscellaneous data
