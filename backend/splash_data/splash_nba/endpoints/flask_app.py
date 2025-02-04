@@ -693,15 +693,15 @@ def get_scoreboard():
                 for player in stats["players"]:
                     for key, value in player.items():
                         if key == "statistics":
-                            for key, stat in value.items():
-                                if key == "minutes":
+                            for stat_key, stat in value.items():
+                                if stat_key == "minutes":
                                     stat = convert_playtime(stat)
-                                if key == "plusMinusPoints":
-                                    stat = int(stat) # fix
-                                if stat in [0, "0", "0-0", "0:00"]:
-                                    value[key] = None
+                                if stat_key == "plusMinusPoints":
+                                    stat = int(stat)
+                                if stat in [0, "0", "0-0", "0:00"] and stat_key not in ["fieldGoalsMade", "threePointersMade", "freeThrowsMade"]:
+                                    value[stat_key] = None
                                 else:
-                                    value[key] = str(stat)
+                                    value[stat_key] = str(stat)
                         else:
                             player[key] = str(value)
 
