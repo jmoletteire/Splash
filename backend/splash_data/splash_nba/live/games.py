@@ -804,7 +804,7 @@ async def games_live_update():
                 final_game(game["gameId"], game_et_date, line_score)
 
 
-def games_daily_update():
+async def games_daily_update():
     """
     Runs every day at 2:00AM.\n
     Updates games, NBA Cup, and playoff data for each team.
