@@ -697,7 +697,7 @@ def get_scoreboard():
                                 if key == "minutes":
                                     stat = convert_playtime(stat)
                                 if key == "plusMinusPoints":
-                                    stat = int(stat)
+                                    stat = int(stat) # fix
                                 if stat in [0, "0", "0-0", "0:00"]:
                                     value[key] = None
                                 else:
