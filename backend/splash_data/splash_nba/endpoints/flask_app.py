@@ -696,10 +696,12 @@ def get_scoreboard():
                             for key, stat in value.items():
                                 if key == "minutes":
                                     stat = convert_playtime(stat)
+                                if key == "plusMinusPoints":
+                                    stat = int(stat)
                                 if stat in [0, "0", "0-0", "0:00"]:
                                     value[key] = None
                                 else:
-                                    value[key] = str(int(stat))
+                                    value[key] = str(stat)
                         else:
                             player[key] = str(value)
 
