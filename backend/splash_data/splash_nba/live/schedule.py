@@ -126,6 +126,6 @@ async def main():
             scheduler.shutdown()
 
 if __name__ == "__main__":
-    # asyncio.run(main())
-    teams_daily_update()
-    players_daily_update()
+    asyncio.run(main())
+    # teams_daily_update()
+    # players_daily_update()
