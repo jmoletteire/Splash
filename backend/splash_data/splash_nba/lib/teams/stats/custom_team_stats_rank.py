@@ -121,7 +121,7 @@ def custom_team_stats_rank():
         teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
         logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     # Stats to rank
     custom_stats = [
