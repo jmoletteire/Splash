@@ -813,7 +813,10 @@ async def games_daily_update():
     logging.basicConfig(level=logging.INFO)
 
     logging.info("Video PBP..")
-    update_play_by_play()
+    try:
+        update_play_by_play()
+    except Exception as e:
+        logging.error(f"(Video PBP) Error fetching video PBP: {e}", exc_info=True)
 
     # Upcoming Games
     logging.info("Upcoming Games..")

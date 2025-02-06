@@ -216,9 +216,12 @@ def fetch_upcoming_games(game_date):
         '5': 'PLAY_IN',
         '6': 'IST_FINAL'
     }
-
-    scoreboard = ScoreboardV2(proxy=PROXY, game_date=game_date, day_offset=0)
-    games = scoreboard.get_normalized_dict()
+    try:
+        scoreboard = ScoreboardV2(proxy=PROXY, game_date=game_date, day_offset=0)
+        games = scoreboard.get_normalized_dict()
+    except Exception as e:
+        logging.error(f"(Upcoming Games) Failed to fetch games for {game_date}: {e}")
+        return
 
     if len(games['GameHeader']) > 0:
         season = games['GameHeader'][0]['SEASON']

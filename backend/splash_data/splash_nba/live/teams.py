@@ -107,7 +107,7 @@ async def teams_daily_update():
         teams_collection = get_mongo_collection('nba_teams')
         games_collection = get_mongo_collection('nba_games')
     except Exception as e:
-        logging.error(f'(Teams Daily) Failed to connect to MongoDB [{datetime.now()}]: {e}')
+        logging.error(f'(Teams Daily) Failed to connect to MongoDB [{datetime.now()}]: {e}', exc_info=True)
         return
 
     logging.info("Updating teams (daily)...")
@@ -133,7 +133,6 @@ async def teams_daily_update():
         logging.info("News & Transactions (0 API calls)...")
         fetch_team_transactions()
         fetch_team_news()
-        update_transactions()
     except Exception as e:
         logging.error(f"(Teams Daily) Error updating team news & transactions: {e}", exc_info=True)
 
@@ -144,102 +143,102 @@ async def teams_daily_update():
     except Exception as e:
         logging.error(f"(Teams Daily) Error updating team contracts: {e}", exc_info=True)
 
-        # Loop through all documents in the collection
-        batch_size = 10
-        total_documents = teams_collection.count_documents({})
-        processed_count = 0
-        i = 0
-        while processed_count < total_documents:
-            with teams_collection.find({}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0}).skip(processed_count).limit(
-                    batch_size).batch_size(batch_size) as cursor:
-                documents = list(cursor)
-                if not documents:
-                    break
-                processed_count += len(documents)
+    # Loop through all documents in the collection
+    batch_size = 10
+    total_documents = teams_collection.count_documents({})
+    processed_count = 0
+    i = 0
+    while processed_count < total_documents:
+        with teams_collection.find({}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0}).skip(processed_count).limit(
+                batch_size).batch_size(batch_size) as cursor:
+            documents = list(cursor)
+            if not documents:
+                break
+            processed_count += len(documents)
 
-                for doc in documents:
-                    team = doc['TEAM_ID']
-                    i += 1
+            for doc in documents:
+                team = doc['TEAM_ID']
+                i += 1
 
-                    if team == 0:
-                        continue
+                if team == 0:
+                    continue
 
-                    logging.info(f"Processing team {team} ({i} of 30)...")
+                logging.info(f"Processing team {team} ({i} of 30)...")
 
-                    try:
-                        # Team History (30 API calls)
-                        logging.info("History (30 API calls)...")
-                        update_team_history(team_id=team)
-                        time.sleep(15)
-                    except Exception as e:
-                        logging.error(f"(Teams Daily) Error updating team {team} history: {e}", exc_info=True)
-
-                    # Season Stats (120 API calls)
-                    try:
-                        logging.info("Stats (120 API calls)...")
-                        update_current_season(team_id=team)
-                        # Filter seasons to only include the current season key
-                        filtered_doc = doc.copy()
-                        filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
-                                                   key == CURR_SEASON}
-                        current_season_per_100_possessions(team_doc=filtered_doc,
-                                                           playoffs=CURR_SEASON_TYPE == 'PLAYOFFS')
-                        time.sleep(15)
-                    except Exception as e:
-                        logging.error(f"(Teams Daily) Error updating team {team} stats: {e}", exc_info=True)
-
-                    try:
-                        # Current Roster & Coaches (~400-500 API calls)
-                        logging.info("Roster & Coaches (~400-500 API calls)...")
-                        season_not_started = True if doc['seasons'][CURR_SEASON]['GP'] == 0 else False
-                        update_current_roster(team_id=team, season_not_started=season_not_started)
-                        time.sleep(30)
-                    except Exception as e:
-                        logging.error(f"(Teams Daily) Error updating team {team} roster: {e}", exc_info=True)
-
-                    try:
-                        # Last Starting Lineup (0 API Calls)
-                        logging.info("Last Starting Lineup (0 API calls)...")
-
-                        # Get most recent game by date
-                        game_id, game_date = get_last_game(doc['seasons'])
-
-                        # Get starting lineup for most recent game
-                        last_starting_lineup = get_last_lineup(team, game_id, game_date)
-
-                        # Update document
-                        teams_collection.update_one(
-                            {"TEAM_ID": team},
-                            {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
-                        )
-                    except Exception as e:
-                        logging.error(f"(Teams Daily) Error updating team {team} last lineup: {e}", exc_info=True)
-
-                    # Pause 15 seconds between teams
+                try:
+                    # Team History (30 API calls)
+                    logging.info("History (30 API calls)...")
+                    update_team_history(team_id=team)
                     time.sleep(15)
+                except Exception as e:
+                    logging.error(f"(Teams Daily) Error updating team {team} history: {e}", exc_info=True)
 
-        # Hustle Stat Rank
-        try:
-            rank_hustle_stats_current_season()
-        except Exception as e:
-            logging.error(f"(Teams Daily) Error updating hustle stat ranks: {e}", exc_info=True)
+                # Season Stats (120 API calls)
+                try:
+                    logging.info("Stats (120 API calls)...")
+                    update_current_season(team_id=team)
+                    # Filter seasons to only include the current season key
+                    filtered_doc = doc.copy()
+                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
+                                               key == CURR_SEASON}
+                    current_season_per_100_possessions(team_doc=filtered_doc,
+                                                       playoffs=CURR_SEASON_TYPE == 'PLAYOFFS')
+                    time.sleep(15)
+                except Exception as e:
+                    logging.error(f"(Teams Daily) Error updating team {team} stats: {e}", exc_info=True)
 
-        # 3PAr + FTr
-        try:
-            three_and_ft_rate(seasons=[CURR_SEASON], season_type=CURR_SEASON_TYPE)
-        except Exception as e:
-            logging.error(f"(Teams Daily) Error updating 3PAr + FTr: {e}", exc_info=True)
+                try:
+                    # Current Roster & Coaches (~400-500 API calls)
+                    logging.info("Roster & Coaches (~400-500 API calls)...")
+                    season_not_started = True if doc['seasons'][CURR_SEASON]['GP'] == 0 else False
+                    update_current_roster(team_id=team, season_not_started=season_not_started)
+                    time.sleep(30)
+                except Exception as e:
+                    logging.error(f"(Teams Daily) Error updating team {team} roster: {e}", exc_info=True)
 
-        # Custom Stat Ranks
-        try:
-            current_season_custom_team_stats_rank()
-        except Exception as e:
-            logging.error(f"(Teams Daily) Error updating custom team stat ranks: {e}", exc_info=True)
+                try:
+                    # Last Starting Lineup (0 API Calls)
+                    logging.info("Last Starting Lineup (0 API calls)...")
 
-        # Standings
-        try:
-            # Standings (min. 30 API calls [more if tiebreakers])
-            logging.info("Standings (min. 30 API calls)...")
-            update_current_standings()
-        except Exception as e:
-            logging.error(f"(Teams Daily) Error updating standings: {e}", exc_info=True)
+                    # Get most recent game by date
+                    game_id, game_date = get_last_game(doc['seasons'])
+
+                    # Get starting lineup for most recent game
+                    last_starting_lineup = get_last_lineup(team, game_id, game_date)
+
+                    # Update document
+                    teams_collection.update_one(
+                        {"TEAM_ID": team},
+                        {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
+                    )
+                except Exception as e:
+                    logging.error(f"(Teams Daily) Error updating team {team} last lineup: {e}", exc_info=True)
+
+                # Pause 15 seconds between teams
+                time.sleep(15)
+
+    # Hustle Stat Rank
+    try:
+        rank_hustle_stats_current_season()
+    except Exception as e:
+        logging.error(f"(Teams Daily) Error updating hustle stat ranks: {e}", exc_info=True)
+
+    # 3PAr + FTr
+    try:
+        three_and_ft_rate(seasons=[CURR_SEASON], season_type=CURR_SEASON_TYPE)
+    except Exception as e:
+        logging.error(f"(Teams Daily) Error updating 3PAr + FTr: {e}", exc_info=True)
+
+    # Custom Stat Ranks
+    try:
+        current_season_custom_team_stats_rank()
+    except Exception as e:
+        logging.error(f"(Teams Daily) Error updating custom team stat ranks: {e}", exc_info=True)
+
+    # Standings
+    try:
+        # Standings (min. 30 API calls [more if tiebreakers])
+        logging.info("Standings (min. 30 API calls)...")
+        update_current_standings()
+    except Exception as e:
+        logging.error(f"(Teams Daily) Error updating standings: {e}", exc_info=True)
