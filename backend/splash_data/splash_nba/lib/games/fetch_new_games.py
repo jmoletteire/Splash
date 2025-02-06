@@ -220,7 +220,7 @@ def fetch_upcoming_games(game_date):
         scoreboard = ScoreboardV2(proxy=PROXY, game_date=game_date, day_offset=0)
         games = scoreboard.get_normalized_dict()
     except Exception as e:
-        logging.error(f"(Upcoming Games) Failed to fetch games for {game_date}: {e}")
+        logging.error(f"(Upcoming Games) Failed to fetch games for {game_date}: {e}", exc_info=True)
         return
 
     if len(games['GameHeader']) > 0:
@@ -301,4 +301,4 @@ if __name__ == "__main__":
         synergy_game_ids()
 
     except Exception as e:
-        logging.error(f"Failed to fetch games for date range: {e.with_traceback()}")
+        logging.error(f"Failed to fetch games for date range: {e}", exc_info=True)
