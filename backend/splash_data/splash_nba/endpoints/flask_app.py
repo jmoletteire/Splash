@@ -718,20 +718,47 @@ def get_scoreboard():
                     "trueShootingPercentage": "TS%",
                     "turnovers": "TOV"
                 }
+                team_stats = {}
                 for key, value in list(stats["team"].items()):
                     key_final = team_keys[key] if key in team_keys else key
 
                     if key_final == "Time Leading":
-                        stats["team"][key_final] = convert_playtime(value)
+                        team_stats[key_final] = convert_playtime(value)
                     elif '%' in key_final:  # better check than .find('%') is not None
                         value_final = round(value * 100, 1) if value != 0 else 0
-                        stats["team"][key_final] = f"{value_final:.1f}%"
+                        team_stats[key_final] = f"{value_final:.1f}%"
                     else:
-                        stats["team"][key_final] = str(value)
+                        team_stats[key_final] = str(value)
 
-                    # To remove the old key when it has changed:
-                    if key_final != key:
-                        del stats["team"][key]
+                try:
+                    team_min = int(convert_playtime(team_stats['minutesCalculated'])) / 5
+                except Exception as e:
+                    team_min = 48
+
+                try:
+                    poss = stats['team']['fieldGoalsAttempted'] + stats['team']['turnovers'] + (stats['team']['freeThrowsAttempted'] * 0.44) - stats['team']['reboundsOffensive']
+                except Exception as e:
+                    poss = 0
+
+                try:
+                    ppp = stats['team']['points'] / poss
+                except Exception as e:
+                    ppp = 0
+
+                try:
+                    pps = stats['team']['points'] / stats['team']['fieldGoalsAttempted']
+                except Exception as e:
+                    pps = 0
+
+                team_stats["FG"] = f"{team_stats['FGM']}-{team_stats['FGA']}"
+                team_stats["3P"] = f"{team_stats['3PM']}-{team_stats['3PA']}"
+                team_stats["FT"] = f"{team_stats['FTM']}-{team_stats['FTA']}"
+                team_stats["Poss"] = f"{poss:.0f}"
+                team_stats["Pace"] = f"{48 * poss / team_min:.1f}"
+                team_stats["Per Poss"] = f"{ppp:.2f}"
+                team_stats["Per Shot"] = f"{pps:.2f}"
+
+                stats["team"] = team_stats
 
                 # Convert player statistics to strings
                 for player in stats["players"]:
