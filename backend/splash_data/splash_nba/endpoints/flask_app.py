@@ -718,16 +718,20 @@ def get_scoreboard():
                     "trueShootingPercentage": "TS%",
                     "turnovers": "TOV"
                 }
-                for key, value in stats["team"].items():
+                for key, value in list(stats["team"].items()):
                     key_final = team_keys[key] if key in team_keys else key
 
                     if key_final == "Time Leading":
                         stats["team"][key_final] = convert_playtime(value)
-                    elif key_final.find('%') is not None:
+                    elif '%' in key_final:  # better check than .find('%') is not None
                         value_final = round(value * 100, 1) if value != 0 else 0
                         stats["team"][key_final] = f"{value_final:.1f}%"
                     else:
                         stats["team"][key_final] = str(value)
+
+                    # To remove the old key when it has changed:
+                    if key_final != key:
+                        del stats["team"][key]
 
                 # Convert player statistics to strings
                 for player in stats["players"]:
