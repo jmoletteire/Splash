@@ -686,8 +686,48 @@ def get_scoreboard():
                     return None  # Return None if the format is incorrect
 
                 # Convert team statistics to strings
+                team_keys = {
+                    "assists": "AST",
+                    "assistsTurnoverRatio": "AST : TOV",
+                    "benchPoints": "Bench PTS",
+                    "biggestLead": "Biggest Lead",
+                    "blocks": "BLK",
+                    "fieldGoalsAttempted": "FGA",
+                    "fieldGoalsMade": "FGM",
+                    "fieldGoalsPercentage": "FG%",
+                    "fieldGoalsEffectiveAdjusted": "eFG%",
+                    "foulsPersonal": "Fouls",
+                    "freeThrowsAttempted": "FTA",
+                    "freeThrowsMade": "FTM",
+                    "freeThrowsPercentage": "FT%",
+                    "leadChanges": "Lead Changes",
+                    "points": "PTS",
+                    "pointsFastBreak": "Fast Break PTS",
+                    "pointsFromTurnovers": "TOV PTS",
+                    "pointsInThePaint": "PTS Paint",
+                    "pointsSecondChance": "2nd Chance PTS",
+                    "reboundsDefensive": "OREB",
+                    "reboundsOffensive": "DREB",
+                    "reboundsTotal": "REB",
+                    "steals": "STL",
+                    "threePointersAttempted": "3PA",
+                    "threePointersMade": "3PM",
+                    "threePointersPercentage": "3P%",
+                    "timeLeading": "Time Leading",
+                    "timesTied": "Times Tied",
+                    "trueShootingPercentage": "TS%",
+                    "turnovers": "TOV"
+                }
                 for key, value in stats["team"].items():
-                    stats["team"][key] = str(value)
+                    key_final = team_keys[key] if key in team_keys else key
+
+                    if key_final == "Time Leading":
+                        stats["team"][key_final] = convert_playtime(value)
+                    elif key_final.find('%') is not None:
+                        value_final = round(value * 100, 1) if value != 0 else 0
+                        stats["team"][key_final] = f"{value_final:.1f}%"
+                    else:
+                        stats["team"][key_final] = str(value)
 
                 # Convert player statistics to strings
                 for player in stats["players"]:
