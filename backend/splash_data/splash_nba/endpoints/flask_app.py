@@ -687,11 +687,11 @@ def get_scoreboard():
 
                 # Convert team statistics to strings
                 team_keys = {
-                    "assists": "AST",
-                    "assistsTurnoverRatio": "AST : TOV",
-                    "benchPoints": "Bench PTS",
+                    "assists": "Assists",
+                    "assistsTurnoverRatio": "Assist : Turnover",
+                    "benchPoints": "Bench Points",
                     "biggestLead": "Biggest Lead",
-                    "blocks": "BLK",
+                    "blocks": "Blocks",
                     "fieldGoalsAttempted": "FGA",
                     "fieldGoalsMade": "FGM",
                     "fieldGoalsPercentage": "FG%",
@@ -701,22 +701,22 @@ def get_scoreboard():
                     "freeThrowsMade": "FTM",
                     "freeThrowsPercentage": "FT%",
                     "leadChanges": "Lead Changes",
-                    "points": "PTS",
-                    "pointsFastBreak": "Fast Break PTS",
-                    "pointsFromTurnovers": "TOV PTS",
-                    "pointsInThePaint": "PTS Paint",
-                    "pointsSecondChance": "2nd Chance PTS",
-                    "reboundsDefensive": "OREB",
-                    "reboundsOffensive": "DREB",
-                    "reboundsTotal": "REB",
-                    "steals": "STL",
+                    "points": "Points",
+                    "pointsFastBreak": "Fast Break Points",
+                    "pointsFromTurnovers": "Points off Turnovers",
+                    "pointsInThePaint": "Points in Paint",
+                    "pointsSecondChance": "2nd Chance Pts",
+                    "reboundsDefensive": "Def Rebounds",
+                    "reboundsOffensive": "Off Rebounds",
+                    "reboundsTotal": "Rebounds",
+                    "steals": "Steals",
                     "threePointersAttempted": "3PA",
                     "threePointersMade": "3PM",
                     "threePointersPercentage": "3P%",
                     "timeLeading": "Time Leading",
                     "timesTied": "Times Tied",
                     "trueShootingPercentage": "TS%",
-                    "turnovers": "TOV"
+                    "turnovers": "Turnovers"
                 }
                 team_stats = {}
                 for key, value in list(stats["team"].items()):
@@ -731,7 +731,7 @@ def get_scoreboard():
                         team_stats[key_final] = str(value)
 
                 try:
-                    team_min = int(convert_playtime(team_stats['minutesCalculated'])) / 5
+                    team_min = int(team_stats['minutesCalculated'][2:-1]) / 5
                 except Exception as e:
                     team_min = 48
 
@@ -750,13 +750,19 @@ def get_scoreboard():
                 except Exception as e:
                     pps = 0
 
+                try:
+                    ast_pct = 100 * stats["team"]["assists"] / stats["team"]["fieldGoalsMade"]
+                except Exception as e:
+                    ast_pct = 0
+
                 team_stats["FG"] = f"{team_stats['FGM']}-{team_stats['FGA']}"
                 team_stats["3P"] = f"{team_stats['3PM']}-{team_stats['3PA']}"
                 team_stats["FT"] = f"{team_stats['FTM']}-{team_stats['FTA']}"
-                team_stats["Poss"] = f"{poss:.0f}"
+                team_stats["Possessions"] = f"{poss:.0f}"
                 team_stats["Pace"] = f"{48 * poss / team_min:.1f}"
                 team_stats["Per Poss"] = f"{ppp:.2f}"
                 team_stats["Per Shot"] = f"{pps:.2f}"
+                team_stats["Assist %"] = f"{ast_pct:.2f}%"
 
                 stats["team"] = team_stats
 
