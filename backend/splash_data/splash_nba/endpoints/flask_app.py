@@ -751,6 +751,11 @@ def get_scoreboard():
                     pps = 0
 
                 try:
+                    tov_pct = 100 * stats["team"]["turnovers"] / poss
+                except Exception as e:
+                    tov_pct = 0
+
+                try:
                     ast_pct = 100 * stats["team"]["assists"] / stats["team"]["fieldGoalsMade"]
                 except Exception as e:
                     ast_pct = 0
@@ -762,7 +767,9 @@ def get_scoreboard():
                 team_stats["Pace"] = f"{48 * poss / team_min:.1f}"
                 team_stats["Per Poss"] = f"{ppp:.2f}"
                 team_stats["Per Shot"] = f"{pps:.2f}"
-                team_stats["Assist %"] = f"{ast_pct:.2f}%"
+                team_stats["Turnover %"] = f"{tov_pct:.1f}%"
+                team_stats["Assist %"] = f"{ast_pct:.1f}%"
+                team_stats["Assist : Turnover"] = f"{stats['team']['assistsTurnoverRatio']:.2f}"
 
                 stats["team"] = team_stats
 
