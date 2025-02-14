@@ -663,6 +663,7 @@ def get_scoreboard():
                 homeName = line_score[0]["NICKNAME"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["NICKNAME"]
                 return {"matchup": {f"{awayName} @ {homeName}"}, "stats": {}}
 
+            status = game.get("SUMMARY", {}).get("GameSummary", {})[0].get("GAME_STATUS_ID", 0)
             matchup = f'{boxscore.get("awayTeam", {}).get("teamName", "")} @ {boxscore.get("homeTeam", {}).get("teamName", "")}'
             officials = ""
             arena = ""
@@ -798,7 +799,7 @@ def get_scoreboard():
                     "name": player["nameI"] if "nameI" in player else None,
                     "number": player["jerseyNum"] if "jerseyNum" in player else None,
                     "position": player["position"] if "position" in player else None,
-                    "inGame": player["oncourt"] if "oncourt" in player else None,
+                    "inGame": player["oncourt"] if "oncourt" in player and status == 2 else None,
                     "starter": str(player["starter"]) if "starter" in player else None,
                     "statistics": player["statistics"] if "statistics" in player else None,
                 }
