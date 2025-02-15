@@ -814,12 +814,12 @@ def get_scoreboard():
             if "homeTeam" in boxscore:
                 if "players" in boxscore["homeTeam"]:
                     lineups["home"] = [lineup_player_data(player) for player in boxscore["homeTeam"]["players"] if player["starter"] == "1"]
-                    order = [4, 5, 0, 2, 1]
+                    order = [3, 4, 0, 2, 1]
                     lineups["home"] = [lineups["home"][i] for i in order]
             if "awayTeam" in boxscore:
                 if "players" in boxscore["awayTeam"]:
                     lineups["away"] = [lineup_player_data(player) for player in boxscore["awayTeam"]["players"] if player["starter"] == "1"]
-                    order = [1, 2, 0, 5, 4]
+                    order = [1, 2, 0, 4, 3]
                     lineups["away"] = [lineups["away"][i] for i in order]
 
             # Create stats dictionary
