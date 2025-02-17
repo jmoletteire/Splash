@@ -654,13 +654,17 @@ def get_scoreboard():
             }
 
         def specific_game(game):
+            summary = game.get("SUMMARY", {})
             boxscore = game.get("BOXSCORE", {})
 
+            if summary is None:
+                return {"matchup": {f"Away @ Home"}, "stats": {}}
+
             if boxscore is None:
-                summary = game["SUMMARY"]["GameSummary"][0]
-                line_score = game["SUMMARY"]["LineScore"]
-                awayName = line_score[1]["NICKNAME"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[0]["NICKNAME"]
-                homeName = line_score[0]["NICKNAME"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["NICKNAME"]
+                game_summary = summary["GameSummary"][0]
+                line_score = summary["LineScore"]
+                awayName = line_score[1]["NICKNAME"] if line_score[0]["TEAM_ID"] == game_summary["HOME_TEAM_ID"] else line_score[0]["NICKNAME"]
+                homeName = line_score[0]["NICKNAME"] if line_score[0]["TEAM_ID"] == game_summary["HOME_TEAM_ID"] else line_score[1]["NICKNAME"]
                 return {"matchup": {f"{awayName} @ {homeName}"}, "stats": {}}
 
             status = game.get("SUMMARY", {}).get("GameSummary", {})[0].get("GAME_STATUS_ID", 0)
@@ -668,6 +672,7 @@ def get_scoreboard():
             officials = ""
             arena = ""
             lineups = {"home": [], "away": []}
+            inactive = {"home": "", "away": ""}
 
             def lineup_player_data(player):
                 return {
@@ -821,6 +826,16 @@ def get_scoreboard():
                     lineups["away"] = [lineup_player_data(player) for player in boxscore["awayTeam"]["players"] if player["starter"] == "1"]
                     order = [0, 2, 1, 4, 3]  # SF, C, PF, PG, SG
                     lineups["away"] = [lineups["away"][i] for i in order]
+            if "InactivePlayers" in summary:
+                try:
+                    home_id = summary["GameSummary"][0]["HOME_TEAM_ID"]
+                    away_id = summary["GameSummary"][0]["VISITOR_TEAM_ID"]
+                except Exception:
+                    home_id = 0
+                    away_id = 0
+
+                inactive["home"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if player["TEAM_ID"] == home_id])
+                inactive["away"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if player["TEAM_ID"] == away_id])
 
             # Create stats dictionary
             stats = {
@@ -842,7 +857,8 @@ def get_scoreboard():
                     "matchup": matchup,
                     "officials": officials,
                     "arena": arena,
-                    "lineups": lineups
+                    "lineups": lineups,
+                    "inactive": inactive
                 },
                 "stats": {
                     "home": {
