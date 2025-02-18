@@ -58,7 +58,14 @@ def calculated_stats(stats, team_stats):
     team_stats["Per Shot"] = f"{pps:.2f}"
     team_stats["Turnover %"] = f"{tov_pct:.1f}%"
     team_stats["Assist %"] = f"{ast_pct:.1f}%"
-    team_stats["Assist : Turnover"] = f"{stats['assistsTurnoverRatio']:.2f}"
+
+    try:
+        team_stats["Assist : Turnover"] = f"{stats['AST_TOV']:.2f}"
+    except KeyError:
+        try:
+            team_stats["Assist : Turnover"] = f"{stats['assistsTurnoverRatio']:.2f}"
+        except Exception:
+            team_stats["Assist : Turnover"] = 0
 
     return team_stats
 
