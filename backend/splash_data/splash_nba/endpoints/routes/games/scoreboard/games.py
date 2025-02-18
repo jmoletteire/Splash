@@ -1,7 +1,7 @@
-from flask import Blueprint, jsonify, request
-from datetime import datetime
 import logging
-from splash_nba.endpoints.routes.games.scoreboard.services.game_service import get_games_from_db, process_scoreboard
+from datetime import datetime
+from flask import Blueprint, jsonify, request
+from services.game_service import get_games_from_db, process_scoreboard
 
 games_bp = Blueprint('games', __name__)
 
