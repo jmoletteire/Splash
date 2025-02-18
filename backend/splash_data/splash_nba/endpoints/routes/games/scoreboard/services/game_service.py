@@ -1,12 +1,19 @@
-from datetime import datetime
-from flask import jsonify
-from splash_nba.endpoints.utils.game_helpers import summarize_game, specific_game
-from pymongo import MongoClient
+import sys
 import logging
+from flask import jsonify
+from utils.game_helpers import summarize_game, specific_game
 
-client = MongoClient("your-mongo-db-connection-string")
-db = client.splash
-games_collection = db.nba_games
+env_path = "/home/ubuntu"
+if env_path not in sys.path:
+    sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
+
+try:
+    from env import URI, PREV_SEASON, CURR_SEASON, CURR_SEASON_TYPE, PROXY
+    from mongo_connect import get_mongo_collection
+except ImportError:
+    raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+
+games_collection = get_mongo_collection("nba_games")
 
 
 def get_games_from_db(game_date):

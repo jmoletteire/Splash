@@ -1,14 +1,12 @@
-import re
 import sys
 import json
 import time
 import logging
-from datetime import datetime
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_compress import Compress
-from routes.games import games_bp
+from splash_nba.endpoints.routes.games.scoreboard.games import games_bp
 
 try:
     # Try to import the local env.py file
