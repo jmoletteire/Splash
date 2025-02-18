@@ -64,6 +64,32 @@ def format_duration(input_str):
     return input_str  # Return original string if no match is found
 
 
+def format_adv_stats(summary, adv_stats=None):
+    # Check for advanced stats
+    team_adv = {"home": {}, "away": {}}
+    player_adv = {"home": [], "away": []}
+    if adv_stats is not None:
+        if "TeamStats" in adv_stats:
+            for team in adv_stats["TeamStats"]:
+                if team["TEAM_ID"] == summary["GameSummary"][0]["HOME_TEAM_ID"]:
+                    team_adv["home"] = team
+                else:
+                    team_adv["away"] = team
+        if "PlayerStats" in adv_stats:
+            for player in adv_stats["PlayerStats"]:
+                if player["TEAM_ID"] == summary["GameSummary"][0]["HOME_TEAM_ID"]:
+                    player_adv["home"].append(player)
+                else:
+                    player_adv["away"].append(player)
+
+    adv = {
+        "home": {"team": team_adv["home"], "players": player_adv["home"]},
+        "away": {"team": team_adv["away"], "players": player_adv["away"]}
+    }
+
+    return adv
+
+
 def upcoming_game(game_id, date):
     try:
         games_collection = get_mongo_collection('nba_games')
@@ -332,7 +358,7 @@ def final_game(game_id, date, game_line_score):
 
     # Finalize Box Score, Adv Stats, and Summary
     summary = fetch_box_score_summary(game_id)
-    adv = fetch_box_score_adv(game_id)
+    adv = format_adv_stats(summary=summary, adv_stats=fetch_box_score_adv(game_id))
     highlights = 'No highlights found'  # search_youtube_highlights(YOUTUBE_API_KEY, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
 
     home_line_index = 0 if game_line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['HOME_TEAM_ID'] else 1

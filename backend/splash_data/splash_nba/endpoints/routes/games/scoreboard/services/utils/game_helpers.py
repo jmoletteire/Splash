@@ -84,6 +84,7 @@ def summarize_game(id, game):
 def specific_game(game):
     summary = game.get("SUMMARY", {})
     boxscore = game.get("BOXSCORE", {})
+    adv = game.get("ADV", {})
 
     if summary is None:
         return {"matchup": {f"Away @ Home"}, "stats": {}}
@@ -99,5 +100,5 @@ def specific_game(game):
 
     return {
         "matchup": matchup_details(summary, boxscore),
-        "stats": stats(boxscore, status)
+        "stats": stats(status, boxscore, adv)
     }
