@@ -122,7 +122,12 @@ def team_stats(stats, adv=None):
 
 def player_stats(stats, adv=None):
     player_stats = []
-    player_adv_keys = ["EFG_PCT", "TS_PCT", "USG_PCT", "POSS"]
+    player_adv_keys = {
+        "EFG_PCT": "eFG%",
+        "TS_PCT": "TS%",
+        "USG_PCT": "USG%",
+        "POSS": "POSS"
+    }
     player_keys = {
         "assists": "AST",
         "blocks": "BLK",
@@ -170,15 +175,15 @@ def player_stats(stats, adv=None):
         # ADV
         if adv is not None:
             if len(adv) > i:
-                for key in player_adv_keys:
-                    if key in adv[i]:
-                        new_player[key] = str(adv[i][key])
+                for stat_key, stat_name in player_adv_keys:
+                    if stat_key in adv[i]:
+                        new_player[stat_name] = str(adv[i][stat_key])
                     else:
                         continue
 
         player_stats.append(new_player)
 
-    return stats
+    return player_stats
 
 
 def player_game_data(player, status):
