@@ -1,7 +1,7 @@
 import sys
 import logging
 from flask import jsonify
-from utils.game_helpers import summarize_game, specific_game
+from .utils.game_helpers import summarize_game, specific_game
 
 env_path = "/home/ubuntu"
 if env_path not in sys.path:
