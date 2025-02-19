@@ -175,7 +175,7 @@ def player_stats(stats, adv=None):
         # ADV
         if adv is not None:
             if len(adv) > i:
-                for stat_key, stat_name in player_adv_keys:
+                for stat_key, stat_name in player_adv_keys.items():
                     if stat_key in adv[i]:
                         new_player[stat_name] = str(adv[i][stat_key])
                     else:
