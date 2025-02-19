@@ -162,22 +162,20 @@ def player_stats(status, stats, adv=None):
                         if stat_key == "plusMinusPoints":
                             stat = int(stat)
                         if stat in [0, "0", "0-0", "0:00"] and stat_key not in ["fieldGoalsMade", "threePointersMade", "freeThrowsMade", "fieldGoalsAttempted", "threePointersAttempted", "freeThrowsAttempted"]:
-                            new_player[stat_key_final] = None
+                            new_player["statistics"][stat_key_final] = None
                         else:
-                            new_player[stat_key_final] = str(stat)
-            else:
-                new_player[key] = str(value)
+                            new_player["statistics"][stat_key_final] = str(stat)
 
-        new_player["FG"] = f"{new_player['FGM']}-{new_player['FGA']}"
-        new_player["3P"] = f"{new_player['3PM']}-{new_player['3PA']}"
-        new_player["FT"] = f"{new_player['FTM']}-{new_player['FTA']}"
+        new_player["statistics"]["FG"] = f"{new_player['statistics']['FGM']}-{new_player['statistics']['FGA']}"
+        new_player["statistics"]["3P"] = f"{new_player['statistics']['3PM']}-{new_player['statistics']['3PA']}"
+        new_player["statistics"]["FT"] = f"{new_player['statistics']['FTM']}-{new_player['statistics']['FTA']}"
 
         # ADV
         if adv is not None:
             if len(adv) > i:
                 for stat_key, stat_name in player_adv_keys.items():
                     if stat_key in adv[i]:
-                        new_player[stat_name] = str(adv[i][stat_key])
+                        new_player["statistics"][stat_name] = str(adv[i][stat_key])
                     else:
                         continue
 
