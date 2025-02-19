@@ -147,8 +147,10 @@ def player_stats(status, stats, adv=None):
         "threePointersMade": "3PM",
         "turnovers": "TO"
     }
+
     for i, player in enumerate(stats):
         new_player = player_game_data(player, status)
+        statistics = {}
 
         # BASIC
         for key, value in player.items():
@@ -162,23 +164,22 @@ def player_stats(status, stats, adv=None):
                         if stat_key == "plusMinusPoints":
                             stat = int(stat)
                         if stat in [0, "0", "0-0", "0:00"] and stat_key not in ["fieldGoalsMade", "threePointersMade", "freeThrowsMade", "fieldGoalsAttempted", "threePointersAttempted", "freeThrowsAttempted"]:
-                            new_player["statistics"][stat_key_final] = None
+                            statistics[stat_key_final] = None
                         else:
-                            new_player["statistics"][stat_key_final] = str(stat)
+                            statistics[stat_key_final] = str(stat)
 
-        new_player["statistics"]["FG"] = f"{new_player['statistics']['FGM']}-{new_player['statistics']['FGA']}"
-        new_player["statistics"]["3P"] = f"{new_player['statistics']['3PM']}-{new_player['statistics']['3PA']}"
-        new_player["statistics"]["FT"] = f"{new_player['statistics']['FTM']}-{new_player['statistics']['FTA']}"
+        # Add computed fields after iteration
+        statistics["FG"] = f"{statistics.get('FGM', '0')}-{statistics.get('FGA', '0')}"
+        statistics["3P"] = f"{statistics.get('3PM', '0')}-{statistics.get('3PA', '0')}"
+        statistics["FT"] = f"{statistics.get('FTM', '0')}-{statistics.get('FTA', '0')}"
 
         # ADV
-        if adv is not None:
-            if len(adv) > i:
-                for stat_key, stat_name in player_adv_keys.items():
-                    if stat_key in adv[i]:
-                        new_player["statistics"][stat_name] = str(adv[i][stat_key])
-                    else:
-                        continue
+        if adv is not None and len(adv) > i:
+            for stat_key, stat_name in player_adv_keys.items():
+                if stat_key in adv[i]:
+                    statistics[stat_name] = str(adv[i][stat_key])
 
+        new_player["statistics"] = statistics
         player_stats.append(new_player)
 
     return player_stats
