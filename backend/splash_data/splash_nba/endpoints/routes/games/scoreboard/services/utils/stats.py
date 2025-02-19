@@ -177,7 +177,11 @@ def player_stats(status, stats, adv=None):
         if adv is not None and len(adv) > i:
             for stat_key, stat_name in player_adv_keys.items():
                 if stat_key in adv[i]:
-                    statistics[stat_name] = str(adv[i][stat_key])
+                    if '%' in stat_key:
+                        stat_final = round(adv[i][stat_key] * 100, 1) if adv[i][stat_key] != 0 else 0
+                        statistics[stat_name] = f"{stat_final:.1f}%"
+                    else:
+                        statistics[stat_name] = str(adv[i][stat_key])
 
         new_player["statistics"] = statistics
         player_stats.append(new_player)
