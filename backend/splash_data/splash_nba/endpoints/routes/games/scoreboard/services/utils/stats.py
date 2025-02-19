@@ -1,5 +1,5 @@
 import re
-import logging
+
 
 def convert_playtime(duration_str):
     match = re.match(r"PT(\d+)M([\d.]+)S", duration_str)
@@ -120,7 +120,7 @@ def team_stats(stats, adv=None):
     return team_stats
 
 
-def player_stats(stats, adv=None):
+def player_stats(status, stats, adv=None):
     player_stats = []
     player_adv_keys = {
         "EFG_PCT": "eFG%",
@@ -148,7 +148,7 @@ def player_stats(stats, adv=None):
         "turnovers": "TO"
     }
     for i, player in enumerate(stats):
-        new_player = {}
+        new_player = player_game_data(player, status)
 
         # BASIC
         for key, value in player.items():
@@ -198,20 +198,18 @@ def player_game_data(player, status):
     }
 
 
-def stats_to_strings(stats, adv=None):
+def stats_to_strings(status, stats, adv=None):
     # Convert team statistics to strings
     stats["team"] = team_stats(stats["team"] if "team" in stats else {}, adv["team"] if "team" in adv else None)
 
     # Convert player statistics to strings
-    stats["players"] = player_stats(stats["players"] if "players" in stats else {}, adv["players"] if "players" in adv else None)
+    stats["players"] = player_stats(status, stats["players"] if "players" in stats else {}, adv["players"] if "players" in adv else None)
 
     # Return updated dictionary
     return stats
 
 
 def stats(status, boxscore, adv):
-    logging.basicConfig(level=logging.INFO)
-
     # Create stats dictionary
     stats = {
         "home": {
@@ -224,12 +222,7 @@ def stats(status, boxscore, adv):
         },
     }
 
-    stats["home"] = stats_to_strings(stats["home"], adv["home"] if "home" in adv else None)
-    stats["away"] = stats_to_strings(stats["away"], adv["away"] if "away" in adv else None)
-
-    logging.info(stats)
-
-    stats["home"]["players"] = [player_game_data(player, status) for player in stats["home"]["players"]]
-    stats["away"]["players"] = [player_game_data(player, status) for player in stats["away"]["players"]]
+    stats["home"] = stats_to_strings(status, stats["home"], adv["home"] if "home" in adv else None)
+    stats["away"] = stats_to_strings(status, stats["away"], adv["away"] if "away" in adv else None)
 
     return stats
