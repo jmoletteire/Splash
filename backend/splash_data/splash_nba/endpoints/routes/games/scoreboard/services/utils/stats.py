@@ -1,5 +1,5 @@
 import re
-
+import logging
 
 def convert_playtime(duration_str):
     match = re.match(r"PT(\d+)M([\d.]+)S", duration_str)
@@ -210,6 +210,8 @@ def stats_to_strings(stats, adv=None):
 
 
 def stats(status, boxscore, adv):
+    logging.basicConfig(level=logging.INFO)
+
     # Create stats dictionary
     stats = {
         "home": {
@@ -224,6 +226,8 @@ def stats(status, boxscore, adv):
 
     stats["home"] = stats_to_strings(stats["home"], adv["home"] if "home" in adv else None)
     stats["away"] = stats_to_strings(stats["away"], adv["away"] if "away" in adv else None)
+
+    logging.info(stats)
 
     stats["home"]["players"] = [player_game_data(player, status) for player in stats["home"]["players"]]
     stats["away"]["players"] = [player_game_data(player, status) for player in stats["away"]["players"]]
