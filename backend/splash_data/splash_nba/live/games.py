@@ -375,8 +375,7 @@ def final_game(game_id, date, game_line_score):
                     game_line_score[away_line_index]['TEAM_WINS_LOSSES'],
                 f'GAMES.{game_id}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
                 f'GAMES.{game_id}.ADV': adv,
-                f'GAMES.{game_id}.FINAL': True if adv['PlayerStats'][0][
-                                                             'E_OFF_RATING'] is not None else False,
+                f'GAMES.{game_id}.FINAL': True if adv['home']['players'] is not [] else False,
                 f'GAMES.{game_id}.UPDATED': False
             }
             }
