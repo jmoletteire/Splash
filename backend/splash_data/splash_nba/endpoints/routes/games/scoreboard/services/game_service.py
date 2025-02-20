@@ -59,9 +59,12 @@ def process_scoreboard(games, game_id=None):
             if not game:
                 return jsonify({"error": f"No game found with id {game_id}"}), 404
             try:
-                summarized_games[0].update(specific_game(game))
+                logging.info(f"{summarized_games is None}")
+                logging.info(summarized_games[0])
             except Exception as e:
                 logging.error(f"(process_scoreboard) Error: {e}")
+
+            summarized_games[0].update(specific_game(game))
 
         return summarized_games
 
