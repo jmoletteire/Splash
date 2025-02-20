@@ -1,4 +1,5 @@
 import re
+import logging
 
 
 def convert_playtime(duration_str):
@@ -104,6 +105,7 @@ def team_stats(stats, adv=None):
         "turnovers": "Turnovers"
     }
     team_stats = {}
+    logging.info(f"(Team Stats) {stats is None}")
     for key, value in list(stats.items()):
         key_final = team_keys[key] if key in team_keys else key
 
@@ -148,6 +150,7 @@ def player_stats(status, stats, adv=None):
         "turnovers": "TO"
     }
 
+    logging.info(f"(Player Stats) {stats is None}")
     for i, player in enumerate(stats):
         new_player = player_game_data(player, status)
         statistics = {}

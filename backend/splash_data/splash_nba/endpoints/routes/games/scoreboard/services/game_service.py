@@ -52,6 +52,8 @@ def process_scoreboard(games, game_id=None):
         else:
             summarized_games = [summarize_game(id, game) for id, game in games.items()]
 
+        logging.info(f"(process_scoreboard) Games: {summarized_games}")
+
         if game_id:
             game = games.get(game_id, {})
             if not game:
