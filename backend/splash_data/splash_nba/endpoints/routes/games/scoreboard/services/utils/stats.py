@@ -174,15 +174,16 @@ def player_stats(status, stats, adv=None):
         statistics["FT"] = f"{statistics.get('FTM', '0')}-{statistics.get('FTA', '0')}"
 
         # ADV
-        if adv is not None and len(adv) > i:
-            for stat_key, stat_name in player_adv_keys.items():
-                if stat_key in adv[i]:
-                    if '%' in stat_name:
-                        stat = adv[i][stat_key] if adv[i][stat_key] is not None else 0
-                        stat_final = round(stat * 100, 1) if stat != 0 else 0
-                        statistics[stat_name] = f"{stat_final:.1f}%"
-                    else:
-                        statistics[stat_name] = str(adv[i][stat_key])
+        if adv is not None:
+            if len(adv) > i:
+                for stat_key, stat_name in player_adv_keys.items():
+                    if stat_key in adv[i]:
+                        if '%' in stat_name:
+                            stat = adv[i][stat_key] if adv[i][stat_key] is not None else 0
+                            stat_final = round(stat * 100, 1) if stat != 0 else 0
+                            statistics[stat_name] = f"{stat_final:.1f}%"
+                        else:
+                            statistics[stat_name] = str(adv[i][stat_key])
 
         new_player["statistics"] = statistics
         player_stats.append(new_player)
@@ -207,7 +208,7 @@ def stats_to_strings(status, stats, adv=None):
     stats["team"] = team_stats(stats["team"] if "team" in stats else {}, adv["team"] if "team" in adv else None)
 
     # Convert player statistics to strings
-    stats["players"] = player_stats(status, stats["players"] if "players" in stats else {}, adv["players"] if "players" in adv else None)
+    stats["players"] = player_stats(status, stats["players"] if "players" in stats else [], adv["players"] if "players" in adv else None)
 
     # Return updated dictionary
     return stats

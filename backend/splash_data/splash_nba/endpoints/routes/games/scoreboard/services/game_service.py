@@ -62,5 +62,5 @@ def process_scoreboard(games, game_id=None):
         return summarized_games
 
     except Exception as e:
-        logging.error(f"(process_scoreboard) Error processing scoreboard: {e}")
+        logging.error(f"(process_scoreboard) Error processing scoreboard: {e.with_traceback()}")
         return []
