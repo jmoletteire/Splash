@@ -206,10 +206,16 @@ def player_game_data(player, status):
 
 def stats_to_strings(status, stats, adv=None):
     # Convert team statistics to strings
-    stats["team"] = team_stats(stats["team"] if "team" in stats else {}, adv["team"] if "team" in adv else None)
+    try:
+        stats["team"] = team_stats(stats["team"] if "team" in stats else {}, adv["team"] if "team" in adv else None)
+    except Exception as e:
+        logging.error(f"Error retrieving team stats: {e}")
 
     # Convert player statistics to strings
-    stats["players"] = player_stats(status, stats["players"] if "players" in stats else [], adv["players"] if "players" in adv else None)
+    try:
+        stats["players"] = player_stats(status, stats["players"] if "players" in stats else [], adv["players"] if "players" in adv else None)
+    except Exception as e:
+        logging.error(f"Error retrieving player stats: {e}")
 
     # Return updated dictionary
     return stats
