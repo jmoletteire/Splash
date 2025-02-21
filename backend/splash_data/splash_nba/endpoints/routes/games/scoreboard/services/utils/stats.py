@@ -71,7 +71,7 @@ def calculated_stats(stats, team_stats):
     return team_stats
 
 
-def team_stats(stats, adv=None):
+def team_stats(stats, adv):
     team_keys = {
         "assists": "Assists",
         "assistsTurnoverRatio": "Assist : Turnover",
@@ -121,7 +121,7 @@ def team_stats(stats, adv=None):
     return team_stats
 
 
-def player_stats(status, stats, adv=None):
+def player_stats(status, stats, adv):
     player_stats = []
     player_adv_keys = {
         "EFG_PCT": "eFG%",
@@ -204,16 +204,16 @@ def player_game_data(player, status):
     }
 
 
-def stats_to_strings(status, stats, adv=None):
+def stats_to_strings(status, stats, adv):
     # Convert team statistics to strings
     try:
-        stats["team"] = team_stats(stats["team"] if "team" in stats else {}, adv["team"] if "team" in adv else None)
+        stats["team"] = team_stats(stats["team"] if "team" in stats else {}, adv["team"] if "team" in adv else {})
     except Exception as e:
         logging.error(f"Error retrieving team stats: {e} - {stats is None}")
 
     # Convert player statistics to strings
     try:
-        stats["players"] = player_stats(status, stats["players"] if "players" in stats else [], adv["players"] if "players" in adv else None)
+        stats["players"] = player_stats(status, stats["players"] if "players" in stats else [], adv["players"] if "players" in adv else [])
     except Exception as e:
         logging.error(f"Error retrieving player stats: {e} - {stats is None}")
 
@@ -234,7 +234,7 @@ def game_stats(status, boxscore, adv):
         },
     }
 
-    stats["home"] = stats_to_strings(status, stats["home"], adv["home"] if "home" in adv else None)
-    stats["away"] = stats_to_strings(status, stats["away"], adv["away"] if "away" in adv else None)
+    stats["home"] = stats_to_strings(status, stats["home"], adv["home"] if "home" in adv else {})
+    stats["away"] = stats_to_strings(status, stats["away"], adv["away"] if "away" in adv else {})
 
     return stats
