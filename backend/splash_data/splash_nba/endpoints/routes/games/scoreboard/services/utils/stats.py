@@ -209,13 +209,13 @@ def stats_to_strings(status, stats, adv):
     try:
         stats["team"] = team_stats(stats["team"] if "team" in stats else {}, adv["team"] if "team" in adv else {})
     except Exception as e:
-        logging.error(f"Error retrieving team stats: {e} - {stats is None}")
+        logging.error(f"Error retrieving team stats: {e}")
 
     # Convert player statistics to strings
     try:
         stats["players"] = player_stats(status, stats["players"] if "players" in stats else [], adv["players"] if "players" in adv else [])
     except Exception as e:
-        logging.error(f"Error retrieving player stats: {e} - {stats is None}")
+        logging.error(f"Error retrieving player stats: {e}")
 
     # Return updated dictionary
     return stats
