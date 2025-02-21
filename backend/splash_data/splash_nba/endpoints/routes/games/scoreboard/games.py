@@ -23,6 +23,8 @@ def get_scoreboard():
         # Process the games
         summarized_games = process_scoreboard(games, game_id)
 
+        logging.info(f"(get_scoreboard) Summarized games: {summarized_games}")
+
         return jsonify(summarized_games)
 
     except Exception as e:
