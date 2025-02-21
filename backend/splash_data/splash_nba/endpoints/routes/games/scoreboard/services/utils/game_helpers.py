@@ -1,5 +1,7 @@
+import logging
+
 from .matchup import matchup_details
-from .stats import stats
+from .stats import game_stats
 
 
 def get_game_status(game):
@@ -97,8 +99,20 @@ def specific_game(game):
         return {"matchup": {f"{awayName} @ {homeName}"}, "stats": {}}
 
     status = game.get("SUMMARY", {}).get("GameSummary", {})[0].get("GAME_STATUS_ID", 0)
+    matchup = {}
+    stats = {}
+
+    try:
+        matchup = matchup_details(summary, boxscore)
+    except Exception as e:
+        logging.info(f"Error retrieving matchup: {e}")
+
+    try:
+        stats = game_stats(status, boxscore, adv)
+    except Exception as e:
+        logging.info(f"Error fetching stats: {e}")
 
     return {
-        "matchup": matchup_details(summary, boxscore),
-        "stats": stats(status, boxscore, adv)
+        "matchup": matchup,
+        "stats": stats
     }

@@ -215,7 +215,7 @@ def stats_to_strings(status, stats, adv=None):
     return stats
 
 
-def stats(status, boxscore, adv):
+def game_stats(status, boxscore, adv):
     # Create stats dictionary
     stats = {
         "home": {
