@@ -66,7 +66,7 @@ def calculated_stats(stats, team_stats):
         try:
             team_stats["Assist : Turnover"] = f"{stats['assistsTurnoverRatio']:.2f}"
         except Exception:
-            team_stats["Assist : Turnover"] = 0
+            team_stats["Assist : Turnover"] = "0"
 
     return team_stats
 
