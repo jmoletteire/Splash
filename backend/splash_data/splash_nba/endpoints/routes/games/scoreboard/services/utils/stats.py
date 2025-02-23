@@ -14,14 +14,14 @@ def convert_playtime(duration_str):
 def calculated_stats(stats, team_stats):
     try:
         poss = stats['POSS']
-    except KeyError:
+    except Exception:
         try:
             poss = stats['fieldGoalsAttempted'] + stats['turnovers'] + (stats['freeThrowsAttempted'] * 0.44) - stats['reboundsOffensive']
         except Exception:
             poss = 0
     try:
         ppp = stats['OFF_RATING'] / 100
-    except KeyError:
+    except Exception:
         try:
             ppp = stats['points'] / poss
         except Exception:
@@ -29,7 +29,7 @@ def calculated_stats(stats, team_stats):
 
     try:
         pps = stats['EFG_PCT'] * 2
-    except KeyError:
+    except Exception:
         try:
             pps = (stats['points'] - stats['freeThrowsMade']) / stats['fieldGoalsAttempted']
         except Exception:
@@ -37,7 +37,7 @@ def calculated_stats(stats, team_stats):
 
     try:
         tov_pct = stats['TM_TOV_PCT']
-    except KeyError:
+    except Exception:
         try:
             tov_pct = 100 * stats["turnovers"] / poss
         except Exception:
@@ -45,7 +45,7 @@ def calculated_stats(stats, team_stats):
 
     try:
         ast_pct = stats['AST_PCT']
-    except KeyError:
+    except Exception:
         try:
             ast_pct = 100 * stats["assists"] / stats["fieldGoalsMade"]
         except Exception:
@@ -62,7 +62,7 @@ def calculated_stats(stats, team_stats):
 
     try:
         team_stats["Assist : Turnover"] = f"{stats['AST_TOV']:.2f}"
-    except KeyError:
+    except Exception:
         try:
             team_stats["Assist : Turnover"] = f"{stats['assistsTurnoverRatio']:.2f}"
         except Exception:
@@ -195,6 +195,7 @@ def player_stats(status, stats, adv):
 def player_game_data(player, status):
     return {
         "personId": str(player["personId"]) if "personId" in player else None,
+        "order": str(player["order"]) if "order" in player else None,
         "name": player["nameI"] if "nameI" in player else None,
         "number": player["jerseyNum"] if "jerseyNum" in player else None,
         "position": player["position"] if "position" in player else None,
