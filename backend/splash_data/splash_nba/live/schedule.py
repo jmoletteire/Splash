@@ -42,10 +42,10 @@ def setup_scheduler():
     )
 
     # Run `check_games_final` every 20 seconds, but as a separate task
-    scheduler.add_job(
-        lambda: asyncio.run_coroutine_threadsafe(check_games_final(), loop),  # Runs in a separate task
-        IntervalTrigger(seconds=20), coalesce=True, max_instances=1, misfire_grace_time=10,
-    )
+    # scheduler.add_job(
+    #     lambda: asyncio.run_coroutine_threadsafe(check_games_final(), loop),  # Runs in a separate task
+    #     IntervalTrigger(seconds=20), coalesce=True, max_instances=1, misfire_grace_time=10,
+    # )
 
     scheduler.add_job(
         lambda: asyncio.run_coroutine_threadsafe(player_rotowires(), loop),  # Runs in a separate task
