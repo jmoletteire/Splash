@@ -50,7 +50,7 @@ def calculated_stats(stats, team_stats):
         if stats.get('TM_TOV_PCT', None) is not None:
             tov_pct = stats['TM_TOV_PCT']
         else:
-            tov_pct = 100 * int(team_stats["TOV"]) / poss
+            tov_pct = 100 * int(team_stats["TO"]) / poss
     except Exception as e:
         logging.error(f"Error retrieving Turnover %: {e}")
         logging.error(traceback.format_exc())
