@@ -22,10 +22,9 @@ def expected_lineup_data(team_id):
     lineup_final = []
 
     for player in last_lineup:
-        name = player["NAME"].split(" ")
         lineup_final.append({
             "personId": str(player["PLAYER_ID"]) if "PLAYER_ID" in player else None,
-            "name": f"{name[0][0]}. {name[-1]}" if name is not None else None,
+            "name": player["NAME"] if "NAME" in player else None,
             "position": player["POSITION"] if "POSITION" in player else None,
         })
 
@@ -72,7 +71,7 @@ def matchup_details(summary, boxscore):
             lineups["home"] = [lineups["home"][i] for i in order]
         except Exception:
             lineups["home"] = []
-            logging.error(traceback.format_exc())
+            # logging.error(traceback.format_exc())
 
     if "awayTeam" in boxscore:
         if "players" in boxscore["awayTeam"]:
@@ -86,6 +85,7 @@ def matchup_details(summary, boxscore):
             lineups["away"] = [lineups["away"][i] for i in order]
         except Exception:
             lineups["away"] = []
+            # logging.error(traceback.format_exc())
 
     # Inactive
     if "InactivePlayers" in summary:

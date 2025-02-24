@@ -64,7 +64,7 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
             if player["starter"] == "1":
                 starters.append({
                     "PLAYER_ID": player["personId"],
-                    "NAME": player["name"],
+                    "NAME": player["nameI"],
                     "POSITION": player["position"],
                 })
 
