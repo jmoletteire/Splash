@@ -13,50 +13,56 @@ def convert_playtime(duration_str):
 
 def calculated_stats(stats, team_stats):
     try:
-        poss = stats['POSS'] if 'POSS' in stats and stats['POSS'] is not None else 0
-    except Exception:
-        try:
+        if 'POSS' in stats and stats['POSS'] is not None:
+            poss = stats['POSS']
+        else:
             poss = stats['fieldGoalsAttempted'] + stats['turnovers'] + (stats['freeThrowsAttempted'] * 0.44) - stats['reboundsOffensive']
-        except Exception:
-            poss = 0
-    try:
-        ortg = stats['OFF_RATING'] if 'OFF_RATING' in stats and stats['OFF_RATING'] is not None else 0
-        ppp = ortg / 100
     except Exception:
-        try:
+        poss = 0
+
+    try:
+        if 'OFF_RATING' in stats and stats['OFF_RATING'] is not None:
+            ortg = stats['OFF_RATING']
+            ppp = ortg / 100
+        else:
             ppp = stats['points'] / poss
-        except Exception:
-            ppp = 0
+    except Exception:
+        ppp = 0
 
     try:
-        efg = stats['EFG_PCT'] if 'EFG_PCT' in stats and stats['EFG_PCT'] is not None else 0
-        pps = efg * 2
-    except Exception:
-        try:
+        if 'EFG_PCT' in stats and stats['EFG_PCT'] is not None:
+            efg = stats['EFG_PCT']
+            pps = efg * 2
+        else:
             pps = (stats['points'] - stats['freeThrowsMade']) / stats['fieldGoalsAttempted']
-        except Exception:
-            pps = 0
+    except Exception:
+        pps = 0
 
     try:
-        tov_pct = stats['TM_TOV_PCT'] if 'TM_TOV_PCT' in stats and stats['TM_TOV_PCT'] is not None else 0
-    except Exception:
-        try:
+        if 'TM_TOV_PCT' in stats and stats['TM_TOV_PCT'] is not None:
+            tov_pct = stats['TM_TOV_PCT']
+        else:
             tov_pct = 100 * stats["turnovers"] / poss
-        except Exception:
-            tov_pct = 0
+    except Exception:
+        tov_pct = 0
 
     try:
-        ast_pct = stats['AST_PCT'] if 'AST_PCT' in stats and stats['AST_PCT'] is not None else 0
-    except Exception:
-        try:
+        if 'AST_PCT' in stats and stats['AST_PCT'] is not None:
+            ast_pct = stats['AST_PCT']
+        else:
             ast_pct = 100 * stats["assists"] / stats["fieldGoalsMade"]
-        except Exception:
-            ast_pct = 0
+    except Exception:
+        ast_pct = 0
 
     team_stats["FG"] = f"{team_stats['FGM']}-{team_stats['FGA']}"
     team_stats["3P"] = f"{team_stats['3PM']}-{team_stats['3PA']}"
     team_stats["FT"] = f"{team_stats['FTM']}-{team_stats['FTA']}"
-    team_stats["Possessions"] = f"{poss:.0f}"
+
+    try:
+        team_stats["Possessions"] = f"{poss:.0f}"
+    except Exception as e:
+        logging.error(f"Error formatting Possessions: {e}")
+
     try:
         team_stats["Per Poss"] = f"{ppp:.2f}"
     except Exception as e:
@@ -78,12 +84,12 @@ def calculated_stats(stats, team_stats):
         logging.error(f"Error formatting Assist %: {e}")
 
     try:
-        team_stats["Assist : Turnover"] = f"{stats['AST_TOV']:.2f}"
-    except Exception:
-        try:
+        if 'AST_TOV' in stats and stats['AST_TOV'] is not None:
+            team_stats["Assist : Turnover"] = f"{stats['AST_TOV']:.2f}"
+        else:
             team_stats["Assist : Turnover"] = f"{stats['assistsTurnoverRatio']:.2f}"
-        except Exception:
-            team_stats["Assist : Turnover"] = "0"
+    except Exception:
+        team_stats["Assist : Turnover"] = "0.00"
 
     return team_stats
 
