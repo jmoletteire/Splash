@@ -1,5 +1,6 @@
 import sys
 import logging
+import traceback
 
 env_path = "/home/ubuntu"
 if env_path not in sys.path:
@@ -71,6 +72,7 @@ def matchup_details(summary, boxscore):
             lineups["home"] = [lineups["home"][i] for i in order]
         except Exception:
             lineups["home"] = []
+            logging.error(traceback.format_exc())
 
     if "awayTeam" in boxscore:
         if "players" in boxscore["awayTeam"]:
