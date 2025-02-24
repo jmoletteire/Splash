@@ -18,7 +18,7 @@ def calculated_stats(stats, team_stats):
             logging.info(stats['POSS'])
             poss = stats['POSS']
         else:
-            poss = int(team_stats['FGA']) + int(team_stats['TO']) + (int(team_stats['FTA']) * 0.44) - int(team_stats['Off Rebounds'])
+            poss = int(team_stats['FGA']) + int(team_stats['Turnovers']) + (int(team_stats['FTA']) * 0.44) - int(team_stats['Off Rebounds'])
     except Exception as e:
         logging.error(f"Error retrieving possessions: {e}")
         logging.error(traceback.format_exc())
@@ -50,7 +50,7 @@ def calculated_stats(stats, team_stats):
         if stats.get('TM_TOV_PCT', None) is not None:
             tov_pct = stats['TM_TOV_PCT']
         else:
-            tov_pct = 100 * int(team_stats["TO"]) / poss
+            tov_pct = 100 * int(team_stats["Turnovers"]) / poss
     except Exception as e:
         logging.error(f"Error retrieving Turnover %: {e}")
         logging.error(traceback.format_exc())
