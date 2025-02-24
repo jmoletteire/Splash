@@ -13,7 +13,7 @@ def convert_playtime(duration_str):
 
 def calculated_stats(stats, team_stats):
     try:
-        if 'POSS' in stats and stats['POSS'] is not None:
+        if stats.get('POSS', None) is not None:
             poss = stats['POSS']
         else:
             poss = stats['fieldGoalsAttempted'] + stats['turnovers'] + (stats['freeThrowsAttempted'] * 0.44) - stats['reboundsOffensive']
@@ -21,7 +21,7 @@ def calculated_stats(stats, team_stats):
         poss = 0
 
     try:
-        if 'OFF_RATING' in stats and stats['OFF_RATING'] is not None:
+        if stats.get('OFF_RATING', None) is not None:
             ortg = stats['OFF_RATING']
             ppp = ortg / 100
         else:
@@ -30,7 +30,7 @@ def calculated_stats(stats, team_stats):
         ppp = 0
 
     try:
-        if 'EFG_PCT' in stats and stats['EFG_PCT'] is not None:
+        if stats.get('EFG_PCT', None) is not None:
             efg = stats['EFG_PCT']
             pps = efg * 2
         else:
@@ -39,7 +39,7 @@ def calculated_stats(stats, team_stats):
         pps = 0
 
     try:
-        if 'TM_TOV_PCT' in stats and stats['TM_TOV_PCT'] is not None:
+        if stats.get('TM_TOV_PCT', None) is not None:
             tov_pct = stats['TM_TOV_PCT']
         else:
             tov_pct = 100 * stats["turnovers"] / poss
@@ -47,7 +47,7 @@ def calculated_stats(stats, team_stats):
         tov_pct = 0
 
     try:
-        if 'AST_PCT' in stats and stats['AST_PCT'] is not None:
+        if stats.get('AST_PCT', None) is not None:
             ast_pct = stats['AST_PCT']
         else:
             ast_pct = 100 * stats["assists"] / stats["fieldGoalsMade"]
@@ -84,7 +84,7 @@ def calculated_stats(stats, team_stats):
         logging.error(f"Error formatting Assist %: {e}")
 
     try:
-        if 'AST_TOV' in stats and stats['AST_TOV'] is not None:
+        if stats.get('AST_TOV', None) is not None:
             team_stats["Assist : Turnover"] = f"{stats['AST_TOV']:.2f}"
         else:
             team_stats["Assist : Turnover"] = f"{stats['assistsTurnoverRatio']:.2f}"
