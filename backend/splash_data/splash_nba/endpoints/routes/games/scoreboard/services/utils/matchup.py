@@ -24,7 +24,7 @@ def expected_lineup_data(team_id):
     for player in last_lineup:
         name = player["NAME"].split(" ")
         lineup_final.append({
-            "personId": player["PLAYER_ID"] if "PLAYER_ID" in player else None,
+            "personId": str(player["PLAYER_ID"]) if "PLAYER_ID" in player else None,
             "name": f"{name[0][0]}. {name[-1]}" if name is not None else None,
             "position": player["POSITION"] if "POSITION" in player else None,
         })
