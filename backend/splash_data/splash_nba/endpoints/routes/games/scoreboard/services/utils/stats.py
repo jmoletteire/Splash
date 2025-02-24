@@ -18,7 +18,7 @@ def calculated_stats(stats, team_stats):
             logging.info(stats['POSS'])
             poss = stats['POSS']
         else:
-            poss = team_stats['FGA'] + team_stats['TOV'] + (team_stats['FTA'] * 0.44) - team_stats['Off Rebounds']
+            poss = int(team_stats['FGA']) + int(team_stats['TOV']) + (int(team_stats['FTA']) * 0.44) - int(team_stats['Off Rebounds'])
     except Exception as e:
         logging.error(f"Error retrieving possessions: {e}")
         logging.error(traceback.format_exc())
@@ -29,7 +29,7 @@ def calculated_stats(stats, team_stats):
             ortg = stats['OFF_RATING']
             ppp = ortg / 100
         else:
-            ppp = team_stats['Points'] / poss
+            ppp = int(team_stats['Points']) / poss
     except Exception as e:
         logging.error(f"Error retrieving PPP: {e}")
         logging.error(traceback.format_exc())
@@ -40,7 +40,7 @@ def calculated_stats(stats, team_stats):
             efg = stats['EFG_PCT']
             pps = efg * 2
         else:
-            pps = (team_stats['Points'] - team_stats['FTM']) / team_stats['FGA']
+            pps = (int(team_stats['Points']) - int(team_stats['FTM'])) / int(team_stats['FGA'])
     except Exception as e:
         logging.error(f"Error retrieving PPS: {e}")
         logging.error(traceback.format_exc())
@@ -50,7 +50,7 @@ def calculated_stats(stats, team_stats):
         if stats.get('TM_TOV_PCT', None) is not None:
             tov_pct = stats['TM_TOV_PCT']
         else:
-            tov_pct = 100 * team_stats["TOV"] / poss
+            tov_pct = 100 * int(team_stats["TOV"]) / poss
     except Exception as e:
         logging.error(f"Error retrieving Turnover %: {e}")
         logging.error(traceback.format_exc())
@@ -60,7 +60,7 @@ def calculated_stats(stats, team_stats):
         if stats.get('AST_PCT', None) is not None:
             ast_pct = stats['AST_PCT']
         else:
-            ast_pct = 100 * team_stats["Assists"] / team_stats["FGM"]
+            ast_pct = 100 * int(team_stats["Assists"]) / int(team_stats["FGM"])
     except Exception as e:
         logging.error(f"Error retrieving Assist %: {e}")
         logging.error(traceback.format_exc())
