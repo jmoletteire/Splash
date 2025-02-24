@@ -5,6 +5,24 @@ from .stats import game_stats
 
 
 def get_game_status(game):
+    if 'SUMMARY' in game:
+        if 'GameSummary' not in game['SUMMARY']:
+            return ''
+
+        summary = game['SUMMARY']['GameSummary'][0]
+        status = summary.get('GAME_STATUS_ID', 0)
+
+        if status == 3:
+            return 3
+        if status == 2:
+            return 1
+        if status == 1:
+            return 2
+
+    return 1
+
+
+def get_game_clock(game):
     if 'BOXSCORE' in game:
         if game['BOXSCORE']['gameStatusText'] == 'pregame':
             return 'Pregame'
@@ -78,7 +96,8 @@ def summarize_game(id, game):
         "homeScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["HOME_TEAM_ID"] else line_score[1]["PTS"],
         "awayScore": line_score[0]["PTS"] if line_score[0]["TEAM_ID"] == summary["VISITOR_TEAM_ID"] else line_score[1]["PTS"],
         "broadcast": summary["NATL_TV_BROADCASTER_ABBREVIATION"],
-        "gameClock": get_game_status(game),
+        "gameClock": get_game_clock(game),
+        "status": get_game_status(game),
         "date": summary["GAME_DATE_EST"][0:10]
     }
 
