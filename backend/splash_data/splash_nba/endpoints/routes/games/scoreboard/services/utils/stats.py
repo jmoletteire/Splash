@@ -18,7 +18,7 @@ def calculated_stats(stats, team_stats):
             logging.info(stats['POSS'])
             poss = stats['POSS']
         else:
-            poss = int(team_stats['FGA']) + int(team_stats['TOV']) + (int(team_stats['FTA']) * 0.44) - int(team_stats['Off Rebounds'])
+            poss = int(team_stats['FGA']) + int(team_stats['TO']) + (int(team_stats['FTA']) * 0.44) - int(team_stats['Off Rebounds'])
     except Exception as e:
         logging.error(f"Error retrieving possessions: {e}")
         logging.error(traceback.format_exc())
