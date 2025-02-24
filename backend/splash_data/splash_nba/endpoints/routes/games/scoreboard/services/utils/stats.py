@@ -105,7 +105,7 @@ def team_stats(stats, adv):
         "turnovers": "Turnovers"
     }
     team_stats = {}
-    for key, value in list(stats.items()):
+    for key, value in stats.items():
         key_final = team_keys[key] if key in team_keys else key
 
         if key_final == "Time Leading":
