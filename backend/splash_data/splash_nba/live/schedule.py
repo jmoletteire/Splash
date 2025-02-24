@@ -47,10 +47,10 @@ def setup_scheduler():
     #     IntervalTrigger(seconds=20), coalesce=True, max_instances=1, misfire_grace_time=10,
     # )
 
-    scheduler.add_job(
-        lambda: asyncio.run_coroutine_threadsafe(player_rotowires(), loop),  # Runs in a separate task
-        IntervalTrigger(minutes=30), coalesce=True, max_instances=1, misfire_grace_time=900,
-    )
+    # scheduler.add_job(
+    #     lambda: asyncio.run_coroutine_threadsafe(player_rotowires(), loop),  # Runs in a separate task
+    #     IntervalTrigger(minutes=30), coalesce=True, max_instances=1, misfire_grace_time=900,
+    # )
 
     scheduler.add_job(
         lambda: asyncio.run_coroutine_threadsafe(daily_update(), loop),  # Runs in a separate task
