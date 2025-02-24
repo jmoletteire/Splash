@@ -106,6 +106,7 @@ def team_stats(stats, adv):
     }
     team_stats = {}
     for key, value in stats.items():
+        logging.info(f"{key}: {value}")
         key_final = team_keys[key] if key in team_keys else key
 
         if key_final == "Time Leading":
@@ -116,7 +117,10 @@ def team_stats(stats, adv):
         else:
             team_stats[key_final] = str(value)
 
-    team_stats = calculated_stats(stats if adv is {} else adv, team_stats)
+    try:
+        team_stats = calculated_stats(stats if adv is {} else adv, team_stats)
+    except Exception as e:
+        logging.error(f"Error calculating team advanced stats: {e}")
 
     return team_stats
 
