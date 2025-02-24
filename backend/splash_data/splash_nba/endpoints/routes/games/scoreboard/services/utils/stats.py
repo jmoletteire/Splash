@@ -18,7 +18,7 @@ def calculated_stats(stats, team_stats):
             logging.info(stats['POSS'])
             poss = stats['POSS']
         else:
-            poss = stats['fieldGoalsAttempted'] + stats['turnovers'] + (stats['freeThrowsAttempted'] * 0.44) - stats['reboundsOffensive']
+            poss = team_stats['FGA'] + team_stats['TOV'] + (team_stats['FTA'] * 0.44) - team_stats['Off Rebounds']
     except Exception as e:
         logging.error(f"Error retrieving possessions: {e}")
         logging.error(traceback.format_exc())
@@ -29,8 +29,10 @@ def calculated_stats(stats, team_stats):
             ortg = stats['OFF_RATING']
             ppp = ortg / 100
         else:
-            ppp = stats['points'] / poss
-    except Exception:
+            ppp = team_stats['Points'] / poss
+    except Exception as e:
+        logging.error(f"Error retrieving PPP: {e}")
+        logging.error(traceback.format_exc())
         ppp = 0
 
     try:
@@ -38,24 +40,30 @@ def calculated_stats(stats, team_stats):
             efg = stats['EFG_PCT']
             pps = efg * 2
         else:
-            pps = (stats['points'] - stats['freeThrowsMade']) / stats['fieldGoalsAttempted']
-    except Exception:
+            pps = (team_stats['Points'] - team_stats['FTM']) / team_stats['FGA']
+    except Exception as e:
+        logging.error(f"Error retrieving PPS: {e}")
+        logging.error(traceback.format_exc())
         pps = 0
 
     try:
         if stats.get('TM_TOV_PCT', None) is not None:
             tov_pct = stats['TM_TOV_PCT']
         else:
-            tov_pct = 100 * stats["turnovers"] / poss
-    except Exception:
+            tov_pct = 100 * team_stats["TOV"] / poss
+    except Exception as e:
+        logging.error(f"Error retrieving Turnover %: {e}")
+        logging.error(traceback.format_exc())
         tov_pct = 0
 
     try:
         if stats.get('AST_PCT', None) is not None:
             ast_pct = stats['AST_PCT']
         else:
-            ast_pct = 100 * stats["assists"] / stats["fieldGoalsMade"]
-    except Exception:
+            ast_pct = 100 * team_stats["Assists"] / team_stats["FGM"]
+    except Exception as e:
+        logging.error(f"Error retrieving Assist %: {e}")
+        logging.error(traceback.format_exc())
         ast_pct = 0
 
     team_stats["FG"] = f"{team_stats['FGM']}-{team_stats['FGA']}"
@@ -91,8 +99,10 @@ def calculated_stats(stats, team_stats):
         if stats.get('AST_TOV', None) is not None:
             team_stats["Assist : Turnover"] = f"{stats['AST_TOV']:.2f}"
         else:
-            team_stats["Assist : Turnover"] = f"{stats['assistsTurnoverRatio']:.2f}"
-    except Exception:
+            team_stats["Assist : Turnover"] = f"{team_stats['Assist : Turnover']:.2f}"
+    except Exception as e:
+        logging.error(f"Error retrieving Assist / Turnover: {e}")
+        logging.error(traceback.format_exc())
         team_stats["Assist : Turnover"] = "0.00"
 
     return team_stats
