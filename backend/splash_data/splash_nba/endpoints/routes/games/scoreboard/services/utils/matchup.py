@@ -1,4 +1,5 @@
 import sys
+import logging
 
 env_path = "/home/ubuntu"
 if env_path not in sys.path:
@@ -10,8 +11,13 @@ except ImportError:
 
 
 def expected_lineup_data(team_id):
-    team = get_mongo_collection('nba_teams').find_one({'TEAM_ID': team_id}, {'LAST_STARTING_LINEUP': 1})
-    last_lineup = team.get('LAST_STARTING_LINEUP', [])
+    try:
+        team = get_mongo_collection('nba_teams').find_one({'TEAM_ID': team_id}, {'LAST_STARTING_LINEUP': 1})
+        last_lineup = team.get('LAST_STARTING_LINEUP', [])
+    except Exception as e:
+        last_lineup = []
+        logging.error(e)
+
     lineup_final = []
 
     for player in last_lineup:
