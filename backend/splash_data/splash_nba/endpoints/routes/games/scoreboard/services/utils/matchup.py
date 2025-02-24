@@ -10,7 +10,7 @@ except ImportError:
 
 
 def expected_lineup_data(team_id):
-    team = get_mongo_collection('teams').find_one({'TEAM_ID': team_id}, {'LAST_STARTING_LINEUP': 1})
+    team = get_mongo_collection('nba_teams').find_one({'TEAM_ID': team_id}, {'LAST_STARTING_LINEUP': 1})
     last_lineup = team.get('LAST_STARTING_LINEUP', [])
     lineup_final = []
 
