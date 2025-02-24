@@ -116,7 +116,7 @@ def team_stats(stats, adv):
         else:
             team_stats[key_final] = str(value)
 
-    team_stats = calculated_stats(stats if adv is None else adv, team_stats)
+    team_stats = calculated_stats(stats if adv is {} else adv, team_stats)
 
     return team_stats
 
