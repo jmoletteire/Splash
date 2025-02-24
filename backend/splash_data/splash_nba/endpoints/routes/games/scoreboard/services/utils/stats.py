@@ -1,5 +1,6 @@
 import re
 import logging
+import traceback
 
 
 def convert_playtime(duration_str):
@@ -14,10 +15,13 @@ def convert_playtime(duration_str):
 def calculated_stats(stats, team_stats):
     try:
         if stats.get('POSS', None) is not None:
+            logging.info(stats['POSS'])
             poss = stats['POSS']
         else:
             poss = stats['fieldGoalsAttempted'] + stats['turnovers'] + (stats['freeThrowsAttempted'] * 0.44) - stats['reboundsOffensive']
-    except Exception:
+    except Exception as e:
+        logging.error(f"Error retrieving possessions: {e}")
+        logging.error(traceback.format_exc())
         poss = 0
 
     try:
