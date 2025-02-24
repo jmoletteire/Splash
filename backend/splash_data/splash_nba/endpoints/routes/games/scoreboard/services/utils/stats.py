@@ -99,7 +99,7 @@ def calculated_stats(stats, team_stats):
         if stats.get('AST_TOV', None) is not None:
             team_stats["Assist : Turnover"] = f"{stats['AST_TOV']:.2f}"
         else:
-            team_stats["Assist : Turnover"] = f"{team_stats['Assist : Turnover']:.2f}"
+            team_stats["Assist : Turnover"] = team_stats["Assist : Turnover"]
     except Exception as e:
         logging.error(f"Error retrieving Assist / Turnover: {e}")
         logging.error(traceback.format_exc())
