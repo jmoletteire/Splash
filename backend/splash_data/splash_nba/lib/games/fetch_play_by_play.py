@@ -6,6 +6,7 @@ from nba_api.live.nba.endpoints import playbyplay
 from nba_api.stats.endpoints import videoeventsasset
 from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
 
+
 def update_play_by_play():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
