@@ -12,9 +12,9 @@ def three_and_ft_rate(seasons: list = None, season_types: list = None):
         return
 
     if seasons is None:
-        # List of seasons
+        # List of all available seasons
         seasons = [
-            '2024-25'
+            '2024-25',
             '2023-24',
             '2022-23',
             '2021-22',
@@ -45,11 +45,13 @@ def three_and_ft_rate(seasons: list = None, season_types: list = None):
             '1996-97'
         ]
     if season_types is None:
-        # List of season types
+        # List of all season types
         season_types = ['REGULAR SEASON', 'PLAYOFFS']
 
     # Update each document in the collection
-    for team in teams_collection.find({}, {"TEAM_ID": 1, "SEASONS": 1, "_id": 0}):
+    query = {"TEAM_ID": {"$ne": 0}}
+    proj = {"TEAM_ID": 1, "SEASONS": 1, "_id": 0}
+    for team in teams_collection.find(query, proj):
         team_id = team.get('TEAM_ID', 0)
         if team_id != 0:
             team_seasons = team.get('SEASONS', None)
@@ -64,7 +66,7 @@ def three_and_ft_rate(seasons: list = None, season_types: list = None):
 
                 for season_type in season_types:
                     season_stats = stats.get(season_type, None)  # Get stats for season type, if not exists return None
-                    if season_stats is None:
+                    if season_stats is None or season_stats == {}:
                         continue  # If team has no data for this season type skip to next season type
 
                     try:
@@ -75,20 +77,20 @@ def three_and_ft_rate(seasons: list = None, season_types: list = None):
                         fga = season_stats.get('FGA', {}).get('Totals', {}).get('Value', 1)
 
                         # Calculate 3PAr, FTAr, FT/FGA
-                        three_pt_rate = {"Value": int(fg3a) / int(fga), "Rank": "0", "Pct": "0.000"}
-                        ft_rate = {"Value": int(fta) / int(fga), "Rank": "0", "Pct": "0.000"}
-                        ft_per_fga = {"Value": int(ftm) / int(fga), "Rank": "0", "Pct": "0.000"}
+                        three_pt_rate = {"Value": f"{100 * (int(fg3a) / int(fga)):.1f}%", "Rank": "0", "Pct": "0.000"}
+                        fta_rate = {"Value": f"{(int(fta) / int(fga)):.3f}", "Rank": "0", "Pct": "0.000"}
+                        ft_rate = {"Value": f"{(int(ftm) / int(fga)):.3f}", "Rank": "0", "Pct": "0.000"}
 
                         # Update the document with the new field
                         teams_collection.update_one(
                             {'TEAM_ID': team['TEAM_ID']},
                             {'$set': {f'SEASONS.{season}.STATS.{season_type}.3PAr.Totals': three_pt_rate,
-                                      f'SEASONS.{season}.STATS.{season_type}.FTr.Totals': ft_rate,
-                                      f'SEASONS.{season}.STATS.{season_type}.FT_PER_FGA.Totals': ft_per_fga}
+                                      f'SEASONS.{season}.STATS.{season_type}.FTAr.Totals': fta_rate,
+                                      f'SEASONS.{season}.STATS.{season_type}.FTr.Totals': ft_rate}
                              }
                         )
 
-                        logging.info(f'\t\tAdded stats for {season}')
+                        # logging.info(f'\tAdded stats for {season}')
 
                     except Exception as e:
                         logging.error(f"(Team 3PAr & FTr) Error for team {team['TEAM_ID']}: {e}", exc_info=True)

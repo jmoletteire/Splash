@@ -1,14 +1,15 @@
 import logging
 import time
 from datetime import datetime
+from splash_nba.lib.teams.team_history import update_team_history
+from splash_nba.lib.teams.stats.team_stats import fetch_team_stats
+from splash_nba.lib.teams.stats.per100 import calculate_per_100_poss
 from splash_nba.lib.teams.stats.custom_team_stats import three_and_ft_rate
 from splash_nba.lib.teams.stats.custom_team_stats_rank import custom_team_stats_rank
-from splash_nba.lib.teams.stats.per100 import calculate_per_100_poss
 from splash_nba.lib.teams.team_cap_sheet import update_team_contract_data
-from splash_nba.lib.teams.team_history import update_team_history
+from splash_nba.lib.teams.update_news_and_transactions import fetch_team_transactions, fetch_team_news
 from splash_nba.lib.teams.update_team_games import update_team_games
 from splash_nba.lib.teams.standings import update_current_standings
-from splash_nba.lib.teams.update_news_and_transactions import fetch_team_transactions, fetch_team_news
 from splash_nba.lib.teams.team_seasons import update_current_season
 from splash_nba.lib.teams.team_rosters import update_current_roster
 from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_lineup
@@ -58,7 +59,7 @@ async def update_teams(team_ids):
                     # Filter seasons to only include the current season key
                     filtered_doc = doc.copy()
                     filtered_doc['SEASONS'] = {key: doc['SEASONS'][key] for key in doc['SEASONS'] if key == CURR_SEASON}
-                    calculate_per_100_poss(team_doc=filtered_doc, seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
+                    calculate_per_100_poss(team=filtered_doc, seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
                     time.sleep(15)
 
                     # Current Roster/Rotation & Coaches (~400-500 API calls)
@@ -84,6 +85,7 @@ async def update_teams(team_ids):
                     time.sleep(15)
 
         # After looping through all teams, calculate ranks/standings
+        fetch_team_stats(seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
         three_and_ft_rate(seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
         custom_team_stats_rank(seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
 
@@ -178,7 +180,7 @@ async def teams_daily_update():
                     filtered_doc = doc.copy()
                     filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
                                                key == CURR_SEASON}
-                    calculate_per_100_poss(team_doc=filtered_doc, seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
+                    calculate_per_100_poss(team=filtered_doc, seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
                     time.sleep(15)
                 except Exception as e:
                     logging.error(f"(Teams Daily) Error updating team {team} stats: {e}", exc_info=True)
@@ -212,6 +214,12 @@ async def teams_daily_update():
 
                 # Pause 15 seconds between teams
                 time.sleep(15)
+
+    # All Team Stats
+    try:
+        fetch_team_stats(seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
+    except Exception as e:
+        logging.error(f"(Teams Daily) Error updating team stats: {e}", exc_info=True)
 
     # 3PAr + FTr
     try:

@@ -26,9 +26,6 @@ def update_current_season(team_id):
         }
 
         try:
-            # Fetch team stats for this team in given season
-            season_stats_dict[CURR_SEASON]['STATS'] = {CURR_SEASON_TYPE: fetch_team_stats(team_id=team_id, season=CURR_SEASON, season_type='Regular Season' if CURR_SEASON_TYPE == 'REGULAR SEASON' else 'Playoffs')}
-
             # Update SEASONS for this team
             teams_collection.update_one(
                 {"TEAM_ID": team_id},
@@ -44,8 +41,7 @@ def update_current_season(team_id):
                     f"SEASONS.{CURR_SEASON}.CONF_RANK": season_stats_dict[CURR_SEASON]['CONF_RANK'],
                     f"SEASONS.{CURR_SEASON}.DIV_RANK": season_stats_dict[CURR_SEASON]['DIV_RANK'],
                     f"SEASONS.{CURR_SEASON}.PO_WINS": season_stats_dict[CURR_SEASON]['PO_WINS'],
-                    f"SEASONS.{CURR_SEASON}.PO_LOSSES": season_stats_dict[CURR_SEASON]['PO_LOSSES'],
-                    f"SEASONS.{CURR_SEASON}.STATS.{CURR_SEASON_TYPE}": season_stats_dict[CURR_SEASON]['STATS'][CURR_SEASON_TYPE]
+                    f"SEASONS.{CURR_SEASON}.PO_LOSSES": season_stats_dict[CURR_SEASON]['PO_LOSSES']
                 }},
                 upsert=True
             )
@@ -63,8 +59,7 @@ def update_current_season(team_id):
                     f"SEASONS.{CURR_SEASON}.CONF_RANK": 0,
                     f"SEASONS.{CURR_SEASON}.DIV_RANK": 0,
                     f"SEASONS.{CURR_SEASON}.PO_WINS": 0,
-                    f"SEASONS.{CURR_SEASON}.PO_LOSSES": 0,
-                    f"SEASONS.{CURR_SEASON}.STATS.{CURR_SEASON_TYPE}": {'BASIC': {}, 'ADV': {}, 'HUSTLE': {}}
+                    f"SEASONS.{CURR_SEASON}.PO_LOSSES": 0
                 }},
                 upsert=True
             )

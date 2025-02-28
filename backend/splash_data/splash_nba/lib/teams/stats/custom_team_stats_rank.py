@@ -10,11 +10,21 @@ def calculate_percentile(path, league_teams_path):
         return
 
     try:
+        match = {
+            "$and": [
+                {f"{league_teams_path}": {"$exists": True}},
+                {f"{path}.Value": {"$exists": True}}
+            ]
+        }
+        print(teams_collection.count_documents(match))
         teams_collection.aggregate([
-            # Match only documents where the 'Value' field exists
+            # Match only documents where the given stat and League Teams fields exist
             {
                 "$match": {
-                    f"{league_teams_path}.Value": {"$exists": True}
+                    "$and": [
+                        {f"{league_teams_path}": {"$exists": True}},
+                        {f"{path}.Value": {"$exists": True}}
+                    ]
                 }
             },
             # Use $set to calculate Pct based on league_teams_path
@@ -23,7 +33,7 @@ def calculate_percentile(path, league_teams_path):
                     f"{path}.Pct": {
                         "$let": {
                             "vars": {
-                                "rank": f"${path}.Rank",
+                                "rank": {"$toInt": f"${path}.Rank"},
                                 "total": f"${league_teams_path}"
                             },
                             "in": {
@@ -74,7 +84,7 @@ def calculate_percentile(path, league_teams_path):
         return
 
 
-def calculate_rank(path):
+def calculate_rank(path, order):
     try:
         teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
@@ -82,6 +92,10 @@ def calculate_rank(path):
         return
 
     try:
+        match = {
+                f"{path}.Value": {"$exists": True}
+            }
+        print(teams_collection.count_documents(match))
         teams_collection.aggregate([
             # Match only documents where the 'Value' field exists
             {
@@ -92,14 +106,26 @@ def calculate_rank(path):
             {
                 "$setWindowFields": {
                     "sortBy": {
-                        f"{path}.Value": -1
+                        f"{path}.Value": order
                     },
                     "output": {
-                        f"{path}.Rank": {
+                        "rankTemp": {
                             "$documentNumber": {}
                         }
                     }
                 }
+            },
+            # Convert rank to string
+            {
+                "$set": {
+                    f"{path}.Rank": {
+                        "$toString": "$rankTemp"
+                    }
+                }
+            },
+            # Remove temporary field
+            {
+                "$unset": "rankTemp"
             },
             # Merge the results back into the same collection
             {
@@ -117,15 +143,8 @@ def calculate_rank(path):
 
 
 def custom_team_stats_rank(seasons: list = None, season_types: list = None):
-    try:
-        # Configure logging
-        logging.basicConfig(level=logging.INFO)
-
-        # Replace with your MongoDB connection string
-        teams_collection = get_mongo_collection('nba_teams')
-    except Exception as e:
-        logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}", exc_info=True)
-        return
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
 
     if seasons is None:
         # List of seasons
@@ -171,8 +190,11 @@ def custom_team_stats_rank(seasons: list = None, season_types: list = None):
     custom_stats = [
         # BASIC
         ("3PAr", -1),
+        ("FTAr", -1),
         ("FTr", -1),
-        ("FT_PER_FGA", -1),
+
+        # ADV
+        ("POSS", -1),
 
         # HUSTLE
         ("CONTESTED_SHOTS", -1),
@@ -193,10 +215,10 @@ def custom_team_stats_rank(seasons: list = None, season_types: list = None):
             for season_type in season_types:
                 for mode in modes:
                     logging.info(f"\tSeason: {season} {season_type} {mode}")
-                    path = f"SEASONS.{season}.STATS.{season_type}.{stat}.{mode}"
-                    league_teams_path = f"SEASONS.{season}.STATS.{season_type}.{stat}.Totals.Value"
+                    path = f"SEASONS.{season}.STATS.{season_type}.{stat[0]}.{mode}"
+                    league_teams_path = f"SEASONS.{season}.STATS.{season_type}.LEAGUE_TEAMS.Totals.Value"
 
-                    calculate_rank(path)
+                    calculate_rank(path, stat[1])
                     calculate_percentile(path, league_teams_path)
 
 
