@@ -1,204 +1,96 @@
 import logging
-from splash_nba.imports import get_mongo_collection, CURR_SEASON
-
-
-def current_season_per_100_possessions(team_doc, playoffs):
-    # Connect to MongoDB
-    try:
-        teams_collection = get_mongo_collection('nba_teams')
-    except Exception as e:
-        logging.error(f"\t(Team Per-100) Failed to connect to MongoDB: {e}")
-        return
-
-    # List of tuples specifying the stats to calculate per-75 possession values for
-    # Each tuple should be in the format ("stat_key", "location")
-    # Example: [("PTS", "BASIC"), ("AST", "BASIC")]
-    stats_to_calculate = [
-        # BASIC
-        ("FGM", "BASIC"),
-        ("FGA", "BASIC"),
-        ("FTM", "BASIC"),
-        ("FTA", "BASIC"),
-        ("FG3M", "BASIC"),
-        ("FG3A", "BASIC"),
-        ("STL", "BASIC"),
-        ("BLK", "BASIC"),
-        ("REB", "BASIC"),
-        ("OREB", "BASIC"),
-        ("DREB", "BASIC"),
-        ("TOV", "BASIC"),
-        ("PF", "BASIC"),
-        ("PFD", "BASIC"),
-        ("PTS", "BASIC"),
-
-        # ADV
-        ("XPTS_DIFF", "ADV"),
-        ("XPTS_FOR", "ADV"),
-        ("XPTS_AGAINST", "ADV"),
-
-        # HUSTLE
-        ("CONTESTED_SHOTS", "HUSTLE"),
-        ("SCREEN_ASSISTS", "HUSTLE"),
-        ("SCREEN_AST_PTS", "HUSTLE"),
-        ("BOX_OUTS", "HUSTLE"),
-        ("OFF_BOXOUTS", "HUSTLE"),
-        ("DEF_BOXOUTS", "HUSTLE"),
-        ("DEFLECTIONS", "HUSTLE"),
-        ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
-    ]
-
-    seasons = team_doc.get("seasons", None)
-
-    for season_key, season in seasons.items():
-        if season_key != CURR_SEASON:
-            continue
-
-        season_stats = season.get("STATS", None)
-        if season_stats is None:
-            continue
-
-        if playoffs:
-            playoff_stats = season_stats.get("PLAYOFFS", None)
-
-            if playoff_stats is None:
-                continue
-
-            adv_stats = playoff_stats.get("ADV", {})
-        else:
-            reg_season_stats = season_stats.get("REGULAR SEASON", None)
-
-            if reg_season_stats is None:
-                continue
-
-            adv_stats = reg_season_stats.get("ADV", {})
-
-        possessions = adv_stats.get("POSS", None)
-
-        if possessions:
-            for stat_key, location in stats_to_calculate:
-                if playoffs:
-                    location = 'PLAYOFFS.' + location
-                else:
-                    location = 'REGULAR SEASON.' + location
-
-                loc = location.split('.')
-
-                try:
-                    if len(loc) == 2:
-                        stat_value = season_stats[loc[0]].get(loc[1], {}).get(stat_key, None)
-                    elif len(loc) == 3:
-                        stat_value = season_stats[loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
-                    else:
-                        stat_value = season_stats.get(location, {}).get(stat_key, None)
-                except KeyError:
-                    logging.error(f"\t(Team Per-100) Could not find stat for {stat_key} in {location}")
-                    stat_value = None
-
-                if stat_value is not None:
-                    try:
-                        try:
-                            per_100_value = (stat_value / possessions) * 100
-                        except ZeroDivisionError:
-                            per_100_value = 0
-
-                        per_100_key = f"{stat_key}_PER_100"
-
-                        # Update the team document with the new per-100 possession value
-                        teams_collection.update_one(
-                            {"TEAM_ID": team_doc["TEAM_ID"]},
-                            {"$set": {f"seasons.{season_key}.STATS.{location}.{per_100_key}": per_100_value}}
-                        )
-                    except Exception as e:
-                        logging.error(f"\t(Team Per-100) Unable to add {stat_key} for {team_doc['TEAM_ID']} for {season_key}: {e}")
-        else:
-            continue
+from splash_nba.imports import get_mongo_collection
 
 
 # Function to calculate per-100 possession values and update the document
-def calculate_and_update_per_100_possessions(team_doc, playoffs):
+def calculate_per_100_poss(team_doc, seasons: list = None, season_types: list = None):
     # Connect to MongoDB
     try:
         teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+        logging.error(f"Failed to connect to MongoDB: {e}", exc_info=True)
         return
 
-    # List of tuples specifying the stats to calculate per-75 possession values for
-    # Each tuple should be in the format ("stat_key", "location")
-    # Example: [("PTS", "BASIC"), ("AST", "BASIC")]
-    stats_to_calculate = [
-        # BASIC
-        ("FGM", "BASIC"),
-        ("FGA", "BASIC"),
-        ("FTM", "BASIC"),
-        ("FTA", "BASIC"),
-        ("FG3M", "BASIC"),
-        ("FG3A", "BASIC"),
-        ("STL", "BASIC"),
-        ("BLK", "BASIC"),
-        ("REB", "BASIC"),
-        ("OREB", "BASIC"),
-        ("DREB", "BASIC"),
-        ("TOV", "BASIC"),
-        ("PF", "BASIC"),
-        ("PFD", "BASIC"),
-        ("PTS", "BASIC"),
+    if seasons is None:
+        # List of seasons
+        seasons = [
+            '2024-25'
+            '2023-24',
+            '2022-23',
+            '2021-22',
+            '2020-21',
+            '2019-20',
+            '2018-19',
+            '2017-18',
+            '2016-17',
+            '2015-16',
+            # '2014-15',
+            # '2013-14',
+            # '2012-13',
+            # '2011-12',
+            # '2010-11',
+            # '2009-10',
+            # '2008-09',
+            # '2007-08',
+            # '2006-07',
+            # '2005-06',
+            # '2004-05',
+            # '2003-04',
+            # '2002-03',
+            # '2001-02',
+            # '2000-01',
+            # '1999-00',
+            # '1998-99',
+            # '1997-98',
+            # '1996-97'
+        ]
+    if season_types is None:
+        # List of season types
+        season_types = ["REGULAR SEASON", "PLAYOFFS"]
 
+    stats_to_calculate = [
         # HUSTLE
-        ("CONTESTED_SHOTS", "HUSTLE"),
-        ("SCREEN_ASSISTS", "HUSTLE"),
-        ("SCREEN_AST_PTS", "HUSTLE"),
-        ("BOX_OUTS", "HUSTLE"),
-        ("OFF_BOXOUTS", "HUSTLE"),
-        ("DEF_BOXOUTS", "HUSTLE"),
-        ("DEFLECTIONS", "HUSTLE"),
-        ("LOOSE_BALLS_RECOVERED", "HUSTLE"),
+        "CONTESTED_SHOTS",
+        "DEFLECTIONS",
+        "CHARGES",
+        "SCREEN_AST",
+        "SCREEN_AST_PTS",
+        "LOOSE_BALLS",
+        "OFF_BOXOUTS",
+        "DEF_BOXOUTS",
+        "BOX_OUTS"
     ]
 
-    seasons = team_doc.get("seasons", None)
-
-    for season_key, season in seasons.items():
-        season_stats = season['STATS']
-        if playoffs:
-            playoff_stats = season_stats.get("PLAYOFFS", None)
-
-            if playoff_stats is None:
+    for season in seasons:
+        for season_type in season_types:
+            stats = team_doc.get(season, {}).get('STATS', {}).get(season_type, None)
+            if stats is None:
                 continue
 
-            adv_stats = playoff_stats.get("ADV", {})
-        else:
-            adv_stats = season_stats.get("ADV", {})
+            possessions = stats.get("POSS", None)
+            if possessions is None:
+                continue
 
-        possessions = adv_stats.get("POSS", None)
+            for stat_key in stats_to_calculate:
+                stat_value = stats.get(stat_key, {}).get("Totals", {}).get("Value", None)
+                if stat_value is None:
+                    continue
 
-        if possessions:
-            for stat_key, location in stats_to_calculate:
-                if playoffs:
-                    location = 'PLAYOFFS.' + location
-
-                loc = location.split('.')
-
-                if len(loc) == 2:
-                    stat_value = season_stats[loc[0]].get(loc[1], {}).get(stat_key, None)
-                elif len(loc) == 3:
-                    stat_value = season_stats[loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
-                else:
-                    stat_value = season_stats.get(location, {}).get(stat_key, None)
-
-                if stat_value is not None:
+                try:
                     try:
                         per_100_value = (stat_value / possessions) * 100
-                        per_100_key = f"{stat_key}_PER_100"
+                    except ZeroDivisionError:
+                        per_100_value = 0
 
-                        # Update the player document with the new per-75 possession value
-                        teams_collection.update_one(
-                            {"_id": team_doc["_id"]},
-                            {"$set": {f"seasons.{season_key}.STATS.{location}.{per_100_key}": per_100_value}}
-                        )
-                    except Exception as e:
-                        logging.error(f'(Stats) Unable to add {stat_key} for {team_doc["TEAM_ID"]} for {season_key}: {e}')
-        else:
-            continue
+                    stat_dict = {"Value": per_100_value, "Rank": "0", "Pct": "0.000"}
+
+                    # Update the team document with the new per-100 possession value
+                    teams_collection.update_one(
+                        {"_id": team_doc["_id"]},
+                        {"$set": {f"SEASONS.{season}.STATS.{season_type}.{stat_key}.Per100Possessions": stat_dict}}
+                    )
+                except Exception as e:
+                    logging.error(f'(Stats) Unable to add {stat_key} for {team_doc["TEAM_ID"]} for {season}: {e}', exc_info=True)
 
 
 if __name__ == "__main__":
@@ -208,8 +100,6 @@ if __name__ == "__main__":
     # Connect to MongoDB
     teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB")
-
-    playoffs = False
 
     # Set the batch size
     batch_size = 10  # Adjust this value based on your needs and system performance
@@ -225,7 +115,6 @@ if __name__ == "__main__":
 
         for i, team_doc in enumerate(batch_cursor):
             logging.info(f'Processing {i + 1} of {batch_size}')
-            # calculate_and_update_per_100_possessions(team_doc, playoffs)
-            current_season_per_100_possessions(team_doc, playoffs)
+            calculate_per_100_poss(team_doc)
 
-    print("Per-100 possession values have been calculated and updated.")
+    logging.info("Per-100 possession values have been calculated and updated.")

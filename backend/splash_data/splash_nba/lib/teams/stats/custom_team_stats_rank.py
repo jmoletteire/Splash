@@ -1,255 +1,204 @@
 import logging
-from splash_nba.imports import get_mongo_collection, CURR_SEASON, CURR_SEASON_TYPE
+from splash_nba.imports import get_mongo_collection
 
 
-def current_season_custom_team_stats_rank():
+def calculate_percentile(path, league_teams_path):
     try:
-        # Configure logging
-        logging.basicConfig(level=logging.INFO)
-
-        # Replace with your MongoDB connection string
         teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
-        logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}")
+        logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}", exc_info=True)
         return
 
-    # Stats to rank
-    custom_stats = [
-        # BASIC
-        ("FGM_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FGA_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FTM_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FTA_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FG3M_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FG3A_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("STL_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("BLK_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("REB_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("OREB_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("DREB_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("TOV_PER_100", f"{CURR_SEASON_TYPE}.BASIC", 1),
-        ("PF_PER_100", f"{CURR_SEASON_TYPE}.BASIC", 1),
-        ("PFD_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("PTS_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FT_PER_FGA", f"{CURR_SEASON_TYPE}.BASIC", -1),
-
-        ("3PAr", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FTAr", f"{CURR_SEASON_TYPE}.BASIC", -1),
-
-        # ADV
-        ("XPTS_DIFF", f"{CURR_SEASON_TYPE}.ADV", -1),
-        ("XPTS_FOR", f"{CURR_SEASON_TYPE}.ADV", -1),
-        ("XPTS_AGAINST", f"{CURR_SEASON_TYPE}.ADV", 1),
-
-        ("XPTS_DIFF_PER_100", f"{CURR_SEASON_TYPE}.ADV", -1),
-        ("XPTS_FOR_PER_100", f"{CURR_SEASON_TYPE}.ADV", -1),
-        ("XPTS_AGAINST_PER_100", f"{CURR_SEASON_TYPE}.ADV", 1),
-
-        # HUSTLE
-        ("CONTESTED_SHOTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("SCREEN_ASSISTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("SCREEN_AST_PTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("BOX_OUTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("OFF_BOXOUTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("DEF_BOXOUTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("DEFLECTIONS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("LOOSE_BALLS_RECOVERED_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("CHARGES_DRAWN_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-
-        ("CONTESTED_SHOTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("SCREEN_ASSISTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("SCREEN_AST_PTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("BOX_OUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("OFF_BOXOUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("DEF_BOXOUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("DEFLECTIONS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("LOOSE_BALLS_RECOVERED", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("CHARGES_DRAWN", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-    ]
-
-    # Loop over each season to build the pipeline
-    for stat in custom_stats:
-        logging.info(f"\n(Team Custom Stats Rank) Calculating {stat[0]} rank...")
-
-        loc = stat[1].split('.')
-
-        pipeline = [
+    try:
+        teams_collection.aggregate([
+            # Match only documents where the 'Value' field exists
             {
-                "$setWindowFields": {
-                    "sortBy": {
-                        f"seasons.{CURR_SEASON}.STATS.{stat[1]}.{stat[0]}": stat[2]
-                    },
-                    "output": {
-                        f"seasons.{CURR_SEASON}.STATS.{stat[1]}.{stat[0]}_RANK": {
-                            "$documentNumber": {}
-                        }
-                    }
+                "$match": {
+                    f"{league_teams_path}.Value": {"$exists": True}
                 }
-            }
-        ]
-
-        # Execute the pipeline and get the results
-        results = list(teams_collection.aggregate(pipeline))
-
-        logging.info(f"(Team Custom Stats Rank) Adding {stat[0]}_RANK to database.")
-
-        # Update each document with the new rank field
-        for result in results:
-            if len(loc) == 2:
-                res = result['seasons'][CURR_SEASON]['STATS'][loc[0]][loc[1]][f'{stat[0]}_RANK']
-            elif len(loc) == 3:
-                res = result['seasons'][CURR_SEASON]['STATS'][loc[0]][loc[1]][loc[2]][f'{stat[0]}_RANK']
-            else:
-                res = result['seasons'][CURR_SEASON]['STATS'][stat[1]][f'{stat[0]}_RANK']
-
-            try:
-                teams_collection.update_one(
-                    {"_id": result["_id"]},
-                    {"$set": {f"seasons.{CURR_SEASON}.STATS.{stat[1]}.{stat[0]}_RANK": res}}
-                )
-            except Exception as e:
-                logging.error(f"(Team Custom Stats Rank) Failed to add {stat[0]}_RANK to database: {e}")
-                continue
-
-
-def custom_team_stats_rank():
-    try:
-        # Configure logging
-        logging.basicConfig(level=logging.INFO)
-
-        # Replace with your MongoDB connection string
-        teams_collection = get_mongo_collection('nba_teams')
-    except Exception as e:
-        logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}")
-        return
-
-    # Stats to rank
-    custom_stats = [
-        # BASIC
-        ("FGM_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FGA_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FTM_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FTA_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FG3M_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FG3A_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("STL_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("BLK_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("REB_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("OREB_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("DREB_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("TOV_PER_100", f"{CURR_SEASON_TYPE}.BASIC", 1),
-        ("PF_PER_100", f"{CURR_SEASON_TYPE}.BASIC", 1),
-        ("PFD_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("PTS_PER_100", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FT_PER_FGA", f"{CURR_SEASON_TYPE}.BASIC", -1),
-
-        ("3PAr", f"{CURR_SEASON_TYPE}.BASIC", -1),
-        ("FTAr", f"{CURR_SEASON_TYPE}.BASIC", -1),
-
-        # HUSTLE
-        ("CONTESTED_SHOTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("SCREEN_ASSISTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("SCREEN_AST_PTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("BOX_OUTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("OFF_BOXOUTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("DEF_BOXOUTS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("DEFLECTIONS_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("LOOSE_BALLS_RECOVERED_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("CHARGES_DRAWN_PER_100", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-
-        ("CONTESTED_SHOTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("SCREEN_ASSISTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("SCREEN_AST_PTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("BOX_OUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("OFF_BOXOUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("DEF_BOXOUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("DEFLECTIONS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("LOOSE_BALLS_RECOVERED", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-        ("CHARGES_DRAWN", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
-    ]
-
-    # List of seasons
-    seasons = [
-        '2024-25'
-        '2023-24',
-        '2022-23',
-        '2021-22',
-        '2020-21',
-        '2019-20',
-        '2018-19',
-        '2017-18',
-        '2016-17',
-        '2015-16',
-        '2014-15',
-        '2013-14',
-        '2012-13',
-        '2011-12',
-        '2010-11',
-        '2009-10',
-        '2008-09',
-        '2007-08',
-        '2006-07',
-        '2005-06',
-        '2004-05',
-        '2003-04',
-        '2002-03',
-        '2001-02',
-        '2000-01',
-        '1999-00',
-        '1998-99',
-        '1997-98',
-        '1996-97'
-    ]
-
-    # Loop over each season to build the pipeline
-    for season in seasons:
-        logging.info(f"Season: {season}")
-        for stat in custom_stats:
-            logging.info(f"\nCalculating {stat[0]} rank...")
-
-            loc = stat[1].split('.')
-
-            if loc[-1] == 'HUSTLE' and season < '2016-17':
-                continue
-
-            pipeline = [
-                {
-                    "$setWindowFields": {
-                        "sortBy": {
-                            f"seasons.{season}.STATS.{stat[1]}.{stat[0]}": stat[2]
-                        },
-                        "output": {
-                            f"seasons.{season}.STATS.{stat[1]}.{stat[0]}_RANK": {
-                                "$documentNumber": {}
+            },
+            # Use $set to calculate Pct based on league_teams_path
+            {
+                "$set": {
+                    f"{path}.Pct": {
+                        "$let": {
+                            "vars": {
+                                "rank": f"${path}.Rank",
+                                "total": f"${league_teams_path}"
+                            },
+                            "in": {
+                                "$cond": {
+                                    "if": {
+                                        "$or": [
+                                            {"$lt": [{"$subtract": ["$$total", 1]}, 1]},  # Pct < 0
+                                            {"$lt": ["$$rank", 1]}  # Pct > 1
+                                        ]
+                                    },
+                                    "then": "0.000",  # Avoid division by zero issues
+                                    "else": {
+                                        "$toString": {
+                                            "$round": [
+                                                {
+                                                    "$subtract": [
+                                                        1,
+                                                        {
+                                                            "$divide": [
+                                                                {"$subtract": ["$$rank", 1]},
+                                                                {"$subtract": ["$$total", 1]}
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                3  # Round to 3 decimal places
+                                            ]
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            ]
+            },
+            # Merge the results back into the same collection
+            {
+                "$merge": {
+                    "into": "nba_teams",  # Updates the same collection
+                    "on": "_id",
+                    "whenMatched": "merge",  # Updates existing documents
+                    "whenNotMatched": "discard"  # Avoids inserting new documents
+                }
+            }
+        ])
+    except Exception as e:
+        logging.error(f"(Custom Team Stats Rank) Failed to calculate percentile: {e}", exc_info=True)
+        return
 
-            # Execute the pipeline and get the results
-            results = list(teams_collection.aggregate(pipeline))
 
-            logging.info(f"Adding {stat[0]}_RANK to database.")
+def calculate_rank(path):
+    try:
+        teams_collection = get_mongo_collection('nba_teams')
+    except Exception as e:
+        logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}", exc_info=True)
+        return
 
-            # Update each document with the new rank field
-            for result in results:
-                if len(loc) == 2:
-                    res = result['seasons'][season]['STATS'][loc[0]][loc[1]][f'{stat[0]}_RANK']
-                elif len(loc) == 3:
-                    res = result['seasons'][season]['STATS'][loc[0]][loc[1]][loc[2]][f'{stat[0]}_RANK']
-                else:
-                    res = result['seasons'][season]['STATS'][stat[1]][f'{stat[0]}_RANK']
+    try:
+        teams_collection.aggregate([
+            # Match only documents where the 'Value' field exists
+            {
+                "$match": {
+                    f"{path}.Value": {"$exists": True}
+                }
+            },
+            {
+                "$setWindowFields": {
+                    "sortBy": {
+                        f"{path}.Value": -1
+                    },
+                    "output": {
+                        f"{path}.Rank": {
+                            "$documentNumber": {}
+                        }
+                    }
+                }
+            },
+            # Merge the results back into the same collection
+            {
+                "$merge": {
+                    "into": "nba_teams",  # Updates the same collection
+                    "on": "_id",
+                    "whenMatched": "merge",  # Updates existing documents
+                    "whenNotMatched": "discard"  # Avoids inserting new documents
+                }
+            }
+        ])
+    except Exception as e:
+        logging.error(f"(Custom Team Stats Rank) Failed to calculate rank: {e}", exc_info=True)
+        return
 
-                try:
-                    teams_collection.update_one(
-                        {"_id": result["_id"]},
-                        {"$set": {f"seasons.{season}.STATS.{stat[1]}.{stat[0]}_RANK": res}}
-                    )
-                except Exception as e:
-                    logging.error(e)
-                    continue
+
+def custom_team_stats_rank(seasons: list = None, season_types: list = None):
+    try:
+        # Configure logging
+        logging.basicConfig(level=logging.INFO)
+
+        # Replace with your MongoDB connection string
+        teams_collection = get_mongo_collection('nba_teams')
+    except Exception as e:
+        logging.error(f"(Custom Team Stats Rank) Failed to connect to MongoDB: {e}", exc_info=True)
+        return
+
+    if seasons is None:
+        # List of seasons
+        seasons = [
+            '2024-25',
+            '2023-24',
+            '2022-23',
+            '2021-22',
+            '2020-21',
+            '2019-20',
+            '2018-19',
+            '2017-18',
+            '2016-17',
+            '2015-16',
+            '2014-15',
+            '2013-14',
+            '2012-13',
+            '2011-12',
+            '2010-11',
+            '2009-10',
+            '2008-09',
+            '2007-08',
+            '2006-07',
+            '2005-06',
+            '2004-05',
+            '2003-04',
+            '2002-03',
+            '2001-02',
+            '2000-01',
+            '1999-00',
+            '1998-99',
+            '1997-98',
+            '1996-97'
+        ]
+    if season_types is None:
+        # List of season types
+        season_types = ['REGULAR SEASON', 'PLAYOFFS']
+
+    # Stat modes
+    modes = ['Totals', 'PerGame', 'Per100Possessions']
+
+    # Stats to rank
+    custom_stats = [
+        # BASIC
+        ("3PAr", -1),
+        ("FTr", -1),
+        ("FT_PER_FGA", -1),
+
+        # HUSTLE
+        ("CONTESTED_SHOTS", -1),
+        ("DEFLECTIONS", -1),
+        ("CHARGES", -1),
+        ("SCREEN_AST", -1),
+        ("SCREEN_AST_PTS", -1),
+        ("LOOSE_BALLS", -1),
+        ("OFF_BOXOUTS", -1),
+        ("DEF_BOXOUTS", -1),
+        ("BOX_OUTS", -1)
+    ]
+
+    # Loop over each season to build the pipeline
+    for stat in custom_stats:
+        logging.info(f"\nCalculating {stat[0]} rank...")
+        for season in seasons:
+            for season_type in season_types:
+                for mode in modes:
+                    logging.info(f"\tSeason: {season} {season_type} {mode}")
+                    path = f"SEASONS.{season}.STATS.{season_type}.{stat}.{mode}"
+                    league_teams_path = f"SEASONS.{season}.STATS.{season_type}.{stat}.Totals.Value"
+
+                    calculate_rank(path)
+                    calculate_percentile(path, league_teams_path)
 
 
 if __name__ == "__main__":
-    current_season_custom_team_stats_rank()
+    custom_team_stats_rank()

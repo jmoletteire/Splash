@@ -10,7 +10,7 @@ def update_current_roster(team_id, season_not_started):
         teams_collection = get_mongo_collection('nba_teams')
         players_collection = get_mongo_collection('nba_players')
     except Exception as e:
-        logging.error(f"\t(Team Rosters) Failed to connect to MongoDB: {e}")
+        logging.error(f"\t(Team Rosters) Failed to connect to MongoDB: {e}", exc_info=True)
         return
 
     try:
@@ -18,7 +18,7 @@ def update_current_roster(team_id, season_not_started):
         team_roster = team_data['CommonTeamRoster']
         team_coaches = team_data['Coaches']
     except Exception as e:
-        logging.error(f"\t(Team Rosters) Unable to fetch {CURR_SEASON} roster for team {team_id}: {e}")
+        logging.error(f"\t(Team Rosters) Unable to fetch {CURR_SEASON} roster for team {team_id}: {e}", exc_info=True)
         return
 
     try:
@@ -72,7 +72,7 @@ def update_current_roster(team_id, season_not_started):
                 team_roster_dict[str(player['PLAYER_ID'])] = player
 
             except Exception as e:
-                logging.error(f"\t(Team Rosters) Unable to fetch {player['PLAYER']} for team {team_id} for {CURR_SEASON}: {e}")
+                logging.error(f"\t(Team Rosters) Unable to fetch {player['PLAYER']} for team {team_id} for {CURR_SEASON}: {e}", exc_info=True)
                 player['GP'] = 0
                 player['GS'] = 0
                 player['MIN'] = 0
@@ -90,12 +90,12 @@ def update_current_roster(team_id, season_not_started):
         # Update document
         teams_collection.update_one(
             {"TEAM_ID": team_id},
-            {"$set": {f"seasons.{CURR_SEASON}.ROSTER": team_roster_dict, f"seasons.{CURR_SEASON}.COACHES": team_coaches}},
+            {"$set": {f"SEASONS.{CURR_SEASON}.ROSTER": team_roster_dict, f"SEASONS.{CURR_SEASON}.COACHES": team_coaches}},
             upsert=True
         )
         logging.info(f"\t(Team Rosters) Updated {CURR_SEASON} roster/coaches for team {team_id}")
     except Exception as e:
-        logging.error(f"\t(Team Rosters) Unable to update {CURR_SEASON} roster for team {team_id}: {e}")
+        logging.error(f"\t(Team Rosters) Unable to update {CURR_SEASON} roster for team {team_id}: {e}", exc_info=True)
 
 
 def fetch_roster(team_id, season):
@@ -103,7 +103,7 @@ def fetch_roster(team_id, season):
     try:
         teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+        logging.error(f"Failed to connect to MongoDB: {e}", exc_info=True)
         return
 
     try:
@@ -111,7 +111,7 @@ def fetch_roster(team_id, season):
         team_roster = team_data['CommonTeamRoster']
         team_coaches = team_data['Coaches']
     except Exception as e:
-        logging.error(f"Unable to fetch {season} roster for team {team_id}: {e}")
+        logging.error(f"Unable to fetch {season} roster for team {team_id}: {e}", exc_info=True)
         return
 
     try:
@@ -138,7 +138,7 @@ def fetch_roster(team_id, season):
                 # Player dictionary {"player_id": {data}}
                 team_roster_dict[str(player['PLAYER_ID'])] = player
             except Exception as e:
-                logging.error(f"Unable to fetch {player['PLAYER']} for team {team_id} for {season}: {e}")
+                logging.error(f"Unable to fetch {player['PLAYER']} for team {team_id} for {season}: {e}", exc_info=True)
                 player['GP'] = 0
                 player['GS'] = 0
                 player['MIN'] = 0
@@ -149,12 +149,12 @@ def fetch_roster(team_id, season):
         # Update document
         teams_collection.update_one(
             {"TEAM_ID": team_id},
-            {"$set": {f"seasons.{season}.ROSTER": team_roster_dict, f"seasons.{season}.COACHES": team_coaches}},
+            {"$set": {f"SEASONS.{season}.ROSTER": team_roster_dict, f"SEASONS.{season}.COACHES": team_coaches}},
             upsert=True
         )
         logging.info(f"Updated {season} roster for team {team_id}")
     except Exception as e:
-        logging.error(f"Unable to update {season} roster for team {team_id}: {e}")
+        logging.error(f"Unable to update {season} roster for team {team_id}: {e}", exc_info=True)
 
 
 if __name__ == "__main__":
@@ -167,16 +167,16 @@ if __name__ == "__main__":
         players_collection = get_mongo_collection('nba_players')
         logging.info("Connected to MongoDB")
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+        logging.error(f"Failed to connect to MongoDB: {e}", exc_info=True)
         exit(1)
 
     try:
         # All Teams
-        for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, "seasons": 1, "_id": 0})):
+        for i, doc in enumerate(teams_collection.find({}, {"TEAM_ID": 1, "SEASONS": 1, "_id": 0})):
             team = doc['TEAM_ID']
-            season_not_started = True if doc['seasons'][CURR_SEASON]['GP'] == 0 else False
+            season_not_started = True if doc['SEASONS'][CURR_SEASON]['GP'] == 0 else False
             update_current_roster(team_id=team, season_not_started=season_not_started)
-            #seasons = doc['seasons']
+            #seasons = doc['SEASONS']
             #for season in seasons.keys():
             #    if season < '1980-81':
             #        fetch_roster(team, season)
@@ -185,4 +185,4 @@ if __name__ == "__main__":
             time.sleep(30)
         logging.info("Done")
     except Exception as e:
-        logging.error(f"Error updating team rosters: {e}")
+        logging.error(f"Error updating team rosters: {e}", exc_info=True)

@@ -29,7 +29,7 @@ def fetch_teams():
 
         logging.info(f"Number of teams fetched: {len(team_ids)}")
     except Exception as e:
-        logging.error(f"Error fetching teams: {e}")
+        logging.error(f"Error fetching teams: {e}", exc_info=True)
 
     try:
         # Loop through all documents in the collection
@@ -38,7 +38,7 @@ def fetch_teams():
             update_team_history(team_id)
             logging.info(f"Processed {i + 1} of 30")
     except Exception as e:
-        logging.error(f"Error updating team history: {e}")
+        logging.error(f"Error updating team history: {e}", exc_info=True)
 
 
 if __name__ == "__main__":

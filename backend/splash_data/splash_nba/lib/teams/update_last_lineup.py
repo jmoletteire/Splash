@@ -45,8 +45,8 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
     try:
         games_collection = get_mongo_collection('nba_games')
     except Exception as e:
-        logging.error(f"\tFailed to connect to MongoDB: {e}")
-        exit(1)
+        logging.error(f"\tFailed to connect to MongoDB: {e}", exc_info=True)
+        return None
 
     try:
         games = games_collection.find({"GAME_DATE": last_game_date}, {"GAMES": 1, "_id": 0})
@@ -76,7 +76,7 @@ def get_last_lineup(team_id, last_game_id, last_game_date):
         return starters
 
     except Exception as e:
-        logging.error(f"\tError while getting last lineup: {e}")
+        logging.error(f"\tError while getting last lineup: {e}", exc_info=True)
 
 
 if __name__ == "__main__":
@@ -87,18 +87,22 @@ if __name__ == "__main__":
         games_collection = get_mongo_collection('nba_games')
         logging.info("Connected to MongoDB")
     except Exception as e:
-        logging.error(f"Unable to connect to MongoDB: {e}")
+        logging.error(f"Unable to connect to MongoDB: {e}", exc_info=True)
         exit(1)
 
     # All Teams
-    for team in teams_collection.find({}, {"TEAM_ID": 1, "seasons": 1, "_id": 0}):
+    for team in teams_collection.find({}, {"TEAM_ID": 1, "SEASONS": 1, "_id": 0}):
         if team['TEAM_ID'] == 0:
             continue
 
         logging.info(f"Processing team {team['TEAM_ID']}...")
 
+        seasons = team.get('SEASONS', None)
+        if seasons is None:
+            continue
+
         # Get most recent game by date
-        game_id, game_date = get_last_game(team['seasons'])
+        game_id, game_date = get_last_game(team['SEASONS'])
 
         # Get starting lineup for most recent game
         last_starting_lineup = get_last_lineup(team['TEAM_ID'], game_id, game_date)

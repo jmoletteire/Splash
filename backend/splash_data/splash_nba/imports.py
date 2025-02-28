@@ -6,7 +6,6 @@ try:
 except ImportError:
     # Fallback to the remote env.py path
     import sys
-    import os
 
     env_path = "/home/ubuntu"
     if env_path not in sys.path:

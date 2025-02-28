@@ -88,13 +88,13 @@ def update_team_games(game_day):
             # Update the home team season data
             teams_collection.update_one(
                 {"TEAM_ID": home_team_id},
-                {"$set": {f"seasons.{season}.GAMES.{game_id}": game_data_home}},
+                {"$set": {f"SEASONS.{season}.GAMES.{game_id}": game_data_home}},
             )
 
             # Update the visitor team season data
             teams_collection.update_one(
                 {"TEAM_ID": visitor_team_id},
-                {"$set": {f"seasons.{season}.GAMES.{game_id}": game_data_visitor}},
+                {"$set": {f"SEASONS.{season}.GAMES.{game_id}": game_data_visitor}},
             )
         except Exception as e:
             logging.error(f"(Team Games) Could not process games for {game_day['GAME_DATE']}: {e}", exc_info=True)
@@ -107,7 +107,6 @@ if __name__ == "__main__":
 
     # Access your database and collections
     games_collection = get_mongo_collection('nba_games')
-    teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB.")
 
     # Set the batch size
@@ -124,6 +123,6 @@ if __name__ == "__main__":
         sorted_games_cursor = games_collection.find({}, {"GAME_DATE": 1, "GAMES": 1, "_id": 0}).sort("GAME_DATE", -1).skip(batch_start).limit(batch_size)
 
         # Process the games in batches
-        for i, game_day in enumerate(sorted_games_cursor):
-            logging.info(f"Processing {i + 1} of {batch_size} ({game_day['GAME_DATE']})")
-            update_team_games(game_day)
+        for i, day in enumerate(sorted_games_cursor):
+            logging.info(f"Processing {i + 1} of {batch_size} ({day['GAME_DATE']})")
+            update_team_games(day)

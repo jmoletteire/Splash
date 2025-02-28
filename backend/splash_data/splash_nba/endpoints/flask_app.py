@@ -1055,15 +1055,6 @@ def get_sports():
         return jsonify({"error": "Failed to retrieve sports"}), 500
 
 
-# @app.route('/api/events', methods=['GET'])
-# def simple_sse():
-#     def generate():
-#         for i in range(10):
-#             yield f"data: {{\"message\": \"Mock Event {i}\"}}\n\n".encode('utf-8')
-#             sys.stdout.flush()  # Ensure the buffer is flushed
-#             time.sleep(1)
-#     return Response(stream_with_context(generate()), content_type="text/event-stream", direct_passthrough=True)
-
 @app.route('/api/events', methods=['GET'])
 def team_sse():
     def watch_team_changes():

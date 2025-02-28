@@ -8,7 +8,7 @@ def update_team_history(team_id):
     try:
         teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
-        logging.error(f"(Team History) Failed to connect to MongoDB: {e}")
+        logging.error(f"(Team History) Failed to connect to MongoDB: {e}", exc_info=True)
         return
 
     try:
@@ -28,7 +28,7 @@ def update_team_history(team_id):
         # Convert the organized data to a list of dictionaries
         organized_data_list = list(organized_data.values())
     except Exception as e:
-        logging.error(f"(Team History) Error fetching team history for {team_id}: {e}")
+        logging.error(f"(Team History) Error fetching team history for {team_id}: {e}", exc_info=True)
         return
 
     try:
@@ -36,11 +36,11 @@ def update_team_history(team_id):
         for team_history in organized_data_list:
             teams_collection.update_one(
                 {"TEAM_ID": team_history['team_id']},
-                {"$set": {"team_history": team_history['team_history']}},
+                {"$set": {"TEAM_HISTORY": team_history['team_history']}},
                 upsert=True
             )
     except Exception as e:
-        logging.error(f"(Team History) Error updating team history for {team_id}: {e}")
+        logging.error(f"(Team History) Error updating team history for {team_id}: {e}", exc_info=True)
 
 
 if __name__ == "__main__":
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         teams_collection = get_mongo_collection('nba_teams')
         logging.info("Connected to MongoDB")
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e}")
+        logging.error(f"Failed to connect to MongoDB: {e}", exc_info=True)
         exit(1)
 
     for i, team in enumerate(teams_collection.find()):

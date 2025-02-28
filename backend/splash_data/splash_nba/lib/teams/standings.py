@@ -374,13 +374,13 @@ def update_current_standings():
             teams_collection.update_one(
                 {"TEAM_ID": team['TeamID']},
                 {"$set": {
-                    f"seasons.{CURR_SEASON}.STANDINGS": team,
-                    f"seasons.{CURR_SEASON}.GP": (team["WINS"] + team["LOSSES"]),
-                    f"seasons.{CURR_SEASON}.WINS": team["WINS"],
-                    f"seasons.{CURR_SEASON}.LOSSES": team["LOSSES"],
-                    f"seasons.{CURR_SEASON}.WIN_PCT": team["WinPCT"],
-                    f"seasons.{CURR_SEASON}.CONF_RANK": team["PlayoffRank"],
-                    f"seasons.{CURR_SEASON}.DIV_RANK": team["DivisionRank"],
+                    f"SEASONS.{CURR_SEASON}.STANDINGS": team,
+                    f"SEASONS.{CURR_SEASON}.GP": (team["WINS"] + team["LOSSES"]),
+                    f"SEASONS.{CURR_SEASON}.WINS": team["WINS"],
+                    f"SEASONS.{CURR_SEASON}.LOSSES": team["LOSSES"],
+                    f"SEASONS.{CURR_SEASON}.WIN_PCT": team["WinPCT"],
+                    f"SEASONS.{CURR_SEASON}.CONF_RANK": team["PlayoffRank"],
+                    f"SEASONS.{CURR_SEASON}.DIV_RANK": team["DivisionRank"],
                 }},
                 upsert=True
             )
@@ -402,8 +402,8 @@ def calculate_strength_of_schedule(team, season):
     if season < '2017-18':
         return 0.000
 
-    team_season = teams_collection.find_one({'TEAM_ID': team['TeamID']}, {f'seasons.{season}.GAMES': 1})
-    team_games = team_season.get('seasons', {}).get(season, {}).get('GAMES', {})
+    team_season = teams_collection.find_one({'TEAM_ID': team['TeamID']}, {f'SEASONS.{season}.GAMES': 1})
+    team_games = team_season.get('SEASONS', {}).get(season, {}).get('GAMES', {})
     opp_win_pct = 0.000
     rem_opp_win_pct = 0.000
     rem_games = 0
@@ -412,18 +412,18 @@ def calculate_strength_of_schedule(team, season):
         for game_id, game_data in team_games.items():
             if game_id[2] == '2':
                 if game_data['RESULT'] == 'W' or game_data['RESULT'] == 'L':
-                    opp = teams_collection.find_one({'TEAM_ID': game_data['OPP']}, {f'seasons.{season}.STANDINGS.WinPCT': 1, '_id': 0})
+                    opp = teams_collection.find_one({'TEAM_ID': game_data['OPP']}, {f'SEASONS.{season}.STANDINGS.WinPCT': 1, '_id': 0})
                     try:
-                        opp_seasons = opp.get('seasons', {})
+                        opp_seasons = opp.get('SEASONS', {})
                         opp_season = opp_seasons.get(season, {})
                         opp_standings = opp_season.get('STANDINGS', {})
                         opp_win_pct += opp_standings.get('WinPCT', 0)
                     except Exception:
                         continue
                 else:
-                    opp = teams_collection.find_one({'TEAM_ID': game_data['OPP']}, {f'seasons.{season}.STANDINGS.WinPCT': 1, '_id': 0})
+                    opp = teams_collection.find_one({'TEAM_ID': game_data['OPP']}, {f'SEASONS.{season}.STANDINGS.WinPCT': 1, '_id': 0})
                     try:
-                        opp_seasons = opp.get('seasons', {})
+                        opp_seasons = opp.get('SEASONS', {})
                         opp_season = opp_seasons.get(season, {})
                         opp_standings = opp_season.get('STANDINGS', {})
                         rem_opp_win_pct += opp_standings.get('WinPCT', 0)
@@ -451,10 +451,10 @@ def strength_of_schedule_rank():
             {
                 "$setWindowFields": {
                     "sortBy": {
-                        f"seasons.{CURR_SEASON}.STANDINGS.{stat}": 1
+                        f"SEASONS.{CURR_SEASON}.STANDINGS.{stat}": 1
                     },
                     "output": {
-                        f"seasons.{CURR_SEASON}.STANDINGS.{stat}_RANK": {
+                        f"SEASONS.{CURR_SEASON}.STANDINGS.{stat}_RANK": {
                             "$documentNumber": {}
                         }
                     }
@@ -467,12 +467,12 @@ def strength_of_schedule_rank():
 
         # Update each document with the new rank field
         for result in results:
-            res = result['seasons'][CURR_SEASON]['STANDINGS'][f'{stat}_RANK']
+            res = result['SEASONS'][CURR_SEASON]['STANDINGS'][f'{stat}_RANK']
 
             try:
                 teams_collection.update_one(
                     {"_id": result["_id"]},
-                    {"$set": {f"seasons.{CURR_SEASON}.STANDINGS.{stat}_RANK": res}}
+                    {"$set": {f"SEASONS.{CURR_SEASON}.STANDINGS.{stat}_RANK": res}}
                 )
             except Exception as e:
                 logging.error(f"Failed to add SOS_RANK to database: {e}")
@@ -517,7 +517,7 @@ def fetch_all_standings():
                 # Add STANDINGS data for each team
                 teams_collection.update_one(
                     {"TEAM_ID": team["TeamID"]},
-                    {"$set": {f"seasons.{season}.STANDINGS": team}},
+                    {"$set": {f"SEASONS.{season}.STANDINGS": team}},
                     upsert=True
                 )
                 logging.info(f"Fetched {i + 1} of {len(standings)}\n")

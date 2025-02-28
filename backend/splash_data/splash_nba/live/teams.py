@@ -1,17 +1,15 @@
 import logging
 import time
 from datetime import datetime
-from splash_nba.lib.misc.update_transactions import update_transactions
 from splash_nba.lib.teams.stats.custom_team_stats import three_and_ft_rate
-from splash_nba.lib.teams.stats.custom_team_stats_rank import current_season_custom_team_stats_rank
-from splash_nba.lib.teams.stats.per100 import current_season_per_100_possessions
+from splash_nba.lib.teams.stats.custom_team_stats_rank import custom_team_stats_rank
+from splash_nba.lib.teams.stats.per100 import calculate_per_100_poss
 from splash_nba.lib.teams.team_cap_sheet import update_team_contract_data
 from splash_nba.lib.teams.team_history import update_team_history
 from splash_nba.lib.teams.update_team_games import update_team_games
 from splash_nba.lib.teams.standings import update_current_standings
 from splash_nba.lib.teams.update_news_and_transactions import fetch_team_transactions, fetch_team_news
 from splash_nba.lib.teams.team_seasons import update_current_season
-from splash_nba.lib.teams.stats.team_hustle_stats_rank import rank_hustle_stats_current_season
 from splash_nba.lib.teams.team_rosters import update_current_roster
 from splash_nba.lib.teams.update_last_lineup import get_last_game, get_last_lineup
 from splash_nba.imports import get_mongo_collection, CURR_SEASON, CURR_SEASON_TYPE
@@ -36,7 +34,7 @@ async def update_teams(team_ids):
 
     try:
         for team_id in team_ids:
-            with teams_collection.find({"TEAM_ID": team_id}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0}) as cursor:
+            with teams_collection.find({"TEAM_ID": team_id}, {"TEAM_ID": 1, f"SEASONS": 1, "_id": 0}) as cursor:
                 documents = list(cursor)
                 if not documents:
                     return
@@ -59,20 +57,20 @@ async def update_teams(team_ids):
                     update_current_season(team_id=team)
                     # Filter seasons to only include the current season key
                     filtered_doc = doc.copy()
-                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if key == CURR_SEASON}
-                    current_season_per_100_possessions(team_doc=filtered_doc, playoffs=CURR_SEASON_TYPE == 'PLAYOFFS')
+                    filtered_doc['SEASONS'] = {key: doc['SEASONS'][key] for key in doc['SEASONS'] if key == CURR_SEASON}
+                    calculate_per_100_poss(team_doc=filtered_doc, seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
                     time.sleep(15)
 
                     # Current Roster/Rotation & Coaches (~400-500 API calls)
                     logging.info("Roster & Coaches...")
-                    season_not_started = True if doc['seasons'][CURR_SEASON]['GP'] == 0 else False
+                    season_not_started = True if doc['SEASONS'][CURR_SEASON]['GP'] == 0 else False
                     update_current_roster(team_id=team, season_not_started=season_not_started)
                     time.sleep(30)
 
                     # Last Starting Lineup (0 API Calls)
                     logging.info("Last Starting Lineup...")
                     # Get most recent game by date
-                    game_id, game_date = get_last_game(doc['seasons'])
+                    game_id, game_date = get_last_game(doc['SEASONS'])
                     # Get starting lineup for most recent game
                     last_starting_lineup = get_last_lineup(team, game_id, game_date)
                     # Update document
@@ -86,9 +84,8 @@ async def update_teams(team_ids):
                     time.sleep(15)
 
         # After looping through all teams, calculate ranks/standings
-        rank_hustle_stats_current_season()
-        three_and_ft_rate(seasons=[CURR_SEASON], season_type=CURR_SEASON_TYPE)
-        current_season_custom_team_stats_rank()
+        three_and_ft_rate(seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
+        custom_team_stats_rank(seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
 
         # Standings (min. 30 API calls [more if tiebreakers])
         logging.info("Standings (min. 30 API calls)...")
@@ -181,8 +178,7 @@ async def teams_daily_update():
                     filtered_doc = doc.copy()
                     filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
                                                key == CURR_SEASON}
-                    current_season_per_100_possessions(team_doc=filtered_doc,
-                                                       playoffs=CURR_SEASON_TYPE == 'PLAYOFFS')
+                    calculate_per_100_poss(team_doc=filtered_doc, seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
                     time.sleep(15)
                 except Exception as e:
                     logging.error(f"(Teams Daily) Error updating team {team} stats: {e}", exc_info=True)
@@ -217,21 +213,15 @@ async def teams_daily_update():
                 # Pause 15 seconds between teams
                 time.sleep(15)
 
-    # Hustle Stat Rank
-    try:
-        rank_hustle_stats_current_season()
-    except Exception as e:
-        logging.error(f"(Teams Daily) Error updating hustle stat ranks: {e}", exc_info=True)
-
     # 3PAr + FTr
     try:
-        three_and_ft_rate(seasons=[CURR_SEASON], season_type=CURR_SEASON_TYPE)
+        three_and_ft_rate(seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
     except Exception as e:
         logging.error(f"(Teams Daily) Error updating 3PAr + FTr: {e}", exc_info=True)
 
     # Custom Stat Ranks
     try:
-        current_season_custom_team_stats_rank()
+        custom_team_stats_rank(seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
     except Exception as e:
         logging.error(f"(Teams Daily) Error updating custom team stat ranks: {e}", exc_info=True)
 

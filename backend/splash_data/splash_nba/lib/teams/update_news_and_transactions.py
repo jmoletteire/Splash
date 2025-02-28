@@ -26,8 +26,8 @@ def fetch_team_news():
     try:
         teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
-        logging.error(f"(Team News) Failed to connect to MongoDB: {e}")
-        exit(1)
+        logging.error(f"(Team News) Failed to connect to MongoDB: {e}", exc_info=True)
+        return
 
     # Key = NatStat, value = MongoDB
     team_codes = {
@@ -117,7 +117,7 @@ def fetch_team_news():
                 logging.info(f"(Team News) Updated news for {team_code} with {len(latest_news)} new items")
 
         except Exception as e:
-            logging.error(f"(Team News) Failed to retrieve news for {team_code}: {e}\n")
+            logging.error(f"(Team News) Failed to retrieve news for {team_code}: {e}\n", exc_info=True)
 
 
 def fetch_team_transactions():
@@ -125,7 +125,7 @@ def fetch_team_transactions():
     try:
         teams_collection = get_mongo_collection('nba_teams')
     except Exception as e:
-        logging.error(f"(Team Transactions) Failed to connect to MongoDB: {e}")
+        logging.error(f"(Team Transactions) Failed to connect to MongoDB: {e}", exc_info=True)
         exit(1)
 
     # Key = NatStat, value = MongoDB
@@ -177,7 +177,7 @@ def fetch_team_transactions():
             )
             logging.info(f"(Team Transactions) Fetched transactions for {i + 1} of 30\n")
         except Exception as e:
-            logging.error(f"(Team Transactions) Failed to retrieve transactions for {team_code}: {e}\n")
+            logging.error(f"(Team Transactions) Failed to retrieve transactions for {team_code}: {e}\n", exc_info=True)
 
 
 if __name__ == "__main__":
