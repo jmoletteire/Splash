@@ -42,40 +42,6 @@ def get_standings(season_data):
     }
 
 
-def get_stats(season_data):
-    rg_basic = season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {})
-    rg_adv = season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {})
-    po_basic = season_data.get("STATS", {}).get("PLAYOFFS", {}).get("BASIC", {})
-    po_adv = season_data.get("STATS", {}).get("PLAYOFFS", {}).get("ADV", {})
-
-    return {
-        # Stats
-        "NRTG": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("NET_RATING", "-")),
-        "ORTG": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OFF_RATING", "-")),
-        "DRTG": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("DEF_RATING", "-")),
-        "Pace": "-" if (pace := season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("PACE")) is None else f'{pace:.1f}',
-        "FG%": "-" if (fg_pct := season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("FG_PCT")) is None else f'{fg_pct * 100:.1f}%',
-        "3P%": "-" if (fg3_pct := season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("FG3_PCT")) is None else f'{fg3_pct * 100:.1f}%',
-        "FT%": "-" if (ft_pct := season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("FT_PCT")) is None else f'{ft_pct * 100:.1f}%',
-        "eFG%": "-" if (efg_pct := season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("EFG_PCT")) is None else f'{efg_pct * 100:.1f}%',
-        "TS%": "-" if (ts_pct := season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("TS_PCT")) is None else f'{ts_pct * 100:.1f}%',
-        "Off Reb %": "-" if (oreb_pct := season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OREB_PCT")) is None else f'{oreb_pct * 100:.1f}%',
-        "Turnover %": "-" if (tov_pct := season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("TM_TOV_PCT")) is None else f'{tov_pct * 100:.1f}%',
-        # Stat Ranks
-        "NRTG Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("NET_RATING_RANK", "-")),
-        "ORTG Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OFF_RATING_RANK", "-")),
-        "DRTG Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("DEF_RATING_RANK", "-")),
-        "Pace Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("PACE_RANK", "-")),
-        "FG% Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("FG_PCT_RANK", "-")),
-        "3P% Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("FG3_PCT_RANK", "-")),
-        "FT% Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("BASIC", {}).get("FT_PCT_RANK", "-")),
-        "eFG% Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("EFG_PCT_RANK", "-")),
-        "TS% Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("TS_PCT_RANK", "-")),
-        "Off Reb % Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("OREB_PCT_RANK", "-")),
-        "Turnover % Rk": str(season_data.get("STATS", {}).get("REGULAR SEASON", {}).get("ADV", {}).get("TM_TOV_PCT_RANK", "-"))
-    }
-
-
 def get_seasons(team):
     return sorted(
         [
@@ -88,10 +54,10 @@ def get_seasons(team):
                 "wins": season_data.get("WINS", 0),
                 "losses": season_data.get("LOSSES", 0),
                 "ties": season_data.get("TIES", 0),
-                "stats": get_stats(season_data),
+                "stats": season_data.get("STATS", {}),
                 "standings": get_standings(season_data=season_data)
             }
-            for season_key, season_data in team["seasons"].items()
+            for season_key, season_data in team["SEASONS"].items()
         ],
         key=lambda x: x["year"],  # Sorting key is the year
         reverse=True

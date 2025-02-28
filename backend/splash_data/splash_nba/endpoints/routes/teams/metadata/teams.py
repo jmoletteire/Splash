@@ -1,7 +1,7 @@
 import sys
 import logging
-from datetime import datetime
 from flask import Blueprint, jsonify, request
+from .services.team_service import process_team_data
 
 env_path = "/home/ubuntu"
 if env_path not in sys.path:
@@ -30,7 +30,7 @@ def get_teams_metadata():
                 "ABBREVIATION": 1,
                 "NICKNAME": 1,
                 "CITY": 1,
-                "seasons": 1
+                "SEASONS": 1
             },
         )
 

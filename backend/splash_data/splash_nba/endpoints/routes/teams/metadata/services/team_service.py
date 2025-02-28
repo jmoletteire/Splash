@@ -6,7 +6,7 @@ def process_team_data(teams):
     """Processes games and returns summarized data."""
     try:
         # Transform the keys
-        teams = [
+        teams_final = [
             {
                 "sportId": team["SPORT_ID"],
                 "teamId": str(team["TEAM_ID"]),
@@ -17,6 +17,8 @@ def process_team_data(teams):
             }
             for team in teams
         ]
+
+        return teams_final
 
     except Exception as e:
         logging.error(f"(process_scoreboard) Error processing scoreboard: {e}")
