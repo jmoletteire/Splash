@@ -1,5 +1,5 @@
 import logging
-from .utils.team_helpers import get_standings, get_seasons
+from .utils.team_helpers import get_seasons
 
 
 def process_team_data(teams):

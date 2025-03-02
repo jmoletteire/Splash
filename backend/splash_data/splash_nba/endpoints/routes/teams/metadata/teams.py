@@ -19,20 +19,27 @@ teams_bp = Blueprint('teams', __name__)
 @teams_bp.route('/teams/metadata', methods=['GET'])
 def get_teams_metadata():
     try:
+        query_params = request.args.to_dict()
+        seasons = query_params.get('seasons')
+
         # Query the database
         teams_collection = get_mongo_collection('nba_teams')
-        teams = teams_collection.find(
-            {"TEAM_ID": {"$exists": True, "$ne": 0}},
-            {
-                "_id": 0,
-                "SPORT_ID": 1,
-                "TEAM_ID": 1,
-                "ABBREVIATION": 1,
-                "NICKNAME": 1,
-                "CITY": 1,
-                "SEASONS": 1
-            },
-        )
+        mongo_query = {"TEAM_ID": {"$exists": True, "$ne": 0}}
+        projection = {
+            "_id": 0,
+            "SPORT_ID": 1,
+            "TEAM_ID": 1,
+            "ABBREVIATION": 1,
+            "NICKNAME": 1,
+            "CITY": 1,
+        }
+
+        if seasons == "Current":
+            projection[f"SEASONS.{CURR_SEASON}"] = 1
+        else:
+            projection["SEASONS"] = 1
+
+        teams = teams_collection.find(mongo_query, projection)
 
         if teams:
             teams_final = process_team_data(teams)
