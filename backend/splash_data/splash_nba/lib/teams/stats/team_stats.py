@@ -120,7 +120,7 @@ def fetch_team_stats(seasons: list = None, season_types: list = None, use_proxy:
                             team_id = team_stats['TEAM_ID']
                             if team_id not in teams:
                                 teams[team_id] = {}
-                            teams[team_id]['LEAGUE_TEAMS'] = {"Totals": {"Value": len(basic_stats), "Rank": "0", "Pct": "0.000"}}
+                            teams[team_id]['LEAGUE_TEAMS'] = {"Totals": {"Value": f"{len(basic_stats)}", "Rank": "0", "Pct": "0.000"}}
                             format_stats(teams[team_id], mode, team_stats, basic_key_map)
 
                 except Exception as e:
