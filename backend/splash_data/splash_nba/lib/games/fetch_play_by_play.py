@@ -9,12 +9,18 @@ from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SE
 
 
 def convert_playtime(duration_str):
-    match = re.match(r"PT(\d+)M([\d.]+)S", duration_str)
-    if match:
-        minutes = int(match.group(1))
-        seconds = round(float(match.group(2)))  # Handle potential float values
-        return f"{minutes}:{seconds:02d}"
-    return None  # Return None if the format is incorrect
+    if duration_str is None:
+        return ""
+    try:
+        match = re.match(r"PT(\d+)M([\d.]+)S", duration_str)
+        if match:
+            minutes = int(match.group(1))
+            seconds = round(float(match.group(2)))  # Handle potential float values
+            return f"{minutes}:{seconds:02d}"
+        else:
+            return ""
+    except Exception:
+        return ""
 
 
 def update_play_by_play():
@@ -64,8 +70,8 @@ def fetch_play_by_play(game_id):
     pbp = []
 
     for i, action in enumerate(actions):
-        logging.info(f'{i + 1} of {len(actions)}')
-        # play_info = {key: action.get(key, 0) for key in keys}
+        # logging.info(f'{i + 1} of {len(actions)}')
+
         play_info = {
             'action': str(action.get('actionNumber', '0')),
             'clock': convert_playtime(action.get('clock', '')),
@@ -82,11 +88,11 @@ def fetch_play_by_play(game_id):
             'yLegacy': str(action.get('yLegacy', '0')),
         }
 
-        try:
-            play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=None, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
-            time.sleep(random.uniform(0.5, 1.0))
-        except Exception:
-            play_info['videoId'] = None
+        # try:
+        #     play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=None, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
+        #     time.sleep(random.uniform(0.5, 1.0))
+        # except Exception:
+        #     play_info['videoId'] = None
 
         pbp.append(play_info)
 
@@ -99,9 +105,14 @@ def reformat_data(game):
         return None
 
     pbp_final = []
+
     for action in game_pbp:
+        actionNum = action.get('actionNumber', '0')
+        if actionNum == '0':
+            actionNum = action.get('action', '0')
+
         pbp_final.append({
-            'action': str(action.get('actionNumber', '0')),
+            'action': str(actionNum),
             'clock': convert_playtime(action.get('clock', '')),
             'period': str(action.get('period', '0')),
             'teamId': str(action.get('teamId', '0')),
@@ -157,12 +168,12 @@ if __name__ == "__main__":
                     for game_id, game_data in document['GAMES'].items():
                         # Fetch PBP for the game
                         try:
-                            # pbp = fetch_play_by_play(document["GAME_DATE"], game_id)
-                            pbp = reformat_data(game_data)
+                            pbp = fetch_play_by_play(game_id)
+                            # pbp = reformat_data(game_data)
                             game_counter += 1
                         except Exception as e:
                             pbp = None
-                            logging.error(f"Error fetching play-by-play for game_id {game_id}: {e}")
+                            logging.error(f"Error fetching play-by-play for game_id {game_id}: {e}", exc_info=True)
                             continue
 
                         # Update the game data with the fetched stats
