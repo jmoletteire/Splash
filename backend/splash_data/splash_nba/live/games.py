@@ -361,6 +361,11 @@ def final_game(game_id, date, game_line_score):
     adv = format_adv_stats(summary=summary, adv_stats=fetch_box_score_adv(game_id))
     highlights = 'No highlights found'  # search_youtube_highlights(YOUTUBE_API_KEY, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
 
+    try:
+        adv_null_check = adv['home']['players'][0]['MIN'] is None
+    except Exception:
+        adv_null_check = False
+
     home_line_index = 0 if game_line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['HOME_TEAM_ID'] else 1
     away_line_index = 0 if game_line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['VISITOR_TEAM_ID'] else 1
 
@@ -375,7 +380,7 @@ def final_game(game_id, date, game_line_score):
                     game_line_score[away_line_index]['TEAM_WINS_LOSSES'],
                 f'GAMES.{game_id}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
                 f'GAMES.{game_id}.ADV': adv,
-                f'GAMES.{game_id}.FINAL': True if adv['home']['players'] is not [] else False,
+                f'GAMES.{game_id}.FINAL': adv_null_check,
                 f'GAMES.{game_id}.UPDATED': False
             }
             }
@@ -425,23 +430,23 @@ def games_prev_day(offset=1):
 
         # If game upcoming or in-progress, check for updates
         if is_upcoming:
-            upcoming_game(game["gameId"], yesterday)
+            upcoming_game(game["GAME_ID"], yesterday)
 
         # IN-PROGRESS
         elif in_progress:
-            in_progress_game(game["gameId"], yesterday, line_score)
+            in_progress_game(game["GAME_ID"], yesterday, line_score)
 
         # If game is final, update final box score
         elif is_final:
             # Check if the final update has already been applied
-            game_doc = games_collection.find_one({'GAME_DATE': yesterday}, {f'GAMES.{game["gameId"]}.FINAL': 1})
-            if game_doc and game_doc.get('GAMES', {}).get(game["gameId"], {}).get('FINAL', False):
+            game_doc = games_collection.find_one({'GAME_DATE': yesterday}, {f'GAMES.{game["GAME_ID"]}.FINAL': 1})
+            if game_doc and game_doc.get('GAMES', {}).get(game["GAME_ID"], {}).get('FINAL', False):
                 logging.info(
-                    f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
+                    f'(Games Live) Game {game["GAME_ID"]} already finalized, skipping update. [{datetime.now()}]')
                 continue  # Skip this game as it's already been finalized
             else:
-                in_progress_game(game["gameId"], yesterday, line_score)
-                final_game(game["gameId"], yesterday, line_score)
+                in_progress_game(game["GAME_ID"], yesterday, line_score)
+                final_game(game["GAME_ID"], yesterday, line_score)
 
 
 async def games_live_update():
@@ -550,13 +555,13 @@ async def games_live_update():
         # If game is final, update final box score
         elif is_final:
             # Check if the final update has already been applied
-            game_doc = games_collection.find_one({'GAME_DATE': game_et_date}, {f'GAMES.{game["gameId"]}.FINAL': 1})
-            if game_doc and game_doc.get('GAMES', {}).get(game["gameId"], {}).get('FINAL', False):
-                logging.info(
-                    f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
-                continue  # Skip this game as it's already been finalized
-            else:
-                in_progress_game(game["gameId"], game_et_date, line_score)
+            # game_doc = games_collection.find_one({'GAME_DATE': game_et_date}, {f'GAMES.{game["gameId"]}.FINAL': 1})
+            # if game_doc and game_doc.get('GAMES', {}).get(game["gameId"], {}).get('FINAL', False):
+            #     logging.info(
+            #         f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
+            #     continue  # Skip this game as it's already been finalized
+            # else:
+            #     in_progress_game(game["gameId"], game_et_date, line_score)
                 final_game(game["gameId"], game_et_date, line_score)
 
 

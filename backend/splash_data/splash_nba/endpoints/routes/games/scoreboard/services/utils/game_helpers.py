@@ -2,6 +2,7 @@ import logging
 
 from .matchup import matchup_details
 from .stats import game_stats
+from .playbyplay import play_by_play
 
 
 def get_game_status(game):
@@ -105,17 +106,18 @@ def summarize_game(id, game):
 def specific_game(game):
     summary = game.get("SUMMARY", {})
     boxscore = game.get("BOXSCORE", {})
+    pbp = game.get("PBP", [])
     adv = game.get("ADV", {})
 
     if summary is None:
-        return {"matchup": {f"Away @ Home"}, "stats": {}}
+        return {"matchup": {f"Away @ Home"}, "stats": {}, "pbp": []}
 
     if boxscore is None:
         game_summary = summary["GameSummary"][0]
         line_score = summary["LineScore"]
         awayName = line_score[1]["NICKNAME"] if line_score[0]["TEAM_ID"] == game_summary["HOME_TEAM_ID"] else line_score[0]["NICKNAME"]
         homeName = line_score[0]["NICKNAME"] if line_score[0]["TEAM_ID"] == game_summary["HOME_TEAM_ID"] else line_score[1]["NICKNAME"]
-        return {"matchup": {f"{awayName} @ {homeName}"}, "stats": {}}
+        return {"matchup": {f"{awayName} @ {homeName}"}, "stats": {}, "pbp": []}
 
     status = game.get("SUMMARY", {}).get("GameSummary", {})[0].get("GAME_STATUS_ID", 0)
     matchup = {}
@@ -133,5 +135,6 @@ def specific_game(game):
 
     return {
         "matchup": matchup,
-        "stats": stats
+        "stats": stats,
+        "pbp": pbp
     }

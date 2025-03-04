@@ -1,3 +1,4 @@
+import re
 import time
 import random
 import logging
@@ -5,6 +6,15 @@ from datetime import datetime, timedelta
 from nba_api.live.nba.endpoints import playbyplay
 from nba_api.stats.endpoints import videoeventsasset
 from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
+
+
+def convert_playtime(duration_str):
+    match = re.match(r"PT(\d+)M([\d.]+)S", duration_str)
+    if match:
+        minutes = int(match.group(1))
+        seconds = round(float(match.group(2)))  # Handle potential float values
+        return f"{minutes}:{seconds:02d}"
+    return None  # Return None if the format is incorrect
 
 
 def update_play_by_play():
@@ -50,32 +60,30 @@ def update_play_by_play():
 
 # Function to fetch box score stats for a game
 def fetch_play_by_play(game_id):
-    keys = [
-        'actionNumber',
-        'clock',
-        'period',
-        'teamId',
-        'personId',
-        'personIdsFilter',
-        'playerNameI',
-        'possession',
-        'scoreHome',
-        'scoreAway',
-        'isFieldGoal',
-        'description',
-        'xLegacy',
-        'yLegacy'
-    ]
-
-    actions = playbyplay.PlayByPlay(proxy=PROXY, game_id=game_id).get_dict()['game']['actions']
+    actions = playbyplay.PlayByPlay(proxy=None, game_id=game_id).get_dict()['game']['actions']
     pbp = []
 
     for i, action in enumerate(actions):
         logging.info(f'{i + 1} of {len(actions)}')
-        play_info = {key: action.get(key, 0) for key in keys}
+        # play_info = {key: action.get(key, 0) for key in keys}
+        play_info = {
+            'action': str(action.get('actionNumber', '0')),
+            'clock': convert_playtime(action.get('clock', '')),
+            'period': str(action.get('period', '0')),
+            'teamId': str(action.get('teamId', '0')),
+            'personId': str(action.get('personId', '0')),
+            'playerNameI': str(action.get('playerNameI', '')),
+            'possession': str(action.get('possession', '0')),
+            'scoreHome': str(action.get('scoreHome', '')),
+            'scoreAway': str(action.get('scoreAway', '')),
+            'isFieldGoal': str(action.get('isFieldGoal', '0')),
+            'description': str(action.get('description', '')),
+            'xLegacy': str(action.get('xLegacy', '0')),
+            'yLegacy': str(action.get('yLegacy', '0')),
+        }
 
         try:
-            play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=PROXY, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
+            play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=None, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
             time.sleep(random.uniform(0.5, 1.0))
         except Exception:
             play_info['videoId'] = None
@@ -83,6 +91,32 @@ def fetch_play_by_play(game_id):
         pbp.append(play_info)
 
     return pbp
+
+
+def reformat_data(game):
+    game_pbp = game.get('PBP', None)
+    if game_pbp is None:
+        return None
+
+    pbp_final = []
+    for action in game_pbp:
+        pbp_final.append({
+            'action': str(action.get('actionNumber', '0')),
+            'clock': convert_playtime(action.get('clock', '')),
+            'period': str(action.get('period', '0')),
+            'teamId': str(action.get('teamId', '0')),
+            'personId': str(action.get('personId', '0')),
+            'playerNameI': str(action.get('playerNameI', '')),
+            'possession': str(action.get('possession', '0')),
+            'scoreHome': str(action.get('scoreHome', '')),
+            'scoreAway': str(action.get('scoreAway', '')),
+            'isFieldGoal': str(action.get('isFieldGoal', '0')),
+            'description': str(action.get('description', '')),
+            'xLegacy': str(action.get('xLegacy', '0')),
+            'yLegacy': str(action.get('yLegacy', '0')),
+        })
+
+    return pbp_final
 
 
 if __name__ == "__main__":
@@ -96,17 +130,19 @@ if __name__ == "__main__":
 
         # Retrieve all documents from the collection
         # documents = games_collection.find({}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1})
+        query = {"SEASON_YEAR": "2024"}
+        proj = {"_id": 1, "GAMES": 1, "GAME_DATE": 1}
 
         # Set batch size to process documents
+
         batch_size = 100
-        total_documents = games_collection.count_documents({"GAME_DATE": "2024-11-11"})
+        total_documents = games_collection.count_documents(query)
         game_counter = 0
         processed_count = 0
         i = 0
 
         while processed_count < total_documents:
-            with games_collection.find({"GAME_DATE": "2024-11-11"}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}).skip(processed_count).limit(
-                    batch_size).batch_size(batch_size) as cursor:
+            with games_collection.find(query, proj).skip(processed_count).limit(batch_size).batch_size(batch_size) as cursor:
                 documents = list(cursor)
                 if not documents:
                     break
@@ -114,12 +150,15 @@ if __name__ == "__main__":
 
                 for document in documents:
                     i += 1
+                    if document["GAME_DATE"] > "2025-03-03":
+                        continue
                     logging.info(f'\nProcessing {i} of {total_documents} ({document["GAME_DATE"]})')
 
                     for game_id, game_data in document['GAMES'].items():
                         # Fetch PBP for the game
                         try:
-                            pbp = fetch_play_by_play(game_id)
+                            # pbp = fetch_play_by_play(document["GAME_DATE"], game_id)
+                            pbp = reformat_data(game_data)
                             game_counter += 1
                         except Exception as e:
                             pbp = None
