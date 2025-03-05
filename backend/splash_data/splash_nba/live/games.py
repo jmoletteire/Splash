@@ -48,18 +48,24 @@ teams = {
 
 
 def format_duration(input_str):
-    # Regular expression to match 'PT' followed by minutes and seconds
-    match = re.match(r'PT(\d+)M(\d+)\.(\d+)S', input_str)
+    if input_str is None:
+        return ""
 
-    if match:
-        minutes = int(match.group(1))  # Convert minutes to int
-        seconds = int(match.group(2))  # Convert seconds to int
-        tenths = match.group(3)[0]  # Take only the first digit of the fraction for tenths
+    try:
+        # Regular expression to match 'PT' followed by minutes and seconds
+        match = re.match(r'PT(\d+)M(\d+)\.(\d+)S', input_str)
 
-        if minutes == 0:  # Less than a minute left, show seconds and tenths
-            return f":{seconds}.{tenths}"
-        else:  # Regular minutes and seconds format
-            return f"{minutes}:{seconds:02d}"  # Format seconds with leading zero if necessary
+        if match:
+            minutes = int(match.group(1))  # Convert minutes to int
+            seconds = int(match.group(2))  # Convert seconds to int
+            tenths = match.group(3)[0]  # Take only the first digit of the fraction for tenths
+
+            if minutes == 0:  # Less than a minute left, show seconds and tenths
+                return f":{seconds}.{tenths}"
+            else:  # Regular minutes and seconds format
+                return f"{minutes}:{seconds:02d}"  # Format seconds with leading zero if necessary
+    except Exception:
+        return ""
 
     return input_str  # Return original string if no match is found
 
@@ -190,26 +196,28 @@ def in_progress_game(game_id, date, game_line_score):
     summary = fetch_box_score_summary(game_id)
     box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
 
-    keys = [
-        'actionNumber',
-        'clock',
-        'period',
-        'teamId',
-        'personId',
-        'personIdsFilter',
-        'playerNameI',
-        'possession',
-        'scoreHome',
-        'scoreAway',
-        'isFieldGoal',
-        'description',
-        'xLegacy',
-        'yLegacy'
-    ]
-
     try:
         actions = playbyplay.PlayByPlay(proxy=PROXY, game_id=game_id).get_dict()['game']['actions']
-        pbp = [{key: action.get(key, 0) for key in keys} for action in actions]
+        pbp = []
+
+        for i, action in enumerate(actions):
+            play_info = {
+                'action': str(action.get('actionNumber', '0')),
+                'clock': format_duration(action.get('clock', '')),
+                'period': str(action.get('period', '0')),
+                'teamId': str(action.get('teamId', '0')),
+                'personId': str(action.get('personId', '0')),
+                'playerNameI': str(action.get('playerNameI', '')),
+                'possession': str(action.get('possession', '0')),
+                'scoreHome': str(action.get('scoreHome', '')),
+                'scoreAway': str(action.get('scoreAway', '')),
+                'isFieldGoal': str(action.get('isFieldGoal', '0')),
+                'description': str(action.get('description', '')),
+                'xLegacy': str(action.get('xLegacy', '0')),
+                'yLegacy': str(action.get('yLegacy', '0')),
+            }
+
+            pbp.append(play_info)
     except Exception:
         pbp = []
 

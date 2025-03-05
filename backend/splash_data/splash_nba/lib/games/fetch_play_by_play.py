@@ -70,8 +70,6 @@ def fetch_play_by_play(game_id):
     pbp = []
 
     for i, action in enumerate(actions):
-        # logging.info(f'{i + 1} of {len(actions)}')
-
         play_info = {
             'action': str(action.get('actionNumber', '0')),
             'clock': convert_playtime(action.get('clock', '')),
@@ -97,37 +95,6 @@ def fetch_play_by_play(game_id):
         pbp.append(play_info)
 
     return pbp
-
-
-def reformat_data(game):
-    game_pbp = game.get('PBP', None)
-    if game_pbp is None:
-        return None
-
-    pbp_final = []
-
-    for action in game_pbp:
-        actionNum = action.get('actionNumber', '0')
-        if actionNum == '0':
-            actionNum = action.get('action', '0')
-
-        pbp_final.append({
-            'action': str(actionNum),
-            'clock': convert_playtime(action.get('clock', '')),
-            'period': str(action.get('period', '0')),
-            'teamId': str(action.get('teamId', '0')),
-            'personId': str(action.get('personId', '0')),
-            'playerNameI': str(action.get('playerNameI', '')),
-            'possession': str(action.get('possession', '0')),
-            'scoreHome': str(action.get('scoreHome', '')),
-            'scoreAway': str(action.get('scoreAway', '')),
-            'isFieldGoal': str(action.get('isFieldGoal', '0')),
-            'description': str(action.get('description', '')),
-            'xLegacy': str(action.get('xLegacy', '0')),
-            'yLegacy': str(action.get('yLegacy', '0')),
-        })
-
-    return pbp_final
 
 
 if __name__ == "__main__":
@@ -169,7 +136,6 @@ if __name__ == "__main__":
                         # Fetch PBP for the game
                         try:
                             pbp = fetch_play_by_play(game_id)
-                            # pbp = reformat_data(game_data)
                             game_counter += 1
                         except Exception as e:
                             pbp = None
