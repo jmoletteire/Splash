@@ -937,21 +937,31 @@ def team_sse():
         yield "event: ping\ndata: {\"message\": \"Connection Established\"}\n\n".encode('utf-8')
         sys.stdout.flush()  # Ensure the buffer is flushed
 
+        id_map = {
+            "nba_teams": "TEAM_ID",
+            "nba_players": "PERSON_ID"
+        }
+
         try:
-            with teams_collection.watch(full_document="updateLookup") as stream:
+            with db.watch(full_document="updateLookup") as stream:
                 while stream.alive:
                     try:
                         # Fetch the next change
                         change = stream.try_next()
                         if change is not None:
                             # Prepare and send the event data
+                            collection_name = change.get("ns", {}).get("coll", "")  # Identify the collection
+                            doc_id = full_document.get(id_map[collection_name]) if collection_name in id_map else None
                             full_document = change.get("fullDocument", {})
                             updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
+
                             event_data = {
                                 "eventId": str(change["_id"]),
-                                "teamId": full_document.get("TEAM_ID"),
+                                "collection": collection_name,
+                                "documentId": doc_id,
                                 "updatedFields": updated_fields
                             }
+
                             logging.info(f"Streaming SSE Event: {event_data}")
                             yield f"data: {json.dumps(event_data)}\n\n".encode('utf-8')
                             sys.stdout.flush()  # Ensure the buffer is flushed
