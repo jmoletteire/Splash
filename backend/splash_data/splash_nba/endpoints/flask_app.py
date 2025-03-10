@@ -938,7 +938,7 @@ def team_sse():
         sys.stdout.flush()  # Ensure the buffer is flushed
 
         id_map = {
-            "nba_games": {"type": "games", "id": "GAME_ID"},
+            "nba_games_unwrapped": {"type": "games", "id": "gameId"},
             "nba_teams": {"type": "teams", "id": "TEAM_ID"},
             # "nba_players": {"type": "players", "id": "PERSON_ID"}
         }
