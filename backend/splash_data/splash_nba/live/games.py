@@ -319,7 +319,12 @@ def upcoming_game(game_id):
     summary = fetch_box_score_summary(game_id)
 
     try:
-        broadcast = summary["GameSummary"][0]["NATL_TV_BROADCASTER_ABBREVIATION"]
+        game_summary = summary["GameSummary"][0]
+    except Exception:
+        return
+
+    try:
+        broadcast = game_summary["NATL_TV_BROADCASTER_ABBREVIATION"]
     except Exception:
         broadcast = None
 
@@ -328,11 +333,11 @@ def upcoming_game(game_id):
         games_collection.update_one(
             {'gameId': game_id},
             {'$set': {
-                'gameId': str(summary['GameSummary'][0]['GAME_ID']),
-                'date': summary['GameSummary'][0]['GAME_DATE_EST'][:10],
-                'homeTeamId': str(summary['GameSummary'][0]['HOME_TEAM_ID']),
-                'awayTeamId': str(summary['GameSummary'][0]['VISITOR_TEAM_ID']),
-                'season': summary['GameSummary'][0]['SEASON'],
+                'gameId': str(game_summary['GAME_ID']),
+                'date': game_summary['GAME_DATE_EST'][:10],
+                'homeTeamId': str(game_summary['HOME_TEAM_ID']),
+                'awayTeamId': str(game_summary['VISITOR_TEAM_ID']),
+                'season': game_summary['SEASON'],
                 'broadcast': broadcast,
                 'status': get_game_status(summary),
                 'gameClock': get_game_clock(summary, box_score),
@@ -346,15 +351,15 @@ def upcoming_game(game_id):
         games_collection.update_one(
             {'gameId': game_id},
             {'$set': {
-                'gameId': str(summary['GameSummary'][0]['GAME_ID']),
-                'date': summary['GameSummary'][0]['GAME_DATE_EST'][:10],
-                'homeTeamId': str(summary['GameSummary'][0]['HOME_TEAM_ID']),
-                'awayTeamId': str(summary['GameSummary'][0]['VISITOR_TEAM_ID']),
-                'season': summary['GameSummary'][0]['SEASON'],
+                'gameId': str(game_summary['GAME_ID']),
+                'date': game_summary['GAME_DATE_EST'][:10],
+                'homeTeamId': str(game_summary['HOME_TEAM_ID']),
+                'awayTeamId': str(game_summary['VISITOR_TEAM_ID']),
+                'season': game_summary['SEASON'],
                 'broadcast': broadcast,
                 'status': 2,
-                'gameClock': summary['GameSummary'][0]['LIVE_PC_TIME'],
-                'matchup': {},
+                'gameClock': game_summary['LIVE_PC_TIME'],
+                'matchup': matchup_details(summary, {}),
                 'pbp': [],
                 'stats': {}
             }}
