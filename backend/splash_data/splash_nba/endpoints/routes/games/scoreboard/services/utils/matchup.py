@@ -43,9 +43,11 @@ def lineup_data(player):
 def matchup_details(summary, boxscore):
     matchup = f'{boxscore.get("awayTeam", {}).get("teamName", "Away")} @ {boxscore.get("homeTeam", {}).get("teamName", "Home")}'
     officials = ""
-    arena = ""
+    location = ""
     lineups = {"home": [], "away": []}
     inactive = {"home": "", "away": ""}
+    last_meeting = {}
+    series = {"home": "0", "away": "0"}
 
     # Officials
     if "officials" in boxscore:
@@ -56,7 +58,7 @@ def matchup_details(summary, boxscore):
         name = boxscore["arena"]["arenaName"] if "arenaName" in boxscore["arena"] else ""
         city = boxscore["arena"]["arenaCity"] if "arenaCity" in boxscore["arena"] else ""
         state = boxscore["arena"]["arenaState"] if "arenaState" in boxscore["arena"] else ""
-        arena = f'{name}, {city}, {state}'
+        location = f'{name}, {city}, {state}'
 
     # Lineups
     if "homeTeam" in boxscore:
@@ -99,10 +101,36 @@ def matchup_details(summary, boxscore):
         inactive["home"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if player["TEAM_ID"] == home_id])
         inactive["away"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if player["TEAM_ID"] == away_id])
 
+    if "LastMeeting" in summary:
+        try:
+            last_meeting["game_id"] = summary["LastMeeting"][0]["LAST_GAME_ID"]
+            last_meeting["date"] = summary["LastMeeting"][0]["GAME_DATE_EST"]
+            last_meeting["home_id"] = summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_ID"]
+            last_meeting["home_score"] = summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_POINTS"]
+            last_meeting["away_id"] = summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_ID"]
+            last_meeting["away_score"] = summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_POINTS"]
+        except Exception:
+            last_meeting["game_id"] = ""
+            last_meeting["date"] = ""
+            last_meeting["home_id"] = ""
+            last_meeting["home_score"] = ""
+            last_meeting["away_id"] = ""
+            last_meeting["away_score"] = ""
+
+    if "SeasonSeries" in summary:
+        try:
+            series["home"] = summary["SeasonSeries"][0]["HOME_TEAM_WINS"]
+            series["away"] = summary["SeasonSeries"][0]["HOME_TEAM_LOSSES"]
+        except Exception:
+            series["home"] = "0"
+            series["away"] = "0"
+
     return {
         "matchup": matchup,
         "officials": officials,
-        "arena": arena,
+        "location": location,
         "lineups": lineups,
-        "inactive": inactive
+        "inactive": inactive,
+        "lastMeeting": last_meeting,
+        "series": series
     }

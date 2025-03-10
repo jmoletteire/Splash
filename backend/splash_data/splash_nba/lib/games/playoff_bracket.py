@@ -87,11 +87,11 @@ def get_playoff_bracket_data(season, playoff_data):
     # Get the current call stack
     try:
         teams_collection = get_mongo_collection('nba_teams')
-        games_collection = get_mongo_collection('nba_games')
+        games_collection = get_mongo_collection('nba_games_unwrapped')
         playoff_collection = get_mongo_collection('nba_playoff_history')
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
-        exit(1)
+        return
 
     rounds = {
         '1': 'First Round',
@@ -133,22 +133,17 @@ def get_playoff_bracket_data(season, playoff_data):
             series['GAMES'].append({})
             series['GAMES'][i]['GAME_ID'] = game_id
 
-            game_data = games_collection.find_one({"GAMES." + game_id: {"$exists": True}})
+            game_data = games_collection.find_one({"gameId": game_id})
 
             if game_data:
                 # Extract the score and date
-                game_info = game_data['GAMES'][game_id]
-                series['GAMES'][i]['GAME_DATE'] = game_data['GAME_DATE']
-                series['GAMES'][i]['HOME_SCORE'] = game_info['BOXSCORE']['TeamStats'][0]['PTS'] if \
-                game_info['BOXSCORE']['TeamStats'][0]['TEAM_ID'] == game['HOME_TEAM_ID'] else \
-                game_info['BOXSCORE']['TeamStats'][1]['PTS']
-                series['GAMES'][i]['AWAY_SCORE'] = game_info['BOXSCORE']['TeamStats'][0]['PTS'] if \
-                game_info['BOXSCORE']['TeamStats'][0]['TEAM_ID'] == game['VISITOR_TEAM_ID'] else \
-                game_info['BOXSCORE']['TeamStats'][1]['PTS']
+                series['GAMES'][i]['GAME_DATE'] = game_data['date']
+                series['GAMES'][i]['HOME_SCORE'] = game_data['homeScore']
+                series['GAMES'][i]['AWAY_SCORE'] = game_data['awayScore']
 
                 if i == (len(games_list)-1):
-                    series['TEAM_ONE_WINS'] = game_info['SUMMARY']['SeasonSeries'][0]['HOME_TEAM_WINS']
-                    series['TEAM_TWO_WINS'] = game_info['SUMMARY']['SeasonSeries'][0]['HOME_TEAM_LOSSES']
+                    series['TEAM_ONE_WINS'] = game_data.get('matchup', {}).get('series', {}).get('home', '0')
+                    series['TEAM_TWO_WINS'] = game_data.get('matchup', {}).get('series', {}).get('away', '0')
 
             else:
                 logging.info(f"Game ID {game_id} not found in the collection, gathering data...")

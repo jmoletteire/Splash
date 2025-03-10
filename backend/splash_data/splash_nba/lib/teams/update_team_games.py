@@ -1,5 +1,5 @@
 import logging
-from splash_nba.imports import get_mongo_collection
+from splash_nba.imports import get_mongo_collection, CURR_SEASON
 
 
 def convert_year_to_season(year):
@@ -16,7 +16,7 @@ def get_game_result(team_pts, opp_pts):
     return "W" if team_pts > opp_pts else "L"
 
 
-def update_team_games(game_day):
+def update_team_games(game):
     """
     Iterates over games from games collection and uses the data
     to write game results to teams collection.
@@ -29,76 +29,62 @@ def update_team_games(game_day):
         return
 
     # Iterate through each game on that date
-    for game_id, game in game_day["GAMES"].items():
+    try:
         try:
-            season = convert_year_to_season(game["SUMMARY"]["GameSummary"][0]["SEASON"])
-            game_date = game["SUMMARY"]["GameSummary"][0]["GAME_DATE_EST"][:10]
-            season_id = game["SUMMARY"]["GameSummary"][0]["GAME_ID"][2] + game["SUMMARY"]["GameSummary"][0]["SEASON"]
-            is_nba_cup = 'NBA_CUP' in game["SUMMARY"]["GameSummary"][0].keys()
+            season = convert_year_to_season(game["season"])
+        except Exception:
+            season = CURR_SEASON
 
-            line_scores = game["SUMMARY"]["LineScore"]
-            home_team_id = game["SUMMARY"]["GameSummary"][0]['HOME_TEAM_ID']
-            visitor_team_id = game["SUMMARY"]["GameSummary"][0]['VISITOR_TEAM_ID']
-            home_team_pts = None
-            visitor_team_pts = None
+        is_nba_cup = False
+        if "title" in game.keys():
+            if 'NBA Cup' in game["title"]:
+                is_nba_cup = True
 
-            # Determine home and away team by checking team IDs
-            if len(line_scores) > 0:
-                if line_scores[0]["TEAM_ID"] == home_team_id:
-                    home_team_pts = line_scores[0]["PTS"]
-                    visitor_team_pts = line_scores[1]["PTS"]
-                else:
-                    home_team_pts = line_scores[1]["PTS"]
-                    visitor_team_pts = line_scores[0]["PTS"]
+        if game["status"] == 3 and game["homeScore"] is not None and game["awayScore"] is not None:
+            home_result = get_game_result(game["homeScore"], game["awayScore"])
+            visitor_result = get_game_result(game["awayScore"], game["homeScore"])
+        else:
+            home_result = game["gameClock"]
+            visitor_result = game["gameClock"]
 
-            if home_team_pts is not None and visitor_team_pts is not None:
-                home_result = get_game_result(home_team_pts, visitor_team_pts)
-                visitor_result = get_game_result(visitor_team_pts, home_team_pts)
-            else:
-                home_result = game["SUMMARY"]["GameSummary"][0]['GAME_STATUS_TEXT']
-                visitor_result = game["SUMMARY"]["GameSummary"][0]['GAME_STATUS_TEXT']
+        # Create the game object for both teams
+        game_data_home = {
+            "SEASON_ID": game["season"],
+            "GAME_DATE": game["date"],
+            "NBA_CUP": is_nba_cup,
+            "HOME_AWAY": "vs",
+            "OPP": game["awayTeamId"],
+            "TEAM_PTS": game["homeScore"],
+            "OPP_PTS": game["awayScore"],
+            "RESULT": home_result,
+            "BROADCAST": game["broadcast"]
+        }
 
-            natl_tv = game["SUMMARY"]["GameSummary"][0]['NATL_TV_BROADCASTER_ABBREVIATION']
+        game_data_visitor = {
+            "SEASON_ID": game["season"],
+            "GAME_DATE": game["date"],
+            "NBA_CUP": is_nba_cup,
+            "HOME_AWAY": "@",
+            "OPP": game["homeTeamId"],
+            "TEAM_PTS": game["awayScore"],
+            "OPP_PTS": game["homeScore"],
+            "RESULT": visitor_result,
+            "BROADCAST": game["broadcast"]
+        }
 
-            # Create the game object for both teams
-            game_data_home = {
-                "SEASON_ID": season_id,
-                "GAME_DATE": game_date,
-                "NBA_CUP": is_nba_cup,
-                "HOME_AWAY": "vs",
-                "OPP": visitor_team_id,
-                "TEAM_PTS": home_team_pts,
-                "OPP_PTS": visitor_team_pts,
-                "RESULT": home_result,
-                "BROADCAST": natl_tv
-            }
+        # Update the home team season data
+        teams_collection.update_one(
+            {"TEAM_ID": game["homeTeamId"]},
+            {"$set": {f"SEASONS.{season}.GAMES.{game['gameId']}": game_data_home}},
+        )
 
-            game_data_visitor = {
-                "SEASON_ID": season_id,
-                "GAME_DATE": game_date,
-                "NBA_CUP": is_nba_cup,
-                "HOME_AWAY": "@",
-                "OPP": home_team_id,
-                "TEAM_PTS": visitor_team_pts,
-                "OPP_PTS": home_team_pts,
-                "RESULT": visitor_result,
-                "BROADCAST": natl_tv
-            }
-
-            # Update the home team season data
-            teams_collection.update_one(
-                {"TEAM_ID": home_team_id},
-                {"$set": {f"SEASONS.{season}.GAMES.{game_id}": game_data_home}},
-            )
-
-            # Update the visitor team season data
-            teams_collection.update_one(
-                {"TEAM_ID": visitor_team_id},
-                {"$set": {f"SEASONS.{season}.GAMES.{game_id}": game_data_visitor}},
-            )
-        except Exception as e:
-            logging.error(f"(Team Games) Could not process games for {game_day['GAME_DATE']}: {e}", exc_info=True)
-            continue
+        # Update the visitor team season data
+        teams_collection.update_one(
+            {"TEAM_ID": game["awayTeamId"]},
+            {"$set": {f"SEASONS.{season}.GAMES.{game['gameId']}": game_data_visitor}},
+        )
+    except Exception as e:
+        logging.error(f"(Team Games) Could not process games for {game['gameId']}: {e}", exc_info=True)
 
 
 if __name__ == "__main__":

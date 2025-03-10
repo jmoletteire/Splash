@@ -2,7 +2,6 @@ import logging
 
 from .matchup import matchup_details
 from .stats import game_stats
-from .playbyplay import play_by_play
 
 
 def get_game_status(game):
@@ -119,7 +118,11 @@ def specific_game(game):
         homeName = line_score[0]["NICKNAME"] if line_score[0]["TEAM_ID"] == game_summary["HOME_TEAM_ID"] else line_score[1]["NICKNAME"]
         return {"matchup": {f"{awayName} @ {homeName}"}, "stats": {}, "pbp": []}
 
-    status = game.get("SUMMARY", {}).get("GameSummary", {})[0].get("GAME_STATUS_ID", 0)
+    try:
+        status = game.get("SUMMARY", {}).get("GameSummary", {})[0].get("GAME_STATUS_ID", 3)
+    except IndexError:
+        return {"matchup": {f"Away @ Home"}, "stats": {}, "pbp": []}
+
     matchup = {}
     stats = {}
 
@@ -129,7 +132,7 @@ def specific_game(game):
         logging.info(f"Error retrieving matchup: {e}")
 
     try:
-        stats = game_stats(status, boxscore, adv)
+        stats = game_stats(status, summary, boxscore, adv)
     except Exception as e:
         logging.info(f"Error fetching stats: {e}")
 

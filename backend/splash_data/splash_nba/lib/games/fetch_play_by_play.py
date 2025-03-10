@@ -27,46 +27,46 @@ def update_play_by_play():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
-    games_collection = get_mongo_collection('nba_games')
+    games_collection = get_mongo_collection('nba_games_unwrapped')
 
     # Video PBP
     yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-    with games_collection.find({'GAME_DATE': yesterday}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}) as cursor:
+    with games_collection.find({'date': yesterday}, {"_id": 1, "gameId": 1, "pbp": 1}) as cursor:
         docs = list(cursor)
         if not docs:
             return
 
         for doc in docs:
-            logging.info(f'\nAdding Video PBP for {doc["GAME_DATE"]}')
+            logging.info(f'\nAdding Video PBP for {doc["date"]}')
+            game_id = doc['gameId']
 
-            for game_id, game_data in doc['GAMES'].items():
-                # Fetch PBP for the game
-                try:
-                    pbp = fetch_play_by_play(game_id)
-                except Exception as e:
-                    logging.error(f"Error fetching play-by-play for game_id {game_id}: {e}")
-                    continue
+            # Fetch PBP for the game
+            try:
+                pbp = fetch_play_by_play(game_id)
+            except Exception as e:
+                logging.error(f"Error fetching play-by-play for game_id {game_id}: {e}")
+                continue
 
-                # Update the game data with the fetched stats
-                try:
-                    # Update the MongoDB document with the fetched stats under the "PBP" key
-                    games_collection.update_one(
-                        {'_id': doc['_id'], f"GAMES.{game_id}": {"$exists": True}},
-                        {"$set": {f"GAMES.{game_id}.PBP": pbp}}
-                    )
+            # Update the game data with the fetched stats
+            try:
+                # Update the MongoDB document with the fetched stats under the "PBP" key
+                games_collection.update_one(
+                    {'_id': doc['_id']},
+                    {"$set": {"pbp": pbp}}
+                )
 
-                    print(f"Processed {doc['GAME_DATE']} {game_id}")
-                except Exception as e:
-                    logging.error(f"Error updating box score for game_id {game_id}: {e}")
-                    continue
+                logging.info(f"Processed {doc['date']} {game_id}")
+            except Exception as e:
+                logging.error(f"Error updating box score for game_id {game_id}: {e}")
+                continue
 
-                # Pause 30 seconds between games
-                time.sleep(30)
+            # Pause 30 seconds between games
+            time.sleep(30)
 
 
 # Function to fetch box score stats for a game
 def fetch_play_by_play(game_id):
-    actions = playbyplay.PlayByPlay(proxy=None, game_id=game_id).get_dict()['game']['actions']
+    actions = playbyplay.PlayByPlay(proxy=PROXY, game_id=game_id).get_dict()['game']['actions']
     pbp = []
 
     for i, action in enumerate(actions):
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
         # Retrieve all documents from the collection
         # documents = games_collection.find({}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1})
-        query = {"SEASON_YEAR": "2024"}
+        query = {"SEASON_YEAR": "2023"}
         proj = {"_id": 1, "GAMES": 1, "GAME_DATE": 1}
 
         # Set batch size to process documents

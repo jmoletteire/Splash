@@ -70,7 +70,7 @@ def flag_cup_games(season=None):
     try:
         logging.basicConfig(level=logging.INFO)
         cup_collection = get_mongo_collection('nba_cup_history')
-        games_collection = get_mongo_collection('nba_games')
+        games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
         return
@@ -90,13 +90,9 @@ def flag_cup_games(season=None):
                     for i, game in enumerate(team['games']):
                         logging.info(f'({team["teamAbbreviation"]}) {i + 1} of {len(team["games"])}')
                         # Query to find & update the document
-                        games_collection.find_one_and_update({
-                            "SEASON_CODE": season_code,
-                            f"GAMES.{game['gameId']}": {"$exists": True}
-                        },
-                            {
-                                "$set": {f"GAMES.{game['gameId']}.SUMMARY.GameSummary.0.NBA_CUP": f'NBA Cup - {group}'}
-                            },
+                        games_collection.find_one_and_update(
+                            {"gameId": game['gameId']},
+                            {"$set": {f"title": f'NBA Cup - {group}'}},
                         )
 
 
@@ -157,7 +153,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     cup_collection = get_mongo_collection('nba_cup_history')
-    games_collection = get_mongo_collection('nba_games')
     # fetch_all_cups()
     update_current_cup()
     # flag_cup_games(season='2024-25')

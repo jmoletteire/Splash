@@ -938,8 +938,9 @@ def team_sse():
         sys.stdout.flush()  # Ensure the buffer is flushed
 
         id_map = {
-            "nba_teams": "TEAM_ID",
-            "nba_players": "PERSON_ID"
+            "nba_games": {"type": "games", "id": "GAME_ID"},
+            "nba_teams": {"type": "teams", "id": "TEAM_ID"},
+            # "nba_players": {"type": "players", "id": "PERSON_ID"}
         }
 
         try:
@@ -951,14 +952,17 @@ def team_sse():
                         if change is not None:
                             # Prepare and send the event data
                             collection_name = change.get("ns", {}).get("coll", "")  # Identify the collection
-                            doc_id = full_document.get(id_map[collection_name]) if collection_name in id_map else None
+
+                            if collection_name not in id_map:
+                                continue
+
                             full_document = change.get("fullDocument", {})
                             updated_fields = change.get("updateDescription", {}).get("updatedFields", {})
 
                             event_data = {
                                 "eventId": str(change["_id"]),
-                                "collection": collection_name,
-                                "documentId": doc_id,
+                                "collection": id_map[collection_name]["type"],
+                                "documentId": full_document.get(id_map[collection_name]["id"]),
                                 "updatedFields": updated_fields
                             }
 

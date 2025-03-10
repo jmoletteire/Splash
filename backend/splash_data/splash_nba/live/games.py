@@ -4,6 +4,8 @@ import nba_api
 from datetime import datetime, timedelta, timezone
 from nba_api.live.nba.endpoints import boxscore, playbyplay
 from nba_api.stats.endpoints import commonplayoffseries, scoreboardv2
+
+from splash_nba.endpoints.routes.games.scoreboard.services.utils.stats import game_stats
 from splash_nba.lib.games.fetch_adv_boxscore import fetch_box_score_adv
 from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
 from splash_nba.lib.games.fetch_new_games import fetch_games_for_date_range
@@ -96,98 +98,268 @@ def format_adv_stats(summary, adv_stats=None):
     return adv
 
 
-def upcoming_game(game_id, date):
+def get_game_status(summary):
+    if 'GameSummary' not in summary:
+        return ''
+
     try:
-        games_collection = get_mongo_collection('nba_games')
+        game_summary = summary['GameSummary'][0]
+    except Exception:
+        return ''
+
+    status = game_summary.get('GAME_STATUS_ID', 0)
+
+    if status == 3:
+        return 3
+    if status == 2:
+        return 1
+    if status == 1:
+        return 2
+
+    return 1
+
+
+def get_game_clock(summary, boxscore):
+    if boxscore.get('gameStatusText', '') == 'pregame':
+        return 'Pregame'
+
+    if 'GameSummary' not in summary:
+        return ''
+
+    try:
+        game_summary = summary['GameSummary'][0]
+    except Exception:
+        return ''
+
+    status = summary.get('GAME_STATUS_ID', 0)
+
+    period = game_summary['LIVE_PERIOD']
+    clock = game_summary['LIVE_PC_TIME']
+
+    if status == 1:
+        # Upcoming
+        return game_summary['GAME_STATUS_TEXT'].replace(" ET", "").replace(" ", "")
+    elif status == 2:
+        # End Quarter
+        if clock == ":0.0" or clock == "     ":
+            if period == 1:
+                return 'End 1st'
+            elif period == 2:
+                return 'HALF'
+            elif period == 3:
+                return 'End 3rd'
+            elif period == 4:
+                return 'Final'
+            elif period == 5:
+                return 'Final/OT'
+            else:
+                return f'Final/{period - 4}OT'
+        else:
+            # Game in-progress
+            if period <= 4:
+                if period == 1:
+                    return f'{period}st {clock}'
+                elif period == 2:
+                    return f'{period}nd {clock}'
+                elif period == 3:
+                    return f'{period}rd {clock}'
+                elif period == 4:
+                    return f'{period}th {clock}'
+                else:
+                    return ''
+            elif period == 5:
+                return f'OT {clock}'
+            else:
+                return f'{period - 4}OT {clock}'
+
+    elif status == 3:
+        # Game Final
+        if period == 4:
+            return 'Final'
+        elif period == 5:
+            return 'Final/OT'
+        else:
+            return f'Final/{period - 4}OT'
+    else:
+        return ''
+
+
+def expected_lineup_data(team_id):
+    try:
+        team = get_mongo_collection('nba_teams').find_one({'TEAM_ID': team_id}, {'LAST_STARTING_LINEUP': 1})
+        last_lineup = team.get('LAST_STARTING_LINEUP', [])
+    except Exception as e:
+        last_lineup = []
+        logging.error(e)
+
+    lineup_final = []
+
+    for player in last_lineup:
+        lineup_final.append({
+            "personId": str(player["PLAYER_ID"]) if "PLAYER_ID" in player else None,
+            "name": player["NAME"] if "NAME" in player else None,
+            "position": player["POSITION"] if "POSITION" in player else None,
+        })
+
+    return lineup_final
+
+
+def lineup_data(player):
+    return {
+        "personId": str(player["personId"]) if "personId" in player else None,
+        "name": player["nameI"] if "nameI" in player else None,
+        "number": player["jerseyNum"] if "jerseyNum" in player else None,
+        "position": player["position"] if "position" in player else None
+    }
+
+
+def matchup_details(summary, boxscore):
+    matchup = f'{boxscore.get("awayTeam", {}).get("teamName", "Away")} @ {boxscore.get("homeTeam", {}).get("teamName", "Home")}'
+    officials = ""
+    location = ""
+    lineups = {"home": [], "away": []}
+    inactive = {"home": "", "away": ""}
+    last_meeting = {}
+    series = {"home": "0", "away": "0"}
+
+    # Officials
+    if "officials" in boxscore:
+        officials = ", ".join([ref["name"] for ref in boxscore["officials"]])
+
+    # Arena
+    if "arena" in boxscore:
+        name = boxscore["arena"]["arenaName"] if "arenaName" in boxscore["arena"] else ""
+        city = boxscore["arena"]["arenaCity"] if "arenaCity" in boxscore["arena"] else ""
+        state = boxscore["arena"]["arenaState"] if "arenaState" in boxscore["arena"] else ""
+        location = f'{name}, {city}, {state}'
+
+    # Lineups
+    if "homeTeam" in boxscore:
+        if "players" in boxscore["homeTeam"]:
+            lineups["home"] = [lineup_data(player) for player in boxscore["homeTeam"]["players"] if player["starter"] == "1"]
+            order = [4, 3, 0, 2, 1]  # PG, SG, SF, C, PF
+            lineups["home"] = [lineups["home"][i] for i in order]
+    else:
+        try:
+            lineups["home"] = expected_lineup_data(summary["GameSummary"][0]["HOME_TEAM_ID"])
+            order = [4, 3, 0, 2, 1]  # PG, SG, SF, C, PF
+            lineups["home"] = [lineups["home"][i] for i in order]
+        except Exception:
+            lineups["home"] = []
+            # logging.error(traceback.format_exc())
+
+    if "awayTeam" in boxscore:
+        if "players" in boxscore["awayTeam"]:
+            lineups["away"] = [lineup_data(player) for player in boxscore["awayTeam"]["players"] if player["starter"] == "1"]
+            order = [0, 2, 1, 4, 3]  # SF, C, PF, PG, SG
+            lineups["away"] = [lineups["away"][i] for i in order]
+    else:
+        try:
+            lineups["away"] = expected_lineup_data(summary["GameSummary"][0]["VISITOR_TEAM_ID"])
+            order = [0, 2, 1, 4, 3]  # SF, C, PF, PG, SG
+            lineups["away"] = [lineups["away"][i] for i in order]
+        except Exception:
+            lineups["away"] = []
+            # logging.error(traceback.format_exc())
+
+    # Inactive
+    if "InactivePlayers" in summary:
+        try:
+            home_id = summary["GameSummary"][0]["HOME_TEAM_ID"]
+            away_id = summary["GameSummary"][0]["VISITOR_TEAM_ID"]
+        except Exception:
+            home_id = 0
+            away_id = 0
+
+        inactive["home"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if player["TEAM_ID"] == home_id])
+        inactive["away"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if player["TEAM_ID"] == away_id])
+
+    if "LastMeeting" in summary:
+        try:
+            last_meeting["game_id"] = summary["LastMeeting"][0]["LAST_GAME_ID"]
+            last_meeting["date"] = summary["LastMeeting"][0]["GAME_DATE_EST"]
+            last_meeting["home_id"] = summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_ID"]
+            last_meeting["home_score"] = summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_POINTS"]
+            last_meeting["away_id"] = summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_ID"]
+            last_meeting["away_score"] = summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_POINTS"]
+        except Exception:
+            last_meeting["game_id"] = ""
+            last_meeting["date"] = ""
+            last_meeting["home_id"] = ""
+            last_meeting["home_score"] = ""
+            last_meeting["away_id"] = ""
+            last_meeting["away_score"] = ""
+
+    if "SeasonSeries" in summary:
+        try:
+            series["home"] = summary["SeasonSeries"][0]["HOME_TEAM_WINS"]
+            series["away"] = summary["SeasonSeries"][0]["HOME_TEAM_LOSSES"]
+        except Exception:
+            series["home"] = "0"
+            series["away"] = "0"
+
+    return {
+        "matchup": matchup,
+        "officials": officials,
+        "location": location,
+        "lineups": lineups,
+        "inactive": inactive,
+        "lastMeeting": last_meeting,
+        "series": series
+    }
+
+
+def upcoming_game(game_id):
+    try:
+        games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
         logging.error(f'(Games Live - upcoming_game) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
 
     summary = fetch_box_score_summary(game_id)
+
     try:
         box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
         games_collection.update_one(
-            {'GAME_DATE': date},
+            {'gameId': game_id},
             {'$set': {
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_DATE_EST': summary['GameSummary'][0][
-                    'GAME_DATE_EST'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_SEQUENCE': summary['GameSummary'][0][
-                    'GAME_SEQUENCE'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_ID': summary['GameSummary'][0]['GAME_ID'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_STATUS_ID': summary['GameSummary'][0][
-                    'GAME_STATUS_ID'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_STATUS_TEXT': summary['GameSummary'][0][
-                    'GAME_STATUS_TEXT'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAMECODE': summary['GameSummary'][0]['GAMECODE'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.HOME_TEAM_ID': summary['GameSummary'][0][
-                    'HOME_TEAM_ID'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.VISITOR_TEAM_ID': summary['GameSummary'][0][
-                    'VISITOR_TEAM_ID'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.SEASON': summary['GameSummary'][0]['SEASON'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.LIVE_PERIOD': summary['GameSummary'][0][
-                    'LIVE_PERIOD'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.LIVE_PC_TIME': summary['GameSummary'][0][
-                    'LIVE_PC_TIME'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.NATL_TV_BROADCASTER_ABBREVIATION':
-                    summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.LIVE_PERIOD_TIME_BCAST':
-                    summary['GameSummary'][0]['LIVE_PERIOD_TIME_BCAST'],
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0][
-                    'WH_STATUS'],
-                f'GAMES.{game_id}.SUMMARY.Officials': summary['Officials'],
-                f'GAMES.{game_id}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
-                f'GAMES.{game_id}.SUMMARY.GameInfo': summary['GameInfo'],
-                f'GAMES.{game_id}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
-                f'GAMES.{game_id}.SUMMARY.OtherStats': summary['OtherStats'],
-                f'GAMES.{game_id}.SUMMARY.LineScore': summary['LineScore'],
-                f'GAMES.{game_id}.BOXSCORE': box_score
+                'gameId': summary['GameSummary'][0]['GAME_ID'],
+                'date': summary['GameSummary'][0]['GAME_DATE_EST'][:10],
+                'homeTeamId': summary['GameSummary'][0]['HOME_TEAM_ID'],
+                'awayTeamId': summary['GameSummary'][0]['VISITOR_TEAM_ID'],
+                'season': summary['GameSummary'][0]['SEASON'],
+                'broadcast': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
+                'status': summary['GameSummary'][0]['GAME_STATUS_ID'],
+                'gameClock': summary['GameSummary'][0]['LIVE_PC_TIME'],
+                'matchup': matchup_details(summary, box_score),
+                'pbp': [],
+                'stats': {}
             }}
         )
         logging.info(f'(Games Live) Upcoming game {game_id} is up to date + Box Score.')
     except Exception:
         games_collection.update_one(
-            {'GAME_DATE': date},
-            {'$set': {f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_DATE_EST': summary['GameSummary'][0][
-                'GAME_DATE_EST'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_SEQUENCE': summary['GameSummary'][0][
-                          'GAME_SEQUENCE'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_ID': summary['GameSummary'][0][
-                          'GAME_ID'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_STATUS_ID': summary['GameSummary'][0][
-                          'GAME_STATUS_ID'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_STATUS_TEXT':
-                          summary['GameSummary'][0]['GAME_STATUS_TEXT'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAMECODE': summary['GameSummary'][0][
-                          'GAMECODE'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.HOME_TEAM_ID': summary['GameSummary'][0][
-                          'HOME_TEAM_ID'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.VISITOR_TEAM_ID':
-                          summary['GameSummary'][0]['VISITOR_TEAM_ID'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.SEASON': summary['GameSummary'][0][
-                          'SEASON'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.LIVE_PERIOD': summary['GameSummary'][0][
-                          'LIVE_PERIOD'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.LIVE_PC_TIME': summary['GameSummary'][0][
-                          'LIVE_PC_TIME'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.NATL_TV_BROADCASTER_ABBREVIATION':
-                          summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.LIVE_PERIOD_TIME_BCAST':
-                          summary['GameSummary'][0]['LIVE_PERIOD_TIME_BCAST'],
-                      f'GAMES.{game_id}.SUMMARY.GameSummary.0.WH_STATUS': summary['GameSummary'][0][
-                          'WH_STATUS'],
-                      f'GAMES.{game_id}.SUMMARY.Officials': summary['Officials'],
-                      f'GAMES.{game_id}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
-                      f'GAMES.{game_id}.SUMMARY.GameInfo': summary['GameInfo'],
-                      f'GAMES.{game_id}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
-                      f'GAMES.{game_id}.SUMMARY.OtherStats': summary['OtherStats'],
-                      }}
+            {'gameId': game_id},
+            {'$set': {
+                'gameId': summary['GameSummary'][0]['GAME_ID'],
+                'date': summary['GameSummary'][0]['GAME_DATE_EST'][:10],
+                'homeTeamId': summary['GameSummary'][0]['HOME_TEAM_ID'],
+                'awayTeamId': summary['GameSummary'][0]['VISITOR_TEAM_ID'],
+                'season': summary['GameSummary'][0]['SEASON'],
+                'broadcast': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
+                'status': summary['GameSummary'][0]['GAME_STATUS_ID'],
+                'gameClock': summary['GameSummary'][0]['LIVE_PC_TIME'],
+                'matchup': {},
+                'pbp': [],
+                'stats': {}
+            }}
         )
         logging.info(f'(Games Live) Upcoming game {game_id} is up to date.')
 
 
-def in_progress_game(game_id, date, game_line_score):
+def in_progress_game(game_id, game_line_score):
     try:
-        games_collection = get_mongo_collection('nba_games')
+        games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
         logging.error(f'(Games Live - in_progress_game) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
@@ -221,195 +393,75 @@ def in_progress_game(game_id, date, game_line_score):
     except Exception:
         pbp = []
 
-    home_line_index = 0 if game_line_score[0]['TEAM_ID'] == box_score['homeTeam']['teamId'] else 1
-    away_line_index = 0 if game_line_score[0]['TEAM_ID'] == box_score['awayTeam']['teamId'] else 1
+    home_line_score = game_line_score[0] if game_line_score[0]['TEAM_ID'] == box_score['homeTeam']['teamId'] else game_line_score[1]
+    away_line_score = game_line_score[0] if game_line_score[0]['TEAM_ID'] == box_score['awayTeam']['teamId'] else game_line_score[1]
+
+    try:
+        broadcast = summary["GameSummary"][0]["NATL_TV_BROADCASTER_ABBREVIATION"]
+    except Exception:
+        broadcast = None
 
     # Update data
     games_collection.update_one(
-        {'GAME_DATE': date},
+        {'gameId': game_id},
         {'$set': {
-            f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_STATUS_ID': box_score['gameStatus'],
-            f'GAMES.{game_id}.SUMMARY.GameSummary.0.LIVE_PERIOD': box_score['period'],
-            f'GAMES.{game_id}.SUMMARY.GameSummary.0.LIVE_PC_TIME': format_duration(
-                box_score['gameClock']),
-            f'GAMES.{game_id}.SUMMARY.Officials': summary['Officials'],
-            f'GAMES.{game_id}.SUMMARY.InactivePlayers': summary['InactivePlayers'],
-            f'GAMES.{game_id}.SUMMARY.GameInfo': summary['GameInfo'],
-            # HOME TEAM
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.GAME_ID': game_line_score[home_line_index][
-                'GAME_ID'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.TEAM_ID': game_line_score[home_line_index][
-                'TEAM_ID'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.TEAM_ABBREVIATION':
-                game_line_score[home_line_index]['TEAM_ABBREVIATION'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.TEAM_CITY_NAME':
-                game_line_score[home_line_index]['TEAM_CITY_NAME'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.TEAM_NICKNAME':
-                game_line_score[home_line_index]['TEAM_NAME'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.TEAM_NAME':
-                game_line_score[home_line_index]['TEAM_NAME'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_QTR1':
-                box_score['homeTeam']['periods'][0]['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_QTR2':
-                box_score['homeTeam']['periods'][1]['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_QTR3':
-                box_score['homeTeam']['periods'][2]['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_QTR4':
-                box_score['homeTeam']['periods'][3]['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT1':
-                box_score['homeTeam']['periods'][4]['score'] if len(
-                    box_score['homeTeam']['periods']) > 4 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT2':
-                box_score['homeTeam']['periods'][5]['score'] if len(
-                    box_score['homeTeam']['periods']) > 5 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT3':
-                box_score['homeTeam']['periods'][6]['score'] if len(
-                    box_score['homeTeam']['periods']) > 6 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT4':
-                box_score['homeTeam']['periods'][7]['score'] if len(
-                    box_score['homeTeam']['periods']) > 7 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT5':
-                box_score['homeTeam']['periods'][8]['score'] if len(
-                    box_score['homeTeam']['periods']) > 8 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT6':
-                box_score['homeTeam']['periods'][9]['score'] if len(
-                    box_score['homeTeam']['periods']) > 9 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT7':
-                box_score['homeTeam']['periods'][10]['score'] if len(
-                    box_score['homeTeam']['periods']) > 10 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT8':
-                box_score['homeTeam']['periods'][11]['score'] if len(
-                    box_score['homeTeam']['periods']) > 11 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT9':
-                box_score['homeTeam']['periods'][12]['score'] if len(
-                    box_score['homeTeam']['periods']) > 12 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS_OT10':
-                box_score['homeTeam']['periods'][13]['score'] if len(
-                    box_score['homeTeam']['periods']) > 13 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.PTS': box_score['homeTeam']['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES':
-                game_line_score[home_line_index]['TEAM_WINS_LOSSES'],
-            # AWAY TEAM
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.GAME_ID': game_line_score[away_line_index][
-                'GAME_ID'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.TEAM_ID': game_line_score[away_line_index][
-                'TEAM_ID'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.TEAM_ABBREVIATION':
-                game_line_score[away_line_index]['TEAM_ABBREVIATION'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.TEAM_CITY_NAME':
-                game_line_score[away_line_index]['TEAM_CITY_NAME'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.TEAM_NICKNAME':
-                game_line_score[away_line_index]['TEAM_NAME'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.TEAM_NAME':
-                game_line_score[away_line_index]['TEAM_NAME'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_QTR1':
-                box_score['awayTeam']['periods'][0]['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_QTR2':
-                box_score['awayTeam']['periods'][1]['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_QTR3':
-                box_score['awayTeam']['periods'][2]['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_QTR4':
-                box_score['awayTeam']['periods'][3]['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT1':
-                box_score['awayTeam']['periods'][4]['score'] if len(
-                    box_score['awayTeam']['periods']) > 4 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT2':
-                box_score['awayTeam']['periods'][5]['score'] if len(
-                    box_score['awayTeam']['periods']) > 5 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT3':
-                box_score['awayTeam']['periods'][6]['score'] if len(
-                    box_score['awayTeam']['periods']) > 6 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT4':
-                box_score['awayTeam']['periods'][7]['score'] if len(
-                    box_score['awayTeam']['periods']) > 7 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT5':
-                box_score['awayTeam']['periods'][8]['score'] if len(
-                    box_score['awayTeam']['periods']) > 8 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT6':
-                box_score['awayTeam']['periods'][9]['score'] if len(
-                    box_score['awayTeam']['periods']) > 9 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT7':
-                box_score['awayTeam']['periods'][10]['score'] if len(
-                    box_score['awayTeam']['periods']) > 10 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT8':
-                box_score['awayTeam']['periods'][11]['score'] if len(
-                    box_score['awayTeam']['periods']) > 11 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT9':
-                box_score['awayTeam']['periods'][12]['score'] if len(
-                    box_score['awayTeam']['periods']) > 12 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS_OT10':
-                box_score['awayTeam']['periods'][13]['score'] if len(
-                    box_score['awayTeam']['periods']) > 13 else 0,
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.PTS': box_score['awayTeam']['score'],
-            f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES':
-                game_line_score[away_line_index]['TEAM_WINS_LOSSES'],
-            # Summary, Box Score, PBP
-            f'GAMES.{game_id}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
-            f'GAMES.{game_id}.SUMMARY.OtherStats': summary['OtherStats'],
-            f'GAMES.{game_id}.BOXSCORE': box_score,
-            f'GAMES.{game_id}.PBP': pbp,
-        }
+            "homeTeamId": str(box_score.get('homeTeam', {}).get('teamId', 0)),
+            "awayTeamId": str(box_score.get('awayTeam', {}).get('teamId', 0)),
+            "homeScore": str(home_line_score.get("PTS", "") if home_line_score.get("PTS", "") is not None else ""),
+            "awayScore": str(away_line_score.get("PTS", "") if away_line_score.get("PTS", "") is not None else ""),
+            "broadcast": broadcast,
+            "status": get_game_status(summary),
+            "gameClock": get_game_clock(summary, box_score),
+            "matchup": matchup_details(summary, box_score),
+            "pbp": pbp,
+            "stats": game_stats(2, summary, box_score, {})
+            }
         }
     )
     logging.info(f'(Games Live) Updated live game {game_id} [{datetime.now()}]')
 
 
-def final_game(game_id, date, game_line_score):
+def final_game(game_id):
     try:
-        games_collection = get_mongo_collection('nba_games')
+        games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
         logging.error(f'(Games Live - in_progress_game) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
 
     # Update team schedules with game results
-    update_team_games(games_collection.find_one({'GAME_DATE': date}, {'GAMES': 1}))
+    update_team_games(games_collection.find_one({'gameId': game_id}))
 
     # Finalize Box Score, Adv Stats, and Summary
     summary = fetch_box_score_summary(game_id)
+    box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
     adv = format_adv_stats(summary=summary, adv_stats=fetch_box_score_adv(game_id))
-    highlights = 'No highlights found'  # search_youtube_highlights(YOUTUBE_API_KEY, teams[game['homeTeam']['teamId']], teams[game['awayTeam']['teamId']], today)
+
+    series = {"home": "0", "away": "0"}
+
+    if "SeasonSeries" in summary:
+        try:
+            series["home"] = summary["SeasonSeries"][0]["HOME_TEAM_WINS"]
+            series["away"] = summary["SeasonSeries"][0]["HOME_TEAM_LOSSES"]
+        except Exception:
+            series["home"] = "0"
+            series["away"] = "0"
 
     try:
-        adv_null_check = adv['home']['players'][0]['MIN'] is None
-    except Exception:
+        adv_null_check = adv['home']['players'][0]['MIN'] is not None
+    except Exception as e:
+        logging.error(f"Error retrieving adv stats: {e}", exc_info=True)
         adv_null_check = False
 
-    home_line_index = 0 if game_line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['HOME_TEAM_ID'] else 1
-    away_line_index = 0 if game_line_score[0]['TEAM_ID'] == summary['GameSummary'][0]['VISITOR_TEAM_ID'] else 1
-
-    if highlights == 'No highlights found':
-        games_collection.update_one(
-            {'GAME_DATE': date},
-            {'$set': {
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_STATUS_ID': 3,
-                f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES':
-                    game_line_score[home_line_index]['TEAM_WINS_LOSSES'],
-                f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES':
-                    game_line_score[away_line_index]['TEAM_WINS_LOSSES'],
-                f'GAMES.{game_id}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
-                f'GAMES.{game_id}.ADV': adv,
-                f'GAMES.{game_id}.FINAL': adv_null_check,
-                f'GAMES.{game_id}.UPDATED': False
+    games_collection.update_one(
+        {'gameId': game_id},
+        {'$set': {
+            'status': 3,
+            'matchup.series': series,
+            'stats': game_stats(3, summary, box_score, adv),
+            'FINAL': adv_null_check
             }
-            }
-        )
-    else:
-        games_collection.update_one(
-            {'GAME_DATE': date},
-            {'$set': {
-                f'GAMES.{game_id}.SUMMARY.GameSummary.0.GAME_STATUS_ID': 3,
-                f'GAMES.{game_id}.SUMMARY.LineScore.{home_line_index}.TEAM_WINS_LOSSES':
-                    game_line_score[home_line_index]['TEAM_WINS_LOSSES'],
-                f'GAMES.{game_id}.SUMMARY.LineScore.{away_line_index}.TEAM_WINS_LOSSES':
-                    game_line_score[away_line_index]['TEAM_WINS_LOSSES'],
-                f'GAMES.{game_id}.SUMMARY.SeasonSeries': summary['SeasonSeries'],
-                f'GAMES.{game_id}.SUMMARY.Highlights': highlights,
-                f'GAMES.{game_id}.ADV': adv,
-                f'GAMES.{game_id}.FINAL': True,
-                f'GAMES.{game_id}.UPDATED': False
-            }
-            }
-        )
+        }
+    )
     logging.info(f'(Games Live) Finalizing game {game_id}.')
 
 
@@ -418,7 +470,7 @@ def games_prev_day(offset=1):
     logging.basicConfig(level=logging.INFO)
 
     try:
-        games_collection = get_mongo_collection('nba_games')
+        games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
         logging.error(f'(Games Live) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
@@ -438,23 +490,23 @@ def games_prev_day(offset=1):
 
         # If game upcoming or in-progress, check for updates
         if is_upcoming:
-            upcoming_game(game["GAME_ID"], yesterday)
+            upcoming_game(game["GAME_ID"])
 
         # IN-PROGRESS
         elif in_progress:
-            in_progress_game(game["GAME_ID"], yesterday, line_score)
+            in_progress_game(game["GAME_ID"], line_score)
 
         # If game is final, update final box score
         elif is_final:
             # Check if the final update has already been applied
-            game_doc = games_collection.find_one({'GAME_DATE': yesterday}, {f'GAMES.{game["GAME_ID"]}.FINAL': 1})
-            if game_doc and game_doc.get('GAMES', {}).get(game["GAME_ID"], {}).get('FINAL', False):
+            game_doc = games_collection.find_one({'gameId': game["GAME_ID"]}, {'FINAL': 1})
+            if game_doc and game_doc.get('FINAL', False):
                 logging.info(
                     f'(Games Live) Game {game["GAME_ID"]} already finalized, skipping update. [{datetime.now()}]')
                 continue  # Skip this game as it's already been finalized
             else:
-                in_progress_game(game["GAME_ID"], yesterday, line_score)
-                final_game(game["GAME_ID"], yesterday, line_score)
+                in_progress_game(game["GAME_ID"], line_score)
+                final_game(game["GAME_ID"])
 
 
 async def games_live_update():
@@ -462,7 +514,7 @@ async def games_live_update():
     logging.basicConfig(level=logging.INFO)
 
     try:
-        games_collection = get_mongo_collection('nba_games')
+        games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
         logging.error(f'(Games Live) Failed to connect to MongoDB [{datetime.now()}]: {e}')
         return
@@ -492,22 +544,6 @@ async def games_live_update():
     if not games_today:
         logging.info(
             f"(Games Live) No games found for today: {today}. Skipping updates for the rest of the day. [{datetime.now()}]")
-        return
-
-    # Check if all games are final
-    all_final = False
-    for game in games_today:
-        game_doc = games_collection.find_one({'GAME_DATE': today}, {f'GAMES.{game["gameId"]}.FINAL': 1})
-        if game_doc and game_doc.get('GAMES', {}).get(game['gameId'], {}).get('FINAL', False):
-            all_final = True
-            continue
-        else:
-            all_final = False
-            break
-
-    if all_final:
-        logging.info(
-            f"(Games Live) All games are final for today: {today}. Skipping updates for the rest of the day. [{datetime.now()}]")
         return
 
     # Check if the first game is more than 1 hour away from start time
@@ -546,31 +582,25 @@ async def games_live_update():
         is_final = game['gameStatus'] == 3
         line_score = [line for line in line_scores if line['GAME_ID'] == game['gameId']]
 
-        # Check if the gameEt (game Eastern Time) is from yesterday
-        game_et_str = game['gameEt']  # Assuming 'gameEt' contains the game time in Eastern Time
-        game_et_str = game_et_str.replace('Z', '+00:00')  # Replace 'Z' with '+00:00' for UTC
-        game_et = datetime.strptime(game_et_str, '%Y-%m-%dT%H:%M:%S%z')  # Parse with timezone information
-        game_et_date = game_et.strftime('%Y-%m-%d')  # Extract only the date part
-
         # If game upcoming or in-progress, check for updates
         if is_upcoming:
-            upcoming_game(game["gameId"], game_et_date)
+            upcoming_game(game["gameId"])
 
         # IN-PROGRESS
         elif in_progress:
-            in_progress_game(game["gameId"], game_et_date, line_score)
+            in_progress_game(game["gameId"], line_score)
 
         # If game is final, update final box score
         elif is_final:
             # Check if the final update has already been applied
-            # game_doc = games_collection.find_one({'GAME_DATE': game_et_date}, {f'GAMES.{game["gameId"]}.FINAL': 1})
-            # if game_doc and game_doc.get('GAMES', {}).get(game["gameId"], {}).get('FINAL', False):
-            #     logging.info(
-            #         f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
-            #     continue  # Skip this game as it's already been finalized
-            # else:
-            #     in_progress_game(game["gameId"], game_et_date, line_score)
-                final_game(game["gameId"], game_et_date, line_score)
+            game_doc = games_collection.find_one({"gameId": game["gameId"]}, {'FINAL': 1})
+            if game_doc and game_doc.get("FINAL", False):
+                logging.info(
+                    f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
+                continue  # Skip this game as it's already been finalized
+            else:
+                in_progress_game(game["gameId"], line_score)
+                final_game(game["gameId"])
 
 
 async def games_daily_update():

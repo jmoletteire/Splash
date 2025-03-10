@@ -1,5 +1,8 @@
 import sys
 import logging
+
+from flask import jsonify
+
 from .utils.game_helpers import summarize_game, specific_game
 
 env_path = "/home/ubuntu"
@@ -15,32 +18,19 @@ except ImportError:
 games_collection = get_mongo_collection("nba_games")
 
 
-def get_games_from_db(game_date):
-    """Fetches games from the database by date."""
-    pipeline = [
-        {
-            "$search": {
-                "index": "game_index",
-                "phrase": {
-                    "query": game_date,
-                    "path": "GAME_DATE"
-                }
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "GAMES": 1
-            }
-        }
-    ]
-
+def get_games_from_db(game_date, game_id=None):
     try:
-        games = list(games_collection.aggregate(pipeline))
-        return games[0]['GAMES'] if games else {}
+        games_collection = get_mongo_collection("nba_games_unwrapped")
+
+        if game_id is None:
+            games = list(games_collection.find({"date": game_date}))
+        else:
+            games = games_collection.find_one({"gameId": game_id})  # Don't wrap find_one in list()
+
+        return jsonify(games) if games else jsonify({}), 200  # Always return a valid response
     except Exception as e:
         logging.error(f"(get_games_from_db) MongoDB Query Error: {e}")
-        return {}
+        return jsonify({"error": "Database query failed"}), 500  # Return an error response
 
 
 def process_scoreboard(games, game_id=None):
