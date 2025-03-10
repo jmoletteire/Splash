@@ -25,7 +25,7 @@ def get_teams_metadata():
 
         # Query the database
         teams_collection = get_mongo_collection('nba_teams')
-        mongo_query = {"TEAM_ID": {"$exists": True, "$ne": 0}, "SPORT_ID": sport}
+        mongo_query = {"TEAM_ID": {"$exists": True, "$ne": 0}, "SPORT_ID": int(sport)}
         projection = {
             "_id": 0,
             "SPORT_ID": 1,
