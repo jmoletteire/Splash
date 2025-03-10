@@ -220,7 +220,7 @@ def matchup_details(summary, boxscore):
     lineups = {"home": [], "away": []}
     inactive = {"home": "", "away": ""}
     last_meeting = {}
-    series = {"home": "0", "away": "0"}
+    series = {"home": 0, "away": 0}
 
     # Officials
     if "officials" in boxscore:
