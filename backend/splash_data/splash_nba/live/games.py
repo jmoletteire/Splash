@@ -131,7 +131,7 @@ def get_game_clock(summary, boxscore):
     except Exception:
         return ''
 
-    status = summary.get('GAME_STATUS_ID', 0)
+    status = game_summary.get('GAME_STATUS_ID', 0)
 
     period = game_summary['LIVE_PERIOD']
     clock = game_summary['LIVE_PC_TIME']
