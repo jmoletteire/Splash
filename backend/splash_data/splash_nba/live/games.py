@@ -319,18 +319,23 @@ def upcoming_game(game_id):
     summary = fetch_box_score_summary(game_id)
 
     try:
+        broadcast = summary["GameSummary"][0]["NATL_TV_BROADCASTER_ABBREVIATION"]
+    except Exception:
+        broadcast = None
+
+    try:
         box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
         games_collection.update_one(
             {'gameId': game_id},
             {'$set': {
-                'gameId': summary['GameSummary'][0]['GAME_ID'],
+                'gameId': str(summary['GameSummary'][0]['GAME_ID']),
                 'date': summary['GameSummary'][0]['GAME_DATE_EST'][:10],
-                'homeTeamId': summary['GameSummary'][0]['HOME_TEAM_ID'],
-                'awayTeamId': summary['GameSummary'][0]['VISITOR_TEAM_ID'],
+                'homeTeamId': str(summary['GameSummary'][0]['HOME_TEAM_ID']),
+                'awayTeamId': str(summary['GameSummary'][0]['VISITOR_TEAM_ID']),
                 'season': summary['GameSummary'][0]['SEASON'],
-                'broadcast': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
-                'status': summary['GameSummary'][0]['GAME_STATUS_ID'],
-                'gameClock': summary['GameSummary'][0]['LIVE_PC_TIME'],
+                'broadcast': broadcast,
+                'status': get_game_status(summary),
+                'gameClock': get_game_clock(summary, box_score),
                 'matchup': matchup_details(summary, box_score),
                 'pbp': [],
                 'stats': {}
@@ -341,13 +346,13 @@ def upcoming_game(game_id):
         games_collection.update_one(
             {'gameId': game_id},
             {'$set': {
-                'gameId': summary['GameSummary'][0]['GAME_ID'],
+                'gameId': str(summary['GameSummary'][0]['GAME_ID']),
                 'date': summary['GameSummary'][0]['GAME_DATE_EST'][:10],
-                'homeTeamId': summary['GameSummary'][0]['HOME_TEAM_ID'],
-                'awayTeamId': summary['GameSummary'][0]['VISITOR_TEAM_ID'],
+                'homeTeamId': str(summary['GameSummary'][0]['HOME_TEAM_ID']),
+                'awayTeamId': str(summary['GameSummary'][0]['VISITOR_TEAM_ID']),
                 'season': summary['GameSummary'][0]['SEASON'],
-                'broadcast': summary['GameSummary'][0]['NATL_TV_BROADCASTER_ABBREVIATION'],
-                'status': summary['GameSummary'][0]['GAME_STATUS_ID'],
+                'broadcast': broadcast,
+                'status': 2,
                 'gameClock': summary['GameSummary'][0]['LIVE_PC_TIME'],
                 'matchup': {},
                 'pbp': [],
@@ -654,3 +659,4 @@ async def games_daily_update():
 
 if __name__ == '__main__':
     games_prev_day()  # Optionally, pass an offset to change timedelta (e.g., 1 = yesterday)
+    # games_live_update()
