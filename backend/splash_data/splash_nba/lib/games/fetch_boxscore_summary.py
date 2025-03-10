@@ -2,12 +2,12 @@ import time
 import random
 import logging
 from nba_api.stats.endpoints import boxscoresummaryv2
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 # Function to fetch box score stats for a game
 def fetch_box_score_summary(game_id):
-    boxscore = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id, proxy=PROXY).get_normalized_dict()
+    boxscore = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id, proxy=PROXY, headers=HEADERS).get_normalized_dict()
     return boxscore
 
 

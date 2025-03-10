@@ -2,7 +2,7 @@ import time
 import random
 import logging
 from nba_api.stats.endpoints import playercareerstats
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def update_player_career_stats(player):
@@ -12,8 +12,8 @@ def update_player_career_stats(player):
     # Replace with your MongoDB connection string
     players_collection = get_mongo_collection('nba_players')
 
-    player_totals = playercareerstats.PlayerCareerStats(proxy=PROXY, player_id=player).get_normalized_dict()
-    player_per_game = playercareerstats.PlayerCareerStats(proxy=PROXY, player_id=player, per_mode36='PerGame').get_normalized_dict()
+    player_totals = playercareerstats.PlayerCareerStats(proxy=PROXY, headers=HEADERS, player_id=player).get_normalized_dict()
+    player_per_game = playercareerstats.PlayerCareerStats(proxy=PROXY, headers=HEADERS, player_id=player, per_mode36='PerGame').get_normalized_dict()
 
     reg_totals = player_totals['CareerTotalsRegularSeason']
     reg_totals_by_season = player_totals['SeasonTotalsRegularSeason']
@@ -223,8 +223,8 @@ def update_player_career_stats(player):
 
 
 def player_career_stats(player):
-    player_totals = playercareerstats.PlayerCareerStats(proxy=PROXY, player_id=player).get_normalized_dict()
-    player_per_game = playercareerstats.PlayerCareerStats(proxy=PROXY, player_id=player, per_mode36='PerGame').get_normalized_dict()
+    player_totals = playercareerstats.PlayerCareerStats(proxy=PROXY, headers=HEADERS, player_id=player).get_normalized_dict()
+    player_per_game = playercareerstats.PlayerCareerStats(proxy=PROXY, headers=HEADERS, player_id=player, per_mode36='PerGame').get_normalized_dict()
 
     reg_totals = player_totals['CareerTotalsRegularSeason']
     reg_totals_by_season = player_totals['SeasonTotalsRegularSeason']

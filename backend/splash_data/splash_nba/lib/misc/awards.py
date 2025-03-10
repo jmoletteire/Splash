@@ -2,7 +2,7 @@ import time
 import random
 import logging
 from nba_api.stats.endpoints import teamdetails, commonallplayers, playerawards
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def player_award_details():
@@ -85,7 +85,7 @@ def fetch_player_awards(players):
     awards = {}
     for j, player in enumerate(players):
         try:
-            player_awards = playerawards.PlayerAwards(player, proxy=PROXY).get_normalized_dict()['PlayerAwards']
+            player_awards = playerawards.PlayerAwards(player, proxy=PROXY, headers=HEADERS).get_normalized_dict()['PlayerAwards']
 
             for award in player_awards:
                 season = '19' + award['SEASON'][5:] if award['SEASON'][:4] < '2000' else '20' + award['SEASON'][5:]
@@ -134,7 +134,7 @@ def fetch_player_awards(players):
 
 
 def fetch_team_awards(team_id):
-    team_details = teamdetails.TeamDetails(team_id, proxy=PROXY).get_normalized_dict()
+    team_details = teamdetails.TeamDetails(team_id, proxy=PROXY, headers=HEADERS).get_normalized_dict()
     league_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsChampionships']]
     conf_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsConf']]
     div_title_years = [team_dict['YEARAWARDED'] for team_dict in team_details['TeamAwardsDiv']]
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
 
-    all_players = commonallplayers.CommonAllPlayers(proxy=PROXY).get_normalized_dict()['CommonAllPlayers']
+    all_players = commonallplayers.CommonAllPlayers(proxy=PROXY, headers=HEADERS).get_normalized_dict()['CommonAllPlayers']
     player_ids = [player['PERSON_ID'] for player in all_players]
     fetch_player_awards(player_ids)
     player_award_details()

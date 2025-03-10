@@ -2,7 +2,7 @@ import random
 import time
 import logging
 from nba_api.stats.endpoints import playerawards
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +22,7 @@ players = players_collection.count_documents({})
 
 for i, player in enumerate(players_collection.find({}, {"PERSON_ID": 1, "_id": 0})):
     try:
-        player_awards = playerawards.PlayerAwards(player["PERSON_ID"], proxy=PROXY).get_normalized_dict()['PlayerAwards']
+        player_awards = playerawards.PlayerAwards(player["PERSON_ID"], proxy=PROXY, headers=HEADERS).get_normalized_dict()['PlayerAwards']
 
         awards = {}
 

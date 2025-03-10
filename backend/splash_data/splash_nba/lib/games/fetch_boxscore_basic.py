@@ -2,12 +2,12 @@ import time
 import random
 import logging
 from nba_api.live.nba.endpoints import boxscore
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 # Function to fetch box score stats for a game
 def fetch_box_score_stats(game_id):
-    box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
+    box_score = boxscore.BoxScore(proxy=PROXY, headers=HEADERS, game_id=game_id).get_dict()['game']
     return box_score
 
 

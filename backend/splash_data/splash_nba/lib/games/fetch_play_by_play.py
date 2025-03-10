@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 from nba_api.live.nba.endpoints import playbyplay
 from nba_api.stats.endpoints import videoeventsasset
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def convert_playtime(duration_str):
@@ -66,7 +66,7 @@ def update_play_by_play():
 
 # Function to fetch box score stats for a game
 def fetch_play_by_play(game_id):
-    actions = playbyplay.PlayByPlay(proxy=PROXY, game_id=game_id).get_dict()['game']['actions']
+    actions = playbyplay.PlayByPlay(proxy=PROXY, headers=HEADERS, game_id=game_id).get_dict()['game']['actions']
     pbp = []
 
     for i, action in enumerate(actions):
@@ -87,7 +87,7 @@ def fetch_play_by_play(game_id):
         }
 
         # try:
-        #     play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=None, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
+        #     play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=PROXY, headers=HEADERS, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
         #     time.sleep(random.uniform(0.5, 1.0))
         # except Exception:
         #     play_info['videoId'] = None

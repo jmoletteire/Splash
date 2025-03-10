@@ -2,7 +2,7 @@ import random
 import time
 import logging
 from nba_api.stats.endpoints import playergamelogs
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def gamelogs(player_id, season, season_type):
@@ -13,13 +13,13 @@ def gamelogs(player_id, season, season_type):
         return
 
     if season_type == 'PLAYOFFS':
-        gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs').get_normalized_dict()['PlayerGameLogs']
+        gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, headers=HEADERS, player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs').get_normalized_dict()['PlayerGameLogs']
         if season >= '1996-97':
-            adv_gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs', measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
+            adv_gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, headers=HEADERS, player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs', measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
     else:
-        gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, player_id_nullable=player_id, season_nullable=season).get_normalized_dict()['PlayerGameLogs']
+        gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, headers=HEADERS, player_id_nullable=player_id, season_nullable=season).get_normalized_dict()['PlayerGameLogs']
         if season >= '1996-97':
-            adv_gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
+            adv_gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, headers=HEADERS, player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
 
     base_keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:34]
     if season >= '1996-97':

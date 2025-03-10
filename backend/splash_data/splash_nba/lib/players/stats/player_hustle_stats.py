@@ -1,6 +1,6 @@
 import logging
 from nba_api.stats.endpoints import leaguehustlestatsplayer
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON
 
 
 def update_player_hustle_stats(season_type, team_id):
@@ -14,10 +14,10 @@ def update_player_hustle_stats(season_type, team_id):
 
     logging.info(f'Processing HUSTLE stats for {CURR_SEASON}...')
     if season_type == 'REGULAR SEASON':
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, team_id_nullable=team_id, season=CURR_SEASON).get_normalized_dict()[
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, headers=HEADERS, team_id_nullable=team_id, season=CURR_SEASON).get_normalized_dict()[
             'HustleStatsPlayer']
     elif season_type == 'PLAYOFFS':
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, team_id_nullable=team_id, season=CURR_SEASON, season_type_all_star='Playoffs').get_normalized_dict()[
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, headers=HEADERS, team_id_nullable=team_id, season=CURR_SEASON, season_type_all_star='Playoffs').get_normalized_dict()[
             'HustleStatsPlayer']
 
     if len(player_hustle_stats) > 0:
@@ -36,7 +36,7 @@ def update_player_hustle_stats(season_type, team_id):
 def fetch_player_playoff_hustle_stats(seasons):
     for season in seasons:
         logging.info(f'Processing stats for {season}...')
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, season=season,
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, headers=HEADERS, season=season,
                                                                               season_type_all_star='Playoffs').get_normalized_dict()[
             'HustleStatsPlayer']
 
@@ -55,7 +55,7 @@ def fetch_player_playoff_hustle_stats(seasons):
 def fetch_player_hustle_stats(seasons):
     for season in seasons:
         logging.info(f'Processing stats for {season}...')
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, season=season).get_normalized_dict()[
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, headers=HEADERS, season=season).get_normalized_dict()[
             'HustleStatsPlayer']
 
         logging.info(f'Adding data for {len(player_hustle_stats)} players.')

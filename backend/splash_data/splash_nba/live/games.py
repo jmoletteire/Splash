@@ -13,7 +13,7 @@ from splash_nba.lib.games.fetch_play_by_play import update_play_by_play
 from splash_nba.lib.games.nba_cup import update_current_cup, flag_cup_games
 from splash_nba.lib.games.playoff_bracket import reformat_series_data, get_playoff_bracket_data
 from splash_nba.lib.teams.update_team_games import update_team_games
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON
 
 teams = {
     1610612737: 'Atlanta Hawks',
@@ -324,7 +324,7 @@ def upcoming_game(game_id):
         broadcast = None
 
     try:
-        box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
+        box_score = boxscore.BoxScore(proxy=PROXY, headers=HEADERS, game_id=game_id).get_dict()['game']
         games_collection.update_one(
             {'gameId': game_id},
             {'$set': {
@@ -371,10 +371,10 @@ def in_progress_game(game_id, game_line_score):
 
     # Summary, Box Score, PBP
     summary = fetch_box_score_summary(game_id)
-    box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
+    box_score = boxscore.BoxScore(proxy=PROXY, headers=HEADERS, game_id=game_id).get_dict()['game']
 
     try:
-        actions = playbyplay.PlayByPlay(proxy=PROXY, game_id=game_id).get_dict()['game']['actions']
+        actions = playbyplay.PlayByPlay(proxy=PROXY, headers=HEADERS, game_id=game_id).get_dict()['game']['actions']
         pbp = []
 
         for i, action in enumerate(actions):
@@ -438,7 +438,7 @@ def final_game(game_id):
 
     # Finalize Box Score, Adv Stats, and Summary
     summary = fetch_box_score_summary(game_id)
-    box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
+    box_score = boxscore.BoxScore(proxy=PROXY, headers=HEADERS, game_id=game_id).get_dict()['game']
     adv = format_adv_stats(summary=summary, adv_stats=fetch_box_score_adv(game_id))
 
     series = {"home": 0, "away": 0}
@@ -483,7 +483,7 @@ def games_prev_day(offset=1):
     yesterday = (datetime.today() - timedelta(days=offset)).strftime('%Y-%m-%d')
 
     # Else if games today + within 1 hour of first tip-off
-    linescore = scoreboardv2.ScoreboardV2(proxy=PROXY, game_date=yesterday, day_offset=0).get_normalized_dict()
+    linescore = scoreboardv2.ScoreboardV2(proxy=PROXY, headers=HEADERS, game_date=yesterday, day_offset=0).get_normalized_dict()
     line_scores = linescore['LineScore']
     games_yesterday = linescore['GameHeader']
 
@@ -535,7 +535,7 @@ async def games_live_update():
     today = datetime.today().strftime('%Y-%m-%d')
 
     try:
-        scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard(proxy=PROXY).get_dict()
+        scoreboard = nba_api.live.nba.endpoints.scoreboard.ScoreBoard(proxy=PROXY, headers=HEADERS).get_dict()
     except Exception:
         return
 
@@ -567,7 +567,7 @@ async def games_live_update():
 
     # Else if games today + within 1 hour of first tip-off
     try:
-        linescore = scoreboardv2.ScoreboardV2(proxy=PROXY, game_date=first_game_date, day_offset=0).get_normalized_dict()
+        linescore = scoreboardv2.ScoreboardV2(proxy=PROXY, headers=HEADERS, game_date=first_game_date, day_offset=0).get_normalized_dict()
     except Exception:
         return
 
@@ -645,7 +645,7 @@ async def games_daily_update():
     # Playoffs
     logging.info("Playoffs...")
     try:
-        playoff_games = commonplayoffseries.CommonPlayoffSeries(proxy=PROXY, season=CURR_SEASON).get_normalized_dict()[
+        playoff_games = commonplayoffseries.CommonPlayoffSeries(proxy=PROXY, headers=HEADERS, season=CURR_SEASON).get_normalized_dict()[
             'PlayoffSeries']
         if not playoff_games:
             logging.info("(Games Daily) No playoff games found.")

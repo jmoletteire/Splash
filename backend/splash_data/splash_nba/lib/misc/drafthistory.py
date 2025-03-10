@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from nba_api.stats.endpoints import drafthistory, commonplayerinfo, playerawards
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def age_at_draft(year, birth_date):
@@ -95,7 +95,7 @@ def get_awards(player):
     result = players_collection.find_one({'PERSON_ID': player}, {'AWARDS': 1, '_id': 0})
 
     if result is None:
-        awards = playerawards.PlayerAwards(proxy=PROXY, player_id=player).get_normalized_dict()['PlayerAwards']
+        awards = playerawards.PlayerAwards(proxy=PROXY, headers=HEADERS, player_id=player).get_normalized_dict()['PlayerAwards']
         for award in awards:
             if award['DESCRIPTION'] == 'Hall of Fame Inductee':
                 award_checks['hof'] = 1
@@ -131,7 +131,7 @@ def get_additional_info():
         all_star = 0
         for player in draft['SELECTIONS']:
             try:
-                player_data = commonplayerinfo.CommonPlayerInfo(player['PERSON_ID'], proxy=PROXY).get_normalized_dict()['CommonPlayerInfo'][0]
+                player_data = commonplayerinfo.CommonPlayerInfo(player['PERSON_ID'], proxy=PROXY, headers=HEADERS).get_normalized_dict()['CommonPlayerInfo'][0]
                 player['POSITION'] = player_data['POSITION']
                 player['AGE'] = age_at_draft(year, player_data['BIRTHDATE'])
                 player['HEIGHT'] = player_data['HEIGHT']
@@ -167,7 +167,7 @@ def get_additional_info():
 
 
 def draft_history():
-    draft_hist = drafthistory.DraftHistory(proxy=PROXY).get_normalized_dict()['DraftHistory']
+    draft_hist = drafthistory.DraftHistory(proxy=PROXY, headers=HEADERS).get_normalized_dict()['DraftHistory']
 
     # Organize the data into the desired format
     organized_data = {}

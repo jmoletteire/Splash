@@ -2,7 +2,7 @@ import logging
 from itertools import groupby
 from collections import defaultdict
 from nba_api.stats.endpoints import leaguestandings, leaguedashteamstats
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON
 
 
 def determine_tiebreakers(season, standings):
@@ -100,7 +100,7 @@ def break_tie_two_teams(season, teams, rank, standings):
     else:
         # (1) Better winning percentage in games against each other.
         team1_vs_team2 = leaguedashteamstats.LeagueDashTeamStats(
-            proxy=PROXY,
+            proxy=PROXY, headers=HEADERS,
             season=season,
             team_id_nullable=team1['TeamID'],
             opponent_team_id=team2['TeamID']
@@ -161,7 +161,7 @@ def break_tie_two_teams(season, teams, rank, standings):
                                 if team != opponent:
                                     try:
                                         team_vs_opp = leaguedashteamstats.LeagueDashTeamStats(
-                                            proxy=PROXY,
+                                            proxy=PROXY, headers=HEADERS,
                                             season=season,
                                             team_id_nullable=team['TeamID'],
                                             opponent_team_id=opponent
@@ -198,7 +198,7 @@ def break_tie_two_teams(season, teams, rank, standings):
                                     if team != opponent:
                                         try:
                                             team_vs_opp = leaguedashteamstats.LeagueDashTeamStats(
-                                                proxy=PROXY,
+                                                proxy=PROXY, headers=HEADERS,
                                                 season=season,
                                                 team_id_nullable=team['TeamID'],
                                                 opponent_team_id=opponent
@@ -314,7 +314,7 @@ def calculate_head_to_head_pct(team, teams, season):
     for opponent in teams:
         if team['TeamID'] != opponent['TeamID']:
             team_vs_opp = leaguedashteamstats.LeagueDashTeamStats(
-                proxy=PROXY,
+                proxy=PROXY, headers=HEADERS,
                 season=season,
                 team_id_nullable=team['TeamID'],
                 opponent_team_id=opponent['TeamID']
@@ -341,7 +341,7 @@ def calculate_playoff_win_pct(team, standings, season, own_conference=True):
     for opponent in eligible_teams:
         if team['TeamID'] != opponent:
             team_vs_opp = leaguedashteamstats.LeagueDashTeamStats(
-                proxy=PROXY,
+                proxy=PROXY, headers=HEADERS,
                 season=season,
                 team_id_nullable=team['TeamID'],
                 opponent_team_id=opponent
@@ -364,7 +364,7 @@ def update_current_standings():
 
     try:
         logging.info(f"(Standings) Updating standings for Season: {CURR_SEASON}")
-        standings = leaguestandings.LeagueStandings(season=CURR_SEASON, proxy=PROXY).get_normalized_dict()['Standings']
+        standings = leaguestandings.LeagueStandings(season=CURR_SEASON, proxy=PROXY, headers=HEADERS).get_normalized_dict()['Standings']
         determine_tiebreakers(CURR_SEASON, standings)
 
         for i, team in enumerate(standings):
@@ -510,7 +510,7 @@ def fetch_all_standings():
         logging.info(f"Fetching standings for Season: {season}")
 
         try:
-            standings = leaguestandings.LeagueStandings(season=season, proxy=PROXY).get_normalized_dict()['Standings']
+            standings = leaguestandings.LeagueStandings(season=season, proxy=PROXY, headers=HEADERS).get_normalized_dict()['Standings']
             determine_tiebreakers(season, standings)
 
             for i, team in enumerate(standings):

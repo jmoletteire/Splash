@@ -1,6 +1,6 @@
 import logging
 from nba_api.stats.endpoints import franchisehistory
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def update_team_history(team_id):
@@ -13,7 +13,7 @@ def update_team_history(team_id):
 
     try:
         # Fetch the franchise history data
-        history_list = franchisehistory.FranchiseHistory(proxy=PROXY).get_normalized_dict()['FranchiseHistory']
+        history_list = franchisehistory.FranchiseHistory(proxy=PROXY, headers=HEADERS).get_normalized_dict()['FranchiseHistory']
 
         # Organize the data into the desired format
         organized_data = {}

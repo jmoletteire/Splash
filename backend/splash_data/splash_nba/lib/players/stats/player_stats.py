@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from nba_api.stats.endpoints import leaguedashplayerstats
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON
 
 
 def update_player_stats(season_type, team_id):
@@ -16,11 +16,11 @@ def update_player_stats(season_type, team_id):
 
     # Fetch basic and advanced stats for the given season
     if season_type == 'REGULAR SEASON':
-        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, season=CURR_SEASON, team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
-        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, measure_type_detailed_defense='Advanced', season=CURR_SEASON, team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
+        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, season=CURR_SEASON, team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
+        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, measure_type_detailed_defense='Advanced', season=CURR_SEASON, team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
     elif season_type == 'PLAYOFFS':
-        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, season=CURR_SEASON, season_type_all_star='Playoffs', team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
-        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, measure_type_detailed_defense='Advanced', season=CURR_SEASON, season_type_all_star='Playoffs', team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
+        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, season=CURR_SEASON, season_type_all_star='Playoffs', team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
+        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, measure_type_detailed_defense='Advanced', season=CURR_SEASON, season_type_all_star='Playoffs', team_id_nullable=team_id).get_normalized_dict()['LeagueDashPlayerStats']
 
     if len(basic_stats) > 0 and len(adv_stats) > 0:
         basic_keys = list(basic_stats[0].keys())[:35] if len(basic_stats) > 0 else []
@@ -79,8 +79,8 @@ def update_player_stats(season_type, team_id):
 
 def fetch_playoff_stats(seasons):
     for season in seasons:
-        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, season=season, season_type_all_star='Playoffs').get_normalized_dict()['LeagueDashPlayerStats']
-        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, measure_type_detailed_defense='Advanced', season=season, season_type_all_star='Playoffs').get_normalized_dict()['LeagueDashPlayerStats']
+        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, season=season, season_type_all_star='Playoffs').get_normalized_dict()['LeagueDashPlayerStats']
+        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, measure_type_detailed_defense='Advanced', season=season, season_type_all_star='Playoffs').get_normalized_dict()['LeagueDashPlayerStats']
 
         player_stats = [(d1, d2) for d1 in basic_stats for d2 in adv_stats if d1['PLAYER_ID'] == d2['PLAYER_ID']]
 
@@ -106,8 +106,8 @@ def fetch_playoff_stats(seasons):
 def fetch_player_stats(seasons):
     for season in seasons:
         # Fetch basic and advanced stats for the given season
-        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, season=season).get_normalized_dict()['LeagueDashPlayerStats']
-        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, measure_type_detailed_defense='Advanced', season=season).get_normalized_dict()['LeagueDashPlayerStats']
+        basic_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, season=season).get_normalized_dict()['LeagueDashPlayerStats']
+        adv_stats = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, measure_type_detailed_defense='Advanced', season=season).get_normalized_dict()['LeagueDashPlayerStats']
 
         # Combine basic and advanced stats based on PLAYER_ID
         combined_list = [(d1, d2) for d1 in basic_stats for d2 in adv_stats if d1['PLAYER_ID'] == d2['PLAYER_ID']]

@@ -2,7 +2,7 @@ import logging
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import teamdetails
 from splash_nba.lib.teams.team_history import update_team_history
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def update_teams():
@@ -23,7 +23,7 @@ def fetch_teams():
 
         # Insert teams into the collection
         for team_id in team_ids:
-            team_details = teamdetails.TeamDetails(team_id, proxy=PROXY)
+            team_details = teamdetails.TeamDetails(team_id, proxy=PROXY, headers=HEADERS)
             team_info = team_details.get_normalized_dict()['TeamBackground'][0]
             teams_collection.insert_one(team_info)
 

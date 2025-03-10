@@ -8,10 +8,9 @@ if env_path not in sys.path:
     sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
 try:
-    from env import URI, PREV_SEASON, CURR_SEASON, CURR_SEASON_TYPE, PROXY
     from mongo_connect import get_mongo_collection
 except ImportError:
-    raise ImportError("env.py could not be found locally or at /home/ubuntu.")
+    raise ImportError("mongo_connect.py could not be found locally or at /home/ubuntu.")
 
 games_bp = Blueprint('games', __name__)
 

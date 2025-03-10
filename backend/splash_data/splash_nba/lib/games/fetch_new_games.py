@@ -2,7 +2,7 @@ import time
 import logging
 from datetime import datetime, timedelta
 from nba_api.stats.endpoints import ScoreboardV2
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def fetch_upcoming_games(game_date):
@@ -26,7 +26,7 @@ def fetch_upcoming_games(game_date):
         '6': 'IST_FINAL'
     }
     try:
-        scoreboard = ScoreboardV2(proxy=PROXY, game_date=game_date, day_offset=0)
+        scoreboard = ScoreboardV2(proxy=PROXY, headers=HEADERS, game_date=game_date, day_offset=0)
         games = scoreboard.get_normalized_dict()
     except Exception as e:
         logging.error(f"(Upcoming Games) Failed to fetch games for {game_date}: {e}", exc_info=True)

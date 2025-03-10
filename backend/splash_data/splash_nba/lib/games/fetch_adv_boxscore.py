@@ -3,12 +3,12 @@ import random
 import logging
 from datetime import datetime
 from nba_api.stats.endpoints import boxscoreadvancedv2
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 # Function to fetch box score stats for a game
 def fetch_box_score_adv(game_id):
-    boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(proxy=PROXY, game_id=game_id).get_normalized_dict()
+    boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(proxy=PROXY, headers=HEADERS, game_id=game_id).get_normalized_dict()
     return boxscore
 
 

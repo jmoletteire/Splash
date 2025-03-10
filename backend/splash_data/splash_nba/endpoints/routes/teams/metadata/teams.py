@@ -8,7 +8,7 @@ if env_path not in sys.path:
     sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
 try:
-    from env import URI, PREV_SEASON, CURR_SEASON, CURR_SEASON_TYPE, PROXY
+    from env import URI, PREV_SEASON, CURR_SEASON, CURR_SEASON_TYPE
     from mongo_connect import get_mongo_collection
 except ImportError:
     raise ImportError("env.py could not be found locally or at /home/ubuntu.")

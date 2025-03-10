@@ -2,7 +2,7 @@ import time
 import logging
 from collections import defaultdict
 from nba_api.stats.endpoints import shotchartdetail, videodetailsasset, shotchartleaguewide
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
@@ -12,10 +12,10 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
     # Replace with your MongoDB connection string
     player_shots_collection = get_mongo_collection('nba_player_shot_data')
 
-    shot_data = shotchartdetail.ShotChartDetail(proxy=PROXY, player_id=player, team_id=team, season_nullable=season,
+    shot_data = shotchartdetail.ShotChartDetail(proxy=PROXY, headers=HEADERS, player_id=player, team_id=team, season_nullable=season,
                                                 season_type_all_star=season_type,
                                                 context_measure_simple='FGA').get_normalized_dict()
-    video_data = videodetailsasset.VideoDetailsAsset(proxy=PROXY, player_id=player, team_id=team, season=season,
+    video_data = videodetailsasset.VideoDetailsAsset(proxy=PROXY, headers=HEADERS, player_id=player, team_id=team, season=season,
                                                 season_type_all_star=season_type,
                                                 context_measure_detailed='FGA').get_normalized_dict()
 
@@ -67,7 +67,7 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
             upsert=True
         )
 
-        league_avg = shotchartleaguewide.ShotChartLeagueWide(proxy=PROXY, season=season).get_normalized_dict()
+        league_avg = shotchartleaguewide.ShotChartLeagueWide(proxy=PROXY, headers=HEADERS, season=season).get_normalized_dict()
 
         # Mapping from SHOT_ZONE_AREA and SHOT_ZONE_BASIC to your Dart zone names
         zone_mapping = {

@@ -3,6 +3,7 @@ try:
     from splash_nba.util.env import URI, PREV_SEASON, CURR_SEASON, NEXT_SEASON, CURR_SEASON_TYPE, NEWS_API_KEY, YOUTUBE_API_KEY
     from splash_nba.util.mongo_connect import get_mongo_collection
     PROXY = None
+    HEADERS = None
 except ImportError:
     # Fallback to the remote env.py path
     import sys
@@ -12,7 +13,7 @@ except ImportError:
         sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
     try:
-        from env import PROXY, URI, PREV_SEASON, CURR_SEASON, NEXT_SEASON, CURR_SEASON_TYPE, NEWS_API_KEY, YOUTUBE_API_KEY
+        from env import PROXY, HEADERS, URI, PREV_SEASON, CURR_SEASON, NEXT_SEASON, CURR_SEASON_TYPE, NEWS_API_KEY, YOUTUBE_API_KEY
     except ImportError:
         raise ImportError("env.py could not be found locally or at /home/ubuntu.")
 

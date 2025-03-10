@@ -1,6 +1,6 @@
 import logging
 import requests
-from splash_nba.imports import get_mongo_collection, PROXY
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 # Function to compare old data with new data and find new entries
@@ -26,7 +26,7 @@ def update_transactions():
 
     # Fetch the data from the URL
     url = "https://stats.nba.com/js/data/playermovement/NBA_Player_Movement.json"
-    response = requests.get(url, proxies=PROXY)
+    response = requests.get(url, proxies=PROXY, headers=HEADERS)
 
     # Check if the request was successful
     if response.status_code == 200:

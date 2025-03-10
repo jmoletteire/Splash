@@ -18,7 +18,7 @@ from splash_nba.lib.players.stats.update_custom_player_stats import update_playe
     update_adj_turnover_pct, update_versatility_score, update_matchup_difficulty_and_dps
 from splash_nba.lib.players.update_all_players import add_players, restructure_new_docs, update_player_info
 from splash_nba.lib.players.update_player_contracts import fetch_player_contract_data, keep_most_informative
-from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON, CURR_SEASON_TYPE
 
 
 async def update_players(team_ids):
@@ -338,7 +338,7 @@ async def players_daily_update():
         # Update awards for all ACTIVE players
         for i, player in enumerate(players_collection.find({'ROSTERSTATUS': 'Active'}, {"PERSON_ID": 1, "_id": 0})):
             try:
-                player_awards = playerawards.PlayerAwards(player["PERSON_ID"], proxy=PROXY).get_normalized_dict()['PlayerAwards']
+                player_awards = playerawards.PlayerAwards(player["PERSON_ID"], proxy=PROXY, headers=HEADERS).get_normalized_dict()['PlayerAwards']
 
                 awards = {}
 

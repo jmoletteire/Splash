@@ -1,6 +1,6 @@
 import logging
 from nba_api.stats.endpoints import leaguedashteamstats, leaguehustlestatsteam
-from splash_nba.imports import PROXY, CURR_SEASON, get_mongo_collection
+from splash_nba.imports import PROXY, HEADERS, CURR_SEASON, get_mongo_collection
 
 
 def calculate_percentile_rank(value, total):
@@ -76,6 +76,7 @@ def fetch_team_stats(seasons: list = None, season_types: list = None, use_proxy:
 
     # Set proxy usage
     proxy = PROXY if use_proxy else None
+    headers = HEADERS if use_proxy else None
 
     for season in seasons:
         logging.info(f"Fetching stats for season: {season}")
@@ -113,7 +114,7 @@ def fetch_team_stats(seasons: list = None, season_types: list = None, use_proxy:
                     # Get basic stats
                     for mode in basic_modes:
                         basic_stats = leaguedashteamstats.LeagueDashTeamStats(
-                            season=season, season_type_all_star=season_type, per_mode_detailed=mode, timeout=30, proxy=proxy
+                            season=season, season_type_all_star=season_type, per_mode_detailed=mode, timeout=30, proxy=proxy, headers=headers
                         ).get_normalized_dict()['LeagueDashTeamStats']
 
                         for team_stats in basic_stats:
@@ -145,7 +146,7 @@ def fetch_team_stats(seasons: list = None, season_types: list = None, use_proxy:
                     }
 
                     adv_stats = leaguedashteamstats.LeagueDashTeamStats(
-                        season=season, season_type_all_star=season_type, measure_type_detailed_defense='Advanced', timeout=30, proxy=proxy
+                        season=season, season_type_all_star=season_type, measure_type_detailed_defense='Advanced', timeout=30, proxy=proxy, headers=headers
                     ).get_normalized_dict()['LeagueDashTeamStats']
 
                     for team_stats in adv_stats:
@@ -175,7 +176,7 @@ def fetch_team_stats(seasons: list = None, season_types: list = None, use_proxy:
                     modes = ['Totals', 'PerGame']
                     for mode in modes:
                         hustle_stats = leaguehustlestatsteam.LeagueHustleStatsTeam(
-                            season=season, season_type_all_star=season_type, per_mode_time=mode, timeout=30, proxy=proxy
+                            season=season, season_type_all_star=season_type, per_mode_time=mode, timeout=30, proxy=proxy, headers=headers
                         ).get_normalized_dict()['HustleStatsTeam']
 
                         for team_stats in hustle_stats:
