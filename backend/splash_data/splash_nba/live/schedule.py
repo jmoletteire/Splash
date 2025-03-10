@@ -37,7 +37,7 @@ def setup_scheduler():
     # Schedule tasks
     # Run `live_update` every 20 seconds (ensures live game updates are always fresh)
     scheduler.add_job(
-        lambda: asyncio.run(live_update()),  # Creates a new task that runs in the background
+        live_update,  # Creates a new task that runs in the background
         IntervalTrigger(seconds=20), coalesce=True, max_instances=1, misfire_grace_time=10
     )
 
@@ -53,7 +53,7 @@ def setup_scheduler():
     # )
 
     scheduler.add_job(
-        lambda: asyncio.run(daily_update()),  # Runs in a separate task
+        daily_update,  # Runs in a separate task
         CronTrigger(hour=2, minute=0, timezone='America/Chicago'),  # 2AM CST
         coalesce=True, max_instances=1, misfire_grace_time=18000,
     )
