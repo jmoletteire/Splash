@@ -441,15 +441,15 @@ def final_game(game_id):
     box_score = boxscore.BoxScore(proxy=PROXY, game_id=game_id).get_dict()['game']
     adv = format_adv_stats(summary=summary, adv_stats=fetch_box_score_adv(game_id))
 
-    series = {"home": "0", "away": "0"}
+    series = {"home": 0, "away": 0}
 
     if "SeasonSeries" in summary:
         try:
             series["home"] = summary["SeasonSeries"][0]["HOME_TEAM_WINS"]
             series["away"] = summary["SeasonSeries"][0]["HOME_TEAM_LOSSES"]
         except Exception:
-            series["home"] = "0"
-            series["away"] = "0"
+            series["home"] = 0
+            series["away"] = 0
 
     try:
         adv_null_check = adv['home']['players'][0]['MIN'] is not None
