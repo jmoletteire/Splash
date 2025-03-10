@@ -412,8 +412,8 @@ def in_progress_game(game_id, game_line_score):
         {'$set': {
             "homeTeamId": str(box_score.get('homeTeam', {}).get('teamId', 0)),
             "awayTeamId": str(box_score.get('awayTeam', {}).get('teamId', 0)),
-            "homeScore": str(home_line_score.get("PTS", "") if home_line_score.get("PTS", "") is not None else ""),
-            "awayScore": str(away_line_score.get("PTS", "") if away_line_score.get("PTS", "") is not None else ""),
+            "homeScore": home_line_score.get("PTS", None),
+            "awayScore": away_line_score.get("PTS", None),
             "broadcast": broadcast,
             "status": get_game_status(summary),
             "gameClock": get_game_clock(summary, box_score),
