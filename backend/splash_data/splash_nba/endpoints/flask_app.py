@@ -966,7 +966,7 @@ def team_sse():
                                 "updatedFields": updated_fields
                             }
 
-                            logging.info(f"Streaming SSE Event: {event_data}")
+                            # logging.info(f"Streaming SSE Event: {event_data}")
                             yield f"data: {json.dumps(event_data)}\n\n".encode('utf-8')
                             sys.stdout.flush()  # Ensure the buffer is flushed
                             logging.info("Yielded event data")
