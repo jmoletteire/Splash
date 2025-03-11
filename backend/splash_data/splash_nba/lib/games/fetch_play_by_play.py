@@ -94,7 +94,7 @@ def fetch_play_by_play(game_id):
 
         pbp.append(play_info)
 
-    return pbp
+    return pbp.sort(key=lambda x: x['action'], reverse=True)
 
 
 if __name__ == "__main__":

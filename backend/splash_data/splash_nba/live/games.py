@@ -343,7 +343,11 @@ def upcoming_game(game_id):
                 'gameClock': get_game_clock(summary, box_score),
                 'matchup': matchup_details(summary, box_score),
                 'pbp': [],
-                'stats': {}
+                'stats': {
+                    "home": {"team": {}, "players": []},
+                    "away": {"team": {}, "players": []},
+                    "linescore": {}
+                }
             }}
         )
         logging.info(f'(Games Live) Upcoming game {game_id} is up to date + Box Score.')
@@ -361,7 +365,11 @@ def upcoming_game(game_id):
                 'gameClock': game_summary['LIVE_PC_TIME'],
                 'matchup': matchup_details(summary, {}),
                 'pbp': [],
-                'stats': {}
+                'stats': {
+                    "home": {"team": {}, "players": []},
+                    "away": {"team": {}, "players": []},
+                    "linescore": {}
+                }
             }}
         )
         logging.info(f'(Games Live) Upcoming game {game_id} is up to date.')
