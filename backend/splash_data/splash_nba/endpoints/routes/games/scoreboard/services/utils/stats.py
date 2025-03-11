@@ -213,7 +213,7 @@ def player_stats(status, stats, adv):
         "freeThrowsMade": "FTM",
         "minutes": "MIN",
         "points": "PTS",
-        "plusMinusPoints": "+/-",
+        "plusMinusPoints": "PlusMinus",
         "reboundsDefensive": "DRB",
         "reboundsOffensive": "ORB",
         "reboundsTotal": "REB",
