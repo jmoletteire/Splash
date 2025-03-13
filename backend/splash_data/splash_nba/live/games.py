@@ -138,7 +138,10 @@ def get_game_clock(summary, boxscore):
 
     if status == 1:
         # Upcoming
-        return game_summary['GAME_STATUS_TEXT'].replace(" ET", "").replace(" ", "")
+        if clock == "     ":
+            return "Pregame"
+        else:
+            return game_summary['GAME_STATUS_TEXT'].replace(" ET", "").replace(" ", "")
     elif status == 2:
         # End Quarter
         if clock == ":0.0" or clock == "     ":
