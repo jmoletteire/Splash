@@ -295,8 +295,8 @@ def matchup_details(summary, boxscore):
             series["home"] = summary["SeasonSeries"][0]["HOME_TEAM_WINS"]
             series["away"] = summary["SeasonSeries"][0]["HOME_TEAM_LOSSES"]
         except Exception:
-            series["home"] = "0"
-            series["away"] = "0"
+            series["home"] = 0
+            series["away"] = 0
 
     return {
         "matchup": matchup,
