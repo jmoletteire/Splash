@@ -131,17 +131,23 @@ def get_game_clock(summary, boxscore):
     except Exception:
         return ''
 
-    status = game_summary.get('GAME_STATUS_ID', 0)
+    status = boxscore.get('gameStatus', game_summary.get('GAME_STATUS_ID', 0))
 
-    period = game_summary['LIVE_PERIOD']
-    clock = game_summary['LIVE_PC_TIME']
+    period = boxscore.get('period', game_summary.get('LIVE_PERIOD', 0))
+    try:
+        clock = format_duration(boxscore.get('gameClock', ''))
+    except Exception:
+        clock = game_summary.get('LIVE_PC_TIME', '')
+
+    if clock == "":
+        clock = game_summary.get('LIVE_PC_TIME', '')
 
     if status == 1:
         # Upcoming
         if clock == "     ":
             return "Pregame"
         else:
-            return game_summary['GAME_STATUS_TEXT'].replace(" ET", "").replace(" ", "")
+            return boxscore.get('gameStatusText', game_summary.get('GAME_STATUS_TEXT', '')).replace(" ET", "").replace(" ", "")
     elif status == 2:
         # End Quarter
         if clock == ":0.0" or clock == "     ":
@@ -414,8 +420,8 @@ def in_progress_game(game_id, game_line_score):
     except Exception:
         pbp = []
 
-    home_line_score = game_line_score[0] if game_line_score[0]['TEAM_ID'] == box_score['homeTeam']['teamId'] else game_line_score[1]
-    away_line_score = game_line_score[0] if game_line_score[0]['TEAM_ID'] == box_score['awayTeam']['teamId'] else game_line_score[1]
+    # home_line_score = game_line_score[0] if game_line_score[0]['TEAM_ID'] == box_score['homeTeam']['teamId'] else game_line_score[1]
+    # away_line_score = game_line_score[0] if game_line_score[0]['TEAM_ID'] == box_score['awayTeam']['teamId'] else game_line_score[1]
 
     try:
         broadcast = summary["GameSummary"][0]["NATL_TV_BROADCASTER_ABBREVIATION"]
@@ -428,8 +434,8 @@ def in_progress_game(game_id, game_line_score):
         {'$set': {
             "homeTeamId": str(box_score.get('homeTeam', {}).get('teamId', 0)),
             "awayTeamId": str(box_score.get('awayTeam', {}).get('teamId', 0)),
-            "homeScore": home_line_score.get("PTS", None),
-            "awayScore": away_line_score.get("PTS", None),
+            "homeScore": box_score.get('homeTeam', {}).get('score', None),
+            "awayScore": box_score.get('awayTeam', {}).get('score', None),
             "broadcast": broadcast,
             "status": get_game_status(summary),
             "gameClock": get_game_clock(summary, box_score),
