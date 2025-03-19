@@ -137,7 +137,10 @@ def calculated_stats(stats, team_stats):
     except Exception as e:
         # logging.error(f"Error retrieving Assist / Turnover: {e}")
         # logging.error(traceback.format_exc())
-        team_stats["Assist : Turnover"] = "0.00"
+        try:
+            team_stats["Assist : Turnover"] = f"{team_stats['Assists'] / team_stats['Turnovers']:.2f}"
+        except Exception as e:
+            team_stats["Assist : Turnover"] = "0.00"
 
     return team_stats
 

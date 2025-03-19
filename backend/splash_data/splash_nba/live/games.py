@@ -132,8 +132,8 @@ def get_game_clock(summary, boxscore):
         return ''
 
     status = boxscore.get('gameStatus', game_summary.get('GAME_STATUS_ID', 0))
-
     period = boxscore.get('period', game_summary.get('LIVE_PERIOD', 0))
+
     try:
         clock = format_duration(boxscore.get('gameClock', ''))
     except Exception:
@@ -371,7 +371,7 @@ def upcoming_game(game_id):
                 'season': game_summary['SEASON'],
                 'broadcast': broadcast,
                 'status': 2,
-                'gameClock': game_summary['LIVE_PC_TIME'],
+                'gameClock': get_game_clock(summary, {}),
                 'matchup': matchup_details(summary, {}),
                 'pbp': [],
                 'stats': {
