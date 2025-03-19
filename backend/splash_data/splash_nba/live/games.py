@@ -370,7 +370,7 @@ def upcoming_game(game_id):
                 'awayTeamId': str(game_summary['VISITOR_TEAM_ID']),
                 'season': game_summary['SEASON'],
                 'broadcast': broadcast,
-                'status': 2,
+                'status': get_game_status(summary),
                 'gameClock': get_game_clock(summary, {}),
                 'matchup': matchup_details(summary, {}),
                 'pbp': [],
