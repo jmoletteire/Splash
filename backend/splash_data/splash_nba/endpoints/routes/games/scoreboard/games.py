@@ -29,7 +29,7 @@ def get_scoreboard():
         if game_id is None:
             games = list(games_collection.find({"date": game_date}, proj))
         else:
-            games = list(games_collection.find_one({"gameId": game_id}, proj))
+            games = games_collection.find_one({"gameId": game_id}, proj)
 
         return jsonify(games) if games else jsonify({}), 200  # Always return a valid response
 
