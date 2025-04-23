@@ -1,6 +1,5 @@
 import re
 import logging
-import traceback
 
 
 def convert_playtime(duration_str):

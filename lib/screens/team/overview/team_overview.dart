@@ -117,11 +117,11 @@ class _TeamOverviewState extends State<TeamOverview> {
                             radius: 10.0.r,
                             backgroundColor: Colors.white24,
                             playerImageUrl:
-                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.team['seasons'][kCurrentSeason]['COACHES'][0]['COACH_ID']}.png',
+                                'https://cdn.nba.com/headshots/nba/latest/1040x760/${widget.team['SEASONS'][kCurrentSeason]['COACHES'][0]['COACH_ID']}.png',
                           ),
                           SizedBox(width: 10.0.r),
                           Text(
-                            '${widget.team['seasons'][kCurrentSeason]['COACHES'][0]['COACH_NAME']}',
+                            '${widget.team['SEASONS'][kCurrentSeason]['COACHES'][0]['COACH_NAME']}',
                             style: kBebasNormal.copyWith(fontSize: 16.0.r),
                           ),
                         ],

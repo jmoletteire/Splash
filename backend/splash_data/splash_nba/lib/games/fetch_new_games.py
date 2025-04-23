@@ -46,7 +46,7 @@ def fetch_upcoming_games(game_date):
                           'seasonType': season_type_map[season_type],
                           'homeTeamId': details['HOME_TEAM_ID'],
                           'awayTeamId': details['VISITOR_TEAM_ID'],
-                          'broadcast': details['BROADCAST'],
+                          'broadcast': details['BROADCAST'] if 'BROADCAST' in details else "",
                           'gameClock': "",
                           'status': "1",
                           "matchup": {},
@@ -79,8 +79,8 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        start_date = datetime(2024, 11, 15)
-        end_date = datetime(2024, 11, 15)
+        start_date = datetime(2025, 4, 14)
+        end_date = datetime(2025, 4, 30)
 
         # Fetch games for each date in the range
         fetch_games_for_date_range(start_date, end_date)

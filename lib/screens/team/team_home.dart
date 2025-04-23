@@ -104,31 +104,33 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
 
   Map<String, dynamic> getNextGame() {
     for (String season in kSeasons) {
-      Map<String, dynamic> schedule = team['seasons'][season]['GAMES'];
+      Map<String, dynamic> schedule = team['SEASONS']?[season]?['GAMES'] ?? {};
 
-      // Convert the map to a list of entries
-      var entries = schedule.entries.toList();
+      if (schedule.isNotEmpty) {
+        // Convert the map to a list of entries
+        var entries = schedule.entries.toList();
 
-      // Sort the entries by the GAME_DATE value
-      entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
+        // Sort the entries by the GAME_DATE value
+        entries.sort((a, b) => a.value['GAME_DATE'].compareTo(b.value['GAME_DATE']));
 
-      // Extract the sorted keys
-      var games = entries.map((e) => e.key).toList();
+        // Extract the sorted keys
+        var games = entries.map((e) => e.key).toList();
 
-      final nextGame = DateTime.parse(schedule[games.last]['GAME_DATE']);
-      final today = DateTime.now();
+        final nextGame = DateTime.parse(schedule[games.last]['GAME_DATE']);
+        final today = DateTime.now();
 
-      // Strip the time part by only keeping year, month, and day
-      final nextGameDate = DateTime(nextGame.year, nextGame.month, nextGame.day);
-      final todayDate = DateTime(today.year, today.month, today.day);
+        // Strip the time part by only keeping year, month, and day
+        final nextGameDate = DateTime(nextGame.year, nextGame.month, nextGame.day);
+        final todayDate = DateTime(today.year, today.month, today.day);
 
-      // If season has not ended
-      if (nextGameDate.compareTo(todayDate) >= 0) {
-        // Find next game
-        for (var game in games) {
-          if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) >= 0 &&
-              schedule[game]['RESULT'] != 'Cancelled') {
-            return schedule[game];
+        // If season has not ended
+        if (nextGameDate.compareTo(todayDate) >= 0) {
+          // Find next game
+          for (var game in games) {
+            if (DateTime.parse(schedule[game]['GAME_DATE']).compareTo(todayDate) >= 0 &&
+                schedule[game]['RESULT'] != 'Cancelled') {
+              return schedule[game];
+            }
           }
         }
       }
@@ -273,13 +275,13 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
                               RichText(
                                 text: TextSpan(
                                   text:
-                                      "${team['seasons'][kCurrentSeason]['WINS']!.toInt()}-${team['seasons'][kCurrentSeason]['LOSSES']!.toInt()}",
+                                      "${team['SEASONS'][kCurrentSeason]['WINS']!.toInt()}-${team['SEASONS'][kCurrentSeason]['LOSSES']!.toInt()}",
                                   style: kBebasNormal.copyWith(
                                       fontSize: 16.0.r, color: Colors.grey.shade300),
                                   children: [
                                     TextSpan(
                                       text:
-                                          '  (${getStanding(team['seasons'][kCurrentSeason]['STANDINGS']['PlayoffRank'])} ${team['seasons'][kCurrentSeason]['STANDINGS']['Conference'].substring(0, 4)})',
+                                          '  (${getStanding(team['SEASONS'][kCurrentSeason]['STANDINGS']['PlayoffRank'])} ${team['SEASONS'][kCurrentSeason]['STANDINGS']['Conference'].substring(0, 4)})',
                                       style: kBebasNormal.copyWith(
                                           fontSize: 14.5.r, color: Colors.grey.shade300),
                                     ),
@@ -513,12 +515,12 @@ class TeamInfo extends StatelessWidget {
                 RichText(
                   text: TextSpan(
                     text:
-                        "${team['seasons'][kCurrentSeason]['WINS']!.toInt()}-${team['seasons'][kCurrentSeason]['LOSSES']!.toInt()}",
+                        "${team['SEASONS'][kCurrentSeason]['WINS']!.toInt()}-${team['SEASONS'][kCurrentSeason]['LOSSES']!.toInt()}",
                     style: kBebasNormal.copyWith(fontSize: 32.0.r),
                     children: [
                       TextSpan(
                         text:
-                            '  (${getStanding(team['seasons'][kCurrentSeason]['STANDINGS']['PlayoffRank'])} ${team['seasons'][kCurrentSeason]['STANDINGS']['Conference'].substring(0, 4)})',
+                            '  (${getStanding(team['SEASONS'][kCurrentSeason]['STANDINGS']['PlayoffRank'])} ${team['SEASONS'][kCurrentSeason]['STANDINGS']['Conference'].substring(0, 4)})',
                         style: kBebasNormal.copyWith(fontSize: 22.0.r),
                       ),
                     ],

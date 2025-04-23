@@ -384,7 +384,7 @@ def upcoming_game(game_id):
         logging.info(f'(Games Live) Upcoming game {game_id} is up to date.')
 
 
-def in_progress_game(game_id, game_line_score):
+def in_progress_game(game_id):
     try:
         games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
@@ -532,7 +532,7 @@ def games_prev_day(offset=1):
                     f'(Games Live) Game {game["GAME_ID"]} already finalized, skipping update. [{datetime.now()}]')
                 continue  # Skip this game as it's already been finalized
             else:
-                in_progress_game(game["GAME_ID"], line_score)
+                in_progress_game(game["GAME_ID"])
                 final_game(game["GAME_ID"])
 
 
@@ -680,5 +680,6 @@ async def games_daily_update():
 
 
 if __name__ == '__main__':
-    games_prev_day()  # Optionally, pass an offset to change timedelta (e.g., 1 = yesterday)
+    for i in range(5, 9):
+        games_prev_day(i)  # Optionally, pass an offset to change timedelta (e.g., 1 = yesterday)
     # games_live_update()
