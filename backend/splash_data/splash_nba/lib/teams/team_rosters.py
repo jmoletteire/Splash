@@ -1,5 +1,7 @@
 import time
 import logging
+from json import JSONDecodeError
+
 from nba_api.stats.endpoints import commonteamroster, playercareerstats
 from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON, PREV_SEASON
 
@@ -32,7 +34,11 @@ def update_current_roster(team_id, season_not_started):
 
         # Get player stats
         for player in team_roster:
-            player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID'], proxy=PROXY, headers=HEADERS).get_normalized_dict()['SeasonTotalsRegularSeason']
+            try:
+                player_stats = playercareerstats.PlayerCareerStats(player_id=player['PLAYER_ID'], proxy=PROXY, headers=HEADERS).get_normalized_dict()['SeasonTotalsRegularSeason']
+            except JSONDecodeError:
+                player_stats = []
+
             player_season_stats = [season_stats for season_stats in player_stats if season_stats['SEASON_ID'] == player_season and season_stats['TEAM_ID'] == team_id]
             try:
                 if len(player_season_stats) > 0:

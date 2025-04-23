@@ -34,7 +34,7 @@ def calculate_percentile(path, league_teams_path):
                         "$let": {
                             "vars": {
                                 "rank": {"$toInt": f"${path}.Rank"},
-                                "total": f"${league_teams_path}"
+                                "total": {"$toInt": f"${league_teams_path}"}
                             },
                             "in": {
                                 "$cond": {

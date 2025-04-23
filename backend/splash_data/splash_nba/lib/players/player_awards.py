@@ -1,6 +1,8 @@
 import random
 import time
 import logging
+from json import JSONDecodeError
+
 from nba_api.stats.endpoints import playerawards
 from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
@@ -39,8 +41,10 @@ for i, player in enumerate(players_collection.find({}, {"PERSON_ID": 1, "_id": 0
 
         logging.info(f"Updated {i + 1} of {players}")
 
+    except JSONDecodeError:
+        logging.error(f"Unable to process player {player['PERSON_ID']}: No awards")
     except Exception as e:
-        logging.error(f"Unable to process player {player['PERSON_ID']}: {e}")
+        logging.error(f"Unable to process player {player['PERSON_ID']}: {e}", exc_info=True)
 
     # Pause for a random time between 0.5 and 2 seconds
     time.sleep(random.uniform(0.5, 2.0))

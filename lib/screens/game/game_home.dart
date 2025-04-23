@@ -70,99 +70,6 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   String overUnder = '';
 
   /// ******************************************************
-  ///                    Set Game Odds
-  /// ******************************************************
-
-  void calculateMoneyLineOdds(bool isLive) {
-    int decimalToMoneyline(double decimalOdds) {
-      if (decimalOdds <= 1.0) {
-        throw ArgumentError('Decimal odds must be greater than 1.');
-      }
-
-      if (decimalOdds >= 2.0) {
-        // Positive moneyline odds
-        return ((decimalOdds - 1.0) * 100).round();
-      } else {
-        // Negative moneyline odds
-        return (-100 / (decimalOdds - 1.0)).round();
-      }
-    }
-
-    // MoneyLine
-    try {
-      int raw = decimalToMoneyline(
-          double.parse(odds['oddstypes'][isLive ? '19' : '1']['outcomes']['1']['odds']));
-      if (raw > 0) {
-        moneyLine = '+${raw.toString()}';
-      } else {
-        moneyLine = raw.toString();
-      }
-    } catch (e) {
-      moneyLine = '';
-    }
-  }
-
-  void calculateSpreadOdds(bool isLive) {
-    // Spread
-    try {
-      double raw = double.parse(odds['oddstypes'][isLive ? '168' : '4']['hcp']['value']);
-      if (raw > 0) {
-        spread = '+${raw.toStringAsFixed(1)}';
-      } else {
-        spread = raw.toStringAsFixed(1);
-      }
-    } catch (e) {
-      spread = '';
-    }
-  }
-
-  void calculateOverUnderOdds(bool isLive) {
-    // Over/Under
-    try {
-      double raw = double.parse(odds['oddstypes'][isLive ? '18' : '3']['hcp']['value']);
-      overUnder = raw.toStringAsFixed(1);
-    } catch (e) {
-      overUnder = '';
-    }
-  }
-
-  void setOdds(Map<String, dynamic> game) {
-    bool isLive = false;
-
-    try {
-      if (game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] != 1 &&
-          game['ODDS']?['LIVE'].containsKey('26338')) {
-        odds = game['ODDS']?['LIVE']?['26338'];
-        isLive = true;
-      } else {
-        odds = game['ODDS']?['BOOK']?['18186'];
-      }
-    } catch (e) {
-      odds = {};
-      return;
-    }
-
-    calculateMoneyLineOdds(isLive);
-    calculateSpreadOdds(isLive);
-    calculateOverUnderOdds(isLive);
-
-    if (odds !=
-        {
-          'ML': moneyLine,
-          'SPREAD': spread,
-          'OU': overUnder,
-        }) {
-      setState(() {
-        odds = {
-          'ML': moneyLine,
-          'SPREAD': spread,
-          'OU': overUnder,
-        };
-      });
-    }
-  }
-
-  /// ******************************************************
   ///             Initialize Game Data & Timer
   /// ******************************************************
 
@@ -175,7 +82,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
   Future<void> getGame(String gameId, String gameDate) async {
     var fetchedGame = await Game().getGame(gameId, gameDate);
-    game = fetchedGame;
+    game = fetchedGame.first;
     setSummaryLineScore();
   }
 
@@ -208,9 +115,6 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       // Set game data
       game = widget.gameData!;
     }
-
-    // Set odds
-    setOdds(game);
 
     // Check if upcoming
     _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;

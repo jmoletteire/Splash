@@ -4,7 +4,7 @@ import 'package:splash/utilities/nba_api/library/network.dart';
 class Game {
   Network network = Network();
 
-  Future<Map<String, dynamic>> getGame(String gameId, String gameDate) async {
+  Future<List<Map<String, dynamic>>> getGame(String gameId, String gameDate) async {
     // Create the query parameters map
     Map<String, String> queryParams = {'gameId': gameId, 'date': gameDate};
 
@@ -17,7 +17,7 @@ class Game {
 
     // Fetch the data from the network
     dynamic jsonData = await network.getData(url);
-    Map<String, dynamic> game = jsonData;
+    List<Map<String, dynamic>> game = jsonData;
     return game;
   }
 }

@@ -40,40 +40,23 @@ def get_last_game(seasons):
     return None, None
 
 
-def get_last_lineup(team_id, last_game_id, last_game_date):
+def get_last_lineup(team_id, last_game_id):
     # Connect to MongoDB
     try:
-        games_collection = get_mongo_collection('nba_games')
+        games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
         logging.error(f"\tFailed to connect to MongoDB: {e}", exc_info=True)
         return None
 
     try:
-        games = games_collection.find({"GAME_DATE": last_game_date}, {"GAMES": 1, "_id": 0})
+        games = games_collection.find({"gameId": last_game_id}, {"homeTeamId": 1, "awayTeamId": 1, "matchup": 1, "_id": 0})
+        try:
+            last_game = games[0]
+            home_id = last_game["homeTeamId"]
+        except IndexError:
+            return None
 
-        # Extract the "GAMES" key from the cursor
-        games_data = []
-        for document in games:
-            games_data.append(document.get("GAMES"))
-
-        last_game = games_data[0][last_game_id]
-        team = last_game["BOXSCORE"]["homeTeam"]["players"] if last_game["BOXSCORE"]["homeTeam"]["teamId"] == team_id else last_game["BOXSCORE"]["awayTeam"]["players"]
-
-        starters = []
-        for player in team:
-            if player["starter"] == "1":
-                starters.append({
-                    "PLAYER_ID": player["personId"],
-                    "NAME": player["nameI"],
-                    "POSITION": player["position"],
-                })
-
-            if len(starters) == 5:
-                break
-            else:
-                continue
-
-        return starters
+        return last_game["matchup"]["lineups"]["home"] if team_id == home_id else last_game["matchup"]["lineups"]["away"]
 
     except Exception as e:
         logging.error(f"\tError while getting last lineup: {e}", exc_info=True)
@@ -83,15 +66,14 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     try:
-        teams_collection = get_mongo_collection('nba_teams')
-        games_collection = get_mongo_collection('nba_games')
+        teams_collection_ = get_mongo_collection('nba_teams')
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Unable to connect to MongoDB: {e}", exc_info=True)
         exit(1)
 
     # All Teams
-    for team in teams_collection.find({}, {"TEAM_ID": 1, "SEASONS": 1, "_id": 0}):
+    for team in teams_collection_.find({}, {"TEAM_ID": 1, "SEASONS": 1, "_id": 0}):
         if team['TEAM_ID'] == 0:
             continue
 
@@ -105,10 +87,10 @@ if __name__ == "__main__":
         game_id, game_date = get_last_game(team['SEASONS'])
 
         # Get starting lineup for most recent game
-        last_starting_lineup = get_last_lineup(team['TEAM_ID'], game_id, game_date)
+        last_starting_lineup = get_last_lineup(team['TEAM_ID'], game_id)
 
         # Update document
-        teams_collection.update_one(
+        teams_collection_.update_one(
             {"TEAM_ID": team['TEAM_ID']},
             {"$set": {"LAST_STARTING_LINEUP": last_starting_lineup}},
         )

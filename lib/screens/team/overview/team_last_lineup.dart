@@ -143,17 +143,17 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                                   children: [
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[4]['PLAYER_ID'].toString(),
-                                        name: lineup[4]['NAME'],
-                                        position: lineup[4]['POSITION'],
+                                        playerId: lineup[4]['personId'].toString(),
+                                        name: lineup[4]['name'],
+                                        position: lineup[4]['position'],
                                         team: widget.team,
                                       ),
                                     ),
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[3]['PLAYER_ID'].toString(),
-                                        name: lineup[3]['NAME'],
-                                        position: lineup[3]['POSITION'],
+                                        playerId: lineup[3]['personId'].toString(),
+                                        name: lineup[3]['name'],
+                                        position: lineup[3]['position'],
                                         team: widget.team,
                                       ),
                                     ),
@@ -165,25 +165,25 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                                   children: [
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[0]['PLAYER_ID'].toString(),
-                                        name: lineup[0]['NAME'],
-                                        position: lineup[0]['POSITION'],
+                                        playerId: lineup[0]['personId'].toString(),
+                                        name: lineup[0]['name'],
+                                        position: lineup[0]['position'],
                                         team: widget.team,
                                       ),
                                     ),
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[2]['PLAYER_ID'].toString(),
-                                        name: lineup[2]['NAME'],
-                                        position: lineup[2]['POSITION'],
+                                        playerId: lineup[2]['personId'].toString(),
+                                        name: lineup[2]['name'],
+                                        position: lineup[2]['position'],
                                         team: widget.team,
                                       ),
                                     ),
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[1]['PLAYER_ID'].toString(),
-                                        name: lineup[1]['NAME'],
-                                        position: lineup[1]['POSITION'],
+                                        playerId: lineup[1]['personId'].toString(),
+                                        name: lineup[1]['name'],
+                                        position: lineup[1]['position'],
                                         team: widget.team,
                                       ),
                                     ),
@@ -206,17 +206,17 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                             children: [
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[4]['PLAYER_ID'].toString(),
-                                  name: lineup[4]['NAME'],
-                                  position: lineup[4]['POSITION'],
+                                  playerId: lineup[4]['personId'].toString(),
+                                  name: lineup[4]['name'],
+                                  position: lineup[4]['position'],
                                   team: widget.team,
                                 ),
                               ),
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[3]['PLAYER_ID'].toString(),
-                                  name: lineup[3]['NAME'],
-                                  position: lineup[3]['POSITION'],
+                                  playerId: lineup[3]['personId'].toString(),
+                                  name: lineup[3]['name'],
+                                  position: lineup[3]['position'],
                                   team: widget.team,
                                 ),
                               ),
@@ -228,25 +228,25 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                             children: [
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[0]['PLAYER_ID'].toString(),
-                                  name: lineup[0]['NAME'],
-                                  position: lineup[0]['POSITION'],
+                                  playerId: lineup[0]['personId'].toString(),
+                                  name: lineup[0]['name'],
+                                  position: lineup[0]['position'],
                                   team: widget.team,
                                 ),
                               ),
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[2]['PLAYER_ID'].toString(),
-                                  name: lineup[2]['NAME'],
-                                  position: lineup[2]['POSITION'],
+                                  playerId: lineup[2]['personId'].toString(),
+                                  name: lineup[2]['name'],
+                                  position: lineup[2]['position'],
                                   team: widget.team,
                                 ),
                               ),
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[1]['PLAYER_ID'].toString(),
-                                  name: lineup[1]['NAME'],
-                                  position: lineup[1]['POSITION'],
+                                  playerId: lineup[1]['personId'].toString(),
+                                  name: lineup[1]['name'],
+                                  position: lineup[1]['position'],
                                   team: widget.team,
                                 ),
                               ),

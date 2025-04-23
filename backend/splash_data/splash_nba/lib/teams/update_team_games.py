@@ -40,9 +40,19 @@ def update_team_games(game):
             if 'NBA Cup' in game["title"]:
                 is_nba_cup = True
 
-        if game["status"] == 3 and game["homeScore"] is not None and game["awayScore"] is not None:
-            home_result = get_game_result(game["homeScore"], game["awayScore"])
-            visitor_result = get_game_result(game["awayScore"], game["homeScore"])
+        home_score = None
+        away_score = None
+        broadcast = None
+        if "homeScore" in game.keys():
+            home_score = game["homeScore"]
+        if "awayScore" in game.keys():
+            away_score = game["awayScore"]
+        if "broadcast" in game.keys():
+            broadcast = game["broadcast"]
+
+        if game["status"] == 3 and home_score is not None and away_score is not None:
+            home_result = get_game_result(home_score, away_score)
+            visitor_result = get_game_result(away_score, home_score)
         else:
             home_result = game["gameClock"]
             visitor_result = game["gameClock"]
@@ -54,10 +64,10 @@ def update_team_games(game):
             "NBA_CUP": is_nba_cup,
             "HOME_AWAY": "vs",
             "OPP": game["awayTeamId"],
-            "TEAM_PTS": game["homeScore"],
-            "OPP_PTS": game["awayScore"],
+            "TEAM_PTS": home_score,
+            "OPP_PTS": away_score,
             "RESULT": home_result,
-            "BROADCAST": game["broadcast"]
+            "BROADCAST": broadcast
         }
 
         game_data_visitor = {
@@ -66,10 +76,10 @@ def update_team_games(game):
             "NBA_CUP": is_nba_cup,
             "HOME_AWAY": "@",
             "OPP": game["homeTeamId"],
-            "TEAM_PTS": game["awayScore"],
-            "OPP_PTS": game["homeScore"],
+            "TEAM_PTS": away_score,
+            "OPP_PTS": home_score,
             "RESULT": visitor_result,
-            "BROADCAST": game["broadcast"]
+            "BROADCAST": broadcast
         }
 
         # Update the home team season data
@@ -92,23 +102,37 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Access your database and collections
-    games_collection = get_mongo_collection('nba_games')
-    logging.info("Connected to MongoDB.")
+    games_collection = get_mongo_collection('nba_games_unwrapped')
+    logging.info("Connected to MongoDB")
 
     # Set the batch size
     batch_size = 25
 
     # Get the total number of documents
-    total_documents = games_collection.count_documents({})
+    query = {"season": "2024"}
+    proj = {
+        "gameId": 1,
+        "awayTeamId": 1,
+        "homeTeamId": 1,
+        "broadcast": 1,
+        "date": 1,
+        "gameClock": 1,
+        "homeScore": 1,
+        "awayScore": 1,
+        "season": 1,
+        "status": 1,
+        "title": 1
+    }
+    total_documents = games_collection.count_documents(query)
     logging.info(f"Total game dates to process: {total_documents}")
 
     for batch_start in range(0, total_documents, batch_size):
         logging.info(f"Processing batch starting at {batch_start}")
 
         # Sort the documents in nba_games collection by GAME_DATE in descending order and set batch size
-        sorted_games_cursor = games_collection.find({}, {"GAME_DATE": 1, "GAMES": 1, "_id": 0}).sort("GAME_DATE", -1).skip(batch_start).limit(batch_size)
+        sorted_games_cursor = games_collection.find(query, proj).sort("date", -1).skip(batch_start).limit(batch_size)
 
         # Process the games in batches
-        for i, day in enumerate(sorted_games_cursor):
-            logging.info(f"Processing {i + 1} of {batch_size} ({day['GAME_DATE']})")
-            update_team_games(day)
+        for i, game in enumerate(sorted_games_cursor):
+            logging.info(f"Processing {i + 1} of {batch_size} ({game['date']})")
+            update_team_games(game)

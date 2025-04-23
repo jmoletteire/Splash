@@ -4,46 +4,47 @@ from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 # List of seasons
 seasons = [
-    #'2023-24',
-    #'2022-23',
-    #'2021-22',
-    #'2020-21',
-    #'2019-20',
-    #'2018-19',
-    #'2017-18',
-    #'2016-17',
-    #'2015-16',
-    #'2014-15',
-    #'2013-14',
-    #'2012-13',
-    #'2011-12',
-    #'2010-11',
-    #'2009-10',
-    #'2008-09',
-    #'2007-08',
-    #'2006-07',
-    #'2005-06',
-    #'2004-05',
-    #'2003-04',
-    #'2002-03',
-    #'2001-02',
-    #'2000-01',
-    #'1999-00',
-    #'1998-99',
-    #'1997-98',
-    #'1996-97',
-    #'1995-96',
-    #'1994-95',
-    #'1993-94',
-    #'1992-93',
-    #'1991-92',
-    #'1990-91',
-    #'1989-90',
-    #'1988-89',
-    #'1987-88',
-    #'1986-87',
-    '1985-86',
-    #'1984-85'
+    '2024-25'
+    # '2023-24',
+    # '2022-23',
+    # '2021-22',
+    # '2020-21',
+    # '2019-20',
+    # '2018-19',
+    # '2017-18',
+    # '2016-17',
+    # '2015-16',
+    # '2014-15',
+    # '2013-14',
+    # '2012-13',
+    # '2011-12',
+    # '2010-11',
+    # '2009-10',
+    # '2008-09',
+    # '2007-08',
+    # '2006-07',
+    # '2005-06',
+    # '2004-05',
+    # '2003-04',
+    # '2002-03',
+    # '2001-02',
+    # '2000-01',
+    # '1999-00',
+    # '1998-99',
+    # '1997-98',
+    # '1996-97',
+    # '1995-96',
+    # '1994-95',
+    # '1993-94',
+    # '1992-93',
+    # '1991-92',
+    # '1990-91',
+    # '1989-90',
+    # '1988-89',
+    # '1987-88',
+    # '1986-87',
+    # '1985-86',
+    # '1984-85'
 ]
 
 eastConfTeamIds = [
@@ -138,8 +139,8 @@ def get_playoff_bracket_data(season, playoff_data):
             if game_data:
                 # Extract the score and date
                 series['GAMES'][i]['GAME_DATE'] = game_data['date']
-                series['GAMES'][i]['HOME_SCORE'] = game_data['homeScore']
-                series['GAMES'][i]['AWAY_SCORE'] = game_data['awayScore']
+                series['GAMES'][i]['HOME_SCORE'] = game_data['homeScore'] if 'homeScore' in game_data else None
+                series['GAMES'][i]['AWAY_SCORE'] = game_data['awayScore'] if 'awayScore' in game_data else None
 
                 if i == (len(games_list)-1):
                     series['TEAM_ONE_WINS'] = game_data.get('matchup', {}).get('series', {}).get('home', '0')
@@ -149,13 +150,11 @@ def get_playoff_bracket_data(season, playoff_data):
                 logging.info(f"Game ID {game_id} not found in the collection, gathering data...")
 
                 summary = boxscoresummaryv2.BoxScoreSummaryV2(proxy=PROXY, headers=HEADERS, game_id=game_id).get_normalized_dict()
+                home_wins = summary['SeasonSeries'][0]['HOME_TEAM_WINS']
+                home_losses = summary['SeasonSeries'][0]['HOME_TEAM_LOSSES']
 
-                series['TEAM_ONE_WINS'] = summary['SeasonSeries'][0]['HOME_TEAM_WINS'] if game['HOME_TEAM_ID'] == \
-                                                                                          series['TEAM_ONE'] else \
-                summary['SeasonSeries'][0]['HOME_TEAM_LOSSES']
-                series['TEAM_TWO_WINS'] = summary['SeasonSeries'][0]['HOME_TEAM_WINS'] if game['HOME_TEAM_ID'] == \
-                                                                                          series['TEAM_TWO'] else \
-                summary['SeasonSeries'][0]['HOME_TEAM_LOSSES']
+                series['TEAM_ONE_WINS'] = home_wins if game['HOME_TEAM_ID'] == series['TEAM_ONE'] else home_losses
+                series['TEAM_TWO_WINS'] = home_wins if game['HOME_TEAM_ID'] == series['TEAM_TWO'] else home_losses
 
                 series['GAMES'][i]['GAME_DATE'] = summary['GameSummary'][0]['GAME_DATE_EST']
                 series['GAMES'][i]['HOME_SCORE'] = summary['LineScore'][0]['PTS'] if summary['LineScore'][0][
@@ -235,7 +234,7 @@ def reformat_pre2002_series_data(season, games):
         home_team = game['HOME_TEAM_ID']
         visitor_team = game['VISITOR_TEAM_ID']
 
-        home_team_data = teams_collection.find_one(
+        home_team_data = _teams_collection.find_one(
             {'TEAM_ID': home_team},
             {
                 f'seasons.{season}.STANDINGS.Conference': 1,
@@ -317,9 +316,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    teams_collection = get_mongo_collection('nba_teams')
-    games_collection = get_mongo_collection('nba_games')
-    playoff_collection = get_mongo_collection('nba_playoff_history')
+    _teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB")
 
     for season in seasons:

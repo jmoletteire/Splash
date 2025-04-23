@@ -54,7 +54,7 @@ class _LastMeetingState extends State<LastMeeting> {
       game = gameCache.getGame(gameId)!;
     } else {
       var fetchedGame = await Game().getGame(gameId, gameDate);
-      game = fetchedGame;
+      game = fetchedGame.first;
       gameCache.addGame(gameId, game);
     }
   }

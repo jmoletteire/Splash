@@ -24,37 +24,78 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
   List westFirstRound = [];
 
   void sortRounds() {
+    Map<String, dynamic> placeholder = {
+      'TEAM_ONE': 0,
+      'TEAM_TWO': 0,
+      'TEAM_ONE_ABBR': '',
+      'TEAM_TWO_ABBR': '',
+      'TEAM_ONE_SEED': '',
+      'TEAM_TWO_SEED': '',
+      'TEAM_ONE_WINS': '',
+      'TEAM_TWO_WINS': '',
+      'GAMES': []
+    };
+
     /// FIRST ROUND
-    for (var series in widget.playoffData['First Round'].entries) {
-      if (kEastConfTeamIds.contains(series.value['TEAM_ONE'].toString()) ||
-          kEastConfTeamIds.contains(series.value['TEAM_TWO'].toString())) {
-        eastFirstRound.add(series);
-      } else {
-        westFirstRound.add(series);
+    if (widget.playoffData.containsKey('First Round')) {
+      for (var series in widget.playoffData['First Round'].entries) {
+        if (kEastConfTeamIds.contains(series.value['TEAM_ONE'].toString()) ||
+            kEastConfTeamIds.contains(series.value['TEAM_TWO'].toString())) {
+          eastFirstRound.add(series);
+        } else {
+          westFirstRound.add(series);
+        }
       }
+    } else {
+      eastFirstRound.add(placeholder);
+      eastFirstRound.add(placeholder);
+      eastFirstRound.add(placeholder);
+      eastFirstRound.add(placeholder);
+
+      westFirstRound.add(placeholder);
+      westFirstRound.add(placeholder);
+      westFirstRound.add(placeholder);
+      westFirstRound.add(placeholder);
     }
 
     /// CONF SEMIS
-    for (var series in widget.playoffData['Conf Semi-Finals'].entries) {
-      if (kEastConfTeamIds.contains(series.value['TEAM_ONE'].toString())) {
-        eastConfSemis.add(series);
-      } else {
-        westConfSemis.add(series);
+    if (widget.playoffData.containsKey('Conf Semi-Finals')) {
+      for (var series in (widget.playoffData['Conf Semi-Finals'] ?? {}).entries) {
+        if (kEastConfTeamIds.contains(series.value['TEAM_ONE'].toString())) {
+          eastConfSemis.add(series);
+        } else {
+          westConfSemis.add(series);
+        }
       }
+    } else {
+      eastConfSemis.add(placeholder);
+      eastConfSemis.add(placeholder);
+
+      westConfSemis.add(placeholder);
+      westConfSemis.add(placeholder);
     }
 
     /// CONF FINALS
-    for (var series in widget.playoffData['Conf Finals'].entries) {
-      if (kEastConfTeamIds.contains(series.value['TEAM_ONE'].toString())) {
-        eastConfFinals = series.value;
-      } else {
-        westConfFinals = series.value;
+    if (widget.playoffData.containsKey('Conf Finals')) {
+      for (var series in (widget.playoffData['Conf Finals'] ?? {}).entries) {
+        if (kEastConfTeamIds.contains(series.value['TEAM_ONE'].toString())) {
+          eastConfFinals = series.value;
+        } else {
+          westConfFinals = series.value;
+        }
       }
+    } else {
+      eastConfFinals = placeholder;
+      westConfFinals = placeholder;
     }
 
     /// NBA Finals
-    for (var series in widget.playoffData['NBA Finals'].entries) {
-      nbaFinals = series.value;
+    if (widget.playoffData.containsKey('NBA Finals')) {
+      for (var series in (widget.playoffData['NBA Finals'] ?? {}).entries) {
+        nbaFinals = series.value;
+      }
+    } else {
+      nbaFinals = placeholder;
     }
   }
 
@@ -231,25 +272,29 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
                                               height: 16.0.r,
                                             ),
                                     ),
-                                    Text(
-                                      game['AWAY_SCORE'].toStringAsFixed(0),
-                                      style: kBebasBold.copyWith(
-                                        fontSize: 16.0.r,
-                                        color: game['AWAY_SCORE'] < game['HOME_SCORE']
-                                            ? Colors.grey
-                                            : Colors.white,
+                                    if (game['AWAY_SCORE'] != null)
+                                      Text(
+                                        game['AWAY_SCORE'].toStringAsFixed(0),
+                                        style: kBebasBold.copyWith(
+                                          fontSize: 16.0.r,
+                                          color: game['AWAY_SCORE'] < game['HOME_SCORE']
+                                              ? Colors.grey
+                                              : Colors.white,
+                                        ),
                                       ),
-                                    ),
+                                    if (game['AWAY_SCORE'] == null) const Text('  '),
                                     Text('@', style: kBebasBold.copyWith(fontSize: 12.0.r)),
-                                    Text(
-                                      game['HOME_SCORE'].toStringAsFixed(0),
-                                      style: kBebasBold.copyWith(
-                                        fontSize: 16.0.r,
-                                        color: game['HOME_SCORE'] < game['AWAY_SCORE']
-                                            ? Colors.grey
-                                            : Colors.white,
+                                    if (game['HOME_SCORE'] != null)
+                                      Text(
+                                        game['HOME_SCORE'].toStringAsFixed(0),
+                                        style: kBebasBold.copyWith(
+                                          fontSize: 16.0.r,
+                                          color: game['HOME_SCORE'] < game['AWAY_SCORE']
+                                              ? Colors.grey
+                                              : Colors.white,
+                                        ),
                                       ),
-                                    ),
+                                    if (game['HOME_SCORE'] == null) const Text('  '),
                                     SizedBox(
                                       width: 24.0.r,
                                       height: 24.0.r,
@@ -840,8 +885,8 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  seriesCard(eastConfSemis[0].value, 'East Conf Semis'),
-                  seriesCard(eastConfSemis[1].value, 'East Conf Semis'),
+                  seriesCard(eastConfSemis[0], 'East Conf Semis'),
+                  seriesCard(eastConfSemis[1], 'East Conf Semis'),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height / 25),
@@ -869,8 +914,8 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  seriesCard(westConfSemis[0].value, 'West Conf Semis'),
-                  seriesCard(westConfSemis[1].value, 'West Conf Semis'),
+                  seriesCard(westConfSemis[0], 'West Conf Semis'),
+                  seriesCard(westConfSemis[1], 'West Conf Semis'),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height / 25),
@@ -969,7 +1014,7 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.1375),
       Offset(size.width * 0.2525, size.height * 0.215),
-      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0].value, 2, season),
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0], 2, season),
     );
 
     /// EAST FIRST ROUND
@@ -996,29 +1041,29 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.1375),
       Offset(size.width * 0.7525, size.height * 0.215),
-      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1].value, 2, season),
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1], 2, season),
     );
 
     /// EAST SEMIS
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.215),
       Offset(size.width * 0.7525, size.height * 0.295),
-      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1].value, 2, season),
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.215),
       Offset(size.width * 0.2525, size.height * 0.295),
-      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0].value, 2, season),
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.295),
       Offset(size.width * 0.5, size.height * 0.295),
-      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0].value, 2, season),
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.295),
       Offset(size.width * 0.7525, size.height * 0.295),
-      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1].value, 2, season),
+      eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.295),
@@ -1044,22 +1089,22 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.765),
       Offset(size.width * 0.7525, size.height * 0.835),
-      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value, 2, season),
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.765),
       Offset(size.width * 0.2525, size.height * 0.835),
-      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value, 2, season),
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.765),
       Offset(size.width * 0.5, size.height * 0.765),
-      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value, 2, season),
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.765),
       Offset(size.width * 0.7525, size.height * 0.765),
-      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value, 2, season),
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.5, size.height * 0.675),
@@ -1091,7 +1136,7 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.835),
       Offset(size.width * 0.2525, size.height * 0.925),
-      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0].value, 2, season),
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0], 2, season),
     );
 
     /// WEST FIRST ROUND
@@ -1118,7 +1163,7 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.835),
       Offset(size.width * 0.7525, size.height * 0.925),
-      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1].value, 2, season),
+      westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1], 2, season),
     );
   }
 
