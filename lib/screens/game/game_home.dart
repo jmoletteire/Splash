@@ -84,9 +84,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
   void setSummaryLineScore() {
     // Set all necessary variables and set state to update UI
-    setState(() {
-      lineScore = game['stats']['linescore'];
-    });
+    setState(() {});
   }
 
   /// ******************************************************

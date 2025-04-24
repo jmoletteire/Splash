@@ -179,8 +179,8 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
             return 3; // For status 3 or any other value
           }
 
-          var aStatus = a['status'] ?? 0;
-          var bStatus = b['status'] ?? 0;
+          var aStatus = int.parse((a['status'] ?? 0).toString());
+          var bStatus = int.parse((b['status'] ?? 0).toString());
 
           // Compare based on custom priority
           int statusCompare = getStatusPriority(aStatus).compareTo(getStatusPriority(bStatus));

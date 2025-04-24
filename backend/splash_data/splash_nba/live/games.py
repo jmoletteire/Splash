@@ -521,7 +521,7 @@ def games_prev_day(offset=1):
 
         # IN-PROGRESS
         elif in_progress:
-            in_progress_game(game["GAME_ID"], line_score)
+            in_progress_game(game["GAME_ID"])
 
         # If game is final, update final box score
         elif is_final:
@@ -615,7 +615,7 @@ async def games_live_update():
 
         # IN-PROGRESS
         elif in_progress:
-            in_progress_game(game["gameId"], line_score)
+            in_progress_game(game["gameId"])
 
         # If game is final, update final box score
         elif is_final:
@@ -626,7 +626,7 @@ async def games_live_update():
                     f'(Games Live) Game {game["gameId"]} already finalized, skipping update. [{datetime.now()}]')
                 continue  # Skip this game as it's already been finalized
             else:
-                in_progress_game(game["gameId"], line_score)
+                in_progress_game(game["gameId"])
                 final_game(game["gameId"])
 
 
