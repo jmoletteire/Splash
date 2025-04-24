@@ -4,6 +4,7 @@ import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/game/game_odds.dart';
@@ -13,7 +14,9 @@ import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
 import '../../utilities/game.dart';
 import '../../utilities/scroll/scroll_controller_provider.dart';
+import '../../utilities/team.dart';
 import '../search_screen.dart';
+import '../team/team_cache.dart';
 import '../team/team_home.dart';
 import 'boxscore/game_boxscore.dart';
 import 'boxscore/game_preview/game_preview_stats.dart';
@@ -54,6 +57,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   late String homeTeamId;
   late String awayTeamAbbr;
   late String homeTeamAbbr;
+  Map<String, dynamic> homeTeam = {};
+  Map<String, dynamic> awayTeam = {};
   late List lineScore;
   final ValueNotifier<bool> _showImagesNotifier = ValueNotifier<bool>(false);
   Map<String, dynamic> game = {};
@@ -79,12 +84,24 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   Future<void> getGame(String gameId, String gameDate) async {
     var fetchedGame = await Game().getGame(gameId, gameDate);
     game = fetchedGame.first;
-    setSummaryLineScore();
+    _setTeams();
   }
 
-  void setSummaryLineScore() {
-    // Set all necessary variables and set state to update UI
-    setState(() {});
+  void _setTeams() async {
+    homeTeam = await getTeam(widget.homeId.toString());
+    awayTeam = await getTeam(widget.awayId.toString());
+  }
+
+  Future<Map<String, dynamic>> getTeam(String teamId) async {
+    final teamCache = Provider.of<TeamCache>(context, listen: false);
+    if (teamCache.containsTeam(teamId)) {
+      return teamCache.getTeam(teamId)!;
+    } else {
+      var fetchedTeam = await Team().getTeam(teamId);
+      var team = fetchedTeam;
+      teamCache.addTeam(teamId, team);
+      return team;
+    }
   }
 
   /// ******************************************************
@@ -115,7 +132,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       }
     }
 
-    setSummaryLineScore();
+    _setTeams();
 
     setState(() {
       _isLoading = false;
@@ -494,30 +511,30 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           GameMatchup(
             key: const PageStorageKey('GameMatchup'),
             game: game,
-            homeId: widget.homeId,
-            awayId: widget.awayId,
+            homeTeam: homeTeam,
+            awayTeam: awayTeam,
             isUpcoming: _isUpcoming,
           ),
           if (!_isUpcoming && game.containsKey('pbp'))
             PlayByPlay(
               key: const PageStorageKey('PlayByPlay'),
               game: game,
-              homeId: widget.homeId,
-              awayId: widget.awayId,
+              homeTeam: homeTeam,
+              awayTeam: awayTeam,
             ),
           if (_isUpcoming)
             GamePreviewStats(
               key: const PageStorageKey('GamePreviewStats'),
               game: game,
-              homeId: widget.homeId,
-              awayId: awayTeamId,
+              homeTeam: homeTeam,
+              awayTeam: awayTeam,
             ),
           if (!_isUpcoming)
             GameBoxScore(
               key: const PageStorageKey('GameBoxScore'),
               game: game,
-              homeId: widget.homeId,
-              awayId: awayTeamId,
+              homeTeam: homeTeam,
+              awayTeam: awayTeam,
               inProgress: game['status'] == 2,
             ),
           if (odds.isNotEmpty)

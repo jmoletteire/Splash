@@ -13,13 +13,14 @@ import '../../../team/team_cache.dart';
 
 class GamePreviewStats extends StatefulWidget {
   final Map<String, dynamic> game;
-  final String homeId;
-  final String awayId;
+  final Map<String, dynamic> homeTeam;
+  final Map<String, dynamic> awayTeam;
+
   const GamePreviewStats({
     super.key,
     required this.game,
-    required this.homeId,
-    required this.awayId,
+    required this.homeTeam,
+    required this.awayTeam,
   });
 
   @override
@@ -77,8 +78,10 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     });
 
     try {
-      List<Map<String, dynamic>> fetchedTeams = await getTeams([widget.homeId, widget.awayId]);
-      List fetchedPlayers = await getPlayers(widget.homeId, widget.awayId);
+      List<Map<String, dynamic>> fetchedTeams =
+          await getTeams([widget.homeTeam['TEAM_ID'], widget.awayTeam['TEAM_ID']]);
+      List fetchedPlayers =
+          await getPlayers(widget.homeTeam['TEAM_ID'], widget.awayTeam['TEAM_ID']);
 
       setState(() {
         homeTeam = fetchedTeams[0];
@@ -111,7 +114,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
         case 0:
           setState(() {
             awayContainerColor =
-                kTeamColors[kTeamIdToName[widget.awayId][1]]!['primaryColor']!;
+                kTeamColors[kTeamIdToName[widget.awayTeam['TEAM_ID']][1]]!['primaryColor']!;
             homeContainerColor = const Color(0xFF1B1B1B);
             teamContainerColor = const Color(0xFF1B1B1B);
           });
@@ -119,7 +122,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
           setState(() {
             awayContainerColor = const Color(0xFF1B1B1B);
             homeContainerColor =
-                kTeamColors[kTeamIdToName[widget.homeId][1]]!['primaryColor']!;
+                kTeamColors[kTeamIdToName[widget.homeTeam['TEAM_ID']][1]]!['primaryColor']!;
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         default:
@@ -135,13 +138,6 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
 
   @override
   Widget build(BuildContext context) {
-    var linescore = widget.game['SUMMARY']['LineScore'];
-
-    Map<String, dynamic> homeLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-    Map<String, dynamic> awayLinescore =
-        linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[1] : linescore[0];
-
     return _isLoading
         ? const SpinningIcon()
         : Column(
@@ -152,8 +148,8 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                 controller: _tabController,
                 indicator: CustomTabIndicator(
                   controller: _tabController,
-                  homeTeam: kTeamIdToName[widget.homeId][1],
-                  awayTeam: kTeamIdToName[widget.awayId][1],
+                  homeTeam: kTeamIdToName[widget.homeTeam['TEAM_ID']][1],
+                  awayTeam: kTeamIdToName[widget.awayTeam['TEAM_ID']][1],
                 ),
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
@@ -173,7 +169,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                           ),
                           margin: const EdgeInsets.only(bottom: 1.0),
                           child: Tab(
-                            text: awayLinescore['TEAM_NAME'] ?? awayLinescore['TEAM_NICKNAME'],
+                            text: widget.awayTeam['NICKNAME'],
                           ),
                         ),
                       ),
@@ -205,7 +201,7 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                             ),
                           ),
                           child: Tab(
-                            text: homeLinescore['TEAM_NAME'] ?? homeLinescore['TEAM_NICKNAME'],
+                            text: widget.homeTeam['NICKNAME'],
                           ),
                         ),
                       ),
@@ -228,9 +224,9 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                           padding: EdgeInsets.only(top: 10.0.r),
                           sliver: TeamLeaders(
                             season:
-                                '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                            homeId: widget.homeId,
-                            awayId: widget.awayId,
+                                '${widget.game['season']}-${(int.parse(widget.game['season'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                            homeId: widget.homeTeam['TEAM_ID'],
+                            awayId: widget.awayTeam['TEAM_ID'],
                             homePlayers: homePlayers,
                             awayPlayers: awayPlayers,
                           ),
@@ -240,9 +236,9 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                           sliver: SliverToBoxAdapter(
                             child: TeamSeasonStats(
                               season:
-                                  '${widget.game['SUMMARY']['GameSummary'][0]['SEASON']}-${(int.parse(widget.game['SUMMARY']['GameSummary'][0]['SEASON'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                              homeId: widget.homeId,
-                              awayId: widget.awayId,
+                                  '${widget.game['season']}-${(int.parse(widget.game['season'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                              homeId: widget.homeTeam['TEAM_ID'],
+                              awayId: widget.awayTeam['TEAM_ID'],
                             ),
                           ),
                         ),

@@ -13,14 +13,14 @@ import '../../player/player_home.dart';
 
 class PlayByPlay extends StatefulWidget {
   final Map<String, dynamic> game;
-  final String homeId;
-  final String awayId;
+  final Map<String, dynamic> homeTeam;
+  final Map<String, dynamic> awayTeam;
 
   const PlayByPlay({
     super.key,
     required this.game,
-    required this.homeId,
-    required this.awayId,
+    required this.homeTeam,
+    required this.awayTeam,
   });
 
   @override
@@ -121,15 +121,15 @@ class _PlayByPlayState extends State<PlayByPlay> {
     super.initState();
     _inProgress = widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2;
 
-    homeTeamAbbr = kTeamIdToName[widget.homeId][1] ?? 'Home';
-    awayTeamAbbr = kTeamIdToName[widget.awayId][1] ?? 'Away';
+    homeTeamAbbr = kTeamIdToName[widget.homeTeam['TEAM_ID']][1] ?? 'Home';
+    awayTeamAbbr = kTeamIdToName[widget.awayTeam['TEAM_ID']][1] ?? 'Away';
     teams = [awayTeamAbbr, 'ALL', homeTeamAbbr];
 
     selectedTeam = 'ALL';
     teamCodes = {
-      homeTeamAbbr: int.parse(widget.homeId),
+      homeTeamAbbr: int.parse(widget.homeTeam['TEAM_ID']),
       'ALL': 0,
-      awayTeamAbbr: int.parse(widget.awayId),
+      awayTeamAbbr: int.parse(widget.awayTeam['TEAM_ID']),
     };
 
     selectedPlayer = 0;
@@ -142,7 +142,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
         for (var player in widget.game['BOXSCORE']['homeTeam']['players']) {
           Map<String, dynamic> playerData = {
             'id': player['personId'],
-            'team': widget.homeId,
+            'team': widget.homeTeam['TEAM_ID'],
             'name': player['nameI'],
             'number': player['jerseyNum'],
           };
@@ -151,7 +151,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
         for (var player in widget.game['BOXSCORE']['awayTeam']['players']) {
           Map<String, dynamic> playerData = {
             'id': player['personId'],
-            'team': widget.awayId,
+            'team': widget.awayTeam['TEAM_ID'],
             'name': player['nameI'],
             'number': player['jerseyNum'],
           };
@@ -209,12 +209,12 @@ class _PlayByPlayState extends State<PlayByPlay> {
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    String homeAbbr = kTeamIdToName[widget.homeId][1];
+    String homeAbbr = kTeamIdToName[widget.homeTeam['TEAM_ID']][1];
     Color homeTeamColor = kDarkPrimaryColors.contains(homeAbbr)
         ? (kTeamColors[homeAbbr]!['secondaryColor']!)
         : (kTeamColors[homeAbbr]!['primaryColor']!);
 
-    String awayAbbr = kTeamIdToName[widget.awayId]?[1] ?? 'FA';
+    String awayAbbr = kTeamIdToName[widget.awayTeam['TEAM_ID']]?[1] ?? 'FA';
     Color awayTeamColor = kDarkPrimaryColors.contains(awayAbbr)
         ? (kTeamColors[awayAbbr]!['secondaryColor']!)
         : (kTeamColors[awayAbbr]!['primaryColor']!);
@@ -265,8 +265,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: _inProgress ? 'Overtime' : '1st Quarter',
                       actions: _inProgress ? overTime : firstQuarter,
-                      homeId: widget.homeId,
-                      awayId: widget.awayId,
+                      homeId: widget.homeTeam['TEAM_ID'],
+                      awayId: widget.awayTeam['TEAM_ID'],
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
@@ -278,8 +278,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: _inProgress ? '4th Quarter' : '2nd Quarter',
                       actions: _inProgress ? fourthQuarter : secondQuarter,
-                      homeId: widget.homeId,
-                      awayId: widget.awayId,
+                      homeId: widget.homeTeam['TEAM_ID'],
+                      awayId: widget.awayTeam['TEAM_ID'],
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
@@ -290,8 +290,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: '3rd Quarter',
                       actions: thirdQuarter,
-                      homeId: widget.homeId,
-                      awayId: widget.awayId,
+                      homeId: widget.homeTeam['TEAM_ID'],
+                      awayId: widget.awayTeam['TEAM_ID'],
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
@@ -303,8 +303,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: _inProgress ? '2nd Quarter' : '4th Quarter',
                       actions: _inProgress ? secondQuarter : fourthQuarter,
-                      homeId: widget.homeId,
-                      awayId: widget.awayId,
+                      homeId: widget.homeTeam['TEAM_ID'],
+                      awayId: widget.awayTeam['TEAM_ID'],
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
@@ -316,8 +316,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
                       period: _inProgress ? '1st Quarter' : 'Overtime',
                       actions: _inProgress ? firstQuarter : overTime,
-                      homeId: widget.homeId,
-                      awayId: widget.awayId,
+                      homeId: widget.homeTeam['TEAM_ID'],
+                      awayId: widget.awayTeam['TEAM_ID'],
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),

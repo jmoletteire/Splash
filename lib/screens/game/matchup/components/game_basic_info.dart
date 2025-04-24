@@ -9,26 +9,23 @@ class GameBasicInfo extends StatefulWidget {
     super.key,
     required this.game,
     required this.isUpcoming,
-    required this.homeLineScore,
-    required this.awayLineScore,
+    required this.homeTeamName,
+    required this.awayTeamName,
   });
 
   final Map<String, dynamic> game;
   final bool isUpcoming;
-  final Map<String, dynamic> homeLineScore;
-  final Map<String, dynamic> awayLineScore;
+  final String homeTeamName;
+  final String awayTeamName;
 
   @override
   State<GameBasicInfo> createState() => _GameBasicInfoState();
 }
 
 class _GameBasicInfoState extends State<GameBasicInfo> {
-  late Map<String, dynamic> summary;
   late int year;
   late String formattedDate;
   late String seasonType;
-  late String awayTeamName;
-  late String homeTeamName;
   String broadcast = '';
   String arena = '';
   List<String> officials = [];
@@ -43,47 +40,10 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
       '6': 'NBA Cup Final'
     };
 
-    seasonType = seasonTypes[summary['GAME_ID'].substring(2, 3)] ?? '-';
+    seasonType = seasonTypes[widget.game['gameId'].substring(2, 3)] ?? '-';
 
-    if (summary.containsKey('NBA_CUP')) {
-      seasonType = '${summary['NBA_CUP']}  (Regular Season)';
-    }
-  }
-
-  void setArenaAndOfficials() {
-    String arenaName = summary['ARENA_NAME'] ?? '';
-
-    if (!widget.isUpcoming || (widget.isUpcoming && widget.game.containsKey('BOXSCORE'))) {
-      for (Map<String, dynamic> official in (widget.game['SUMMARY']?['Officials'] ?? [])) {
-        officials.add('${official['FIRST_NAME']} ${official['LAST_NAME']}');
-      }
-      if (widget.game['BOXSCORE'].containsKey('arena')) {
-        arena =
-            '${widget.game['BOXSCORE']?['arena']?['arenaName'] ?? ''} - ${widget.game['BOXSCORE']?['arena']?['arenaCity'] ?? ''}, ${widget.game['BOXSCORE']?['arena']?['arenaState'] ?? ''}';
-      } else {
-        if (kArenas.containsKey(arenaName)) {
-          arena = '$arenaName - ${kArenas[arenaName]}';
-        } else {
-          arena = arenaName;
-        }
-      }
-    } else {
-      officials.add('TBA');
-      if (kArenas.containsKey(arenaName)) {
-        arena = '$arenaName - ${kArenas[arenaName]}';
-      } else {
-        arena = arenaName;
-      }
-    }
-  }
-
-  void setBroadcast() {
-    broadcast = summary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS';
-    if (summary['HOME_TV_BROADCASTER_ABBREVIATION'] != null) {
-      broadcast += ', ${summary['HOME_TV_BROADCASTER_ABBREVIATION']}';
-    }
-    if (summary['AWAY_TV_BROADCASTER_ABBREVIATION'] != null) {
-      broadcast += ', ${summary['AWAY_TV_BROADCASTER_ABBREVIATION']}';
+    if (widget.game.containsKey('title')) {
+      seasonType = '${widget.game['title']}  (Regular Season)';
     }
   }
 
@@ -91,24 +51,15 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
   void initState() {
     super.initState();
 
-    summary = widget.game['SUMMARY']?['GameSummary']?[0] ?? {};
-
-    year = int.parse((summary['GAME_DATE_EST'] ?? '1900-01-01').substring(0, 4));
+    year = int.parse((widget.game['date'] ?? '1900-01-01').substring(0, 4));
 
     // Parse the input string into a DateTime object
-    DateTime parsedDate = DateTime.parse(summary['GAME_DATE_EST'] ?? '1900-01-01');
+    DateTime parsedDate = DateTime.parse(widget.game['date'] ?? '1900-01-01');
 
     // Format the DateTime object into the desired string format
     formattedDate = DateFormat('EEEE, MMMM d, y').format(parsedDate).toUpperCase();
 
-    awayTeamName =
-        '${widget.awayLineScore['TEAM_CITY_NAME'] ?? ''} ${widget.awayLineScore['TEAM_NICKNAME'] ?? widget.awayLineScore['TEAM_NAME'] ?? ''}';
-    homeTeamName =
-        '${widget.homeLineScore['TEAM_CITY_NAME'] ?? ''} ${widget.homeLineScore['TEAM_NICKNAME'] ?? widget.homeLineScore['TEAM_NAME'] ?? ''}';
-
     setSeasonType();
-    setArenaAndOfficials();
-    setBroadcast();
   }
 
   @override
@@ -127,7 +78,7 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
             SizedBox(height: 10.0.r),
             GameBasicInfoRow(
               icon: Icons.sports_basketball,
-              data: ['$awayTeamName @ $homeTeamName'],
+              data: ['${widget.awayTeamName} @ ${widget.homeTeamName}'],
             ),
             SizedBox(height: 10.0.r),
 
@@ -142,20 +93,20 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
               // Date
               GameBasicInfoRow(
                 icon: Icons.stadium,
-                data: [arena],
+                data: [widget.game['matchup']?['location'] ?? ''],
               ),
 
             SizedBox(height: 10.0.r),
             // Broadcast
             GameBasicInfoRow(
               icon: Icons.tv_sharp,
-              data: [broadcast],
+              data: [widget.game['broadcast'] ?? ''],
             ),
             SizedBox(height: 10.0.r),
             // Officials
             GameBasicInfoRow(
               icon: Icons.sports,
-              data: officials,
+              data: [widget.game['matchup']?['officials'] ?? ''],
             ),
           ],
         ),

@@ -87,10 +87,10 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
 
   void updateSeasonIfNeeded() {
     bool seasonNotStarted =
-        (awayTeam['seasons']?[season]?['GP'] == 0 || homeTeam['seasons']?[season]?['GP'] == 0);
+        (awayTeam['SEASONS']?[season]?['GP'] == 0 || homeTeam['SEASONS']?[season]?['GP'] == 0);
 
-    if (!awayTeam['seasons'].containsKey(season) ||
-        !homeTeam['seasons'].containsKey(season) ||
+    if (!awayTeam['SEASONS'].containsKey(season) ||
+        !homeTeam['SEASONS'].containsKey(season) ||
         seasonNotStarted) {
       setState(() {
         season = getPreviousSeason(season);
@@ -144,48 +144,47 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
     return [
       buildHeaderRow(),
       SizedBox(height: 10.0.r),
-      buildComparisonRow('NRTG', 'NET_RATING', 'ADV'),
+      buildComparisonRow('NRTG'),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('ORTG', 'OFF_RATING', 'ADV'),
+      buildComparisonRow('ORTG'),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('DRTG', 'DEF_RATING', 'ADV'),
+      buildComparisonRow('DRTG'),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('PACE', 'PACE', 'ADV'),
+      buildComparisonRow('PACE'),
       SizedBox(height: 15.0.r),
-      buildComparisonRow('FG%', 'FG_PCT', 'BASIC', isPercentage: true),
+      buildComparisonRow('FG%', isPercentage: true),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('3P%', 'FG3_PCT', 'BASIC', isPercentage: true),
+      buildComparisonRow('3P%', isPercentage: true),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('FT%', 'FT_PCT', 'BASIC', isPercentage: true),
+      buildComparisonRow('FT%', isPercentage: true),
       SizedBox(height: 15.0.r),
-      buildComparisonRow('EFG%', 'EFG_PCT', 'ADV', isPercentage: true),
+      buildComparisonRow('eFG%', isPercentage: true),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('TS%', 'TS_PCT', 'ADV', isPercentage: true),
+      buildComparisonRow('TS%', isPercentage: true),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('OREB%', 'OREB_PCT', 'ADV', isPercentage: true),
+      buildComparisonRow('OREB%', isPercentage: true),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('TOV%', 'TM_TOV_PCT', 'ADV', isPercentage: true),
+      buildComparisonRow('TOV%', isPercentage: true),
     ];
   }
 
-  Widget buildComparisonRow(String statName, String statKey, String loc,
-      {bool isPercentage = false}) {
+  Widget buildComparisonRow(String statKey, {bool isPercentage = false}) {
+    Map<String, dynamic> awaySeasonStats =
+        awayTeam['SEASONS']?[season]?['STATS']?['REGULAR SEASON'] ?? {};
+    Map<String, dynamic> homeSeasonStats =
+        homeTeam['SEASONS']?[season]?['STATS']?['REGULAR SEASON'] ?? {};
     return ComparisonRow(
-      statName: statName,
+      statName: statKey,
       awayTeam: roundToDecimalPlaces(
-          ((awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?[loc]?[statKey] ?? 0.0) *
+          ((double.parse(awaySeasonStats[statKey]?['Totals']?['Value'].toString() ?? '0.0')) *
               (isPercentage ? 100 : 1)),
           1),
       homeTeam: roundToDecimalPlaces(
-          ((homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?[loc]?[statKey] ?? 0.0) *
+          ((double.parse(homeSeasonStats[statKey]?['Totals']?['Value'].toString() ?? '0.0')) *
               (isPercentage ? 100 : 1)),
           1),
-      awayRank: awayTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?[loc]
-              ?['${statKey}_RANK'] ??
-          0,
-      homeRank: homeTeam['seasons']?[season]?['STATS']?['REGULAR SEASON']?[loc]
-              ?['${statKey}_RANK'] ??
-          0,
+      awayRank: int.parse(awaySeasonStats[statKey]?['Totals']?['Rank'].toString() ?? '0'),
+      homeRank: int.parse(homeSeasonStats[statKey]?['Totals']?['Rank'] ?? '0'),
       awayTeamColor: awayTeamColor,
       homeTeamColor: homeTeamColor,
       isPercentage: isPercentage,
@@ -361,16 +360,16 @@ class StatValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map<Color, Color> lightColors = {
-      const Color(0xFFFFFFFF): Color(0xFF000000),
-      const Color(0xFFFEC524): Color(0xFF0E2240),
-      const Color(0xFFFDBB30): Color(0xFF002D62),
-      const Color(0xFFED184D): Color(0xFF0B2240),
-      const Color(0xFF78BE20): Color(0xFF0B233F),
-      const Color(0xFF85714D): Color(0xFF0C2340),
-      const Color(0xFFE56020): Color(0xFF1D1160),
-      const Color(0xFFC4CED4): Color(0xFF000000),
-      const Color(0xFFFCA200): Color(0xFF002B5C),
-      const Color(0xFFE31837): Color(0xFF002B5C),
+      const Color(0xFFFFFFFF): const Color(0xFF000000),
+      const Color(0xFFFEC524): const Color(0xFF0E2240),
+      const Color(0xFFFDBB30): const Color(0xFF002D62),
+      const Color(0xFFED184D): const Color(0xFF0B2240),
+      const Color(0xFF78BE20): const Color(0xFF0B233F),
+      const Color(0xFF85714D): const Color(0xFF0C2340),
+      const Color(0xFFE56020): const Color(0xFF1D1160),
+      const Color(0xFFC4CED4): const Color(0xFF000000),
+      const Color(0xFFFCA200): const Color(0xFF002B5C),
+      const Color(0xFFE31837): const Color(0xFF002B5C),
     };
 
     return Container(

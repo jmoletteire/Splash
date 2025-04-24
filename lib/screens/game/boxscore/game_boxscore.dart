@@ -10,14 +10,15 @@ import 'box_team_stats.dart';
 
 class GameBoxScore extends StatefulWidget {
   final Map<String, dynamic> game;
-  final String homeId;
-  final String awayId;
+  final Map<String, dynamic> homeTeam;
+  final Map<String, dynamic> awayTeam;
   final bool inProgress;
+
   const GameBoxScore({
     super.key,
     required this.game,
-    required this.homeId,
-    required this.awayId,
+    required this.homeTeam,
+    required this.awayTeam,
     required this.inProgress,
   });
 
@@ -72,8 +73,8 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         : [gameBoxscore['homeTeam']['statistics'], gameBoxscore['awayTeam']['statistics']];
     advTeamStats = gameAdv.isEmpty ? [] : castToListOfMap(gameAdv['TeamStats']);
 
-    boxTeamStats[0]['teamId'] = widget.homeId;
-    boxTeamStats[1]['teamId'] = widget.awayId;
+    boxTeamStats[0]['teamId'] = widget.homeTeam['TEAM_ID'];
+    boxTeamStats[1]['teamId'] = widget.awayTeam['TEAM_ID'];
 
     // Adv Stats NOT available, just use basic stats
     teamStats = gameAdv.isEmpty
@@ -98,8 +99,10 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           return {...boxStats, ...advStats};
         }
 
-        teamStats.add(findAndCombineStats(widget.homeId, boxTeamStats, advTeamStats));
-        teamStats.add(findAndCombineStats(widget.awayId, boxTeamStats, advTeamStats));
+        teamStats
+            .add(findAndCombineStats(widget.homeTeam['TEAM_ID'], boxTeamStats, advTeamStats));
+        teamStats
+            .add(findAndCombineStats(widget.awayTeam['TEAM_ID'], boxTeamStats, advTeamStats));
       }
     }
   }
@@ -121,7 +124,7 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
         playerStats.add({...boxPlayerStats[i], ...advPlayerStats[i]});
       }
       for (var player in playerStats) {
-        if (player['TEAM_ID'].toString() == widget.homeId) {
+        if (player['TEAM_ID'].toString() == widget.homeTeam['TEAM_ID']) {
           homePlayerStats.add(player);
         } else {
           awayPlayerStats.add(player);
@@ -219,9 +222,11 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
       selectedTabIndex.value = _boxscoreTabController.index;
     });
 
-    awayContainerColor = kTeamColors[kTeamIdToName[widget.awayId][1]]?['primaryColor'] ??
+    awayContainerColor = kTeamColors[kTeamIdToName[widget.awayTeam['TEAM_ID']][1]]
+            ?['primaryColor'] ??
         const Color(0xFF00438C);
-    homeContainerColor = kTeamColors[kTeamIdToName[widget.homeId][1]]?['primaryColor'] ??
+    homeContainerColor = kTeamColors[kTeamIdToName[widget.homeTeam['TEAM_ID']][1]]
+            ?['primaryColor'] ??
         const Color(0xFF00438C);
     teamContainerColor = const Color(0xFF1B1B1B);
   }
@@ -242,10 +247,12 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
       homeLinescore = {};
       awayLinescore = {};
     } else {
-      homeLinescore =
-          linescore[0]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
-      awayLinescore =
-          linescore[1]['TEAM_ID'].toString() == widget.homeId ? linescore[0] : linescore[1];
+      homeLinescore = linescore[0]['TEAM_ID'].toString() == widget.homeTeam['TEAM_ID']
+          ? linescore[0]
+          : linescore[1];
+      awayLinescore = linescore[1]['TEAM_ID'].toString() == widget.homeTeam['TEAM_ID']
+          ? linescore[0]
+          : linescore[1];
     }
 
     // Tab Controller + Listeners
@@ -287,10 +294,10 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           homeLinescore = {};
           awayLinescore = {};
         } else {
-          homeLinescore = linescore[0]['TEAM_ID'].toString() == widget.homeId
+          homeLinescore = linescore[0]['TEAM_ID'].toString() == widget.homeTeam['TEAM_ID']
               ? linescore[0]
               : linescore[1];
-          awayLinescore = linescore[1]['TEAM_ID'].toString() == widget.homeId
+          awayLinescore = linescore[1]['TEAM_ID'].toString() == widget.homeTeam['TEAM_ID']
               ? linescore[0]
               : linescore[1];
         }
@@ -344,8 +351,10 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
           ),
         ),
         LineScore(
-          homeTeam: widget.homeId,
-          awayTeam: kTeamIdToName.containsKey(widget.awayId) ? widget.awayId : '0',
+          homeTeam: widget.homeTeam['TEAM_ID'],
+          awayTeam: kTeamIdToName.containsKey(widget.awayTeam['TEAM_ID'])
+              ? widget.awayTeam['TEAM_ID']
+              : '0',
           homeAbbr: homeLinescore['TEAM_ABBREVIATION'],
           awayAbbr: awayLinescore['TEAM_ABBREVIATION'],
           homeScores: [
@@ -541,8 +550,8 @@ class _GameBoxScoreState extends State<GameBoxScore> with TickerProviderStateMix
                       padding: EdgeInsets.only(top: 10.0.r),
                       sliver: BoxTeamStats(
                         teams: teamStats,
-                        homeId: widget.homeId,
-                        awayId: widget.awayId,
+                        homeId: widget.homeTeam['TEAM_ID'],
+                        awayId: widget.awayTeam['TEAM_ID'],
                         inProgress:
                             widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
                       ),

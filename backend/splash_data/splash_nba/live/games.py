@@ -286,7 +286,7 @@ def matchup_details(summary, boxscore):
     if "LastMeeting" in summary:
         try:
             last_meeting["game_id"] = summary["LastMeeting"][0]["LAST_GAME_ID"]
-            last_meeting["date"] = summary["LastMeeting"][0]["GAME_DATE_EST"]
+            last_meeting["date"] = summary["LastMeeting"][0]["LAST_GAME_DATE_EST"]
             last_meeting["home_id"] = summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_ID"]
             last_meeting["home_score"] = summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_POINTS"]
             last_meeting["away_id"] = summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_ID"]
@@ -649,7 +649,7 @@ async def games_daily_update():
     try:
         # Define date range
         start_date = datetime.today()
-        end_date = datetime(2025, 4, 13)
+        end_date = datetime(2025, 6, 30)
 
         # Fetch games for each date in the range
         fetch_games_for_date_range(start_date, end_date)

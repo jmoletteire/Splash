@@ -128,27 +128,27 @@ class GameCardState extends State<GameCard> {
       // spread = _parseOdds(widget.game, 'hcp', live: false, type: '168', fallbackType: '4');
       // overUnder = _parseOdds(widget.game, 'hcp', live: false, type: '18', fallbackType: '3');
 
-      headerRow = _buildHeaderRow();
-
-      awayRow = TeamRow(
-        team: away,
-        teamLogo: awayLogo,
-        pts: widget.game['awayScore'],
-        odds: spread,
-        scoreColor: statusCode != 3
-            ? Colors.white
-            : _getScoreColor(widget.game['awayScore'], widget.game['homeScore']),
-      );
-
-      homeRow = TeamRow(
-        team: home,
-        teamLogo: homeLogo,
-        pts: widget.game['homeScore'],
-        odds: overUnder,
-        scoreColor: statusCode != 3
-            ? Colors.white
-            : _getScoreColor(widget.game['homeScore'], widget.game['awayScore']),
-      );
+      // headerRow = _buildHeaderRow();
+      //
+      // awayRow = TeamRow(
+      //   team: away,
+      //   teamLogo: awayLogo,
+      //   pts: widget.game['awayScore'],
+      //   odds: spread,
+      //   scoreColor: statusCode != 3
+      //       ? Colors.white
+      //       : _getScoreColor(widget.game['awayScore'], widget.game['homeScore']),
+      // );
+      //
+      // homeRow = TeamRow(
+      //   team: home,
+      //   teamLogo: homeLogo,
+      //   pts: widget.game['homeScore'],
+      //   odds: overUnder,
+      //   scoreColor: statusCode != 3
+      //       ? Colors.white
+      //       : _getScoreColor(widget.game['homeScore'], widget.game['awayScore']),
+      // );
     }
   }
 
@@ -428,31 +428,46 @@ class GameCardState extends State<GameCard> {
           context,
           MaterialPageRoute(
             builder: (context) => GameHome(
-              gameData: widget.game,
-              gameId: widget.game['gameId'],
-              homeId: widget.homeTeam.toString(),
-              awayId: widget.awayTeam.toString(),
-              gameDate: widget.game['date'],
-              gameTime: _adjustTimezone(widget.game['date'], widget.game['gameClock']),
-            ),
+                gameData: widget.game,
+                gameId: widget.game['gameId'],
+                homeId: widget.homeTeam.toString(),
+                awayId: widget.awayTeam.toString(),
+                gameDate: widget.game['date'],
+                gameTime: widget.game[
+                    'gameClock'] // _adjustTimezone(widget.game['date'], widget.game['gameClock']),
+                ),
           ),
         );
       },
-      child: RepaintBoundary(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey.shade900,
-            border: Border(bottom: BorderSide(width: 0.5, color: Colors.grey.shade800)),
-          ),
-          padding: EdgeInsets.all(15.0.r),
-          child: Column(
-            children: [
-              headerRow,
-              SizedBox(height: 5.0.r),
-              awayRow,
-              homeRow,
-            ],
-          ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.shade900,
+          border: Border(bottom: BorderSide(width: 0.5, color: Colors.grey.shade800)),
+        ),
+        padding: EdgeInsets.all(15.0.r),
+        child: Column(
+          children: [
+            _buildHeaderRow(),
+            SizedBox(height: 5.0.r),
+            TeamRow(
+              team: away,
+              teamLogo: awayLogo,
+              pts: widget.game['awayScore'],
+              odds: spread,
+              scoreColor: statusCode != 3
+                  ? Colors.white
+                  : _getScoreColor(widget.game['awayScore'], widget.game['homeScore']),
+            ),
+            TeamRow(
+              team: home,
+              teamLogo: homeLogo,
+              pts: widget.game['homeScore'],
+              odds: overUnder,
+              scoreColor: statusCode != 3
+                  ? Colors.white
+                  : _getScoreColor(widget.game['homeScore'], widget.game['awayScore']),
+            ),
+          ],
         ),
       ),
     );
