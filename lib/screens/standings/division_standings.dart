@@ -58,10 +58,10 @@ class _DivisionStandingsState extends State<DivisionStandings> {
 
   void _checkSeasons() {
     for (var team in widget.standings) {
-      if (!teams.contains(team) && team['seasons'].containsKey(widget.season)) {
+      if (!teams.contains(team) && team['SEASONS'].containsKey(widget.season)) {
         teams.add(team);
       }
-      if (teams.contains(team) && !team['seasons'].containsKey(widget.season)) {
+      if (teams.contains(team) && !team['SEASONS'].containsKey(widget.season)) {
         teams.remove(team);
       }
     }
@@ -87,8 +87,8 @@ class _DivisionStandingsState extends State<DivisionStandings> {
     _checkSeasons();
 
     teams.sort((a, b) {
-      return a['seasons'][widget.season]['STANDINGS']['DivisionRank']
-          .compareTo(b['seasons'][widget.season]['STANDINGS']['DivisionRank']);
+      return a['SEASONS'][widget.season]['STANDINGS']['DivisionRank']
+          .compareTo(b['SEASONS'][widget.season]['STANDINGS']['DivisionRank']);
     });
 
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
@@ -303,7 +303,7 @@ class _DivisionStandingsState extends State<DivisionStandings> {
               Expanded(
                 flex: 1,
                 child: Text(
-                  teams[row]['seasons'][widget.season]['STANDINGS']['DivisionRank'].toString(),
+                  teams[row]['SEASONS'][widget.season]['STANDINGS']['DivisionRank'].toString(),
                   textAlign: TextAlign.center,
                   style: kBebasNormal.copyWith(
                     color: Colors.white70,
@@ -334,7 +334,7 @@ class _DivisionStandingsState extends State<DivisionStandings> {
                         style: kBebasBold.copyWith(fontSize: 18.0.r),
                       ),
                       TextSpan(
-                        text: getClinched(teams[row]['seasons'][widget.season]['STANDINGS']),
+                        text: getClinched(teams[row]['SEASONS'][widget.season]['STANDINGS']),
                         style: kBebasNormal.copyWith(fontSize: 10.0.r, letterSpacing: 0.8),
                       ),
                     ],
@@ -347,32 +347,32 @@ class _DivisionStandingsState extends State<DivisionStandings> {
       case 1:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['WINS']!.toStringAsFixed(0));
+              text: teams[row]['SEASONS'][widget.season]['WINS']!.toStringAsFixed(0));
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 2:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['LOSSES']!.toStringAsFixed(0));
+              text: teams[row]['SEASONS'][widget.season]['LOSSES']!.toStringAsFixed(0));
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 3:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3));
+              text: teams[row]['SEASONS'][widget.season]['WIN_PCT']!.toStringAsFixed(3));
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 4:
         String gb =
-            teams[row]['seasons'][widget.season]['STANDINGS']['DivisionGamesBack']!.toString();
+            teams[row]['SEASONS'][widget.season]['STANDINGS']['DivisionGamesBack']!.toString();
         return StandingsDataText(text: gb == '0.0' ? '-' : gb);
       case 5:
         try {
-          double netRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
-              ['ADV']['NET_RATING'];
+          double netRating = double.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['NRTG']['Totals']['Value']);
           String positive = netRating > 0.0 ? '+' : '';
           return Container(
             alignment: Alignment.centerRight,
@@ -387,10 +387,10 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         }
       case 6:
         try {
-          double offRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
-              ['ADV']['OFF_RATING'];
-          int oRtgRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-              ['OFF_RATING_RANK'];
+          double offRating = double.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['ORTG']['Totals']['Value']);
+          int oRtgRank = int.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['ORTG']['Totals']['Rank']);
 
           // Define the three colors for the gradient
           Color green = const Color(0xFF55F86F);
@@ -433,10 +433,10 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         }
       case 7:
         try {
-          double defRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
-              ['ADV']['DEF_RATING'];
-          int dRtgRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-              ['DEF_RATING_RANK'];
+          double defRating = double.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['DRTG']['Totals']['Value']);
+          int dRtgRank = int.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['DRTG']['Totals']['Rank']);
 
           // Define the three colors for the gradient
           Color green = const Color(0xFF55F86F);
@@ -479,10 +479,10 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         }
       case 8:
         try {
-          double pace =
-              teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']['PACE'];
-          int paceRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-              ['PACE_RANK'];
+          double pace = double.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['PACE']['Totals']['Value']);
+          int paceRank = int.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['PACE']['Totals']['Rank']);
 
           // Define the three colors for the gradient
           Color green = Colors.pink;
@@ -522,7 +522,7 @@ class _DivisionStandingsState extends State<DivisionStandings> {
           );
           /*
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
+              text: teams[row]['SEASONS'][widget.season]['STATS']['REGULAR SEASON']['ADV']
                       ['PACE']!
                   .toStringAsFixed(1));
 
@@ -532,8 +532,8 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         }
       case 9:
         try {
-          double sos = teams[row]['seasons'][widget.season]['STANDINGS']['SOS'];
-          int sosRank = teams[row]['seasons'][widget.season]['STANDINGS']['SOS_RANK'];
+          double sos = teams[row]['SEASONS'][widget.season]['STANDINGS']['SOS'];
+          int sosRank = teams[row]['SEASONS'][widget.season]['STANDINGS']['SOS_RANK'];
 
           // Define the three colors for the gradient
           Color green = const Color(0xFF55F86F);
@@ -577,8 +577,8 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         }
       case 10:
         try {
-          double sos = teams[row]['seasons'][widget.season]['STANDINGS']['rSOS'];
-          int sosRank = teams[row]['seasons'][widget.season]['STANDINGS']['rSOS_RANK'];
+          double sos = teams[row]['SEASONS'][widget.season]['STANDINGS']['rSOS'];
+          int sosRank = teams[row]['SEASONS'][widget.season]['STANDINGS']['rSOS_RANK'];
 
           // Define the three colors for the gradient
           Color green = const Color(0xFF55F86F);
@@ -623,11 +623,11 @@ class _DivisionStandingsState extends State<DivisionStandings> {
       case 11:
         try {
           String streak =
-              teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak'];
+              teams[row]['SEASONS'][widget.season]['STANDINGS']['strCurrentStreak'];
           return Container(
             alignment: Alignment.centerRight,
             child: Text(
-              teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!,
+              teams[row]['SEASONS'][widget.season]['STANDINGS']['strCurrentStreak']!,
               style: kBebasNormal.copyWith(
                 fontSize: 16.0.r,
                 color: streak == 'W 0'
@@ -645,7 +645,7 @@ class _DivisionStandingsState extends State<DivisionStandings> {
         try {
           return StandingsDataText(
             text:
-                '${teams[row]['seasons']?[widget.season]?['xPTS_W'] ?? '0'} - ${teams[row]['seasons']?[widget.season]?['xPTS_L'] ?? '0'}',
+                '${teams[row]['SEASONS']?[widget.season]?['xPTS_W'] ?? '0'} - ${teams[row]['SEASONS']?[widget.season]?['xPTS_L'] ?? '0'}',
           );
         } catch (e) {
           return const StandingsDataText(text: '-');
@@ -653,126 +653,126 @@ class _DivisionStandingsState extends State<DivisionStandings> {
       case 13:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['L10']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['L10']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 14:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['HOME']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['HOME']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 15:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['ROAD']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['ROAD']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 16:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['OppOver500']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['OppOver500']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 17:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsEast']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['vsEast']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 18:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsWest']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['vsWest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 19:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsAtlantic']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['vsAtlantic']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 20:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsCentral']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['vsCentral']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 21:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSoutheast']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['vsSoutheast']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 22:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsNorthwest']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['vsNorthwest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 23:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsPacific']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['vsPacific']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 24:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['vsSouthwest']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['vsSouthwest']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 25:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['Score100PTS']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['Score100PTS']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 26:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtHalf']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['AheadAtHalf']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 27:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['AheadAtThird']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['AheadAtThird']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 28:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInFGPCT']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['LeadInFGPCT']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 29:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['LeadInReb']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['LeadInReb']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }
       case 30:
         try {
           return StandingsDataText(
-              text: teams[row]['seasons'][widget.season]['STANDINGS']['FewerTurnovers']!);
+              text: teams[row]['SEASONS'][widget.season]['STANDINGS']['FewerTurnovers']!);
         } catch (e) {
           return const StandingsDataText(text: '-');
         }

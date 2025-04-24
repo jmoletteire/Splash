@@ -169,38 +169,38 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
           {'date': formattedDate},
         );
         dynamic jsonData = await network.getData(url);
-        Map<String, dynamic> gamesData = jsonData ?? {};
+        List<dynamic> gamesData = jsonData ?? {};
 
-        var sortedEntries = gamesData.entries.toList()
-          ..sort((a, b) {
-            int getStatusPriority(int status) {
-              // Assign priority: 2 has the highest priority, then 1, and 3 last
-              if (status == 2) return 1;
-              if (status == 1) return 2;
-              return 3; // For status 3 or any other value
-            }
+        gamesData.sort((a, b) {
+          int getStatusPriority(int status) {
+            // Assign priority: 2 has the highest priority, then 1, and 3 last
+            if (status == 2) return 1;
+            if (status == 1) return 2;
+            return 3; // For status 3 or any other value
+          }
 
-            var aStatus = a.value['SUMMARY']?['GameSummary']?[0]?['GAME_STATUS_ID'] ?? 0;
-            var bStatus = b.value['SUMMARY']?['GameSummary']?[0]?['GAME_STATUS_ID'] ?? 0;
+          var aStatus = a['status'] ?? 0;
+          var bStatus = b['status'] ?? 0;
 
-            // Compare based on custom priority
-            int statusCompare =
-                getStatusPriority(aStatus).compareTo(getStatusPriority(bStatus));
-            if (statusCompare != 0) {
-              return statusCompare;
-            } else {
-              // If GAME_STATUS_IDs are the same, fall back to sorting by GAME_SEQUENCE
-              var aSequence = a.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
-              var bSequence = b.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
-              return aSequence.compareTo(bSequence);
-            }
-          });
+          // Compare based on custom priority
+          int statusCompare = getStatusPriority(aStatus).compareTo(getStatusPriority(bStatus));
+          if (statusCompare != 0) {
+            return statusCompare;
+          } else {
+            // If statuses are the same, fall back to sorting by game ID
+            var aSequence = a['gameId'] ?? 0;
+            var bSequence = b['gameId'] ?? 0;
+            return aSequence.compareTo(bSequence);
+          }
+        });
 
         // Assign the sorted list back to widget.teams
-        gamesData = Map.fromEntries(sortedEntries);
+        Map<String, dynamic> gamesDataFinal = {
+          for (var item in gamesData) item['gameId']: item
+        };
 
         setState(() {
-          cachedGames[formattedDate] = gamesData;
+          cachedGames[formattedDate] = gamesDataFinal;
           _isLoading = false; // Set loading state to false
         });
       } catch (e) {
@@ -220,27 +220,26 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
       Network network = Network();
       var url = Uri.http(
         kFlaskUrl,
-        '/get_games',
+        '/games/scoreboard',
         {'date': formattedDate},
       );
       dynamic jsonData = await network.getData(url);
-      Map<String, dynamic> gamesData = jsonData ?? {};
+      List<dynamic> gamesData = jsonData ?? {};
 
-      var sortedEntries = gamesData.entries.toList()
-        ..sort((a, b) {
-          var aValue, bValue;
+      gamesData.sort((a, b) {
+        var aValue, bValue;
 
-          aValue = a.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
-          bValue = b.value['SUMMARY']?['GameSummary']?[0]?['GAME_SEQUENCE'] ?? 0;
+        aValue = a['gameId'] ?? 0;
+        bValue = b['gameId'] ?? 0;
 
-          return aValue.compareTo(bValue);
-        });
+        return aValue.compareTo(bValue);
+      });
 
       // Assign the sorted list back to widget.teams
-      gamesData = Map.fromEntries(sortedEntries);
+      Map<String, dynamic> gamesDataFinal = {for (var item in gamesData) item['gameId']: item};
 
       setState(() {
-        cachedGames[formattedDate] = gamesData;
+        cachedGames[formattedDate] = gamesDataFinal;
         _isLoading = false; // Set loading state to false
       });
     } catch (e) {
@@ -333,7 +332,7 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
               return CalendarDatePicker(
                 initialDate: findNearestValidDate(selectedDate),
                 firstDate: DateTime(2017, 9, 30),
-                lastDate: DateTime(2025, 4, 13),
+                lastDate: DateTime(2025, 9, 30),
                 onDateChanged: onDateChanged,
                 selectableDayPredicate: selectableDayPredicate,
               );
@@ -367,13 +366,12 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
         );
       } else if (gamesData[gameKey] is Map) {
         Map<String, dynamic> game = gamesData[gameKey];
-        if (gameKey.substring(2, 3) != "3" &&
-            (game['SUMMARY']?['LineScore'] ?? {}).isNotEmpty) {
+        if (gameKey.substring(2, 3) != "3") {
           gameCards.add(
             GameCard(
               game: game,
-              homeTeam: game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'],
-              awayTeam: game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'] ?? 0,
+              homeTeam: int.tryParse(game['homeTeamId'].toString()) ?? game['homeTeamId'] ?? 0,
+              awayTeam: int.tryParse(game['awayTeamId'].toString()) ?? game['awayTeamId'] ?? 0,
             ),
           );
         }

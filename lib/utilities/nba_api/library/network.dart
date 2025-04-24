@@ -27,7 +27,7 @@ class Network {
       String data = response.body;
       return jsonDecode(data);
     } else {
-      print(response.statusCode);
+      print('Error fetching data: ${response.statusCode}');
     }
   }
 }

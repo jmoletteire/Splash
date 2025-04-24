@@ -72,10 +72,10 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
 
   void _checkSeasons() {
     for (var team in widget.standings) {
-      if (!teams.contains(team) && team['seasons'].containsKey(widget.season)) {
+      if (!teams.contains(team) && team['SEASONS'].containsKey(widget.season)) {
         teams.add(team);
       }
-      if (teams.contains(team) && !team['seasons'].containsKey(widget.season)) {
+      if (teams.contains(team) && !team['SEASONS'].containsKey(widget.season)) {
         teams.remove(team);
       }
     }
@@ -187,8 +187,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
     _checkSeasons();
 
     teams.sort((a, b) {
-      return a['seasons'][widget.season]['STANDINGS']['PlayoffRank']
-          .compareTo(b['seasons'][widget.season]['STANDINGS']['PlayoffRank']);
+      return a['SEASONS'][widget.season]['STANDINGS']['PlayoffRank']
+          .compareTo(b['SEASONS'][widget.season]['STANDINGS']['PlayoffRank']);
     });
   }
 
@@ -383,7 +383,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
               Expanded(
                 flex: 1,
                 child: Text(
-                  teams[row]['seasons'][widget.season]['STANDINGS']['PlayoffRank'].toString(),
+                  teams[row]['SEASONS'][widget.season]['STANDINGS']['PlayoffRank'].toString(),
                   textAlign: TextAlign.center,
                   style: kBebasNormal.copyWith(
                     color: Colors.white70,
@@ -409,7 +409,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
                         style: kBebasBold.copyWith(fontSize: 18.0.r),
                       ),
                       TextSpan(
-                        text: getClinched(teams[row]['seasons'][widget.season]['STANDINGS']),
+                        text: getClinched(teams[row]['SEASONS'][widget.season]['STANDINGS']),
                         style: kBebasNormal.copyWith(fontSize: 11.0.r, letterSpacing: 0.8),
                       ),
                     ],
@@ -421,7 +421,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         );
       case 1:
         try {
-          String wins = teams[row]['seasons'][widget.season]['WINS']!.toStringAsFixed(0);
+          String wins = teams[row]['SEASONS'][widget.season]['WINS']!.toStringAsFixed(0);
           return _cachedContent[row]![column] ??=
               StandingsDataText(key: ValueKey(wins), text: wins);
         } catch (e) {
@@ -429,7 +429,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 2:
         try {
-          String losses = teams[row]['seasons'][widget.season]['LOSSES']!.toStringAsFixed(0);
+          String losses = teams[row]['SEASONS'][widget.season]['LOSSES']!.toStringAsFixed(0);
           return _cachedContent[row]![column] ??=
               StandingsDataText(key: ValueKey(losses), text: losses);
         } catch (e) {
@@ -437,21 +437,21 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 3:
         try {
-          String winPct = teams[row]['seasons'][widget.season]['WIN_PCT']!.toStringAsFixed(3);
+          String winPct = teams[row]['SEASONS'][widget.season]['WIN_PCT']!.toStringAsFixed(3);
           return _cachedContent[row]![column] ??=
               StandingsDataText(key: ValueKey(winPct), text: winPct);
         } catch (e) {
           return _cachedContent[row]![column] ??= const StandingsDataText(text: '-');
         }
       case 4:
-        String gb = teams[row]['seasons'][widget.season]['STANDINGS']['ConferenceGamesBack']!
+        String gb = teams[row]['SEASONS'][widget.season]['STANDINGS']['ConferenceGamesBack']!
             .toString();
         return _cachedContent[row]![column] ??=
             StandingsDataText(key: ValueKey(gb), text: gb == '0.0' ? '-' : gb);
       case 5:
         try {
-          double netRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
-              ['ADV']['NET_RATING'];
+          double netRating = double.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['NRTG']['Totals']['Value']);
           String positive = netRating > 0.0 ? '+' : '';
           return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
@@ -466,10 +466,10 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 6:
         try {
-          double offRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
-              ['ADV']['OFF_RATING'];
-          int oRtgRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-              ['OFF_RATING_RANK'];
+          double offRating = double.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['ORTG']['Totals']['Value']);
+          int oRtgRank = int.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['ORTG']['Totals']['Rank']);
 
           // Define the three colors for the gradient
           Color green = const Color(0xFF55F86F);
@@ -512,10 +512,10 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 7:
         try {
-          double defRating = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']
-              ['ADV']['DEF_RATING'];
-          int dRtgRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-              ['DEF_RATING_RANK'];
+          double defRating = double.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['DRTG']['Totals']['Value']);
+          int dRtgRank = int.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['DRTG']['Totals']['Rank']);
 
           // Define the three colors for the gradient
           Color green = const Color(0xFF55F86F);
@@ -558,10 +558,10 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 8:
         try {
-          double pace =
-              teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']['PACE'];
-          int paceRank = teams[row]['seasons'][widget.season]['STATS']['REGULAR SEASON']['ADV']
-              ['PACE_RANK'];
+          double pace = double.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['PACE']['Totals']['Value']);
+          int paceRank = int.parse(teams[row]['SEASONS'][widget.season]['STATS']
+              ['REGULAR SEASON']['PACE']['Totals']['Rank']);
 
           // Define the three colors for the gradient
           Color green = Colors.pink;
@@ -604,8 +604,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 9:
         try {
-          double sos = teams[row]['seasons'][widget.season]['STANDINGS']['SOS'];
-          int sosRank = teams[row]['seasons'][widget.season]['STANDINGS']['SOS_RANK'];
+          double sos = teams[row]['SEASONS'][widget.season]['STANDINGS']['SOS'];
+          int sosRank = teams[row]['SEASONS'][widget.season]['STANDINGS']['SOS_RANK'];
 
           // Define the three colors for the gradient
           Color green = const Color(0xFF55F86F);
@@ -649,8 +649,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         }
       case 10:
         try {
-          double sos = teams[row]['seasons'][widget.season]['STANDINGS']['rSOS'];
-          int sosRank = teams[row]['seasons'][widget.season]['STANDINGS']['rSOS_RANK'];
+          double sos = teams[row]['SEASONS'][widget.season]['STANDINGS']['rSOS'];
+          int sosRank = teams[row]['SEASONS'][widget.season]['STANDINGS']['rSOS_RANK'];
 
           // Define the three colors for the gradient
           Color green = const Color(0xFF55F86F);
@@ -695,11 +695,11 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
       case 11:
         try {
           String streak =
-              teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak'];
+              teams[row]['SEASONS'][widget.season]['STANDINGS']['strCurrentStreak'];
           return _cachedContent[row]![column] ??= Container(
             alignment: Alignment.centerRight,
             child: Text(
-              teams[row]['seasons'][widget.season]['STANDINGS']['strCurrentStreak']!,
+              teams[row]['SEASONS'][widget.season]['STANDINGS']['strCurrentStreak']!,
               style: kBebasNormal.copyWith(
                 fontSize: 16.0.r,
                 color: streak == 'W 0'
@@ -716,7 +716,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
       case 12:
         try {
           String xPts =
-              '${teams[row]['seasons']?[widget.season]?['xPTS_W'] ?? '0'} - ${teams[row]['seasons']?[widget.season]?['xPTS_L'] ?? '0'}';
+              '${teams[row]['SEASONS']?[widget.season]?['xPTS_W'] ?? '0'} - ${teams[row]['SEASONS']?[widget.season]?['xPTS_L'] ?? '0'}';
           return _cachedContent[row]![column] ??=
               StandingsDataText(key: ValueKey(xPts), text: xPts);
         } catch (e) {
@@ -765,7 +765,7 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
 
   Widget getStandingsData(int row, String name) {
     try {
-      String stat = teams[row]['seasons'][widget.season]['STANDINGS'][name]!;
+      String stat = teams[row]['SEASONS'][widget.season]['STANDINGS'][name]!;
       return StandingsDataText(key: ValueKey(stat), text: stat);
     } catch (e) {
       return const StandingsDataText(key: ValueKey('-'), text: '-');

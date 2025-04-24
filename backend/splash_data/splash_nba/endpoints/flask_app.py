@@ -43,6 +43,7 @@ try:
     # Define all collections at the top level, so they're accessible across routes
     sports_collection = db.sports
     games_collection = db.nba_games
+    games_unwrapped_collection = db.nba_games_unwrapped
     teams_collection = db.nba_teams
     players_collection = db.nba_players
     player_shots_collection = db.nba_player_shot_data
@@ -548,7 +549,7 @@ def get_playoff_bracket():
 
 @app.route('/games/all-game-dates', methods=['GET'])
 def get_game_dates():
-    dates = games_collection.distinct('GAME_DATE')
+    dates = games_unwrapped_collection.distinct('date')
     return jsonify(dates)
 
 

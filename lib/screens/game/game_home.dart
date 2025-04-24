@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
@@ -55,10 +54,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   late String homeTeamId;
   late String awayTeamAbbr;
   late String homeTeamAbbr;
-  late Map<String, dynamic> summary;
   late List lineScore;
-  late Map<String, dynamic> homeLineScore;
-  late Map<String, dynamic> awayLineScore;
   final ValueNotifier<bool> _showImagesNotifier = ValueNotifier<bool>(false);
   Map<String, dynamic> game = {};
   bool _isLoading = false;
@@ -89,13 +85,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   void setSummaryLineScore() {
     // Set all necessary variables and set state to update UI
     setState(() {
-      summary = game['SUMMARY']['GameSummary'][0];
-      lineScore = game['SUMMARY']['LineScore'];
-
-      homeLineScore =
-          lineScore[0]['TEAM_ID'].toString() == widget.homeId ? lineScore[0] : lineScore[1];
-      awayLineScore =
-          lineScore[1]['TEAM_ID'].toString() == widget.homeId ? lineScore[0] : lineScore[1];
+      lineScore = game['stats']['linescore'];
     });
   }
 
@@ -117,11 +107,11 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     }
 
     // Check if upcoming
-    _isUpcoming = game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 1;
+    _isUpcoming = game['status'] == 1;
 
     if (_isUpcoming) {
-      if (game.containsKey('BOXSCORE')) {
-        if (game['BOXSCORE']['gameStatusText'] == 'pregame') {
+      if (game.containsKey('gameClock')) {
+        if (game['gameClock'] == 'pregame') {
           pregame = true;
         }
       }
@@ -217,58 +207,58 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   ///                   Build the page.
   /// ******************************************************
 
-  Widget getStatus() {
-    if (summary['GAME_STATUS_ID'] == 3) {
-      switch (summary['LIVE_PERIOD']) {
-        case 4:
-          return Text('FINAL',
-              style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
-        case 5:
-          return Text('FINAL/OT',
-              style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
-        default:
-          return Text('FINAL/${summary['LIVE_PERIOD'] - 4}OT',
-              style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
-      }
-    }
-    if (summary['GAME_STATUS_ID'] == 2) {
-      if (summary['LIVE_PC_TIME'] == ":0.0") {
-        switch (summary['LIVE_PERIOD']) {
-          case 1:
-            return Text('END 1ST', style: kBebasBold.copyWith(fontSize: 16.0.r));
-          case 2:
-            return Text('HALF', style: kBebasBold.copyWith(fontSize: 16.0.r));
-          case 3:
-            return Text('END 3RD', style: kBebasBold.copyWith(fontSize: 16.0.r));
-          case 4:
-            return Text('FINAL', style: kBebasBold.copyWith(fontSize: 16.0.r));
-          case 5:
-            return Text('FINAL/OT', style: kBebasBold.copyWith(fontSize: 16.0.r));
-          default:
-            return Text('FINAL/${summary['LIVE_PERIOD'] - 4}OT',
-                style: kBebasBold.copyWith(fontSize: 16.0.r));
-        }
-      } else {
-        int period = summary['LIVE_PERIOD'];
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-                period <= 4
-                    ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
-                    : period == 5
-                        ? 'OT'
-                        : '${(period - 4).toString()}OT',
-                style: kBebasBold.copyWith(fontSize: 12.0.r)),
-            Text(summary['LIVE_PC_TIME'].toString(),
-                style: kBebasBold.copyWith(fontSize: 14.0.r)),
-          ],
-        );
-      }
-    } else {
-      return Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r));
-    }
-  }
+  // Widget getStatus() {
+  //   if (game['status'] == 3) {
+  //     switch (summary['LIVE_PERIOD']) {
+  //       case 4:
+  //         return Text('FINAL',
+  //             style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
+  //       case 5:
+  //         return Text('FINAL/OT',
+  //             style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
+  //       default:
+  //         return Text('FINAL/${summary['LIVE_PERIOD'] - 4}OT',
+  //             style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
+  //     }
+  //   }
+  //   if (summary['GAME_STATUS_ID'] == 2) {
+  //     if (summary['LIVE_PC_TIME'] == ":0.0") {
+  //       switch (summary['LIVE_PERIOD']) {
+  //         case 1:
+  //           return Text('END 1ST', style: kBebasBold.copyWith(fontSize: 16.0.r));
+  //         case 2:
+  //           return Text('HALF', style: kBebasBold.copyWith(fontSize: 16.0.r));
+  //         case 3:
+  //           return Text('END 3RD', style: kBebasBold.copyWith(fontSize: 16.0.r));
+  //         case 4:
+  //           return Text('FINAL', style: kBebasBold.copyWith(fontSize: 16.0.r));
+  //         case 5:
+  //           return Text('FINAL/OT', style: kBebasBold.copyWith(fontSize: 16.0.r));
+  //         default:
+  //           return Text('FINAL/${summary['LIVE_PERIOD'] - 4}OT',
+  //               style: kBebasBold.copyWith(fontSize: 16.0.r));
+  //       }
+  //     } else {
+  //       int period = summary['LIVE_PERIOD'];
+  //       return Column(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           Text(
+  //               period <= 4
+  //                   ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
+  //                   : period == 5
+  //                       ? 'OT'
+  //                       : '${(period - 4).toString()}OT',
+  //               style: kBebasBold.copyWith(fontSize: 12.0.r)),
+  //           Text(summary['LIVE_PC_TIME'].toString(),
+  //               style: kBebasBold.copyWith(fontSize: 14.0.r)),
+  //         ],
+  //       );
+  //     }
+  //   } else {
+  //     return Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r));
+  //   }
+  // }
 
   Widget getTitleDetails() {
     if (_isUpcoming) {
@@ -281,8 +271,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
         ],
       );
     } else {
-      int homeScore = homeLineScore['PTS'];
-      int awayScore = awayLineScore['PTS'];
+      int homeScore = game['homeScore'];
+      int awayScore = game['awayScore'];
       return Row(
         children: [
           Text(
@@ -291,10 +281,10 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 fontSize: 26.0.r,
                 color: awayScore > homeScore
                     ? Colors.white
-                    : (summary['GAME_STATUS_ID'] == 3 ? Colors.grey : Colors.white)),
+                    : (game['status'] == 3 ? Colors.grey : Colors.white)),
           ),
           SizedBox(width: 20.0.r),
-          getStatus(),
+          Text(game['gameClock']),
           SizedBox(width: 20.0.r),
           Text(
             homeScore.toString(),
@@ -302,7 +292,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 fontSize: 26.0.r,
                 color: homeScore > awayScore
                     ? Colors.white
-                    : (summary['GAME_STATUS_ID'] == 3 ? Colors.grey : Colors.white)),
+                    : (game['status'] == 3 ? Colors.grey : Colors.white)),
           ),
         ],
       );
@@ -443,11 +433,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     child: FlexibleSpaceBar(
                       background: GameInfo(
                         pregame: pregame,
-                        gameSummary: summary,
-                        homeLinescore: homeLineScore,
-                        awayLinescore: awayLineScore,
-                        homeId: widget.homeId,
-                        awayId: awayTeamId,
+                        game: game,
                         isUpcoming: _isUpcoming,
                         odds: odds,
                         gameTime: widget.gameTime,
@@ -514,7 +500,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
             awayId: widget.awayId,
             isUpcoming: _isUpcoming,
           ),
-          if (!_isUpcoming && game.containsKey('PBP'))
+          if (!_isUpcoming && game.containsKey('pbp'))
             PlayByPlay(
               key: const PageStorageKey('PlayByPlay'),
               game: game,
@@ -534,7 +520,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
               game: game,
               homeId: widget.homeId,
               awayId: awayTeamId,
-              inProgress: game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2,
+              inProgress: game['status'] == 2,
             ),
           if (odds.isNotEmpty)
             Odds(key: const PageStorageKey('GameOdds'), odds: game['ODDS']?['BOOK']),
@@ -548,170 +534,162 @@ class GameInfo extends StatelessWidget {
   const GameInfo({
     super.key,
     required this.pregame,
-    required this.gameSummary,
-    required this.homeLinescore,
-    required this.awayLinescore,
-    required this.homeId,
-    required this.awayId,
+    required this.game,
     required this.isUpcoming,
     this.odds,
     this.gameTime,
   });
 
   final bool pregame;
-  final Map<String, dynamic> gameSummary;
-  final Map<String, dynamic> homeLinescore;
-  final Map<String, dynamic> awayLinescore;
-  final String homeId;
-  final String awayId;
+  final Map<String, dynamic> game;
   final bool isUpcoming;
   final Map<String, dynamic>? odds;
   final String? gameTime;
 
-  Widget getStatus(int status) {
-    if (status == 3) {
-      switch (gameSummary['LIVE_PERIOD']) {
-        case 4:
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('FINAL',
-                  style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
-            ],
-          );
-        case 5:
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('FINAL/OT',
-                  style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
-            ],
-          );
-        default:
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('FINAL/${gameSummary['LIVE_PERIOD'] - 4}OT',
-                  style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
-            ],
-          );
-      }
-    }
-    if (status == 2) {
-      if (gameSummary['LIVE_PC_TIME'] == ":0.0") {
-        switch (gameSummary['LIVE_PERIOD']) {
-          case 1:
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('END 1ST', style: kBebasBold.copyWith(fontSize: 20.0.r)),
-              ],
-            );
-          case 2:
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('HALF', style: kBebasBold.copyWith(fontSize: 20.0.r)),
-              ],
-            );
-          case 3:
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('END 3RD', style: kBebasBold.copyWith(fontSize: 20.0.r)),
-              ],
-            );
-          case 4:
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('FINAL', style: kBebasBold.copyWith(fontSize: 16.0.r)),
-              ],
-            );
-          case 5:
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('FINAL/OT', style: kBebasBold.copyWith(fontSize: 16.0.r)),
-              ],
-            );
-          default:
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('FINAL/${gameSummary['LIVE_PERIOD'] - 4}OT',
-                    style: kBebasBold.copyWith(fontSize: 16.0.r)),
-              ],
-            );
-        }
-      } else {
-        int period = gameSummary['LIVE_PERIOD'];
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-                period <= 4
-                    ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
-                    : period == 5
-                        ? 'OT'
-                        : '${(period - 4).toString()}OT',
-                style: kBebasBold.copyWith(fontSize: 16.0.r)),
-            Text(gameSummary['LIVE_PC_TIME'].toString(),
-                style: kBebasBold.copyWith(fontSize: 16.0.r)),
-          ],
-        );
-      }
-    } else {
-      return Column(
-        children: [
-          if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV' &&
-              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
-              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN2' &&
-              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
-              gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT' &&
-              gameSummary['GAME_STATUS_TEXT'] != 'Cancelled')
-            Text(gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS',
-                style: kBebasBold.copyWith(fontSize: 19.0.r)),
-          if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != null &&
-              gameSummary['GAME_STATUS_TEXT'] != 'Cancelled') ...[
-            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
-              SvgPicture.asset(
-                'images/NBA_TV.svg',
-                width: 30.0.r,
-                height: 30.0.r,
-              ),
-            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
-              SvgPicture.asset(
-                'images/NBA_on_TNT.svg',
-                width: 28.0.r,
-                height: 28.0.r,
-              ),
-            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
-              SvgPicture.asset(
-                'images/ESPN.svg',
-                width: 12.0.r,
-                height: 12.0.r,
-              ),
-            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN2')
-              SvgPicture.asset(
-                'images/ESPN2.svg',
-                width: 12.0.r,
-                height: 12.0.r,
-              ),
-            if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
-              SvgPicture.asset(
-                'images/abc.svg',
-                width: 32.0.r,
-                height: 32.0.r,
-              ),
-            SizedBox(height: 8.0.r),
-          ],
-          Text(pregame ? 'PREGAME' : gameTime ?? '',
-              style: kBebasBold.copyWith(fontSize: 19.0.r)),
-        ],
-      );
-    }
-  }
+  // Widget getStatus(int status) {
+  //   if (status == 3) {
+  //     switch (gameSummary['LIVE_PERIOD']) {
+  //       case 4:
+  //         return Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             Text('FINAL',
+  //                 style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
+  //           ],
+  //         );
+  //       case 5:
+  //         return Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             Text('FINAL/OT',
+  //                 style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
+  //           ],
+  //         );
+  //       default:
+  //         return Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             Text('FINAL/${gameSummary['LIVE_PERIOD'] - 4}OT',
+  //                 style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
+  //           ],
+  //         );
+  //     }
+  //   }
+  //   if (status == 2) {
+  //     if (gameSummary['LIVE_PC_TIME'] == ":0.0") {
+  //       switch (gameSummary['LIVE_PERIOD']) {
+  //         case 1:
+  //           return Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Text('END 1ST', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+  //             ],
+  //           );
+  //         case 2:
+  //           return Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Text('HALF', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+  //             ],
+  //           );
+  //         case 3:
+  //           return Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Text('END 3RD', style: kBebasBold.copyWith(fontSize: 20.0.r)),
+  //             ],
+  //           );
+  //         case 4:
+  //           return Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Text('FINAL', style: kBebasBold.copyWith(fontSize: 16.0.r)),
+  //             ],
+  //           );
+  //         case 5:
+  //           return Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Text('FINAL/OT', style: kBebasBold.copyWith(fontSize: 16.0.r)),
+  //             ],
+  //           );
+  //         default:
+  //           return Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Text('FINAL/${gameSummary['LIVE_PERIOD'] - 4}OT',
+  //                   style: kBebasBold.copyWith(fontSize: 16.0.r)),
+  //             ],
+  //           );
+  //       }
+  //     } else {
+  //       int period = gameSummary['LIVE_PERIOD'];
+  //       return Column(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           Text(
+  //               period <= 4
+  //                   ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
+  //                   : period == 5
+  //                       ? 'OT'
+  //                       : '${(period - 4).toString()}OT',
+  //               style: kBebasBold.copyWith(fontSize: 16.0.r)),
+  //           Text(gameSummary['LIVE_PC_TIME'].toString(),
+  //               style: kBebasBold.copyWith(fontSize: 16.0.r)),
+  //         ],
+  //       );
+  //     }
+  //   } else {
+  //     return Column(
+  //       children: [
+  //         if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV' &&
+  //             gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
+  //             gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN2' &&
+  //             gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
+  //             gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT' &&
+  //             gameSummary['GAME_STATUS_TEXT'] != 'Cancelled')
+  //           Text(gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS',
+  //               style: kBebasBold.copyWith(fontSize: 19.0.r)),
+  //         if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != null &&
+  //             gameSummary['GAME_STATUS_TEXT'] != 'Cancelled') ...[
+  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
+  //             SvgPicture.asset(
+  //               'images/NBA_TV.svg',
+  //               width: 30.0.r,
+  //               height: 30.0.r,
+  //             ),
+  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
+  //             SvgPicture.asset(
+  //               'images/NBA_on_TNT.svg',
+  //               width: 28.0.r,
+  //               height: 28.0.r,
+  //             ),
+  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
+  //             SvgPicture.asset(
+  //               'images/ESPN.svg',
+  //               width: 12.0.r,
+  //               height: 12.0.r,
+  //             ),
+  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN2')
+  //             SvgPicture.asset(
+  //               'images/ESPN2.svg',
+  //               width: 12.0.r,
+  //               height: 12.0.r,
+  //             ),
+  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
+  //             SvgPicture.asset(
+  //               'images/abc.svg',
+  //               width: 32.0.r,
+  //               height: 32.0.r,
+  //             ),
+  //           SizedBox(height: 8.0.r),
+  //         ],
+  //         Text(pregame ? 'PREGAME' : gameTime ?? '',
+  //             style: kBebasBold.copyWith(fontSize: 19.0.r)),
+  //       ],
+  //     );
+  //   }
+  // }
 
   Widget gameTitle(String gameId) {
     String seasonTypeCode = gameId[2];
@@ -758,7 +736,7 @@ class GameInfo extends StatelessWidget {
             style: kBebasBold.copyWith(fontSize: 14.0.r, color: Colors.grey.shade300));
       default:
         // Parse the input string into a DateTime object
-        DateTime parsedDate = DateTime.parse(gameSummary['GAME_DATE_EST']);
+        DateTime parsedDate = DateTime.parse(game['date']);
 
         // Format the DateTime object into the desired string format
         String formattedDate = DateFormat('EEE, MMM d, y').format(parsedDate).toUpperCase();
@@ -781,7 +759,7 @@ class GameInfo extends StatelessWidget {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            gameTitle(gameSummary['GAME_ID']),
+            gameTitle(game['gameId']),
             SizedBox(height: MediaQuery.sizeOf(context).height / 7)
           ],
         ),
@@ -789,19 +767,19 @@ class GameInfo extends StatelessWidget {
           padding: EdgeInsets.all(15.0.r),
           child: Row(
             children: [
-              if (awayId == '0')
+              if (game['awayTeamId'] == '0')
                 if (isLandscape) SizedBox(width: availableWidth * 0.06),
-              if (awayId == '0')
+              if (game['awayTeamId'] == '0')
                 if (!isLandscape) SizedBox(width: availableWidth * 0.1),
               if (isLandscape) SizedBox(width: availableWidth * 0.1),
               GestureDetector(
                 onTap: () {
-                  if (awayId != '0') {
+                  if (game['awayTeamId'] != '0') {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => TeamHome(
-                          teamId: awayId,
+                          teamId: game['awayTeamId'],
                         ),
                       ),
                     );
@@ -810,39 +788,39 @@ class GameInfo extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (awayId == '0')
+                    if (game['awayTeamId'] == '0')
                       Image.asset(
-                        'images/NBA_Logos/$awayId.png',
+                        'images/NBA_Logos/${game['awayTeamId']}.png',
                         width: isLandscape ? availableWidth * 0.04 : availableWidth * 0.1,
                       ),
-                    if (awayId != '0')
+                    if (game['awayTeamId'] != '0')
                       ConstrainedBox(
                         constraints: BoxConstraints(minHeight: 80.0.r, maxHeight: 80.0.r),
                         child: Image.asset(
-                          awayId == '1610612761'
-                              ? 'images/NBA_Logos/${awayId}_alt.png'
-                              : 'images/NBA_Logos/$awayId.png',
+                          game['awayTeamId'] == '1610612761'
+                              ? 'images/NBA_Logos/${game['awayTeamId']}_alt.png'
+                              : 'images/NBA_Logos/${game['awayTeamId']}.png',
                           width: isLandscape ? availableWidth * 0.1 : availableWidth * 0.2,
                         ),
                       ),
                     SizedBox(height: 8.0.r),
-                    Text(
-                      awayLinescore['TEAM_WINS_LOSSES'],
-                      style:
-                          kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
-                    )
+                    // Text(
+                    //   awayLinescore['TEAM_WINS_LOSSES'],
+                    //   style:
+                    //       kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
+                    // )
                   ],
                 ),
               ),
               const Spacer(),
               if (!isUpcoming)
                 Text(
-                  awayLinescore['PTS'].toString(),
+                  game['awayScore'].toString(),
                   style: kBebasBold.copyWith(
                       fontSize: 36.0.r,
-                      color: awayLinescore['PTS'] > homeLinescore['PTS']
+                      color: game['awayScore'] > game['homeScore']
                           ? Colors.white
-                          : gameSummary['GAME_STATUS_ID'] == 3
+                          : game['status'] == 3
                               ? Colors.grey
                               : Colors.white),
                 ),
@@ -850,18 +828,18 @@ class GameInfo extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getStatus(gameSummary['GAME_STATUS_ID']),
+                  Text(game['gameClock']),
                 ],
               ),
               if (!isUpcoming) const Spacer(),
               if (!isUpcoming)
                 Text(
-                  homeLinescore['PTS'].toString(),
+                  game['homeScore'].toString(),
                   style: kBebasBold.copyWith(
                       fontSize: 36.0.r,
-                      color: homeLinescore['PTS'] > awayLinescore['PTS']
+                      color: game['homeScore'] > game['awayScore']
                           ? Colors.white
-                          : gameSummary['GAME_STATUS_ID'] == 3
+                          : game['status'] == 3
                               ? Colors.grey
                               : Colors.white),
                 ),
@@ -872,7 +850,7 @@ class GameInfo extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => TeamHome(
-                        teamId: homeId,
+                        teamId: game['homeTeamId'],
                       ),
                     ),
                   );
@@ -883,10 +861,10 @@ class GameInfo extends StatelessWidget {
                     ConstrainedBox(
                       constraints: BoxConstraints(minHeight: 80.0.r, maxHeight: 80.0.r),
                       child: Image.asset(
-                        homeId == '1610612761'
-                            ? 'images/NBA_Logos/${homeId}_alt.png'
-                            : 'images/NBA_Logos/$homeId.png',
-                        width: homeId == '0'
+                        game['homeTeamId'] == '1610612761'
+                            ? 'images/NBA_Logos/${game['homeTeamId']}_alt.png'
+                            : 'images/NBA_Logos/${game['homeTeamId']}.png',
+                        width: game['homeTeamId'] == '0'
                             ? availableWidth * 0.05
                             : isLandscape
                                 ? availableWidth * 0.1
@@ -894,11 +872,11 @@ class GameInfo extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 8.0.r),
-                    Text(
-                      homeLinescore['TEAM_WINS_LOSSES'],
-                      style:
-                          kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
-                    )
+                    // Text(
+                    //   homeLinescore['TEAM_WINS_LOSSES'],
+                    //   style:
+                    //       kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
+                    // )
                   ],
                 ),
               ),
@@ -919,7 +897,9 @@ class GameInfo extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          odds?['SPREAD'] == null ? '' : kTeamIdToName[awayId]?[1] ?? 'INT\'L',
+                          odds?['SPREAD'] == null
+                              ? ''
+                              : kTeamIdToName[game['awayTeamId']]?[1] ?? 'INT\'L',
                           textAlign: TextAlign.center,
                           style: kBebasNormal.copyWith(
                               fontSize: 14.0.r, color: Colors.grey.shade300),
@@ -959,7 +939,9 @@ class GameInfo extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          odds?['ML'] == null ? '' : kTeamIdToName[homeId]?[1] ?? 'INT\'L',
+                          odds?['ML'] == null
+                              ? ''
+                              : kTeamIdToName[game['homeTeamId']]?[1] ?? 'INT\'L',
                           textAlign: TextAlign.center,
                           style: kBebasNormal.copyWith(
                               fontSize: 14.0.r, color: Colors.grey.shade300),

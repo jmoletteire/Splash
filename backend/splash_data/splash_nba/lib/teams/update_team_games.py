@@ -84,13 +84,13 @@ def update_team_games(game):
 
         # Update the home team season data
         teams_collection.update_one(
-            {"TEAM_ID": game["homeTeamId"]},
+            {"TEAM_ID": int(game["homeTeamId"])},
             {"$set": {f"SEASONS.{season}.GAMES.{game['gameId']}": game_data_home}},
         )
 
         # Update the visitor team season data
         teams_collection.update_one(
-            {"TEAM_ID": game["awayTeamId"]},
+            {"TEAM_ID": int(game["awayTeamId"])},
             {"$set": {f"SEASONS.{season}.GAMES.{game['gameId']}": game_data_visitor}},
         )
     except Exception as e:
@@ -111,6 +111,7 @@ if __name__ == "__main__":
     # Get the total number of documents
     query = {"season": "2024"}
     proj = {
+        "_id": 0,
         "gameId": 1,
         "awayTeamId": 1,
         "homeTeamId": 1,
