@@ -54,9 +54,10 @@ class _TeamGamesState extends State<TeamGames> {
 
     // Iterate through the cache and extract NET_RATING
     teamCache.cache.forEach((teamId, values) {
-      int stat_rank = values['seasons']?[widget.selectedSeason]?['STATS']?['REGULAR SEASON']
-              ?['ADV']?[stat] ??
-          30;
+      int stat_rank = int.parse(values['SEASONS']?[widget.selectedSeason]?['STATS']
+                  ?['REGULAR SEASON']?[stat]?['Totals']?['Rank']
+              .toString() ??
+          '30');
       if (stat_rank <= 10) top10Teams.add(teamId);
     });
 
@@ -228,6 +229,9 @@ class _TeamGamesState extends State<TeamGames> {
   }
 
   String adjustTimezone(String dateString, String timeString) {
+    if (timeString == 'TBD' || timeString == '') {
+      return timeString;
+    }
     // Parse the base date
     DateTime baseDate = DateTime.parse(dateString);
 

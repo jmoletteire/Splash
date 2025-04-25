@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
@@ -299,7 +300,13 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                     : (game['status'] == 3 ? Colors.grey : Colors.white)),
           ),
           SizedBox(width: 20.0.r),
-          Text(game['gameClock']),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(game['gameClock'], style: kBebasBold.copyWith(fontSize: 12.0.r)),
+              Text(game['gameClock'], style: kBebasBold.copyWith(fontSize: 14.0.r)),
+            ],
+          ),
           SizedBox(width: 20.0.r),
           Text(
             homeScore.toString(),
@@ -561,150 +568,55 @@ class GameInfo extends StatelessWidget {
   final Map<String, dynamic>? odds;
   final String? gameTime;
 
-  // Widget getStatus(int status) {
-  //   if (status == 3) {
-  //     switch (gameSummary['LIVE_PERIOD']) {
-  //       case 4:
-  //         return Column(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           children: [
-  //             Text('FINAL',
-  //                 style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
-  //           ],
-  //         );
-  //       case 5:
-  //         return Column(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           children: [
-  //             Text('FINAL/OT',
-  //                 style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
-  //           ],
-  //         );
-  //       default:
-  //         return Column(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           children: [
-  //             Text('FINAL/${gameSummary['LIVE_PERIOD'] - 4}OT',
-  //                 style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300)),
-  //           ],
-  //         );
-  //     }
-  //   }
-  //   if (status == 2) {
-  //     if (gameSummary['LIVE_PC_TIME'] == ":0.0") {
-  //       switch (gameSummary['LIVE_PERIOD']) {
-  //         case 1:
-  //           return Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Text('END 1ST', style: kBebasBold.copyWith(fontSize: 20.0.r)),
-  //             ],
-  //           );
-  //         case 2:
-  //           return Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Text('HALF', style: kBebasBold.copyWith(fontSize: 20.0.r)),
-  //             ],
-  //           );
-  //         case 3:
-  //           return Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Text('END 3RD', style: kBebasBold.copyWith(fontSize: 20.0.r)),
-  //             ],
-  //           );
-  //         case 4:
-  //           return Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Text('FINAL', style: kBebasBold.copyWith(fontSize: 16.0.r)),
-  //             ],
-  //           );
-  //         case 5:
-  //           return Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Text('FINAL/OT', style: kBebasBold.copyWith(fontSize: 16.0.r)),
-  //             ],
-  //           );
-  //         default:
-  //           return Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Text('FINAL/${gameSummary['LIVE_PERIOD'] - 4}OT',
-  //                   style: kBebasBold.copyWith(fontSize: 16.0.r)),
-  //             ],
-  //           );
-  //       }
-  //     } else {
-  //       int period = gameSummary['LIVE_PERIOD'];
-  //       return Column(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           Text(
-  //               period <= 4
-  //                   ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
-  //                   : period == 5
-  //                       ? 'OT'
-  //                       : '${(period - 4).toString()}OT',
-  //               style: kBebasBold.copyWith(fontSize: 16.0.r)),
-  //           Text(gameSummary['LIVE_PC_TIME'].toString(),
-  //               style: kBebasBold.copyWith(fontSize: 16.0.r)),
-  //         ],
-  //       );
-  //     }
-  //   } else {
-  //     return Column(
-  //       children: [
-  //         if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'NBA TV' &&
-  //             gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN' &&
-  //             gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ESPN2' &&
-  //             gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'ABC' &&
-  //             gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != 'TNT' &&
-  //             gameSummary['GAME_STATUS_TEXT'] != 'Cancelled')
-  //           Text(gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] ?? 'LEAGUE PASS',
-  //               style: kBebasBold.copyWith(fontSize: 19.0.r)),
-  //         if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] != null &&
-  //             gameSummary['GAME_STATUS_TEXT'] != 'Cancelled') ...[
-  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'NBA TV')
-  //             SvgPicture.asset(
-  //               'images/NBA_TV.svg',
-  //               width: 30.0.r,
-  //               height: 30.0.r,
-  //             ),
-  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'TNT')
-  //             SvgPicture.asset(
-  //               'images/NBA_on_TNT.svg',
-  //               width: 28.0.r,
-  //               height: 28.0.r,
-  //             ),
-  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN')
-  //             SvgPicture.asset(
-  //               'images/ESPN.svg',
-  //               width: 12.0.r,
-  //               height: 12.0.r,
-  //             ),
-  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ESPN2')
-  //             SvgPicture.asset(
-  //               'images/ESPN2.svg',
-  //               width: 12.0.r,
-  //               height: 12.0.r,
-  //             ),
-  //           if (gameSummary['NATL_TV_BROADCASTER_ABBREVIATION'] == 'ABC')
-  //             SvgPicture.asset(
-  //               'images/abc.svg',
-  //               width: 32.0.r,
-  //               height: 32.0.r,
-  //             ),
-  //           SizedBox(height: 8.0.r),
-  //         ],
-  //         Text(pregame ? 'PREGAME' : gameTime ?? '',
-  //             style: kBebasBold.copyWith(fontSize: 19.0.r)),
-  //       ],
-  //     );
-  //   }
-  // }
+  Widget getStatus(int status) {
+    return Column(
+      children: [
+        if (game['broadcast'] != 'NBA TV' &&
+            game['broadcast'] != 'ESPN' &&
+            game['broadcast'] != 'ESPN2' &&
+            game['broadcast'] != 'ABC' &&
+            game['broadcast'] != 'TNT' &&
+            game['gameClock'] != 'Cancelled')
+          Text(game['broadcast'] ?? 'LEAGUE PASS',
+              style: kBebasBold.copyWith(fontSize: 19.0.r)),
+        if (game['broadcast'] != null && game['gameClock'] != 'Cancelled') ...[
+          if (game['broadcast'] == 'NBA TV')
+            SvgPicture.asset(
+              'images/NBA_TV.svg',
+              width: 30.0.r,
+              height: 30.0.r,
+            ),
+          if (game['broadcast'] == 'TNT')
+            SvgPicture.asset(
+              'images/NBA_on_TNT.svg',
+              width: 28.0.r,
+              height: 28.0.r,
+            ),
+          if (game['broadcast'] == 'ESPN')
+            SvgPicture.asset(
+              'images/ESPN.svg',
+              width: 12.0.r,
+              height: 12.0.r,
+            ),
+          if (game['broadcast'] == 'ESPN2')
+            SvgPicture.asset(
+              'images/ESPN2.svg',
+              width: 12.0.r,
+              height: 12.0.r,
+            ),
+          if (game['broadcast'] == 'ABC')
+            SvgPicture.asset(
+              'images/abc.svg',
+              width: 32.0.r,
+              height: 32.0.r,
+            ),
+          SizedBox(height: 8.0.r),
+        ],
+        Text(pregame ? 'PREGAME' : gameTime ?? '',
+            style: kBebasBold.copyWith(fontSize: 19.0.r)),
+      ],
+    );
+  }
 
   Widget gameTitle(String gameId) {
     String seasonTypeCode = gameId[2];
@@ -819,11 +731,11 @@ class GameInfo extends StatelessWidget {
                         ),
                       ),
                     SizedBox(height: 8.0.r),
-                    // Text(
-                    //   awayLinescore['TEAM_WINS_LOSSES'],
-                    //   style:
-                    //       kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
-                    // )
+                    Text(
+                      game['matchup']?['teamRecords']?['away'] ?? '',
+                      style:
+                          kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
+                    )
                   ],
                 ),
               ),
@@ -842,9 +754,7 @@ class GameInfo extends StatelessWidget {
               if (!isUpcoming) const Spacer(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(game['gameClock']),
-                ],
+                children: [getStatus(game['status'])],
               ),
               if (!isUpcoming) const Spacer(),
               if (!isUpcoming)
@@ -887,11 +797,11 @@ class GameInfo extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 8.0.r),
-                    // Text(
-                    //   homeLinescore['TEAM_WINS_LOSSES'],
-                    //   style:
-                    //       kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
-                    // )
+                    Text(
+                      game['matchup']?['teamRecords']?['home'] ?? '',
+                      style:
+                          kBebasNormal.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300),
+                    )
                   ],
                 ),
               ),

@@ -62,8 +62,8 @@ class _TeamRecordState extends State<TeamRecord> {
     setState(() {
       homeTeam = home;
       awayTeam = away;
-      homeStandings = homeTeam?['seasons']?[widget.season]?['STANDINGS'] ?? {};
-      awayStandings = awayTeam?['seasons']?[widget.season]?['STANDINGS'] ?? {};
+      homeStandings = homeTeam?['SEASONS']?[widget.season]?['STANDINGS'] ?? {};
+      awayStandings = awayTeam?['SEASONS']?[widget.season]?['STANDINGS'] ?? {};
 
       homeColor = getTeamColor(homeTeam);
       awayColor = getTeamColor(awayTeam);

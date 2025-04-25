@@ -19,7 +19,7 @@ class TeamLastLineup extends StatefulWidget {
 class _TeamLastLineupState extends State<TeamLastLineup> {
   Map<String, dynamic> getLastGame() {
     for (String season in kSeasons) {
-      Map<String, dynamic> schedule = widget.team['seasons']?[season]?['GAMES'] ?? {};
+      Map<String, dynamic> schedule = widget.team['SEASONS']?[season]?['GAMES'] ?? {};
 
       // Convert the map to a list of entries
       var entries = schedule.entries.toList();
@@ -143,17 +143,17 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                                   children: [
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[4]['personId'].toString(),
-                                        name: lineup[4]['name'],
-                                        position: lineup[4]['position'],
+                                        playerId: lineup[3]['personId'].toString(),
+                                        name: lineup[3]['name'],
+                                        position: lineup[3]['position'],
                                         team: widget.team,
                                       ),
                                     ),
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[3]['personId'].toString(),
-                                        name: lineup[3]['name'],
-                                        position: lineup[3]['position'],
+                                        playerId: lineup[4]['personId'].toString(),
+                                        name: lineup[4]['name'],
+                                        position: lineup[4]['position'],
                                         team: widget.team,
                                       ),
                                     ),
@@ -173,17 +173,17 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                                     ),
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[2]['personId'].toString(),
-                                        name: lineup[2]['name'],
-                                        position: lineup[2]['position'],
+                                        playerId: lineup[1]['personId'].toString(),
+                                        name: lineup[1]['name'],
+                                        position: lineup[1]['position'],
                                         team: widget.team,
                                       ),
                                     ),
                                     Expanded(
                                       child: PlayerCard(
-                                        playerId: lineup[1]['personId'].toString(),
-                                        name: lineup[1]['name'],
-                                        position: lineup[1]['position'],
+                                        playerId: lineup[2]['personId'].toString(),
+                                        name: lineup[2]['name'],
+                                        position: lineup[2]['position'],
                                         team: widget.team,
                                       ),
                                     ),
@@ -206,17 +206,17 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                             children: [
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[4]['personId'].toString(),
-                                  name: lineup[4]['name'],
-                                  position: lineup[4]['position'],
+                                  playerId: lineup[3]['personId'].toString(),
+                                  name: lineup[3]['name'],
+                                  position: lineup[3]['position'],
                                   team: widget.team,
                                 ),
                               ),
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[3]['personId'].toString(),
-                                  name: lineup[3]['name'],
-                                  position: lineup[3]['position'],
+                                  playerId: lineup[4]['personId'].toString(),
+                                  name: lineup[4]['name'],
+                                  position: lineup[4]['position'],
                                   team: widget.team,
                                 ),
                               ),
@@ -236,17 +236,17 @@ class _TeamLastLineupState extends State<TeamLastLineup> {
                               ),
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[2]['personId'].toString(),
-                                  name: lineup[2]['name'],
-                                  position: lineup[2]['position'],
+                                  playerId: lineup[1]['personId'].toString(),
+                                  name: lineup[1]['name'],
+                                  position: lineup[1]['position'],
                                   team: widget.team,
                                 ),
                               ),
                               Expanded(
                                 child: PlayerCard(
-                                  playerId: lineup[1]['personId'].toString(),
-                                  name: lineup[1]['name'],
-                                  position: lineup[1]['position'],
+                                  playerId: lineup[2]['personId'].toString(),
+                                  name: lineup[2]['name'],
+                                  position: lineup[2]['position'],
                                   team: widget.team,
                                 ),
                               ),

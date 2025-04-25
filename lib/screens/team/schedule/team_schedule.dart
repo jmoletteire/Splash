@@ -109,10 +109,10 @@ class _TeamScheduleState extends State<TeamSchedule> with AutomaticKeepAliveClie
   void initState() {
     super.initState();
 
-    seasons = widget.team['seasons'].keys.toList().reversed.toList();
+    seasons = widget.team['SEASONS'].keys.toList().reversed.toList();
     seasons = seasons.where((e) => int.parse(e.substring(0, 4)) >= 2017).toList();
     selectedSeason = seasons.first;
-    schedule = widget.team['seasons'][selectedSeason]['GAMES'];
+    schedule = widget.team['SEASONS'][selectedSeason]['GAMES'];
 
     filterSeasonTypes(schedule.keys.toList());
     selectedSeasonType = 'All';
@@ -244,7 +244,7 @@ class _TeamScheduleState extends State<TeamSchedule> with AutomaticKeepAliveClie
                                                 setState(() {
                                                   selectedSeason = value!;
                                                   schedule =
-                                                      widget.team['seasons'][value]['GAMES'];
+                                                      widget.team['SEASONS'][value]['GAMES'];
                                                   filterSeasonTypes(schedule.keys.toList());
                                                   games = TeamGames(
                                                     team: widget.team,

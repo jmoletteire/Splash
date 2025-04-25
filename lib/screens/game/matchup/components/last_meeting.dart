@@ -62,37 +62,33 @@ class _LastMeetingState extends State<LastMeeting> {
   Future<void> setValues(String gameId, String gameDate) async {
     await getGame(gameId, gameDate);
 
-    lastHomeId = game['SUMMARY']['GameSummary'][0]['HOME_TEAM_ID'].toString();
-    lastAwayId = game['SUMMARY']['GameSummary'][0]['VISITOR_TEAM_ID'].toString();
+    lastHomeId = game['homeTeamId'].toString();
+    lastAwayId = game['awayTeamId'].toString();
     if (!kTeamIdToName.containsKey(lastAwayId)) {
       lastAwayId = '0';
     }
 
-    lastGameHomePts = widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() == lastHomeId
-        ? widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS'].toStringAsFixed(0)
-        : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS'].toStringAsFixed(0);
+    lastGameHomePts = widget.lastMeeting['home_id'].toString() == lastHomeId
+        ? widget.lastMeeting['home_score'].toStringAsFixed(0)
+        : widget.lastMeeting['away_score'].toStringAsFixed(0);
 
-    lastGameAwayPts = widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() == lastAwayId
-        ? widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS'].toStringAsFixed(0)
-        : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS'].toStringAsFixed(0);
+    lastGameAwayPts = widget.lastMeeting['home_id'].toString() == lastAwayId
+        ? widget.lastMeeting['home_score'].toStringAsFixed(0)
+        : widget.lastMeeting['away_score'].toStringAsFixed(0);
 
-    homePtsColor = widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() == lastHomeId
-        ? widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS'] >
-                widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
+    homePtsColor = widget.lastMeeting['home_id'].toString() == lastHomeId
+        ? widget.lastMeeting['home_score'] > widget.lastMeeting['away_score']
             ? Colors.white
             : Colors.grey
-        : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS'] >
-                widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS']
+        : widget.lastMeeting['away_score'] > widget.lastMeeting['home_score']
             ? Colors.white
             : Colors.grey;
 
-    awayPtsColor = widget.lastMeeting['LAST_GAME_HOME_TEAM_ID'].toString() == lastAwayId
-        ? widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS'] >
-                widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS']
+    awayPtsColor = widget.lastMeeting['home_id'].toString() == lastAwayId
+        ? widget.lastMeeting['home_score'] > widget.lastMeeting['away_score']
             ? Colors.white
             : Colors.grey
-        : widget.lastMeeting['LAST_GAME_VISITOR_TEAM_POINTS'] >
-                widget.lastMeeting['LAST_GAME_HOME_TEAM_POINTS']
+        : widget.lastMeeting['away_score'] > widget.lastMeeting['home_score']
             ? Colors.white
             : Colors.grey;
 
@@ -118,9 +114,8 @@ class _LastMeetingState extends State<LastMeeting> {
   @override
   void initState() {
     super.initState();
-    gameDate = formatDate(widget.lastMeeting['LAST_GAME_DATE_EST']);
-    setValues(widget.lastMeeting['LAST_GAME_ID'],
-        widget.lastMeeting['LAST_GAME_DATE_EST'].substring(0, 10));
+    gameDate = formatDate(widget.lastMeeting['date']);
+    setValues(widget.lastMeeting['game_id'], widget.lastMeeting['date'].substring(0, 10));
   }
 
   @override
@@ -134,10 +129,10 @@ class _LastMeetingState extends State<LastMeeting> {
             MaterialPageRoute(
               builder: (context) => GameHome(
                 gameData: game,
-                gameId: widget.lastMeeting['LAST_GAME_ID'],
+                gameId: widget.lastMeeting['game_id'],
                 homeId: lastHomeId,
                 awayId: lastAwayId,
-                gameDate: widget.lastMeeting['LAST_GAME_DATE_EST'].substring(0, 10),
+                gameDate: widget.lastMeeting['date'].substring(0, 10),
               ),
             ),
           );

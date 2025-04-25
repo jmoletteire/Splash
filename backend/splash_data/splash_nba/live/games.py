@@ -226,10 +226,23 @@ def matchup_details(summary, boxscore):
     matchup = f'{boxscore.get("awayTeam", {}).get("teamName", "Away")} @ {boxscore.get("homeTeam", {}).get("teamName", "Home")}'
     officials = ""
     location = ""
+    team_records = {"home": "0-0", "away": "0-0"}
     lineups = {"home": [], "away": []}
     inactive = {"home": "", "away": ""}
     last_meeting = {}
     series = {"home": 0, "away": 0}
+
+    if matchup == 'Away @ Home' and 'LineScore' in summary:
+        try:
+            home_id = summary["GameSummary"][0]["HOME_TEAM_ID"]
+            away_id = summary["GameSummary"][0]["VISITOR_TEAM_ID"]
+            home_linescore = summary["LineScore"][0] if summary["LineScore"][0]["TEAM_ID"] == home_id else summary["LineScore"][1]
+            away_linescore = summary["LineScore"][0] if summary["LineScore"][0]["TEAM_ID"] == away_id else summary["LineScore"][1]
+            matchup = f'{away_linescore["TEAM_NICKNAME"]} @ {home_linescore["TEAM_NICKNAME"]}'
+            team_records["home"] = home_linescore["TEAM_WINS_LOSSES"]
+            team_records["away"] = away_linescore["TEAM_WINS_LOSSES"]
+        except Exception:
+            matchup = 'Away @ Home'
 
     # Officials
     if "officials" in boxscore:
@@ -311,6 +324,7 @@ def matchup_details(summary, boxscore):
         "matchup": matchup,
         "officials": officials,
         "location": location,
+        "teamRecords": team_records,
         "lineups": lineups,
         "inactive": inactive,
         "lastMeeting": last_meeting,

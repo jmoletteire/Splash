@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../utilities/constants.dart';
-import '../../../../utilities/team.dart';
-import '../../../team/team_cache.dart';
 import '../../game_home.dart';
 
 class LastFiveGames extends StatefulWidget {
   final String gameDate;
-  final String homeId;
-  final String awayId;
+  final Map<String, dynamic> homeTeam;
+  final Map<String, dynamic> awayTeam;
 
   const LastFiveGames({
     super.key,
     required this.gameDate,
-    required this.homeId,
-    required this.awayId,
+    required this.homeTeam,
+    required this.awayTeam,
   });
 
   @override
@@ -26,8 +23,6 @@ class LastFiveGames extends StatefulWidget {
 }
 
 class _LastFiveGamesState extends State<LastFiveGames> {
-  Map<String, dynamic> homeTeam = {};
-  Map<String, dynamic> awayTeam = {};
   List homeLastFive = [];
   List awayLastFive = [];
   List<Widget> homeGameRows = [];
@@ -41,7 +36,7 @@ class _LastFiveGamesState extends State<LastFiveGames> {
 
     while (gamesToAdd.length < 5) {
       for (String season in kSeasons) {
-        Map<String, dynamic> schedule = team['seasons']?[season]?['GAMES'] ?? {};
+        Map<String, dynamic> schedule = team['SEASONS']?[season]?['GAMES'] ?? {};
 
         if (schedule.isEmpty) {
           break;
@@ -79,53 +74,39 @@ class _LastFiveGamesState extends State<LastFiveGames> {
     return gamesToAdd;
   }
 
-  Future<Map<String, dynamic>> getTeam(String teamId) async {
-    final teamCache = Provider.of<TeamCache>(context, listen: false);
-    if (teamCache.containsTeam(teamId)) {
-      return teamCache.getTeam(teamId)!;
-    } else {
-      var fetchedTeam = await Team().getTeam(teamId);
-      teamCache.addTeam(teamId, fetchedTeam);
-      return fetchedTeam;
-    }
-  }
-
-  Future<void> setValues(String homeId, String awayId) async {
+  void setValues() {
     setState(() {
       _isLoading = true;
     });
-    List teams = await Future.wait([
-      getTeam(homeId),
-      getTeam(awayId),
-    ]);
+
+    if (widget.awayTeam.isNotEmpty) {
+      awayTeamColor = kDarkPrimaryColors.contains(widget.awayTeam['ABBREVIATION'])
+          ? (kTeamColors[widget.awayTeam['ABBREVIATION']]!['secondaryColor']!)
+          : (kTeamColors[widget.awayTeam['ABBREVIATION']]!['primaryColor']!);
+    }
+
+    if (widget.homeTeam.isNotEmpty) {
+      homeTeamColor = kDarkPrimaryColors.contains(widget.homeTeam['ABBREVIATION'])
+          ? (kTeamColors[widget.homeTeam['ABBREVIATION']]!['secondaryColor']!)
+          : (kTeamColors[widget.homeTeam['ABBREVIATION']]!['primaryColor']!);
+    }
+
+    if (widget.homeTeam.isNotEmpty && widget.homeTeam['ABBREVIATION'] != 'FA') {
+      homeLastFive = getLastFiveGames(widget.homeTeam);
+    }
+    if (widget.awayTeam.isNotEmpty && widget.awayTeam['ABBREVIATION'] != 'FA') {
+      awayLastFive = getLastFiveGames(widget.awayTeam);
+    }
+
+    for (int i = 0; i < homeLastFive.length; i++) {
+      homeGameRows.add(homeGameRow(i));
+    }
+
+    for (int i = 0; i < awayLastFive.length; i++) {
+      awayGameRows.add(awayGameRow(i));
+    }
+
     setState(() {
-      homeTeam = teams[0];
-      awayTeam = teams[1];
-
-      if (awayTeam.isNotEmpty) {
-        awayTeamColor = kDarkPrimaryColors.contains(awayTeam['ABBREVIATION'])
-            ? (kTeamColors[awayTeam['ABBREVIATION']]!['secondaryColor']!)
-            : (kTeamColors[awayTeam['ABBREVIATION']]!['primaryColor']!);
-      }
-
-      if (homeTeam.isNotEmpty) {
-        homeTeamColor = kDarkPrimaryColors.contains(homeTeam['ABBREVIATION'])
-            ? (kTeamColors[homeTeam['ABBREVIATION']]!['secondaryColor']!)
-            : (kTeamColors[homeTeam['ABBREVIATION']]!['primaryColor']!);
-      }
-
-      if (homeTeam.isNotEmpty) {
-        homeLastFive = getLastFiveGames(homeTeam);
-      }
-      if (awayTeam.isNotEmpty && awayTeam['ABBREVIATION'] != 'FA') {
-        awayLastFive = getLastFiveGames(awayTeam);
-      }
-
-      for (int i = 0; i < 5; i++) {
-        homeGameRows.add(homeGameRow(i));
-        awayGameRows.add(awayGameRow(i));
-      }
-
       _isLoading = false;
     });
   }
@@ -133,7 +114,22 @@ class _LastFiveGamesState extends State<LastFiveGames> {
   @override
   void initState() {
     super.initState();
-    setValues(widget.homeId, widget.awayId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.homeTeam.isNotEmpty && widget.awayTeam.isNotEmpty) {
+        setValues();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant LastFiveGames oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && widget.homeTeam.isNotEmpty && widget.awayTeam.isNotEmpty) {
+        setValues();
+      }
+    });
   }
 
   List<String> formatDate(String date) {
@@ -161,10 +157,10 @@ class _LastFiveGamesState extends State<LastFiveGames> {
               builder: (context) => GameHome(
                 gameId: homeLastFive[index]['GAME_ID'],
                 homeId: homeLastFive[index]['HOME_AWAY'] == 'vs'
-                    ? widget.homeId
+                    ? widget.homeTeam['TEAM_ID']
                     : homeLastFive[index]['OPP'].toString(),
                 awayId: homeLastFive[index]['HOME_AWAY'] == '@'
-                    ? widget.homeId
+                    ? widget.homeTeam['TEAM_ID']
                     : homeLastFive[index]['OPP'].toString(),
                 gameDate: homeLastFive[index]['GAME_DATE'],
               ),
@@ -267,10 +263,10 @@ class _LastFiveGamesState extends State<LastFiveGames> {
               builder: (context) => GameHome(
                 gameId: awayLastFive[index]['GAME_ID'],
                 homeId: awayLastFive[index]['HOME_AWAY'] == 'vs'
-                    ? widget.awayId
+                    ? widget.awayTeam['TEAM_ID']
                     : awayLastFive[index]['OPP'].toString(),
                 awayId: awayLastFive[index]['HOME_AWAY'] == '@'
-                    ? widget.awayId
+                    ? widget.awayTeam['TEAM_ID']
                     : awayLastFive[index]['OPP'].toString(),
                 gameDate: awayLastFive[index]['GAME_DATE'],
               ),

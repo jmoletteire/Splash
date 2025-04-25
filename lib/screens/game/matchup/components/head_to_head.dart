@@ -47,8 +47,8 @@ class _H2HState extends State<H2H> {
     percentageTextStyle = kBebasNormal.copyWith(fontSize: 13.0.r);
     winTextStyle = kBebasNormal.copyWith(fontSize: 14.0.r);
 
-    awayTeamWins = widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_LOSSES'] ?? 0;
-    homeTeamWins = widget.game['SUMMARY']?['SeasonSeries']?[0]?['HOME_TEAM_WINS'] ?? 0;
+    awayTeamWins = widget.game['matchup']?['series']?['away'] ?? 0;
+    homeTeamWins = widget.game['matchup']?['series']?['home'] ?? 0;
 
     int totalGames = awayTeamWins + homeTeamWins;
     awayTeamWinPct = totalGames == 0 ? 50 : (awayTeamWins / totalGames) * 100;

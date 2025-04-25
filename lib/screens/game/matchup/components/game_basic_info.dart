@@ -78,7 +78,7 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
             SizedBox(height: 10.0.r),
             GameBasicInfoRow(
               icon: Icons.sports_basketball,
-              data: ['${widget.awayTeamName} @ ${widget.homeTeamName}'],
+              data: [widget.game['matchup']['matchup']],
             ),
             SizedBox(height: 10.0.r),
 
@@ -106,7 +106,7 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
             // Officials
             GameBasicInfoRow(
               icon: Icons.sports,
-              data: [widget.game['matchup']?['officials'] ?? ''],
+              data: [widget.game['matchup']?['officials'] ?? 'TBA'],
             ),
           ],
         ),

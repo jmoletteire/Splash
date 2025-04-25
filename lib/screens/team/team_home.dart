@@ -70,7 +70,7 @@ class _TeamHomeState extends State<TeamHome> with SingleTickerProviderStateMixin
 
   Map<String, dynamic> getLastGame() {
     for (String season in kSeasons) {
-      Map<String, dynamic> schedule = team['seasons']?[season]?['GAMES'] ?? {};
+      Map<String, dynamic> schedule = team['SEASONS']?[season]?['GAMES'] ?? {};
 
       // Convert the map to a list of entries
       var entries = schedule.entries.toList();

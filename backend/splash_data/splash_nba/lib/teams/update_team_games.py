@@ -59,7 +59,7 @@ def update_team_games(game):
 
         # Create the game object for both teams
         game_data_home = {
-            "SEASON_ID": game["season"],
+            "SEASON_ID": game["seasonCode"],
             "GAME_DATE": game["date"],
             "NBA_CUP": is_nba_cup,
             "HOME_AWAY": "vs",
@@ -71,7 +71,7 @@ def update_team_games(game):
         }
 
         game_data_visitor = {
-            "SEASON_ID": game["season"],
+            "SEASON_ID": game["seasonCode"],
             "GAME_DATE": game["date"],
             "NBA_CUP": is_nba_cup,
             "HOME_AWAY": "@",
@@ -121,6 +121,7 @@ if __name__ == "__main__":
         "homeScore": 1,
         "awayScore": 1,
         "season": 1,
+        "seasonCode": 1,
         "status": 1,
         "title": 1
     }

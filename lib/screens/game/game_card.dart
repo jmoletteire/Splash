@@ -78,26 +78,28 @@ class GameCardState extends State<GameCard> {
       cacheWidth: (logicalSize * devicePixelRatio).toInt(),
     );
 
-    headerRow = _buildHeaderRow();
-    awayRow = TeamRow(
-      team: away,
-      teamLogo: awayLogo,
-      pts: widget.game['awayScore'],
-      odds: spread,
-      scoreColor: statusCode != 3
-          ? Colors.white
-          : _getScoreColor(widget.game['awayScore'], widget.game['homeScore']),
-    );
-
-    homeRow = TeamRow(
-      team: home,
-      teamLogo: homeLogo,
-      pts: widget.game['homeScore'],
-      odds: overUnder,
-      scoreColor: statusCode != 3
-          ? Colors.white
-          : _getScoreColor(widget.game['homeScore'], widget.game['awayScore']),
-    );
+    // headerRow = _buildHeaderRow();
+    // awayRow = TeamRow(
+    //   team: away,
+    //   teamLogo: awayLogo,
+    //   teamRecord: widget.game['matchup']?['teamRecords']?['away'] ?? '0-0',
+    //   pts: widget.game['awayScore'],
+    //   odds: spread,
+    //   scoreColor: statusCode != 3
+    //       ? Colors.white
+    //       : _getScoreColor(widget.game['awayScore'], widget.game['homeScore']),
+    // );
+    //
+    // homeRow = TeamRow(
+    //   team: home,
+    //   teamLogo: homeLogo,
+    //   teamRecord: widget.game['matchup']?['teamRecords']?['home'] ?? '0-0',
+    //   pts: widget.game['homeScore'],
+    //   odds: overUnder,
+    //   scoreColor: statusCode != 3
+    //       ? Colors.white
+    //       : _getScoreColor(widget.game['homeScore'], widget.game['awayScore']),
+    // );
   }
 
   @override
@@ -288,6 +290,9 @@ class GameCardState extends State<GameCard> {
 
   Widget _getStatus() {
     String gameTime = widget.game['gameClock'];
+    if (gameTime.contains("ET")) {
+      gameTime = _adjustTimezone(widget.game['date'], gameTime);
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -315,77 +320,8 @@ class GameCardState extends State<GameCard> {
     );
   }
 
-  // String _getGameTime(Map<String, dynamic> summary) {
-  //   if (widget.game.containsKey('BOXSCORE')) {
-  //     if (widget.game['BOXSCORE']['gameStatusText'] == 'pregame') {
-  //       return 'Pregame';
-  //     }
-  //   }
-  //   switch (summary['GAME_STATUS_ID']) {
-  //     case 1:
-  //       // Upcoming
-  //       if (summary['GAME_STATUS_TEXT'] == 'Cancelled') {
-  //         return summary['GAME_STATUS_TEXT'];
-  //       }
-  //       return _adjustTimezone(summary['GAME_DATE_EST'], summary['GAME_STATUS_TEXT']);
-  //     case 2:
-  //       // End Quarter
-  //       if (summary['LIVE_PC_TIME'] == ":0.0" || summary['LIVE_PC_TIME'] == "     ") {
-  //         switch (summary['LIVE_PERIOD']) {
-  //           case 1:
-  //             return 'End 1Q';
-  //           case 2:
-  //             return 'HALF';
-  //           case 3:
-  //             return 'End 3Q';
-  //           case 4:
-  //             return 'Final';
-  //           case 5:
-  //             return 'Final/OT';
-  //           default:
-  //             return 'Final/${summary['LIVE_PERIOD'] - 4}OT';
-  //         }
-  //       } else {
-  //         // Game in-progress
-  //         if (summary['LIVE_PERIOD'] <= 4) {
-  //           return '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'].toString()}Q ';
-  //         } else if (summary['LIVE_PERIOD'] == 5) {
-  //           return '${summary['LIVE_PC_TIME'].toString()} OT';
-  //         } else {
-  //           return '${summary['LIVE_PC_TIME'].toString()} ${summary['LIVE_PERIOD'] - 4}OT';
-  //         }
-  //       }
-  //     case 3:
-  //       // Game Final
-  //       switch (summary['LIVE_PERIOD']) {
-  //         case 4:
-  //           return 'Final';
-  //         case 5:
-  //           return 'Final/OT';
-  //         default:
-  //           return 'Final/${summary['LIVE_PERIOD'] - 4}OT';
-  //       }
-  //     default:
-  //       return '';
-  //   }
-  // }
-  //
-  // String _parseOdds(Map<String, dynamic> game, String field,
-  //     {required bool live, required String type, required String fallbackType}) {
-  //   try {
-  //     final odds = live ? game['ODDS']['LIVE']['26338'] : game['ODDS']['BOOK']['18186'];
-  //     double value =
-  //         double.parse(odds['oddstypes']?[live ? type : fallbackType]?[field]?['value']);
-  //     return value > 0 && type != '18' && fallbackType != '3'
-  //         ? '+${value.toStringAsFixed(1)}'
-  //         : value.toStringAsFixed(1);
-  //   } catch (e) {
-  //     return '';
-  //   }
-  // }
-
   String _adjustTimezone(String dateString, String timeString) {
-    if (timeString == 'Final') {
+    if (!timeString.contains('am') && !timeString.contains('pm')) {
       return timeString;
     }
 
@@ -428,14 +364,13 @@ class GameCardState extends State<GameCard> {
           context,
           MaterialPageRoute(
             builder: (context) => GameHome(
-                gameData: widget.game,
-                gameId: widget.game['gameId'],
-                homeId: widget.homeTeam.toString(),
-                awayId: widget.awayTeam.toString(),
-                gameDate: widget.game['date'],
-                gameTime: widget.game[
-                    'gameClock'] // _adjustTimezone(widget.game['date'], widget.game['gameClock']),
-                ),
+              gameData: widget.game,
+              gameId: widget.game['gameId'],
+              homeId: widget.homeTeam.toString(),
+              awayId: widget.awayTeam.toString(),
+              gameDate: widget.game['date'],
+              gameTime: _adjustTimezone(widget.game['date'], widget.game['gameClock']),
+            ),
           ),
         );
       },
@@ -452,6 +387,7 @@ class GameCardState extends State<GameCard> {
             TeamRow(
               team: away,
               teamLogo: awayLogo,
+              teamRecord: widget.game['matchup']?['teamRecords']?['away'] ?? '0-0',
               pts: widget.game['awayScore'],
               odds: spread,
               scoreColor: statusCode != 3
@@ -461,6 +397,7 @@ class GameCardState extends State<GameCard> {
             TeamRow(
               team: home,
               teamLogo: homeLogo,
+              teamRecord: widget.game['matchup']?['teamRecords']?['home'] ?? '0-0',
               pts: widget.game['homeScore'],
               odds: overUnder,
               scoreColor: statusCode != 3
@@ -493,6 +430,7 @@ class GameCardState extends State<GameCard> {
 class TeamRow extends StatelessWidget {
   final Map<String, dynamic> team;
   final Image teamLogo;
+  final String teamRecord;
   final int? pts;
   final String odds;
   final Color scoreColor;
@@ -501,6 +439,7 @@ class TeamRow extends StatelessWidget {
     super.key,
     required this.team,
     required this.teamLogo,
+    required this.teamRecord,
     required this.pts,
     required this.odds,
     required this.scoreColor,
@@ -521,12 +460,11 @@ class TeamRow extends StatelessWidget {
               teamLogo,
               SizedBox(width: 10.0.r),
               Text(
-                team['NICKNAME'] ?? 'INT\'L',
+                team['NICKNAME'] ?? '',
                 style: kGameCardTextStyle.copyWith(color: scoreColor, fontSize: 20.0.r),
               ),
               SizedBox(width: 4.0.r),
-              // Text(lineScore['TEAM_WINS_LOSSES'] ?? '0-0',
-              //     style: kGameCardTextStyle.copyWith(fontSize: 14.0.r)),
+              Text(teamRecord, style: kGameCardTextStyle.copyWith(fontSize: 14.0.r)),
             ],
           ),
         ),
