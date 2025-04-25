@@ -321,7 +321,7 @@ class GameCardState extends State<GameCard> {
   }
 
   String _adjustTimezone(String dateString, String timeString) {
-    if (!timeString.contains('am') && !timeString.contains('pm')) {
+    if (!timeString.contains('ET')) {
       return timeString;
     }
 
