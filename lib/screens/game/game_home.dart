@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
-import 'package:splash/screens/game/game_odds.dart';
 import 'package:splash/screens/game/play_by_play/play_by_play.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
@@ -88,7 +87,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     _setTeams();
   }
 
-  void _setTeams() async {
+  Future<void> _setTeams() async {
     homeTeam = await getTeam(widget.homeId.toString());
     awayTeam = await getTeam(widget.awayId.toString());
   }
@@ -133,7 +132,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       }
     }
 
-    _setTeams();
+    await _setTeams();
 
     setState(() {
       _isLoading = false;
@@ -282,13 +281,14 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
         children: [
           SizedBox(width: 15.0.r),
           Text(pregame ? 'PREGAME' : widget.gameTime!,
-              style: kBebasBold.copyWith(fontSize: 22.0.r)),
+              style: kBebasBold.copyWith(fontSize: 20.0.r)),
           SizedBox(width: 15.0.r),
         ],
       );
     } else {
       int homeScore = game['homeScore'];
       int awayScore = game['awayScore'];
+      List<String> gameTime = game['gameClock'].split(" ");
       return Row(
         children: [
           Text(
@@ -303,8 +303,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(game['gameClock'], style: kBebasBold.copyWith(fontSize: 12.0.r)),
-              Text(game['gameClock'], style: kBebasBold.copyWith(fontSize: 14.0.r)),
+              if (gameTime.length > 1)
+                Text(gameTime.first, style: kBebasBold.copyWith(fontSize: 12.0.r)),
+              Text(gameTime.last, style: kBebasBold.copyWith(fontSize: 14.0.r)),
             ],
           ),
           SizedBox(width: 20.0.r),
@@ -475,9 +476,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                 labelStyle: kBebasNormal.copyWith(fontSize: !_isUpcoming ? 16.5.r : 18.0.r),
                 tabs: [
                   const Tab(text: 'Matchup'),
-                  if (!_isUpcoming && game.containsKey('PBP')) const Tab(text: 'Play-By-Play'),
+                  if (!_isUpcoming && game.containsKey('pbp')) const Tab(text: 'Play-By-Play'),
                   Tab(text: _isUpcoming ? 'Stats' : 'Box Score'),
-                  if (odds.isNotEmpty) const Tab(text: 'Odds')
+                  // if (odds.isNotEmpty) const Tab(text: 'Odds')
                 ],
               ),
               actions: [
@@ -544,8 +545,8 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
               awayTeam: awayTeam,
               inProgress: game['status'] == 2,
             ),
-          if (odds.isNotEmpty)
-            Odds(key: const PageStorageKey('GameOdds'), odds: game['ODDS']?['BOOK']),
+          // if (odds.isNotEmpty)
+          // Odds(key: const PageStorageKey('GameOdds'), odds: game['ODDS']?['BOOK']),
         ]),
       ),
     );

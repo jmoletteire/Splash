@@ -34,8 +34,8 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
       const List<String> positionHierarchy = ['G', 'G-F', 'F-G', 'F', 'F-C', 'C-F', 'C'];
 
       // Convert the map to a list of entries
-      var entries = widget.team['seasons'][selectedSeason]['ROSTER'].entries.toList();
-      int teamGP = widget.team['seasons'][selectedSeason]['GP'];
+      var entries = widget.team['SEASONS'][selectedSeason]['ROSTER'].entries.toList();
+      int teamGP = widget.team['SEASONS'][selectedSeason]['GP'];
 
       // Filter out players with GP == 0
       /*
@@ -171,7 +171,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
   @override
   void initState() {
     super.initState();
-    seasons = widget.team['seasons'].keys.toList().reversed.toList();
+    seasons = widget.team['SEASONS'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
     setPlayers();
   }
@@ -183,16 +183,16 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
 
     Color getColor(String index) {
-      return widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] == ''
+      return widget.team['SEASONS'][selectedSeason]['ROSTER'][index]['Injured_Status'] == ''
           ? Colors.grey.shade900
-          : widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+          : widget.team['SEASONS'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
                       'OUT' ||
-                  widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+                  widget.team['SEASONS'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
                       'OFS'
               ? Colors.redAccent.withOpacity(0.15)
-              : widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+              : widget.team['SEASONS'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
                           'GTD' ||
-                      widget.team['seasons'][selectedSeason]['ROSTER'][index]
+                      widget.team['SEASONS'][selectedSeason]['ROSTER'][index]
                               ['Injured_Status'] ==
                           'DTD'
                   ? Colors.orangeAccent.withOpacity(0.15)
@@ -344,7 +344,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                   width: 0.5,
                                 ))),
                             child: RotationRow(
-                              player: widget.team['seasons'][selectedSeason]['ROSTER']
+                              player: widget.team['SEASONS'][selectedSeason]['ROSTER']
                                   [starters[index]],
                             ),
                           ),
@@ -454,7 +454,7 @@ class _TeamRotationState extends State<TeamRotation> with AutomaticKeepAliveClie
                                   width: 0.5,
                                 ))),
                             child: RotationRow(
-                              player: widget.team['seasons'][selectedSeason]['ROSTER']
+                              player: widget.team['SEASONS'][selectedSeason]['ROSTER']
                                   [bench[index]],
                             ),
                           ),

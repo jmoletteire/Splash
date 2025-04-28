@@ -182,5 +182,6 @@ if __name__ == '__main__':
         '1996-97'
     ]
 
-    fetch_player_stats(seasons)
+    # fetch_player_stats(seasons)
     # fetch_playoff_stats(seasons)
+    update_player_stats('PLAYOFFS', 1610612753)

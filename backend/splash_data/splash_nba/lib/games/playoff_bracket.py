@@ -116,16 +116,18 @@ def get_playoff_bracket_data(season, playoff_data):
                 teams_collection.find_one({'TEAM_ID': games_list[0]['HOME_TEAM_ID']}, {'_id': 0, 'ABBREVIATION': 1})[
                     'ABBREVIATION'],
             'TEAM_ONE_SEED': teams_collection.find_one({'TEAM_ID': games_list[0]['HOME_TEAM_ID']},
-                                                       {'_id': 0, f'seasons.{season}.STANDINGS.PlayoffRank': 1})[
-                'seasons'][season]['STANDINGS']['PlayoffRank'],
+                                                       {'_id': 0, f'SEASONS.{season}.STANDINGS.PlayoffRank': 1})[
+                'SEASONS'][season]['STANDINGS']['PlayoffRank'],
             'TEAM_TWO': games_list[0]['VISITOR_TEAM_ID'],
             'TEAM_TWO_ABBR':
                 teams_collection.find_one({'TEAM_ID': games_list[0]['VISITOR_TEAM_ID']}, {'_id': 0, 'ABBREVIATION': 1})[
                     'ABBREVIATION'],
             'TEAM_TWO_SEED': teams_collection.find_one({'TEAM_ID': games_list[0]['VISITOR_TEAM_ID']},
-                                                       {'_id': 0, f'seasons.{season}.STANDINGS.PlayoffRank': 1})[
-                'seasons'][season]['STANDINGS']['PlayoffRank'],
-            'GAMES': []
+                                                       {'_id': 0, f'SEASONS.{season}.STANDINGS.PlayoffRank': 1})[
+                'SEASONS'][season]['STANDINGS']['PlayoffRank'],
+            'GAMES': [],
+            'TEAM_ONE_WINS': 0,
+            'TEAM_TWO_WINS': 0
         }
 
         for i, game in enumerate(games_list):
@@ -142,9 +144,12 @@ def get_playoff_bracket_data(season, playoff_data):
                 series['GAMES'][i]['HOME_SCORE'] = game_data['homeScore'] if 'homeScore' in game_data else None
                 series['GAMES'][i]['AWAY_SCORE'] = game_data['awayScore'] if 'awayScore' in game_data else None
 
-                if i == (len(games_list)-1):
-                    series['TEAM_ONE_WINS'] = game_data.get('matchup', {}).get('series', {}).get('home', '0')
-                    series['TEAM_TWO_WINS'] = game_data.get('matchup', {}).get('series', {}).get('away', '0')
+                if game_data.get('homeScore', 0) > game_data.get('awayScore', 0):
+                    series['TEAM_ONE_WINS'] += 1 if series['TEAM_ONE'] == int(game_data.get('homeTeamId', '0')) else 0
+                    series['TEAM_TWO_WINS'] += 1 if series['TEAM_TWO'] == int(game_data.get('homeTeamId', '0')) else 0
+                elif game_data.get('awayScore', 0) > game_data.get('homeScore', 0):
+                    series['TEAM_ONE_WINS'] += 1 if series['TEAM_ONE'] == int(game_data.get('awayTeamId', '0')) else 0
+                    series['TEAM_TWO_WINS'] += 1 if series['TEAM_TWO'] == int(game_data.get('awayTeamId', '0')) else 0
 
             else:
                 logging.info(f"Game ID {game_id} not found in the collection, gathering data...")
@@ -237,14 +242,14 @@ def reformat_pre2002_series_data(season, games):
         home_team_data = _teams_collection.find_one(
             {'TEAM_ID': home_team},
             {
-                f'seasons.{season}.STANDINGS.Conference': 1,
-                f'seasons.{season}.STANDINGS.PlayoffRank': 1,
+                f'SEASONS.{season}.STANDINGS.Conference': 1,
+                f'SEASONS.{season}.STANDINGS.PlayoffRank': 1,
                 '_id': 0
             }
         )
 
-        conf = home_team_data['seasons'][season]['STANDINGS']['Conference']
-        seed = home_team_data['seasons'][season]['STANDINGS']['PlayoffRank']
+        conf = home_team_data['SEASONS'][season]['STANDINGS']['Conference']
+        seed = home_team_data['SEASONS'][season]['STANDINGS']['PlayoffRank']
 
         # Create a unique key for the matchup, sorting to make it order-independent
         matchup_key = tuple(sorted([home_team, visitor_team]))

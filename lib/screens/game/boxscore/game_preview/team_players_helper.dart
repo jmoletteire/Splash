@@ -6,12 +6,12 @@ class TeamPlayers {
 
   Future<List> getTeamPlayers(String teamId) async {
     // Create the query parameters map
-    Map<String, String> queryParams = {'team_id': teamId};
+    Map<String, String> queryParams = {'teamId': teamId};
 
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_team_player_stats',
+      '/team/roster/player-stats',
       queryParams,
     );
 

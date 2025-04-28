@@ -42,7 +42,7 @@ async def update_players(team_ids):
             try:
                 update_player_stats(CURR_SEASON_TYPE, team_id)
             except Exception as e:
-                logging.error(f"(Player Stats) Error updating BASIC/ADV stats for team {team_id}: {e}")
+                logging.error(f"(Player Stats) Error updating BASIC/ADV stats for team {team_id}: {e}", exc_info=True)
 
             try:
                 update_player_hustle_stats(CURR_SEASON_TYPE, team_id)

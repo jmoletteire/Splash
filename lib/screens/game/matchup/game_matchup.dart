@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:splash/utilities/constants.dart';
 
+import '../boxscore/game_preview/team_records.dart';
 import 'components/game_basic_info.dart';
 import 'components/head_to_head.dart';
 import 'components/inactives.dart';
 import 'components/last_five_games.dart';
 import 'components/last_meeting.dart';
 import 'components/lineups.dart';
+import 'components/team_season_stats.dart';
 
 class GameMatchup extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -29,6 +31,17 @@ class GameMatchup extends StatefulWidget {
 
 class _GameMatchupState extends State<GameMatchup> {
   @override
+  void didUpdateWidget(covariant GameMatchup oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.homeTeam != oldWidget.homeTeam || widget.awayTeam != oldWidget.awayTeam) {
+      setState(() {
+        // This triggers a re-build when the teams change
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
@@ -37,12 +50,7 @@ class _GameMatchupState extends State<GameMatchup> {
           sliver: SliverList(
             delegate: SliverChildListDelegate(
               [
-                GameBasicInfo(
-                  game: widget.game,
-                  isUpcoming: widget.isUpcoming,
-                  homeTeamName: '${widget.homeTeam['CITY']} ${widget.homeTeam['NICKNAME']}',
-                  awayTeamName: '${widget.awayTeam['CITY']} ${widget.awayTeam['NICKNAME']}',
-                ),
+                GameBasicInfo(game: widget.game, isUpcoming: widget.isUpcoming),
                 if (!widget.isUpcoming ||
                     (widget.isUpcoming && widget.game['gameClock'] == 'Pregame'))
                   Lineups(
@@ -90,27 +98,23 @@ class _GameMatchupState extends State<GameMatchup> {
                   homeTeam: widget.homeTeam,
                   awayTeam: widget.awayTeam,
                 ),
-                // TeamRecord(
-                //   season:
-                //       '${widget.game['season']}-${(int.parse(widget.game['season'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                //   homeId: kTeamIdToName.containsKey(widget.game['homeTeamId'])
-                //       ? widget.game['homeTeamId']
-                //       : '0',
-                //   awayId: kTeamIdToName.containsKey(widget.game['awayTeamId'])
-                //       ? widget.game['awayTeamId']
-                //       : '0',
-                // ),
-                // if (!widget.isUpcoming)
-                //   TeamSeasonStats(
-                //     season:
-                //         '${widget.game['season']}-${(int.parse(widget.game['season'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                //     homeId: kTeamIdToName.containsKey(widget.game['homeTeamId'])
-                //         ? widget.game['homeTeamId']
-                //         : '0',
-                //     awayId: kTeamIdToName.containsKey(widget.game['awayTeamId'])
-                //         ? widget.game['awayTeamId']
-                //         : '0',
-                //   ),
+                TeamRecord(
+                  season:
+                      '${widget.game['season']}-${(int.parse(widget.game['season'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                  homeId: widget.homeTeam['TEAM_ID'].toString(),
+                  awayId: widget.awayTeam['TEAM_ID'].toString(),
+                  homeTeam: widget.homeTeam,
+                  awayTeam: widget.awayTeam,
+                ),
+                if (!widget.isUpcoming)
+                  TeamSeasonStats(
+                    season:
+                        '${widget.game['season']}-${(int.parse(widget.game['season'].toString().substring(2)) + 1).toStringAsFixed(0)}',
+                    homeId: widget.homeTeam['TEAM_ID'].toString(),
+                    awayId: widget.awayTeam['TEAM_ID'].toString(),
+                    homeTeam: widget.homeTeam,
+                    awayTeam: widget.awayTeam,
+                  ),
               ],
             ),
           ),

@@ -5,18 +5,10 @@ import 'package:intl/intl.dart';
 import '../../../../utilities/constants.dart';
 
 class GameBasicInfo extends StatefulWidget {
-  const GameBasicInfo({
-    super.key,
-    required this.game,
-    required this.isUpcoming,
-    required this.homeTeamName,
-    required this.awayTeamName,
-  });
+  const GameBasicInfo({super.key, required this.game, required this.isUpcoming});
 
   final Map<String, dynamic> game;
   final bool isUpcoming;
-  final String homeTeamName;
-  final String awayTeamName;
 
   @override
   State<GameBasicInfo> createState() => _GameBasicInfoState();

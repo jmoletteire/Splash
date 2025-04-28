@@ -24,8 +24,8 @@ class Lineups extends StatefulWidget {
 class _LineupsState extends State<Lineups> {
   bool isLandscape = false;
   int status = 0;
-  List homePlayerStats = [];
-  List awayPlayerStats = [];
+  List homePlayers = [];
+  List awayPlayers = [];
   List<Widget> playerWidgets = [];
   late String homeAbbr;
   late String awayAbbr;
@@ -33,8 +33,8 @@ class _LineupsState extends State<Lineups> {
 
   void _initializePlayers() {
     status = int.parse(widget.game['status'].toString());
-    homePlayerStats = widget.game['stats']?['home']?['players'] ?? [];
-    awayPlayerStats = widget.game['stats']?['away']?['players'] ?? [];
+    homePlayers = widget.game['matchup']?['lineups']?['home'] ?? [];
+    awayPlayers = widget.game['matchup']?['lineups']?['away'] ?? [];
 
     homeAbbr = kTeamIdToName[widget.homeId][1];
     awayAbbr = kTeamIdToName[widget.awayId][1];
@@ -64,8 +64,8 @@ class _LineupsState extends State<Lineups> {
       });
     }
 
-    sortPlayers(homePlayerStats);
-    sortPlayers(awayPlayerStats);
+    sortPlayers(homePlayers);
+    sortPlayers(awayPlayers);
   }
 
   List<Widget> _setPlayerWidgets() {
@@ -76,40 +76,21 @@ class _LineupsState extends State<Lineups> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               PlayerCard(
-                playerId: awayPlayerStats[0]['personId'] ?? '',
-                name: awayPlayerStats[0]['name'] ?? '',
-                position: awayPlayerStats[0]['position'] ?? '',
+                playerId: awayPlayers[0]?['personId'] ?? '',
+                name: awayPlayers[0]?['name'] ?? '',
+                position: awayPlayers[0]?['position'] ?? '',
                 team: widget.awayId,
               ),
               PlayerCard(
-                playerId: awayPlayerStats[2]['personId'] ?? '',
-                name: awayPlayerStats[2]['name'] ?? '',
-                position: awayPlayerStats[2]['position'] ?? '',
+                playerId: awayPlayers[1]?['personId'] ?? '',
+                name: awayPlayers[1]?['name'] ?? '',
+                position: awayPlayers[1]?['position'] ?? '',
                 team: widget.awayId,
               ),
               PlayerCard(
-                playerId: awayPlayerStats[1]['personId'] ?? '',
-                name: awayPlayerStats[1]['name'] ?? '',
-                position: awayPlayerStats[1]['position'] ?? '',
-                team: widget.awayId,
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              PlayerCard(
-                playerId: awayPlayerStats[4]['personId'] ?? '',
-                name: awayPlayerStats[4]['name'] ?? '',
-                position: awayPlayerStats[4]['position'] ?? '',
-                team: widget.awayId,
-              ),
-              PlayerCard(
-                playerId: awayPlayerStats[3]['personId'] ?? '',
-                name: awayPlayerStats[3]['name'] ?? '',
-                position: awayPlayerStats[3]['position'] ?? '',
+                playerId: awayPlayers[2]?['personId'] ?? '',
+                name: awayPlayers[2]?['name'] ?? '',
+                position: awayPlayers[2]?['position'] ?? '',
                 team: widget.awayId,
               ),
             ],
@@ -120,15 +101,34 @@ class _LineupsState extends State<Lineups> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               PlayerCard(
-                playerId: homePlayerStats[4]['personId'] ?? '',
-                name: homePlayerStats[4]['name'] ?? '',
-                position: homePlayerStats[4]['position'] ?? '',
+                playerId: awayPlayers[3]?['personId'] ?? '',
+                name: awayPlayers[3]?['name'] ?? '',
+                position: awayPlayers[3]?['position'] ?? '',
+                team: widget.awayId,
+              ),
+              PlayerCard(
+                playerId: awayPlayers[4]?['personId'] ?? '',
+                name: awayPlayers[4]?['name'] ?? '',
+                position: awayPlayers[4]?['position'] ?? '',
+                team: widget.awayId,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              PlayerCard(
+                playerId: homePlayers[0]?['personId'] ?? '',
+                name: homePlayers[0]?['name'] ?? '',
+                position: homePlayers[0]?['position'] ?? '',
                 team: widget.homeId,
               ),
               PlayerCard(
-                playerId: homePlayerStats[3]['personId'] ?? '',
-                name: homePlayerStats[3]['name'] ?? '',
-                position: homePlayerStats[3]['position'] ?? '',
+                playerId: homePlayers[1]?['personId'] ?? '',
+                name: homePlayers[1]?['name'] ?? '',
+                position: homePlayers[1]?['position'] ?? '',
                 team: widget.homeId,
               ),
             ],
@@ -139,21 +139,21 @@ class _LineupsState extends State<Lineups> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               PlayerCard(
-                playerId: homePlayerStats[0]['personId'] ?? '',
-                name: homePlayerStats[0]['name'] ?? '',
-                position: homePlayerStats[0]['position'] ?? '',
+                playerId: homePlayers[2]?['personId'] ?? '',
+                name: homePlayers[2]?['name'] ?? '',
+                position: homePlayers[2]?['position'] ?? '',
                 team: widget.homeId,
               ),
               PlayerCard(
-                playerId: homePlayerStats[2]['personId'] ?? '',
-                name: homePlayerStats[2]['name'] ?? '',
-                position: homePlayerStats[2]['position'] ?? '',
+                playerId: homePlayers[3]?['personId'] ?? '',
+                name: homePlayers[3]?['name'] ?? '',
+                position: homePlayers[3]?['position'] ?? '',
                 team: widget.homeId,
               ),
               PlayerCard(
-                playerId: homePlayerStats[1]['personId'] ?? '',
-                name: homePlayerStats[1]['name'] ?? '',
-                position: homePlayerStats[1]['position'] ?? '',
+                playerId: homePlayers[4]?['personId'] ?? '',
+                name: homePlayers[4]?['name'] ?? '',
+                position: homePlayers[4]?['position'] ?? '',
                 team: widget.homeId,
               ),
             ],
@@ -168,25 +168,25 @@ class _LineupsState extends State<Lineups> {
           children: [
             Expanded(
               child: PlayerCard(
-                playerId: awayPlayerStats[0]['personId'] ?? '',
-                name: awayPlayerStats[0]['name'] ?? '',
-                position: awayPlayerStats[0]['position'] ?? '',
+                playerId: awayPlayers[0]?['personId'] ?? '',
+                name: awayPlayers[0]?['name'] ?? '',
+                position: awayPlayers[0]?['position'] ?? '',
                 team: widget.awayId,
               ),
             ),
             Expanded(
               child: PlayerCard(
-                playerId: awayPlayerStats[2]['personId'] ?? '',
-                name: awayPlayerStats[2]['name'] ?? '',
-                position: awayPlayerStats[2]['position'] ?? '',
+                playerId: awayPlayers[1]?['personId'] ?? '',
+                name: awayPlayers[1]?['name'] ?? '',
+                position: awayPlayers[1]?['position'] ?? '',
                 team: widget.awayId,
               ),
             ),
             Expanded(
               child: PlayerCard(
-                playerId: awayPlayerStats[1]['personId'] ?? '',
-                name: awayPlayerStats[1]['name'] ?? '',
-                position: awayPlayerStats[1]['position'] ?? '',
+                playerId: awayPlayers[2]?['personId'] ?? '',
+                name: awayPlayers[2]?['name'] ?? '',
+                position: awayPlayers[2]?['position'] ?? '',
                 team: widget.awayId,
               ),
             ),
@@ -198,17 +198,17 @@ class _LineupsState extends State<Lineups> {
           children: [
             Expanded(
               child: PlayerCard(
-                playerId: awayPlayerStats[4]['personId'] ?? '',
-                name: awayPlayerStats[4]['name'] ?? '',
-                position: awayPlayerStats[4]['position'] ?? '',
+                playerId: awayPlayers[3]?['personId'] ?? '',
+                name: awayPlayers[3]?['name'] ?? '',
+                position: awayPlayers[3]?['position'] ?? '',
                 team: widget.awayId,
               ),
             ),
             Expanded(
               child: PlayerCard(
-                playerId: awayPlayerStats[3]['personId'] ?? '',
-                name: awayPlayerStats[3]['name'] ?? '',
-                position: awayPlayerStats[3]['position'] ?? '',
+                playerId: awayPlayers[4]?['personId'] ?? '',
+                name: awayPlayers[4]?['name'] ?? '',
+                position: awayPlayers[4]?['position'] ?? '',
                 team: widget.awayId,
               ),
             ),
@@ -220,17 +220,17 @@ class _LineupsState extends State<Lineups> {
           children: [
             Expanded(
               child: PlayerCard(
-                playerId: homePlayerStats[4]['personId'] ?? '',
-                name: homePlayerStats[4]['name'] ?? '',
-                position: homePlayerStats[4]['position'] ?? '',
+                playerId: homePlayers[0]?['personId'] ?? '',
+                name: homePlayers[0]?['name'] ?? '',
+                position: homePlayers[0]?['position'] ?? '',
                 team: widget.homeId,
               ),
             ),
             Expanded(
               child: PlayerCard(
-                playerId: homePlayerStats[3]['personId'] ?? '',
-                name: homePlayerStats[3]['name'] ?? '',
-                position: homePlayerStats[3]['position'] ?? '',
+                playerId: homePlayers[1]?['personId'] ?? '',
+                name: homePlayers[1]?['name'] ?? '',
+                position: homePlayers[1]?['position'] ?? '',
                 team: widget.homeId,
               ),
             ),
@@ -242,25 +242,25 @@ class _LineupsState extends State<Lineups> {
           children: [
             Expanded(
               child: PlayerCard(
-                playerId: homePlayerStats[0]['personId'] ?? '',
-                name: homePlayerStats[0]['name'] ?? '',
-                position: homePlayerStats[0]['position'] ?? '',
+                playerId: homePlayers[2]?['personId'] ?? '',
+                name: homePlayers[2]?['name'] ?? '',
+                position: homePlayers[2]?['position'] ?? '',
                 team: widget.homeId,
               ),
             ),
             Expanded(
               child: PlayerCard(
-                playerId: homePlayerStats[2]['personId'] ?? '',
-                name: homePlayerStats[2]['name'] ?? '',
-                position: homePlayerStats[2]['position'] ?? '',
+                playerId: homePlayers[3]?['personId'] ?? '',
+                name: homePlayers[3]?['name'] ?? '',
+                position: homePlayers[3]?['position'] ?? '',
                 team: widget.homeId,
               ),
             ),
             Expanded(
               child: PlayerCard(
-                playerId: homePlayerStats[1]['personId'] ?? '',
-                name: homePlayerStats[1]['name'] ?? '',
-                position: homePlayerStats[1]['position'] ?? '',
+                playerId: homePlayers[4]?['personId'] ?? '',
+                name: homePlayers[4]?['name'] ?? '',
+                position: homePlayers[4]?['position'] ?? '',
                 team: widget.homeId,
               ),
             ),
@@ -356,7 +356,7 @@ class _LineupsState extends State<Lineups> {
                                           style: kBebasBold.copyWith(fontSize: 16.0.r),
                                         ),
                                       ),
-                                      for (var player in awayPlayerStats.sublist(6))
+                                      for (var player in awayPlayers.sublist(6))
                                         if (player['notPlayingReason'] == null ||
                                             (player['notPlayingReason'] !=
                                                     'INACTIVE_GLEAGUE_TWOWAY' &&
@@ -379,7 +379,7 @@ class _LineupsState extends State<Lineups> {
                                           style: kBebasBold.copyWith(fontSize: 16.0.r),
                                         ),
                                       ),
-                                      for (var player in homePlayerStats.sublist(6))
+                                      for (var player in homePlayers.sublist(6))
                                         if (player['notPlayingReason'] == null ||
                                             (player['notPlayingReason'] !=
                                                     'INACTIVE_GLEAGUE_TWOWAY' &&

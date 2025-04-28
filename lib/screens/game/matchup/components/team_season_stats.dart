@@ -13,12 +13,16 @@ class TeamSeasonStats extends StatefulWidget {
   final String season;
   final String homeId;
   final String awayId;
+  final Map<String, dynamic>? homeTeam;
+  final Map<String, dynamic>? awayTeam;
 
   const TeamSeasonStats({
     super.key,
     required this.season,
     required this.homeId,
     required this.awayId,
+    this.homeTeam,
+    this.awayTeam,
   });
 
   @override
@@ -38,7 +42,11 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
   void initState() {
     super.initState();
     season = widget.season;
-    fetchTeams();
+    if (widget.homeTeam == null || widget.awayTeam == null) {
+      fetchTeams();
+    } else {
+      initializeTeamData(widget.homeTeam!, widget.awayTeam!);
+    }
   }
 
   Future<void> fetchTeams() async {
@@ -152,42 +160,37 @@ class _TeamSeasonStatsState extends State<TeamSeasonStats> {
       SizedBox(height: 5.0.r),
       buildComparisonRow('PACE'),
       SizedBox(height: 15.0.r),
-      buildComparisonRow('FG%', isPercentage: true),
+      buildComparisonRow('FG%'),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('3P%', isPercentage: true),
+      buildComparisonRow('3P%'),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('FT%', isPercentage: true),
+      buildComparisonRow('FT%'),
       SizedBox(height: 15.0.r),
-      buildComparisonRow('eFG%', isPercentage: true),
+      buildComparisonRow('eFG%'),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('TS%', isPercentage: true),
+      buildComparisonRow('TS%'),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('OREB%', isPercentage: true),
+      buildComparisonRow('OREB%'),
       SizedBox(height: 5.0.r),
-      buildComparisonRow('TOV%', isPercentage: true),
+      buildComparisonRow('TOV%'),
     ];
   }
 
-  Widget buildComparisonRow(String statKey, {bool isPercentage = false}) {
+  Widget buildComparisonRow(String statKey) {
     Map<String, dynamic> awaySeasonStats =
         awayTeam['SEASONS']?[season]?['STATS']?['REGULAR SEASON'] ?? {};
     Map<String, dynamic> homeSeasonStats =
         homeTeam['SEASONS']?[season]?['STATS']?['REGULAR SEASON'] ?? {};
     return ComparisonRow(
       statName: statKey,
-      awayTeam: roundToDecimalPlaces(
-          ((double.parse(awaySeasonStats[statKey]?['Totals']?['Value'].toString() ?? '0.0')) *
-              (isPercentage ? 100 : 1)),
-          1),
-      homeTeam: roundToDecimalPlaces(
-          ((double.parse(homeSeasonStats[statKey]?['Totals']?['Value'].toString() ?? '0.0')) *
-              (isPercentage ? 100 : 1)),
-          1),
-      awayRank: int.parse(awaySeasonStats[statKey]?['Totals']?['Rank'].toString() ?? '0'),
+      awayTeam: double.parse(
+          awaySeasonStats[statKey]?['Totals']?['Value'].replaceAll('%', '') ?? '0.0'),
+      homeTeam: double.parse(
+          homeSeasonStats[statKey]?['Totals']?['Value'].replaceAll('%', '') ?? '0.0'),
+      awayRank: int.parse(awaySeasonStats[statKey]?['Totals']?['Rank'] ?? '0'),
       homeRank: int.parse(homeSeasonStats[statKey]?['Totals']?['Rank'] ?? '0'),
       awayTeamColor: awayTeamColor,
       homeTeamColor: homeTeamColor,
-      isPercentage: isPercentage,
     );
   }
 
@@ -217,7 +220,6 @@ class ComparisonRow extends StatelessWidget {
     required this.homeTeam,
     required this.awayRank,
     required this.homeRank,
-    required this.isPercentage,
     this.awayTeamColor = Colors.transparent,
     this.homeTeamColor = Colors.transparent,
   });
@@ -227,7 +229,6 @@ class ComparisonRow extends StatelessWidget {
   final dynamic homeTeam;
   final dynamic awayRank;
   final dynamic homeRank;
-  final bool isPercentage;
   final Color awayTeamColor;
   final Color homeTeamColor;
 
@@ -276,7 +277,6 @@ class ComparisonRow extends StatelessWidget {
                 value: awayTeam,
                 isHighlighted: oneIsBetter ? true : false,
                 color: awayTeamColor,
-                isPercentage: isPercentage,
               ),
             ],
           ),
@@ -335,7 +335,6 @@ class ComparisonRow extends StatelessWidget {
                 value: homeTeam,
                 isHighlighted: twoIsBetter ? true : false,
                 color: homeTeamColor,
-                isPercentage: isPercentage,
               ),
             ],
           ),
@@ -349,13 +348,12 @@ class StatValue extends StatelessWidget {
   final dynamic value;
   final bool isHighlighted;
   final Color color;
-  final bool isPercentage;
 
-  StatValue(
-      {required this.value,
-      this.isHighlighted = false,
-      required this.color,
-      required this.isPercentage});
+  StatValue({
+    required this.value,
+    this.isHighlighted = false,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +377,7 @@ class StatValue extends StatelessWidget {
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Text(
-        isPercentage ? '$value%' : '$value',
+        '$value',
         style: isHighlighted && lightColors.containsKey(color)
             ? kBebasNormal.copyWith(fontSize: 16.0.r, color: lightColors[color])
             : kBebasNormal.copyWith(fontSize: 16.0.r),

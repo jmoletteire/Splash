@@ -176,8 +176,11 @@ def fetch_upcoming_games(game_date):
         season = games['GameHeader'][0]['SEASON']
         season_type = games['GameHeader'][0]['GAME_ID'][2]
 
-        for i in range(0, len(games['GameHeader'])):
-            details = games['GameHeader'][i]
+        # Collect all GAME_IDs into a list
+        game_ids = []
+
+        for details in games['GameHeader']:
+            game_ids.append(details['GAME_ID'])
             games_collection.update_one(
                 {'gameId': details['GAME_ID']},
                 {'$set': {'date': game_date,
@@ -196,6 +199,9 @@ def fetch_upcoming_games(game_date):
                  },
                 upsert=True
             )
+
+        # After all updates, delete any documents where gameId is not in the list
+        games_collection.delete_many({'gameId': {'$nin': game_ids}, 'date': game_date})
 
 
 def fetch_games_for_date_range(start_date, end_date):
@@ -219,7 +225,7 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        start_date = datetime(2025, 4, 25)
+        start_date = datetime(2025, 4, 28)
         end_date = datetime(2025, 6, 30)
 
         # Fetch games for each date in the range

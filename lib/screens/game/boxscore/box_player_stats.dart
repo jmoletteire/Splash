@@ -47,13 +47,9 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       setPlayer(i);
     }
 
-    // Check if xPTS data is available for any player
+    // Check if possession data is available for any player
     hasPoss = widget.players
         .any((player) => player['statistics']?['POSS'] != null || player['POSS'] != null);
-
-    // Check if xPTS data is available for any player
-    hasXPts = widget.players.any(
-        (player) => player['statistics']?['SQ_TOTAL'] != null || player['SQ_TOTAL'] != null);
   }
 
   @override
@@ -139,12 +135,6 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       TableColumn(
         width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.125,
       ),
-
-      /// xPTS
-      if (columnNames.contains('xPTS'))
-        TableColumn(
-          width: isLandscape ? availableWidth * 0.05 : availableWidth * 0.1,
-        ),
 
       /// PTS
       TableColumn(
@@ -266,29 +256,26 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
     _players[index]['nameWidget'] = playerNameWidget(index);
     _players[index]['possWidget'] = possWidget(index, played);
     _players[index]['minutesWidget'] = minutesWidget(index, played);
-    _players[index]['xPtsWidget'] = xPtsWidget(index, played);
-    _players[index]['ptsWidget'] = basicStatWidget(index, played, 'points', 'PTS');
-    _players[index]['rebWidget'] = basicStatWidget(index, played, 'reboundsTotal', 'REB');
-    _players[index]['astWidget'] = basicStatWidget(index, played, 'assists', 'AST');
-    _players[index]['tovWidget'] = basicStatWidget(index, played, 'turnovers', 'TO');
-    _players[index]['stlWidget'] = basicStatWidget(index, played, 'steals', 'STL');
-    _players[index]['blkWidget'] = basicStatWidget(index, played, 'blocks', 'BLK');
-    _players[index]['orebWidget'] =
-        basicStatWidget(index, played, 'reboundsOffensive', 'OREB');
-    _players[index]['drebWidget'] =
-        basicStatWidget(index, played, 'reboundsDefensive', 'DREB');
-    _players[index]['pfWidget'] = basicStatWidget(index, played, 'foulsPersonal', 'PF');
+    _players[index]['ptsWidget'] = basicStatWidget(index, played, 'PTS', 'PTS');
+    _players[index]['rebWidget'] = basicStatWidget(index, played, 'REB', 'REB');
+    _players[index]['astWidget'] = basicStatWidget(index, played, 'AST', 'AST');
+    _players[index]['tovWidget'] = basicStatWidget(index, played, 'TO', 'TO');
+    _players[index]['stlWidget'] = basicStatWidget(index, played, 'STL', 'STL');
+    _players[index]['blkWidget'] = basicStatWidget(index, played, 'BLK', 'BLK');
+    _players[index]['orebWidget'] = basicStatWidget(index, played, 'ORB', 'OREB');
+    _players[index]['drebWidget'] = basicStatWidget(index, played, 'DRB', 'DREB');
+    _players[index]['pfWidget'] = basicStatWidget(index, played, 'PF', 'PF');
     _players[index]['plusMinusWidget'] =
-        basicStatWidget(index, played, 'plusMinusPoints', 'PLUS_MINUS');
-    _players[index]['fgWidget'] = shootingAttemptsWidget(
-        index, played, 'fieldGoalsMade', 'fieldGoalsAttempted', 'FGM', 'FGA');
-    _players[index]['fg3Widget'] = shootingAttemptsWidget(
-        index, played, 'threePointersMade', 'threePointersAttempted', 'FG3M', 'FG3A');
-    _players[index]['ftWidget'] = shootingAttemptsWidget(
-        index, played, 'freeThrowsMade', 'freeThrowsAttempted', 'FTM', 'FTA');
+        basicStatWidget(index, played, 'PlusMinus', 'PLUS_MINUS');
+    _players[index]['fgWidget'] =
+        shootingAttemptsWidget(index, played, 'FGM', 'FGA', 'FGM', 'FGA');
+    _players[index]['fg3Widget'] =
+        shootingAttemptsWidget(index, played, '3PM', '3PA', 'FG3M', 'FG3A');
+    _players[index]['ftWidget'] =
+        shootingAttemptsWidget(index, played, 'FTM', 'FTA', 'FTM', 'FTA');
     _players[index]['efgWidget'] = efgWidget(index, played);
-    _players[index]['tsWidget'] = basicStatWidget(index, played, 'TS_PCT', 'TS_PCT');
-    _players[index]['usgWidget'] = basicStatWidget(index, played, 'USG_PCT', 'USG_PCT');
+    _players[index]['tsWidget'] = basicStatWidget(index, played, 'TS%', 'TS_PCT');
+    _players[index]['usgWidget'] = basicStatWidget(index, played, 'USG%', 'USG_PCT');
     _players[index]['nRtgWidget'] = nRtgWidget(index, played);
     _players[index]['oRtgWidget'] = oRtgWidget(index, played);
     _players[index]['dRtgWidget'] = dRtgWidget(index, played);
@@ -377,12 +364,8 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PlayerHome(
-                  playerId: (widget.players[row]?['personId'] ??
-                          widget.players[row]?['PLAYER_ID'] ??
-                          '0')
-                      .toString(),
-                ),
+                builder: (context) =>
+                    PlayerHome(playerId: widget.players[row]?['personId'] ?? '0'),
               ),
             );
           },
@@ -471,17 +454,11 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
   }
 
   Widget playerNameWidget(int index) {
-    String jersey = widget.players[index]?['jerseyNum'].toString() ?? '';
-    String playerId = widget.players[index]?['personId'].toString() ??
-        widget.players[index]?['PLAYER_ID'].toString() ??
-        '0';
-    String name = widget.players[index]?['nameI'] ??
-        (widget.players[index]?['PLAYER_NAME'] != null
-            ? '${widget.players[index]['PLAYER_NAME'][0]}. ${(widget.players[index]['PLAYER_NAME']).substring((widget.players[index]['PLAYER_NAME']).indexOf(' ') + 1)}'
-            : '');
-    String position =
-        widget.players[index]?['position'] ?? widget.players[index]?['START_POSITION'] ?? '';
-    int onCourt = widget.inProgress ? int.parse(widget.players[index]?['oncourt'] ?? '0') : 0;
+    String jersey = widget.players[index]?['number'] ?? '';
+    String playerId = widget.players[index]?['personId'] ?? '0';
+    String name = widget.players[index]?['name'] ?? '';
+    String position = widget.players[index]?['position'] ?? '';
+    int onCourt = widget.inProgress ? int.parse(widget.players[index]?['inGame'] ?? '0') : 0;
 
     return RepaintBoundary(
       key: ValueKey(onCourt),
@@ -551,14 +528,10 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
     try {
       if (played == 0 && !widget.inProgress) {
         return BoxScoreDataText(key: const ValueKey('DNP'), text: 'DNP', size: 14.0.r);
-      } else if ((widget.players[index]?['statistics']?['POSS'] ??
-              widget.players[index]?['POSS'] ??
-              0) ==
-          0) {
+      } else if (int.parse(widget.players[index]?['statistics']?['POSS'] ?? '0') == 0) {
         return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
-      String text =
-          '${widget.players[index]?['statistics']?['POSS'] ?? widget.players[index]?['POSS'] ?? '-'}';
+      String text = widget.players[index]?['statistics']?['POSS'] ?? '-';
       return RepaintBoundary(
         key: ValueKey(text),
         child: Container(
@@ -577,25 +550,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
   }
 
   Widget minutesWidget(int index, int played) {
-    String formatLiveDuration(String input) {
-      final regex = RegExp(r'PT(\d+)M(\d+).(\d+)S');
-      final match = regex.firstMatch(input);
-
-      if (match != null) {
-        final minutes =
-            int.parse(match.group(1) ?? '0'); // Convert to int to remove leading zeros
-        final seconds = match.group(2);
-
-        return '$minutes:$seconds';
-      }
-
-      return input; // Return the original string if no match is found
-    }
-
-    String minutes = widget.players[index]?['statistics']?['minutes'] != null
-        ? formatLiveDuration(widget.players[index]?['statistics']?['minutes'] ?? 'PT00M00.00S')
-        : '${(widget.players[index]?['MIN'] ?? '').replaceAll(RegExp(r'\..*?(?=:)'), '')}';
-
+    String minutes = widget.players[index]?['statistics']?['MIN'] ?? '-';
     try {
       if (played == 0) {
         return const BoxScoreDataText(key: ValueKey('-'), text: '-');
@@ -605,24 +560,11 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         child: Container(
           alignment: Alignment.centerRight,
           child: Text(
-            minutes == '0:00' || minutes == 'null' ? '-' : minutes,
+            minutes == '0:00' ? '-' : minutes,
             style: kBebasNormal.copyWith(fontSize: 14.0.r),
           ),
         ),
       );
-    } catch (e) {
-      return const BoxScoreDataText(key: ValueKey('-'), text: '-');
-    }
-  }
-
-  Widget xPtsWidget(int index, int played) {
-    try {
-      if (played == 0) {
-        return const BoxScoreDataText(key: ValueKey('-'), text: '-');
-      }
-      String text =
-          '${((widget.players[index]?['statistics']?['SQ_TOTAL'] ?? 0.0) + (widget.players[index]?['statistics']?['freeThrowsMade'] ?? widget.players[index]['FTM'] ?? 0.0)).toStringAsFixed(1)}';
-      return BoxScoreDataText(key: ValueKey(text), text: text);
     } catch (e) {
       return const BoxScoreDataText(key: ValueKey('-'), text: '-');
     }
@@ -633,9 +575,9 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       if (played == 0) {
         return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
-      String text = statName == 'TS_PCT' || statName == 'USG_PCT'
+      String text = statName == 'TS%' || statName == 'USG%'
           ? '${((widget.players[index]?['statistics']?[statName] ?? widget.players[index]?[statAbbr] ?? '-') * 100).toStringAsFixed(1)}%'
-          : '${(widget.players[index]?['statistics']?[statName] ?? widget.players[index]?[statAbbr] ?? '-').toStringAsFixed(0)}';
+          : widget.players[index]?['statistics']?[statName] ?? '-';
       return BoxScoreDataText(key: ValueKey(text), text: text);
     } catch (e) {
       return const BoxScoreDataText(key: ValueKey('-'), text: '-');
@@ -649,7 +591,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
         return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
       String text =
-          '${(widget.players[index]?['statistics']?[madeName] ?? widget.players[index]?[madeAbbr] ?? '').toStringAsFixed(0)}-${(widget.players[index]?['statistics']?[attName] ?? widget.players[index]?[attAbbr] ?? '').toStringAsFixed(0)}';
+          '${widget.players[index]?['statistics']?[madeName] ?? ''}-${widget.players[index]?['statistics']?[attName] ?? ''}';
       return BoxScoreDataText(key: ValueKey(text), text: text);
     } catch (e) {
       return const BoxScoreDataText(key: ValueKey('-'), text: '-');
@@ -661,22 +603,21 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       if (played == 0) {
         return const BoxScoreDataText(key: ValueKey('-'), text: '-');
       }
-      int fieldGoalsAttempted =
-          widget.players[index]?['statistics']?['fieldGoalsAttempted'] ?? 0;
+      int fieldGoalsAttempted = int.parse(widget.players[index]?['statistics']?['FGA'] ?? '0');
 
       // Check for division by zero
       if (fieldGoalsAttempted == 0) {
         try {
           return BoxScoreDataText(
               text:
-                  '${((widget.players[index]?['statistics']?['EFG_PCT'] ?? widget.players[index]?['EFG_PCT'] ?? 0) * 100).toStringAsFixed(1)}%');
+                  '${((widget.players[index]?['statistics']?['eFG%'] ?? widget.players[index]?['eFG%'] ?? 0) * 100).toStringAsFixed(1)}%');
         } catch (e) {
           return const BoxScoreDataText(text: '-');
         }
       }
 
-      double efgPct = (((widget.players[index]?['statistics']?['fieldGoalsMade'] ?? 0) +
-                  (0.5 * (widget.players[index]?['statistics']?['threePointersMade'] ?? 0))) /
+      double efgPct = (((int.parse(widget.players[index]?['statistics']?['FGM'] ?? '0')) +
+                  (0.5 * int.parse(widget.players[index]?['statistics']?['3PM'] ?? '0'))) /
               fieldGoalsAttempted) *
           100;
 

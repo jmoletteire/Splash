@@ -35,83 +35,84 @@ class _PlayByPlayState extends State<PlayByPlay> {
   late List thirdQuarter;
   late List fourthQuarter;
   late List overTime;
-  late int selectedPlayer;
+  late String selectedPlayer;
   late List<Map<String, dynamic>> players;
   late String selectedTeam;
   late List<String> teams;
-  late Map<String, int> teamCodes;
+  late Map<String, String> teamCodes;
   late String homeTeamAbbr;
   late String awayTeamAbbr;
   int initialLabelIndex = 1;
 
-  void filterActions(int? teamId, int? playerId) {
-    if (teamId == 0 && playerId == 0) {
+  void filterActions(String? teamId, String? playerId) {
+    if (teamId == '0' && playerId == '0') {
       setState(() {
-        allActions = widget.game['PBP'];
+        allActions = widget.game['pbp'];
       });
-    } else if (teamId != 0 && playerId == 0) {
+    } else if (teamId != '0' && playerId == '0') {
       setState(() {
-        allActions = widget.game['PBP'].where((e) => e['possession'] == teamId).toList();
+        allActions = widget.game['pbp'].where((e) => e['possession'] == teamId).toList();
       });
-    } else if (teamId == 0 && playerId != 0) {
+    } else if (teamId == '0' && playerId != '0') {
       setState(() {
-        allActions = widget.game['PBP']
-            .where(
-                (e) => e['personIdsFilter'] != null && e['personIdsFilter'].contains(playerId))
+        allActions = widget.game['pbp']
+            .where((e) => e['personId'] != null && e['personId'] == playerId)
             .toList();
       });
     } else {
       setState(() {
-        allActions = widget.game['PBP']
+        allActions = widget.game['pbp']
             .where((e) =>
                 e['possession'] == teamId &&
-                e['personIdsFilter'] != null &&
-                e['personIdsFilter'].contains(playerId))
+                e['personId'] != null &&
+                e['personId'] == playerId)
             .toList();
       });
     }
 
     if (_inProgress) {
       firstQuarter = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 1)
+          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == '1')
           .toList()
           .reversed
           .toList();
       secondQuarter = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 2)
+          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == '2')
           .toList()
           .reversed
           .toList();
       thirdQuarter = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 3)
+          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == '3')
           .toList()
           .reversed
           .toList();
       fourthQuarter = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 4)
+          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == '4')
           .toList()
           .reversed
           .toList();
       overTime = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] > 4)
+          .where((e) =>
+              e is Map<String, dynamic> && e['period'] != null && int.parse(e['period']) > 4)
           .toList()
           .reversed
           .toList();
     } else {
       firstQuarter = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 1)
+          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == '1')
           .toList();
       secondQuarter = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 2)
+          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == '2')
           .toList();
       thirdQuarter = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 3)
+          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == '3')
           .toList();
       fourthQuarter = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == 4)
+          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] == '4')
           .toList();
       overTime = allActions
-          .where((e) => e is Map<String, dynamic> && e['period'] != null && e['period'] > 4)
+          .where((e) =>
+              e is Map<String, dynamic> && e['period'] != null && int.parse(e['period']) > 4)
           .toList();
     }
   }
@@ -119,58 +120,48 @@ class _PlayByPlayState extends State<PlayByPlay> {
   @override
   void initState() {
     super.initState();
-    _inProgress = widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] == 2;
+    _inProgress = widget.game['status'] == 2;
 
-    homeTeamAbbr = kTeamIdToName[widget.homeTeam['TEAM_ID']][1] ?? 'Home';
-    awayTeamAbbr = kTeamIdToName[widget.awayTeam['TEAM_ID']][1] ?? 'Away';
+    homeTeamAbbr = kTeamIdToName[widget.homeTeam['TEAM_ID'].toString()][1] ?? 'Home';
+    awayTeamAbbr = kTeamIdToName[widget.awayTeam['TEAM_ID'].toString()][1] ?? 'Away';
     teams = [awayTeamAbbr, 'ALL', homeTeamAbbr];
 
     selectedTeam = 'ALL';
     teamCodes = {
-      homeTeamAbbr: int.parse(widget.homeTeam['TEAM_ID']),
-      'ALL': 0,
-      awayTeamAbbr: int.parse(widget.awayTeam['TEAM_ID']),
+      homeTeamAbbr: widget.homeTeam['TEAM_ID'].toString(),
+      'ALL': '0',
+      awayTeamAbbr: widget.awayTeam['TEAM_ID'].toString(),
     };
 
-    selectedPlayer = 0;
+    selectedPlayer = '0';
     players = [
-      {'id': 0, 'name': 'ALL'}
+      {'id': '0', 'name': 'ALL'}
     ];
 
-    if (widget.game['SUMMARY']['GameSummary'][0]['GAME_STATUS_ID'] > 1) {
-      if (widget.game['BOXSCORE'].containsKey('homeTeam')) {
-        for (var player in widget.game['BOXSCORE']['homeTeam']['players']) {
+    if (widget.game['status'] > 1) {
+      if (widget.game['stats'].containsKey('home')) {
+        for (var player in widget.game['stats']['home']['players']) {
           Map<String, dynamic> playerData = {
             'id': player['personId'],
-            'team': widget.homeTeam['TEAM_ID'],
-            'name': player['nameI'],
-            'number': player['jerseyNum'],
+            'team': widget.homeTeam['TEAM_ID'].toString(),
+            'name': player['name'],
+            'number': player['number'],
           };
           players.add(playerData);
         }
-        for (var player in widget.game['BOXSCORE']['awayTeam']['players']) {
+        for (var player in widget.game['stats']['away']['players']) {
           Map<String, dynamic> playerData = {
             'id': player['personId'],
-            'team': widget.awayTeam['TEAM_ID'],
-            'name': player['nameI'],
-            'number': player['jerseyNum'],
-          };
-          players.add(playerData);
-        }
-      } else {
-        for (var player in widget.game['BOXSCORE']['PlayerStats']) {
-          Map<String, dynamic> playerData = {
-            'id': player['PLAYER_ID'],
-            'team': player['TEAM_ID'],
-            'name': player['PLAYER_NAME'],
-            'number': 0,
+            'team': widget.awayTeam['TEAM_ID'].toString(),
+            'name': player['name'],
+            'number': player['number'],
           };
           players.add(playerData);
         }
       }
     }
 
-    allActions = widget.game['PBP'];
+    allActions = widget.game['pbp'];
     filterActions(teamCodes[selectedTeam], selectedPlayer);
   }
 
@@ -209,12 +200,12 @@ class _PlayByPlayState extends State<PlayByPlay> {
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    String homeAbbr = kTeamIdToName[widget.homeTeam['TEAM_ID']][1];
+    String homeAbbr = kTeamIdToName[widget.homeTeam['TEAM_ID'].toString()][1];
     Color homeTeamColor = kDarkPrimaryColors.contains(homeAbbr)
         ? (kTeamColors[homeAbbr]!['secondaryColor']!)
         : (kTeamColors[homeAbbr]!['primaryColor']!);
 
-    String awayAbbr = kTeamIdToName[widget.awayTeam['TEAM_ID']]?[1] ?? 'FA';
+    String awayAbbr = kTeamIdToName[widget.awayTeam['TEAM_ID'].toString()]?[1] ?? 'FA';
     Color awayTeamColor = kDarkPrimaryColors.contains(awayAbbr)
         ? (kTeamColors[awayAbbr]!['secondaryColor']!)
         : (kTeamColors[awayAbbr]!['primaryColor']!);
@@ -261,12 +252,12 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       (!_inProgress && firstQuarter.isNotEmpty))
                     Plays(
                       allActions: allActions,
-                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
-                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      gameId: widget.game['gameId'],
+                      gameDate: widget.game['date'],
                       period: _inProgress ? 'Overtime' : '1st Quarter',
                       actions: _inProgress ? overTime : firstQuarter,
-                      homeId: widget.homeTeam['TEAM_ID'],
-                      awayId: widget.awayTeam['TEAM_ID'],
+                      homeId: widget.homeTeam['TEAM_ID'].toString(),
+                      awayId: widget.awayTeam['TEAM_ID'].toString(),
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
@@ -274,24 +265,24 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       (!_inProgress && secondQuarter.isNotEmpty))
                     Plays(
                       allActions: allActions,
-                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
-                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      gameId: widget.game['gameId'],
+                      gameDate: widget.game['date'],
                       period: _inProgress ? '4th Quarter' : '2nd Quarter',
                       actions: _inProgress ? fourthQuarter : secondQuarter,
-                      homeId: widget.homeTeam['TEAM_ID'],
-                      awayId: widget.awayTeam['TEAM_ID'],
+                      homeId: widget.homeTeam['TEAM_ID'].toString(),
+                      awayId: widget.awayTeam['TEAM_ID'].toString(),
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
                   if (thirdQuarter.isNotEmpty)
                     Plays(
                       allActions: allActions,
-                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
-                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      gameId: widget.game['gameId'],
+                      gameDate: widget.game['date'],
                       period: '3rd Quarter',
                       actions: thirdQuarter,
-                      homeId: widget.homeTeam['TEAM_ID'],
-                      awayId: widget.awayTeam['TEAM_ID'],
+                      homeId: widget.homeTeam['TEAM_ID'].toString(),
+                      awayId: widget.awayTeam['TEAM_ID'].toString(),
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
@@ -299,12 +290,12 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       (!_inProgress && fourthQuarter.isNotEmpty))
                     Plays(
                       allActions: allActions,
-                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
-                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      gameId: widget.game['gameId'],
+                      gameDate: widget.game['date'],
                       period: _inProgress ? '2nd Quarter' : '4th Quarter',
                       actions: _inProgress ? secondQuarter : fourthQuarter,
-                      homeId: widget.homeTeam['TEAM_ID'],
-                      awayId: widget.awayTeam['TEAM_ID'],
+                      homeId: widget.homeTeam['TEAM_ID'].toString(),
+                      awayId: widget.awayTeam['TEAM_ID'].toString(),
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
@@ -312,12 +303,12 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       (!_inProgress && overTime.isNotEmpty))
                     Plays(
                       allActions: allActions,
-                      gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
-                      gameDate: widget.game['SUMMARY']['GameSummary'][0]['GAME_DATE_EST'],
+                      gameId: widget.game['gameId'],
+                      gameDate: widget.game['date'],
                       period: _inProgress ? '1st Quarter' : 'Overtime',
                       actions: _inProgress ? firstQuarter : overTime,
-                      homeId: widget.homeTeam['TEAM_ID'],
-                      awayId: widget.awayTeam['TEAM_ID'],
+                      homeId: widget.homeTeam['TEAM_ID'].toString(),
+                      awayId: widget.awayTeam['TEAM_ID'].toString(),
                       homeTeamColor: homeTeamColor,
                       awayTeamColor: awayTeamColor,
                     ),
@@ -354,7 +345,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                       borderRadius: BorderRadius.circular(10.0)),
                   margin: EdgeInsets.symmetric(vertical: 6.0.r, horizontal: 8.0.r),
                   width: MediaQuery.of(context).size.width * 0.4,
-                  child: DropdownButton<int>(
+                  child: DropdownButton<String>(
                     padding: EdgeInsets.symmetric(horizontal: 8.0.r),
                     borderRadius: BorderRadius.circular(10.0),
                     menuMaxHeight: 300.0.r,
@@ -362,8 +353,9 @@ class _PlayByPlayState extends State<PlayByPlay> {
                     isExpanded: true,
                     underline: Container(),
                     value: selectedPlayer,
-                    items: players.map<DropdownMenuItem<int>>((Map<String, dynamic> player) {
-                      return DropdownMenuItem<int>(
+                    items:
+                        players.map<DropdownMenuItem<String>>((Map<String, dynamic> player) {
+                      return DropdownMenuItem<String>(
                         value: player['id'],
                         child: Row(
                           children: [
@@ -392,7 +384,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                             Flexible(
                               flex: 6,
                               child: AutoSizeText(
-                                player['name'],
+                                player['name'] ?? '',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: kBebasNormal.copyWith(fontSize: 15.0.r),
@@ -411,7 +403,7 @@ class _PlayByPlayState extends State<PlayByPlay> {
                         ),
                       );
                     }).toList(),
-                    onChanged: (int? value) {
+                    onChanged: (String? value) {
                       setState(() {
                         selectedPlayer = value!;
                       });
@@ -490,9 +482,8 @@ class _PlayByPlayState extends State<PlayByPlay> {
                                     !e['description'].contains('Timeout') &&
                                     !e['description'].contains('Period Start'))
                                 .toList(),
-                            gameId: widget.game['SUMMARY']['GameSummary'][0]['GAME_ID'],
-                            gameDate: widget.game['SUMMARY']['GameSummary'][0]
-                                ['GAME_DATE_EST'],
+                            gameId: widget.game['gameId'],
+                            gameDate: widget.game['date'],
                             homeAbbr: homeAbbr,
                             awayAbbr: awayAbbr,
                             index: 0,
@@ -820,7 +811,7 @@ class _PlaysState extends State<Plays> {
                                   child: Text(
                                     (widget.actions[i]['description'] is String &&
                                             widget.actions[i]['description'].contains('TEAM'))
-                                        ? '${widget.actions[i]['description'].toString()} (${kTeamIdToName[widget.actions[i]['teamId'].toString()]?[1] ?? 'INT\'L'})'
+                                        ? '${widget.actions[i]['description'].toString()} (${kTeamIdToName[widget.actions[i]['teamId'].toString()]?[1] ?? 'TEAM'})'
                                         : widget.actions[i]['description'].toString(),
                                     textAlign: TextAlign.left,
                                     style: (widget.actions[i]['description'] is String &&

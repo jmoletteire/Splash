@@ -45,7 +45,10 @@ class _InactivesState extends State<Inactives> {
               children: [
                 Text('${widget.awayAbbr}:', style: kBebasBold.copyWith(fontSize: 14.0.r)),
                 SizedBox(width: 5.0.r),
-                Text(widget.inactivePlayers['away'],
+                Text(
+                    widget.inactivePlayers['away'].isEmpty
+                        ? 'None'
+                        : widget.inactivePlayers['away'],
                     style: kBebasNormal.copyWith(fontSize: 14.0.r))
               ],
             ),
@@ -54,7 +57,10 @@ class _InactivesState extends State<Inactives> {
               children: [
                 Text('${widget.homeAbbr}:', style: kBebasBold.copyWith(fontSize: 14.0.r)),
                 SizedBox(width: 5.0.r),
-                Text(widget.inactivePlayers['home'],
+                Text(
+                    widget.inactivePlayers['home'].isEmpty
+                        ? 'None'
+                        : widget.inactivePlayers['home'],
                     style: kBebasNormal.copyWith(fontSize: 14.0.r))
               ],
             ),

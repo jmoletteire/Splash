@@ -109,7 +109,7 @@ if __name__ == "__main__":
     batch_size = 25
 
     # Get the total number of documents
-    query = {"season": "2024"}
+    query = {"seasonCode": "42024"}
     proj = {
         "_id": 0,
         "gameId": 1,

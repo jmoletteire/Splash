@@ -30,7 +30,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
     try {
       if (_isLoading == false) _isLoading = true;
       // Convert the map to a list of entries
-      var entries = widget.team['seasons'][selectedSeason]['ROSTER'].entries.toList();
+      var entries = widget.team['SEASONS'][selectedSeason]['ROSTER'].entries.toList();
 
       // Helper function to get the last name
       String getLastName(String fullName) {
@@ -86,7 +86,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
   @override
   void initState() {
     super.initState();
-    seasons = widget.team['seasons'].keys.toList().reversed.toList();
+    seasons = widget.team['SEASONS'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
     setPlayers('Name', 'ASC');
   }
@@ -96,7 +96,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
     Color teamColor = kDarkPrimaryColors.contains(widget.team['ABBREVIATION'])
         ? (kTeamColors[widget.team['ABBREVIATION']]!['secondaryColor']!)
         : (kTeamColors[widget.team['ABBREVIATION']]!['primaryColor']!);
-    List coaches = widget.team['seasons'][selectedSeason]['COACHES'] ?? [];
+    List coaches = widget.team['SEASONS'][selectedSeason]['COACHES'] ?? [];
     return _isLoading
         ? Center(
             child: SpinningIcon(
@@ -278,14 +278,14 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                             padding: EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
                             height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
-                                color: widget.team['seasons'][selectedSeason]['ROSTER']
+                                color: widget.team['SEASONS'][selectedSeason]['ROSTER']
                                                 ?[players[index]]?['Injured_Status'] ==
                                             'OUT' ||
-                                        widget.team['seasons'][selectedSeason]['ROSTER']
+                                        widget.team['SEASONS'][selectedSeason]['ROSTER']
                                                 ?[players[index]]?['Injured_Status'] ==
                                             'OFS'
                                     ? Colors.redAccent.withOpacity(0.1)
-                                    : widget.team['seasons'][selectedSeason]['ROSTER']
+                                    : widget.team['SEASONS'][selectedSeason]['ROSTER']
                                                 ?[players[index]]?['Injured_Status'] ==
                                             'GTD'
                                         ? Colors.orangeAccent.withOpacity(0.1)
@@ -312,7 +312,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                         width: 15.0.r,
                                       ),
                                       Text(
-                                        widget.team['seasons'][selectedSeason]['ROSTER']
+                                        widget.team['SEASONS'][selectedSeason]['ROSTER']
                                                 ?[players[index]]?['PLAYER'] ??
                                             '-',
                                         style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
@@ -322,20 +322,20 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                 ),
                                 Expanded(
                                     child: Text(
-                                  (widget.team['seasons'][selectedSeason]['ROSTER']
+                                  (widget.team['SEASONS'][selectedSeason]['ROSTER']
                                                   ?[players[index]]?['Injured_Status'] ??
                                               '') ==
                                           'GTD'
                                       ? 'DTD'
-                                      : widget.team['seasons'][selectedSeason]['ROSTER']
+                                      : widget.team['SEASONS'][selectedSeason]['ROSTER']
                                               ?[players[index]]?['Injured_Status'] ??
                                           '',
                                   style: kBebasNormal.copyWith(
                                     fontSize: 14.0.r,
-                                    color: widget.team['seasons'][selectedSeason]['ROSTER']
+                                    color: widget.team['SEASONS'][selectedSeason]['ROSTER']
                                                     ?[players[index]]?['Injured_Status'] ==
                                                 'OUT' ||
-                                            widget.team['seasons'][selectedSeason]['ROSTER']
+                                            widget.team['SEASONS'][selectedSeason]['ROSTER']
                                                     ?[players[index]]?['Injured_Status'] ==
                                                 'OFS'
                                         ? Colors.redAccent
@@ -345,7 +345,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                 Expanded(
                                   flex: 2,
                                   child: Text(
-                                    widget.team['seasons'][selectedSeason]['ROSTER']
+                                    widget.team['SEASONS'][selectedSeason]['ROSTER']
                                             ?[players[index]]?['NUM'] ??
                                         '',
                                     textAlign: TextAlign.center,
@@ -355,7 +355,7 @@ class _TeamRosterState extends State<TeamRoster> with AutomaticKeepAliveClientMi
                                 Expanded(
                                   flex: 1,
                                   child: Text(
-                                    widget.team['seasons'][selectedSeason]['ROSTER']
+                                    widget.team['SEASONS'][selectedSeason]['ROSTER']
                                             ?[players[index]]?['POSITION'] ??
                                         '',
                                     textAlign: TextAlign.center,

@@ -29,7 +29,7 @@ class _TeamInjuriesState extends State<TeamInjuries> with AutomaticKeepAliveClie
     try {
       if (_isLoading == false) _isLoading = true;
       // Convert the map to a list of entries
-      var entries = widget.team['seasons'][kCurrentSeason]['ROSTER'].entries
+      var entries = widget.team['SEASONS'][kCurrentSeason]['ROSTER'].entries
           .toList()
           .where((e) => e.value['Injured'] == 'YES')
           .toList();
@@ -321,14 +321,14 @@ class _TeamInjuriesState extends State<TeamInjuries> with AutomaticKeepAliveClie
                                     EdgeInsets.symmetric(horizontal: 14.0.r, vertical: 6.0.r),
                                 height: MediaQuery.of(context).size.height * 0.05,
                                 decoration: BoxDecoration(
-                                    color: widget.team['seasons'][kCurrentSeason]['ROSTER']
+                                    color: widget.team['SEASONS'][kCurrentSeason]['ROSTER']
                                                     ?[players[index]]?['Injured_Status'] ==
                                                 'OUT' ||
-                                            widget.team['seasons'][kCurrentSeason]['ROSTER']
+                                            widget.team['SEASONS'][kCurrentSeason]['ROSTER']
                                                     ?[players[index]]?['Injured_Status'] ==
                                                 'OFS'
                                         ? Colors.redAccent.withOpacity(0.1)
-                                        : widget.team['seasons'][kCurrentSeason]['ROSTER']
+                                        : widget.team['SEASONS'][kCurrentSeason]['ROSTER']
                                                     ?[players[index]]?['Injured_Status'] ==
                                                 'GTD'
                                             ? Colors.orangeAccent.withOpacity(0.1)
@@ -355,7 +355,7 @@ class _TeamInjuriesState extends State<TeamInjuries> with AutomaticKeepAliveClie
                                             width: 15.0.r,
                                           ),
                                           Text(
-                                            widget.team['seasons'][kCurrentSeason]['ROSTER']
+                                            widget.team['SEASONS'][kCurrentSeason]['ROSTER']
                                                     ?[players[index]]?['PLAYER'] ??
                                                 '-',
                                             style: kBebasOffWhite.copyWith(fontSize: 16.0.r),
@@ -366,21 +366,21 @@ class _TeamInjuriesState extends State<TeamInjuries> with AutomaticKeepAliveClie
                                     Expanded(
                                       flex: 3,
                                       child: Text(
-                                        (widget.team['seasons'][kCurrentSeason]['ROSTER']
+                                        (widget.team['SEASONS'][kCurrentSeason]['ROSTER']
                                                         ?[players[index]]?['Injured_Status'] ??
                                                     '') ==
                                                 'GTD'
                                             ? 'DTD'
-                                            : widget.team['seasons'][kCurrentSeason]['ROSTER']
+                                            : widget.team['SEASONS'][kCurrentSeason]['ROSTER']
                                                     ?[players[index]]?['Injured_Status'] ??
                                                 '',
                                         style: kBebasNormal.copyWith(
                                           fontSize: 14.0.r,
-                                          color: widget.team['seasons'][kCurrentSeason]
+                                          color: widget.team['SEASONS'][kCurrentSeason]
                                                               ['ROSTER']?[players[index]]
                                                           ?['Injured_Status'] ==
                                                       'OUT' ||
-                                                  widget.team['seasons'][kCurrentSeason]
+                                                  widget.team['SEASONS'][kCurrentSeason]
                                                               ['ROSTER']?[players[index]]
                                                           ?['Injured_Status'] ==
                                                       'OFS'
@@ -393,7 +393,7 @@ class _TeamInjuriesState extends State<TeamInjuries> with AutomaticKeepAliveClie
                                     Expanded(
                                       flex: 5,
                                       child: AutoSizeText(
-                                        widget.team['seasons'][kCurrentSeason]['ROSTER']
+                                        widget.team['SEASONS'][kCurrentSeason]['ROSTER']
                                                 ?[players[index]]?['Injury_Type'] ??
                                             '',
                                         textAlign: TextAlign.center,
@@ -405,7 +405,7 @@ class _TeamInjuriesState extends State<TeamInjuries> with AutomaticKeepAliveClie
                                     Expanded(
                                       flex: 4,
                                       child: AutoSizeText(
-                                        widget.team['seasons'][kCurrentSeason]['ROSTER']
+                                        widget.team['SEASONS'][kCurrentSeason]['ROSTER']
                                                 ?[players[index]]?['EST_RETURN'] ??
                                             '',
                                         textAlign: TextAlign.end,

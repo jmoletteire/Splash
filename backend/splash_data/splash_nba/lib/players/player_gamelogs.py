@@ -16,14 +16,21 @@ def gamelogs(player_id, season, season_type):
         gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, headers=HEADERS, player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs').get_normalized_dict()['PlayerGameLogs']
         if season >= '1996-97':
             adv_gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, headers=HEADERS, player_id_nullable=player_id, season_nullable=season, season_type_nullable='Playoffs', measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
+        else:
+            adv_gamelog = []
     else:
         gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, headers=HEADERS, player_id_nullable=player_id, season_nullable=season).get_normalized_dict()['PlayerGameLogs']
         if season >= '1996-97':
             adv_gamelog = playergamelogs.PlayerGameLogs(proxy=PROXY, headers=HEADERS, player_id_nullable=player_id, season_nullable=season, measure_type_player_game_logs_nullable='Advanced').get_normalized_dict()['PlayerGameLogs']
+        else:
+            adv_gamelog = []
 
-    base_keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:34]
-    if season >= '1996-97':
-        adv_keys = ['OFF_RATING', 'DEF_RATING', 'NET_RATING', 'EFG_PCT', 'TS_PCT', 'USG_PCT', 'PACE', 'POSS', 'MIN_SEC']
+    base_keys = []
+    adv_keys = []
+    if gamelog is not None and len(gamelog) > 0:
+        base_keys = [list(gamelog[0].keys())[1]] + [list(gamelog[0].keys())[4]] + list(gamelog[0].keys())[7:34]
+        if season >= '1996-97':
+            adv_keys = ['OFF_RATING', 'DEF_RATING', 'NET_RATING', 'EFG_PCT', 'TS_PCT', 'USG_PCT', 'PACE', 'POSS', 'MIN_SEC']
 
     gamelog_data = {}
 

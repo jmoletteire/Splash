@@ -31,15 +31,15 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
       if (_isLoading == false) _isLoading = true;
 
       // Convert the map to a list of entries
-      var guardEntries = widget.team['seasons'][selectedSeason]['ROSTER'].entries
+      var guardEntries = widget.team['SEASONS'][selectedSeason]['ROSTER'].entries
           .where((entry) => entry.value['POSITION'] == 'G' || entry.value['POSITION'] == 'G-F')
           .toList();
 
-      var forwardEntries = widget.team['seasons'][selectedSeason]['ROSTER'].entries
+      var forwardEntries = widget.team['SEASONS'][selectedSeason]['ROSTER'].entries
           .where((entry) => entry.value['POSITION'] == 'F' || entry.value['POSITION'] == 'F-G')
           .toList();
 
-      var centerEntries = widget.team['seasons'][selectedSeason]['ROSTER'].entries
+      var centerEntries = widget.team['SEASONS'][selectedSeason]['ROSTER'].entries
           .where((entry) =>
               entry.value['POSITION'] == 'C' ||
               entry.value['POSITION'] == 'F-C' ||
@@ -87,7 +87,7 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
   @override
   void initState() {
     super.initState();
-    seasons = widget.team['seasons'].keys.toList().reversed.toList();
+    seasons = widget.team['SEASONS'].keys.toList().reversed.toList();
     selectedSeason = seasons.first;
     setPlayers();
   }
@@ -95,16 +95,16 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
   @override
   Widget build(BuildContext context) {
     Color getColor(String index) {
-      return widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] == ''
+      return widget.team['SEASONS'][selectedSeason]['ROSTER'][index]['Injured_Status'] == ''
           ? Colors.grey.shade900
-          : widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+          : widget.team['SEASONS'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
                       'OUT' ||
-                  widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+                  widget.team['SEASONS'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
                       'OFS'
               ? Colors.redAccent.withOpacity(0.15)
-              : widget.team['seasons'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
+              : widget.team['SEASONS'][selectedSeason]['ROSTER'][index]['Injured_Status'] ==
                           'GTD' ||
-                      widget.team['seasons'][selectedSeason]['ROSTER'][index]
+                      widget.team['SEASONS'][selectedSeason]['ROSTER'][index]
                               ['Injured_Status'] ==
                           'DTD'
                   ? Colors.orangeAccent.withOpacity(0.15)
@@ -250,7 +250,7 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
                             width: 0.5,
                           ))),
                       child: RotationRow(
-                        player: widget.team['seasons'][selectedSeason]['ROSTER']
+                        player: widget.team['SEASONS'][selectedSeason]['ROSTER']
                             [guards[index]],
                       ),
                     ),
@@ -360,7 +360,7 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
                             width: 0.5,
                           ))),
                       child: RotationRow(
-                        player: widget.team['seasons'][selectedSeason]['ROSTER']
+                        player: widget.team['SEASONS'][selectedSeason]['ROSTER']
                             [forwards[index]],
                       ),
                     ),
@@ -470,7 +470,7 @@ class _DepthChartState extends State<DepthChart> with AutomaticKeepAliveClientMi
                             width: 0.5,
                           ))),
                       child: RotationRow(
-                        player: widget.team['seasons'][selectedSeason]['ROSTER']
+                        player: widget.team['SEASONS'][selectedSeason]['ROSTER']
                             [centers[index]],
                       ),
                     ),

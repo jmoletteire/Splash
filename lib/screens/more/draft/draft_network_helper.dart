@@ -11,7 +11,7 @@ class DraftNetworkHelper {
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_draft',
+      '/draft/by-year',
       queryParams,
     );
 
@@ -28,7 +28,7 @@ class DraftNetworkHelper {
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_draft/by_pick',
+      '/draft/by-pick',
       queryParams,
     );
 

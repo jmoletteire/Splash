@@ -11,7 +11,7 @@ class AwardsNetworkHelper {
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_awards',
+      '/awards/by-year',
       queryParams,
     );
 
@@ -28,7 +28,7 @@ class AwardsNetworkHelper {
     // Create the URL with query parameters
     var url = Uri.http(
       kFlaskUrl,
-      '/get_awards/by_award',
+      '/awards/by-award',
       queryParams,
     );
 

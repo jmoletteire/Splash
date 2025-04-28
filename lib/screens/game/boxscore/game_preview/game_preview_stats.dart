@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_leaders.dart';
 import 'package:splash/screens/game/boxscore/game_preview/team_players_helper.dart';
@@ -8,8 +7,6 @@ import 'package:splash/screens/game/boxscore/team_player_stats.dart';
 import 'package:splash/screens/game/matchup/components/team_season_stats.dart';
 
 import '../../../../utilities/constants.dart';
-import '../../../../utilities/team.dart';
-import '../../../team/team_cache.dart';
 
 class GamePreviewStats extends StatefulWidget {
   final Map<String, dynamic> game;
@@ -53,76 +50,44 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
     return [home, away];
   }
 
-  Future<List<Map<String, dynamic>>> getTeams(List<String> teamIds) async {
-    final teamCache = Provider.of<TeamCache>(context, listen: false);
-    List<Future<Map<String, dynamic>>> teamFutures = teamIds.map((teamId) async {
-      try {
-        if (teamCache.containsTeam(teamId)) {
-          return teamCache.getTeam(teamId)!;
-        } else {
-          var fetchedTeam = await Team().getTeam(teamId);
-          teamCache.addTeam(teamId, fetchedTeam);
-          return fetchedTeam;
-        }
-      } catch (e) {
-        return {'error': 'not found'}; // Return an empty map in case of an error
-      }
-    }).toList();
+  Future<void> setTeams() async {
+    try {
+      List fetchedPlayers = await getPlayers(
+          widget.homeTeam['TEAM_ID'].toString(), widget.awayTeam['TEAM_ID'].toString());
 
-    return await Future.wait(teamFutures);
+      homeTeam = widget.homeTeam;
+      awayTeam = widget.awayTeam;
+      homePlayers = fetchedPlayers[0];
+      awayPlayers = fetchedPlayers[1];
+    } catch (e) {}
   }
 
-  void setTeams() async {
+  Future<void> initializeData() async {
     setState(() {
       _isLoading = true;
     });
 
-    try {
-      List<Map<String, dynamic>> fetchedTeams =
-          await getTeams([widget.homeTeam['TEAM_ID'], widget.awayTeam['TEAM_ID']]);
-      List fetchedPlayers =
-          await getPlayers(widget.homeTeam['TEAM_ID'], widget.awayTeam['TEAM_ID']);
+    await setTeams();
 
-      setState(() {
-        homeTeam = fetchedTeams[0];
-        awayTeam = fetchedTeams[1];
-        homePlayers = fetchedPlayers[0];
-        awayPlayers = fetchedPlayers[1];
-      });
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _homeController = ScrollController();
     _awayController = ScrollController();
-
-    setTeams();
 
     _tabController.addListener(() {
       _selectedIndex.value = _tabController.index;
       switch (_tabController.index) {
         case 0:
           setState(() {
-            awayContainerColor =
-                kTeamColors[kTeamIdToName[widget.awayTeam['TEAM_ID']][1]]!['primaryColor']!;
+            awayContainerColor = kTeamColors[
+                kTeamIdToName[widget.awayTeam['TEAM_ID'].toString()][1]]!['primaryColor']!;
             homeContainerColor = const Color(0xFF1B1B1B);
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         case 2:
           setState(() {
             awayContainerColor = const Color(0xFF1B1B1B);
-            homeContainerColor =
-                kTeamColors[kTeamIdToName[widget.homeTeam['TEAM_ID']][1]]!['primaryColor']!;
+            homeContainerColor = kTeamColors[
+                kTeamIdToName[widget.homeTeam['TEAM_ID'].toString()][1]]!['primaryColor']!;
             teamContainerColor = const Color(0xFF1B1B1B);
           });
         default:
@@ -134,6 +99,16 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
       }
     });
     _tabController.index = 1;
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initializeData();
   }
 
   @override
@@ -148,8 +123,8 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                 controller: _tabController,
                 indicator: CustomTabIndicator(
                   controller: _tabController,
-                  homeTeam: kTeamIdToName[widget.homeTeam['TEAM_ID']][1],
-                  awayTeam: kTeamIdToName[widget.awayTeam['TEAM_ID']][1],
+                  homeTeam: kTeamIdToName[widget.homeTeam['TEAM_ID'].toString()][1],
+                  awayTeam: kTeamIdToName[widget.awayTeam['TEAM_ID'].toString()][1],
                 ),
                 unselectedLabelColor: Colors.grey,
                 labelColor: Colors.white,
@@ -225,8 +200,8 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                           sliver: TeamLeaders(
                             season:
                                 '${widget.game['season']}-${(int.parse(widget.game['season'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                            homeId: widget.homeTeam['TEAM_ID'],
-                            awayId: widget.awayTeam['TEAM_ID'],
+                            homeId: widget.homeTeam['TEAM_ID'].toString(),
+                            awayId: widget.awayTeam['TEAM_ID'].toString(),
                             homePlayers: homePlayers,
                             awayPlayers: awayPlayers,
                           ),
@@ -237,8 +212,8 @@ class _GamePreviewStatsState extends State<GamePreviewStats>
                             child: TeamSeasonStats(
                               season:
                                   '${widget.game['season']}-${(int.parse(widget.game['season'].toString().substring(2)) + 1).toStringAsFixed(0)}',
-                              homeId: widget.homeTeam['TEAM_ID'],
-                              awayId: widget.awayTeam['TEAM_ID'],
+                              homeId: widget.homeTeam['TEAM_ID'].toString(),
+                              awayId: widget.awayTeam['TEAM_ID'].toString(),
                             ),
                           ),
                         ),
@@ -263,7 +238,7 @@ class CustomTabIndicator extends Decoration {
   final String homeTeam;
   final String awayTeam;
 
-  CustomTabIndicator(
+  const CustomTabIndicator(
       {required this.controller, required this.homeTeam, required this.awayTeam});
 
   @override
@@ -284,7 +259,6 @@ class _CustomPainter extends BoxPainter {
     Paint paint = Paint();
     if (controller.index == 0) {
       paint.color = kTeamColors[awayTeam]?['secondaryColor'] ?? Colors.white;
-      ;
     } else if (controller.index == 1) {
       paint.color = Colors.deepOrange;
     } else if (controller.index == 2) {
