@@ -73,7 +73,7 @@ async def update_teams(team_ids):
                     # Get most recent game by date
                     game_id, game_date = get_last_game(doc['SEASONS'])
                     # Get starting lineup for most recent game
-                    last_starting_lineup = get_last_lineup(team, game_id, game_date)
+                    last_starting_lineup = get_last_lineup(team, game_id)
                     # Update document
                     teams_collection.update_one(
                         {"TEAM_ID": team},
@@ -104,7 +104,7 @@ async def teams_daily_update():
     """
     try:
         teams_collection = get_mongo_collection('nba_teams')
-        games_collection = get_mongo_collection('nba_games')
+        games_collection = get_mongo_collection('nba_games_unwrapped')
     except Exception as e:
         logging.error(f'(Teams Daily) Failed to connect to MongoDB [{datetime.now()}]: {e}', exc_info=True)
         return
@@ -116,14 +116,13 @@ async def teams_daily_update():
 
         # Sort the documents in nba_games collection by GAME_DATE in descending order
         sorted_games_cursor = games_collection.find(
-            {"SEASON_YEAR": CURR_SEASON[0:4]},
-            {"GAME_DATE": 1, "GAMES": 1, "_id": 0}
-        ).sort("GAME_DATE", -1)
+            {"season": CURR_SEASON[0:4]}
+        ).sort("date", -1)
 
         # Process the games in batches
-        for i, game_day in enumerate(sorted_games_cursor):
-            logging.info(f"Processing {game_day['GAME_DATE']}...")
-            update_team_games(game_day)
+        for i, game in enumerate(sorted_games_cursor):
+            logging.info(f"Processing {game['date']}...")
+            update_team_games(game)
     except Exception as e:
         logging.error(f"(Teams Daily) Error updating team game logs: {e}", exc_info=True)
 
@@ -148,7 +147,7 @@ async def teams_daily_update():
     processed_count = 0
     i = 0
     while processed_count < total_documents:
-        with teams_collection.find({}, {"TEAM_ID": 1, f"seasons": 1, "_id": 0}).skip(processed_count).limit(
+        with teams_collection.find({}, {"TEAM_ID": 1, "SEASONS": 1, "_id": 0}).skip(processed_count).limit(
                 batch_size).batch_size(batch_size) as cursor:
             documents = list(cursor)
             if not documents:
@@ -178,7 +177,7 @@ async def teams_daily_update():
                     update_current_season(team_id=team)
                     # Filter seasons to only include the current season key
                     filtered_doc = doc.copy()
-                    filtered_doc['seasons'] = {key: doc['seasons'][key] for key in doc['seasons'] if
+                    filtered_doc['SEASONS'] = {key: doc['SEASONS'][key] for key in doc['SEASONS'] if
                                                key == CURR_SEASON}
                     calculate_per_100_poss(team=filtered_doc, seasons=[CURR_SEASON], season_types=[CURR_SEASON_TYPE])
                     time.sleep(15)
@@ -188,7 +187,7 @@ async def teams_daily_update():
                 try:
                     # Current Roster & Coaches (~400-500 API calls)
                     logging.info("Roster & Coaches (~400-500 API calls)...")
-                    season_not_started = True if doc['seasons'][CURR_SEASON]['GP'] == 0 else False
+                    season_not_started = True if doc['SEASONS'][CURR_SEASON]['GP'] == 0 else False
                     update_current_roster(team_id=team, season_not_started=season_not_started)
                     time.sleep(30)
                 except Exception as e:
@@ -199,10 +198,10 @@ async def teams_daily_update():
                     logging.info("Last Starting Lineup (0 API calls)...")
 
                     # Get most recent game by date
-                    game_id, game_date = get_last_game(doc['seasons'])
+                    game_id, game_date = get_last_game(doc['SEASONS'])
 
                     # Get starting lineup for most recent game
-                    last_starting_lineup = get_last_lineup(team, game_id, game_date)
+                    last_starting_lineup = get_last_lineup(team, game_id)
 
                     # Update document
                     teams_collection.update_one(

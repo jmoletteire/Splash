@@ -432,7 +432,12 @@ def calculate_strength_of_schedule(team, season):
                         continue
 
     sos = opp_win_pct / (team['WINS'] + team['LOSSES'])
-    r_sos = rem_opp_win_pct / rem_games
+
+    try:
+        r_sos = rem_opp_win_pct / rem_games
+    except ZeroDivisionError:
+        r_sos = 0.000
+
     return sos, r_sos
 
 

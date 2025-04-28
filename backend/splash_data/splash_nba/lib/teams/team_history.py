@@ -15,32 +15,19 @@ def update_team_history(team_id):
         # Fetch the franchise history data
         history_list = franchisehistory.FranchiseHistory(proxy=PROXY, headers=HEADERS).get_normalized_dict()['FranchiseHistory']
 
-        # Organize the data into the desired format
-        organized_data = {}
+        # Insert or update the team history in MongoDB
         for entry in history_list:
-            if entry['TEAM_ID'] == team_id and team_id not in organized_data:
-                organized_data[team_id] = {
-                    "team_id": team_id,
-                    "team_history": []
-                }
-            organized_data[team_id]['team_history'].append(entry)
-
-        # Convert the organized data to a list of dictionaries
-        organized_data_list = list(organized_data.values())
+            if entry['TEAM_ID'] == team_id:
+                teams_collection.update_one(
+                    {"TEAM_ID": entry['TEAM_ID']},
+                    {"$set": {"TEAM_HISTORY": entry}},
+                    upsert=True
+                )
     except Exception as e:
         logging.error(f"(Team History) Error fetching team history for {team_id}: {e}", exc_info=True)
         return
 
-    try:
-        # Insert or update the team history in MongoDB
-        for team_history in organized_data_list:
-            teams_collection.update_one(
-                {"TEAM_ID": team_history['team_id']},
-                {"$set": {"TEAM_HISTORY": team_history['team_history']}},
-                upsert=True
-            )
-    except Exception as e:
-        logging.error(f"(Team History) Error updating team history for {team_id}: {e}", exc_info=True)
+
 
 
 if __name__ == "__main__":

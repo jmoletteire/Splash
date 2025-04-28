@@ -81,6 +81,11 @@ def fetch_team_stats(seasons: list = None, season_types: list = None, use_proxy:
     for season in seasons:
         logging.info(f"Fetching stats for season: {season}")
         for season_type in season_types:
+            if season_type == "REGULAR SEASON":
+                season_type = "Regular Season"
+            elif season_type == "PLAYOFFS":
+                season_type = "Playoffs"
+
             logging.info(f"\t{season_type}")
             teams = {}
 

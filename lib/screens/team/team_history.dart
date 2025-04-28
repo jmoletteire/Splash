@@ -194,7 +194,7 @@ class _TeamHistoryState extends State<TeamHistory> {
   @override
   void initState() {
     super.initState();
-    seasons = widget.team['seasons'];
+    seasons = widget.team['SEASONS'];
   }
 
   @override
@@ -285,7 +285,7 @@ class _TeamHistoryState extends State<TeamHistory> {
                   name !=
                       (seasons[seasonIndex[index - 1]]?['TEAM_NAME'] ??
                           widget.team['NICKNAME'])) {
-                var startYearList = widget.team['team_history']
+                var startYearList = widget.team['TEAM_HISTORY']
                     .where((e) =>
                         e['TEAM_CITY'] ==
                             (seasons[seasonIndex[index]]?['TEAM_CITY'] ??
@@ -404,7 +404,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
   @override
   void initState() {
     super.initState();
-    seasons = widget.team['seasons'];
+    seasons = widget.team['SEASONS'];
 
     for (var season in seasons.entries) {
       String key = '';
@@ -477,9 +477,9 @@ class _ExpandableCardState extends State<ExpandableCard> {
                   Expanded(
                     flex: 1,
                     child: Text(
-                      widget.team['team_history']?[0]?['LEAGUE_TITLES'] == 0
+                      widget.team['TEAM_HISTORY']?[0]?['LEAGUE_TITLES'] == 0
                           ? '-'
-                          : (widget.team['team_history']?[0]?['LEAGUE_TITLES'] ?? 0)
+                          : (widget.team['TEAM_HISTORY']?[0]?['LEAGUE_TITLES'] ?? 0)
                               .toString(),
                       textAlign: TextAlign.center,
                       style: kBebasNormal.copyWith(fontSize: 20.0.r),
@@ -488,9 +488,9 @@ class _ExpandableCardState extends State<ExpandableCard> {
                   Expanded(
                     flex: 1,
                     child: Text(
-                      widget.team['team_history']?[0]?['CONF_TITLES'] == 0
+                      widget.team['TEAM_HISTORY']?[0]?['CONF_TITLES'] == 0
                           ? '-'
-                          : (widget.team['team_history']?[0]?['CONF_TITLES'] ?? 0).toString(),
+                          : (widget.team['TEAM_HISTORY']?[0]?['CONF_TITLES'] ?? 0).toString(),
                       textAlign: TextAlign.center,
                       style: kBebasNormal.copyWith(fontSize: 20.0.r),
                     ),
@@ -498,9 +498,9 @@ class _ExpandableCardState extends State<ExpandableCard> {
                   Expanded(
                     flex: 1,
                     child: Text(
-                      widget.team['team_history']?[0]?['DIV_TITLES'] == 0
+                      widget.team['TEAM_HISTORY']?[0]?['DIV_TITLES'] == 0
                           ? '-'
-                          : (widget.team['team_history']?[0]?['DIV_TITLES'] ?? 0).toString(),
+                          : (widget.team['TEAM_HISTORY']?[0]?['DIV_TITLES'] ?? 0).toString(),
                       textAlign: TextAlign.center,
                       style: kBebasNormal.copyWith(fontSize: 20.0.r),
                     ),
@@ -508,9 +508,9 @@ class _ExpandableCardState extends State<ExpandableCard> {
                   Expanded(
                     flex: 1,
                     child: Text(
-                      widget.team['team_history']?[0]?['PO_APPEARANCES'] == 0
+                      widget.team['TEAM_HISTORY']?[0]?['PO_APPEARANCES'] == 0
                           ? '-'
-                          : (widget.team['team_history']?[0]?['PO_APPEARANCES'] ?? 0)
+                          : (widget.team['TEAM_HISTORY']?[0]?['PO_APPEARANCES'] ?? 0)
                               .toString(),
                       textAlign: TextAlign.center,
                       style: kBebasNormal.copyWith(fontSize: 20.0.r),

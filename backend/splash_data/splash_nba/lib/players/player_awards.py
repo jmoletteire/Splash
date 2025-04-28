@@ -43,8 +43,6 @@ for i, player in enumerate(players_collection.find({}, {"PERSON_ID": 1, "_id": 0
 
     except JSONDecodeError:
         logging.error(f"Unable to process player {player['PERSON_ID']}: No awards")
-    except Exception as e:
-        logging.error(f"Unable to process player {player['PERSON_ID']}: {e}", exc_info=True)
 
     # Pause for a random time between 0.5 and 2 seconds
     time.sleep(random.uniform(0.5, 2.0))
