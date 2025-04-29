@@ -73,7 +73,7 @@ async def update_teams(team_ids):
                     # Get most recent game by date
                     game_id, game_date = get_last_game(doc['SEASONS'])
                     # Get starting lineup for most recent game
-                    last_starting_lineup = get_last_lineup(team, game_id)
+                    last_starting_lineup = get_last_lineup(str(team), game_id)
                     # Update document
                     teams_collection.update_one(
                         {"TEAM_ID": team},
@@ -201,7 +201,7 @@ async def teams_daily_update():
                     game_id, game_date = get_last_game(doc['SEASONS'])
 
                     # Get starting lineup for most recent game
-                    last_starting_lineup = get_last_lineup(team, game_id)
+                    last_starting_lineup = get_last_lineup(str(team), game_id)
 
                     # Update document
                     teams_collection.update_one(

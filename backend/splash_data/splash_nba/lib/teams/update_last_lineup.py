@@ -87,7 +87,7 @@ if __name__ == "__main__":
         game_id, game_date = get_last_game(team['SEASONS'])
 
         # Get starting lineup for most recent game
-        last_starting_lineup = get_last_lineup(team['TEAM_ID'], game_id)
+        last_starting_lineup = get_last_lineup(str(team['TEAM_ID']), game_id)
 
         # Update document
         teams_collection_.update_one(

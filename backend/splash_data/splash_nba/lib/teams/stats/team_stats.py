@@ -26,7 +26,7 @@ def format_stats(team, mode, stats, key_map):
             rank = stats[rank_key] if rank_key in stats else 0
 
             # Calculate percentile
-            pct = calculate_percentile_rank(rank, team['LEAGUE_TEAMS']['Totals']['Value'])
+            pct = calculate_percentile_rank(int(rank), int(team['LEAGUE_TEAMS']['Totals']['Value']))
 
             # Get updated key name
             key_final = key_map[key]

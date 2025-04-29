@@ -18,9 +18,9 @@ def expected_lineup_data(team_id):
 
     for player in last_lineup:
         lineup_final.append({
-            "personId": str(player["PLAYER_ID"]) if "PLAYER_ID" in player else None,
-            "name": player["NAME"] if "NAME" in player else None,
-            "position": player["POSITION"] if "POSITION" in player else None,
+            "personId": str(player["personId"]) if "personId" in player else None,
+            "name": player["name"] if "name" in player else None,
+            "position": player["position"] if "position" in player else None,
         })
 
     return lineup_final
@@ -47,10 +47,10 @@ def matchup_details(summary, boxscore):
 
     if 'LineScore' in summary:
         try:
-            home_id = summary["GameSummary"][0]["HOME_TEAM_ID"]
-            away_id = summary["GameSummary"][0]["VISITOR_TEAM_ID"]
-            home_linescore = summary["LineScore"][0] if summary["LineScore"][0]["TEAM_ID"] == home_id else summary["LineScore"][1]
-            away_linescore = summary["LineScore"][0] if summary["LineScore"][0]["TEAM_ID"] == away_id else summary["LineScore"][1]
+            home_id = str(summary["GameSummary"][0]["HOME_TEAM_ID"])
+            away_id = str(summary["GameSummary"][0]["VISITOR_TEAM_ID"])
+            home_linescore = summary["LineScore"][0] if str(summary["LineScore"][0]["TEAM_ID"]) == home_id else summary["LineScore"][1]
+            away_linescore = summary["LineScore"][0] if str(summary["LineScore"][0]["TEAM_ID"]) == away_id else summary["LineScore"][1]
             matchup = f'{away_linescore["TEAM_NICKNAME"]} @ {home_linescore["TEAM_NICKNAME"]}'
             team_records["home"] = home_linescore["TEAM_WINS_LOSSES"]
             team_records["away"] = away_linescore["TEAM_WINS_LOSSES"]
@@ -100,23 +100,23 @@ def matchup_details(summary, boxscore):
     # Inactive
     if "InactivePlayers" in summary:
         try:
-            home_id = summary["GameSummary"][0]["HOME_TEAM_ID"]
-            away_id = summary["GameSummary"][0]["VISITOR_TEAM_ID"]
+            home_id = str(summary["GameSummary"][0]["HOME_TEAM_ID"])
+            away_id = str(summary["GameSummary"][0]["VISITOR_TEAM_ID"])
         except Exception:
             home_id = 0
             away_id = 0
 
-        inactive["home"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if player["TEAM_ID"] == home_id])
-        inactive["away"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if player["TEAM_ID"] == away_id])
+        inactive["home"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if str(player["TEAM_ID"]) == home_id])
+        inactive["away"] = ", ".join([f"{player['FIRST_NAME']} {player['LAST_NAME']}" for player in summary["InactivePlayers"] if str(player["TEAM_ID"]) == away_id])
 
     if "LastMeeting" in summary:
         try:
-            last_meeting["game_id"] = summary["LastMeeting"][0]["LAST_GAME_ID"]
+            last_meeting["game_id"] = str(summary["LastMeeting"][0]["LAST_GAME_ID"])
             last_meeting["date"] = summary["LastMeeting"][0]["LAST_GAME_DATE_EST"]
-            last_meeting["home_id"] = summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_ID"]
-            last_meeting["home_score"] = summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_POINTS"]
-            last_meeting["away_id"] = summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_ID"]
-            last_meeting["away_score"] = summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_POINTS"]
+            last_meeting["home_id"] = str(summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_ID"])
+            last_meeting["home_score"] = str(summary["LastMeeting"][0]["LAST_GAME_HOME_TEAM_POINTS"])
+            last_meeting["away_id"] = str(summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_ID"])
+            last_meeting["away_score"] = str(summary["LastMeeting"][0]["LAST_GAME_VISITOR_TEAM_POINTS"])
         except Exception:
             last_meeting["game_id"] = ""
             last_meeting["date"] = ""
@@ -183,17 +183,18 @@ def fetch_upcoming_games(game_date):
             game_ids.append(details['GAME_ID'])
             games_collection.update_one(
                 {'gameId': details['GAME_ID']},
-                {'$set': {'date': game_date,
+                {'$set': {'sportId': 0,
+                          'date': game_date,
                           'season': season,
                           'seasonCode': f'{season_type}{season}',
                           'seasonType': season_type_map[season_type],
-                          'homeTeamId': details['HOME_TEAM_ID'],
-                          'awayTeamId': details['VISITOR_TEAM_ID'],
+                          'homeTeamId': str(details['HOME_TEAM_ID']),
+                          'awayTeamId': str(details['VISITOR_TEAM_ID']),
                           'broadcast': details['NATL_TV_BROADCASTER_ABBREVIATION'],
-                          'gameClock': details['GAME_STATUS_TEXT'],
+                          'gameClock': details['GAME_STATUS_TEXT'].replace(' ET', ''),
                           'status': 1,
                           "matchup": matchup_details(fetch_box_score_summary(details['GAME_ID']), {}),
-                          "stats": {},
+                          "stats": {"home": {"team": {}, "players": []}, "away": {"team": {}, "players": []}, "linescore": {}},
                           "pbp": []
                           }
                  },
@@ -225,7 +226,7 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        start_date = datetime(2025, 4, 28)
+        start_date = datetime(2025, 4, 29)
         end_date = datetime(2025, 6, 30)
 
         # Fetch games for each date in the range
