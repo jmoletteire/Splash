@@ -162,7 +162,7 @@ class _FiltersBottomSheetState extends State<FiltersBottomSheet> {
     setState(() {
       _loading = true;
     });
-    final url = Uri.parse('http://$kFlaskUrl/stats-query');
+    final url = Uri.parse('https://$kFlaskUrl/stats-query');
 
     final response = await http.post(
       url,

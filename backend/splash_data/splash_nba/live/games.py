@@ -694,6 +694,6 @@ async def games_daily_update():
 
 
 if __name__ == '__main__':
-    for i in range(5, 9):
+    for i in range(1, 365):
         games_prev_day(i)  # Optionally, pass an offset to change timedelta (e.g., 1 = yesterday)
     # games_live_update()

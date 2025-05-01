@@ -41,9 +41,9 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
       for (var series in widget.playoffData['First Round'].entries) {
         if (kEastConfTeamIds.contains(series.value['TEAM_ONE'].toString()) ||
             kEastConfTeamIds.contains(series.value['TEAM_TWO'].toString())) {
-          eastFirstRound.add(series);
+          eastFirstRound.add(series.value);
         } else {
-          westFirstRound.add(series);
+          westFirstRound.add(series.value);
         }
       }
     } else {
@@ -62,9 +62,21 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
     if (widget.playoffData.containsKey('Conf Semi-Finals')) {
       for (var series in (widget.playoffData['Conf Semi-Finals'] ?? {}).entries) {
         if (kEastConfTeamIds.contains(series.value['TEAM_ONE'].toString())) {
-          eastConfSemis.add(series);
+          eastConfSemis.add(series.value);
         } else {
-          westConfSemis.add(series);
+          westConfSemis.add(series.value);
+        }
+      }
+      if (eastConfSemis.length < 2) {
+        eastConfSemis.add(placeholder);
+        if (eastConfSemis.length == 1) {
+          eastConfSemis.add(placeholder);
+        }
+      }
+      if (westConfSemis.length < 2) {
+        westConfSemis.add(placeholder);
+        if (westConfSemis.length == 1) {
+          westConfSemis.add(placeholder);
         }
       }
     } else {
@@ -875,10 +887,10 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  seriesCard(eastFirstRound[0].value, 'East First Round'),
-                  seriesCard(eastFirstRound[3].value, 'East First Round'),
-                  seriesCard(eastFirstRound[2].value, 'East First Round'),
-                  seriesCard(eastFirstRound[1].value, 'East First Round'),
+                  seriesCard(eastFirstRound[0], 'East First Round'),
+                  seriesCard(eastFirstRound[3], 'East First Round'),
+                  seriesCard(eastFirstRound[2], 'East First Round'),
+                  seriesCard(eastFirstRound[1], 'East First Round'),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height / 25),
@@ -922,10 +934,10 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  seriesCard(westFirstRound[0].value, 'West First Round'),
-                  seriesCard(westFirstRound[3].value, 'West First Round'),
-                  seriesCard(westFirstRound[2].value, 'West First Round'),
-                  seriesCard(westFirstRound[1].value, 'West First Round'),
+                  seriesCard(westFirstRound[0], 'West First Round'),
+                  seriesCard(westFirstRound[3], 'West First Round'),
+                  seriesCard(westFirstRound[2], 'West First Round'),
+                  seriesCard(westFirstRound[1], 'West First Round'),
                 ],
               ),
             ],
@@ -994,22 +1006,22 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.13, size.height * 0.06),
       Offset(size.width * 0.13, size.height * 0.1375),
-      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[0].value, 1, season),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[0], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.375, size.height * 0.06),
       Offset(size.width * 0.375, size.height * 0.1375),
-      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[3].value, 1, season),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[3], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.13, size.height * 0.1375),
       Offset(size.width * 0.2525, size.height * 0.1375),
-      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[0].value, 1, season),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[0], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.1375),
       Offset(size.width * 0.375, size.height * 0.1375),
-      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[3].value, 1, season),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[3], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.1375),
@@ -1021,22 +1033,22 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.06),
       Offset(size.width * 0.625, size.height * 0.1375),
-      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[2].value, 1, season),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[2], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.875, size.height * 0.06),
       Offset(size.width * 0.875, size.height * 0.1375),
-      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[1].value, 1, season),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[1], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.1375),
       Offset(size.width * 0.7525, size.height * 0.1375),
-      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[2].value, 1, season),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[2], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.1375),
       Offset(size.width * 0.875, size.height * 0.1375),
-      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[1].value, 1, season),
+      eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[1], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.1375),
@@ -1116,22 +1128,22 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.13, size.height * 0.925),
       Offset(size.width * 0.13, size.height),
-      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0].value, 1, season),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.375, size.height * 0.925),
       Offset(size.width * 0.375, size.height),
-      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3].value, 1, season),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.13, size.height * 0.925),
       Offset(size.width * 0.2525, size.height * 0.925),
-      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0].value, 1, season),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.925),
       Offset(size.width * 0.375, size.height * 0.925),
-      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3].value, 1, season),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.835),
@@ -1143,22 +1155,22 @@ class BracketPainter extends CustomPainter {
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.925),
       Offset(size.width * 0.625, size.height),
-      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2].value, 1, season),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.875, size.height * 0.925),
       Offset(size.width * 0.875, size.height),
-      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1].value, 1, season),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.925),
       Offset(size.width * 0.7525, size.height * 0.925),
-      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2].value, 1, season),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.925),
       Offset(size.width * 0.875, size.height * 0.925),
-      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1].value, 1, season),
+      westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.835),

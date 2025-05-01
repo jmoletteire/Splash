@@ -85,7 +85,7 @@ class _StatsQueryState extends State<StatsQuery> with SingleTickerProviderStateM
     setState(() {
       _isLoading = true;
     });
-    final url = Uri.parse('http://$kFlaskUrl/stats-query');
+    final url = Uri.parse('https://$kFlaskUrl/stats-query');
 
     final response = await http.post(
       url,
