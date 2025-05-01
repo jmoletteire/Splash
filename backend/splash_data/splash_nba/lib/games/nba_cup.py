@@ -1,20 +1,25 @@
-import requests
-import logging
+import inspect
 from collections import defaultdict
+
+import requests
 from nba_api.stats.endpoints import iststandings
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON
+from pymongo import MongoClient
+from splash_nba.util.env import uri, k_current_season
+import logging
 
 
 def update_current_cup():
     # Connect to MongoDB
     try:
-        cup_collection = get_mongo_collection('nba_cup_history')
+        client = MongoClient(uri)
+        db = client.splash
+        cup_collection = db.nba_cup_history
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
         exit(1)
 
     try:
-        teams = iststandings.ISTStandings(proxy=PROXY, headers=HEADERS, season=CURR_SEASON).get_dict()['teams']
+        teams = iststandings.ISTStandings(season=k_current_season).get_dict()['teams']
     except Exception as e:
         logging.error(f"NBA Cup data unavailable: {e}")
         return
@@ -37,7 +42,7 @@ def update_current_cup():
 
         # Update the database with the sorted array of teams
         cup_collection.update_one(
-            {'SEASON': CURR_SEASON},
+            {'SEASON': k_current_season},
             {'$set': {f'GROUP.{group_standings[0]["conference"]}.{group}': group_standings}},
             upsert=True
         )
@@ -47,20 +52,20 @@ def update_current_cup():
 
         # Update the database with the sorted array of teams
         cup_collection.update_one(
-            {'SEASON': CURR_SEASON},
+            {'SEASON': k_current_season},
             {'$set': {f'WILD CARD.{wildcard_standings[0]["conference"]}': wildcard_standings}},
             upsert=True
         )
 
     # Fetching the JSON data from the URL
-    url = f"https://cdn.nba.com/static/json/staticData/brackets/{CURR_SEASON[0:4]}/ISTBracket.json"
+    url = f"https://cdn.nba.com/static/json/staticData/brackets/{k_current_season[0:4]}/ISTBracket.json"
     response = requests.get(url)
 
     # Check if the request was successful
     if response.status_code == 200:
         json_data = response.json()
         cup_collection.update_one(
-            {'SEASON': CURR_SEASON},
+            {'SEASON': k_current_season},
             {'$set': {f'KNOCKOUT': json_data['bracket']['istBracketSeries']}},
             upsert=True
         )
@@ -69,8 +74,10 @@ def update_current_cup():
 def flag_cup_games(season=None):
     try:
         logging.basicConfig(level=logging.INFO)
-        cup_collection = get_mongo_collection('nba_cup_history')
-        games_collection = get_mongo_collection('nba_games_unwrapped')
+        client = MongoClient(uri)
+        db = client.splash
+        cup_collection = db.nba_cup_history
+        games_collection = db.nba_games
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
         return
@@ -90,9 +97,13 @@ def flag_cup_games(season=None):
                     for i, game in enumerate(team['games']):
                         logging.info(f'({team["teamAbbreviation"]}) {i + 1} of {len(team["games"])}')
                         # Query to find & update the document
-                        games_collection.find_one_and_update(
-                            {"gameId": game['gameId']},
-                            {"$set": {f"title": f'NBA Cup - {group}'}},
+                        games_collection.find_one_and_update({
+                            "SEASON_CODE": season_code,
+                            f"GAMES.{game['gameId']}": {"$exists": True}
+                        },
+                            {
+                                "$set": {f"GAMES.{game['gameId']}.SUMMARY.GameSummary.0.NBA_CUP": f'NBA Cup - {group}'}
+                            },
                         )
 
 
@@ -100,7 +111,7 @@ def fetch_all_cups():
     seasons = ['2023-24']
 
     for season in seasons:
-        teams = iststandings.ISTStandings(proxy=PROXY, headers=HEADERS, season=season).get_dict()['teams']
+        teams = iststandings.ISTStandings(season=season).get_dict()['teams']
 
         # Initialize a dictionary to group teams by istGroup
         grouped_teams = defaultdict(list)
@@ -152,7 +163,10 @@ def fetch_all_cups():
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
-    cup_collection = get_mongo_collection('nba_cup_history')
+    client = MongoClient(uri)
+    db = client.splash
+    cup_collection = db.nba_cup_history
+    games_collection = db.nba_games
     # fetch_all_cups()
     update_current_cup()
     # flag_cup_games(season='2024-25')

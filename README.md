@@ -1,16 +1,7 @@
 # Splash
 
-A new Flutter project.
+Every season, every team, every game. An all-in-one NBA stats, scores, and history app.
 
-## Getting Started
+## Demo
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [Splash Demo (YouTube)](https://youtu.be/IytdMpO188c)

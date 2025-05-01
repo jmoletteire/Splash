@@ -1,13 +1,14 @@
-import time
 import random
-import logging
+import time
 from nba_api.stats.endpoints import boxscoresummaryv2
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
+from pymongo import MongoClient
+from splash_nba.util.env import uri
+import logging
 
 
 # Function to fetch box score stats for a game
 def fetch_box_score_summary(game_id):
-    boxscore = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id, proxy=PROXY, headers=HEADERS).get_normalized_dict()
+    boxscore = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id).get_normalized_dict()
     return boxscore
 
 
@@ -15,14 +16,10 @@ def process_documents(documents):
     game_counter = 0
 
     for document in documents:
-        if document['GAME_DATE'] <= '2024-06-17':
+        if document['GAME_DATE'] < '2024-07-01':
             for game_id, game_data in document['GAMES'].items():
                 # Check if SUMMARY already exists for the game
-                summary = []
-                if "SUMMARY" in game_data.keys():
-                    if game_data["SUMMARY"] is not None:
-                        summary = game_data['SUMMARY'].keys()
-                if "AvailableVideo" not in summary:
+                if "AvailableVideo" not in game_data['SUMMARY'].keys():
                     # Fetch box score summary for the game
                     try:
                         stats = fetch_box_score_summary(game_id)
@@ -61,7 +58,9 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        games_collection = get_mongo_collection('nba_games')
+        client = MongoClient(uri)
+        db = client.splash
+        games_collection = db.nba_games
         logging.info("Connected to MongoDB")
 
         # Set batch size to process documents
@@ -79,4 +78,4 @@ if __name__ == "__main__":
 
         print("Box score stats update complete.")
     except Exception as e:
-        logging.error(f"Failed to connect to MongoDB: {e.with_traceback()}")
+        logging.error(f"Failed to connect to MongoDB: {e}")

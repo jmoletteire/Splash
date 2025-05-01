@@ -76,7 +76,7 @@ class _MyDropdownSearchState extends State<MyDropdownSearch> {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     return DropdownSearch<String>(
-      items: categorizedFields.values.expand((list) => list).toList(),
+      items: (f, cs) => categorizedFields.values.expand((list) => list).toList(),
       popupProps: PopupProps.dialog(
         fit: FlexFit.loose,
         dialogProps: const DialogProps(backgroundColor: Color(0xFF121212)),

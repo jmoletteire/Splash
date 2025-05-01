@@ -32,13 +32,13 @@ async def live_update():
 def setup_scheduler():
     scheduler = AsyncIOScheduler()
 
-    # loop = asyncio.get_event_loop()
+    loop = asyncio.get_event_loop()
 
     # Schedule tasks
     # Run `live_update` every 20 seconds (ensures live game updates are always fresh)
     scheduler.add_job(
-        live_update,  # Creates a new task that runs in the background
-        IntervalTrigger(seconds=20), coalesce=True, max_instances=1, misfire_grace_time=10
+        lambda: asyncio.run_coroutine_threadsafe(live_update(), loop),  # Runs in a separate task
+        IntervalTrigger(seconds=20), coalesce=True, max_instances=1, misfire_grace_time=10,
     )
 
     # Run `check_games_final` every 20 seconds, but as a separate task
@@ -53,7 +53,7 @@ def setup_scheduler():
     # )
 
     scheduler.add_job(
-        daily_update,  # Runs in a separate task
+        lambda: asyncio.run_coroutine_threadsafe(daily_update(), loop),  # Runs in a separate task
         CronTrigger(hour=2, minute=0, timezone='America/Chicago'),  # 2AM CST
         coalesce=True, max_instances=1, misfire_grace_time=18000,
     )

@@ -1,7 +1,8 @@
-import logging
-from datetime import datetime
 from nba_api.stats.endpoints import drafthistory, commonplayerinfo, playerawards
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
+from pymongo import MongoClient
+from splash_nba.util.env import uri
+from datetime import datetime
+import logging
 
 
 def age_at_draft(year, birth_date):
@@ -95,7 +96,7 @@ def get_awards(player):
     result = players_collection.find_one({'PERSON_ID': player}, {'AWARDS': 1, '_id': 0})
 
     if result is None:
-        awards = playerawards.PlayerAwards(proxy=PROXY, headers=HEADERS, player_id=player).get_normalized_dict()['PlayerAwards']
+        awards = playerawards.PlayerAwards(player_id=player).get_normalized_dict()['PlayerAwards']
         for award in awards:
             if award['DESCRIPTION'] == 'Hall of Fame Inductee':
                 award_checks['hof'] = 1
@@ -131,7 +132,7 @@ def get_additional_info():
         all_star = 0
         for player in draft['SELECTIONS']:
             try:
-                player_data = commonplayerinfo.CommonPlayerInfo(player['PERSON_ID'], proxy=PROXY, headers=HEADERS).get_normalized_dict()['CommonPlayerInfo'][0]
+                player_data = commonplayerinfo.CommonPlayerInfo(player['PERSON_ID']).get_normalized_dict()['CommonPlayerInfo'][0]
                 player['POSITION'] = player_data['POSITION']
                 player['AGE'] = age_at_draft(year, player_data['BIRTHDATE'])
                 player['HEIGHT'] = player_data['HEIGHT']
@@ -167,7 +168,7 @@ def get_additional_info():
 
 
 def draft_history():
-    draft_hist = drafthistory.DraftHistory(proxy=PROXY, headers=HEADERS).get_normalized_dict()['DraftHistory']
+    draft_hist = drafthistory.DraftHistory().get_normalized_dict()['DraftHistory']
 
     # Organize the data into the desired format
     organized_data = {}
@@ -198,9 +199,11 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    draft_collection = get_mongo_collection('nba_draft_history')
-    players_collection = get_mongo_collection('nba_players')
-    teams_collection = get_mongo_collection('nba_teams')
+    client = MongoClient(uri)
+    db = client.splash
+    draft_collection = db.nba_draft_history
+    players_collection = db.nba_players
+    teams_collection = db.nba_teams
     logging.info("Connected to MongoDB")
 
     #draft_history()

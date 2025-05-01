@@ -1,8 +1,9 @@
-import time
 import random
-import logging
+import time
 from nba_api.stats.endpoints import playercareerstats
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
+from pymongo import MongoClient
+from splash_nba.util.env import uri, k_current_season
+import logging
 
 
 def update_player_career_stats(player):
@@ -10,10 +11,13 @@ def update_player_career_stats(player):
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    players_collection = get_mongo_collection('nba_players')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    teams_collection = db.nba_teams
 
-    player_totals = playercareerstats.PlayerCareerStats(proxy=PROXY, headers=HEADERS, player_id=player).get_normalized_dict()
-    player_per_game = playercareerstats.PlayerCareerStats(proxy=PROXY, headers=HEADERS, player_id=player, per_mode36='PerGame').get_normalized_dict()
+    player_totals = playercareerstats.PlayerCareerStats(player_id=player).get_normalized_dict()
+    player_per_game = playercareerstats.PlayerCareerStats(player_id=player, per_mode36='PerGame').get_normalized_dict()
 
     reg_totals = player_totals['CareerTotalsRegularSeason']
     reg_totals_by_season = player_totals['SeasonTotalsRegularSeason']
@@ -223,8 +227,8 @@ def update_player_career_stats(player):
 
 
 def player_career_stats(player):
-    player_totals = playercareerstats.PlayerCareerStats(proxy=PROXY, headers=HEADERS, player_id=player).get_normalized_dict()
-    player_per_game = playercareerstats.PlayerCareerStats(proxy=PROXY, headers=HEADERS, player_id=player, per_mode36='PerGame').get_normalized_dict()
+    player_totals = playercareerstats.PlayerCareerStats(player_id=player).get_normalized_dict()
+    player_per_game = playercareerstats.PlayerCareerStats(player_id=player, per_mode36='PerGame').get_normalized_dict()
 
     reg_totals = player_totals['CareerTotalsRegularSeason']
     reg_totals_by_season = player_totals['SeasonTotalsRegularSeason']
@@ -438,8 +442,10 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    players_collection = get_mongo_collection('nba_players')
-    teams_collection = get_mongo_collection('nba_teams')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    teams_collection = db.nba_teams
     logging.info("Connected to MongoDB")
 
     # Set batch size to process documents

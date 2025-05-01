@@ -1,11 +1,13 @@
 import math
-import time
 import random
-import logging
-from collections import defaultdict
+import time
+
 from nba_api.stats.endpoints import teamplayeronoffdetails, leaguedashptstats, playerdashptshots, leagueseasonmatchups, \
     leaguedashplayerstats, matchupsrollup
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
+from pymongo import MongoClient
+from splash_nba.util.env import uri
+import logging
+from collections import defaultdict
 
 seasons = [
     '2023-24',
@@ -43,12 +45,12 @@ season_types = ['REGULAR SEASON', 'PLAYOFFS']
 def scoring_breakdown_and_pct_unassisted(season_type):
     for season in seasons:
         if season_type == 'PLAYOFFS':
-            player_uast = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, measure_type_detailed_defense='Scoring',
+            player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
                                                                       season=season,
                                                                       season_type_all_star='Playoffs').get_normalized_dict()[
                 'LeagueDashPlayerStats']
         else:
-            player_uast = leaguedashplayerstats.LeagueDashPlayerStats(proxy=PROXY, headers=HEADERS, measure_type_detailed_defense='Scoring',
+            player_uast = leaguedashplayerstats.LeagueDashPlayerStats(measure_type_detailed_defense='Scoring',
                                                                       season=season).get_normalized_dict()[
                 'LeagueDashPlayerStats']
 
@@ -110,10 +112,10 @@ def matchup_difficulty_and_dps(season_type):
                     logging.info(f'Processing {season}...')
                     try:
                         if season_type == 'REGULAR SEASON':
-                            data = leagueseasonmatchups.LeagueSeasonMatchups(proxy=PROXY, headers=HEADERS, season=season,
+                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
                                                                              def_player_id_nullable=player['PERSON_ID'])
                         else:
-                            data = leagueseasonmatchups.LeagueSeasonMatchups(proxy=PROXY, headers=HEADERS, season=season,
+                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
                                                                              season_type_playoffs='Playoffs',
                                                                              def_player_id_nullable=player['PERSON_ID'])
 
@@ -194,9 +196,9 @@ def versatility_score(season_type):
                         continue
                     try:
                         if season_type == 'PLAYOFFS':
-                            matchups = matchupsrollup.MatchupsRollup(proxy=PROXY, headers=HEADERS, def_player_id_nullable=player['PERSON_ID'], season=season, season_type_playoffs='Playoffs').get_normalized_dict()
+                            matchups = matchupsrollup.MatchupsRollup(def_player_id_nullable=player['PERSON_ID'], season=season, season_type_playoffs='Playoffs').get_normalized_dict()
                         else:
-                            matchups = matchupsrollup.MatchupsRollup(proxy=PROXY, headers=HEADERS, def_player_id_nullable=player['PERSON_ID'], season=season).get_normalized_dict()
+                            matchups = matchupsrollup.MatchupsRollup(def_player_id_nullable=player['PERSON_ID'], season=season).get_normalized_dict()
 
                         t_G = matchups['MatchupsRollup'][0]['PERCENT_OF_TIME']
                         t_F = matchups['MatchupsRollup'][1]['PERCENT_OF_TIME']
@@ -282,10 +284,10 @@ def defensive_points_saved(season_type):
                     logging.info(f'Processing {season}...')
                     try:
                         if season_type == 'REGULAR SEASON':
-                            data = leagueseasonmatchups.LeagueSeasonMatchups(proxy=PROXY, headers=HEADERS, season=season,
+                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
                                                                              def_player_id_nullable=player['PERSON_ID'])
                         else:
-                            data = leagueseasonmatchups.LeagueSeasonMatchups(proxy=PROXY, headers=HEADERS, season=season,
+                            data = leagueseasonmatchups.LeagueSeasonMatchups(season=season,
                                                                              season_type_playoffs='Playoffs',
                                                                              def_player_id_nullable=player['PERSON_ID'])
 
@@ -658,13 +660,13 @@ def shot_distribution(season_type):
                             continue
 
                         if season_type == 'PLAYOFFS':
-                            player_shooting = playerdashptshots.PlayerDashPtShots(proxy=PROXY, headers=HEADERS, team_id=team_id,
+                            player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
                                                                                   player_id=player_id,
                                                                                   season=season,
                                                                                   season_type_all_star='Playoffs'
                                                                                   ).get_normalized_dict()
                         else:
-                            player_shooting = playerdashptshots.PlayerDashPtShots(proxy=PROXY, headers=HEADERS, team_id=team_id,
+                            player_shooting = playerdashptshots.PlayerDashPtShots(team_id=team_id,
                                                                                   player_id=player_id,
                                                                                   season=season
                                                                                   ).get_normalized_dict()
@@ -720,42 +722,42 @@ def player_tracking_stats(season_type):
 
     for season in avail_seasons:
         if season_type == 'PLAYOFFS':
-            player_touches = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='Possessions',
+            player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
                                                                  season=season,
                                                                  season_type_all_star='Playoffs').get_normalized_dict()[
                 'LeagueDashPtStats']
-            player_passing = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='Passing',
+            player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
                                                                  season=season,
                                                                  season_type_all_star='Playoffs').get_normalized_dict()[
                 'LeagueDashPtStats']
-            player_drives = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='Drives',
+            player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Drives',
                                                                 season=season,
                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
                 'LeagueDashPtStats']
             player_rebounding = \
-                leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='Rebounding',
+                leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Rebounding',
                                                     season=season,
                                                     season_type_all_star='Playoffs').get_normalized_dict()[
                     'LeagueDashPtStats']
-            player_speed_dist = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='SpeedDistance',
+            player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='SpeedDistance',
                                                                 season=season,
                                                                 season_type_all_star='Playoffs').get_normalized_dict()[
                 'LeagueDashPtStats']
         else:
-            player_touches = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='Possessions',
+            player_touches = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Possessions',
                                                                  season=season).get_normalized_dict()[
                 'LeagueDashPtStats']
-            player_passing = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='Passing',
+            player_passing = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Passing',
                                                                  season=season).get_normalized_dict()[
                 'LeagueDashPtStats']
-            player_drives = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='Drives',
+            player_drives = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Drives',
                                                                 season=season).get_normalized_dict()[
                 'LeagueDashPtStats']
             player_rebounding = \
-                leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='Rebounding',
+                leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='Rebounding',
                                                     season=season).get_normalized_dict()[
                     'LeagueDashPtStats']
-            player_speed_dist = leaguedashptstats.LeagueDashPtStats(proxy=PROXY, headers=HEADERS, player_or_team='Player', pt_measure_type='SpeedDistance',
+            player_speed_dist = leaguedashptstats.LeagueDashPtStats(player_or_team='Player', pt_measure_type='SpeedDistance',
                                                                     season=season).get_normalized_dict()[
                 'LeagueDashPtStats']
 
@@ -902,7 +904,7 @@ def player_on_off(season_type):
 
             # PLAYOFFS
             if season_type == 'PLAYOFFS':
-                player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(proxy=PROXY, headers=HEADERS, team_id=team['TEAM_ID'], season=season,
+                player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=season,
                                                                               season_type_all_star='Playoffs',
                                                                               measure_type_detailed_defense='Advanced').get_normalized_dict()
 
@@ -927,7 +929,7 @@ def player_on_off(season_type):
 
             # REGULAR SEASON
             else:
-                player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(proxy=PROXY, headers=HEADERS, team_id=team['TEAM_ID'], season=season,
+                player_on_off = teamplayeronoffdetails.TeamPlayerOnOffDetails(team_id=team['TEAM_ID'], season=season,
                                                                               measure_type_detailed_defense='Advanced').get_normalized_dict()
 
                 player_on = player_on_off['PlayersOnCourtTeamPlayerOnOffDetails']
@@ -983,8 +985,10 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    players_collection = get_mongo_collection('nba_players')
-    teams_collection = get_mongo_collection('nba_teams')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    teams_collection = db.nba_teams
     logging.info("Connected to MongoDB")
 
     # logging.info("\nAdding Player On/Off data...\n")

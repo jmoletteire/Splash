@@ -8,7 +8,7 @@ if env_path not in sys.path:
     sys.path.insert(0, env_path)  # Add /home/ubuntu to the module search path
 
 try:
-    from env import URI, PREV_SEASON, CURR_SEASON, CURR_SEASON_TYPE
+    from env import URI, PREV_SEASON, CURR_SEASON, CURR_SEASON_TYPE, PROXY
     from mongo_connect import get_mongo_collection
 except ImportError:
     raise ImportError("env.py could not be found locally or at /home/ubuntu.")
@@ -21,11 +21,10 @@ def get_teams_metadata():
     try:
         query_params = request.args.to_dict()
         seasons = query_params.get('seasons')
-        sport = query_params.get('sport')
 
         # Query the database
         teams_collection = get_mongo_collection('nba_teams')
-        mongo_query = {"TEAM_ID": {"$exists": True, "$ne": 0}, "SPORT_ID": int(sport)}
+        mongo_query = {"TEAM_ID": {"$exists": True, "$ne": 0}}
         projection = {
             "_id": 0,
             "SPORT_ID": 1,

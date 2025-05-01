@@ -1,18 +1,22 @@
 import random
 import time
-import logging
+
 from nba_api.stats.endpoints import commonallplayers, commonplayerinfo
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON, CURR_SEASON_TYPE
+from pymongo import MongoClient
+from splash_nba.util.env import uri, k_current_season
+import logging
 
 
 def add_historic_players():
     try:
-        players_collection = get_mongo_collection('nba_players')
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        return
+        exit(1)
 
-    all_players = commonallplayers.CommonAllPlayers(proxy=PROXY, headers=HEADERS).get_normalized_dict()['CommonAllPlayers']
+    all_players = commonallplayers.CommonAllPlayers().get_normalized_dict()['CommonAllPlayers']
 
     # Filter players to only add those that don't exist in the collection
     new_players = [player for player in all_players if not players_collection.find_one({"PERSON_ID": player["PERSON_ID"]})]
@@ -30,12 +34,14 @@ def add_historic_players():
 
 def add_players():
     try:
-        players_collection = get_mongo_collection('nba_players')
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        return
+        exit(1)
 
-    all_players = commonallplayers.CommonAllPlayers(season=CURR_SEASON, proxy=PROXY, headers=HEADERS).get_normalized_dict()['CommonAllPlayers']
+    all_players = commonallplayers.CommonAllPlayers(season=k_current_season).get_normalized_dict()['CommonAllPlayers']
 
     # Filter players to only add those that don't exist in the collection
     new_players = [player for player in all_players if not players_collection.find_one({"PERSON_ID": player["PERSON_ID"]}) and player["ROSTERSTATUS"] == 1]
@@ -53,13 +59,15 @@ def add_players():
 
 def new_player_info(player):
     try:
-        players_collection = get_mongo_collection('nba_players')
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        return
+        exit(1)
 
     try:
-        player_data = commonplayerinfo.CommonPlayerInfo(player, proxy=PROXY, headers=HEADERS).get_normalized_dict()['CommonPlayerInfo']
+        player_data = commonplayerinfo.CommonPlayerInfo(player).get_normalized_dict()['CommonPlayerInfo']
 
         players_collection.update_one(
             {"PERSON_ID": player},
@@ -73,10 +81,12 @@ def new_player_info(player):
 
 def restructure_new_docs():
     try:
-        players_collection = get_mongo_collection('nba_players')
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        return
+        exit(1)
 
     # Loop through each document in the collection
     for i, player in enumerate(players_collection.find({"player_info": {"$exists": True}})):
@@ -103,7 +113,7 @@ def restructure_new_docs():
 # Function to get the latest player info
 def get_player_info(person_id):
     try:
-        latest_info = commonplayerinfo.CommonPlayerInfo(player_id=person_id, proxy=PROXY, headers=HEADERS).get_normalized_dict()['CommonPlayerInfo']
+        latest_info = commonplayerinfo.CommonPlayerInfo(player_id=person_id).get_normalized_dict()['CommonPlayerInfo']
         return latest_info
     except Exception as e:
         print(f"Error fetching data for player ID {person_id}: {e}")
@@ -112,10 +122,12 @@ def get_player_info(person_id):
 
 def update_player_info():
     try:
-        players_collection = get_mongo_collection('nba_players')
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
     except Exception as e:
         logging.error(f"Error connecting to MongoDB: {e}")
-        return
+        exit(1)
 
     # Loop through each document in the collection
     for i, player in enumerate(players_collection.find({"ROSTERSTATUS": "Active"}, {"PERSON_ID": 1, "_id": 1})):
@@ -164,7 +176,9 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        players_collection = get_mongo_collection('nba_players')
+        client = MongoClient(uri)
+        db = client.splash
+        players_collection = db.nba_players
         logging.info("Connected to MongoDB")
 
         try:

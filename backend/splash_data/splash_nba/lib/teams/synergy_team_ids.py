@@ -1,6 +1,14 @@
+import re
+from datetime import datetime
+
+from pymongo import MongoClient
+from unidecode import unidecode
+
+from splash_nba.util.env import uri
 import logging
 import requests
-from splash_nba.imports import get_mongo_collection, PROXY
+import json
+from bs4 import BeautifulSoup
 
 
 def team_synergy_ids():
@@ -8,7 +16,9 @@ def team_synergy_ids():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    teams_collection = get_mongo_collection('nba_teams')
+    client = MongoClient(uri)
+    db = client.splash
+    teams_collection = db.nba_teams
 
     # URL template for fetching player news
     url = "https://basketball.synergysportstech.com/api/leagues/54457dce300969b132fcfb34/teamswithstats"
@@ -59,7 +69,7 @@ def team_synergy_ids():
                     {"$set": {"SR_ID": sr_id}}
                 )
                 logging.info(f"Added SR ID for {team['fullName']}")
-            except Exception:
+            except Exception as e:
                 print(f"No match found for team {team['fullName']}.")
 
     else:

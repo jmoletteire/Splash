@@ -21,5 +21,5 @@ def process_team_data(teams):
         return teams_final
 
     except Exception as e:
-        logging.error(f"(process_team_data) Error processing teams: {e}")
+        logging.error(f"(process_scoreboard) Error processing scoreboard: {e}")
         return []

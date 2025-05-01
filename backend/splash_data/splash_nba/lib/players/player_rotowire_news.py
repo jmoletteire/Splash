@@ -1,13 +1,17 @@
 import re
+from datetime import datetime
+
+from pymongo import MongoClient
+from unidecode import unidecode
+
+from splash_nba.util.env import uri
 import logging
 import requests
-from datetime import datetime
+import json
 from bs4 import BeautifulSoup
-from unidecode import unidecode
-from splash_nba.imports import get_mongo_collection
 
 
-async def player_rotowires():
+def player_rotowires():
     player_rotowire_news()
     player_rotowire_injuries()
 
@@ -32,7 +36,9 @@ def player_rotowire_ids():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    players_collection = get_mongo_collection('nba_players')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
 
     # URL template for fetching player news
     url = "https://www.rotowire.com/basketball/tables/injury-report.php?team=ALL&pos=ALL"
@@ -108,7 +114,9 @@ def player_rotowire_injuries():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    players_collection = get_mongo_collection('nba_players')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
 
     # Base URL for the initial JSON data and the player page
     injury_report_url = "https://www.rotowire.com/basketball/tables/injury-report.php?team=ALL&pos=ALL"
@@ -177,7 +185,9 @@ def player_rotowire_news():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    players_collection = get_mongo_collection('nba_players')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
     logging.info("Connected to MongoDB")
 
     # URL template for fetching player news

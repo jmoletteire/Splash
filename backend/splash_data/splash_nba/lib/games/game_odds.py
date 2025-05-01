@@ -1,7 +1,15 @@
-import logging
-import requests
+import time
 from datetime import datetime, timedelta
-from splash_nba.imports import get_mongo_collection
+
+import requests
+from nba_api.stats.endpoints import leaguegamefinder, ScoreboardV2
+from pymongo import MongoClient
+
+from splash_nba.lib.games.fetch_adv_boxscore import fetch_box_score_adv
+from splash_nba.lib.games.fetch_boxscore_basic import fetch_box_score_stats
+from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
+from splash_nba.util.env import uri, k_current_season
+import logging
 
 
 def draft_kings_odds():
@@ -30,10 +38,12 @@ def draft_kings_odds():
         games[market['eventId']]['marketId'] = market['id']
 
 
-async def fetch_odds():
+def fetch_odds():
     # Connect to MongoDB
     try:
-        games_collection = get_mongo_collection('nba_games')
+        client = MongoClient(uri)
+        db = client.splash
+        games_collection = db.nba_games
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")
         exit(1)

@@ -5,7 +5,7 @@ import 'package:material_table_view/default_animated_switcher_transition_builder
 import 'package:material_table_view/material_table_view.dart';
 import 'package:material_table_view/sliver_table_view.dart';
 import 'package:material_table_view/table_view_typedefs.dart';
-import 'package:splash/screens/more/stats_query/util/column_options.dart';
+import 'package:splash/screens/more/stats_query/utilities/column_options.dart';
 import 'package:splash/utilities/constants.dart';
 
 import '../../../components/player_avatar.dart';

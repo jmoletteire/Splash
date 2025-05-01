@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from nba_api.stats.endpoints import teamyearbyyearstats
 from splash_nba.lib.teams.stats.team_stats import fetch_team_stats
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON, CURR_SEASON_TYPE
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def update_current_season(team_id):
@@ -15,7 +15,7 @@ def update_current_season(team_id):
         return
 
     try:
-        team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id, proxy=PROXY, headers=HEADERS).get_normalized_dict()['TeamStats']
+        team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id, proxy=PROXY).get_normalized_dict()['TeamStats']
 
         # Only for current season
         # EXAMPLE: season_stats_dict = {"2024-25": { data }}
@@ -70,7 +70,7 @@ def update_current_season(team_id):
 
 
 def fetch_all_seasons(team_id):
-    team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id, proxy=None, headers=None).get_normalized_dict()['TeamStats']
+    team_seasons_list = teamyearbyyearstats.TeamYearByYearStats(team_id, proxy=None).get_normalized_dict()['TeamStats']
 
     # All seasons since 1996-97
     season_stats_dict = {

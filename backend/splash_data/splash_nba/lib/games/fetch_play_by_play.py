@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 from nba_api.live.nba.endpoints import playbyplay
 from nba_api.stats.endpoints import videoeventsasset
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
+from splash_nba.imports import get_mongo_collection, PROXY, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def convert_playtime(duration_str):
@@ -27,49 +27,51 @@ def update_play_by_play():
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
-    games_collection = get_mongo_collection('nba_games_unwrapped')
+    games_collection = get_mongo_collection('nba_games')
 
     # Video PBP
     yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-    with games_collection.find({'date': yesterday}, {"_id": 1, "gameId": 1, "pbp": 1}) as cursor:
+    with games_collection.find({'GAME_DATE': yesterday}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1}) as cursor:
         docs = list(cursor)
         if not docs:
             return
 
         for doc in docs:
-            logging.info(f'\nAdding Video PBP for {doc["date"]}')
-            game_id = doc['gameId']
+            logging.info(f'\nAdding Video PBP for {doc["GAME_DATE"]}')
 
-            # Fetch PBP for the game
-            try:
-                pbp = fetch_play_by_play(game_id)
-            except Exception as e:
-                logging.error(f"Error fetching play-by-play for game_id {game_id}: {e}")
-                continue
+            for game_id, game_data in doc['GAMES'].items():
+                # Fetch PBP for the game
+                try:
+                    pbp = fetch_play_by_play(game_id)
+                except Exception as e:
+                    logging.error(f"Error fetching play-by-play for game_id {game_id}: {e}")
+                    continue
 
-            # Update the game data with the fetched stats
-            try:
-                # Update the MongoDB document with the fetched stats under the "PBP" key
-                games_collection.update_one(
-                    {'_id': doc['_id']},
-                    {"$set": {"pbp": pbp}}
-                )
+                # Update the game data with the fetched stats
+                try:
+                    # Update the MongoDB document with the fetched stats under the "PBP" key
+                    games_collection.update_one(
+                        {'_id': doc['_id'], f"GAMES.{game_id}": {"$exists": True}},
+                        {"$set": {f"GAMES.{game_id}.PBP": pbp}}
+                    )
 
-                logging.info(f"Processed {doc['date']} {game_id}")
-            except Exception as e:
-                logging.error(f"Error updating box score for game_id {game_id}: {e}")
-                continue
+                    print(f"Processed {doc['GAME_DATE']} {game_id}")
+                except Exception as e:
+                    logging.error(f"Error updating box score for game_id {game_id}: {e}")
+                    continue
 
-            # Pause 30 seconds between games
-            time.sleep(30)
+                # Pause 30 seconds between games
+                time.sleep(30)
 
 
 # Function to fetch box score stats for a game
 def fetch_play_by_play(game_id):
-    actions = playbyplay.PlayByPlay(proxy=PROXY, headers=HEADERS, game_id=game_id).get_dict()['game']['actions']
+    actions = playbyplay.PlayByPlay(proxy=None, game_id=game_id).get_dict()['game']['actions']
     pbp = []
 
     for i, action in enumerate(actions):
+        # logging.info(f'{i + 1} of {len(actions)}')
+
         play_info = {
             'action': str(action.get('actionNumber', '0')),
             'clock': convert_playtime(action.get('clock', '')),
@@ -87,14 +89,45 @@ def fetch_play_by_play(game_id):
         }
 
         # try:
-        #     play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=PROXY, headers=HEADERS, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
+        #     play_info['videoId'] = videoeventsasset.VideoEventsAsset(proxy=None, game_id=game_id, game_event_id=action.get('actionNumber', 0)).get_dict()['resultSets']['Meta']['videoUrls'][0]['uuid']
         #     time.sleep(random.uniform(0.5, 1.0))
         # except Exception:
         #     play_info['videoId'] = None
 
         pbp.append(play_info)
 
-    return pbp.sort(key=lambda x: x['action'], reverse=True)
+    return pbp
+
+
+def reformat_data(game):
+    game_pbp = game.get('PBP', None)
+    if game_pbp is None:
+        return None
+
+    pbp_final = []
+
+    for action in game_pbp:
+        actionNum = action.get('actionNumber', '0')
+        if actionNum == '0':
+            actionNum = action.get('action', '0')
+
+        pbp_final.append({
+            'action': str(actionNum),
+            'clock': convert_playtime(action.get('clock', '')),
+            'period': str(action.get('period', '0')),
+            'teamId': str(action.get('teamId', '0')),
+            'personId': str(action.get('personId', '0')),
+            'playerNameI': str(action.get('playerNameI', '')),
+            'possession': str(action.get('possession', '0')),
+            'scoreHome': str(action.get('scoreHome', '')),
+            'scoreAway': str(action.get('scoreAway', '')),
+            'isFieldGoal': str(action.get('isFieldGoal', '0')),
+            'description': str(action.get('description', '')),
+            'xLegacy': str(action.get('xLegacy', '0')),
+            'yLegacy': str(action.get('yLegacy', '0')),
+        })
+
+    return pbp_final
 
 
 if __name__ == "__main__":
@@ -108,7 +141,7 @@ if __name__ == "__main__":
 
         # Retrieve all documents from the collection
         # documents = games_collection.find({}, {"_id": 1, "GAMES": 1, "GAME_DATE": 1})
-        query = {"SEASON_YEAR": "2023"}
+        query = {"SEASON_YEAR": "2024"}
         proj = {"_id": 1, "GAMES": 1, "GAME_DATE": 1}
 
         # Set batch size to process documents
@@ -136,6 +169,7 @@ if __name__ == "__main__":
                         # Fetch PBP for the game
                         try:
                             pbp = fetch_play_by_play(game_id)
+                            # pbp = reformat_data(game_data)
                             game_counter += 1
                         except Exception as e:
                             pbp = None

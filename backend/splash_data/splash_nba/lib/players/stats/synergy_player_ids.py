@@ -1,6 +1,14 @@
+import re
+from datetime import datetime
+
+from pymongo import MongoClient
+from unidecode import unidecode
+
+from splash_nba.util.env import uri
 import logging
 import requests
-from splash_nba.imports import get_mongo_collection
+import json
+from bs4 import BeautifulSoup
 
 
 def player_synergy_ids(team, team_sr_id):
@@ -76,8 +84,10 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    players_collection = get_mongo_collection('nba_players')
-    teams_collection = get_mongo_collection('nba_teams')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    teams_collection = db.nba_teams
 
     for team in teams_collection.find({}, {'SR_ID': 1, 'ABBREVIATION': 1, '_id': 0}).skip(14):
         logging.info(f"Processing {team['ABBREVIATION']}...")

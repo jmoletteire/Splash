@@ -69,26 +69,30 @@ class _LastMeetingState extends State<LastMeeting> {
     }
 
     lastGameHomePts = widget.lastMeeting['home_id'].toString() == lastHomeId
-        ? widget.lastMeeting['home_score'].toStringAsFixed(0)
-        : widget.lastMeeting['away_score'].toStringAsFixed(0);
+        ? widget.lastMeeting['home_score']
+        : widget.lastMeeting['away_score'];
 
     lastGameAwayPts = widget.lastMeeting['home_id'].toString() == lastAwayId
-        ? widget.lastMeeting['home_score'].toStringAsFixed(0)
-        : widget.lastMeeting['away_score'].toStringAsFixed(0);
+        ? widget.lastMeeting['home_score']
+        : widget.lastMeeting['away_score'];
 
     homePtsColor = widget.lastMeeting['home_id'].toString() == lastHomeId
-        ? widget.lastMeeting['home_score'] > widget.lastMeeting['away_score']
+        ? int.parse(widget.lastMeeting['home_score']) >
+                int.parse(widget.lastMeeting['away_score'])
             ? Colors.white
             : Colors.grey
-        : widget.lastMeeting['away_score'] > widget.lastMeeting['home_score']
+        : int.parse(widget.lastMeeting['away_score']) >
+                int.parse(widget.lastMeeting['home_score'])
             ? Colors.white
             : Colors.grey;
 
     awayPtsColor = widget.lastMeeting['home_id'].toString() == lastAwayId
-        ? widget.lastMeeting['home_score'] > widget.lastMeeting['away_score']
+        ? int.parse(widget.lastMeeting['home_score']) >
+                int.parse(widget.lastMeeting['away_score'])
             ? Colors.white
             : Colors.grey
-        : widget.lastMeeting['away_score'] > widget.lastMeeting['home_score']
+        : int.parse(widget.lastMeeting['away_score']) >
+                int.parse(widget.lastMeeting['home_score'])
             ? Colors.white
             : Colors.grey;
 

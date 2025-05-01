@@ -1,8 +1,11 @@
+import random
 import time
-import logging
 from collections import defaultdict
+
 from nba_api.stats.endpoints import shotchartdetail, videodetailsasset, shotchartleaguewide
-from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
+from pymongo import MongoClient
+from splash_nba.util.env import uri
+import logging
 
 
 def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
@@ -10,12 +13,14 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    player_shots_collection = get_mongo_collection('nba_player_shot_data')
+    client = MongoClient(uri)
+    db = client.splash
+    player_shots_collection = db.nba_player_shot_data
 
-    shot_data = shotchartdetail.ShotChartDetail(proxy=PROXY, headers=HEADERS, player_id=player, team_id=team, season_nullable=season,
+    shot_data = shotchartdetail.ShotChartDetail(player_id=player, team_id=team, season_nullable=season,
                                                 season_type_all_star=season_type,
                                                 context_measure_simple='FGA').get_normalized_dict()
-    video_data = videodetailsasset.VideoDetailsAsset(proxy=PROXY, headers=HEADERS, player_id=player, team_id=team, season=season,
+    video_data = videodetailsasset.VideoDetailsAsset(player_id=player, team_id=team, season=season,
                                                 season_type_all_star=season_type,
                                                 context_measure_detailed='FGA').get_normalized_dict()
 
@@ -67,7 +72,7 @@ def get_shot_chart_data(player, team, season, season_type, keep_lg_avg):
             upsert=True
         )
 
-        league_avg = shotchartleaguewide.ShotChartLeagueWide(proxy=PROXY, headers=HEADERS, season=season).get_normalized_dict()
+        league_avg = shotchartleaguewide.ShotChartLeagueWide(season=season).get_normalized_dict()
 
         # Mapping from SHOT_ZONE_AREA and SHOT_ZONE_BASIC to your Dart zone names
         zone_mapping = {
@@ -125,8 +130,10 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    players_collection = get_mongo_collection('nba_players')
-    player_shots_collection = get_mongo_collection('nba_player_shot_data')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
+    player_shots_collection = db.nba_player_shot_data
     logging.info("Connected to MongoDB")
 
     league_averages = player_shots_collection.find_one(

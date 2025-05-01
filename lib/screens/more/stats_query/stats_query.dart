@@ -6,8 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/more/stats_query/filters_bottom_sheet.dart';
 import 'package:splash/screens/more/stats_query/players_table.dart';
-import 'package:splash/screens/more/stats_query/util/column_options.dart';
-import 'package:splash/screens/more/stats_query/util/custom_bottom_sheet.dart';
+import 'package:splash/screens/more/stats_query/utilities/column_options.dart';
+import 'package:splash/screens/more/stats_query/utilities/custom_bottom_sheet.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 

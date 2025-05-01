@@ -1,5 +1,6 @@
+from pymongo import MongoClient
+from splash_nba.util.env import uri, k_current_season
 import logging
-from splash_nba.imports import get_mongo_collection, CURR_SEASON
 
 
 def current_season_per_75(playoffs, team_id):
@@ -7,7 +8,9 @@ def current_season_per_75(playoffs, team_id):
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    players_collection = get_mongo_collection('nba_players')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
 
     # List of tuples specifying the stats to calculate per-75 possession values for
     # Each tuple should be in the format ("stat_key", "location")
@@ -109,7 +112,7 @@ def current_season_per_75(playoffs, team_id):
 
             if playoffs:
                 try:
-                    playoff_stats = player_doc['STATS'][CURR_SEASON].get("PLAYOFFS", None)
+                    playoff_stats = player_doc['STATS'][k_current_season].get("PLAYOFFS", None)
                 except KeyError:
                     continue
 
@@ -119,7 +122,7 @@ def current_season_per_75(playoffs, team_id):
                 adv_stats = playoff_stats.get("ADV", {})
             else:
                 try:
-                    reg_season_stats = player_doc['STATS'][CURR_SEASON].get("REGULAR SEASON", None)
+                    reg_season_stats = player_doc['STATS'][k_current_season].get("REGULAR SEASON", None)
                 except KeyError:
                     continue
 
@@ -140,11 +143,11 @@ def current_season_per_75(playoffs, team_id):
                     loc = location.split('.')
 
                     if len(loc) == 2:
-                        stat_value = stats[CURR_SEASON][loc[0]].get(loc[1], {}).get(stat_key, None)
+                        stat_value = stats[k_current_season][loc[0]].get(loc[1], {}).get(stat_key, None)
                     elif len(loc) == 3:
-                        stat_value = stats[CURR_SEASON][loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
+                        stat_value = stats[k_current_season][loc[0]][loc[1]].get(loc[2], {}).get(stat_key, None)
                     else:
-                        stat_value = stats[CURR_SEASON].get(location, {}).get(stat_key, None)
+                        stat_value = stats[k_current_season].get(location, {}).get(stat_key, None)
 
                     if stat_value is not None:
                         try:
@@ -158,10 +161,10 @@ def current_season_per_75(playoffs, team_id):
                             # Update the player document with the new per-75 possession value
                             players_collection.update_one(
                                 {"_id": player_doc["_id"]},
-                                {"$set": {f"STATS.{CURR_SEASON}.{location}.{per_75_key}": per_75_value}}
+                                {"$set": {f"STATS.{k_current_season}.{location}.{per_75_key}": per_75_value}}
                             )
                         except Exception as e:
-                            logging.error(f'Unable to add {stat_key} for {player_doc["PLAYER_ID"]} for {CURR_SEASON}: {e}')
+                            logging.error(f'Unable to add {stat_key} for {player_doc["PLAYER_ID"]} for {k_current_season}: {e}')
             else:
                 continue
 
@@ -227,7 +230,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    players_collection = get_mongo_collection('nba_players')
+    client = MongoClient(uri)
+    db = client.splash
+    players_collection = db.nba_players
     logging.info("Connected to MongoDB")
 
     # List of tuples specifying the stats to calculate per-75 possession values for
