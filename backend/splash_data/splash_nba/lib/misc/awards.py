@@ -1,10 +1,8 @@
-import random
 import time
-
-from nba_api.stats.endpoints import teamdetails, commonallplayers, playerawards
-from pymongo import MongoClient
-from splash_nba.util.env import uri
+import random
 import logging
+from splash_nba.imports import get_mongo_collection
+from nba_api.stats.endpoints import teamdetails, commonallplayers, playerawards
 
 
 def player_award_details():
@@ -148,11 +146,9 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
-        db = client.splash
-        lg_history_collection = db.nba_league_history
-        teams_collection = db.nba_teams
-        players_collection = db.nba_players
+        lg_history_collection = get_mongo_collection('nba_league_history')
+        teams_collection = get_mongo_collection('nba_teams')
+        players_collection = get_mongo_collection('nba_players')
         logging.info("Connected to MongoDB")
     except Exception as e:
         logging.error(f"Failed to connect to MongoDB: {e}")

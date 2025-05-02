@@ -1,7 +1,7 @@
+import logging
 import requests
 from pymongo import MongoClient
-from splash_nba.util.env import uri
-import logging
+from splash_nba.imports import get_mongo_collection
 
 
 # Function to compare old data with new data and find new entries
@@ -23,9 +23,7 @@ def update_transactions():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    transactions_collection = db.nba_transactions
+    transactions_collection = get_mongo_collection('nba_transactions')
 
     # Fetch the data from the URL
     url = "https://stats.nba.com/js/data/playermovement/NBA_Player_Movement.json"

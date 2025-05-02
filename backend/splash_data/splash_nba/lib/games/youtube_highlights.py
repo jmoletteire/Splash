@@ -1,7 +1,6 @@
 import requests
 import datetime
-
-from splash_nba.util.env import youtube_api_key
+from splash_nba.imports import YOUTUBE_API_KEY
 
 
 def search_youtube_highlights(api_key, team_one, team_two, date):
@@ -61,7 +60,7 @@ if __name__ == '__main__':
     today = datetime.datetime.now().strftime('%Y-%m-%d')
 
     # Search for highlights
-    results = search_youtube_highlights(youtube_api_key, team_one, team_two, today)
+    results = search_youtube_highlights(YOUTUBE_API_KEY, team_one, team_two, today)
 
     if results:
         print(results)

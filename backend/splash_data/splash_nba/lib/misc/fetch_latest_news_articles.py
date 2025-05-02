@@ -1,13 +1,11 @@
-import requests
 import logging
-from pymongo import MongoClient
-from splash_nba.util.env import uri, news_api_key
+import requests
+from splash_nba.imports import get_mongo_collection, NEWS_API_KEY
 
 
 def add_article_to_mongo(article):
     try:
-        client = MongoClient(uri)
-        latest_news_articles = client.splash.latest_news_articles
+        latest_news_articles = get_mongo_collection('latest_news_articles')
 
         # Check if an article with the same URL already exists
         existing_article = latest_news_articles.find_one({'url': article['url']})
@@ -43,7 +41,7 @@ def fetch_latest_news_articles():
     logging.basicConfig(level=logging.INFO)
 
     news_api = 'https://newsapi.org/v2/top-headlines?'
-    parameters = f'country=us&category=sports&pageSize=100&apiKey={news_api_key}'
+    parameters = f'country=us&category=sports&pageSize=100&apiKey={NEWS_API_KEY}'
     url = news_api + parameters
 
     response = requests.get(url)
@@ -59,8 +57,7 @@ def fetch_latest_news_articles():
 
 
 if __name__ == '__main__':
-    client = MongoClient(uri)
-    latest_news_collection = client.splash.latest_news_articles
+    latest_news_collection = get_mongo_collection('latest_news_articles')
 
     fetch_latest_news_articles()
     news = latest_news_collection.find()

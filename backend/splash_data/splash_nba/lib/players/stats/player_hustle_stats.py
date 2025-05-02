@@ -1,7 +1,6 @@
-from nba_api.stats.endpoints import leaguehustlestatsplayer
-from pymongo import MongoClient
-from splash_nba.util.env import uri, k_current_season
 import logging
+from nba_api.stats.endpoints import leaguehustlestatsplayer
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON
 
 
 def update_player_hustle_stats(season_type, team_id):
@@ -9,18 +8,16 @@ def update_player_hustle_stats(season_type, team_id):
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
     logging.info("Connected to MongoDB")
     player_hustle_stats = []
 
-    logging.info(f'Processing HUSTLE stats for {k_current_season}...')
+    logging.info(f'Processing HUSTLE stats for {CURR_SEASON}...')
     if season_type == 'REGULAR SEASON':
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(team_id_nullable=team_id, season=k_current_season).get_normalized_dict()[
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, headers=HEADERS, team_id_nullable=team_id, season=CURR_SEASON).get_normalized_dict()[
             'HustleStatsPlayer']
     elif season_type == 'PLAYOFFS':
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(team_id_nullable=team_id, season=k_current_season, season_type_all_star='Playoffs').get_normalized_dict()[
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, headers=HEADERS, team_id_nullable=team_id, season=CURR_SEASON, season_type_all_star='Playoffs').get_normalized_dict()[
             'HustleStatsPlayer']
 
     if len(player_hustle_stats) > 0:
@@ -29,7 +26,7 @@ def update_player_hustle_stats(season_type, team_id):
             try:
                 players_collection.update_one(
                     {'PERSON_ID': player['PLAYER_ID']},
-                    {'$set': {f'STATS.{k_current_season}.{season_type}.HUSTLE': player}}
+                    {'$set': {f'STATS.{CURR_SEASON}.{season_type}.HUSTLE': player}}
                 )
             except Exception as e:
                 logging.error(f'Unable to add stats for player {player}: {e}')
@@ -39,7 +36,7 @@ def update_player_hustle_stats(season_type, team_id):
 def fetch_player_playoff_hustle_stats(seasons):
     for season in seasons:
         logging.info(f'Processing stats for {season}...')
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=season,
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, headers=HEADERS, season=season,
                                                                               season_type_all_star='Playoffs').get_normalized_dict()[
             'HustleStatsPlayer']
 
@@ -58,7 +55,7 @@ def fetch_player_playoff_hustle_stats(seasons):
 def fetch_player_hustle_stats(seasons):
     for season in seasons:
         logging.info(f'Processing stats for {season}...')
-        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(season=season).get_normalized_dict()[
+        player_hustle_stats = leaguehustlestatsplayer.LeagueHustleStatsPlayer(proxy=PROXY, headers=HEADERS, season=season).get_normalized_dict()[
             'HustleStatsPlayer']
 
         logging.info(f'Adding data for {len(player_hustle_stats)} players.')
@@ -84,9 +81,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
     logging.info("Connected to MongoDB")
 
     # List of seasons

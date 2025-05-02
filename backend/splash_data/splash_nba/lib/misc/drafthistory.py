@@ -1,8 +1,7 @@
-from nba_api.stats.endpoints import drafthistory, commonplayerinfo, playerawards
-from pymongo import MongoClient
-from splash_nba.util.env import uri
-from datetime import datetime
 import logging
+from datetime import datetime
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
+from nba_api.stats.endpoints import drafthistory, commonplayerinfo, playerawards
 
 
 def age_at_draft(year, birth_date):
@@ -51,8 +50,8 @@ def get_starters():
                             season_id = season['SEASON_ID']
                             team_id = season['TEAM_ID']
 
-                            team = teams_collection.find_one({'TEAM_ID': team_id}, {f'seasons.{season_id}.GP': 1, f'seasons.{season_id}.PO_WINS': 1, f'seasons.{season_id}.PO_LOSSES': 1, '_id': 0})
-                            available_games += team['seasons'][season_id]['GP'] + team['seasons'][season_id]['PO_WINS'] + team['seasons'][season_id]['PO_LOSSES']
+                            team = teams_collection.find_one({'TEAM_ID': team_id}, {f'SEASONS.{season_id}.GP': 1, f'SEASONS.{season_id}.PO_WINS': 1, f'seasons.{season_id}.PO_LOSSES': 1, '_id': 0})
+                            available_games += team['SEASONS'][season_id]['GP'] + team['SEASONS'][season_id]['PO_WINS'] + team['SEASONS'][season_id]['PO_LOSSES']
                     else:
                         logging.info(f"\tSeason Stats unavailable for {player['PLAYER_NAME']} ({player['SEASON']})")
 
@@ -96,7 +95,7 @@ def get_awards(player):
     result = players_collection.find_one({'PERSON_ID': player}, {'AWARDS': 1, '_id': 0})
 
     if result is None:
-        awards = playerawards.PlayerAwards(player_id=player).get_normalized_dict()['PlayerAwards']
+        awards = playerawards.PlayerAwards(proxy=PROXY, headers=HEADERS, player_id=player).get_normalized_dict()['PlayerAwards']
         for award in awards:
             if award['DESCRIPTION'] == 'Hall of Fame Inductee':
                 award_checks['hof'] = 1
@@ -199,11 +198,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    draft_collection = db.nba_draft_history
-    players_collection = db.nba_players
-    teams_collection = db.nba_teams
+    draft_collection = get_mongo_collection('nba_draft_history')
+    players_collection = get_mongo_collection('nba_players')
+    teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB")
 
     #draft_history()

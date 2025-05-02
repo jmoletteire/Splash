@@ -1,14 +1,13 @@
-import random
 import time
-from nba_api.stats.endpoints import boxscoresummaryv2
-from pymongo import MongoClient
-from splash_nba.util.env import uri
+import random
 import logging
+from nba_api.stats.endpoints import boxscoresummaryv2
+from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 
 
 # Function to fetch box score stats for a game
 def fetch_box_score_summary(game_id):
-    boxscore = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id).get_normalized_dict()
+    boxscore = boxscoresummaryv2.BoxScoreSummaryV2(proxy=PROXY, headers=HEADERS, game_id=game_id).get_normalized_dict()
     return boxscore
 
 
@@ -58,9 +57,7 @@ if __name__ == "__main__":
 
     # Connect to MongoDB
     try:
-        client = MongoClient(uri)
-        db = client.splash
-        games_collection = db.nba_games
+        games_collection = get_mongo_collection('nba_games')
         logging.info("Connected to MongoDB")
 
         # Set batch size to process documents

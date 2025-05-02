@@ -1,6 +1,5 @@
-from pymongo import MongoClient
-from splash_nba.util.env import uri, k_current_season, k_current_season_type
 import logging
+from splash_nba.imports import get_mongo_collection, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def current_season_custom_stats_rank():
@@ -8,228 +7,226 @@ def current_season_custom_stats_rank():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
 
     # Stats to rank
     custom_stats = [
         # BASIC
-        ("GP", f"{k_current_season_type}.BASIC", -1),
-        ("MIN", f"{k_current_season_type}.BASIC", -1),
-        ("FGM", f"{k_current_season_type}.BASIC", -1),
-        ("FGA", f"{k_current_season_type}.BASIC", -1),
-        ("FG_PCT", f"{k_current_season_type}.BASIC", -1),
-        ("FTM", f"{k_current_season_type}.BASIC", -1),
-        ("FTA", f"{k_current_season_type}.BASIC", -1),
-        ("FT_PCT", f"{k_current_season_type}.BASIC", -1),
-        ("FG3M", f"{k_current_season_type}.BASIC", -1),
-        ("FG3A", f"{k_current_season_type}.BASIC", -1),
-        ("FG3_PCT", f"{k_current_season_type}.BASIC", -1),
-        ("STL", f"{k_current_season_type}.BASIC", -1),
-        ("BLK", f"{k_current_season_type}.BASIC", -1),
-        ("REB", f"{k_current_season_type}.BASIC", -1),
-        ("OREB", f"{k_current_season_type}.BASIC", -1),
-        ("DREB", f"{k_current_season_type}.BASIC", -1),
-        ("PF", f"{k_current_season_type}.BASIC", 1),
-        ("PFD", f"{k_current_season_type}.BASIC", -1),
-        ("PTS", f"{k_current_season_type}.BASIC", -1),
-        ("PLUS_MINUS", f"{k_current_season_type}.BASIC", -1),
+        ("GP", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("MIN", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FGM", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FGA", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FG_PCT", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FTM", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FTA", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FT_PCT", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FG3M", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FG3A", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FG3_PCT", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("STL", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("BLK", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("REB", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("OREB", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("DREB", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("PF", f"{CURR_SEASON_TYPE}.BASIC", 1),
+        ("PFD", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("PTS", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("PLUS_MINUS", f"{CURR_SEASON_TYPE}.BASIC", -1),
 
-        ("FGM_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("FGA_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("FTM_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("FTA_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("FG3M_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("FG3A_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("STL_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("BLK_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("REB_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("OREB_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("DREB_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("PF_PER_75", f"{k_current_season_type}.BASIC", 1),
-        ("PFD_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("PTS_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("PLUS_MINUS_PER_75", f"{k_current_season_type}.BASIC", -1),
-        ("TOV", f"{k_current_season_type}.BASIC", 1),
-        ("TOV_PER_75", f"{k_current_season_type}.BASIC", 1),
+        ("FGM_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FGA_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FTM_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FTA_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FG3M_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FG3A_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("STL_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("BLK_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("REB_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("OREB_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("DREB_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("PF_PER_75", f"{CURR_SEASON_TYPE}.BASIC", 1),
+        ("PFD_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("PTS_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("PLUS_MINUS_PER_75", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("TOV", f"{CURR_SEASON_TYPE}.BASIC", 1),
+        ("TOV_PER_75", f"{CURR_SEASON_TYPE}.BASIC", 1),
 
-        ("3PAr", f"{k_current_season_type}.BASIC", -1),
-        ("FTAr", f"{k_current_season_type}.BASIC", -1),
-        ("FT_PER_FGA", f"{k_current_season_type}.BASIC", -1),
+        ("3PAr", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FTAr", f"{CURR_SEASON_TYPE}.BASIC", -1),
+        ("FT_PER_FGA", f"{CURR_SEASON_TYPE}.BASIC", -1),
 
         # ADV
-        ("MIN", f"{k_current_season_type}.ADV", -1),
-        ("OFF_RATING", f"{k_current_season_type}.ADV", -1),
-        ("DEF_RATING", f"{k_current_season_type}.ADV", 1),
-        ("NET_RATING", f"{k_current_season_type}.ADV", -1),
-        ("AST_PCT", f"{k_current_season_type}.ADV", -1),
-        ("AST_TO", f"{k_current_season_type}.ADV", -1),
-        ("AST_RATIO", f"{k_current_season_type}.ADV", -1),
-        ("OREB_PCT", f"{k_current_season_type}.ADV", -1),
-        ("DREB_PCT", f"{k_current_season_type}.ADV", -1),
-        ("REB_PCT", f"{k_current_season_type}.ADV", -1),
-        ("TM_TOV_PCT", f"{k_current_season_type}.ADV", 1),
-        ("EFG_PCT", f"{k_current_season_type}.ADV", -1),
-        ("TS_PCT", f"{k_current_season_type}.ADV", -1),
-        ("USG_PCT", f"{k_current_season_type}.ADV", -1),
-        ("PACE", f"{k_current_season_type}.ADV", -1),
-        ("PIE", f"{k_current_season_type}.ADV", -1),
+        ("MIN", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("OFF_RATING", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("DEF_RATING", f"{CURR_SEASON_TYPE}.ADV", 1),
+        ("NET_RATING", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("AST_PCT", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("AST_TO", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("AST_RATIO", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("OREB_PCT", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("DREB_PCT", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("REB_PCT", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("TM_TOV_PCT", f"{CURR_SEASON_TYPE}.ADV", 1),
+        ("EFG_PCT", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("TS_PCT", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("USG_PCT", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("PACE", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("PIE", f"{CURR_SEASON_TYPE}.ADV", -1),
 
-        ("OFF_RATING_ON_OFF", f"{k_current_season_type}.ADV", -1),
-        ("DEF_RATING_ON_OFF", f"{k_current_season_type}.ADV", 1),
-        ("NET_RATING_ON_OFF", f"{k_current_season_type}.ADV", -1),
-        ("POSS", f"{k_current_season_type}.ADV", -1),
-        ("POSS_PER_GM", f"{k_current_season_type}.ADV", -1),
-        ("PARTIAL_POSS", f"{k_current_season_type}.ADV", -1),
-        ("BOX_CREATION", f"{k_current_season_type}.ADV", -1),
-        ("OFFENSIVE_LOAD", f"{k_current_season_type}.ADV", -1),
-        ("ADJ_TOV_PCT", f"{k_current_season_type}.ADV", 1),
-        ("VERSATILITY_SCORE", f"{k_current_season_type}.ADV", -1),
-        ("MATCHUP_DIFFICULTY", f"{k_current_season_type}.ADV", -1),
-        ("DEF_IMPACT_EST", f"{k_current_season_type}.ADV", -1),
+        ("OFF_RATING_ON_OFF", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("DEF_RATING_ON_OFF", f"{CURR_SEASON_TYPE}.ADV", 1),
+        ("NET_RATING_ON_OFF", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("POSS", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("POSS_PER_GM", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("PARTIAL_POSS", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("BOX_CREATION", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("OFFENSIVE_LOAD", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("ADJ_TOV_PCT", f"{CURR_SEASON_TYPE}.ADV", 1),
+        ("VERSATILITY_SCORE", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("MATCHUP_DIFFICULTY", f"{CURR_SEASON_TYPE}.ADV", -1),
+        ("DEF_IMPACT_EST", f"{CURR_SEASON_TYPE}.ADV", -1),
 
         # ADV -> PASSING
-        ("PASSES_MADE", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("PASSES_RECEIVED", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("AST", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("FT_AST", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("SECONDARY_AST", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("POTENTIAL_AST", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("AST_PTS_CREATED", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("AST_ADJ", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("AST_TO_PASS_PCT", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("AST_TO_PASS_PCT_ADJ", f"{k_current_season_type}.ADV.PASSING", -1),
+        ("PASSES_MADE", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("PASSES_RECEIVED", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("AST", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("FT_AST", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("SECONDARY_AST", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("POTENTIAL_AST", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("AST_PTS_CREATED", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("AST_ADJ", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("AST_TO_PASS_PCT", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("AST_TO_PASS_PCT_ADJ", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
 
-        ("PASSES_MADE_PER_75", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("PASSES_RECEIVED_PER_75", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("AST_PER_75", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("FT_AST_PER_75", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("SECONDARY_AST_PER_75", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("POTENTIAL_AST_PER_75", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("AST_PTS_CREATED_PER_75", f"{k_current_season_type}.ADV.PASSING", -1),
-        ("AST_ADJ_PER_75", f"{k_current_season_type}.ADV.PASSING", -1),
+        ("PASSES_MADE_PER_75", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("PASSES_RECEIVED_PER_75", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("AST_PER_75", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("FT_AST_PER_75", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("SECONDARY_AST_PER_75", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("POTENTIAL_AST_PER_75", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("AST_PTS_CREATED_PER_75", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
+        ("AST_ADJ_PER_75", f"{CURR_SEASON_TYPE}.ADV.PASSING", -1),
 
-        ("TOUCHES", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("FRONT_CT_TOUCHES", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("TIME_OF_POSS", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("AVG_SEC_PER_TOUCH", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("AVG_DRIB_PER_TOUCH", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("PTS_PER_TOUCH", f"{k_current_season_type}.ADV.TOUCHES", -1),
+        ("TOUCHES", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("FRONT_CT_TOUCHES", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("TIME_OF_POSS", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("AVG_SEC_PER_TOUCH", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("AVG_DRIB_PER_TOUCH", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("PTS_PER_TOUCH", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
 
-        ("FGA_PER_TOUCH", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("PASSES_PER_TOUCH", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("TOV_PER_TOUCH", f"{k_current_season_type}.ADV.TOUCHES", 1),
-        ("PFD_PER_TOUCH", f"{k_current_season_type}.ADV.TOUCHES", -1),
+        ("FGA_PER_TOUCH", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("PASSES_PER_TOUCH", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("TOV_PER_TOUCH", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", 1),
+        ("PFD_PER_TOUCH", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
 
-        ("TOUCHES_PER_75", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("FRONT_CT_TOUCHES_PER_75", f"{k_current_season_type}.ADV.TOUCHES", -1),
-        ("TIME_OF_POSS_PER_75", f"{k_current_season_type}.ADV.TOUCHES", -1),
+        ("TOUCHES_PER_75", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("FRONT_CT_TOUCHES_PER_75", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
+        ("TIME_OF_POSS_PER_75", f"{CURR_SEASON_TYPE}.ADV.TOUCHES", -1),
 
         # HUSTLE
-        ("CONTESTED_SHOTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("SCREEN_ASSISTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("SCREEN_AST_PTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("BOX_OUTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("OFF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("DEF_BOXOUTS", f"{k_current_season_type}.HUSTLE", -1),
-        ("DEFLECTIONS", f"{k_current_season_type}.HUSTLE", -1),
-        ("LOOSE_BALLS_RECOVERED", f"{k_current_season_type}.HUSTLE", -1),
-        ("CHARGES_DRAWN", f"{k_current_season_type}.HUSTLE", -1),
+        ("CONTESTED_SHOTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("SCREEN_ASSISTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("SCREEN_AST_PTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("BOX_OUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("OFF_BOXOUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("DEF_BOXOUTS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("DEFLECTIONS", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("LOOSE_BALLS_RECOVERED", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("CHARGES_DRAWN", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
 
-        ("CONTESTED_SHOTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("SCREEN_ASSISTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("SCREEN_AST_PTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("BOX_OUTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("OFF_BOXOUTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("DEF_BOXOUTS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("DEFLECTIONS_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("LOOSE_BALLS_RECOVERED_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("CHARGES_DRAWN_PER_75", f"{k_current_season_type}.HUSTLE", -1),
-        ("DIST_MILES", f"{k_current_season_type}.HUSTLE.SPEED", -1),
-        ("DIST_MILES_OFF", f"{k_current_season_type}.HUSTLE.SPEED", -1),
-        ("DIST_MILES_DEF", f"{k_current_season_type}.HUSTLE.SPEED", -1),
-        ("DIST_MILES_PER_75", f"{k_current_season_type}.HUSTLE.SPEED", -1),
-        ("DIST_MILES_OFF_PER_75", f"{k_current_season_type}.HUSTLE.SPEED", -1),
-        ("DIST_MILES_DEF_PER_75", f"{k_current_season_type}.HUSTLE.SPEED", -1),
-        ("AVG_SPEED", f"{k_current_season_type}.HUSTLE.SPEED", -1),
-        ("AVG_SPEED_OFF", f"{k_current_season_type}.HUSTLE.SPEED", -1),
-        ("AVG_SPEED_DEF", f"{k_current_season_type}.HUSTLE.SPEED", -1),
+        ("CONTESTED_SHOTS_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("SCREEN_ASSISTS_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("SCREEN_AST_PTS_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("BOX_OUTS_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("OFF_BOXOUTS_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("DEF_BOXOUTS_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("DEFLECTIONS_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("LOOSE_BALLS_RECOVERED_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("CHARGES_DRAWN_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE", -1),
+        ("DIST_MILES", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
+        ("DIST_MILES_OFF", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
+        ("DIST_MILES_DEF", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
+        ("DIST_MILES_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
+        ("DIST_MILES_OFF_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
+        ("DIST_MILES_DEF_PER_75", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
+        ("AVG_SPEED", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
+        ("AVG_SPEED_OFF", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
+        ("AVG_SPEED_DEF", f"{CURR_SEASON_TYPE}.HUSTLE.SPEED", -1),
 
         # ADV -> DRIVES
-        ("DRIVES", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FGM", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FGA", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FG_PCT", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FTM", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FTA", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FT_PCT", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_PTS", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_PTS_PCT", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_PASSES", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_PASSES_PCT", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_AST", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_AST_PCT", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_TOV", f"{k_current_season_type}.ADV.DRIVES", 1),
-        ("DRIVE_TOV_PCT", f"{k_current_season_type}.ADV.DRIVES", 1),
-        ("DRIVE_TS_PCT", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FT_PER_FGA", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVES_PER_TOUCH", f"{k_current_season_type}.ADV.DRIVES", -1),
+        ("DRIVES", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FGM", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FGA", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FG_PCT", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FTM", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FTA", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FT_PCT", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_PTS", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_PTS_PCT", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_PASSES", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_PASSES_PCT", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_AST", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_AST_PCT", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_TOV", f"{CURR_SEASON_TYPE}.ADV.DRIVES", 1),
+        ("DRIVE_TOV_PCT", f"{CURR_SEASON_TYPE}.ADV.DRIVES", 1),
+        ("DRIVE_TS_PCT", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FT_PER_FGA", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVES_PER_TOUCH", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
 
-        ("DRIVES_PER_75", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FGM_PER_75", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FGA_PER_75", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FTM_PER_75", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_FTA_PER_75", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_PTS_PER_75", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_PASSES_PER_75", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_AST_PER_75", f"{k_current_season_type}.ADV.DRIVES", -1),
-        ("DRIVE_TOV_PER_75", f"{k_current_season_type}.ADV.DRIVES", 1),
+        ("DRIVES_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FGM_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FGA_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FTM_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_FTA_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_PTS_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_PASSES_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_AST_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", -1),
+        ("DRIVE_TOV_PER_75", f"{CURR_SEASON_TYPE}.ADV.DRIVES", 1),
 
         # ADV -> REBOUNDING
-        ("OREB_CONTEST", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_UNCONTEST", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_CONTEST_PCT", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_CHANCES", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_CHANCE_DEFER", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_CHANCE_PCT", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_CHANCE_PCT_ADJ", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CONTEST", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_UNCONTEST", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CONTEST_PCT", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CHANCES", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CHANCE_DEFER", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CHANCE_PCT", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CHANCE_PCT_ADJ", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CONTEST", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_UNCONTEST", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CONTEST_PCT", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CHANCES", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CHANCE_DEFER", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CHANCE_PCT", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CHANCE_PCT_ADJ", f"{k_current_season_type}.ADV.REBOUNDING", -1),
+        ("OREB_CONTEST", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_UNCONTEST", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_CONTEST_PCT", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_CHANCES", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_CHANCE_DEFER", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_CHANCE_PCT", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_CHANCE_PCT_ADJ", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CONTEST", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_UNCONTEST", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CONTEST_PCT", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CHANCES", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CHANCE_DEFER", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CHANCE_PCT", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CHANCE_PCT_ADJ", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CONTEST", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_UNCONTEST", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CONTEST_PCT", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CHANCES", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CHANCE_DEFER", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CHANCE_PCT", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CHANCE_PCT_ADJ", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
 
-        ("OREB_CONTEST_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_UNCONTEST_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_CHANCES_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("OREB_CHANCE_DEFER_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CONTEST_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_UNCONTEST_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CHANCES_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("DREB_CHANCE_DEFER_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CONTEST_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_UNCONTEST_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CHANCES_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1),
-        ("REB_CHANCE_DEFER_PER_75", f"{k_current_season_type}.ADV.REBOUNDING", -1)
+        ("OREB_CONTEST_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_UNCONTEST_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_CHANCES_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("OREB_CHANCE_DEFER_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CONTEST_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_UNCONTEST_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CHANCES_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("DREB_CHANCE_DEFER_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CONTEST_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_UNCONTEST_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CHANCES_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1),
+        ("REB_CHANCE_DEFER_PER_75", f"{CURR_SEASON_TYPE}.ADV.REBOUNDING", -1)
     ]
 
     for stat in custom_stats:
 
         loc = stat[1].split('.')
 
-        if (loc[-1] == 'PASSING' or loc[-1] == 'TOUCHES' or loc[-1] == 'DRIVES' or loc[-1] == 'REBOUNDING') and k_current_season < '2013-14':
+        if (loc[-1] == 'PASSING' or loc[-1] == 'TOUCHES' or loc[-1] == 'DRIVES' or loc[-1] == 'REBOUNDING') and CURR_SEASON < '2013-14':
             continue
-        elif loc[-1] == 'HUSTLE' and k_current_season < '2016-17':
+        elif loc[-1] == 'HUSTLE' and CURR_SEASON < '2016-17':
             continue
 
         logging.info(f"(Custom Stats Rank) Calculating {stat[0]} rank...")
@@ -238,21 +235,21 @@ def current_season_custom_stats_rank():
         pipeline = [
             {
                 "$match": {
-                    f"STATS.{k_current_season}.{stat[1]}.{stat[0]}": {"$exists": True}
+                    f"STATS.{CURR_SEASON}.{stat[1]}.{stat[0]}": {"$exists": True}
                 }
             },
             {
                 "$project": {
-                    f"STATS.{k_current_season}.{stat[1]}.{stat[0]}": 1
+                    f"STATS.{CURR_SEASON}.{stat[1]}.{stat[0]}": 1
                 }
             },
             {
                 "$setWindowFields": {
                     "sortBy": {
-                        f"STATS.{k_current_season}.{stat[1]}.{stat[0]}": stat[2]
+                        f"STATS.{CURR_SEASON}.{stat[1]}.{stat[0]}": stat[2]
                     },
                     "output": {
-                        f"STATS.{k_current_season}.{stat[1]}.{stat[0]}_RANK": {
+                        f"STATS.{CURR_SEASON}.{stat[1]}.{stat[0]}_RANK": {
                             "$documentNumber": {}
                         }
                     }
@@ -268,16 +265,16 @@ def current_season_custom_stats_rank():
         # Update each document with the new rank field
         for result in results:
             if len(loc) == 2:
-                res = result['STATS'][k_current_season][loc[0]][loc[1]][f'{stat[0]}_RANK']
+                res = result['STATS'][CURR_SEASON][loc[0]][loc[1]][f'{stat[0]}_RANK']
             elif len(loc) == 3:
-                res = result['STATS'][k_current_season][loc[0]][loc[1]][loc[2]][f'{stat[0]}_RANK']
+                res = result['STATS'][CURR_SEASON][loc[0]][loc[1]][loc[2]][f'{stat[0]}_RANK']
             else:
-                res = result['STATS'][k_current_season][stat[1]][f'{stat[0]}_RANK']
+                res = result['STATS'][CURR_SEASON][stat[1]][f'{stat[0]}_RANK']
 
             players_collection.update_one(
                 {"_id": result["_id"]},
                 {"$set": {
-                    f"STATS.{k_current_season}.{stat[1]}.{stat[0]}_RANK": res}}
+                    f"STATS.{CURR_SEASON}.{stat[1]}.{stat[0]}_RANK": res}}
             )
 
 
@@ -286,9 +283,7 @@ def custom_stats_rank():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
     logging.info("Connected to MongoDB")
 
     # Stats to rank

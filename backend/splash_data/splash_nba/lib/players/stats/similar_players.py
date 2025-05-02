@@ -1,9 +1,8 @@
-import numpy as np
-from pymongo import MongoClient
-from sklearn.metrics.pairwise import euclidean_distances
-import pandas as pd
-from splash_nba.util.env import uri, k_current_season, k_current_season_type
 import logging
+import numpy as np
+import pandas as pd
+from sklearn.metrics.pairwise import euclidean_distances
+from splash_nba.imports import get_mongo_collection, CURR_SEASON, CURR_SEASON_TYPE
 
 
 def get_nested_value(data, path):
@@ -20,9 +19,7 @@ def update_similar_players():
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    client = MongoClient(uri)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
 
     # Define the rank stats to use for similarity comparison
     rank_stat_paths = [
@@ -57,7 +54,7 @@ def update_similar_players():
         "ADV.SHOOTING.SHOT_TYPE.Lees than 10 ft.FGA_FREQUENCY_RANK"
     ]
 
-    all_players = list(players_collection.find({f"STATS.{k_current_season}": {"$exists": True}}))
+    all_players = list(players_collection.find({f"STATS.{CURR_SEASON}": {"$exists": True}}))
     count = len(all_players)
     # suggs = list(players_collection.find({'PERSON_ID': 1630591, "STATS": {"$exists": True}}))
 
@@ -71,7 +68,7 @@ def update_similar_players():
         logging.info(f'Processing {i + 1} of {count} ({player["DISPLAY_FIRST_LAST"]})')
 
         # Get ranks for the player for the specified stats
-        stats = player.get("STATS", {}).get(k_current_season, {}).get(k_current_season_type, {})
+        stats = player.get("STATS", {}).get(CURR_SEASON, {}).get(CURR_SEASON_TYPE, {})
         if not stats:
             continue
 
@@ -92,7 +89,7 @@ def update_similar_players():
                 'TEAM_ID': other_player["TEAM_ID"] if "TEAM_ID" in other_player else 0,
                 'POSITION': other_player["POSITION"] if "POSITION" in other_player else '',
             }
-            other_player_stats = other_player["STATS"].get(k_current_season, {}).get(k_current_season_type, {})
+            other_player_stats = other_player["STATS"].get(CURR_SEASON, {}).get(CURR_SEASON_TYPE, {})
 
             if not other_player_stats:
                 continue
@@ -129,7 +126,7 @@ def update_similar_players():
             # Update the MongoDB document with the similar players and their scores
             players_collection.update_one(
                 {"PERSON_ID": player_id},
-                {"$set": {f'STATS.{k_current_season}.{k_current_season_type}.SIMILAR_PLAYERS': similar_players}},
+                {"$set": {f'STATS.{CURR_SEASON}.{CURR_SEASON_TYPE}.SIMILAR_PLAYERS': similar_players}},
             )
 
 
@@ -138,9 +135,7 @@ def find_similar_players():
     logging.basicConfig(level=logging.INFO)
 
     # Connect to MongoDB
-    client = MongoClient(uri)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
 
     # Define the rank stats to use for similarity comparison
     rank_stat_paths = [

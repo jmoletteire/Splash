@@ -1,8 +1,7 @@
-from pymongo import MongoClient
-from splash_nba.util.env import uri
+import json
 import logging
 import requests
-import json
+from splash_nba.imports import get_mongo_collection
 
 
 def fetch_player_contract_data(url, player_id, headers):
@@ -207,9 +206,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
     logging.info("Connected to MongoDB")
 
     # Define the GraphQL endpoint
