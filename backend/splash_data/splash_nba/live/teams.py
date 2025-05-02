@@ -1,5 +1,5 @@
-import logging
 import time
+import logging
 from datetime import datetime
 from splash_nba.lib.teams.team_history import update_team_history
 from splash_nba.lib.teams.stats.team_stats import fetch_team_stats

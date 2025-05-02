@@ -221,6 +221,6 @@ def player_rotowire_news():
 
 
 if __name__ == "__main__":
-    player_rotowire_ids()
-    #player_rotowire_news()
-    #player_rotowire_injuries()
+    # player_rotowire_ids()
+    player_rotowire_news()
+    player_rotowire_injuries()

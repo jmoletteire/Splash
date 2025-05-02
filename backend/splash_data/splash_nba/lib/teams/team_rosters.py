@@ -1,7 +1,6 @@
 import time
 import logging
 from json import JSONDecodeError
-
 from nba_api.stats.endpoints import commonteamroster, playercareerstats
 from splash_nba.imports import get_mongo_collection, PROXY, HEADERS, CURR_SEASON, PREV_SEASON
 

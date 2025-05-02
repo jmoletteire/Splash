@@ -1,5 +1,8 @@
 import logging
+import random
 import re
+import time
+
 import nba_api
 from datetime import datetime, timedelta, timezone
 from nba_api.live.nba.endpoints import boxscore, playbyplay
@@ -506,7 +509,7 @@ def final_game(game_id):
     logging.info(f'(Games Live) Finalizing game {game_id}.')
 
 
-def games_prev_day(offset=1):
+def games_prev_day(offset: int = 1):
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
@@ -519,15 +522,12 @@ def games_prev_day(offset=1):
     yesterday = (datetime.today() - timedelta(days=offset)).strftime('%Y-%m-%d')
 
     # Else if games today + within 1 hour of first tip-off
-    linescore = scoreboardv2.ScoreboardV2(proxy=PROXY, headers=HEADERS, game_date=yesterday, day_offset=0).get_normalized_dict()
-    line_scores = linescore['LineScore']
-    games_yesterday = linescore['GameHeader']
+    games_yesterday = scoreboardv2.ScoreboardV2(proxy=PROXY, headers=HEADERS, game_date=yesterday, day_offset=0).get_normalized_dict()['GameHeader']
 
     for game in games_yesterday:
         is_upcoming = game['GAME_STATUS_ID'] == 1
         in_progress = game['GAME_STATUS_ID'] == 2
         is_final = game['GAME_STATUS_ID'] == 3
-        line_score = [line for line in line_scores if line['GAME_ID'] == game['GAME_ID']]
 
         # If game upcoming or in-progress, check for updates
         if is_upcoming:
@@ -539,15 +539,8 @@ def games_prev_day(offset=1):
 
         # If game is final, update final box score
         elif is_final:
-            # Check if the final update has already been applied
-            game_doc = games_collection.find_one({'gameId': game["GAME_ID"]}, {'FINAL': 1})
-            if game_doc and game_doc.get('FINAL', False):
-                logging.info(
-                    f'(Games Live) Game {game["GAME_ID"]} already finalized, skipping update. [{datetime.now()}]')
-                continue  # Skip this game as it's already been finalized
-            else:
-                in_progress_game(game["GAME_ID"])
-                final_game(game["GAME_ID"])
+            in_progress_game(game["GAME_ID"])
+            final_game(game["GAME_ID"])
 
 
 async def games_live_update():
@@ -591,7 +584,6 @@ async def games_live_update():
     first_game = games_today[0]
     first_game_time_str = first_game['gameTimeUTC']
     first_game_time = parse_game_time(first_game_time_str)
-    first_game_date = first_game['gameEt'][:10]
 
     # Make current_time offset-aware in UTC
     current_time = datetime.now(timezone.utc)
@@ -600,14 +592,6 @@ async def games_live_update():
     if time_difference > timedelta(hours=1):
         logging.info(f"(Games Live) First game is more than 1 hour away. Skipping updates. [{datetime.now()}]")
         return
-
-    # Else if games today + within 1 hour of first tip-off
-    try:
-        linescore = scoreboardv2.ScoreboardV2(proxy=PROXY, headers=HEADERS, game_date=first_game_date, day_offset=0).get_normalized_dict()
-    except Exception:
-        return
-
-    line_scores = linescore['LineScore']
 
     for game in games_today:
         game_time_str = game['gameTimeUTC']
@@ -621,7 +605,6 @@ async def games_live_update():
         is_upcoming = game['gameStatus'] == 1
         in_progress = game['gameStatus'] == 2
         is_final = game['gameStatus'] == 3
-        line_score = [line for line in line_scores if line['GAME_ID'] == game['gameId']]
 
         # If game upcoming or in-progress, check for updates
         if is_upcoming:
@@ -694,6 +677,23 @@ async def games_daily_update():
 
 
 if __name__ == '__main__':
-    for i in range(1, 365):
-        games_prev_day(i)  # Optionally, pass an offset to change timedelta (e.g., 1 = yesterday)
+    # Define your target date as a string and convert it to a datetime object
+    target_date_str = '2022-09-30'
+    target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date()
+
+    # Get today's date
+    today = datetime.today().date()
+
+    # Calculate the number of days between today and the target date
+    days_to_go_back = (today - target_date).days
+
+    # Optional: Ensure the date isn't in the future
+    if days_to_go_back < 1:
+        print("Target date must be in the past.")
+    else:
+        for i in range(1, days_to_go_back + 1):
+            games_prev_day(i)  # Optionally, pass an offset to change timedelta (e.g., 1 = yesterday)
+            # Pause for a random time between 0.5 and 1 second
+            time.sleep(random.uniform(0.5, 1.0))
+
     # games_live_update()

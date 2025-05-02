@@ -6,7 +6,7 @@ import signal
 
 from splash_nba.lib.games.game_odds import fetch_odds
 from splash_nba.lib.players.player_rotowire_news import player_rotowires
-from splash_nba.live.games import games_daily_update, games_live_update, reset_flags
+from splash_nba.live.games import games_daily_update, games_live_update
 from splash_nba.live.players import players_daily_update
 from splash_nba.live.postgame_team_player_update import check_games_final
 from splash_nba.live.teams import teams_daily_update

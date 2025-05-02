@@ -1,8 +1,8 @@
-from pymongo import MongoClient
-from splash_nba.util.env import uri
+import json
 import logging
 import requests
-import json
+from pymongo import MongoClient
+from splash_nba.imports import get_mongo_collection
 
 
 def merge_contracts(contracts):
@@ -93,10 +93,8 @@ def update_team_contract_data():
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    teams_collection = db.nba_teams
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
+    teams_collection = get_mongo_collection('nba_teams')
 
     # Define the GraphQL endpoint
     url = "https://fanspo.com/api/graphql"
@@ -250,10 +248,8 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     # Replace with your MongoDB connection string
-    client = MongoClient(uri)
-    db = client.splash
-    teams_collection = db.nba_teams
-    players_collection = db.nba_players
+    players_collection = get_mongo_collection('nba_players')
+    teams_collection = get_mongo_collection('nba_teams')
     logging.info("Connected to MongoDB")
 
     # Define the GraphQL endpoint

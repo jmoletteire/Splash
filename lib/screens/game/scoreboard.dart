@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,7 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
   bool _showFab = false;
   bool _isLoading = false;
   bool _pageInitLoad = false;
-  Map<String, dynamic> cachedGames = {};
+  Map<String, dynamic> games = {};
   late Timer _timer;
 
   List<DateTime> _dates = List.generate(15, (index) {
@@ -160,7 +161,8 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
   Future<void> fetchGames(DateTime date) async {
     String formattedDate = date.toIso8601String().split('T').first;
 
-    if (cachedGames.containsKey(formattedDate)) {
+    // Update games for date
+    if (games.containsKey(formattedDate)) {
       try {
         Network network = Network();
         var url = Uri.http(
@@ -194,19 +196,16 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
           }
         });
 
-        // Assign the sorted list back to widget.teams
-        Map<String, dynamic> gamesDataFinal = {
-          for (var item in gamesData) item['gameId']: item
-        };
-
         setState(() {
-          cachedGames[formattedDate] = gamesDataFinal;
+          games[formattedDate] = gamesData;
           _isLoading = false; // Set loading state to false
         });
       } catch (e) {
-        print('Error updating games: $e');
+        if (kDebugMode) {
+          print('Error updating games: $e');
+        }
         setState(() {
-          cachedGames[formattedDate] = 'Error updating games';
+          games[formattedDate] = 'Error updating games';
         });
       }
       return;
@@ -235,17 +234,16 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
         return aValue.compareTo(bValue);
       });
 
-      // Assign the sorted list back to widget.teams
-      Map<String, dynamic> gamesDataFinal = {for (var item in gamesData) item['gameId']: item};
-
       setState(() {
-        cachedGames[formattedDate] = gamesDataFinal;
+        games[formattedDate] = gamesData;
         _isLoading = false; // Set loading state to false
       });
     } catch (e) {
-      print('Error fetching games: $e');
+      if (kDebugMode) {
+        print('Error fetching games: $e');
+      }
       setState(() {
-        cachedGames[formattedDate] = 'Error fetching games';
+        games[formattedDate] = 'Error fetching games';
         _isLoading = false; // Set loading state to false
       });
     }
@@ -345,36 +343,16 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
 
   List<Widget> _buildGameCards(var gamesData) {
     List<Widget> gameCards = [];
-    for (String gameKey in gamesData.keys) {
-      if (gameKey == 'error') {
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.sports_basketball,
-                color: Colors.white38,
-                size: 40.0.r,
-              ),
-              SizedBox(height: 15.0.r),
-              Text(
-                'No Games Today',
-                style: kBebasNormal.copyWith(fontSize: 18.0.r, color: Colors.white54),
-              ),
-            ],
+    for (var game in gamesData) {
+      if (game is Map<String, dynamic> && game['gameId'].substring(2, 3) != "3") {
+        gameCards.add(
+          GameCard(
+            key: ValueKey(game['gameId']),
+            game: game,
+            homeTeam: int.tryParse(game['homeTeamId'].toString()) ?? game['homeTeamId'] ?? 0,
+            awayTeam: int.tryParse(game['awayTeamId'].toString()) ?? game['awayTeamId'] ?? 0,
           ),
         );
-      } else if (gamesData[gameKey] is Map) {
-        Map<String, dynamic> game = gamesData[gameKey];
-        if (gameKey.substring(2, 3) != "3") {
-          gameCards.add(
-            GameCard(
-              game: game,
-              homeTeam: int.tryParse(game['homeTeamId'].toString()) ?? game['homeTeamId'] ?? 0,
-              awayTeam: int.tryParse(game['awayTeamId'].toString()) ?? game['awayTeamId'] ?? 0,
-            ),
-          );
-        }
       }
     }
     return gameCards;
@@ -410,9 +388,9 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
                     controller: _tabController,
                     children: _dates.map((date) {
                       String formattedDate = date.toIso8601String().split('T').first;
-                      var gamesData = cachedGames[formattedDate];
+                      var gamesData = games[formattedDate];
 
-                      if (gamesData is Map && !gamesData.containsKey('error')) {
+                      if (gamesData is List && gamesData.isNotEmpty) {
                         List<Widget> gameCards = _buildGameCards(gamesData);
                         return GameList(
                           scrollController: _scrollController,

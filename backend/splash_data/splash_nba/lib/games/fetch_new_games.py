@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from nba_api.stats.endpoints import ScoreboardV2
 from splash_nba.imports import get_mongo_collection, PROXY, HEADERS
 from splash_nba.lib.games.fetch_boxscore_summary import fetch_box_score_summary
+from splash_nba.lib.teams.update_team_games import update_team_games
 
 
 def expected_lineup_data(team_id):
@@ -202,7 +203,12 @@ def fetch_upcoming_games(game_date):
             )
 
         # After all updates, delete any documents where gameId is not in the list
-        games_collection.delete_many({'gameId': {'$nin': game_ids}, 'date': game_date})
+        query = {'gameId': {'$nin': game_ids}, 'date': game_date}
+        games = games_collection.find(query)
+        for game in games:
+            update_team_games(game, to_remove=True)
+
+        games_collection.delete_many(query)
 
 
 def fetch_games_for_date_range(start_date, end_date):
@@ -226,7 +232,7 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        start_date = datetime(2025, 4, 29)
+        start_date = datetime(2025, 4, 28)
         end_date = datetime(2025, 6, 30)
 
         # Fetch games for each date in the range

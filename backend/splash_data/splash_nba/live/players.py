@@ -4,6 +4,8 @@ from numpy import random
 from datetime import datetime
 from nba_api.stats.endpoints import playerawards
 from splash_nba.lib.players.player_gamelogs import gamelogs
+from splash_nba.lib.players.player_rotowire_news import player_rotowire_news, player_rotowire_injuries, \
+    player_rotowire_ids
 from splash_nba.lib.players.stats.custom_player_stats_rank import current_season_custom_stats_rank
 from splash_nba.lib.players.stats.per75 import current_season_per_75
 from splash_nba.lib.players.stats.player_career_stats import update_player_career_stats
@@ -283,6 +285,9 @@ async def players_daily_update():
             add_players()
             restructure_new_docs()
             update_player_info()
+            player_rotowire_ids()
+            player_rotowire_news()
+            player_rotowire_injuries()
         except Exception as e:
             logging.error(f"(Player Info) Error adding players: {e}", exc_info=True)
 

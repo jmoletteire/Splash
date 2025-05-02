@@ -16,7 +16,7 @@ def get_game_result(team_pts, opp_pts):
     return "W" if team_pts > opp_pts else "L"
 
 
-def update_team_games(game):
+def update_team_games(game, to_remove: bool = False):
     """
     Iterates over games from games collection and uses the data
     to write game results to teams collection.
@@ -28,12 +28,26 @@ def update_team_games(game):
         logging.error(f"(Team Games) Failed to connect to MongoDB: {e}", exc_info=True)
         return
 
-    # Iterate through each game on that date
     try:
         try:
             season = convert_year_to_season(game["season"])
         except Exception:
             season = CURR_SEASON
+
+        if to_remove:
+            # Update the home team season data
+            teams_collection.update_one(
+                {"TEAM_ID": int(game["homeTeamId"])},
+                {"$unset": {f"SEASONS.{season}.GAMES.{game['gameId']}": ""}},
+            )
+
+            # Update the visitor team season data
+            teams_collection.update_one(
+                {"TEAM_ID": int(game["awayTeamId"])},
+                {"$unset": {f"SEASONS.{season}.GAMES.{game['gameId']}": ""}},
+            )
+
+            return
 
         is_nba_cup = False
         if "title" in game.keys():
@@ -63,7 +77,7 @@ def update_team_games(game):
             "GAME_DATE": game["date"],
             "NBA_CUP": is_nba_cup,
             "HOME_AWAY": "vs",
-            "OPP": game["awayTeamId"],
+            "OPP": str(game["awayTeamId"]),
             "TEAM_PTS": home_score,
             "OPP_PTS": away_score,
             "RESULT": home_result,
@@ -75,7 +89,7 @@ def update_team_games(game):
             "GAME_DATE": game["date"],
             "NBA_CUP": is_nba_cup,
             "HOME_AWAY": "@",
-            "OPP": game["homeTeamId"],
+            "OPP": str(game["homeTeamId"]),
             "TEAM_PTS": away_score,
             "OPP_PTS": home_score,
             "RESULT": visitor_result,
