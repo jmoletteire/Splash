@@ -576,7 +576,7 @@ class GameInfo extends StatelessWidget {
             game['broadcast'] != 'ESPN' &&
             game['broadcast'] != 'ESPN2' &&
             game['broadcast'] != 'ABC' &&
-            game['broadcast'] != 'TNT' &&
+            !game['broadcast'].contains('TNT') &&
             game['gameClock'] != 'Cancelled')
           Text(game['broadcast'] ?? 'LEAGUE PASS',
               style: kBebasBold.copyWith(fontSize: 19.0.r)),
@@ -587,7 +587,7 @@ class GameInfo extends StatelessWidget {
               width: 30.0.r,
               height: 30.0.r,
             ),
-          if (game['broadcast'] == 'TNT')
+          if (game['broadcast'].contains('TNT'))
             SvgPicture.asset(
               'images/NBA_on_TNT.svg',
               width: 28.0.r,

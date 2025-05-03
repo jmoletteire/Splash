@@ -20,7 +20,7 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
   late String seasonType;
   String broadcast = '';
   String arena = '';
-  List<String> officials = [];
+  String officials = '';
 
   void setSeasonType() {
     Map<String, String> seasonTypes = {
@@ -85,7 +85,11 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
               // Date
               GameBasicInfoRow(
                 icon: Icons.stadium,
-                data: [widget.game['matchup']?['location'] ?? ''],
+                data: [
+                  widget.game['matchup']?['location'] == ""
+                      ? kArenas[widget.game['homeTeamId']] ?? 'TBA'
+                      : widget.game['matchup']?['location']
+                ],
               ),
 
             SizedBox(height: 10.0.r),
@@ -98,7 +102,11 @@ class _GameBasicInfoState extends State<GameBasicInfo> {
             // Officials
             GameBasicInfoRow(
               icon: Icons.sports,
-              data: [widget.game['matchup']?['officials'] ?? 'TBA'],
+              data: [
+                widget.game['matchup']?['officials'] == ""
+                    ? 'TBA'
+                    : widget.game['matchup']?['officials']
+              ],
             ),
           ],
         ),

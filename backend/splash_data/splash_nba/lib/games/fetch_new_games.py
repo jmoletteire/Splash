@@ -182,6 +182,10 @@ def fetch_upcoming_games(game_date):
 
         for details in games['GameHeader']:
             game_ids.append(details['GAME_ID'])
+            try:
+                summary = fetch_box_score_summary(details['GAME_ID'])
+            except Exception:
+                summary = {}
             games_collection.update_one(
                 {'gameId': details['GAME_ID']},
                 {'$set': {'sportId': 0,
@@ -194,7 +198,7 @@ def fetch_upcoming_games(game_date):
                           'broadcast': details['NATL_TV_BROADCASTER_ABBREVIATION'],
                           'gameClock': details['GAME_STATUS_TEXT'].replace(' ET', ''),
                           'status': 1,
-                          "matchup": matchup_details(fetch_box_score_summary(details['GAME_ID']), {}),
+                          "matchup": matchup_details(summary, {}),
                           "stats": {"home": {"team": {}, "players": []}, "away": {"team": {}, "players": []}, "linescore": {}},
                           "pbp": []
                           }
@@ -232,7 +236,7 @@ if __name__ == "__main__":
 
     try:
         # Define date range
-        start_date = datetime(2025, 4, 28)
+        start_date = datetime(2025, 5, 4)
         end_date = datetime(2025, 6, 30)
 
         # Fetch games for each date in the range

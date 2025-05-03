@@ -155,12 +155,12 @@ class _LastFiveGamesState extends State<LastFiveGames> {
             context,
             MaterialPageRoute(
               builder: (context) => GameHome(
-                gameId: homeLastFive[index]['GAME_ID'],
+                gameId: homeLastFive[index]['GAME_ID'].toString(),
                 homeId: homeLastFive[index]['HOME_AWAY'] == 'vs'
-                    ? widget.homeTeam['TEAM_ID']
+                    ? widget.homeTeam['TEAM_ID'].toString()
                     : homeLastFive[index]['OPP'].toString(),
                 awayId: homeLastFive[index]['HOME_AWAY'] == '@'
-                    ? widget.homeTeam['TEAM_ID']
+                    ? widget.homeTeam['TEAM_ID'].toString()
                     : homeLastFive[index]['OPP'].toString(),
                 gameDate: homeLastFive[index]['GAME_DATE'],
               ),
@@ -261,12 +261,12 @@ class _LastFiveGamesState extends State<LastFiveGames> {
             context,
             MaterialPageRoute(
               builder: (context) => GameHome(
-                gameId: awayLastFive[index]['GAME_ID'],
+                gameId: awayLastFive[index]['GAME_ID'].toString(),
                 homeId: awayLastFive[index]['HOME_AWAY'] == 'vs'
-                    ? widget.awayTeam['TEAM_ID']
+                    ? widget.awayTeam['TEAM_ID'].toString()
                     : awayLastFive[index]['OPP'].toString(),
                 awayId: awayLastFive[index]['HOME_AWAY'] == '@'
-                    ? widget.awayTeam['TEAM_ID']
+                    ? widget.awayTeam['TEAM_ID'].toString()
                     : awayLastFive[index]['OPP'].toString(),
                 gameDate: awayLastFive[index]['GAME_DATE'],
               ),
