@@ -48,6 +48,14 @@ const kBebasNormal = TextStyle(
   textBaseline: TextBaseline.alphabetic,
 );
 
+const kBebasLower = TextStyle(
+  color: Colors.white,
+  fontFamily: 'Bebas_Neue_Pro',
+  fontSize: 20.0,
+  letterSpacing: -0.3,
+  textBaseline: TextBaseline.alphabetic,
+);
+
 const kAntonNormal = TextStyle(
   color: Colors.white,
   fontFamily: 'Anton',
