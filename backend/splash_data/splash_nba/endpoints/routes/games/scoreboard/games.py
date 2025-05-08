@@ -33,7 +33,7 @@ def get_scoreboard():
 
         # Sort by custom status order: 2, 1, 3
         custom_order = {2: 0, 1: 1, 3: 2}
-        games.sort(key=lambda x: custom_order.get(x.get('status', 3), 99))
+        games.sort(key=lambda x: (custom_order.get(x.get('status', 3), 99), x.get('gameId', '999999999')))
 
         return jsonify(games) if games else jsonify({}), 200  # Always return a valid response
 
