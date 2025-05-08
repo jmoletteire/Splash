@@ -336,7 +336,6 @@ class _CareerStatsState extends State<CareerStats> {
   Widget _wrapRow(Map<String, dynamic> season, int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
         child: DecoratedBox(
-          position: DecorationPosition.foreground,
           decoration: BoxDecoration(
             color: tradedYears.contains(season['SEASON_ID']) &&
                     season['TEAM_ABBREVIATION'] != 'TOT'

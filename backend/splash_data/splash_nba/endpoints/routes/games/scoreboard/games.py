@@ -31,6 +31,10 @@ def get_scoreboard():
         else:
             games = list(games_collection.find({"gameId": game_id}, proj))
 
+        # Sort by custom status order: 2, 1, 3
+        custom_order = {2: 0, 1: 1, 3: 2}
+        games.sort(key=lambda x: custom_order.get(x.get('status', 3), 99))
+
         return jsonify(games) if games else jsonify({}), 200  # Always return a valid response
 
     except Exception as e:

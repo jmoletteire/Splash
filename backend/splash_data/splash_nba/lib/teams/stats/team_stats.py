@@ -219,4 +219,5 @@ def fetch_team_stats(seasons: list = None, season_types: list = None, use_proxy:
 
 
 if __name__ == '__main__':
-    fetch_team_stats(use_proxy=False)
+    fetch_team_stats(seasons=[CURR_SEASON], season_types=['REGULAR SEASON'], use_proxy=False)
+    # fetch_team_stats(use_proxy=False)

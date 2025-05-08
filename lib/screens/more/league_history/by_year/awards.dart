@@ -106,7 +106,6 @@ class _AwardsState extends State<Awards> {
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
         child: DecoratedBox(
-          position: DecorationPosition.foreground,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             border: Border(

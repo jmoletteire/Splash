@@ -11,7 +11,8 @@ class LineScore extends StatefulWidget {
   final List<int> homeScores;
   final List<int> awayScores;
 
-  LineScore({
+  const LineScore({
+    super.key,
     required this.homeTeam,
     required this.awayTeam,
     required this.homeAbbr,
@@ -160,7 +161,7 @@ class LineScoreRow extends StatefulWidget {
   }) : super(key: ValueKey('$teamId-${scores.hashCode}'));
 
   @override
-  _LineScoreRowState createState() => _LineScoreRowState();
+  State<LineScoreRow> createState() => _LineScoreRowState();
 }
 
 class _LineScoreRowState extends State<LineScoreRow> with AutomaticKeepAliveClientMixin {

@@ -289,7 +289,7 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
       style: const TableViewStyle(
         dividers: TableViewDividersStyle(
           vertical: TableViewVerticalDividersStyle.symmetric(
-            TableViewVerticalDividerStyle(wigglesPerRow: 0),
+            TableViewVerticalDividerStyle(wiggleCount: 0),
           ),
         ),
         scrollbars: TableViewScrollbarsStyle.symmetric(
@@ -339,7 +339,6 @@ class _BoxPlayerStatsState extends State<BoxPlayerStats> {
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
         child: DecoratedBox(
-          position: DecorationPosition.foreground,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             border: Border(

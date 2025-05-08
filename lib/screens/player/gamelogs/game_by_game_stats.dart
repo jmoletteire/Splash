@@ -340,7 +340,6 @@ class _GameByGameStatsState extends State<GameByGameStats> {
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
         child: DecoratedBox(
-          position: DecorationPosition.foreground,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             border: Border(

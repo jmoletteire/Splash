@@ -23,6 +23,7 @@ class LastFiveGames extends StatefulWidget {
 }
 
 class _LastFiveGamesState extends State<LastFiveGames> {
+  bool isLandscape = false;
   List homeLastFive = [];
   List awayLastFive = [];
   List<Widget> homeGameRows = [];
@@ -119,6 +120,12 @@ class _LastFiveGamesState extends State<LastFiveGames> {
         setValues();
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
   }
 
   @override
@@ -228,6 +235,17 @@ class _LastFiveGamesState extends State<LastFiveGames> {
                       child: Image.asset('images/NBA_Logos/${homeLastFive[index]['OPP']}.png'),
                     ),
                   ),
+                  if (isLandscape)
+                    Expanded(
+                      flex: 3,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 20.0.r, maxHeight: 20.0.r),
+                        child: Text(
+                          kTeamIdToName[homeLastFive[index]['OPP']]?[0] ?? 'INT\'L',
+                          style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -311,6 +329,17 @@ class _LastFiveGamesState extends State<LastFiveGames> {
                           'images/NBA_Logos/${kTeamIdToName.containsKey(awayLastFive[index]['OPP'].toString()) ? awayLastFive[index]['OPP'].toString() : '0'}.png'),
                     ),
                   ),
+                  if (isLandscape)
+                    Expanded(
+                      flex: 3,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 20.0.r, maxHeight: 20.0.r),
+                        child: Text(
+                          kTeamIdToName[awayLastFive[index]['OPP']]?[0] ?? 'INT\'L',
+                          style: kBebasNormal.copyWith(fontSize: 14.0.r),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

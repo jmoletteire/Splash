@@ -33,8 +33,12 @@ class _LineupsState extends State<Lineups> {
 
   void _initializePlayers() {
     status = int.parse(widget.game['status'].toString());
-    homePlayers = widget.game['matchup']?['lineups']?['home'] ?? [];
-    awayPlayers = widget.game['matchup']?['lineups']?['away'] ?? [];
+    homePlayers = widget.game['stats']?['home']?['players'] ??
+        widget.game['matchup']?['lineups']?['home'] ??
+        [];
+    awayPlayers = widget.game['stats']?['away']?['players'] ??
+        widget.game['matchup']?['lineups']?['away'] ??
+        [];
 
     homeAbbr = kTeamIdToName[widget.homeId][1];
     awayAbbr = kTeamIdToName[widget.awayId][1];
@@ -82,15 +86,15 @@ class _LineupsState extends State<Lineups> {
                 team: widget.awayId,
               ),
               PlayerCard(
-                playerId: awayPlayers[1]?['personId'] ?? '',
-                name: awayPlayers[1]?['name'] ?? '',
-                position: awayPlayers[1]?['position'] ?? '',
-                team: widget.awayId,
-              ),
-              PlayerCard(
                 playerId: awayPlayers[2]?['personId'] ?? '',
                 name: awayPlayers[2]?['name'] ?? '',
                 position: awayPlayers[2]?['position'] ?? '',
+                team: widget.awayId,
+              ),
+              PlayerCard(
+                playerId: awayPlayers[1]?['personId'] ?? '',
+                name: awayPlayers[1]?['name'] ?? '',
+                position: awayPlayers[1]?['position'] ?? '',
                 team: widget.awayId,
               ),
             ],
@@ -101,16 +105,35 @@ class _LineupsState extends State<Lineups> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               PlayerCard(
+                playerId: awayPlayers[4]?['personId'] ?? '',
+                name: awayPlayers[4]?['name'] ?? '',
+                position: awayPlayers[4]?['position'] ?? '',
+                team: widget.awayId,
+              ),
+              PlayerCard(
                 playerId: awayPlayers[3]?['personId'] ?? '',
                 name: awayPlayers[3]?['name'] ?? '',
                 position: awayPlayers[3]?['position'] ?? '',
                 team: widget.awayId,
               ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
               PlayerCard(
-                playerId: awayPlayers[4]?['personId'] ?? '',
-                name: awayPlayers[4]?['name'] ?? '',
-                position: awayPlayers[4]?['position'] ?? '',
-                team: widget.awayId,
+                playerId: homePlayers[4]?['personId'] ?? '',
+                name: homePlayers[4]?['name'] ?? '',
+                position: homePlayers[4]?['position'] ?? '',
+                team: widget.homeId,
+              ),
+              PlayerCard(
+                playerId: homePlayers[3]?['personId'] ?? '',
+                name: homePlayers[3]?['name'] ?? '',
+                position: homePlayers[3]?['position'] ?? '',
+                team: widget.homeId,
               ),
             ],
           ),
@@ -126,34 +149,15 @@ class _LineupsState extends State<Lineups> {
                 team: widget.homeId,
               ),
               PlayerCard(
-                playerId: homePlayers[1]?['personId'] ?? '',
-                name: homePlayers[1]?['name'] ?? '',
-                position: homePlayers[1]?['position'] ?? '',
-                team: widget.homeId,
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              PlayerCard(
                 playerId: homePlayers[2]?['personId'] ?? '',
                 name: homePlayers[2]?['name'] ?? '',
                 position: homePlayers[2]?['position'] ?? '',
                 team: widget.homeId,
               ),
               PlayerCard(
-                playerId: homePlayers[3]?['personId'] ?? '',
-                name: homePlayers[3]?['name'] ?? '',
-                position: homePlayers[3]?['position'] ?? '',
-                team: widget.homeId,
-              ),
-              PlayerCard(
-                playerId: homePlayers[4]?['personId'] ?? '',
-                name: homePlayers[4]?['name'] ?? '',
-                position: homePlayers[4]?['position'] ?? '',
+                playerId: homePlayers[1]?['personId'] ?? '',
+                name: homePlayers[1]?['name'] ?? '',
+                position: homePlayers[1]?['position'] ?? '',
                 team: widget.homeId,
               ),
             ],
@@ -357,12 +361,12 @@ class _LineupsState extends State<Lineups> {
                                         ),
                                       ),
                                       for (var player in awayPlayers.sublist(6))
-                                        if (player['notPlayingReason'] == null ||
-                                            (player['notPlayingReason'] !=
-                                                    'INACTIVE_GLEAGUE_TWOWAY' &&
-                                                player['notPlayingReason'] !=
-                                                    'INACTIVE_NOT_WITH_TEAM'))
-                                          BenchRow(player: player),
+                                        // if (player['notPlayingReason'] == null ||
+                                        //     (player['notPlayingReason'] !=
+                                        //             'INACTIVE_GLEAGUE_TWOWAY' &&
+                                        //         player['notPlayingReason'] !=
+                                        //             'INACTIVE_NOT_WITH_TEAM'))
+                                        BenchRow(player: player),
                                     ],
                                   ),
                                   Column(
@@ -380,12 +384,12 @@ class _LineupsState extends State<Lineups> {
                                         ),
                                       ),
                                       for (var player in homePlayers.sublist(6))
-                                        if (player['notPlayingReason'] == null ||
-                                            (player['notPlayingReason'] !=
-                                                    'INACTIVE_GLEAGUE_TWOWAY' &&
-                                                player['notPlayingReason'] !=
-                                                    'INACTIVE_NOT_WITH_TEAM'))
-                                          BenchRow(player: player),
+                                        // if (player['notPlayingReason'] == null ||
+                                        //     (player['notPlayingReason'] !=
+                                        //             'INACTIVE_GLEAGUE_TWOWAY' &&
+                                        //         player['notPlayingReason'] !=
+                                        //             'INACTIVE_NOT_WITH_TEAM'))
+                                        BenchRow(player: player),
                                     ],
                                   )
                                 ],
@@ -461,11 +465,12 @@ class BenchRow extends StatelessWidget {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: player['PLAYER_NAME'] ?? player['name'],
+                        text: player['name'],
                         style: kBebasNormal.copyWith(fontSize: 13.0.r),
                       ),
                       if (player['notPlayingDescription'] != null ||
-                          player['notPlayingReason'] == 'INACTIVE_COACH')
+                          (player['notPlayingReason'] != null &&
+                              player['notPlayingReason'] == 'INACTIVE_COACH'))
                         TextSpan(
                           text: '\nOUT',
                           style: kBebasNormal.copyWith(fontSize: 11.0.r, color: Colors.red),
@@ -475,7 +480,8 @@ class BenchRow extends StatelessWidget {
                           text: ' (${player['notPlayingDescription'].split(';')[0]})',
                           style: kBebasNormal.copyWith(fontSize: 11.0.r, color: Colors.grey),
                         ),
-                      if (player['notPlayingReason'] == 'INACTIVE_COACH')
+                      if (player['notPlayingReason'] != null &&
+                          player['notPlayingReason'] == 'INACTIVE_COACH')
                         TextSpan(
                           text: ' (Coach Decision)',
                           style: kBebasNormal.copyWith(fontSize: 11.0.r, color: Colors.grey),

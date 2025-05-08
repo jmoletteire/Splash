@@ -233,7 +233,6 @@ class _TeamCapSpaceState extends State<TeamCapSpace> {
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
         child: DecoratedBox(
-          position: DecorationPosition.foreground,
           decoration: BoxDecoration(
             color: const Color(0xFF202020),
             border: Border(

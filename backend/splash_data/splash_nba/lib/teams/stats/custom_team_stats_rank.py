@@ -223,4 +223,5 @@ def custom_team_stats_rank(seasons: list = None, season_types: list = None):
 
 
 if __name__ == "__main__":
-    custom_team_stats_rank()
+    custom_team_stats_rank(seasons=['2024-25'], season_types=['REGULAR SEASON'])
+    # custom_team_stats_rank()

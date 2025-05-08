@@ -168,7 +168,6 @@ class _DraftSelectionsByPickState extends State<DraftSelectionsByPick> {
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
         child: DecoratedBox(
-          position: DecorationPosition.foreground,
           decoration: BoxDecoration(
             color: getRowColor(index),
             border: Border(

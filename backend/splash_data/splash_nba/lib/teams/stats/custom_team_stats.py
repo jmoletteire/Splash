@@ -97,4 +97,5 @@ def three_and_ft_rate(seasons: list = None, season_types: list = None):
 
 
 if __name__ == "__main__":
-    three_and_ft_rate()
+    three_and_ft_rate(seasons=['2024-25'], season_types=['REGULAR SEASON'])
+    # three_and_ft_rate()

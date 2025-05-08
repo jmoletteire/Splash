@@ -222,59 +222,6 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   ///                   Build the page.
   /// ******************************************************
 
-  // Widget getStatus() {
-  //   if (game['status'] == 3) {
-  //     switch (summary['LIVE_PERIOD']) {
-  //       case 4:
-  //         return Text('FINAL',
-  //             style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
-  //       case 5:
-  //         return Text('FINAL/OT',
-  //             style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
-  //       default:
-  //         return Text('FINAL/${summary['LIVE_PERIOD'] - 4}OT',
-  //             style: kBebasBold.copyWith(fontSize: 16.0.r, color: Colors.grey.shade300));
-  //     }
-  //   }
-  //   if (summary['GAME_STATUS_ID'] == 2) {
-  //     if (summary['LIVE_PC_TIME'] == ":0.0") {
-  //       switch (summary['LIVE_PERIOD']) {
-  //         case 1:
-  //           return Text('END 1ST', style: kBebasBold.copyWith(fontSize: 16.0.r));
-  //         case 2:
-  //           return Text('HALF', style: kBebasBold.copyWith(fontSize: 16.0.r));
-  //         case 3:
-  //           return Text('END 3RD', style: kBebasBold.copyWith(fontSize: 16.0.r));
-  //         case 4:
-  //           return Text('FINAL', style: kBebasBold.copyWith(fontSize: 16.0.r));
-  //         case 5:
-  //           return Text('FINAL/OT', style: kBebasBold.copyWith(fontSize: 16.0.r));
-  //         default:
-  //           return Text('FINAL/${summary['LIVE_PERIOD'] - 4}OT',
-  //               style: kBebasBold.copyWith(fontSize: 16.0.r));
-  //       }
-  //     } else {
-  //       int period = summary['LIVE_PERIOD'];
-  //       return Column(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           Text(
-  //               period <= 4
-  //                   ? '$period${period == 1 ? 'ST' : period == 2 ? 'ND' : period == 3 ? 'RD' : 'TH'}'
-  //                   : period == 5
-  //                       ? 'OT'
-  //                       : '${(period - 4).toString()}OT',
-  //               style: kBebasBold.copyWith(fontSize: 12.0.r)),
-  //           Text(summary['LIVE_PC_TIME'].toString(),
-  //               style: kBebasBold.copyWith(fontSize: 14.0.r)),
-  //         ],
-  //       );
-  //     }
-  //   } else {
-  //     return Text(widget.gameTime!, style: kBebasBold.copyWith(fontSize: 22.0.r));
-  //   }
-  // }
-
   Widget getTitleDetails() {
     if (_isUpcoming) {
       return Row(

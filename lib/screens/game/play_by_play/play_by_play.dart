@@ -677,8 +677,8 @@ class _PlaysState extends State<Plays> {
                             child: Image.asset(
                                 'images/NBA_Logos/${kTeamIdToName.containsKey(widget.actions[i]['teamId'].toString()) ? widget.actions[i]['teamId'] : '0'}.png'),
                           ),
-                        if (widget.actions[i]['personId'] != 0 &&
-                                widget.actions[i]['isFieldGoal'] == 1 ||
+                        if (widget.actions[i]['personId'] != '0' &&
+                                widget.actions[i]['isFieldGoal'] == '1' ||
                             (widget.actions[i]['description'] is String &&
                                 widget.actions[i]['description'].contains('Free Throw')))
                           Expanded(
@@ -727,8 +727,8 @@ class _PlaysState extends State<Plays> {
                                   ],
                                 ),
                               )),
-                        if (widget.actions[i]['personId'] == 0 ||
-                            widget.actions[i]['isFieldGoal'] != 1 &&
+                        if (widget.actions[i]['personId'] == '0' ||
+                            widget.actions[i]['isFieldGoal'] != '1' &&
                                 !(widget.actions[i]['description'] is String &&
                                     widget.actions[i]['description'].contains('Free Throw')))
                           const Spacer(flex: 2),

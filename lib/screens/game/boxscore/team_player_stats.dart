@@ -249,7 +249,6 @@ class _TeamPlayerStatsState extends State<TeamPlayerStats> {
     return KeyedSubtree(
       key: ValueKey(index),
       child: DecoratedBox(
-        position: DecorationPosition.foreground,
         decoration: BoxDecoration(
           color: status == ''
               ? Colors.grey.shade900

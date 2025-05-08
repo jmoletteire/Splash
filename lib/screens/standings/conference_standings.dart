@@ -285,9 +285,8 @@ class _ConferenceStandingsState extends State<ConferenceStandings>
         child: Stack(
           children: [
             DecoratedBox(
-              position: DecorationPosition.foreground,
               decoration: BoxDecoration(
-                color: Colors.grey.shade900.withOpacity(0.75),
+                color: Colors.grey.shade900.withValues(alpha: 0.75),
                 border: _getRowBorder(index),
               ),
               child: child,

@@ -204,9 +204,8 @@ class _PlayersTableState extends State<PlayersTable> {
   Widget _wrapRow(int index, Widget child) => KeyedSubtree(
         key: ValueKey(index),
         child: DecoratedBox(
-          position: DecorationPosition.foreground,
           decoration: BoxDecoration(
-            color: Colors.grey.shade900.withOpacity(0.75),
+            color: Colors.grey.shade900.withValues(alpha: 0.75),
             border: Border(
               bottom: BorderSide(
                 color: Colors.grey.shade700,
