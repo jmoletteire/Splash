@@ -12,8 +12,8 @@ def convert_playtime(duration_str):
 
 
 def line_score(boxscore):
-    home = boxscore.get("home", {}).get("periods", [])
-    away = boxscore.get("away", {}).get("periods", [])
+    home = boxscore.get("homeTeam", {}).get("periods", [])
+    away = boxscore.get("awayTeam", {}).get("periods", [])
 
     periods = {str(period['period']): {"home": "0", "away": "0"} for period in home}
 
