@@ -11,38 +11,17 @@ def convert_playtime(duration_str):
     return None  # Return None if the format is incorrect
 
 
-def line_score(summary):
-    periods = {
-        "1": "PTS_QTR1",
-        "2": "PTS_QTR2",
-        "3": "PTS_QTR3",
-        "4": "PTS_QTR4",
-        "5": "PTS_OT1",
-        "6": "PTS_OT2",
-        "7": "PTS_OT3",
-        "8": "PTS_OT4",
-        "9": "PTS_OT5",
-        "10": "PTS_OT6",
-        "11": "PTS_OT7",
-        "12": "PTS_OT8",
-        "13": "PTS_OT9",
-        "14": "PTS_OT10"
-    }
+def line_score(boxscore):
+    home = boxscore.get("home", {}).get("periods", [])
+    away = boxscore.get("away", {}).get("periods", [])
 
-    game_summary = summary.get("GameSummary", None)
-    if game_summary is None:
-        return {key: {"home": "", "away": ""} for key, value in periods.items()}
-    else:
-        game_summary = game_summary[0]
+    periods = {str(period['period']): {"home": "0", "away": "0"} for period in home}
 
-    scores = summary.get("LineScore", None)
-    if scores is None:
-        return {key: {"home": "", "away": ""} for key, value in periods.items()}
+    for period, scores in periods.items():
+        scores['home'] = str(home[int(period) - 1])
+        scores['away'] = str(away[int(period) - 1])
 
-    home = scores[0] if scores[0]["TEAM_ID"] == game_summary["HOME_TEAM_ID"] else scores[1]
-    away = scores[0] if scores[0]["TEAM_ID"] == game_summary["VISITOR_TEAM_ID"] else scores[1]
-
-    return {key: {"home": str(home.get(value, 0)), "away": str(away.get(value, 0))} for key, value in periods.items()}
+    return periods
 
 
 def calculated_stats(stats, team_stats):
@@ -309,7 +288,7 @@ def game_stats(status, summary, boxscore, adv):
             "team": boxscore.get("awayTeam", {}).get("statistics", {}),
             "players": boxscore.get("awayTeam", {}).get("players", []),
         },
-        "linescore": line_score(summary)
+        "linescore": line_score(boxscore)
     }
 
     stats["home"] = stats_to_strings(status, stats["home"], adv["home"] if "home" in adv else {})

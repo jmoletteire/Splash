@@ -33,12 +33,14 @@ class _LineupsState extends State<Lineups> {
 
   void _initializePlayers() {
     status = int.parse(widget.game['status'].toString());
-    homePlayers = widget.game['stats']?['home']?['players'] ??
-        widget.game['matchup']?['lineups']?['home'] ??
-        [];
-    awayPlayers = widget.game['stats']?['away']?['players'] ??
-        widget.game['matchup']?['lineups']?['away'] ??
-        [];
+    homePlayers = widget.game['stats']?['home']?['players'] ?? [];
+    if (homePlayers.isEmpty) {
+      homePlayers = widget.game['matchup']?['lineups']?['home'] ?? [];
+    }
+    awayPlayers = widget.game['stats']?['away']?['players'] ?? [];
+    if (awayPlayers.isEmpty) {
+      awayPlayers = widget.game['matchup']?['lineups']?['away'] ?? [];
+    }
 
     homeAbbr = kTeamIdToName[widget.homeId][1];
     awayAbbr = kTeamIdToName[widget.awayId][1];
@@ -360,13 +362,14 @@ class _LineupsState extends State<Lineups> {
                                           style: kBebasBold.copyWith(fontSize: 16.0.r),
                                         ),
                                       ),
-                                      for (var player in awayPlayers.sublist(6))
-                                        // if (player['notPlayingReason'] == null ||
-                                        //     (player['notPlayingReason'] !=
-                                        //             'INACTIVE_GLEAGUE_TWOWAY' &&
-                                        //         player['notPlayingReason'] !=
-                                        //             'INACTIVE_NOT_WITH_TEAM'))
-                                        BenchRow(player: player),
+                                      if (awayPlayers.length > 5)
+                                        for (var player in awayPlayers.sublist(6))
+                                          // if (player['notPlayingReason'] == null ||
+                                          //     (player['notPlayingReason'] !=
+                                          //             'INACTIVE_GLEAGUE_TWOWAY' &&
+                                          //         player['notPlayingReason'] !=
+                                          //             'INACTIVE_NOT_WITH_TEAM'))
+                                          BenchRow(player: player),
                                     ],
                                   ),
                                   Column(
@@ -383,13 +386,14 @@ class _LineupsState extends State<Lineups> {
                                           style: kBebasBold.copyWith(fontSize: 16.0.r),
                                         ),
                                       ),
-                                      for (var player in homePlayers.sublist(6))
-                                        // if (player['notPlayingReason'] == null ||
-                                        //     (player['notPlayingReason'] !=
-                                        //             'INACTIVE_GLEAGUE_TWOWAY' &&
-                                        //         player['notPlayingReason'] !=
-                                        //             'INACTIVE_NOT_WITH_TEAM'))
-                                        BenchRow(player: player),
+                                      if (homePlayers.length > 5)
+                                        for (var player in homePlayers.sublist(6))
+                                          // if (player['notPlayingReason'] == null ||
+                                          //     (player['notPlayingReason'] !=
+                                          //             'INACTIVE_GLEAGUE_TWOWAY' &&
+                                          //         player['notPlayingReason'] !=
+                                          //             'INACTIVE_NOT_WITH_TEAM'))
+                                          BenchRow(player: player),
                                     ],
                                   )
                                 ],

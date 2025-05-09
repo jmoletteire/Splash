@@ -77,29 +77,6 @@ class GameCardState extends State<GameCard> {
       height: logicalSize,
       cacheWidth: (logicalSize * devicePixelRatio).toInt(),
     );
-
-    // headerRow = _buildHeaderRow();
-    // awayRow = TeamRow(
-    //   team: away,
-    //   teamLogo: awayLogo,
-    //   teamRecord: widget.game['matchup']?['teamRecords']?['away'] ?? '0-0',
-    //   pts: widget.game['awayScore'],
-    //   odds: spread,
-    //   scoreColor: statusCode != 3
-    //       ? Colors.white
-    //       : _getScoreColor(widget.game['awayScore'], widget.game['homeScore']),
-    // );
-    //
-    // homeRow = TeamRow(
-    //   team: home,
-    //   teamLogo: homeLogo,
-    //   teamRecord: widget.game['matchup']?['teamRecords']?['home'] ?? '0-0',
-    //   pts: widget.game['homeScore'],
-    //   odds: overUnder,
-    //   scoreColor: statusCode != 3
-    //       ? Colors.white
-    //       : _getScoreColor(widget.game['homeScore'], widget.game['awayScore']),
-    // );
   }
 
   @override
@@ -126,31 +103,6 @@ class GameCardState extends State<GameCard> {
         width: logicalSize,
         height: logicalSize,
       );
-
-      // spread = _parseOdds(widget.game, 'hcp', live: false, type: '168', fallbackType: '4');
-      // overUnder = _parseOdds(widget.game, 'hcp', live: false, type: '18', fallbackType: '3');
-
-      // headerRow = _buildHeaderRow();
-      //
-      // awayRow = TeamRow(
-      //   team: away,
-      //   teamLogo: awayLogo,
-      //   pts: widget.game['awayScore'],
-      //   odds: spread,
-      //   scoreColor: statusCode != 3
-      //       ? Colors.white
-      //       : _getScoreColor(widget.game['awayScore'], widget.game['homeScore']),
-      // );
-      //
-      // homeRow = TeamRow(
-      //   team: home,
-      //   teamLogo: homeLogo,
-      //   pts: widget.game['homeScore'],
-      //   odds: overUnder,
-      //   scoreColor: statusCode != 3
-      //       ? Colors.white
-      //       : _getScoreColor(widget.game['homeScore'], widget.game['awayScore']),
-      // );
     }
   }
 

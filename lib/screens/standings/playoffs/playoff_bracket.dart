@@ -865,84 +865,94 @@ class _PlayoffBracketState extends State<PlayoffBracket> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Stack(
-        children: [
-          // CustomPaint for drawing lines
-          CustomPaint(
-            size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
-            painter: BracketPainter(
-              int.parse(widget.playoffData['SEASON'].substring(0, 4)),
-              eastFirstRound,
-              eastConfSemis,
-              eastConfFinals,
-              nbaFinals,
-              westConfFinals,
-              westConfSemis,
-              westFirstRound,
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0x770050BD), Color(0x559D0A0A)],
+          ),
+        ),
+        child: Stack(
+          children: [
+            // CustomPaint for drawing lines
+            CustomPaint(
+              size:
+                  Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+              painter: BracketPainter(
+                int.parse(widget.playoffData['SEASON'].substring(0, 4)),
+                eastFirstRound,
+                eastConfSemis,
+                eastConfFinals,
+                nbaFinals,
+                westConfFinals,
+                westConfSemis,
+                westFirstRound,
+              ),
             ),
-          ),
 
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  seriesCard(eastFirstRound[0], 'East First Round'),
-                  seriesCard(eastFirstRound[3], 'East First Round'),
-                  seriesCard(eastFirstRound[2], 'East First Round'),
-                  seriesCard(eastFirstRound[1], 'East First Round'),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  seriesCard(eastConfSemis[0], 'East Conf Semis'),
-                  seriesCard(eastConfSemis[1], 'East Conf Semis'),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  seriesCard(eastConfFinals, 'East Conference Finals'),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 50),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  seriesCard(nbaFinals, 'NBA Finals'),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 50),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  seriesCard(westConfFinals, 'West Conference Finals'),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  seriesCard(westConfSemis[0], 'West Conf Semis'),
-                  seriesCard(westConfSemis[1], 'West Conf Semis'),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height / 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  seriesCard(westFirstRound[0], 'West First Round'),
-                  seriesCard(westFirstRound[3], 'West First Round'),
-                  seriesCard(westFirstRound[2], 'West First Round'),
-                  seriesCard(westFirstRound[1], 'West First Round'),
-                ],
-              ),
-            ],
-          ),
-        ],
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    seriesCard(eastFirstRound[0], 'East First Round'),
+                    seriesCard(eastFirstRound[3], 'East First Round'),
+                    seriesCard(eastFirstRound[2], 'East First Round'),
+                    seriesCard(eastFirstRound[1], 'East First Round'),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    seriesCard(eastConfSemis[0], 'East Conf Semis'),
+                    seriesCard(eastConfSemis[1], 'East Conf Semis'),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    seriesCard(eastConfFinals, 'East Conference Finals'),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 50),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    seriesCard(nbaFinals, 'NBA Finals'),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 50),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    seriesCard(westConfFinals, 'West Conference Finals'),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    seriesCard(westConfSemis[0], 'West Conf Semis'),
+                    seriesCard(westConfSemis[1], 'West Conf Semis'),
+                  ],
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height / 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    seriesCard(westFirstRound[0], 'West First Round'),
+                    seriesCard(westFirstRound[3], 'West First Round'),
+                    seriesCard(westFirstRound[2], 'West First Round'),
+                    seriesCard(westFirstRound[1], 'West First Round'),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -976,7 +986,7 @@ class BracketPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     Paint getPaint(String teamId) {
-      List<String> useSecondary = ['BKN', 'SAS'];
+      List<String> useSecondary = ['BKN', 'SAS', 'IND', 'MIN', 'UTA', 'PHX'];
       Color teamColor = useSecondary.contains(kTeamIdToName[teamId][1])
           ? kTeamColors[kTeamIdToName[teamId]?[1]]!['secondaryColor']!
           : kTeamColors[kTeamIdToName[teamId]?[1]]!['primaryColor']!;
@@ -1005,12 +1015,12 @@ class BracketPainter extends CustomPainter {
     /// EAST FIRST ROUND
     canvas.drawLine(
       Offset(size.width * 0.13, size.height * 0.06),
-      Offset(size.width * 0.13, size.height * 0.1375),
+      Offset(size.width * 0.13, size.height * 0.139),
       eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[0], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.375, size.height * 0.06),
-      Offset(size.width * 0.375, size.height * 0.1375),
+      Offset(size.width * 0.375, size.height * 0.139),
       eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[3], 1, season),
     );
     canvas.drawLine(
@@ -1032,12 +1042,12 @@ class BracketPainter extends CustomPainter {
     /// EAST FIRST ROUND
     canvas.drawLine(
       Offset(size.width * 0.625, size.height * 0.06),
-      Offset(size.width * 0.625, size.height * 0.1375),
+      Offset(size.width * 0.625, size.height * 0.139),
       eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[2], 1, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.875, size.height * 0.06),
-      Offset(size.width * 0.875, size.height * 0.1375),
+      Offset(size.width * 0.875, size.height * 0.139),
       eastFirstRound.isEmpty ? paint : choosePaint(eastFirstRound[1], 1, season),
     );
     canvas.drawLine(
@@ -1059,12 +1069,12 @@ class BracketPainter extends CustomPainter {
     /// EAST SEMIS
     canvas.drawLine(
       Offset(size.width * 0.7525, size.height * 0.215),
-      Offset(size.width * 0.7525, size.height * 0.295),
+      Offset(size.width * 0.7525, size.height * 0.2965),
       eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[1], 2, season),
     );
     canvas.drawLine(
       Offset(size.width * 0.2525, size.height * 0.215),
-      Offset(size.width * 0.2525, size.height * 0.295),
+      Offset(size.width * 0.2525, size.height * 0.2965),
       eastConfSemis.isEmpty ? paint : choosePaint(eastConfSemis[0], 2, season),
     );
     canvas.drawLine(
@@ -1099,12 +1109,12 @@ class BracketPainter extends CustomPainter {
 
     /// WEST SEMIS
     canvas.drawLine(
-      Offset(size.width * 0.7525, size.height * 0.765),
+      Offset(size.width * 0.7525, size.height * 0.7635),
       Offset(size.width * 0.7525, size.height * 0.835),
       westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[1], 2, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.2525, size.height * 0.765),
+      Offset(size.width * 0.2525, size.height * 0.7635),
       Offset(size.width * 0.2525, size.height * 0.835),
       westConfSemis.isEmpty ? paint : choosePaint(westConfSemis[0], 2, season),
     );
@@ -1126,12 +1136,12 @@ class BracketPainter extends CustomPainter {
 
     /// WEST FIRST ROUND
     canvas.drawLine(
-      Offset(size.width * 0.13, size.height * 0.925),
+      Offset(size.width * 0.13, size.height * 0.9235),
       Offset(size.width * 0.13, size.height),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[0], 1, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.375, size.height * 0.925),
+      Offset(size.width * 0.375, size.height * 0.9235),
       Offset(size.width * 0.375, size.height),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[3], 1, season),
     );
@@ -1153,12 +1163,12 @@ class BracketPainter extends CustomPainter {
 
     /// WEST FIRST ROUND
     canvas.drawLine(
-      Offset(size.width * 0.625, size.height * 0.925),
+      Offset(size.width * 0.625, size.height * 0.9235),
       Offset(size.width * 0.625, size.height),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[2], 1, season),
     );
     canvas.drawLine(
-      Offset(size.width * 0.875, size.height * 0.925),
+      Offset(size.width * 0.875, size.height * 0.9235),
       Offset(size.width * 0.875, size.height),
       westFirstRound.isEmpty ? paint : choosePaint(westFirstRound[1], 1, season),
     );

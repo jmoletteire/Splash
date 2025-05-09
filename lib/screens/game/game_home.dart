@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:splash/components/custom_icon_button.dart';
 import 'package:splash/components/spinning_ball_loading.dart';
 import 'package:splash/screens/game/play_by_play/play_by_play.dart';
+import 'package:splash/screens/standings/playoffs/playoff_bracket.dart';
 import 'package:splash/utilities/constants.dart';
 import 'package:splash/utilities/scroll/scroll_controller_notifier.dart';
 
@@ -16,6 +17,8 @@ import '../../utilities/game.dart';
 import '../../utilities/scroll/scroll_controller_provider.dart';
 import '../../utilities/team.dart';
 import '../search_screen.dart';
+import '../standings/playoffs/playoffs_cache.dart';
+import '../standings/playoffs/playoffs_network_helper.dart';
 import '../team/team_cache.dart';
 import '../team/team_home.dart';
 import 'boxscore/game_boxscore.dart';
@@ -69,6 +72,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   String moneyLine = '';
   String spread = '';
   String overUnder = '';
+  late Map<String, dynamic> playoffData;
 
   /// ******************************************************
   ///             Initialize Game Data & Timer
@@ -83,7 +87,9 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
 
   Future<void> getGame(String gameId, String gameDate) async {
     var fetchedGame = await Game().getGame(gameId, gameDate);
-    game = fetchedGame.first;
+    setState(() {
+      game = fetchedGame.first;
+    });
     _setTeams();
   }
 
@@ -101,6 +107,19 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       var team = fetchedTeam;
       teamCache.addTeam(teamId, team);
       return team;
+    }
+  }
+
+  Future<void> getPlayoffs(String season) async {
+    final playoffsCache = Provider.of<PlayoffCache>(context, listen: false);
+    if (playoffsCache.containsPlayoffs(season)) {
+      playoffData = playoffsCache.getPlayoffs(season)!;
+      setState(() {});
+    } else {
+      var fetchedPlayoffs = await PlayoffsNetworkHelper().getPlayoffs(season);
+      playoffData = fetchedPlayoffs;
+      playoffsCache.addPlayoffs(season, playoffData);
+      setState(() {});
     }
   }
 
@@ -140,12 +159,15 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
   }
 
   void _initializeControllers() {
-    int tabLength = 4;
+    int tabLength = 5;
 
     if (_isUpcoming) {
       tabLength -= 1;
     }
     if (!game.containsKey('ODDS')) {
+      tabLength -= 1;
+    }
+    if (game['seasonType'] != 'PLAYOFFS') {
       tabLength -= 1;
     }
 
@@ -183,6 +205,12 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
     _initializeGameState();
     _initializeControllers();
     _initializeTabListener();
+
+    if (widget.gameId.substring(2, 3) == '4') {
+      String season =
+          '20${widget.gameId.substring(3, 5)}-${int.parse(widget.gameId.substring(3, 5)) + 1}';
+      getPlayoffs(season);
+    }
 
     startPolling(widget.gameId, widget.gameDate);
 
@@ -238,13 +266,20 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
       List<String> gameTime = game['gameClock'].split(" ");
       return Row(
         children: [
-          Text(
-            awayScore.toString(),
-            style: kBebasBold.copyWith(
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) =>
+                ScaleTransition(scale: animation, child: child),
+            child: Text(
+              awayScore.toString(),
+              key: ValueKey<int>(awayScore), // Important to use a key to detect changes
+              style: kBebasBold.copyWith(
                 fontSize: 26.0.r,
                 color: awayScore > homeScore
                     ? Colors.white
-                    : (game['status'] == 3 ? Colors.grey : Colors.white)),
+                    : (game['status'] == 3 ? Colors.grey : Colors.white),
+              ),
+            ),
           ),
           SizedBox(width: 20.0.r),
           Column(
@@ -256,13 +291,20 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
             ],
           ),
           SizedBox(width: 20.0.r),
-          Text(
-            homeScore.toString(),
-            style: kBebasBold.copyWith(
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) =>
+                ScaleTransition(scale: animation, child: child),
+            child: Text(
+              homeScore.toString(),
+              key: ValueKey<int>(homeScore), // Important to use a key to detect changes
+              style: kBebasBold.copyWith(
                 fontSize: 26.0.r,
                 color: homeScore > awayScore
                     ? Colors.white
-                    : (game['status'] == 3 ? Colors.grey : Colors.white)),
+                    : (game['status'] == 3 ? Colors.grey : Colors.white),
+              ),
+            ),
           ),
         ],
       );
@@ -406,7 +448,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                         game: game,
                         isUpcoming: _isUpcoming,
                         odds: odds,
-                        gameTime: widget.gameTime,
+                        gameTime: pregame ? 'PREGAME' : game['gameClock'],
                       ),
                       collapseMode: CollapseMode.pin,
                     ),
@@ -425,6 +467,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
                   const Tab(text: 'Matchup'),
                   if (!_isUpcoming && game.containsKey('pbp')) const Tab(text: 'Play-By-Play'),
                   Tab(text: _isUpcoming ? 'Stats' : 'Box Score'),
+                  if (game['seasonType'] == 'PLAYOFFS') const Tab(text: 'Bracket')
                   // if (odds.isNotEmpty) const Tab(text: 'Odds')
                 ],
               ),
@@ -492,6 +535,7 @@ class _GameHomeState extends State<GameHome> with TickerProviderStateMixin {
               awayTeam: awayTeam,
               inProgress: game['status'] == 2,
             ),
+          if (game['seasonType'] == 'PLAYOFFS') PlayoffBracket(playoffData: playoffData)
           // if (odds.isNotEmpty)
           // Odds(key: const PageStorageKey('GameOdds'), odds: game['ODDS']?['BOOK']),
         ]),
@@ -689,15 +733,22 @@ class GameInfo extends StatelessWidget {
               ),
               const Spacer(),
               if (!isUpcoming)
-                Text(
-                  game['awayScore'].toString(),
-                  style: kBebasBold.copyWith(
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) =>
+                      ScaleTransition(scale: animation, child: child),
+                  child: Text(
+                    game['awayScore'].toString(),
+                    key: ValueKey<int>(game['awayScore']),
+                    style: kBebasBold.copyWith(
                       fontSize: 36.0.r,
                       color: game['awayScore'] > game['homeScore']
                           ? Colors.white
                           : game['status'] == 3
                               ? Colors.grey
-                              : Colors.white),
+                              : Colors.white,
+                    ),
+                  ),
                 ),
               if (!isUpcoming) const Spacer(),
               Column(
@@ -706,15 +757,22 @@ class GameInfo extends StatelessWidget {
               ),
               if (!isUpcoming) const Spacer(),
               if (!isUpcoming)
-                Text(
-                  game['homeScore'].toString(),
-                  style: kBebasBold.copyWith(
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) =>
+                      ScaleTransition(scale: animation, child: child),
+                  child: Text(
+                    game['homeScore'].toString(),
+                    key: ValueKey<int>(game['homeScore']),
+                    style: kBebasBold.copyWith(
                       fontSize: 36.0.r,
                       color: game['homeScore'] > game['awayScore']
                           ? Colors.white
                           : game['status'] == 3
                               ? Colors.grey
-                              : Colors.white),
+                              : Colors.white,
+                    ),
+                  ),
                 ),
               const Spacer(),
               GestureDetector(

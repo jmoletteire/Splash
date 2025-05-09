@@ -173,28 +173,28 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
         dynamic jsonData = await network.getData(url);
         List<dynamic> gamesData = jsonData ?? {};
 
-        gamesData.sort((a, b) {
-          int getStatusPriority(int status) {
-            // Assign priority: 2 has the highest priority, then 1, and 3 last
-            if (status == 2) return 1;
-            if (status == 1) return 2;
-            return 3; // For status 3 or any other value
-          }
-
-          var aStatus = int.parse((a['status'] ?? 0).toString());
-          var bStatus = int.parse((b['status'] ?? 0).toString());
-
-          // Compare based on custom priority
-          int statusCompare = getStatusPriority(aStatus).compareTo(getStatusPriority(bStatus));
-          if (statusCompare != 0) {
-            return statusCompare;
-          } else {
-            // If statuses are the same, fall back to sorting by game ID
-            var aSequence = a['gameId'] ?? 0;
-            var bSequence = b['gameId'] ?? 0;
-            return aSequence.compareTo(bSequence);
-          }
-        });
+        // gamesData.sort((a, b) {
+        //   int getStatusPriority(int status) {
+        //     // Assign priority: 2 has the highest priority, then 1, and 3 last
+        //     if (status == 2) return 1;
+        //     if (status == 1) return 2;
+        //     return 3; // For status 3 or any other value
+        //   }
+        //
+        //   var aStatus = int.parse((a['status'] ?? 0).toString());
+        //   var bStatus = int.parse((b['status'] ?? 0).toString());
+        //
+        //   // Compare based on custom priority
+        //   int statusCompare = getStatusPriority(aStatus).compareTo(getStatusPriority(bStatus));
+        //   if (statusCompare != 0) {
+        //     return statusCompare;
+        //   } else {
+        //     // If statuses are the same, fall back to sorting by game ID
+        //     var aSequence = a['gameId'] ?? 0;
+        //     var bSequence = b['gameId'] ?? 0;
+        //     return aSequence.compareTo(bSequence);
+        //   }
+        // });
 
         setState(() {
           games[formattedDate] = gamesData;
@@ -225,14 +225,14 @@ class ScoreboardState extends State<Scoreboard> with SingleTickerProviderStateMi
       dynamic jsonData = await network.getData(url);
       List<dynamic> gamesData = jsonData ?? {};
 
-      gamesData.sort((a, b) {
-        var aValue, bValue;
-
-        aValue = a['gameId'] ?? 0;
-        bValue = b['gameId'] ?? 0;
-
-        return aValue.compareTo(bValue);
-      });
+      // gamesData.sort((a, b) {
+      //   var aValue, bValue;
+      //
+      //   aValue = a['gameId'] ?? 0;
+      //   bValue = b['gameId'] ?? 0;
+      //
+      //   return aValue.compareTo(bValue);
+      // });
 
       setState(() {
         games[formattedDate] = gamesData;

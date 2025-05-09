@@ -858,8 +858,8 @@ class _PlaysState extends State<Plays> {
                             ),
                           ),
                         ),
-                        if (widget.actions[i]['personId'] != 0) SizedBox(width: 8.0.r),
-                        if (widget.actions[i]['personId'] != 0)
+                        if (widget.actions[i]['personId'] != '0') SizedBox(width: 8.0.r),
+                        if (widget.actions[i]['personId'] != '0')
                           Expanded(
                             flex: 1,
                             child: GestureDetector(
