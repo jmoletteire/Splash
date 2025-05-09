@@ -18,8 +18,8 @@ def line_score(boxscore):
     periods = {str(period['period']): {"home": "0", "away": "0"} for period in home}
 
     for period, scores in periods.items():
-        scores['home'] = str(home[int(period) - 1])
-        scores['away'] = str(away[int(period) - 1])
+        scores['home'] = str(home[int(period) - 1].get("score", 0))
+        scores['away'] = str(away[int(period) - 1].get("score", 0))
 
     return periods
 
